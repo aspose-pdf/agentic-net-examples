@@ -8,37 +8,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "annotated.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the annotation editor and bind the source PDF
-        PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        editor.BindPdf(inputPdf);
+        // Bind the PDF using the Facade, then add a markup annotation with UTC creation date
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        {
+            editor.BindPdf(inputPath);
 
-        // Access the underlying Document object
-        Document doc = editor.Document;
+            // Choose the page to place the annotation (1‑based indexing)
+            Page page = editor.Document.Pages[1];
 
-        // Create a Text (sticky‑note) annotation on the first page
-        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
-        TextAnnotation txtAnn = new TextAnnotation(doc);
-        txtAnn.Rect = rect;
-        txtAnn.Title    = "Note";
-        txtAnn.Contents = "Annotation with UTC creation date";
-        txtAnn.CreationDate = DateTime.UtcNow;   // set creation timestamp to current UTC time
+            // Define the annotation rectangle
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
 
-        // Add the annotation to the page
-        doc.Pages[1].Annotations.Add(txtAnn);
+            // Create a Text (markup) annotation
+            TextAnnotation annotation = new TextAnnotation(page, rect)
+            {
+                Title    = "Sample Note",
+                Contents = "This annotation was created programmatically.",
+                CreationDate = DateTime.UtcNow   // Set creation date to current UTC time
+            };
 
-        // Save the modified PDF
-        editor.Save(outputPdf);
-        editor.Close();
+            // Add the annotation to the page
+            page.Annotations.Add(annotation);
 
-        Console.WriteLine($"Annotation added. Output saved to '{outputPdf}'.");
+            // Save the modified document
+            editor.Save(outputPath);
+        }
+
+        Console.WriteLine($"Annotation with UTC creation date saved to '{outputPath}'.");
     }
 }

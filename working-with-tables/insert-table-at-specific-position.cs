@@ -1,51 +1,47 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text; // for MarginInfo if needed (actually MarginInfo is in Aspose.Pdf)
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_table.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!System.IO.File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF document
+        // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            // Choose the page where the table will be placed (first page in this example)
             Page page = doc.Pages[1];
 
             // Create a new table
             Table table = new Table();
 
-            // NOTE: Table does not have a Position property.
-            // Position is set via the Left and Top properties (coordinates in points).
-            // Set the desired X (left) and Y (top) coordinates.
-            float x = 100f; // X coordinate from the left edge
-            float y = 500f; // Y coordinate from the bottom edge
-            table.Left = x;
-            table.Top  = y;
-
-            // Optional: define column widths (comma‑separated or space‑separated string)
-            table.ColumnWidths = "100 100 100";
+            // Define column widths (optional)
+            table.ColumnWidths = "100 150 100";
 
             // Add a header row
             Row header = table.Rows.Add();
-            header.Cells.Add("Header 1");
-            header.Cells.Add("Header 2");
-            header.Cells.Add("Header 3");
+            header.Cells.Add("Product");
+            header.Cells.Add("Quantity");
+            header.Cells.Add("Price");
 
             // Add a data row
             Row data = table.Rows.Add();
-            data.Cells.Add("Cell 1");
-            data.Cells.Add("Cell 2");
-            data.Cells.Add("Cell 3");
+            data.Cells.Add("Widget A");
+            data.Cells.Add("10");
+            data.Cells.Add("$5.00");
+
+            // Set the absolute position of the table on the page using MarginInfo
+            // Left = X coordinate, Top = Y coordinate measured from the top of the page
+            table.Margin = new MarginInfo { Left = 100, Top = 500 };
 
             // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);

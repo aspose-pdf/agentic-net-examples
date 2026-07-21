@@ -5,101 +5,83 @@ using System.Threading.Tasks;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfAsyncDemo
+class Program
 {
-    public static class AsyncAnnotationHelper
+    static async Task Main(string[] args)
     {
-        // Asynchronously flattens all annotations in a PDF document.
-        public static Task FlattenAnnotationsAsync(string inputPdfPath, string outputPdfPath, CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_flattened.pdf";
 
-                // Load the source PDF (load rule).
-                using (Document doc = new Document(inputPdfPath))
-                {
-                    // Initialize the annotation editor facade.
-                    using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-                    {
-                        editor.BindPdf(doc);                     // Bind the document.
-                        editor.FlatteningAnnotations();          // Flatten all annotations.
-                        editor.Save(outputPdfPath);               // Save the modified PDF (save rule).
-                    }
-                }
-            }, cancellationToken);
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
         }
 
-        // Asynchronously deletes all annotations from a PDF document.
-        public static Task DeleteAllAnnotationsAsync(string inputPdfPath, string outputPdfPath, CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
+        // Asynchronously flatten all annotations in the PDF
+        await FlattenAnnotationsAsync(inputPdf, outputPdf, CancellationToken.None);
 
-                using (Document doc = new Document(inputPdfPath))
-                {
-                    using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-                    {
-                        editor.BindPdf(doc);
-                        editor.DeleteAnnotations();               // Remove every annotation.
-                        editor.Save(outputPdfPath);
-                    }
-                }
-            }, cancellationToken);
-        }
-
-        // Asynchronously imports annotations from an FDF file into a PDF document.
-        public static Task ImportAnnotationsFromFdfAsync(string inputPdfPath, string fdfFilePath, string outputPdfPath, CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                using (Document doc = new Document(inputPdfPath))
-                {
-                    using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-                    {
-                        editor.BindPdf(doc);
-                        editor.ImportAnnotationsFromFdf(fdfFilePath); // Import FDF annotations.
-                        editor.Save(outputPdfPath);
-                    }
-                }
-            }, cancellationToken);
-        }
-
-        // Asynchronously exports all annotations of a PDF document to an XFDF file.
-        public static Task ExportAnnotationsToXfdfAsync(string inputPdfPath, string xfdfOutputPath, CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                using (Document doc = new Document(inputPdfPath))
-                {
-                    using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-                    {
-                        editor.BindPdf(doc);
-                        // Export annotations to the specified XFDF stream (file stream used here).
-                        using (FileStream xfdfStream = new FileStream(xfdfOutputPath, FileMode.Create, FileAccess.Write))
-                        {
-                            editor.ExportAnnotationsToXfdf(xfdfStream);
-                        }
-                    }
-                }
-            }, cancellationToken);
-        }
+        Console.WriteLine($"Flattened PDF saved to '{outputPdf}'.");
     }
 
-    // Minimal entry point to satisfy the compiler. The program does not perform any work by default.
-    internal class Program
+    // Wraps PdfAnnotationEditor operations in Task.Run for non‑blocking execution
+    static Task FlattenAnnotationsAsync(string sourcePath, string destPath, CancellationToken cancellationToken)
     {
-        // Async Main is allowed and returns a Task.
-        private static async Task Main(string[] args)
+        return Task.Run(() =>
         {
-            // Example placeholder – can be removed or expanded.
-            Console.WriteLine("AsyncAnnotationHelper library loaded. No operation executed.");
-            await Task.CompletedTask;
-        }
+            // Initialize the editor and bind the source PDF
+            PdfAnnotationEditor editor = new PdfAnnotationEditor();
+            editor.BindPdf(sourcePath);
+
+            // Flatten all annotations
+            editor.FlatteningAnnotations();
+
+            // Save the modified PDF
+            editor.Save(destPath);
+
+            // Release resources
+            editor.Close();
+        }, cancellationToken);
+    }
+
+    // Example: delete all annotations asynchronously
+    static Task DeleteAllAnnotationsAsync(string sourcePath, string destPath, CancellationToken cancellationToken)
+    {
+        return Task.Run(() =>
+        {
+            PdfAnnotationEditor editor = new PdfAnnotationEditor();
+            editor.BindPdf(sourcePath);
+            editor.DeleteAnnotations();
+            editor.Save(destPath);
+            editor.Close();
+        }, cancellationToken);
+    }
+
+    // Example: import annotations from an FDF file asynchronously
+    static Task ImportAnnotationsFromFdfAsync(string sourcePath, string fdfPath, string destPath, CancellationToken cancellationToken)
+    {
+        return Task.Run(() =>
+        {
+            PdfAnnotationEditor editor = new PdfAnnotationEditor();
+            editor.BindPdf(sourcePath);
+            editor.ImportAnnotationsFromFdf(fdfPath);
+            editor.Save(destPath);
+            editor.Close();
+        }, cancellationToken);
+    }
+
+    // Example: export annotations to an XFDF file asynchronously
+    static Task ExportAnnotationsToXfdfAsync(string sourcePath, string xfdfPath, CancellationToken cancellationToken)
+    {
+        return Task.Run(() =>
+        {
+            PdfAnnotationEditor editor = new PdfAnnotationEditor();
+            editor.BindPdf(sourcePath);
+            using (var stream = File.Create(xfdfPath))
+            {
+                editor.ExportAnnotationsToXfdf(stream);
+            }
+            editor.Close();
+        }, cancellationToken);
     }
 }

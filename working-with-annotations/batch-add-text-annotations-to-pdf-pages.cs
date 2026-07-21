@@ -7,45 +7,51 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "annotated.pdf";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[i];
-
-                // Define the annotation rectangle (fully qualified to avoid ambiguity)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-                // Create a text annotation for the current page
-                TextAnnotation txtAnn = new TextAnnotation(page, rect)
+                // Iterate over all pages (1‑based indexing)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    Title    = $"Page {i}",
-                    Contents = $"Annotation on page {i}",
-                    Color    = Aspose.Pdf.Color.Yellow, // Background color of the annotation icon
-                    Open     = true,                    // Open the annotation pop‑up by default
-                    Icon     = TextIcon.Note            // Use the standard note icon
-                };
+                    Page page = doc.Pages[i];
 
-                // Add the annotation to the page's annotation collection
-                page.Annotations.Add(txtAnn);
+                    // Define the annotation rectangle (left, bottom, right, top)
+                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+                    // Create a text annotation for the current page
+                    TextAnnotation annotation = new TextAnnotation(page, rect)
+                    {
+                        Title = $"Note {i}",
+                        Contents = $"This is a text annotation on page {i}.",
+                        Open = true,
+                        Icon = TextIcon.Note,
+                        Color = Aspose.Pdf.Color.Yellow
+                    };
+
+                    // Add the annotation to the page's annotation collection
+                    page.Annotations.Add(annotation);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified document (Document.Save writes PDF regardless of extension)
-            doc.Save(outputPath);
+            Console.WriteLine($"Annotations added and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Text annotations added to each page. Saved as '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

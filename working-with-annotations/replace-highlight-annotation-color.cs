@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_custom_highlight.pdf";
+        const string outputPath = "highlight_modified.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,7 +16,7 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
             // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
@@ -24,27 +24,25 @@ class Program
             {
                 Page page = doc.Pages[pageNum];
 
-                // Iterate over all annotations on the page
-                for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
+                // Iterate through all annotations on the page
+                foreach (Annotation ann in page.Annotations)
                 {
-                    Annotation ann = page.Annotations[annIdx];
-
                     // Process only HighlightAnnotation instances
                     if (ann is HighlightAnnotation highlight)
                     {
-                        // Change the annotation's color to a custom shade.
-                        // Use Aspose.Pdf.Color to stay cross‑platform.
-                        highlight.Color = Color.FromRgb(0.9, 0.2, 0.2); // custom shade
+                        // Change the annotation color to a custom shade (light orange)
+                        highlight.Color = Color.FromRgb(255, 204, 128);
 
-                        // The appearance stream will be regenerated automatically on Save.
+                        // Ensure the appearance stream is regenerated with the new color.
+                        Annotation.UpdateAppearanceOnConvert = true;
                     }
                 }
             }
 
-            // Save the modified PDF (lifecycle rule: save inside using block)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

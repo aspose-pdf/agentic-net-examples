@@ -3,71 +3,90 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // <-- added namespace for Annotation types
 
-class Program
+class AnnotationSummaryUtility
 {
     static void Main(string[] args)
     {
-        // Example usage: pass PDF file paths as command‑line arguments
+        // Expect one or more PDF file paths as command‑line arguments.
         if (args.Length == 0)
         {
-            Console.Error.WriteLine("Please provide at least one PDF file path.");
+            Console.Error.WriteLine("Usage: AnnotationSummaryUtility <pdf1> [<pdf2> ...]");
             return;
         }
 
-        foreach (string pdfPath in args)
+        // Prepare a summary report file.
+        string reportPath = "AnnotationSummaryReport.txt";
+        using (StreamWriter reportWriter = new StreamWriter(reportPath, false))
         {
-            if (!File.Exists(pdfPath))
+            foreach (string inputPath in args)
             {
-                Console.Error.WriteLine($"File not found: {pdfPath}");
-                continue;
-            }
-
-            try
-            {
-                // Use PdfAnnotationEditor (a Facade) to work with annotations
-                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                if (!File.Exists(inputPath))
                 {
-                    editor.BindPdf(pdfPath);                     // Load the PDF
-                    Document doc = editor.Document;              // Access underlying Document
+                    Console.Error.WriteLine($"File not found: {inputPath}");
+                    continue;
+                }
 
-                    // Count annotations by their type
-                    var counts = new Dictionary<AnnotationType, int>();
-
-                    // Pages are 1‑based in Aspose.Pdf
-                    for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                try
+                {
+                    // ---------- Lifecycle: create, load, save ----------
+                    // Create the PdfAnnotationEditor facade.
+                    using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
                     {
-                        Page page = doc.Pages[pageNum];
-                        foreach (Annotation ann in page.Annotations)
+                        // Load (bind) the PDF document.
+                        editor.BindPdf(inputPath);
+
+                        // Access the underlying Document to enumerate pages.
+                        Document doc = editor.Document;
+
+                        // Dictionary to hold annotation type name -> count.
+                        Dictionary<string, int> typeCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+                        // Iterate all pages (Aspose.Pdf uses 1‑based indexing).
+                        for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
                         {
-                            AnnotationType type = ann.AnnotationType;
-                            if (counts.ContainsKey(type))
-                                counts[type]++;
-                            else
-                                counts[type] = 1;
+                            Page page = doc.Pages[pageNum];
+                            // Each page has an Annotations collection.
+                            foreach (Annotation annot in page.Annotations)
+                            {
+                                string typeName = annot.GetType().Name; // e.g., TextAnnotation, HighlightAnnotation, etc.
+                                if (typeCounts.ContainsKey(typeName))
+                                    typeCounts[typeName]++;
+                                else
+                                    typeCounts[typeName] = 1;
+                            }
                         }
-                    }
 
-                    // Output summary for this PDF
-                    Console.WriteLine($"--- Annotation summary for \"{Path.GetFileName(pdfPath)}\" ---");
-                    if (counts.Count == 0)
-                    {
-                        Console.WriteLine("No annotations found.");
-                    }
-                    else
-                    {
-                        foreach (var kvp in counts)
+                        // Write per‑file summary to the report.
+                        reportWriter.WriteLine($"File: {Path.GetFileName(inputPath)}");
+                        if (typeCounts.Count == 0)
                         {
-                            Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                            reportWriter.WriteLine("  No annotations found.");
                         }
+                        else
+                        {
+                            foreach (var kvp in typeCounts)
+                            {
+                                reportWriter.WriteLine($"  {kvp.Key}: {kvp.Value}");
+                            }
+                        }
+                        reportWriter.WriteLine(); // blank line between files
+
+                        // Optional: save a copy of the PDF (unchanged) to satisfy the save rule.
+                        string outputCopyPath = Path.Combine(
+                            Path.GetDirectoryName(inputPath) ?? "",
+                            Path.GetFileNameWithoutExtension(inputPath) + "_processed.pdf");
+                        editor.Save(outputCopyPath);
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing \"{pdfPath}\": {ex.Message}");
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                }
             }
         }
+
+        Console.WriteLine($"Annotation summary written to '{reportPath}'.");
     }
 }

@@ -1,42 +1,34 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;               // PageSize enum
+using Aspose.Pdf.Facades;      // PdfFileEditor facade
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF and the resulting booklet PDF
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "booklet.pdf";
+        const string inputPath  = "input.pdf";      // source PDF
+        const string outputPath = "booklet.pdf";    // booklet output
 
-        // Ensure the input file exists before proceeding
-        if (!File.Exists(inputPdfPath))
+        // Verify that the source file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Open the input PDF as a read‑only stream and the output PDF as a writeable stream
-        using (FileStream inputStream = new FileStream(inputPdfPath, FileMode.Open, FileAccess.Read))
-        using (FileStream outputStream = new FileStream(outputPdfPath, FileMode.Create, FileAccess.Write))
+        // Open input and output streams inside using blocks for deterministic disposal
+        using (FileStream inputStream  = new FileStream(inputPath,  FileMode.Open,  FileAccess.Read))
+        using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
         {
-            // Define a custom page size of 5.5 x 8.5 inches.
-            // 1 inch = 72 points, so width = 5.5 * 72, height = 8.5 * 72.
-            PageSize customPageSize = new PageSize(5.5f * 72f, 8.5f * 72f);
-
-            // Create the PdfFileEditor facade and generate the booklet.
+            // Instantiate the PdfFileEditor facade (does not implement IDisposable)
             PdfFileEditor editor = new PdfFileEditor();
-            bool success = editor.MakeBooklet(inputStream, outputStream, customPageSize);
 
-            if (!success)
-            {
-                Console.Error.WriteLine("Failed to create booklet.");
-                return;
-            }
+            // Create a booklet from the input stream, write to the output stream,
+            // and set a custom page size (e.g., A5). PageSize is an enum; choose the size you need.
+            bool result = editor.MakeBooklet(inputStream, outputStream, PageSize.A5);
+
+            Console.WriteLine(result ? "Booklet created successfully." : "Failed to create booklet.");
         }
-
-        Console.WriteLine($"Booklet created successfully: {outputPdfPath}");
     }
 }

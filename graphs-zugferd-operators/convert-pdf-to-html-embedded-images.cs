@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core API
-using Aspose.Pdf.Facades;            // For potential custom handling (not required here)
+using Aspose.Pdf;
 
 class Program
 {
@@ -10,6 +9,7 @@ class Program
         const string inputPdf  = "input.pdf";
         const string outputHtml = "output.html";
 
+        // Verify the source PDF exists.
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
@@ -19,30 +19,22 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal.
         using (Document pdfDoc = new Document(inputPdf))
         {
-            // Configure HTML save options:
-            // - Embed all resources (CSS, fonts, images) directly into the HTML file.
-            // - Store raster images as PNGs embedded into SVG wrappers as Base64 strings.
-            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
-            {
-                PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
-            };
+            // Configure HTML save options.
+            HtmlSaveOptions saveOptions = new HtmlSaveOptions();
 
-            // Save to HTML. On non‑Windows platforms this may throw a TypeInitializationException
-            // because HTML conversion relies on GDI+. Wrap it to avoid crashes.
-            try
-            {
-                pdfDoc.Save(outputHtml, htmlOpts);
-                Console.WriteLine($"PDF successfully converted to HTML: '{outputHtml}'");
-            }
-            catch (TypeInitializationException)
-            {
-                Console.WriteLine("HTML conversion requires Windows GDI+. Skipped on this platform.");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error during conversion: {ex.Message}");
-            }
+            // Embed all external resources (CSS, fonts, images) directly into the HTML file.
+            saveOptions.PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml;
+
+            // Embed raster images as Base64 strings inside SVG wrappers.
+            saveOptions.RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg;
+
+            // Optional: set a title for the generated HTML page.
+            saveOptions.Title = Path.GetFileNameWithoutExtension(inputPdf);
+
+            // Save the PDF as HTML using the configured options.
+            pdfDoc.Save(outputHtml, saveOptions);
         }
+
+        Console.WriteLine($"PDF successfully converted to HTML with embedded images: {outputHtml}");
     }
 }

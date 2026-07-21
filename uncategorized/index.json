@@ -1,0 +1,27 @@
+{
+  "category": "uncategorized",
+  "nuget_version": "26.7.0",
+  "last_updated": "2026-07-18T01:34:20Z",
+  "examples": {
+    "merge-two-pdfs": {
+      "title": "Merge Two PDFs into One",
+      "filename": "merge-two-pdfs.cs",
+      "description": "Demonstrates loading two PDF files with Aspose.Pdf, merging them into a single document, and saving the combined PDF.",
+      "tags": [
+        "pdf",
+        "merge",
+        "aspose",
+        "document",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Merge",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T01:34:20Z",
+      "status": "verified"
+    }
+  }
+}

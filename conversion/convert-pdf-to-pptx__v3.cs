@@ -1,32 +1,27 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Document, SaveFormat
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF and output PPTX paths
-        const string pdfPath = "input.pdf";
-        const string outputPptx = "output.pptx";
+        const string pdfPath = "input.pdf";          // Source PDF
+        const string pptxPath = "output.pptx";        // Resulting PPTX file
 
-        // Validate input file
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {pdfPath}");
             return;
         }
 
         // ---------- Convert PDF to PPTX ----------
-        // Aspose.Pdf can directly save a PDF document as a PPTX file.
-        // The original requirement to apply a custom slide master would need
-        // Aspose.Slides, which is not referenced in this project. Therefore the
-        // conversion is performed without master‑template manipulation.
         using (Document pdfDoc = new Document(pdfPath))
         {
-            pdfDoc.Save(outputPptx, SaveFormat.Pptx);
+            // Aspose.Pdf can directly save a PDF as PPTX using SaveFormat.Pptx.
+            pdfDoc.Save(pptxPath, SaveFormat.Pptx);
         }
 
-        Console.WriteLine($"Conversion complete. Output saved to '{outputPptx}'.");
+        Console.WriteLine($"Conversion complete. PPTX saved to '{pptxPath}'.");
     }
 }

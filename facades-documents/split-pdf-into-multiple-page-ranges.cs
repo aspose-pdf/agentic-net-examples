@@ -6,12 +6,12 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputFolder = "SplitBulks";
+        const string inputPath = "input.pdf";
+        const string outputFolder = "Bulks";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
@@ -26,28 +26,21 @@ class Program
             new int[] { 6, 10 }   // pages 6‑10
         };
 
-        // PdfFileEditor does not implement IDisposable; instantiate directly
+        // Split the PDF into the specified bulks
         PdfFileEditor editor = new PdfFileEditor();
+        MemoryStream[] bulks = editor.SplitToBulks(inputPath, ranges);
 
-        // Split the PDF into the specified bulks; each MemoryStream holds a PDF document
-        MemoryStream[] bulks = editor.SplitToBulks(inputPdf, ranges);
-
-        // Save each bulk to a separate PDF file
+        // Save each resulting MemoryStream to a separate PDF file
         for (int i = 0; i < bulks.Length; i++)
         {
-            // Reset stream position before reading
-            bulks[i].Position = 0;
-
-            string outPath = Path.Combine(outputFolder, $"part{i + 1}.pdf");
-            using (FileStream file = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+            string outPath = Path.Combine(outputFolder, $"part_{i + 1}.pdf");
+            using (MemoryStream ms = bulks[i])
+            using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
             {
-                bulks[i].CopyTo(file);
+                ms.Position = 0; // reset stream position before copying
+                ms.CopyTo(fs);
             }
-
-            // Dispose the MemoryStream after saving
-            bulks[i].Dispose();
-
-            Console.WriteLine($"Saved bulk {i + 1} to '{outPath}'.");
+            Console.WriteLine($"Saved bulk {i + 1} to '{outPath}'");
         }
     }
 }

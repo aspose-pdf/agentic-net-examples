@@ -1,133 +1,128 @@
 # Document
 
-> **Document** in PDF using C# / .NET -- **122** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Document** in PDF using C# / .NET -- **117** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `document`
-- Examples: 122
-- NuGet: `Aspose.PDF 26.6.0` -- target `net10.0`
+- Examples: 117
+- NuGet: `Aspose.PDF 26.7.0` -- target `net10.0`
 
 ## Examples
 
-- [`add-accessibility-tags-to-pdf.cs`](./add-accessibility-tags-to-pdf.cs) -- Add accessibility tags to pdf
-- [`add-automatic-page-numbers-to-pdf.cs`](./add-automatic-page-numbers-to-pdf.cs) -- Add automatic page numbers to pdf
 - [`add-background-color-to-pdf-page.cs`](./add-background-color-to-pdf-page.cs) -- Add background color to pdf page
-- [`add-background-template-to-all-pdf-pages.cs`](./add-background-template-to-all-pdf-pages.cs) -- Add background template to all pdf pages
 - [`add-captions-below-images-in-pdf.cs`](./add-captions-below-images-in-pdf.cs) -- Add captions below images in pdf
 - [`add-checked-checkbox-form-field.cs`](./add-checked-checkbox-form-field.cs) -- Add checked checkbox form field
 - [`add-company-logo-header-to-pdf-pages.cs`](./add-company-logo-header-to-pdf-pages.cs) -- Add company logo header to pdf pages
-- [`add-custom-xml-metadata-to-pdf.cs`](./add-custom-xml-metadata-to-pdf.cs) -- Add custom xml metadata to pdf
-- [`add-digital-signature-field-and-sign-pdf.cs`](./add-digital-signature-field-and-sign-pdf.cs) -- Add digital signature field and sign pdf
-- [`add-digital-signature-with-timestamp.cs`](./add-digital-signature-with-timestamp.cs) -- Add digital signature with timestamp
+- [`add-custom-signature-appearance-last-page.cs`](./add-custom-signature-appearance-last-page.cs) -- Add custom signature appearance last page
+- [`add-custom-xml-xmp-metadata-to-pdf.cs`](./add-custom-xml-xmp-metadata-to-pdf.cs) -- Add custom xml xmp metadata to pdf
+- [`add-diagonal-text-stamp-to-pdf-pages.cs`](./add-diagonal-text-stamp-to-pdf-pages.cs) -- Add diagonal text stamp to pdf pages
+- [`add-digital-signature-to-pdf.cs`](./add-digital-signature-to-pdf.cs) -- Add digital signature to pdf
 - [`add-dynamic-heading-to-pdf.cs`](./add-dynamic-heading-to-pdf.cs) -- Add dynamic heading to pdf
-- [`add-header-current-date-javascript.cs`](./add-header-current-date-javascript.cs) -- Add header current date javascript
+- [`add-heading-to-pdf-outline.cs`](./add-heading-to-pdf-outline.cs) -- Add heading to pdf outline
 - [`add-hyperlink-annotation-to-pdf.cs`](./add-hyperlink-annotation-to-pdf.cs) -- Add hyperlink annotation to pdf
-- [`add-javascript-calculation-to-pdf-form.cs`](./add-javascript-calculation-to-pdf-form.cs) -- Add javascript calculation to pdf form
-- [`add-javascript-sum-calculation-to-pdf-form.cs`](./add-javascript-sum-calculation-to-pdf-form.cs) -- Add javascript sum calculation to pdf form
-- [`add-line-annotation-with-color-and-thickness.cs`](./add-line-annotation-with-color-and-thickness.cs) -- Add line annotation with color and thickness
-- [`add-link-annotation-open-embedded-pdf.cs`](./add-link-annotation-open-embedded-pdf.cs) -- Add link annotation open embedded pdf
-- [`add-multi-level-toc-to-pdf.cs`](./add-multi-level-toc-to-pdf.cs) -- Add multi level toc to pdf
-- [`add-open-action-javascript-to-pdf.cs`](./add-open-action-javascript-to-pdf.cs) -- Add open action javascript to pdf
-- [`add-outline-item-to-pdf.cs`](./add-outline-item-to-pdf.cs) -- Add outline item to pdf
-- [`add-page-count-footer-to-pdf-pages.cs`](./add-page-count-footer-to-pdf-pages.cs) -- Add page count footer to pdf pages
+- [`add-indented-paragraph-with-line-spacing.cs`](./add-indented-paragraph-with-line-spacing.cs) -- Add indented paragraph with line spacing
+- [`add-javascript-calculation-to-pdf-form-fields.cs`](./add-javascript-calculation-to-pdf-form-fields.cs) -- Add javascript calculation to pdf form fields
+- [`add-javascript-open-action-to-pdf.cs`](./add-javascript-open-action-to-pdf.cs) -- Add javascript open action to pdf
+- [`add-javascript-total-calculation-to-pdf-form.cs`](./add-javascript-total-calculation-to-pdf-form.cs) -- Add javascript total calculation to pdf form
+- [`add-line-annotation-custom-color-thickness.cs`](./add-line-annotation-custom-color-thickness.cs) -- Add line annotation custom color thickness
+- [`add-line-separator-annotation-to-pdf-page.cs`](./add-line-separator-annotation-to-pdf-page.cs) -- Add line separator annotation to pdf page
+- [`add-link-annotation-open-pdf-attachment.cs`](./add-link-annotation-open-pdf-attachment.cs) -- Add link annotation open pdf attachment
+- [`add-page-number-footer-to-pdf.cs`](./add-page-number-footer-to-pdf.cs) -- Add page number footer to pdf
 - [`add-page-numbers-to-pdf-footer.cs`](./add-page-numbers-to-pdf-footer.cs) -- Add page numbers to pdf footer
-- [`add-paragraph-indentation-line-spacing.cs`](./add-paragraph-indentation-line-spacing.cs) -- Add paragraph indentation line spacing
 - [`add-popup-note-annotation.cs`](./add-popup-note-annotation.cs) -- Add popup note annotation
-- [`add-read-only-text-field-to-pdf.cs`](./add-read-only-text-field-to-pdf.cs) -- Add read only text field to pdf
-- [`add-separator-line-annotation.cs`](./add-separator-line-annotation.cs) -- Add separator line annotation
-- [`add-signature-field-with-styled-appearance.cs`](./add-signature-field-with-styled-appearance.cs) -- Add signature field with styled appearance
-- [`add-signature-image-to-last-page.cs`](./add-signature-image-to-last-page.cs) -- Add signature image to last page
-- [`add-structured-headings-and-toc.cs`](./add-structured-headings-and-toc.cs) -- Add structured headings and toc
-- [`add-styled-table-with-borders-and-alternating-row-colors.cs`](./add-styled-table-with-borders-and-alternating-row-colors.cs) -- Add styled table with borders and alternating row colors
-- [`add-text-stamp-to-pdf-pages.cs`](./add-text-stamp-to-pdf-pages.cs) -- Add text stamp to pdf pages
+- [`add-reusable-background-image-to-all-pdf-pages.cs`](./add-reusable-background-image-to-all-pdf-pages.cs) -- Add reusable background image to all pdf pages
+- [`add-signature-field-to-pdf.cs`](./add-signature-field-to-pdf.cs) -- Add signature field to pdf
+- [`add-structured-headings-to-pdf.cs`](./add-structured-headings-to-pdf.cs) -- Add structured headings to pdf
+- [`add-styled-table-with-borders-to-pdf.cs`](./add-styled-table-with-borders-to-pdf.cs) -- Add styled table with borders to pdf
 - [`add-visible-signature-field-and-lock-pdf.cs`](./add-visible-signature-field-and-lock-pdf.cs) -- Add visible signature field and lock pdf
-- [`add-watermark-layer-merge-pdf-layers.cs`](./add-watermark-layer-merge-pdf-layers.cs) -- Add watermark layer merge pdf layers
 - [`apply-semi-transparent-image-watermark-to-pdf.cs`](./apply-semi-transparent-image-watermark-to-pdf.cs) -- Apply semi transparent image watermark to pdf
-- [`attach-pdf-portfolio-with-description.cs`](./attach-pdf-portfolio-with-description.cs) -- Attach pdf portfolio with description
-- [`audit-pdf-sanitization-logging.cs`](./audit-pdf-sanitization-logging.cs) -- Audit pdf sanitization logging
+- [`attach-pdf-portfolio-with-metadata.cs`](./attach-pdf-portfolio-with-metadata.cs) -- Attach pdf portfolio with metadata
+- [`auto-tagging-and-headings-pdf.cs`](./auto-tagging-and-headings-pdf.cs) -- Auto tagging and headings pdf
 - [`batch-sanitize-pdfs.cs`](./batch-sanitize-pdfs.cs) -- Batch sanitize pdfs
 - [`check-pdf-incremental-updates.cs`](./check-pdf-incremental-updates.cs) -- Check pdf incremental updates
-- [`clean-pdf-remove-metadata-embedded-files.cs`](./clean-pdf-remove-metadata-embedded-files.cs) -- Clean pdf remove metadata embedded files
-- [`combine-multiple-html-to-pdf.cs`](./combine-multiple-html-to-pdf.cs) -- Combine multiple html to pdf
-- [`compress-pdf-images-and-convert-pages-to-jpeg.cs`](./compress-pdf-images-and-convert-pages-to-jpeg.cs) -- Compress pdf images and convert pages to jpeg
+- [`clean-pdf-remove-metadata-attachments-javascript.cs`](./clean-pdf-remove-metadata-attachments-javascript.cs) -- Clean pdf remove metadata attachments javascript
 - [`convert-pdf-pages-to-high-resolution-tiff.cs`](./convert-pdf-pages-to-high-resolution-tiff.cs) -- Convert pdf pages to high resolution tiff
-- [`convert-pdf-pages-to-images-html-150-dpi.cs`](./convert-pdf-pages-to-images-html-150-dpi.cs) -- Convert pdf pages to images html 150 dpi
+- [`convert-pdf-pages-to-jpeg-images.cs`](./convert-pdf-pages-to-jpeg-images.cs) -- Convert pdf pages to jpeg images
 - [`convert-pdf-pages-to-jpeg-no-compression.cs`](./convert-pdf-pages-to-jpeg-no-compression.cs) -- Convert pdf pages to jpeg no compression
-- [`convert-pdf-pages-to-png-images.cs`](./convert-pdf-pages-to-png-images.cs) -- Convert pdf pages to png images
-- [`convert-pdf-pages-to-png-images__v2.cs`](./convert-pdf-pages-to-png-images__v2.cs) -- Convert pdf pages to png images  v2
+- [`convert-pdf-pages-to-jpeg-quality-80.cs`](./convert-pdf-pages-to-jpeg-quality-80.cs) -- Convert pdf pages to jpeg quality 80
+- [`convert-pdf-to-html-with-rasterized-pages.cs`](./convert-pdf-to-html-with-rasterized-pages.cs) -- Convert pdf to html with rasterized pages
+- [`convert-pdf-to-html.cs`](./convert-pdf-to-html.cs) -- Convert pdf to html
 - [`create-5x7-inch-postcard-pdf.cs`](./create-5x7-inch-postcard-pdf.cs) -- Create 5x7 inch postcard pdf
+- [`create-hierarchical-numbered-headings.cs`](./create-hierarchical-numbered-headings.cs) -- Create hierarchical numbered headings
+- [`create-landscape-pdf-page.cs`](./create-landscape-pdf-page.cs) -- Create landscape pdf page
+- [`create-magazine-pdf-with-text-and-image.cs`](./create-magazine-pdf-with-text-and-image.cs) -- Create magazine pdf with text and image
 - [`create-multi-page-table-pdf.cs`](./create-multi-page-table-pdf.cs) -- Create multi page table pdf
 - [`create-pdf-clickable-table-of-contents.cs`](./create-pdf-clickable-table-of-contents.cs) -- Create pdf clickable table of contents
 - [`create-pdf-dynamic-table.cs`](./create-pdf-dynamic-table.cs) -- Create pdf dynamic table
-- [`create-pdf-form-with-radio-buttons.cs`](./create-pdf-form-with-radio-buttons.cs) -- Create pdf form with radio buttons
+- [`create-pdf-from-multiple-html-fragments.cs`](./create-pdf-from-multiple-html-fragments.cs) -- Create pdf from multiple html fragments
+- [`create-pdf-multiple-page-sizes-orientations.cs`](./create-pdf-multiple-page-sizes-orientations.cs) -- Create pdf multiple page sizes orientations
 - [`create-pdf-portfolio.cs`](./create-pdf-portfolio.cs) -- Create pdf portfolio
-- [`create-pdf-roman-headings-validate-sequence.cs`](./create-pdf-roman-headings-validate-sequence.cs) -- Create pdf roman headings validate sequence
-- [`create-pdf-table-with-merged-header-cells.cs`](./create-pdf-table-with-merged-header-cells.cs) -- Create pdf table with merged header cells
-- [`create-pdf-table-with-rich-text.cs`](./create-pdf-table-with-rich-text.cs) -- Create pdf table with rich text
-- [`create-pdf-title-page-custom-font-color.cs`](./create-pdf-title-page-custom-font-color.cs) -- Create pdf title page custom font color
+- [`create-pdf-roman-headings-validation.cs`](./create-pdf-roman-headings-validation.cs) -- Create pdf roman headings validation
+- [`create-pdf-table-with-rich-text-formatting.cs`](./create-pdf-table-with-rich-text-formatting.cs) -- Create pdf table with rich text formatting
+- [`create-pdf-title-page-custom-font.cs`](./create-pdf-title-page-custom-font.cs) -- Create pdf title page custom font
 - [`create-pdf-with-background-template.cs`](./create-pdf-with-background-template.cs) -- Create pdf with background template
-- [`create-pdf-with-clickable-email-link.cs`](./create-pdf-with-clickable-email-link.cs) -- Create pdf with clickable email link
 - [`create-pdf-with-clickable-index.cs`](./create-pdf-with-clickable-index.cs) -- Create pdf with clickable index
-- [`create-pdf-with-date-picker.cs`](./create-pdf-with-date-picker.cs) -- Create pdf with date picker
-- [`create-pdf-with-dropdown-form.cs`](./create-pdf-with-dropdown-form.cs) -- Create pdf with dropdown form
+- [`create-pdf-with-date-picker-form-field.cs`](./create-pdf-with-date-picker-form-field.cs) -- Create pdf with date picker form field
+- [`create-pdf-with-dropdown-list.cs`](./create-pdf-with-dropdown-list.cs) -- Create pdf with dropdown list
+- [`create-pdf-with-email-link.cs`](./create-pdf-with-email-link.cs) -- Create pdf with email link
 - [`create-pdf-with-embedded-truetype-font.cs`](./create-pdf-with-embedded-truetype-font.cs) -- Create pdf with embedded truetype font
-- [`create-pdf-with-headings-and-sanitize.cs`](./create-pdf-with-headings-and-sanitize.cs) -- Create pdf with headings and sanitize
 - [`create-pdf-with-level-1-heading.cs`](./create-pdf-with-level-1-heading.cs) -- Create pdf with level 1 heading
-- [`create-rotated-landscape-pdf-page.cs`](./create-rotated-landscape-pdf-page.cs) -- Create rotated landscape pdf page
-- [`create-searchable-pdf-invisible-text.cs`](./create-searchable-pdf-invisible-text.cs) -- Create searchable pdf invisible text
+- [`create-pdf-with-radio-button-form.cs`](./create-pdf-with-radio-button-form.cs) -- Create pdf with radio button form
+- [`create-read-only-text-field.cs`](./create-read-only-text-field.cs) -- Create read only text field
+- [`create-sanitize-pdf-with-auto-numbered-headings.cs`](./create-sanitize-pdf-with-auto-numbered-headings.cs) -- Create sanitize pdf with auto numbered headings
+- [`create-searchable-pdf-from-scanned-images.cs`](./create-searchable-pdf-from-scanned-images.cs) -- Create searchable pdf from scanned images
 - [`create-zugferd-pdf-invoice.cs`](./create-zugferd-pdf-invoice.cs) -- Create zugferd pdf invoice
 - [`customize-crash-report-filename.cs`](./customize-crash-report-filename.cs) -- Customize crash report filename
-- [`customize-pdf-toc-formatting.cs`](./customize-pdf-toc-formatting.cs) -- Customize pdf toc formatting
 - [`detect-hidden-annotations-in-pdf.cs`](./detect-hidden-annotations-in-pdf.cs) -- Detect hidden annotations in pdf
+- [`digitally-sign-pdf-with-timestamp.cs`](./digitally-sign-pdf-with-timestamp.cs) -- Digitally sign pdf with timestamp
 - [`embed-zugferd-xml-into-pdf.cs`](./embed-zugferd-xml-into-pdf.cs) -- Embed zugferd xml into pdf
-- [`encrypt-pdf-aes256-restrict-print-copy.cs`](./encrypt-pdf-aes256-restrict-print-copy.cs) -- Encrypt pdf aes256 restrict print copy
-- [`encrypt-pdf-with-passwords-and-permissions.cs`](./encrypt-pdf-with-passwords-and-permissions.cs) -- Encrypt pdf with passwords and permissions
+- [`encrypt-pdf-aes256-restrict-permissions.cs`](./encrypt-pdf-aes256-restrict-permissions.cs) -- Encrypt pdf aes256 restrict permissions
+- [`encrypt-pdf-with-user-owner-passwords.cs`](./encrypt-pdf-with-user-owner-passwords.cs) -- Encrypt pdf with user owner passwords
 - [`extract-embedded-files-from-pdf-portfolio.cs`](./extract-embedded-files-from-pdf-portfolio.cs) -- Extract embedded files from pdf portfolio
 - [`extract-hyperlinks-from-pdf.cs`](./extract-hyperlinks-from-pdf.cs) -- Extract hyperlinks from pdf
 - [`extract-images-from-pdf-to-png.cs`](./extract-images-from-pdf-to-png.cs) -- Extract images from pdf to png
 - [`extract-pdf-outline-hierarchy.cs`](./extract-pdf-outline-hierarchy.cs) -- Extract pdf outline hierarchy
-- [`extract-text-from-pdf-pages.cs`](./extract-text-from-pdf-pages.cs) -- Extract text from pdf pages
+- [`extract-text-from-pdf-page-range.cs`](./extract-text-from-pdf-page-range.cs) -- Extract text from pdf page range
 - [`extract-text-from-pdf-to-utf8-file.cs`](./extract-text-from-pdf-to-utf8-file.cs) -- Extract text from pdf to utf8 file
 - [`extract-xmp-metadata-from-pdf.cs`](./extract-xmp-metadata-from-pdf.cs) -- Extract xmp metadata from pdf
 - [`flatten-pdf-form-fields.cs`](./flatten-pdf-form-fields.cs) -- Flatten pdf form fields
-- [`generate-crash-report-for-pdfexception.cs`](./generate-crash-report-for-pdfexception.cs) -- Generate crash report for pdfexception
-- [`generate-crash-report-pdf.cs`](./generate-crash-report-pdf.cs) -- Generate crash report pdf
-- [`generate-crash-report-with-custom-output-directory.cs`](./generate-crash-report-with-custom-output-directory.cs) -- Generate crash report with custom output directory
-- [`generate-crash-report-with-custom-stack-trace.cs`](./generate-crash-report-with-custom-stack-trace.cs) -- Generate crash report with custom stack trace
-- [`generate-pdf-crash-report-to-network-share.cs`](./generate-pdf-crash-report-to-network-share.cs) -- Generate pdf crash report to network share
-- [`hierarchical-numbered-headings.cs`](./hierarchical-numbered-headings.cs) -- Hierarchical numbered headings
-- [`insert-a-page-from-one-pdf-into-another-at-a-specified-position.cs`](./insert-a-page-from-one-pdf-into-another-at-a-specified-position.cs) -- Insert a page from one pdf into another at a specified position
+- [`generate-accessible-pdf-with-tags.cs`](./generate-accessible-pdf-with-tags.cs) -- Generate accessible pdf with tags
+- [`generate-crash-report-for-pdf-exceptions.cs`](./generate-crash-report-for-pdf-exceptions.cs) -- Generate crash report for pdf exceptions
+- [`generate-crash-report-to-network-share.cs`](./generate-crash-report-to-network-share.cs) -- Generate crash report to network share
+- [`generate-pdf-crash-report.cs`](./generate-pdf-crash-report.cs) -- Generate pdf crash report
+- [`generate-pdf-crash-report__v2.cs`](./generate-pdf-crash-report__v2.cs) -- Generate pdf crash report  v2
+- [`handle-pdf-errors-generate-crash-report.cs`](./handle-pdf-errors-generate-crash-report.cs) -- Handle pdf errors generate crash report
+- [`insert-automatic-page-numbers-into-pdf.cs`](./insert-automatic-page-numbers-into-pdf.cs) -- Insert automatic page numbers into pdf
 - [`insert-blank-cover-page-into-pdf.cs`](./insert-blank-cover-page-into-pdf.cs) -- Insert blank cover page into pdf
-- [`insert-highres-image-into-pdf.cs`](./insert-highres-image-into-pdf.cs) -- Insert highres image into pdf
+- [`insert-high-res-image-into-pdf.cs`](./insert-high-res-image-into-pdf.cs) -- Insert high res image into pdf
+- [`insert-pdf-page-into-another.cs`](./insert-pdf-page-into-another.cs) -- Insert pdf page into another
 - [`interrupt-resume-large-pdf-save.cs`](./interrupt-resume-large-pdf-save.cs) -- Interrupt resume large pdf save
 - [`load-pdf-into-document.cs`](./load-pdf-into-document.cs) -- Load pdf into document
-- [`magazine-pdf-multi-column.cs`](./magazine-pdf-multi-column.cs) -- Magazine pdf multi column
-- [`merge-pdfs-preserve-bookmarks.cs`](./merge-pdfs-preserve-bookmarks.cs) -- Merge pdfs preserve bookmarks
-- [`monitor-pdf-conversion-progress.cs`](./monitor-pdf-conversion-progress.cs) -- Monitor pdf conversion progress
-- [`multi-section-pdf-different-page-sizes.cs`](./multi-section-pdf-different-page-sizes.cs) -- Multi section pdf different page sizes
-- [`pdf-processing-with-crash-report.cs`](./pdf-processing-with-crash-report.cs) -- Pdf processing with crash report
-- [`pdf-toc-with-dot-leaders.cs`](./pdf-toc-with-dot-leaders.cs) -- Pdf toc with dot leaders
-- [`print-pdf-to-default-printer.cs`](./print-pdf-to-default-printer.cs) -- Print pdf to default printer
-- [`rasterize-pdf-to-png-with-compression.cs`](./rasterize-pdf-to-png-with-compression.cs) -- Rasterize pdf to png with compression
+- [`merge-two-pdfs-preserve-bookmarks.cs`](./merge-two-pdfs-preserve-bookmarks.cs) -- Merge two pdfs preserve bookmarks
+- [`merged-header-table-pdf.cs`](./merged-header-table-pdf.cs) -- Merged header table pdf
+- [`pdf-header-current-date-javascript.cs`](./pdf-header-current-date-javascript.cs) -- Pdf header current date javascript
+- [`pdf-sanitization-audit-log.cs`](./pdf-sanitization-audit-log.cs) -- Pdf sanitization audit log
+- [`print-pdf-using-os-verb.cs`](./print-pdf-using-os-verb.cs) -- Print pdf using os verb
+- [`rasterize-pdf-to-png-lossless-compression.cs`](./rasterize-pdf-to-png-lossless-compression.cs) -- Rasterize pdf to png lossless compression
 - [`remove-all-annotations-from-pdf.cs`](./remove-all-annotations-from-pdf.cs) -- Remove all annotations from pdf
-- [`remove-all-annotations-pdf.cs`](./remove-all-annotations-pdf.cs) -- Remove all annotations pdf
-- [`remove-annotations-and-attachments.cs`](./remove-annotations-and-attachments.cs) -- Remove annotations and attachments
-- [`remove-hidden-data-and-retag-pdf.cs`](./remove-hidden-data-and-retag-pdf.cs) -- Remove hidden data and retag pdf
+- [`remove-all-annotations-from-pdf__v2.cs`](./remove-all-annotations-from-pdf__v2.cs) -- Remove all annotations from pdf  v2
+- [`remove-annotations-attachments-from-pdf.cs`](./remove-annotations-attachments-from-pdf.cs) -- Remove annotations attachments from pdf
+- [`remove-hidden-data-reapply-headings.cs`](./remove-hidden-data-reapply-headings.cs) -- Remove hidden data reapply headings
 - [`remove-javascript-from-pdf.cs`](./remove-javascript-from-pdf.cs) -- Remove javascript from pdf
 - [`remove-page-from-pdf.cs`](./remove-page-from-pdf.cs) -- Remove page from pdf
 - [`replace-image-in-pdf-page.cs`](./replace-image-in-pdf-page.cs) -- Replace image in pdf page
 - [`replace-pdf-page-with-html.cs`](./replace-pdf-page-with-html.cs) -- Replace pdf page with html
-- [`replace-word-in-pdf.cs`](./replace-word-in-pdf.cs) -- Replace word in pdf
+- [`replace-text-in-pdf-preserving-formatting.cs`](./replace-text-in-pdf-preserving-formatting.cs) -- Replace text in pdf preserving formatting
 - [`rotate-pdf-pages-90-degrees.cs`](./rotate-pdf-pages-90-degrees.cs) -- Rotate pdf pages 90 degrees
-- [`sanitize-hidden-data-selective-rasterization.cs`](./sanitize-hidden-data-selective-rasterization.cs) -- Sanitize hidden data selective rasterization
-- [`sanitize-pdf-add-headings.cs`](./sanitize-pdf-add-headings.cs) -- Sanitize pdf add headings
-- [`sanitize-pdf-keep-metadata.cs`](./sanitize-pdf-keep-metadata.cs) -- Sanitize pdf keep metadata
+- [`sanitize-multiple-pdfs.cs`](./sanitize-multiple-pdfs.cs) -- Sanitize multiple pdfs
 - [`sanitize-pdf-remove-embedded-scripts.cs`](./sanitize-pdf-remove-embedded-scripts.cs) -- Sanitize pdf remove embedded scripts
-- [`sanitize-pdf-remove-metadata-flatten-forms.cs`](./sanitize-pdf-remove-metadata-flatten-forms.cs) -- Sanitize pdf remove metadata flatten forms
+- [`sanitize-pdf-remove-hidden-content-keep-metadata.cs`](./sanitize-pdf-remove-hidden-content-keep-metadata.cs) -- Sanitize pdf remove hidden content keep metadata
 - [`sanitize-pdf-remove-metadata-private-info.cs`](./sanitize-pdf-remove-metadata-private-info.cs) -- Sanitize pdf remove metadata private info
-- [`sanitize-pdfs-remove-metadata.cs`](./sanitize-pdfs-remove-metadata.cs) -- Sanitize pdfs remove metadata
+- [`sanitize-pdf-remove-metadata.cs`](./sanitize-pdf-remove-metadata.cs) -- Sanitize pdf remove metadata
+- [`set-pdf-document-metadata.cs`](./set-pdf-document-metadata.cs) -- Set pdf document metadata
 - [`set-pdf-expiration-date.cs`](./set-pdf-expiration-date.cs) -- Set pdf expiration date
-- [`set-pdf-metadata-creation-modification-keywords.cs`](./set-pdf-metadata-creation-modification-keywords.cs) -- Set pdf metadata creation modification keywords
-- [`update-pdf-author-title-metadata.cs`](./update-pdf-author-title-metadata.cs) -- Update pdf author title metadata
+- [`specify-crash-report-output-directory.cs`](./specify-crash-report-output-directory.cs) -- Specify crash report output directory
+- [`test-convert-pages-to-images.cs`](./test-convert-pages-to-images.cs) -- Test convert pages to images
+- [`update-pdf-metadata-author-title.cs`](./update-pdf-metadata-author-title.cs) -- Update pdf metadata author title
 - [`validate-pdf-a1a-compliance-report.cs`](./validate-pdf-a1a-compliance-report.cs) -- Validate pdf a1a compliance report
 - [`validate-pdf-a1b-compliance.cs`](./validate-pdf-a1b-compliance.cs) -- Validate pdf a1b compliance
 

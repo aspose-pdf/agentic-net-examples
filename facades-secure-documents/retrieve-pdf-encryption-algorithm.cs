@@ -6,29 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        // Verify that the PDF file exists before attempting to open it.
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.WriteLine($"Error: The file '{pdfPath}' was not found.");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document directly. The Document class provides encryption information.
-        Document doc = new Document(pdfPath);
+        try
+        {
+            // Load the PDF document inside a using block for proper disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // CryptoAlgorithm is a nullable enum; null means the document is not encrypted
+                CryptoAlgorithm? algorithm = doc.CryptoAlgorithm;
 
-        // Check whether the PDF is encrypted.
-        if (doc.IsEncrypted)
-        {
-            // CryptoAlgorithm is a nullable enum; handle the possible null value.
-            var algorithm = doc.CryptoAlgorithm;
-            string algoName = algorithm.HasValue ? algorithm.Value.ToString() : "Unknown";
-            Console.WriteLine($"Encryption algorithm: {algoName}");
+                if (algorithm.HasValue)
+                {
+                    // Display the name of the encryption algorithm (e.g., AESx256, RC4x128)
+                    Console.WriteLine($"Encryption algorithm: {algorithm.Value}");
+                }
+                else
+                {
+                    Console.WriteLine("Document is not encrypted.");
+                }
+            }
         }
-        else
+        catch (Exception ex)
         {
-            Console.WriteLine("PDF is not encrypted.");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

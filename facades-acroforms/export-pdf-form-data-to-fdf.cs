@@ -2,32 +2,34 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class Program
+class ExportFormDataToFdf
 {
     static void Main()
     {
+        // Path to the source PDF form
         const string pdfPath = "PdfForm.pdf";
+
+        // Path for the exported FDF file
         const string fdfPath = "export.fdf";
 
-        // Verify that the source PDF exists
+        // Ensure the source PDF exists
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Error: PDF file not found at '{pdfPath}'.");
             return;
         }
 
-        // Initialize the Form facade with the PDF file
+        // Create a Form facade for the PDF
         using (Form form = new Form(pdfPath))
         {
-            // Create a file stream for the output FDF file
+            // Open a file stream for writing the FDF data
             using (FileStream fdfStream = new FileStream(fdfPath, FileMode.Create, FileAccess.Write))
             {
                 // Export the form fields to the FDF stream
                 form.ExportFdf(fdfStream);
-                // The using block ensures the stream is closed
             }
         }
 
-        Console.WriteLine($"Form data successfully exported to '{fdfPath}'.");
+        Console.WriteLine($"Form data exported successfully to '{fdfPath}'.");
     }
 }

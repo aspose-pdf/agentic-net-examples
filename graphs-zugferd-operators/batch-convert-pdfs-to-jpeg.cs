@@ -8,36 +8,39 @@ class Program
     static void Main()
     {
         // Directory containing PDF files
-        string inputDir = @"C:\PdfInput";
+        string inputDirectory = @"C:\PdfInput";
         // Directory where JPEG images will be saved
-        string outputDir = @"C:\JpegOutput";
+        string outputDirectory = @"C:\JpegOutput";
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDirectory);
 
-        // Enumerate all PDF files in the input directory
-        foreach (string pdfPath in Directory.GetFiles(inputDir, "*.pdf"))
+        // Get all PDF files in the input directory
+        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        // Process each PDF file
+        foreach (string pdfPath in pdfFiles)
         {
-            // Derive base name without extension for naming output images
-            string baseName = Path.GetFileNameWithoutExtension(pdfPath);
+            // Extract the file name without extension for naming output images
+            string baseFileName = Path.GetFileNameWithoutExtension(pdfPath);
 
-            // Open PDF document inside a using block for deterministic disposal
+            // Open the PDF document inside a using block for deterministic disposal
             using (Document pdfDocument = new Document(pdfPath))
             {
                 // Set desired resolution (e.g., 300 DPI)
                 Resolution resolution = new Resolution(300);
-                // Initialize JPEG device with the resolution
+                // Initialize the JPEG device with the resolution
                 JpegDevice jpegDevice = new JpegDevice(resolution);
 
-                // Iterate through pages (1‑based indexing)
+                // Iterate through all pages (1‑based indexing)
                 for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
                 {
-                    // Build output file name: <BaseName>_page<Number>.jpeg
+                    // Build the output JPEG file path
                     string jpegPath = Path.Combine(
-                        outputDir,
-                        $"{baseName}_page{pageNumber}.jpeg");
+                        outputDirectory,
+                        $"{baseFileName}_page{pageNumber}.jpeg");
 
-                    // Convert the page to JPEG and write to file
+                    // Convert the current page to JPEG and write to file
                     using (FileStream jpegStream = new FileStream(jpegPath, FileMode.Create))
                     {
                         jpegDevice.Process(pdfDocument.Pages[pageNumber], jpegStream);
@@ -47,5 +50,7 @@ class Program
 
             Console.WriteLine($"Converted '{pdfPath}' to JPEG images.");
         }
+
+        Console.WriteLine("Batch conversion completed.");
     }
 }

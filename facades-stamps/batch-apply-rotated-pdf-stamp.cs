@@ -2,75 +2,61 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class BatchStampProcessor
+class Program
 {
     static void Main()
     {
-        // Network share folder containing source PDFs
-        const string sourceFolder = @"\\Server\Share\PdfFiles";
-        // Folder where stamped PDFs will be saved (can be the same or different)
-        const string outputFolder = @"\\Server\Share\StampedPdfFiles";
-        // Path to the PDF file that will be used as the stamp source
-        const string stampPdfPath = @"\\Server\Share\StampTemplate\stamp.pdf";
-        // Page number (1‑based) in the stamp PDF to use as the stamp content
-        const int stampPageNumber = 1;
-        // Desired rotation angle for the stamp (in degrees, can be any value)
-        const float stampRotationDegrees = 45f;
+        // UNC paths to the source PDFs, the stamp PDF, and the output folder
+        const string sourceFolder = @"\\NetworkShare\PdfFiles";
+        const string stampPdfPath = @"\\NetworkShare\Stamp\stamp.pdf";
+        const string outputFolder = @"\\NetworkShare\StampedPdfFiles";
 
-        if (!Directory.Exists(sourceFolder))
+        // Ensure the output directory exists
+        try
         {
-            Console.Error.WriteLine($"Source folder not found: {sourceFolder}");
+            Directory.CreateDirectory(outputFolder);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to create output folder '{outputFolder}': {ex.Message}");
             return;
         }
 
-        if (!Directory.Exists(outputFolder))
+        // Retrieve all PDF files from the source folder
+        string[] pdfFiles;
+        try
         {
-            try
-            {
-                Directory.CreateDirectory(outputFolder);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to create output folder: {ex.Message}");
-                return;
-            }
+            pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf");
         }
-
-        // Get all PDF files in the source folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
+        catch (Exception ex)
         {
-            Console.WriteLine("No PDF files found to process.");
+            Console.Error.WriteLine($"Failed to enumerate PDF files in '{sourceFolder}': {ex.Message}");
             return;
         }
 
         foreach (string inputPath in pdfFiles)
         {
+            string fileName = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputFolder, $"{fileName}_stamped.pdf");
+
             try
             {
-                // Build output file path – same name, placed in the output folder
-                string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
-
-                // Initialize PdfFileStamp facade
+                // Initialise the facade for stamping
                 PdfFileStamp fileStamp = new PdfFileStamp();
-                fileStamp.InputFile = inputPath;
-                fileStamp.OutputFile = outputPath;
+                fileStamp.InputFile = inputPath;      // source PDF
+                fileStamp.OutputFile = outputPath;    // destination PDF
 
-                // Create a stamp based on a page from another PDF
+                // Create a stamp that uses the first page of another PDF
                 Stamp stamp = new Stamp();
-                stamp.BindPdf(stampPdfPath, stampPageNumber); // use specified page as stamp content
-                stamp.Rotation = stampRotationDegrees;       // rotate the stamp
-                stamp.IsBackground = true;                  // place stamp behind page content (optional)
-                // Apply to all pages (default); can also set specific pages:
-                // stamp.Pages = new int[] { 1, 3, 5 };
+                stamp.BindPdf(stampPdfPath, 1);       // bind page 1 of the stamp PDF
+                stamp.Rotation = 45f;                 // rotate the stamp (degrees)
+                stamp.IsBackground = true;           // place stamp behind page content
 
-                // Add the stamp to the document
+                // Apply the stamp to all pages of the source document
                 fileStamp.AddStamp(stamp);
+                fileStamp.Close();                    // saves the output file
 
-                // Finalize and release resources
-                fileStamp.Close();
-
-                Console.WriteLine($"Stamped PDF saved to: {outputPath}");
+                Console.WriteLine($"Stamped file saved: {outputPath}");
             }
             catch (Exception ex)
             {

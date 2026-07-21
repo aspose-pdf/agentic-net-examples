@@ -15,30 +15,29 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the interactive form
+            // Access the form fields collection
             Form form = doc.Form;
 
-            // Retrieve the first field and cast it to CheckboxField
+            // Retrieve a checkbox field (adjust index or use field name as needed)
             CheckboxField checkbox = form.Fields[0] as CheckboxField;
             if (checkbox == null)
             {
-                Console.WriteLine("No checkbox field found at index 0.");
+                Console.WriteLine("No checkbox field found in the document.");
                 return;
             }
 
-            // Read the Value property (string representation, e.g., "On" or "Off")
+            // Read the string value of the checkbox (e.g., "On", "Off", or a custom export value)
             string rawValue = checkbox.Value;
+            Console.WriteLine($"Checkbox raw Value: {rawValue}");
 
             // Convert the string value to a Boolean.
-            // In Aspose.Pdf a checked box typically has a value other than "Off".
+            // Convention: any value other than "Off" (case‑insensitive) means the box is checked.
             bool isChecked = !string.Equals(rawValue, "Off", StringComparison.OrdinalIgnoreCase);
 
-            // Output the results
-            Console.WriteLine($"Checkbox Value (string): '{rawValue}'");
-            Console.WriteLine($"Checkbox Checked (bool): {isChecked}");
+            Console.WriteLine($"Checkbox is checked: {isChecked}");
         }
     }
 }

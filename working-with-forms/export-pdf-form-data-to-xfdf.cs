@@ -2,34 +2,38 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class ExportFormDataToXml
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";          // Path to the source PDF
-        const string outputXmlPath = "formData.xfdf";      // Desired output XML (XFDF) file
+        // Input PDF containing the form.
+        const string pdfPath = "input.pdf";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        // Desired output XML (XFDF) file path.
+        const string xmlPath = "formData.xml";
+
+        // Verify the source PDF exists.
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
+            Console.Error.WriteLine($"Error: PDF file not found at '{pdfPath}'.");
             return;
         }
 
         try
         {
-            // Load the PDF document
-            using (Document pdfDocument = new Document(inputPdfPath))
+            // Load the PDF document inside a using block for deterministic disposal.
+            using (Document pdfDocument = new Document(pdfPath))
             {
-                // Export all form annotations (including field values) to XFDF (XML) format
-                pdfDocument.ExportAnnotationsToXfdf(outputXmlPath);
+                // Export all annotations (including form fields) to XFDF.
+                // XFDF is an XML representation of form data, satisfying the requirement.
+                pdfDocument.ExportAnnotationsToXfdf(xmlPath);
             }
 
-            Console.WriteLine($"Form data successfully exported to '{outputXmlPath}'.");
+            Console.WriteLine($"Form data successfully exported to XML (XFDF) at '{xmlPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during export: {ex.Message}");
+            Console.Error.WriteLine($"An error occurred: {ex.Message}");
         }
     }
 }

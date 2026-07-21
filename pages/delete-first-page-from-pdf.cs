@@ -15,23 +15,16 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document (wrapped in using for deterministic disposal)
-            using (Document doc = new Document(inputPath))
-            {
-                // Pages are 1‑based; delete the first page.
-                doc.Pages.Delete(1);
+            // Page numbers are 1‑based; delete the first page
+            doc.Pages.Delete(1);
 
-                // Save the modified document.
-                doc.Save(outputPath);
-            }
+            // Save the modified document (PDF format)
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"First page removed and saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"First page deleted. Result saved to '{outputPath}'.");
     }
 }

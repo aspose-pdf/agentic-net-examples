@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
@@ -7,38 +8,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "flattened_first5.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "flattened_first5_pages.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Create the annotation editor facade
-        Aspose.Pdf.Facades.PdfAnnotationEditor editor = new Aspose.Pdf.Facades.PdfAnnotationEditor();
-        try
+        // Create the annotation editor, bind the PDF, flatten annotations on pages 1‑5, and save.
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Load the PDF document
+            // Load the PDF document into the editor.
             editor.BindPdf(inputPath);
 
-            // Retrieve all possible annotation types
-            Aspose.Pdf.Annotations.AnnotationType[] allTypes =
-                (Aspose.Pdf.Annotations.AnnotationType[])Enum.GetValues(typeof(Aspose.Pdf.Annotations.AnnotationType));
+            // Get all possible annotation types to flatten every annotation.
+            AnnotationType[] allTypes = (AnnotationType[])Enum.GetValues(typeof(AnnotationType));
 
-            // Flatten annotations on pages 1 through 5 (inclusive)
+            // Flatten annotations from page 1 to page 5 (inclusive).
             editor.FlatteningAnnotations(1, 5, allTypes);
 
-            // Save the modified PDF
+            // Save the modified PDF.
             editor.Save(outputPath);
         }
-        finally
-        {
-            // Release resources held by the facade
-            editor.Close();
-        }
 
-        Console.WriteLine($"Annotations on the first five pages have been flattened. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Annotations on the first five pages have been flattened and saved to '{outputPath}'.");
     }
 }

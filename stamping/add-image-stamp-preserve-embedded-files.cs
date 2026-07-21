@@ -1,57 +1,52 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // optional, kept for consistency
+using Aspose.Pdf; // Core API – includes ImageStamp, HorizontalAlignment, etc.
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";      // Source PDF (may contain embedded files)
-        const string stampImagePath = "stamp.png";    // Image to use as stamp
-        const string outputPdfPath = "output.pdf";    // Resulting PDF
+        const string inputPdf   = "input.pdf";      // Source PDF with embedded files
+        const string outputPdf  = "output.pdf";     // Resulting PDF
+        const string stampImage = "logo.png";       // Image to use as stamp
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(stampImagePath))
+        if (!File.Exists(stampImage))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImage}");
             return;
         }
 
-        // Load the original PDF (embedded files are loaded automatically)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the original PDF. Embedded files remain attached to the document.
+        using (Document doc = new Document(inputPdf))
         {
-            // Create an ImageStamp instance – this represents the graphic stamp
-            ImageStamp imgStamp = new ImageStamp(stampImagePath)
-            {
-                // Example visual settings – adjust as required
-                Background = false,          // stamp appears on top of page content
-                Opacity = 0.6f,              // semi‑transparent
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                // ImageStamp does not have a Margin property; use XIndent/YIndent instead
-                XIndent = 10,                // horizontal offset (margin) in points
-                YIndent = 10                 // vertical offset (margin) in points
-            };
+            // Create an image stamp using the core Aspose.Pdf API.
+            ImageStamp imgStamp = new ImageStamp(stampImage);
+            imgStamp.Background          = false;               // Stamp on top of page content
+            imgStamp.Opacity             = 0.5f;                // Semi‑transparent
+            imgStamp.HorizontalAlignment = HorizontalAlignment.Right;
+            imgStamp.VerticalAlignment   = VerticalAlignment.Bottom;
+            // Optional: set explicit size or margins
+            // imgStamp.Width  = 100;
+            // imgStamp.Height = 50;
+            // imgStamp.RightMargin = 10;
+            // imgStamp.BottomMargin = 10;
 
-            // Apply the stamp to every page in the document
-            foreach (Page page in pdfDoc.Pages)
+            // Apply the stamp to every page individually.
+            foreach (Page page in doc.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // No extra work is needed to preserve embedded files:
-            // they remain part of the Document object after modifications.
-
-            // Save the modified PDF; embedded files are written out unchanged.
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF. All original embedded files are preserved.
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image stamp added and PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Image stamp added and saved to '{outputPdf}'.");
     }
 }

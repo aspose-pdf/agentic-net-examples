@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const int targetPageNumber = 3; // 1‑based page number to jump to
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_link.pdf";
+        const int targetPageNumber = 3; // page to navigate to (1‑based)
 
         if (!File.Exists(inputPath))
         {
@@ -17,36 +17,29 @@ class Program
             return;
         }
 
-        // Document must be disposed via using (rule: document-disposal-with-using)
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Validate target page number
-            if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
-            {
-                Console.Error.WriteLine("Invalid target page number.");
-                return;
-            }
+            // Choose the page where the link annotation will be placed
+            Page sourcePage = doc.Pages[1]; // first page (1‑based index)
 
-            // Define the clickable rectangle (coordinates in points)
-            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 500, 200, 520);
+            // Define the clickable rectangle (llx, lly, urx, ury) in user space units
+            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Choose the page where the link will be placed (example: first page)
-            Page page = doc.Pages[1];
+            // Create the link annotation on the chosen page
+            LinkAnnotation link = new LinkAnnotation(sourcePage, linkRect);
+            link.Color = Aspose.Pdf.Color.Blue;
+            // Border must be created after the annotation instance exists because it requires the parent annotation
+            link.Border = new Border(link) { Width = 1 };
 
-            // Create the link annotation
-            LinkAnnotation link = new LinkAnnotation(page, linkRect)
-            {
-                Color    = Aspose.Pdf.Color.Blue,                     // visual cue
-                Contents = $"Go to page {targetPageNumber}"           // tooltip text
-            };
+            // Set the action to navigate to the target page within the same document
+            Page targetPage = doc.Pages[targetPageNumber];
+            link.Action = new GoToAction(targetPage);
 
-            // Set the destination using an explicit destination subclass (rule: no-destination-class-use-explicit-destination)
-            link.Destination = new FitExplicitDestination(doc.Pages[targetPageNumber]);
+            // Add the annotation to the page's annotation collection
+            sourcePage.Annotations.Add(link);
 
-            // Attach the annotation to the page
-            page.Annotations.Add(link);
-
-            // Save the modified PDF (rule: document-disposal-with-using ensures proper disposal)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

@@ -11,21 +11,21 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: load)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
             // Set each page's rotation to 90 degrees (portrait on landscape devices)
-            for (int i = 1; i <= doc.Pages.Count; i++) // page indexing is 1‑based
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                page.Rotate = Rotation.on90; // Correct enum value with 'on' prefix
+                page.Rotate = Rotation.on90; // correct enum value with "on" prefix
             }
 
-            // Save the modified PDF (lifecycle rule: save)
+            // Save the modified document
             doc.Save(outputPath);
         }
 

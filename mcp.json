@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "aspose-pdf-examples": {
+      "description": "Aspose.PDF for .NET code-example generation + retrieval. Provides validate-revise-retry code generation and KB-backed example search against 2,600+ compile-verified examples.",
+      "url": "http://172.20.1.175:7050",
+      "type": "http",
+      "endpoint": "http://172.20.1.175:7050/mcp/generate"
+    }
+  }
+}

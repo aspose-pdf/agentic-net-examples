@@ -7,60 +7,72 @@ class Program
 {
     static void Main()
     {
-        // Input PDF and output PDF paths
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output_with_screen_annotations.pdf";
+        // Input PDF containing multiple pages
+        const string inputPdf = "input.pdf";
+        // Output PDF with screen annotations added
+        const string outputPdf = "output_with_videos.pdf";
 
-        // Video files – one per page (ensure the array length matches the number of pages)
+        // Video files to be attached – one per page (order matters)
+        // Ensure the array length matches the number of pages in the PDF
         string[] videoFiles = new string[]
         {
             "video1.mp4",
             "video2.mp4",
             "video3.mp4"
-            // Add more entries as needed for additional pages
+            // Add more entries if the PDF has more pages
         };
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document doc = new Document(inputPdfPath))
+        // Verify that all video files exist before processing
+        foreach (var vf in videoFiles)
         {
-            // Verify that we have enough video files for the pages
-            if (videoFiles.Length < doc.Pages.Count)
+            if (!File.Exists(vf))
             {
-                Console.Error.WriteLine("Not enough video files provided for the number of pages.");
+                Console.Error.WriteLine($"Video file not found: {vf}");
                 return;
             }
+        }
 
-            // Iterate over pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
+        {
+            int pageCount = doc.Pages.Count; // 1‑based indexing
+
+            // Iterate over each page and add a ScreenAnnotation
+            for (int i = 1; i <= pageCount; i++)
             {
+                // If there are fewer video files than pages, stop adding annotations
+                if (i > videoFiles.Length)
+                    break;
+
                 Page page = doc.Pages[i];
+                string videoPath = videoFiles[i - 1];
 
-                // Define the rectangle where the screen annotation will appear
-                // (left, bottom, width, height) – adjust values as needed
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 200);
+                // Define the annotation rectangle (example: 200x150 rectangle at lower‑left corner)
+                // Rectangle constructor: (llx, lly, urx, ury)
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 50, 250, 200);
 
-                // Create the ScreenAnnotation with the corresponding video file
-                ScreenAnnotation screenAnn = new ScreenAnnotation(page, rect, videoFiles[i - 1])
+                // Create the screen annotation with the page, rectangle, and video file path
+                ScreenAnnotation screenAnn = new ScreenAnnotation(page, rect, videoPath)
                 {
                     // Optional: set a title or contents for the annotation
-                    Title    = $"Video {i}",
-                    Contents = $"Play video {Path.GetFileName(videoFiles[i - 1])}"
+                    Title = $"Video for page {i}",
+                    Contents = $"Play video: {Path.GetFileName(videoPath)}"
                 };
 
                 // Add the annotation to the page's annotation collection
                 page.Annotations.Add(screenAnn);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdfPath);
+            // Save the modified document
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with screen annotations: {outputPdfPath}");
+        Console.WriteLine($"Screen annotations added. Output saved to '{outputPdf}'.");
     }
 }

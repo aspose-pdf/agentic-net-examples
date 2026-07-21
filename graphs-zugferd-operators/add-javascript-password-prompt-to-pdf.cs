@@ -8,8 +8,8 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "secured.pdf";
-        const string password   = "Secret123"; // password to validate in JavaScript
+        const string outputPath = "protected_output.pdf";
+        const string password   = "secret"; // password to validate against
 
         if (!File.Exists(inputPath))
         {
@@ -17,22 +17,24 @@ class Program
             return;
         }
 
-        // Open the existing PDF, add a JavaScript OpenAction that prompts for a password,
-        // and save the modified document.
+        // Load the existing PDF (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // JavaScript that asks the user for a password.
-            // If the entered password does not match, the document is closed.
-            string js = $"var pwd = app.response('Enter password to view this document:', 'Password', '');"
-                      + $"if (pwd != '{password}') {{ this.closeDoc(); }}";
+            // JavaScript executed when the document is opened.
+            // It prompts the user for a password and closes the document if the password is incorrect.
+            string js = $"var pwd = app.response('Enter password:', 'Password');" +
+                        $"if (pwd != '{password}') {{ " +
+                        "app.alert('Incorrect password. Document will be closed.'); " +
+                        "this.closeDoc(); " +
+                        "}}";
 
-            // Attach the JavaScript to the document's OpenAction.
+            // Assign the JavaScript action to the document's OpenAction.
             doc.OpenAction = new JavascriptAction(js);
 
-            // Save the PDF with the JavaScript embedded.
+            // Save the modified PDF (lifecycle rule: use provided save method)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Password‑protected PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with JavaScript password prompt: {outputPath}");
     }
 }

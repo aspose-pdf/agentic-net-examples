@@ -8,61 +8,58 @@ class Program
 {
     static void Main()
     {
-        const string outputPdf = "output_with_metadata.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        // -----------------------------------------------------------------
-        // 1. Create a new PDF document (self‑contained, no external input file)
-        // -----------------------------------------------------------------
-        using (Document doc = new Document())
+        // Ensure a source PDF exists – create a minimal one if it does not.
+        if (!File.Exists(inputPdfPath))
         {
-            // Add a blank page – the annotation will be attached to this page.
-            Page page = doc.Pages.Add();
+            using (Document seed = new Document())
+            {
+                seed.Pages.Add();
+                seed.Save(inputPdfPath);
+            }
+        }
 
-            // -----------------------------------------------------------------
-            // 2. Build the XML metadata that we want to embed
-            // -----------------------------------------------------------------
-            XDocument metadataXml = new XDocument(
-                new XElement("DocumentMetadata",
-                    new XElement("CreatedOn", DateTime.UtcNow.ToString("o")),
+        // Load the existing PDF document
+        using (Document pdfDoc = new Document(inputPdfPath))
+        {
+            // Build XML metadata (example structure)
+            XDocument xmlMeta = new XDocument(
+                new XElement("AttachmentMetadata",
                     new XElement("Author", "John Doe"),
+                    new XElement("Created", DateTime.UtcNow.ToString("o")),
                     new XElement("Description", "Sample hidden attachment")
                 )
             );
 
-            // Serialize the XML into a memory stream (no temporary file needed)
+            // Serialize XML to a memory stream
             using (MemoryStream xmlStream = new MemoryStream())
             {
-                metadataXml.Save(xmlStream);
+                xmlMeta.Save(xmlStream);
                 xmlStream.Position = 0; // reset for reading
 
-                // -----------------------------------------------------------------
-                // 3. Create a FileSpecification that points to the XML stream
-                // -----------------------------------------------------------------
-                // Use the constructor that accepts a file name and description, then assign the stream to Contents.
-                FileSpecification fileSpec = new FileSpecification("metadata.xml", "XML metadata");
-                fileSpec.Contents = xmlStream;
+                // Create a file specification that points to the XML stream
+                FileSpecification fileSpec = new FileSpecification(xmlStream, "metadata.xml");
 
-                // -----------------------------------------------------------------
-                // 4. Create a hidden FileAttachment annotation on the first page
-                // -----------------------------------------------------------------
-                // A zero‑size rectangle makes the annotation invisible.
+                // Define a tiny (invisible) rectangle on the first page
                 Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
-                FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec)
+
+                // Create the file attachment annotation and mark it as hidden
+                FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(pdfDoc.Pages[1], rect, fileSpec)
                 {
                     Flags = AnnotationFlags.Hidden,
-                    Contents = "Hidden XML metadata attachment"
+                    Name = "HiddenMetadata"
                 };
 
-                // Add the annotation to the page.
-                page.Annotations.Add(attachment);
+                // Add the annotation to the page
+                pdfDoc.Pages[1].Annotations.Add(attachment);
             }
 
-            // -----------------------------------------------------------------
-            // 5. Save the modified PDF (using the required lifecycle pattern)
-            // -----------------------------------------------------------------
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF saved with hidden XML attachment: {outputPdf}");
+        Console.WriteLine($"PDF saved with hidden XML attachment: {outputPdfPath}");
     }
 }

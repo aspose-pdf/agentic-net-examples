@@ -1,50 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing the PDF files to process
-        const string inputFolder = "InputPdfs";
+        const string inputPath = "input.pdf";
 
-        // Folder where the JSON files will be written
-        const string outputFolder = "OutputJson";
-
-        // Verify input folder exists
-        if (!Directory.Exists(inputFolder))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure output folder exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Build the corresponding JSON file name
-            string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-            string jsonPath = Path.Combine(outputFolder, baseName + ".json");
-
-            try
+            // MemoryStream will hold the JSON output
+            using (MemoryStream jsonStream = new MemoryStream())
             {
-                // Load the PDF document (lifecycle managed by using)
-                using (Document doc = new Document(pdfPath))
+                // Optional: configure export options (e.g., indented JSON)
+                ExportFieldsToJsonOptions options = new ExportFieldsToJsonOptions
                 {
-                    // Export all form fields to a JSON file
-                    // ExportToJson(string) writes directly to the specified file
-                    doc.Form.ExportToJson(jsonPath);
-                }
+                    WriteIndented = true
+                };
 
-                Console.WriteLine($"Exported: {pdfPath} -> {jsonPath}");
-            }
-            catch (Exception ex)
-            {
-                // Log any errors but continue processing remaining files
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                // Export all form fields to JSON written into the stream
+                doc.Form.ExportToJson(jsonStream, options);
+
+                // Reset stream position before reading
+                jsonStream.Position = 0;
+
+                // Read the JSON string from the stream
+                using (StreamReader reader = new StreamReader(jsonStream))
+                {
+                    string json = reader.ReadToEnd();
+                    Console.WriteLine("Exported JSON:");
+                    Console.WriteLine(json);
+                }
             }
         }
     }

@@ -1,22 +1,29 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using Aspose.Pdf;
+using System.Text;
 using System.Text.Json;
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Forms;               // Form handling (ExportToJson)
 
-class Program
+class BatchFormDataExtractor
 {
     static void Main()
     {
-        // Input PDF files containing form fields
-        string[] pdfFiles = { "form1.pdf", "form2.pdf", "form3.pdf" };
-        // Output file that will contain a JSON array with all form data
-        string outputJson = "combined_forms.json";
+        // Input PDF files (adjust paths as needed)
+        string[] pdfFiles = {
+            "Form1.pdf",
+            "Form2.pdf",
+            "Form3.pdf"
+        };
 
-        // List to hold each PDF's exported JSON as a JsonElement
-        var combined = new List<JsonElement>();
+        // Output JSON file that will contain an array of form data objects
+        const string outputJsonPath = "CombinedFormData.json";
 
-        foreach (var pdfPath in pdfFiles)
+        // List to hold each PDF's form data as a JsonElement
+        var formDataElements = new List<JsonElement>();
+
+        foreach (string pdfPath in pdfFiles)
         {
             if (!File.Exists(pdfPath))
             {
@@ -24,37 +31,39 @@ class Program
                 continue;
             }
 
-            // Load the PDF document (lifecycle rule: using ensures disposal)
+            // Load the PDF document (lifecycle rule: use using for deterministic disposal)
             using (Document doc = new Document(pdfPath))
             {
-                // Export the form fields to a memory stream in JSON format
+                // Export form fields to a memory stream in JSON format
                 using (MemoryStream ms = new MemoryStream())
                 {
+                    // ExportToJson writes JSON directly to the provided stream
                     doc.Form.ExportToJson(ms);
-                    ms.Position = 0; // Reset stream for reading
 
-                    // Parse the exported JSON and add its root element to the list
-                    using (JsonDocument jsonDoc = JsonDocument.Parse(ms))
+                    // Reset stream position to read the JSON text
+                    ms.Position = 0;
+                    using (StreamReader reader = new StreamReader(ms, Encoding.UTF8))
                     {
-                        // Clone the root element because JsonDocument will be disposed
-                        combined.Add(jsonDoc.RootElement.Clone());
+                        string jsonText = reader.ReadToEnd();
+
+                        // Parse the JSON text into a JsonDocument to obtain a JsonElement
+                        using (JsonDocument jsonDoc = JsonDocument.Parse(jsonText))
+                        {
+                            // The exported JSON represents an object; add it to the list
+                            formDataElements.Add(jsonDoc.RootElement.Clone());
+                        }
                     }
                 }
             }
         }
 
-        // Write the combined JSON array to the output file
-        using (FileStream outStream = new FileStream(outputJson, FileMode.Create, FileAccess.Write))
-        using (Utf8JsonWriter writer = new Utf8JsonWriter(outStream, new JsonWriterOptions { Indented = true }))
-        {
-            writer.WriteStartArray();
-            foreach (var element in combined)
-            {
-                element.WriteTo(writer);
-            }
-            writer.WriteEndArray();
-        }
+        // Combine all individual form objects into a JSON array
+        JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true };
+        string combinedJson = JsonSerializer.Serialize(formDataElements, options);
 
-        Console.WriteLine($"Combined JSON saved to '{outputJson}'.");
+        // Write the combined JSON array to the output file
+        File.WriteAllText(outputJsonPath, combinedJson, Encoding.UTF8);
+
+        Console.WriteLine($"Combined form data saved to '{outputJsonPath}'.");
     }
 }

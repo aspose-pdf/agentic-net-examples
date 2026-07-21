@@ -7,9 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string language = "en-US";
 
         if (!File.Exists(inputPath))
         {
@@ -17,14 +16,17 @@ class Program
             return;
         }
 
-        // Load the PDF, set the document language, and save
+        // Load the PDF, set its primary language, and save.
         using (Document doc = new Document(inputPath))
         {
+            // Access tagged content and set the document language (e.g., English US).
             ITaggedContent tagged = doc.TaggedContent;
-            tagged.SetLanguage(language);
+            tagged.SetLanguage("en-US");
+
+            // Persist the change.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Language set to '{language}' and saved to '{outputPath}'.");
+        Console.WriteLine($"Language set and saved to '{outputPath}'.");
     }
 }

@@ -22,18 +22,27 @@ class Program
             return;
         }
 
-        // Use Aspose.Pdf.Facades.Form to work with AcroForm fields
-        // The Form class implements IDisposable via SaveableFacade, so wrap it in a using block
-        using (Form form = new Form(pdfPath))
+        try
         {
-            // Retrieve the array of field names
-            string[] fieldNames = form.FieldNames ?? Array.Empty<string>();
+            // Initialize the Form facade with the PDF file
+            using (Form form = new Form(pdfPath))
+            {
+                // Retrieve all field names
+                string[] fieldNames = form.FieldNames;
 
-            // Serialize the field names to JSON (indented for readability)
-            string json = JsonSerializer.Serialize(fieldNames, new JsonSerializerOptions { WriteIndented = true });
+                // Serialize the array to JSON (indented for readability)
+                string json = JsonSerializer.Serialize(fieldNames, new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
 
-            // Output the JSON to the console
-            Console.WriteLine(json);
+                // Output JSON to console
+                Console.WriteLine(json);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

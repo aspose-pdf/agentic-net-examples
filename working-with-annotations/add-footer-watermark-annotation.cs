@@ -25,28 +25,31 @@ class Program
                 Page page = doc.Pages[i];
 
                 // Define a rectangle positioned at the bottom of the page (footer area)
-                // Aspose.Pdf.Rectangle constructor: (llx, lly, urx, ury)
+                // Rectangle constructor: (llx, lly, urx, ury)
+                // Here we use the full page width and a height of 30 points.
                 Aspose.Pdf.Rectangle footerRect = new Aspose.Pdf.Rectangle(
-                    page.Rect.LLX,          // left
-                    page.Rect.LLY,          // bottom
-                    page.Rect.URX,          // right (full page width)
-                    page.Rect.LLY + 50);    // top (50 units height)
+                    page.Rect.LLX,               // left
+                    page.Rect.LLY,               // bottom
+                    page.Rect.URX,               // right
+                    page.Rect.LLY + 30);         // top (30 points above the bottom)
 
-                // Create a WatermarkAnnotation for the current page
-                WatermarkAnnotation watermark = new WatermarkAnnotation(page, footerRect)
+                // Create a WatermarkAnnotation for this page
+                WatermarkAnnotation wm = new WatermarkAnnotation(page, footerRect)
                 {
-                    // Set the visible text – using the page number as a unique identifier
-                    Contents = $"Page {i}",
-                    // Optional styling
-                    Color    = Aspose.Pdf.Color.Gray,
-                    Opacity  = 0.5
+                    // Set the visible text of the annotation.
+                    // Using the page number as a simple unique identifier.
+                    Contents = $"Page {page.Number}",
+                    // Optional: set a light gray background color for visibility
+                    Color = Aspose.Pdf.Color.LightGray,
+                    // Optional: make the annotation semi‑transparent
+                    Opacity = 0.5f
                 };
 
                 // Add the annotation to the page's annotation collection
-                page.Annotations.Add(watermark);
+                page.Annotations.Add(wm);
             }
 
-            // Save the modified document as PDF (no SaveOptions needed for PDF output)
+            // Save the modified document (PDF format)
             doc.Save(outputPath);
         }
 

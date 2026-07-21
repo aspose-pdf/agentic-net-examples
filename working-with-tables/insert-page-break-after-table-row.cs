@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,56 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const int targetRowIndex = 3; // zero‑based index of the row after which a page break is required
-
-        if (!File.Exists(inputPath))
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            // Add the first page where the table will be placed
+            Page firstPage = doc.Pages.Add();
+
+            // Create a table and add it to the page
+            Table table = new Table();
+            firstPage.Paragraphs.Add(table);
+
+            // ----- Row 1 (appears on the first page) -----
+            Row row1 = table.Rows.Add();               // Add a new row to the table
+            row1.Cells.Add("Row 1 – stays on the first page.");
+
+            // ----- Row 2 (should start on a new page) -----
+            Row row2 = table.Rows.Add();               // Add the next row
+            row2.IsInNewPage = true;                   // Force this row onto a new page
+            row2.Cells.Add("Row 2 – begins on a new page.");
+
+            // ----- Row 3 (continues on the new page) -----
+            Row row3 = table.Rows.Add();
+            row3.Cells.Add("Row 3 – follows Row 2 on the same new page.");
+
+            // Save the resulting PDF
+            doc.Save("NewPageFragmentAfterRow.pdf");
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Assume the first page contains the table we want to modify
-            Page page = doc.Pages[1];
-
-            // Find the first Table element on the page (if any)
-            Table table = null;
-            foreach (var element in page.Paragraphs)
-            {
-                if (element is Table t)
-                {
-                    table = t;
-                    break;
-                }
-            }
-
-            if (table == null)
-            {
-                Console.Error.WriteLine("No table found on the first page.");
-                return;
-            }
-
-            // Validate the target row index
-            if (targetRowIndex < 0 || targetRowIndex >= table.Rows.Count - 1)
-            {
-                Console.Error.WriteLine("Target row index is out of range.");
-                return;
-            }
-
-            // The row after which we want a page break
-            Row nextRow = table.Rows[targetRowIndex + 1];
-
-            // Set IsInNewPage = true to force this row onto a new page
-            nextRow.IsInNewPage = true;
-
-            // Save the modified document
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Document saved with page break after row {targetRowIndex} → '{outputPath}'.");
+        Console.WriteLine("PDF created with a page break after the specified row.");
     }
 }

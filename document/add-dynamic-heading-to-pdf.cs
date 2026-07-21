@@ -7,43 +7,45 @@ class Program
 {
     static void Main()
     {
-        // Input PDF (could be a template) and output path
-        const string inputPath = "template.pdf";
+        // Input PDF, output PDF and dynamic heading text (e.g., date or user name)
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-
-        // Dynamic data: user name and current date
-        string userName = Environment.UserName;
-        string dateStr = DateTime.Now.ToString("MMMM dd, yyyy");
+        string dynamicHeading = $"Report generated on {DateTime.Now:yyyy-MM-dd} by {Environment.UserName}";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF, add a heading, and save
         using (Document doc = new Document(inputPath))
         {
-            // Create a level‑1 heading (dynamic text)
-            Heading heading = new Heading(1);
-            heading.Text = $"Report for {userName} – {dateStr}";
+            // Ensure there is at least one page
+            Page page = doc.Pages[1];
 
-            // Position the heading near the top of the first page
-            heading.Position = new Position(50, 750);
+            // Create a heading (level 1) and set its text dynamically
+            Heading heading = new Heading(1) // level 1 heading
+            {
+                Text = dynamicHeading,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
 
-            // Set visual style (font, size, color)
+            // Modify the existing TextState (read‑only property) instead of assigning a new one
             heading.TextState.Font = FontRepository.FindFont("Helvetica");
             heading.TextState.FontSize = 18;
-            heading.TextState.ForegroundColor = Aspose.Pdf.Color.DarkBlue;
+            heading.TextState.ForegroundColor = Color.Blue;
 
-            // Add the heading to the first page (page indexing is 1‑based)
-            Page firstPage = doc.Pages[1];
-            firstPage.Paragraphs.Add(heading);
+            // Insert the heading at the top of the page
+            page.Paragraphs.Insert(1, heading);
 
-            // Save the modified PDF (save rule for PDF format)
+            // Optionally set the document title (metadata)
+            doc.SetTitle("Dynamic Heading Example");
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with dynamic heading to '{outputPath}'.");
     }
 }

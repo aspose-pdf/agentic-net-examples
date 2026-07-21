@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
@@ -17,56 +16,46 @@ class RemoveJavaScript
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document inside a using block for proper disposal
-            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+            // ----- Remove document‑level JavaScript actions -----
+            // Clear the document OpenAction (executed when the PDF is opened).
+            doc.OpenAction = null;
+
+            // ----- Remove page‑level JavaScript actions -----
+            foreach (Page page in doc.Pages)
             {
-                // ----- Remove document‑level JavaScript actions -----
-                // Clear the OpenAction (executed when the document is opened)
-                doc.OpenAction = null;
+                // Page actions only expose OnOpen and OnClose.
+                page.Actions.OnOpen = null;
+                page.Actions.OnClose = null;
+            }
 
-                // Remove any named JavaScript entries stored in the document's JavaScript collection
-                if (doc.JavaScript != null)
+            // ----- Remove JavaScript actions from annotations -----
+            // Iterate all pages and their annotations.
+            foreach (Page page in doc.Pages)
+            {
+                // Annotation collections are 1‑based.
+                for (int i = 1; i <= page.Annotations.Count; i++)
                 {
-                    // JavaScriptCollection is not directly enumerable; iterate via Keys
-                    var keys = new List<string>(doc.JavaScript.Keys);
-                    foreach (var key in keys)
+                    Annotation annotation = page.Annotations[i];
+
+                    // Only LinkAnnotation (and its subclasses) expose the Action property.
+                    if (annotation is LinkAnnotation linkAnnotation)
                     {
-                        doc.JavaScript.Remove(key);
-                    }
-                }
-
-                // ----- Remove page‑level JavaScript actions -----
-                foreach (Page page in doc.Pages)
-                {
-                    // Page actions only expose OnOpen and OnClose
-                    page.Actions.OnOpen = null;
-                    page.Actions.OnClose = null;
-
-                    // ----- Remove JavaScript actions attached to annotations -----
-                    // Iterate backwards when removing/modifying items
-                    for (int i = page.Annotations.Count; i >= 1; i--)
-                    {
-                        var annotation = page.Annotations[i];
-
-                        // For link annotations the Action property can hold a JavascriptAction
-                        if (annotation is LinkAnnotation link && link.Action is JavascriptAction)
+                        // If the action is a JavaScript action, clear it.
+                        if (linkAnnotation.Action is JavascriptAction)
                         {
-                            link.Action = null;
+                            linkAnnotation.Action = null;
                         }
                     }
                 }
-
-                // Save the cleaned PDF.
-                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"JavaScript removed. Clean PDF saved to '{outputPath}'.");
+            // Save the cleaned PDF.
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"JavaScript removed. Clean PDF saved to '{outputPath}'.");
     }
 }

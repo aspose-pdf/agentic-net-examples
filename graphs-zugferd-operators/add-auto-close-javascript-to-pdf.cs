@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // JavascriptAction resides in this namespace
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // source PDF
-        const string outputPath = "output_with_js.pdf"; // PDF with auto‑close script
-        const int timeoutMs    = 5000;                  // close after 5 seconds
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_autoclose.pdf";
+        const int timeoutMs = 5000; // close after 5 seconds
 
         if (!File.Exists(inputPath))
         {
@@ -17,21 +17,22 @@ class Program
             return;
         }
 
-        // Load the PDF, add a JavaScript action that closes the document after the timeout,
-        // and save the result.
+        // Load the PDF, add a JavaScript action that closes the document after a timeout,
+        // then save the modified PDF.
         using (Document doc = new Document(inputPath))
         {
-            // JavaScript to schedule document close after the specified timeout.
-            // app.setTimeOut executes the code after the given milliseconds.
-            string js = $"app.setTimeOut('this.closeDoc();', {timeoutMs});";
+            // JavaScript to be executed when the document is opened.
+            // app.setTimeOut schedules the closeDoc() call after the specified delay (in ms).
+            string jsCode = $"app.setTimeOut('this.closeDoc();', {timeoutMs});";
+            JavascriptAction jsAction = new JavascriptAction(jsCode);
 
-            // Assign the script as the document's OpenAction so it runs when the PDF is opened.
-            doc.OpenAction = new JavascriptAction(js);
+            // Assign the JavaScript as the document's open action.
+            doc.OpenAction = jsAction;
 
-            // Save the modified PDF.
+            // Save the updated PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with auto‑close JavaScript to '{outputPath}'.");
+        Console.WriteLine($"PDF with auto‑close JavaScript saved to '{outputPath}'.");
     }
 }

@@ -2,12 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Input and output file paths
+        // Input/Output paths
         const string outputPath = "table_with_centered_paragraph.pdf";
 
         // Create a new PDF document
@@ -22,30 +23,30 @@ class Program
                 // Position the table (left, top)
                 Left = 50,
                 Top = 700,
-                // Optional: set table width
-                ColumnWidths = "200"
+                // Define column widths (two equal columns)
+                ColumnWidths = "200 200"
             };
 
             // Add a row to the table
-            Row row = table.Rows.Add();
+            var row = table.Rows.Add();
 
             // Add a cell to the row
-            Cell cell = row.Cells.Add();
+            var cell = row.Cells.Add();
 
-            // Create a text fragment with the desired content
-            TextFragment tf = new TextFragment("Centered paragraph inside cell")
+            // Create a text fragment that will be placed inside the cell
+            TextFragment paragraph = new TextFragment("Centered paragraph inside cell")
             {
                 // Center the text horizontally within the cell
-                HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center
+                HorizontalAlignment = HorizontalAlignment.Center
             };
 
-            // Add the text fragment to the cell's paragraph collection
-            cell.Paragraphs.Add(tf);
+            // Add the paragraph to the cell's paragraph collection
+            cell.Paragraphs.Add(paragraph);
 
             // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 

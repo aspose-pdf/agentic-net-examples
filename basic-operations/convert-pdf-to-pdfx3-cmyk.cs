@@ -1,37 +1,47 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.LogicalStructure; // not needed for this task but harmless
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_pdfx3.pdf";
-        const string logFile   = "conversion_log.xml";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_pdfx3.pdf";
+        const string iccProfilePath = "CMYK.icc"; // Path to a CMYK ICC profile
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+
+        if (!File.Exists(iccProfilePath))
+        {
+            Console.Error.WriteLine($"ICC profile not found: {iccProfilePath}");
             return;
         }
 
         try
         {
-            // Load the source PDF
-            using (Document doc = new Document(inputPdf))
+            // Load the source PDF inside a using block for deterministic disposal.
+            using (Document doc = new Document(inputPath))
             {
-                // Convert to PDF/X‑3 format.
-                // The overload with log file, target format and error action is the simplest way.
-                // PDF/X‑3 requires CMYK color space; the conversion process will map colors accordingly.
-                doc.Convert(logFile, PdfFormat.PDF_X_3, ConvertErrorAction.Delete);
+                // Prepare conversion options for PDF/X‑3 compliance.
+                PdfFormatConversionOptions convOptions = new PdfFormatConversionOptions(PdfFormat.PDF_X_3);
 
-                // Save the converted document.
-                doc.Save(outputPdf);
+                // Force all colors to CMYK by specifying an ICC profile.
+                convOptions.IccProfileFileName = iccProfilePath;
+                convOptions.OutputIntent = new OutputIntent(iccProfilePath); // Embed the profile.
+
+                // Convert the document to PDF/X‑3 using the options above.
+                doc.Convert(convOptions);
+
+                // Save the converted document as a regular PDF file (it now conforms to PDF/X‑3).
+                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF/X‑3 compliant file saved to '{outputPdf}'.");
+            Console.WriteLine($"PDF/X‑3 compliant file saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

@@ -1,56 +1,52 @@
 using System;
 using System.IO;
-using System.Drawing.Printing; // for PrintDocument
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Printing;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Create a temporary PDF that contains only pages 1‑5 and 8‑10
-        string tempPdfPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
-        int[] pagesToPrint = { 1, 2, 3, 4, 5, 8, 9, 10 };
-
-        PdfFileEditor editor = new PdfFileEditor();
-        bool extracted = editor.Extract(inputPdfPath, pagesToPrint, tempPdfPath);
-        if (!extracted)
+        // Initialize the viewer and bind the PDF file
+        using (var viewer = new PdfViewer())
         {
-            Console.Error.WriteLine("Failed to extract the required pages.");
-            return;
-        }
+            viewer.BindPdf(pdfPath);
 
-        // Obtain the default printer name via System.Drawing.Printing.PrintDocument
-        using (PrintDocument sysPrintDoc = new PrintDocument())
-        {
-            // Configure Aspose.Pdf printer settings
-            Aspose.Pdf.Printing.PrinterSettings aspPrinterSettings = new Aspose.Pdf.Printing.PrinterSettings
+            // Prepare printer settings – use the default system printer
+            var printerSettings = new PrinterSettings
             {
-                PrinterName = sysPrintDoc.PrinterSettings.PrinterName,
-                PrintRange = Aspose.Pdf.Printing.PrintRange.AllPages // the temp PDF already contains only the desired pages
+                // Obtain the default printer name from System.Drawing.Printing.PrintDocument
+                PrinterName = new System.Drawing.Printing.PrintDocument().PrinterSettings.PrinterName,
+                PrintRange = PrintRange.SomePages // we will set FromPage/ToPage for each range
             };
 
-            // Bind the temporary PDF and print it
-            using (PdfViewer viewer = new PdfViewer())
+            // Prepare page settings (optional – here we use A4 with no margins)
+            var pageSettings = new PageSettings
             {
-                viewer.BindPdf(tempPdfPath);
-                viewer.PrintDocumentWithSettings(aspPrinterSettings);
-                viewer.Close();
-            }
+                PaperSize = PaperSizes.A4,
+                Margins = new Margins(0, 0, 0, 0)
+            };
+
+            // ----- First page range: 1‑5 -----
+            printerSettings.FromPage = 1;
+            printerSettings.ToPage   = 5;
+            viewer.PrintDocumentWithSettings(pageSettings, printerSettings);
+
+            // ----- Second page range: 8‑10 -----
+            printerSettings.FromPage = 8;
+            printerSettings.ToPage   = 10;
+            viewer.PrintDocumentWithSettings(pageSettings, printerSettings);
         }
 
-        // Clean up the temporary file
-        try { File.Delete(tempPdfPath); } catch { /* ignore cleanup errors */ }
-
-        Console.WriteLine("Printing completed.");
+        Console.WriteLine("Printing completed for the specified page ranges.");
     }
 }

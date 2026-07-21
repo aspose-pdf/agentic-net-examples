@@ -8,18 +8,25 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "signed.pdf";
+        const string inputPdf = "signed_document.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document (wrapped in using for deterministic disposal)
+        using (Document doc = new Document(inputPdf))
         {
-            // Locate the first signature field that actually contains a signature
+            // Ensure the document contains a form with fields
+            if (doc.Form == null || doc.Form.Fields == null)
+            {
+                Console.WriteLine("No form fields found in the document.");
+                return;
+            }
+
+            // Locate the first signature field that actually holds a signature
             SignatureField sigField = null;
             foreach (Field field in doc.Form.Fields)
             {
@@ -36,22 +43,21 @@ class Program
                 return;
             }
 
-            // Configure validation to use OCSP and strict mode
-            ValidationOptions options = new ValidationOptions
+            // Configure validation options to use OCSP only
+            var options = new ValidationOptions
             {
-                ValidationMethod = ValidationMethod.Ocsp,   // Use OCSP for revocation checking
-                CheckCertificateChain = false,              // Skip full chain check, focus on revocation
-                ValidationMode = ValidationMode.Strict,      // Fail the signature if validation fails
-                RequestTimeout = 10000                      // 10 seconds timeout for network calls
+                ValidationMethod = ValidationMethod.Ocsp,   // Use OCSP protocol for revocation checking
+                ValidationMode = ValidationMode.Strict,     // Strict validation – any failure marks the signature invalid
+                CheckCertificateChain = false,             // Skip chain validation, check only revocation status
+                RequestTimeout = 5000                      // Network timeout in milliseconds
             };
 
-            // Perform the verification
-            ValidationResult validationResult;
-            bool isSignatureValid = sigField.Signature.Verify(options, out validationResult);
+            // Verify the signature using the configured options
+            bool isValid = sigField.Signature.Verify(options, out ValidationResult validationResult);
 
-            // Output the results
-            Console.WriteLine($"Signature verification succeeded: {isSignatureValid}");
-            Console.WriteLine($"Certificate validation status: {validationResult.Status}");
+            // Output the verification result and detailed status
+            Console.WriteLine($"Signature field '{sigField.PartialName}' verification returned: {isValid}");
+            Console.WriteLine($"Validation status: {validationResult.Status}");
         }
     }
 }

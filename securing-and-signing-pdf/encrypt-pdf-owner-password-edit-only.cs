@@ -16,27 +16,20 @@ class Program
             return;
         }
 
-        // Empty user password => viewing is allowed without any password
-        string userPassword = "";
-
-        // Allow printing and content extraction, but disallow any modifications
-        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-
-        try
+        // Open the PDF, apply encryption, and save.
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF, encrypt it, and save the result
-            using (Document doc = new Document(inputPath))
-            {
-                // Encrypt with AES-256; owner password protects editing, user password is empty
-                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-                doc.Save(outputPath);
-            }
+            // Allow viewing, printing, and content extraction, but prevent modifications.
+            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-            Console.WriteLine($"PDF encrypted. Editing requires password. Saved to '{outputPath}'.");
+            // No user password (empty string) → PDF can be opened for viewing without a password.
+            // Owner password protects editing operations (changing permissions, etc.).
+            doc.Encrypt(string.Empty, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
+            // Save the encrypted PDF.
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
     }
 }

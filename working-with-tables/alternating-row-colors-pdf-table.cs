@@ -1,60 +1,70 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // Added for TextState and FontStyles
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "alternating_table.pdf";
+        const string inputPdf  = "input.pdf";   // source PDF (can be empty or existing)
+        const string outputPdf = "output.pdf";  // result PDF with colored table
 
-        // Create a new PDF document and ensure proper disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPdf))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
+        }
+
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
+        {
+            // Create a new page if the document has no pages
+            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
 
             // Create a table with three columns
             Table table = new Table
             {
-                ColumnWidths = "100 100 100",
-                Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
+                // Example column widths (percentage of page width)
+                ColumnWidths = "33 33 34",
+                // Optional: set table border
+                Border = new BorderInfo(BorderSide.All, 0.5f, Color.Black)
             };
 
-            // Header row
-            Row header = table.Rows.Add();
-            header.DefaultCellTextState = new TextState { FontSize = 12, FontStyle = FontStyles.Bold };
-            header.Cells.Add("ID");
-            header.Cells.Add("Name");
-            header.Cells.Add("Value");
-
-            // Sample data rows
-            for (int i = 1; i <= 10; i++)
+            // Populate the table with sample data (5 rows)
+            for (int r = 0; r < 5; r++)
             {
-                Row row = table.Rows.Add();
-                row.Cells.Add(i.ToString());
-                row.Cells.Add($"Item {i}");
-                row.Cells.Add((i * 10).ToString());
+                Row row = table.Rows.Add(); // Add a new row
+
+                // Add three cells to the row
+                for (int c = 0; c < 3; c++)
+                {
+                    Cell cell = new Cell
+                    {
+                        // Simple text content
+                        Paragraphs = { new TextFragment($"R{r + 1}C{c + 1}") },
+                        // Optional cell padding
+                        Margin = new MarginInfo(5, 5, 5, 5)
+                    };
+                    row.Cells.Add(cell);
+                }
             }
 
-            // Apply alternating background colors to cells based on row index parity
+            // Apply alternating background colors based on row index parity
             for (int i = 0; i < table.Rows.Count; i++)
             {
-                Row row = table.Rows[i];
-                Aspose.Pdf.Color bg = (i % 2 == 0) ? Aspose.Pdf.Color.LightGray : Aspose.Pdf.Color.White;
-                foreach (Cell cell in row.Cells)
-                {
-                    cell.BackgroundColor = bg;
-                }
+                Row currentRow = table.Rows[i];
+                // Even rows (0‑based) get LightGray, odd rows get White
+                currentRow.BackgroundColor = (i % 2 == 0) ? Color.LightGray : Color.White;
             }
 
             // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF
-            doc.Save(outputPath);
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with alternating row colors: {outputPdf}");
     }
 }

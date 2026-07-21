@@ -1,134 +1,132 @@
 {
   "category": "facades-sign-documents",
-  "nuget_version": "26.6.0",
-  "last_updated": "2026-07-05T09:22:43Z",
+  "nuget_version": "26.7.0",
+  "last_updated": "2026-07-18T01:11:06Z",
   "examples": {
-    "digitally-sign-pdf-visible-first-page": {
-      "title": "Digitally Sign PDF with Visible Signature on First Page",
-      "filename": "digitally-sign-pdf-visible-first-page.cs",
-      "description": "Demonstrates how to bind a PDF, set a certificate, and add a visible digital signature to page one using Aspose.Pdf.Facades.PdfFileSignature, then save the signed document.",
-      "tags": [
-        "digital-signature",
-        "pdf",
-        "visible-signature",
-        "certificate",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSignature",
-        "PdfFileSignature.BindPdf",
-        "PdfFileSignature.SetCertificate",
-        "PdfFileSignature.Sign",
-        "PdfFileSignature.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
-      "status": "verified"
-    },
-    "add-second-digital-signature-page-3": {
-      "title": "Add a Second Digital Signature on Page 3",
-      "filename": "add-second-digital-signature-page-3.cs",
-      "description": "Demonstrates how to apply an additional visible digital signature to page three of a PDF using Aspose.Pdf, including certificate setup, appearance image, and custom rectangle positioning.",
+    "digitally-sign-first-page-pdf": {
+      "title": "Digitally Sign First Page of PDF",
+      "filename": "digitally-sign-first-page-pdf.cs",
+      "description": "Shows how to bind a PDF using PdfFileSignature, configure a certificate, add a visible digital signature to page 1, and save the signed document.",
       "tags": [
         "digital-signature",
         "pdf",
         "Aspose.Pdf",
-        "signature-appearance",
-        "page-3"
+        "signing",
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSignature",
         "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
         "Aspose.Pdf.Facades.PdfFileSignature.SetCertificate",
-        "Aspose.Pdf.Facades.PdfFileSignature.SignatureAppearance",
         "Aspose.Pdf.Facades.PdfFileSignature.Sign",
         "Aspose.Pdf.Facades.PdfFileSignature.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "custom-signature-appearance-image-background": {
-      "title": "Configure Custom Signature Appearance with Image and Background Color",
-      "filename": "custom-signature-appearance-image-background.cs",
-      "description": "Demonstrates how to set a foreground image and a background color for a PDF digital signature using Aspose.Pdf's SignatureCustomAppearance before signing the document.",
+    "add-multiple-digital-signatures-to-pdf": {
+      "title": "Add Multiple Digital Signatures to PDF",
+      "filename": "add-multiple-digital-signatures-to-pdf.cs",
+      "description": "Demonstrates how to apply two digital signatures on different pages and rectangle areas of a PDF using Aspose.Pdf.Facades.",
       "tags": [
         "digital-signature",
-        "custom-appearance",
-        "foreground-image",
-        "background-color",
-        "pdf"
+        "pdf",
+        "aspose",
+        "multiple-signatures",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSignature",
-        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileSignature.SetCertificate",
-        "Aspose.Pdf.Facades.PdfFileSignature.Sign",
-        "Aspose.Pdf.Forms.SignatureCustomAppearance",
-        "Aspose.Pdf.Forms.PKCS1"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
-      "status": "verified"
-    },
-    "suppress-signature-reason-location": {
-      "title": "Suppress Signature Reason and Location When Signing PDF",
-      "filename": "suppress-signature-reason-location.cs",
-      "description": "Demonstrates how to sign a PDF with Aspose.Pdf while suppressing the reason, location, and contact info by setting those signature properties to empty strings.",
-      "tags": [
-        "pdf-signature",
-        "aspose-pdf",
-        "csharp",
-        "digital-signature",
-        "suppress-location"
-      ],
-      "apis_used": [
-        "PdfFileSignature",
         "PdfFileSignature.BindPdf",
         "PdfFileSignature.SetCertificate",
-        "PKCS1",
-        "PKCS1.Reason",
-        "PKCS1.Location",
+        "PdfFileSignature.SignatureAppearance",
+        "PdfFileSignature.Sign",
+        "PdfFileSignature.Save",
+        "PdfFileSignature.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:11:06Z",
+      "status": "verified"
+    },
+    "sign-pdf-with-custom-appearance": {
+      "title": "Sign PDF with Custom Appearance (Foreground Image & Background Color)",
+      "filename": "sign-pdf-with-custom-appearance.cs",
+      "description": "Demonstrates how to digitally sign a PDF using Aspose.Pdf.Facades, configuring a custom signature appearance that includes a foreground image and a background color.",
+      "tags": [
+        "digital-signature",
+        "custom-appearance",
+        "pdf",
+        "foreground-image",
+        "background-color"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSignature",
+        "Aspose.Pdf.Facades.PKCS1",
+        "Aspose.Pdf.Facades.SignatureCustomAppearance",
+        "Aspose.Pdf.Color",
         "PdfFileSignature.Sign",
         "PdfFileSignature.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "sign-pdf-french-caption": {
-      "title": "Sign PDF with French Digital Signature Caption",
-      "filename": "sign-pdf-french-caption.cs",
-      "description": "Demonstrates how to digitally sign a PDF using Aspose.Pdf.Facades and configure the SignatureCustomAppearance to display the caption in French.",
+    "sign-pdf-suppress-reason-location": {
+      "title": "Sign PDF and Suppress Signature Reason and Location",
+      "filename": "sign-pdf-suppress-reason-location.cs",
+      "description": "Demonstrates digitally signing a PDF with Aspose.Pdf.Facades while hiding the reason and location fields by assigning empty strings before signing.",
+      "tags": [
+        "pdf",
+        "signature",
+        "aspose",
+        "csharp",
+        "suppress"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSignature",
+        "Aspose.Pdf.Facades.PKCS1",
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.Sign",
+        "Aspose.Pdf.Facades.PdfFileSignature.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T01:11:06Z",
+      "status": "verified"
+    },
+    "sign-pdf-french-appearance": {
+      "title": "Sign PDF with French Signature Appearance",
+      "filename": "sign-pdf-french-appearance.cs",
+      "description": "Demonstrates digitally signing a PDF with a visible signature image and setting the signature's custom appearance locale to French using Aspose.Pdf.",
       "tags": [
         "digital-signature",
         "pdf",
         "custom-appearance",
-        "french",
-        "aspose-pdf"
+        "locale",
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "PdfFileSignature",
         "PdfFileSignature.BindPdf",
         "PdfFileSignature.Sign",
-        "PdfFileSignature.Save",
         "PKCS1",
-        "SignatureCustomAppearance"
+        "SignatureCustomAppearance",
+        "SignatureCustomAppearance.Culture"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
     "remove-signature-from-pdf": {
       "title": "Remove Signature from PDF",
       "filename": "remove-signature-from-pdf.cs",
-      "description": "Demonstrates how to delete a digital signature named 'ApprovalSignature' from an existing PDF using Aspose.Pdf's PdfFileSignature facade and save the updated document.",
+      "description": "Demonstrates how to delete an existing digital signature named 'ApprovalSignature' from a PDF file using Aspose.Pdf's PdfFileSignature facade and save the result.",
       "tags": [
         "pdf",
         "signature",
         "remove",
         "aspose",
-        "csharp"
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSignature",
@@ -137,13 +135,13 @@
         "Aspose.Pdf.Facades.PdfFileSignature.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "verify-pdf-signature-exists": {
-      "title": "Verify Presence and Validity of a PDF Signature",
-      "filename": "verify-pdf-signature-exists.cs",
-      "description": "Shows how to determine whether a PDF contains a signature named 'ContractSigner' and then verify that signature using Aspose.Pdf.Facades.",
+    "verify-specific-pdf-signature": {
+      "title": "Verify Specific PDF Signature Using PdfFileSignature",
+      "filename": "verify-specific-pdf-signature.cs",
+      "description": "Shows how to locate a signature named 'ContractSigner' in a PDF and verify it with Aspose.Pdf's PdfFileSignature facade.",
       "tags": [
         "pdf",
         "signature",
@@ -155,43 +153,43 @@
         "Aspose.Pdf.Facades.PdfFileSignature",
         "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
         "Aspose.Pdf.Facades.PdfFileSignature.GetSignatureNames",
-        "Aspose.Pdf.Facades.PdfFileSignature.VerifySignature",
-        "Aspose.Pdf.Facades.SignatureName"
+        "Aspose.Pdf.Facades.PdfFileSignature.VerifySigned"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "verify-pdf-signature-field": {
-      "title": "Verify PDF Signature Field",
-      "filename": "verify-pdf-signature-field.cs",
-      "description": "Shows how to load a PDF document and validate the cryptographic integrity of a signature field named \"ManagerSignature\" using Aspose.Pdf's PdfFileSignature facade.",
+    "validate-pdf-signature-field": {
+      "title": "Validate PDF Signature Field Using Aspose.Pdf",
+      "filename": "validate-pdf-signature-field.cs",
+      "description": "Shows how to load a PDF, bind it to the PdfFileSignature facade, and verify the cryptographic integrity of a specific signature field (ManagerSignature).",
       "tags": [
         "pdf",
         "signature",
         "verification",
-        "facade",
-        "aspose"
+        "aspose",
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfFileSignature",
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
         "Aspose.Pdf.Facades.PdfFileSignature.VerifySignature"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "extract-certificate-from-pdf-signature": {
-      "title": "Extract Certificate from PDF Signature Field",
-      "filename": "extract-certificate-from-pdf-signature.cs",
-      "description": "Shows how to retrieve the signing certificate from a digital signature field in a PDF document and save it as a .cer file using Aspose.Pdf.",
+    "extract-signing-certificate-from-pdf": {
+      "title": "Extract Signing Certificate from PDF Signature Field",
+      "filename": "extract-signing-certificate-from-pdf.cs",
+      "description": "Shows how to retrieve the X.509 signing certificate from a specific signature field in a PDF and save it as a .cer file using Aspose.Pdf.",
       "tags": [
         "pdf",
         "signature",
         "certificate",
-        "extract",
-        "facade"
+        "extraction",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSignature",
@@ -199,19 +197,19 @@
         "Aspose.Pdf.Facades.PdfFileSignature.ExtractCertificate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
     "extract-signature-image-png": {
       "title": "Extract Signature Image and Save as PNG",
       "filename": "extract-signature-image-png.cs",
-      "description": "Shows how to bind a PDF, extract the image of the 'WitnessSignature' signature field using Aspose.Pdf.Facades, and convert the JPEG stream to a PNG file.",
+      "description": "Shows how to extract the image of a PDF signature field named \"WitnessSignature\" using Aspose.Pdf.Facades and convert it to a PNG file.",
       "tags": [
         "signature",
+        "image-extraction",
         "pdf",
-        "image",
         "png",
-        "facade"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSignature",
@@ -219,41 +217,40 @@
         "Aspose.Pdf.Facades.PdfFileSignature.ExtractImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "custom-signature-appearance-no-caption": {
-      "title": "Create Custom PDF Signature Appearance Without Caption",
-      "filename": "custom-signature-appearance-no-caption.cs",
-      "description": "Demonstrates signing a PDF with Aspose.Pdf while hiding the default \"Digitally signed by\" label by using a custom signature appearance.",
+    "custom-signature-appearance-hide-caption": {
+      "title": "Create Custom Signature Appearance Without 'Digitally signed by' Caption",
+      "filename": "custom-signature-appearance-hide-caption.cs",
+      "description": "Demonstrates how to sign a PDF with Aspose.Pdf and hide the default \"Digitally signed by\" label by disabling signature properties or providing a custom appearance.",
       "tags": [
         "pdf-signature",
         "custom-appearance",
-        "hide-caption",
         "aspose-pdf",
-        "digital-signature"
+        "digital-signature",
+        "csharp"
       ],
       "apis_used": [
-        "PdfFileSignature",
-        "PdfFileSignature.BindPdf",
-        "PKCS1",
-        "SignatureCustomAppearance",
-        "PdfFileSignature.Sign",
-        "PdfFileSignature.Save"
+        "Aspose.Pdf.Facades.PdfFileSignature",
+        "Aspose.Pdf.Facades.PKCS1",
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.Sign",
+        "Aspose.Pdf.Facades.PdfFileSignature.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
     "sign-pdf-with-pfx-certificate": {
       "title": "Sign PDF with PFX Certificate using Aspose.Pdf",
       "filename": "sign-pdf-with-pfx-certificate.cs",
-      "description": "Demonstrates how to digitally sign a PDF file using a password‑protected PFX certificate with Aspose.Pdf.Facades.",
+      "description": "Demonstrates digitally signing a PDF with a password‑protected PFX certificate and optionally adding a visible signature appearance using Aspose.Pdf.",
       "tags": [
         "pdf",
         "digital-signature",
         "pfx",
-        "aspose",
+        "aspose.pdf",
         "c#"
       ],
       "apis_used": [
@@ -264,13 +261,13 @@
         "Aspose.Pdf.Facades.PdfFileSignature.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "remove-pdf-signature-missing-handling": {
-      "title": "Remove PDF Signature with Missing Signature Handling",
-      "filename": "remove-pdf-signature-missing-handling.cs",
-      "description": "Demonstrates how to remove a specific signature from a PDF using Aspose.Pdf.Facades while gracefully handling the case where the signature does not exist.",
+    "remove-pdf-signature-with-missing-field-handling": {
+      "title": "Remove PDF Signature with Missing-Field Handling",
+      "filename": "remove-pdf-signature-with-missing-field-handling.cs",
+      "description": "Demonstrates how to remove a named digital signature from a PDF using Aspose.Pdf.Facades, with graceful handling when the signature does not exist.",
       "tags": [
         "pdf",
         "signature",
@@ -280,112 +277,115 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSignature",
-        "PdfFileSignature.BindPdf",
-        "PdfFileSignature.GetSignatureNames",
-        "PdfFileSignature.RemoveSignature",
-        "PdfFileSignature.Save",
-        "Aspose.Pdf.Facades.SignatureName"
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.GetSignatureNames",
+        "Aspose.Pdf.Facades.PdfFileSignature.RemoveSignature",
+        "Aspose.Pdf.Facades.PdfFileSignature.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "verify-pdf-signatures-log-json": {
-      "title": "Verify PDF Signatures and Log Results to JSON",
-      "filename": "verify-pdf-signatures-log-json.cs",
-      "description": "The example opens a signed PDF, checks each embedded signature for validity, and writes the signature name and verification status to a formatted JSON file.",
+    "verify-pdf-signatures-to-json": {
+      "title": "Verify PDF Signatures and Export Results to JSON",
+      "filename": "verify-pdf-signatures-to-json.cs",
+      "description": "Loads a signed PDF, verifies each digital signature using Aspose.Pdf.Facades, and writes the signature name and validation status to a formatted JSON file.",
       "tags": [
         "pdf",
         "signature",
         "verification",
         "json",
-        "aspose"
+        "facade"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfFileSignature",
-        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileSignature.ContainsSignature",
         "Aspose.Pdf.Facades.PdfFileSignature.GetSignatureNames",
         "Aspose.Pdf.Facades.PdfFileSignature.VerifySignature",
         "Aspose.Pdf.Facades.SignatureName"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "sign-and-verify-pdf": {
+    "sign-and-verify-pdf-using-pdffilesignature": {
       "title": "Sign and Verify PDF Using PdfFileSignature",
-      "filename": "sign-and-verify-pdf.cs",
-      "description": "Demonstrates how to digitally sign a PDF with a certificate using Aspose.Pdf.Facades.PdfFileSignature and then immediately verify the signature's authenticity.",
-      "tags": [
-        "pdf-signature",
-        "digital-signature",
-        "verification",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSignature",
-        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileSignature.SetCertificate",
-        "Aspose.Pdf.Facades.PdfFileSignature.Sign",
-        "Aspose.Pdf.Facades.PdfFileSignature.Save",
-        "Aspose.Pdf.Facades.PdfFileSignature.GetSignatureNames",
-        "Aspose.Pdf.Facades.PdfFileSignature.VerifySignature"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
-      "status": "verified"
-    },
-    "digitally-sign-pdf-with-reason-location": {
-      "title": "Digitally Sign PDF with Reason and Location",
-      "filename": "digitally-sign-pdf-with-reason-location.cs",
-      "description": "Demonstrates how to apply a visible digital signature to a PDF using Aspose.Pdf, specifying the signature reason and location.",
+      "filename": "sign-and-verify-pdf-using-pdffilesignature.cs",
+      "description": "Demonstrates how to digitally sign a PDF with a PFX certificate using PdfFileSignature and then verify the signature's authenticity.",
       "tags": [
         "digital-signature",
         "pdf",
-        "aspose",
-        "signature-reason",
-        "visible-signature"
+        "verification",
+        "Aspose.Pdf",
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSignature",
         "PdfFileSignature.BindPdf",
         "PdfFileSignature.SetCertificate",
         "PdfFileSignature.Sign",
+        "PdfFileSignature.Save",
+        "PdfFileSignature.GetSignatureNames",
+        "PdfFileSignature.VerifySignature",
+        "PdfFileSignature.ContainsSignature"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:11:06Z",
+      "status": "verified"
+    },
+    "sign-pdf-with-reason-and-location": {
+      "title": "Sign PDF with Reason and Location",
+      "filename": "sign-pdf-with-reason-and-location.cs",
+      "description": "Demonstrates digitally signing a PDF using a PFX certificate and setting the signature reason and location via Aspose.Pdf.",
+      "tags": [
+        "digital-signature",
+        "pdf",
+        "Aspose.Pdf",
+        "PKCS1",
+        "signature-reason"
+      ],
+      "apis_used": [
+        "PdfFileSignature",
+        "PdfFileSignature.BindPdf",
+        "PKCS1",
+        "PKCS1.Reason",
+        "PKCS1.Location",
+        "PdfFileSignature.Sign",
         "PdfFileSignature.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "add-signature-field-and-sign-pdf": {
-      "title": "Add Signature Field and Sign PDF on Specific Page",
-      "filename": "add-signature-field-and-sign-pdf.cs",
-      "description": "Demonstrates adding a signature field to a specific page of a PDF and then applying a PKCS#1 digital signature using Aspose.Pdf.",
+    "create-and-sign-pdf-signature-field": {
+      "title": "Create and Sign a PDF Signature Field on a Specific Page",
+      "filename": "create-and-sign-pdf-signature-field.cs",
+      "description": "Shows how to add a digital signature field to a chosen page of a PDF and then sign it using a certificate with Aspose.Pdf.",
       "tags": [
         "signature",
         "pdf",
-        "add-field",
         "digital-signature",
+        "facade",
         "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.FormEditor.AddField",
-        "Aspose.Pdf.Facades.FieldType.Signature",
-        "Aspose.Pdf.Forms.PKCS1",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Facades.PdfFileSignature",
+        "Aspose.Pdf.Facades.PdfFileSignature.SetCertificate",
         "Aspose.Pdf.Facades.PdfFileSignature.Sign",
-        "Aspose.Pdf.Facades.PdfFileSignature.Save"
+        "Aspose.Pdf.Facades.PdfFileSignature.Save",
+        "Aspose.Pdf.Facades.PKCS1"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
     "extract-certificate-details-from-pdf-signature": {
-      "title": "Extract Certificate Details from PDF Signature",
+      "title": "Extract Certificate Details from PDF Signature Field",
       "filename": "extract-certificate-details-from-pdf-signature.cs",
-      "description": "Demonstrates how to bind a PDF, enumerate its signature fields, and retrieve the X.509 certificate information such as issuer and expiration date using Aspose.Pdf.Facades.",
+      "description": "Demonstrates how to load a signed PDF, enumerate its signature fields, and extract the X.509 certificate to read issuer and expiration information.",
       "tags": [
         "pdf",
         "signature",
@@ -394,44 +394,47 @@
         "aspose"
       ],
       "apis_used": [
-        "PdfFileSignature",
-        "PdfFileSignature.BindPdf",
-        "PdfFileSignature.GetSignatureNames",
-        "PdfFileSignature.TryExtractCertificate",
-        "SignatureName"
+        "Aspose.Pdf.Facades.PdfFileSignature",
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.GetSignatureNames",
+        "Aspose.Pdf.Facades.PdfFileSignature.TryExtractCertificate",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Rectangle"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
     "generate-pdf-signature-report": {
       "title": "Generate PDF Signature Verification Report",
       "filename": "generate-pdf-signature-report.cs",
-      "description": "Shows how to extract digital signature details from a PDF using PdfFileSignature and create a new PDF that lists each signature's signer, reason, location, date, validity, revision and coverage.",
+      "description": "Creates a PDF report that lists each digital signature in a signed document, showing signer, validity, reason, location, date, revision and coverage information.",
       "tags": [
         "pdf",
-        "digital-signature",
-        "report",
+        "signature",
         "verification",
-        "aspose-pdf"
+        "report",
+        "aspose"
       ],
       "apis_used": [
-        "PdfFileSignature",
-        "PdfFileSignature.BindPdf",
-        "PdfFileSignature.GetSignatureNames",
-        "PdfFileSignature.VerifySignature",
-        "Document",
-        "Page",
-        "TextFragment"
+        "Aspose.Pdf.Facades.PdfFileSignature",
+        "Aspose.Pdf.Facades.PdfFileSignature.GetSignatureNames",
+        "Aspose.Pdf.Facades.PdfFileSignature.VerifySignature",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
     "retry-sign-pdf-when-file-locked": {
       "title": "Retry Signing PDF When File Is Locked",
       "filename": "retry-sign-pdf-when-file-locked.cs",
-      "description": "Demonstrates how to sign a PDF with Aspose.Pdf while handling file‑locking issues by implementing a retry loop with configurable attempts and delay.",
+      "description": "Demonstrates how to sign a PDF with Aspose.Pdf while handling file‑lock conflicts by implementing a retry loop with configurable attempts and delay.",
       "tags": [
         "pdf",
         "signing",
@@ -440,20 +443,20 @@
         "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSignature",
-        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileSignature.SetCertificate",
-        "Aspose.Pdf.Facades.PdfFileSignature.Sign",
-        "Aspose.Pdf.Facades.PdfFileSignature.Save"
+        "PdfFileSignature",
+        "PdfFileSignature.BindPdf",
+        "PdfFileSignature.SetCertificate",
+        "PdfFileSignature.Sign",
+        "PdfFileSignature.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "remove-all-signatures-from-pdf": {
-      "title": "Remove All Signatures from PDF",
-      "filename": "remove-all-signatures-from-pdf.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfFileSignature to delete all digital signatures from a PDF document and save a clean copy.",
+    "remove-all-pdf-signatures": {
+      "title": "Remove All Signatures from a PDF",
+      "filename": "remove-all-pdf-signatures.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades to strip all digital signatures from a PDF document and save a clean copy.",
       "tags": [
         "pdf",
         "signature",
@@ -463,18 +466,18 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSignature",
-        "PdfFileSignature.BindPdf",
-        "PdfFileSignature.RemoveSignatures",
-        "PdfFileSignature.Save"
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.RemoveSignatures",
+        "Aspose.Pdf.Facades.PdfFileSignature.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "verify-multiple-pdf-signatures": {
+    "verify-multiple-signatures-pdf": {
       "title": "Verify Multiple Signatures in a PDF",
-      "filename": "verify-multiple-pdf-signatures.cs",
-      "description": "Shows how to bind a signed PDF, retrieve all signature names, and verify each signature using Aspose.Pdf.Facades.",
+      "filename": "verify-multiple-signatures-pdf.cs",
+      "description": "Demonstrates loading a signed PDF, retrieving all signature names, and verifying each signature using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
         "signature",
@@ -483,20 +486,20 @@
         "facade"
       ],
       "apis_used": [
-        "PdfFileSignature",
-        "PdfFileSignature.BindPdf",
-        "PdfFileSignature.GetSignatureNames",
-        "PdfFileSignature.VerifySignature",
-        "SignatureInfo"
+        "Aspose.Pdf.Facades.PdfFileSignature",
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.GetSignatureNames",
+        "Aspose.Pdf.Facades.PdfFileSignature.VerifySigned",
+        "Aspose.Pdf.Facades.SignatureName"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
     "extract-signature-images-html-report": {
-      "title": "Extract Signature Images to HTML Report",
+      "title": "Extract Signature Images and Generate HTML Report",
       "filename": "extract-signature-images-html-report.cs",
-      "description": "Loads a signed PDF, extracts each signature's image using Aspose.Pdf.Facades.PdfFileSignature, and embeds the images as Base64 data URIs in an HTML file for visual inspection.",
+      "description": "Demonstrates extracting digital signature images from a PDF with Aspose.Pdf.Facades and embedding them as Base64 data URIs in an HTML report for visual inspection.",
       "tags": [
         "signature",
         "image-extraction",
@@ -506,43 +509,43 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSignature",
-        "PdfFileSignature.BindPdf",
-        "PdfFileSignature.GetSignatureNames",
-        "PdfFileSignature.ExtractImage",
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.GetSignatureNames",
+        "Aspose.Pdf.Facades.PdfFileSignature.ExtractImage",
         "Aspose.Pdf.Facades.SignatureName"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "sign-pdf-with-semi-transparent-background": {
-      "title": "Sign PDF with Semi‑Transparent Background Appearance",
-      "filename": "sign-pdf-with-semi-transparent-background.cs",
-      "description": "Demonstrates how to digitally sign a PDF using Aspose.Pdf and configure a custom signature appearance with a light‑gray (semi‑transparent) background to improve document readability.",
+    "apply-semi-transparent-signature-appearance": {
+      "title": "Apply Semi-Transparent Signature Appearance to PDF",
+      "filename": "apply-semi-transparent-signature-appearance.cs",
+      "description": "Demonstrates how to sign a PDF using Aspose.Pdf.Facades with a semi‑transparent PNG image as the visual signature appearance, improving document readability.",
       "tags": [
-        "digital-signature",
-        "custom-appearance",
-        "pdf-signing",
+        "pdf-signature",
+        "signature-appearance",
+        "transparent",
         "aspose-pdf",
-        "csharp"
+        "facades"
       ],
       "apis_used": [
-        "Aspose.Pdf.Forms.PKCS1",
-        "Aspose.Pdf.Forms.SignatureCustomAppearance",
-        "Aspose.Pdf.Color.FromRgb",
         "Aspose.Pdf.Facades.PdfFileSignature",
-        "PdfFileSignature.BindPdf",
-        "PdfFileSignature.Sign",
-        "PdfFileSignature.Save"
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.SetCertificate",
+        "Aspose.Pdf.Facades.PdfFileSignature.SignatureAppearance",
+        "Aspose.Pdf.Facades.PdfFileSignature.Sign",
+        "Aspose.Pdf.Facades.PdfFileSignature.Save",
+        "Aspose.Pdf.Facades.PdfFileSignature.Close"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "list-signature-names-in-pdf": {
+    "list-pdf-signature-names": {
       "title": "List Signature Names in a PDF Document",
-      "filename": "list-signature-names-in-pdf.cs",
-      "description": "Shows how to retrieve the names of all active signatures in a PDF file using Aspose.Pdf.Facades.",
+      "filename": "list-pdf-signature-names.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades to retrieve and display all non‑empty signature names contained in a PDF file.",
       "tags": [
         "pdf",
         "signature",
@@ -557,29 +560,30 @@
         "Aspose.Pdf.Facades.SignatureName"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
     "sign-pdf-with-visible-image": {
-      "title": "Sign PDF with Visible Image Using Aspose.Pdf",
+      "title": "Sign PDF with Visible Image Using Aspose.Pdf Facade",
       "filename": "sign-pdf-with-visible-image.cs",
-      "description": "A console application that adds a visible signature appearance from an image to a PDF file using Aspose.Pdf.Facades. It loads the PDF, sets the signature image, defines its position, and saves the signed document.",
+      "description": "Demonstrates how to apply a visible signature image to a PDF document using Aspose.Pdf.Facades.PdfFileSignature, optionally attaching a certificate and saving the signed file.",
       "tags": [
         "pdf-signature",
         "visible-signature",
         "aspose-pdf",
-        "console-app",
+        "command-line",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSignature",
         "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
         "Aspose.Pdf.Facades.PdfFileSignature.SignatureAppearance",
+        "Aspose.Pdf.Facades.PdfFileSignature.SetCertificate",
         "Aspose.Pdf.Facades.PdfFileSignature.Sign",
         "Aspose.Pdf.Facades.PdfFileSignature.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
     "sign-pdf-visible-signature-last-page": {
@@ -587,11 +591,11 @@
       "filename": "sign-pdf-visible-signature-last-page.cs",
       "description": "Demonstrates how to digitally sign a PDF using a certificate and add a visible signature image positioned at the bottom‑right corner of the last page.",
       "tags": [
-        "digital-signature",
-        "visible-signature",
-        "pdf",
+        "pdf signing",
+        "visible signature",
+        "digital certificate",
         "Aspose.Pdf",
-        "last-page"
+        "last page"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSignature",
@@ -599,40 +603,39 @@
         "Aspose.Pdf.Facades.PdfFileSignature.SetCertificate",
         "Aspose.Pdf.Facades.PdfFileSignature.Sign",
         "Aspose.Pdf.Facades.PdfFileSignature.Save",
-        "Aspose.Pdf.Page"
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page.PageInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "locale-specific-pdf-signature": {
-      "title": "Locale‑Specific PDF Signature Appearance",
-      "filename": "locale-specific-pdf-signature.cs",
-      "description": "Demonstrates how to apply a digital signature to a PDF with locale‑specific labels and appearance settings for German, Spanish, and Japanese languages using Aspose.Pdf.",
+    "add-locale-specific-visible-signatures": {
+      "title": "Add Locale‑Specific Visible Signatures to PDF",
+      "filename": "add-locale-specific-visible-signatures.cs",
+      "description": "Signs a PDF on multiple pages with visible signatures, each using a different culture (German, Spanish, Japanese) by configuring SignatureCustomAppearance.Culture.",
       "tags": [
-        "pdf",
-        "digital-signature",
-        "localization",
-        "appearance",
-        "aspose"
+        "pdf-signature",
+        "locale",
+        "visible-signature",
+        "culture",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSignature",
         "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileSignature.SetCertificate",
         "Aspose.Pdf.Facades.PdfFileSignature.Sign",
-        "Aspose.Pdf.Facades.PdfFileSignature.Save",
-        "Aspose.Pdf.Forms.PKCS1",
+        "Aspose.Pdf.Facades.PKCS7",
         "Aspose.Pdf.Forms.SignatureCustomAppearance"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "remove-signatures-re-sign-pdf": {
-      "title": "Remove Existing Signatures and Re‑sign PDF with a New Certificate",
-      "filename": "remove-signatures-re-sign-pdf.cs",
-      "description": "Demonstrates how to remove all existing digital signatures from a PDF and then apply a new signature using a different certificate with Aspose.Pdf.Facades.",
+    "remove-signature-re-sign-pdf": {
+      "title": "Remove Existing Signature and Re‑sign PDF with New Certificate",
+      "filename": "remove-signature-re-sign-pdf.cs",
+      "description": "Demonstrates how to remove any existing digital signatures from a PDF and then apply a new signature using a different certificate with Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
         "signature",
@@ -642,41 +645,41 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSignature",
-        "PdfFileSignature.BindPdf",
-        "PdfFileSignature.RemoveSignatures",
-        "PdfFileSignature.SetCertificate",
-        "PdfFileSignature.Sign",
-        "PdfFileSignature.Save"
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.RemoveSignatures",
+        "Aspose.Pdf.Facades.PdfFileSignature.SetCertificate",
+        "Aspose.Pdf.Facades.PdfFileSignature.Sign",
+        "Aspose.Pdf.Facades.PdfFileSignature.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
     "verify-pdf-no-signatures-false": {
       "title": "Verify PDF Without Signatures Returns False",
       "filename": "verify-pdf-no-signatures-false.cs",
-      "description": "Demonstrates how to bind a PDF using Aspose.Pdf.Facades, check if it contains any digital signatures, and attempt to verify a non‑existent signature, which should return false.",
+      "description": "Shows how to detect that a PDF contains no signatures and confirms that the VerifySigned method returns false for an unsigned document.",
       "tags": [
         "pdf",
         "signature",
         "verification",
-        "aspose",
+        "aspose.pdf",
         "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSignature",
-        "PdfFileSignature.BindPdf",
-        "PdfFileSignature.ContainsSignature",
-        "PdfFileSignature.VerifySignature"
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.ContainsSignature",
+        "Aspose.Pdf.Facades.PdfFileSignature.VerifySigned"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "remove-all-pdf-signatures-recursively": {
+    "remove-all-signatures-from-pdfs-recursively": {
       "title": "Remove All Signatures from PDFs Recursively",
-      "filename": "remove-all-pdf-signatures-recursively.cs",
-      "description": "Shows how to walk through a directory tree, open each PDF with Aspose.Pdf.Facades.PdfFileSignature, remove all digital signatures, and save the file back.",
+      "filename": "remove-all-signatures-from-pdfs-recursively.cs",
+      "description": "Demonstrates how to traverse a directory tree, load each PDF with Aspose.Pdf.Facades, remove all embedded signatures, and overwrite the original file.",
       "tags": [
         "pdf",
         "signature",
@@ -685,102 +688,91 @@
         "aspose"
       ],
       "apis_used": [
-        "PdfFileSignature",
+        "Aspose.Pdf.Facades.PdfFileSignature",
         "PdfFileSignature.BindPdf",
         "PdfFileSignature.RemoveSignatures",
         "PdfFileSignature.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     },
-    "extract-signature-certificate-serial-number": {
-      "title": "Extract and Log Signature Certificate Serial Number",
-      "filename": "extract-signature-certificate-serial-number.cs",
-      "description": "Demonstrates how to open a signed PDF, enumerate its signatures, extract the X.509 certificate for each signature, and log the certificate's serial number for auditing.",
+    "extract-certificate-serial-number-from-pdf": {
+      "title": "Extract and Log Certificate Serial Number from PDF Signature",
+      "filename": "extract-certificate-serial-number-from-pdf.cs",
+      "description": "The example opens a signed PDF, verifies the presence of digital signatures, extracts each signature's X.509 certificate, and logs the certificate's serial number for audit purposes.",
       "tags": [
         "pdf",
         "signature",
         "certificate",
-        "audit",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSignature",
-        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileSignature.GetSignatureNames",
-        "Aspose.Pdf.Facades.PdfFileSignature.TryExtractCertificate",
-        "Aspose.Pdf.Facades.SignatureName"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T09:22:43Z",
-      "status": "verified"
-    },
-    "list-signature-reasons-and-locations": {
-      "title": "List Signature Reasons and Locations in a PDF",
-      "filename": "list-signature-reasons-and-locations.cs",
-      "description": "Shows how to bind a PDF with Aspose.Pdf, retrieve all signature names, and extract each signature's reason and location for auditing.",
-      "tags": [
-        "pdf",
-        "signature",
-        "audit",
-        "reason",
-        "location"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSignature",
-        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileSignature.GetSignatureNames",
-        "Aspose.Pdf.Facades.PdfFileSignature.GetReason",
-        "Aspose.Pdf.Facades.PdfFileSignature.GetLocation",
-        "Aspose.Pdf.Facades.SignatureName"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T09:22:43Z",
-      "status": "verified"
-    },
-    "sign-pdf-with-hidden-appearance": {
-      "title": "Sign PDF with Hidden Signature Appearance",
-      "filename": "sign-pdf-with-hidden-appearance.cs",
-      "description": "Demonstrates how to digitally sign a PDF using Aspose.Pdf while completely hiding the signature appearance, preserving cryptographic validity.",
-      "tags": [
-        "pdf",
-        "digital-signature",
-        "hidden-appearance",
-        "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSignature",
-        "PdfFileSignature.BindPdf",
-        "PdfFileSignature.SetCertificate",
-        "PdfFileSignature.Sign",
-        "PdfFileSignature.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T09:22:43Z",
-      "status": "verified"
-    },
-    "extract-signing-certificate-subject-dn": {
-      "title": "Extract Signing Certificate Subject DN from PDF",
-      "filename": "extract-signing-certificate-subject-dn.cs",
-      "description": "Demonstrates how to bind a signed PDF, retrieve the first signature, extract its X.509 certificate, read the subject distinguished name, and store it in an in‑memory DataTable.",
-      "tags": [
-        "pdf",
-        "signature",
-        "certificate",
-        "aspose",
-        "csharp"
+        "serial-number",
+        "audit"
       ],
       "apis_used": [
         "PdfFileSignature",
         "PdfFileSignature.BindPdf",
+        "PdfFileSignature.ContainsSignature",
         "PdfFileSignature.GetSignatureNames",
-        "PdfFileSignature.TryExtractCertificate",
-        "SignatureName"
+        "PdfFileSignature.TryExtractCertificate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T09:22:43Z",
+      "generated_at": "2026-07-18T01:11:06Z",
+      "status": "verified"
+    },
+    "audit-pdf-signatures-reason-location": {
+      "title": "Audit PDF Signatures: List Reason and Location",
+      "filename": "audit-pdf-signatures-reason-location.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades to read digital signatures from a PDF and retrieve each signature's reason and location for auditing purposes.",
+      "tags": [
+        "pdf",
+        "signature",
+        "audit",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "PdfFileSignature",
+        "SignatureName",
+        "PdfFileSignature.BindPdf",
+        "PdfFileSignature.GetSignatureNames",
+        "PdfFileSignature.GetReason",
+        "PdfFileSignature.GetLocation",
+        "PdfFileSignature.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T01:11:06Z",
+      "status": "verified"
+    },
+    "create-invisible-pdf-digital-signature": {
+      "title": "Create an Invisible Digital Signature for a PDF",
+      "filename": "create-invisible-pdf-digital-signature.cs",
+      "description": "Demonstrates signing a PDF with a cryptographically valid digital signature while completely hiding the visual appearance using Aspose.Pdf facades.",
+      "tags": [
+        "pdf",
+        "digital-signature",
+        "invisible",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSignature",
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.Sign",
+        "Aspose.Pdf.Facades.PdfFileSignature.Save",
+        "Aspose.Pdf.Forms.PKCS1"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T01:11:06Z",
+      "status": "verified"
+    },
+    "extract-the-signing-certificate-s-subject-distinguished-name-and-store-it-in-a-database": {
+      "title": "Extract The Signing Certificate S Subject Distinguished Name And Store It In A Database",
+      "filename": "extract-the-signing-certificate-s-subject-distinguished-name-and-store-it-in-a-database.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-07-18T01:11:06Z",
       "status": "verified"
     }
   }

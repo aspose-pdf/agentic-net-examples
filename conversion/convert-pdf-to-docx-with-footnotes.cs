@@ -11,27 +11,30 @@ class Program
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDocument = new Document(inputPdf))
+        try
         {
-            // Configure save options for DOCX conversion
-            var saveOptions = new DocSaveOptions
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDocument = new Document(inputPdf))
             {
-                // Output format: DOCX (correct enum member is DocX)
-                Format = DocSaveOptions.DocFormat.DocX,
-                // Optional: improve bullet detection (still supported)
-                RecognizeBullets = true
-                // Note: The Mode/RecognitionMode property has been removed in recent versions.
-            };
+                // Configure DOCX save options with enhanced flow recognition for footnotes
+                DocSaveOptions saveOptions = new DocSaveOptions
+                {
+                    Mode = DocSaveOptions.RecognitionMode.EnhancedFlow
+                };
 
-            // Save the PDF as DOCX with the specified options
-            pdfDocument.Save(outputDocx, saveOptions);
+                // Save the document as DOCX using the specified options
+                pdfDocument.Save(outputDocx, saveOptions);
+            }
+
+            Console.WriteLine($"PDF successfully converted to DOCX: {outputDocx}");
         }
-
-        Console.WriteLine($"PDF successfully converted to DOCX: {outputDocx}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

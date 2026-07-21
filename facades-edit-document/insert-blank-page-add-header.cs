@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;          // for TextStamp, FontRepository, etc.
-using System.Drawing;          // for System.Drawing.Color (used by TextStamp)
+using Aspose.Pdf.Facades;
+using System.Drawing; // Required for System.Drawing.Color
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,31 +17,29 @@ class Program
             return;
         }
 
-        // Load the PDF, insert a blank page at position 3, then add a header to all pages.
+        // Load the source PDF and insert a blank page at position 3 (1‑based index)
         using (Document doc = new Document(inputPath))
         {
-            // Insert a new blank page at position 3 (1‑based indexing).
-            // The inserted page will adopt the most common page size in the document.
             doc.Pages.Insert(3);
 
-            // Prepare a header using TextStamp (recommended over PdfFileStamp for headers).
-            foreach (Page page in doc.Pages)
+            // Prepare header text using Facades.FormattedText (System.Drawing.Color, float size)
+            Aspose.Pdf.Facades.FormattedText headerText = new Aspose.Pdf.Facades.FormattedText(
+                "Document Header",          // text
+                System.Drawing.Color.Black, // text color (System.Drawing.Color)
+                "Helvetica",                // font name
+                Aspose.Pdf.Facades.EncodingType.Winansi, // encoding
+                false,                       // embed font?
+                12f);                        // font size (float)
+
+            // Use PdfFileStamp to add the header to all pages
+            using (PdfFileStamp stamp = new PdfFileStamp())
             {
-                TextStamp headerStamp = new TextStamp("Document Header");
-                headerStamp.TextState.Font = FontRepository.FindFont("Helvetica");
-                headerStamp.TextState.FontSize = 12;
-                headerStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-                headerStamp.HorizontalAlignment = HorizontalAlignment.Center;
-                headerStamp.VerticalAlignment = VerticalAlignment.Top;
-                headerStamp.YIndent = 20f; // top margin in points
-
-                page.AddStamp(headerStamp);
+                stamp.BindPdf(doc);
+                stamp.AddHeader(headerText, 20); // top margin of 20 points
+                stamp.Save(outputPath);
             }
-
-            // Save the modified document.
-            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF processed successfully. Output saved to '{outputPath}'.");
     }
 }

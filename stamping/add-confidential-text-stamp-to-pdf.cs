@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API (Document, Page, TextStamp)
+using Aspose.Pdf;
+using Aspose.Pdf.Text; // for TextState if needed (optional)
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string stampText  = "CONFIDENTIAL";
+        const string outputPath = "confidential_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,34 +16,36 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TextStamp with the desired label
-            TextStamp textStamp = new TextStamp(stampText)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Set opacity to 0.6 for a subtle appearance
-                Opacity = 0.6,
+                Page page = doc.Pages[i];
 
-                // Optional: place the stamp diagonally across the page
-                // RotateAngle = -45,          // uncomment if rotation is desired
-                // HorizontalAlignment = HorizontalAlignment.Center,
-                // VerticalAlignment   = VerticalAlignment.Center,
+                // Create a simple text stamp with the desired label
+                TextStamp stamp = new TextStamp("CONFIDENTIAL")
+                {
+                    // Set the opacity to 0.6 for a subtle appearance
+                    Opacity = 0.6,
 
-                // Ensure the stamp is drawn as text (not as graphic operators)
-                Draw = false
-            };
+                    // Optional: position the stamp in the center of the page
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Center,
 
-            // Apply the stamp to every page in the document
-            foreach (Page page in doc.Pages)
-            {
-                page.AddStamp(textStamp);
+                    // Ensure the stamp is drawn on top of the page content
+                    Background = false
+                };
+
+                // Add the stamp to the current page
+                page.AddStamp(stamp);
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Text stamp added and saved to '{outputPath}'.");
+        Console.WriteLine($"Saved stamped PDF to '{outputPath}'.");
     }
 }

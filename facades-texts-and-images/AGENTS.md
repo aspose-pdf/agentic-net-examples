@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - facades-texts-and-images
 
-> **Facades texts and images** in PDF using C# / .NET -- **29** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades texts and images** in PDF using C# / .NET -- **28** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,17 +23,19 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf.Facades;` (29/29 files) ← category-specific
-- `using Aspose.Pdf;` (17/29 files) ← category-specific
-- `using Aspose.Pdf.Text;` (5/29 files)
-- `using System;` (29/29 files)
-- `using System.IO;` (29/29 files)
-- `using System.Drawing;` (5/29 files)
-- `using System.Drawing.Imaging;` (3/29 files)
-- `using NUnit.Framework;` (2/29 files)
-- `using System.Linq;` (1/29 files)
-- `using System.Threading;` (1/29 files)
-- `using System.Threading.Tasks;` (1/29 files)
+- `using Aspose.Pdf.Facades;` (27/28 files) ← category-specific
+- `using Aspose.Pdf;` (17/28 files) ← category-specific
+- `using Aspose.Pdf.Text;` (3/28 files)
+- `using Aspose.Pdf.Annotations;` (1/28 files)
+- `using Aspose.Pdf.Drawing;` (1/28 files)
+- `using System;` (28/28 files)
+- `using System.IO;` (26/28 files)
+- `using System.Drawing;` (5/28 files)
+- `using System.Drawing.Imaging;` (2/28 files)
+- `using System.Threading.Tasks;` (2/28 files)
+- `using NUnit.Framework;` (1/28 files)
+- `using System.Runtime.Versioning;` (1/28 files)
+- `using System.Threading;` (1/28 files)
 
 ## Common Code Pattern
 
@@ -50,38 +52,37 @@ tool.Save("output.pdf");
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-background-image-to-all-pdf-pages](./add-background-image-to-all-pdf-pages.cs) | Add Background Image to All PDF Pages | `PdfFileMend`, `BindPdf`, `AddImage` | Demonstrates how to use the PdfFileMend facade to overlay a PNG image as a full‑page background o... |
-| [add-company-logo-to-pdf-pages](./add-company-logo-to-pdf-pages.cs) | Add Company Logo to All PDF Pages | `Document`, `Page`, `PageInfo` | Shows how to batch‑process a folder of PDFs and overlay a PNG company logo in the top‑right corne... |
-| [add-header-image-to-pdf](./add-header-image-to-pdf.cs) | Add Header Image to PDF Files | `PdfFileStamp`, `BindPdf`, `AddHeader` | Shows how to insert a header image into one or more PDF documents using Aspose.Pdf.Facades.PdfFil... |
-| [add-image-and-text-watermark-to-pdf](./add-image-and-text-watermark-to-pdf.cs) | Add Image and Text Watermark to PDF | `PdfFileStamp`, `Stamp`, `FormattedText` | Demonstrates how to combine an image stamp and a semi‑transparent text stamp using Aspose.Pdf Fac... |
-| [add-image-and-text-with-audit-logging](./add-image-and-text-with-audit-logging.cs) | Add Image and Text to PDF with Audit Logging | `PdfFileMend`, `BindPdf`, `AddImage` | Demonstrates using Aspose.Pdf.Facades.PdfFileMend to bind a PDF, insert an image and formatted te... |
-| [add-image-to-pdf-memory-stream](./add-image-to-pdf-memory-stream.cs) | Add Image to PDF and Return as MemoryStream | `PdfFileMend`, `BindPdf`, `AddImage` | Shows how to insert an image onto the first page of an existing PDF using Aspose.Pdf.Facades and ... |
-| [add-image-to-pdf-page](./add-image-to-pdf-page.cs) | Add Image to Specific PDF Page | `PdfFileMend`, `BindPdf`, `AddImage` | Shows how to insert an image onto a chosen page of a PDF document at given rectangle coordinates ... |
-| [add-image-to-pdf-with-format-validation](./add-image-to-pdf-with-format-validation.cs) | Add Image to PDF with Format Validation | `Document`, `Save`, `PdfFileMend` | Demonstrates how to validate an image's file format and then add the image to a specific page of ... |
-| [add-image-verify-pdf-byte-size](./add-image-verify-pdf-byte-size.cs) | Add Image to PDF and Verify Byte Size Increase | `Document`, `PdfFileMend`, `BindPdf` | Creates a blank PDF, inserts a PNG image using PdfFileMend, saves the result, and asserts that th... |
-| [add-images-to-pdf-with-error-handling](./add-images-to-pdf-with-error-handling.cs) | Add Images to PDF with Error Handling | `PdfFileMend`, `AddImage`, `Close` | Demonstrates how to insert multiple images into a PDF using the PdfFileMend facade and handle mis... |
-| [add-multi-line-text-with-custom-spacing](./add-multi-line-text-with-custom-spacing.cs) | Add Multi‑Line Text with Custom Spacing to PDF Page | `PdfFileMend`, `AddText`, `Save` | Shows how to create a FormattedText block, add lines with custom line spacing, and place the bloc... |
+| [add-background-png-to-all-pdf-pages](./add-background-png-to-all-pdf-pages.cs) | Add Background PNG to All PDF Pages | `PdfFileMend`, `BindPdf`, `AddImage` | Demonstrates how to overlay a PNG image as a full‑page background on every page of a PDF using th... |
+| [add-header-image-to-pdfs](./add-header-image-to-pdfs.cs) | Add Header Image to PDFs | `PdfFileStamp`, `BindPdf`, `AddHeader` | Shows how to attach a header image to each page of multiple PDF documents and save the modified f... |
+| [add-image-and-text-audit-pdf](./add-image-and-text-audit-pdf.cs) | Add Image and Text to PDF with Audit Logging | `Document`, `PdfFileMend`, `AddImage` | Demonstrates how to insert an image and a text annotation into a PDF using Aspose.Pdf facades whi... |
+| [add-image-and-text-watermark-to-pdf](./add-image-and-text-watermark-to-pdf.cs) | Add Image and Text Watermark to PDF Pages | `Document`, `Page`, `ImageStamp` | Demonstrates how to overlay a semi‑transparent image and centered text as a watermark on each pag... |
+| [add-image-to-all-pdf-pages-dynamic-position](./add-image-to-all-pdf-pages-dynamic-position.cs) | Add Image to All PDF Pages with Dynamic Positioning | `Document`, `PdfFileMend`, `Page` | Demonstrates loading a PDF, calculating each page's dimensions, and placing an image at the botto... |
+| [add-image-to-pdf-get-memorystream](./add-image-to-pdf-get-memorystream.cs) | Add Image to PDF and Return MemoryStream | `PdfFileMend`, `BindPdf`, `AddImage` | Shows how to bind an existing PDF with Aspose.Pdf.Facades.PdfFileMend, add an image to the first ... |
+| [add-image-to-pdf-page](./add-image-to-pdf-page.cs) | Add Image to Specific PDF Page | `Document`, `PdfFileMend`, `AddImage` | Shows how to insert an image onto a chosen PDF page at given rectangle coordinates using Aspose.P... |
+| [add-image-to-pdf-with-pdffilemend](./add-image-to-pdf-with-pdffilemend.cs) | Add Image to PDF Using PdfFileMend with Try‑Finally | `PdfFileMend`, `BindPdf`, `AddImage` | Demonstrates how to bind a PDF, add an image stamp to a page, save the modified document, and gua... |
+| [add-images-to-pdf-with-error-handling](./add-images-to-pdf-with-error-handling.cs) | Add Images to PDF with Error Handling | `PdfFileMend`, `AddImage`, `Close` | Demonstrates how to insert multiple images into a PDF using Aspose.Pdf's PdfFileMend class while ... |
+| [add-multi-line-text-left-margin-page-3](./add-multi-line-text-left-margin-page-3.cs) | Add Multi‑Line Text with Custom Line Spacing to Left Margin ... | `PdfFileMend`, `BindPdf`, `Save` | Demonstrates how to insert a multi‑line text block with custom line spacing into the left margin ... |
 | [add-png-image-to-pdf-page](./add-png-image-to-pdf-page.cs) | Add PNG Image to PDF Page Using PdfFileMend | `PdfFileMend`, `BindPdf`, `AddImage` | Demonstrates how to bind an existing PDF with PdfFileMend, insert a PNG image onto page two at sp... |
-| [add-promotional-text-multiple-pdf-pages](./add-promotional-text-multiple-pdf-pages.cs) | Add Promotional Text to Multiple PDF Pages | `PdfFileMend`, `BindPdf`, `AddText` | Demonstrates inserting the same promotional message on pages 3, 5, and 7 of a PDF using Aspose.Pd... |
-| [add-tiff-image-to-last-pdf-page](./add-tiff-image-to-last-pdf-page.cs) | Add TIFF Image to Last PDF Page with PdfFileMend | `PdfFileMend`, `BindPdf`, `AddImage` | Demonstrates how to use PdfFileMend to insert a TIFF image onto the final page of an existing PDF... |
-| [add-word-wrapped-footer-to-pdf-pages](./add-word-wrapped-footer-to-pdf-pages.cs) | Add Word‑by‑Word Wrapped Footer to PDF Pages | `PdfFileStamp`, `BindPdf`, `FormattedText` | Shows how to use Aspose.Pdf.Facades to add a formatted footer with automatic word‑by‑word wrappin... |
-| [async-add-image-to-pdf](./async-add-image-to-pdf.cs) | Asynchronously Add Image to PDF using PdfFileMend | `PdfFileMend`, `BindPdf`, `AddImage` | Shows how to wrap PdfFileMend operations in Task.Run to add an image to the first page of a PDF w... |
-| [batch-extract-images-from-pdfs](./batch-extract-images-from-pdfs.cs) | Batch Extract Images from PDFs with Page and Index Naming | `Document`, `PdfExtractor`, `BindPdf` | Shows how to process multiple PDF files, extract images from each page using PdfExtractor, and sa... |
-| [dynamic-image-placement](./dynamic-image-placement.cs) | Dynamic Image Placement on PDF Page | `Document`, `Page`, `PdfFileMend` | Demonstrates calculating image coordinates from a PDF page's dimensions and adding the image usin... |
-| [extract-images-from-pdf-pages-2-5](./extract-images-from-pdf-pages-2-5.cs) | Extract Images from PDF Pages 2‑5 | `PdfExtractor`, `BindPdf`, `StartPage` | Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract all images from a PDF within a specif... |
-| [extract-images-from-pdf-to-png](./extract-images-from-pdf-to-png.cs) | Extract Images from PDF to PNG | `PdfExtractor`, `BindPdf`, `ExtractImage` | Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract all images from a PDF document and sa... |
-| [insert-png-signature-on-all-pdf-pages](./insert-png-signature-on-all-pdf-pages.cs) | Insert PNG Signature on All PDF Pages with PdfFileMend | `PdfFileMend`, `BindPdf`, `AddImage` | Demonstrates how to use the PdfFileMend facade to add a PNG signature image to the bottom‑left co... |
-| [modify-pdf-with-pdffilemend-try-finally](./modify-pdf-with-pdffilemend-try-finally.cs) | Modify PDF Using PdfFileMend with Try-Finally Cleanup | `PdfFileMend`, `BindPdf`, `Save` | Demonstrates binding a PDF, optionally modifying it, saving the result, and guaranteeing that the... |
-| [overlay-semi-transparent-gif-on-pdf](./overlay-semi-transparent-gif-on-pdf.cs) | Overlay Semi-Transparent GIF on PDF | `Document`, `PdfFileMend`, `CompositingParameters` | Demonstrates how to place a semi‑transparent GIF over an existing PNG image in a PDF using Aspose... |
-| [remove-all-images-from-pdf](./remove-all-images-from-pdf.cs) | Remove All Images from PDF | `PdfContentEditor`, `BindPdf`, `DeleteImage` | Shows how to delete every image in a PDF using Aspose.Pdf's PdfContentEditor and save the modifie... |
-| [remove-image-from-pdf-page](./remove-image-from-pdf-page.cs) | Remove Image from PDF Page | `PdfContentEditor`, `BindPdf`, `DeleteImage` | Shows how to delete a specific image on a given page of a PDF using Aspose.Pdf.Facades.PdfContent... |
-| [replace-image-with-bmp](./replace-image-with-bmp.cs) | Replace PDF Image with High‑Resolution BMP | `Document`, `PdfContentEditor`, `BindPdf` | Demonstrates how to replace the first image on the first page of a PDF with a higher‑resolution B... |
-| [replace-low-res-images-with-high-res-pngs](./replace-low-res-images-with-high-res-pngs.cs) | Replace Low-Resolution Images with High-Resolution PNGs in P... | `Document`, `PdfContentEditor`, `Pages` | Loads a PDF, iterates through each page and its images, and replaces every low‑resolution image w... |
-| [verify-added-text-coordinates](./verify-added-text-coordinates.cs) | Verify Added Text Coordinates with PdfContentEditor | `Document`, `PdfContentEditor`, `BindPdf` | Creates a blank PDF, adds a free‑text annotation at a specific rectangle using PdfContentEditor, ... |
-| [wrap-text-by-words-using-pdffilemend](./wrap-text-by-words-using-pdffilemend.cs) | Wrap Text by Words Using PdfFileMend | `Document`, `PdfFileMend`, `FormattedText` | Demonstrates how to enable the ByWords word‑wrapping mode with PdfFileMend and add a long paragra... |
+| [add-promotional-text-multiple-pdf-pages](./add-promotional-text-multiple-pdf-pages.cs) | Add Promotional Text to Multiple PDF Pages | `PdfFileMend`, `BindPdf`, `AddText` | Demonstrates inserting the same promotional text on pages 3, 5, and 7 of a PDF using PdfFileMend.... |
+| [add-tiff-image-to-last-pdf-page](./add-tiff-image-to-last-pdf-page.cs) | Add TIFF Image to Last Page of PDF with PdfFileMend | `PdfFileMend`, `BindPdf`, `AddImage` | Demonstrates using PdfFileMend to bind an existing PDF, determine its last page, and embed a TIFF... |
+| [add-word-wrapped-footer-to-pdf](./add-word-wrapped-footer-to-pdf.cs) | Add Word‑by‑Word Wrapped Footer to PDF Pages | `PdfFileStamp`, `FormattedText`, `BindPdf` | Shows how to add a formatted text footer that automatically wraps word‑by‑word across the page wi... |
+| [async-add-image-to-pdf](./async-add-image-to-pdf.cs) | Asynchronously Add Image to PDF with PdfFileMend | `PdfFileMend`, `BindPdf`, `AddImage` | Shows how to add an image to a specific page of a PDF file asynchronously by wrapping the synchro... |
+| [batch-add-logo-to-pdf-pages](./batch-add-logo-to-pdf-pages.cs) | Batch Add Logo to PDF Pages | `Document`, `PdfFileMend`, `BindPdf` | Shows how to iterate through a folder of PDF files and overlay a PNG company logo at the top‑righ... |
+| [batch-extract-images-from-pdfs](./batch-extract-images-from-pdfs.cs) | Batch Extract Images from PDFs with Page‑Based Naming | `SplitToPages`, `BindPdf`, `ExtractImage` | The example splits each PDF into single‑page files, extracts all images from each page, and saves... |
+| [configure-word-wrapping-bywords](./configure-word-wrapping-bywords.cs) | Configure Word Wrapping ByWords and Add Wrapped Text | `Document`, `PdfFileMend`, `FormattedText` | Demonstrates enabling word‑wrap, setting the wrap mode to ByWords, and adding a long paragraph th... |
+| [extract-images-from-pdf-pages-2-5](./extract-images-from-pdf-pages-2-5.cs) | Extract Images from PDF Pages 2‑5 | `PdfExtractor`, `BindPdf`, `StartPage` | Shows how to extract all images from a specific page range in a PDF using Aspose.Pdf.Facades.PdfE... |
+| [extract-images-from-pdf-to-png](./extract-images-from-pdf-to-png.cs) | Extract Images from PDF to PNG | `PdfExtractor`, `BindPdf`, `ExtractImage` | Shows how to use Aspose.Pdf.Facades.PdfExtractor to extract every image from a PDF document and s... |
+| [insert-png-signature-image-every-pdf-page](./insert-png-signature-image-every-pdf-page.cs) | Insert PNG Signature Image on Every PDF Page | `Document`, `PdfFileMend`, `BindPdf` | Shows how to use PdfFileMend to add a PNG signature image to the bottom‑left corner of each page ... |
+| [overlay-semi-transparent-gif-on-pdf](./overlay-semi-transparent-gif-on-pdf.cs) | Overlay Semi-Transparent GIF onto PDF Image | `PdfFileMend`, `CompositingParameters`, `BlendMode` | Demonstrates how to overlay a semi‑transparent GIF onto an existing PDF page that already contain... |
+| [remove-all-images-from-pdf](./remove-all-images-from-pdf.cs) | Remove All Images from a PDF | `PdfContentEditor`, `BindPdf`, `DeleteImage` | Shows how to load a PDF, delete every image on all pages using Aspose.Pdf.Facades, and save the m... |
+| [remove-image-from-pdf-page](./remove-image-from-pdf-page.cs) | Remove Image from PDF Page using Aspose.Pdf | `PdfContentEditor`, `BindPdf`, `DeleteImage` | Demonstrates how to delete a specific image identified by its object ID from a given page of a PD... |
+| [replace-jpeg-with-bmp-using-replaceimage](./replace-jpeg-with-bmp-using-replaceimage.cs) | Replace JPEG with Higher‑Resolution BMP Using ReplaceImage | `Document`, `Page`, `Image` | Demonstrates how to create a PDF with an embedded JPEG, generate a higher‑resolution BMP in memor... |
+| [replace-lowres-images-with-highres-png](./replace-lowres-images-with-highres-png.cs) | Replace Low-Resolution Images with High-Resolution PNGs in P... | `Document`, `PdfContentEditor`, `BindPdf` | Shows how to iterate through PDF pages and replace each embedded image with a high‑resolution PNG... |
+| [validate-image-format-before-calling-addimage-to-e...](./validate-image-format-before-calling-addimage-to-ensure-only-jpg-png-gif-bmp-or-tiff-files-are-used.cs) | Validate Image Format Before Calling Addimage To Ensure Only... | `PdfFileMend` | Validate Image Format Before Calling Addimage To Ensure Only Jpg Png Gif Bmp Or Tiff Files Are Used |
+| [verify-free-text-annotation-coordinates](./verify-free-text-annotation-coordinates.cs) | Verify Free Text Annotation Coordinates with PdfContentEdito... | `PdfContentEditor`, `Document`, `BindPdf` | Shows how to add a free‑text annotation to a PDF using PdfContentEditor and unit‑test that its re... |
 
 ## Category Statistics
-- Total examples: 29
+- Total examples: 28
 
 ## Category-Specific Tips
 
@@ -123,5 +124,5 @@ tool.Save("output.pdf");
 - Review code examples in this folder for facades-texts-and-images patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-07-05 | Run: `20260705_005655_3d29fa`
+Updated: 2026-07-17 | Run: `20260717_171638_da3b3e`
 <!-- AUTOGENERATED:END -->

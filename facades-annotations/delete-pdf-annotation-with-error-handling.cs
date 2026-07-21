@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
         const string annotationName = "nonexistent-annotation-id";
 
@@ -17,40 +17,36 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Work with annotations via PdfAnnotationEditor (IDisposable)
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            // Initialize the annotation editor with the loaded document
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor(doc))
             {
-                // Load the PDF document
-                editor.BindPdf(inputPath);
+                // Bind the editor to the document (optional when using ctor with Document)
+                editor.BindPdf(doc);
 
-                // Attempt to delete the annotation; handle case where it does not exist
                 try
                 {
+                    // Attempt to delete the annotation by name
                     editor.DeleteAnnotation(annotationName);
-                    Console.WriteLine($"Annotation '{annotationName}' deleted.");
+                    Console.WriteLine($"Annotation '{annotationName}' deleted successfully.");
                 }
                 catch (PdfException ex)
                 {
-                    // Aspose.Pdf throws PdfException when the annotation cannot be found
+                    // Handle the case where the annotation does not exist or other PDF errors
                     Console.Error.WriteLine($"Failed to delete annotation '{annotationName}': {ex.Message}");
                 }
                 catch (Exception ex)
                 {
-                    // Catch any other unexpected errors
+                    // Catch any other unexpected exceptions
                     Console.Error.WriteLine($"Unexpected error: {ex.Message}");
                 }
 
                 // Save the modified PDF
                 editor.Save(outputPath);
+                Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
             }
-
-            Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

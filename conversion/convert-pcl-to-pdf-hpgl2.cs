@@ -6,28 +6,27 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pcl";
-        const string outputPath = "output.pdf";
+        // Paths to the source PCL file and the destination PDF file.
+        const string pclPath = "input.pcl";
+        const string pdfPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Verify that the source file exists.
+        if (!File.Exists(pclPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pclPath}");
             return;
         }
 
-        // Initialize PCL load options.
+        // Create load options for PCL conversion.
+        // HP‑GL/2 vectors are loaded automatically; no explicit property is required.
         PclLoadOptions loadOptions = new PclLoadOptions();
 
-        // If the library version supports it, enable HP‑GL/2 vector loading.
-        // Uncomment the following line when the property is available:
-        // loadOptions.EnableHPGL2 = true;
-
-        // Load the PCL file with the specified options and save as PDF.
-        using (Document pdfDocument = new Document(inputPath, loadOptions))
+        // Load the PCL file with the specified options and save it as PDF.
+        using (Document pdfDocument = new Document(pclPath, loadOptions))
         {
-            pdfDocument.Save(outputPath);
+            pdfDocument.Save(pdfPath); // Save as PDF (default format).
         }
 
-        Console.WriteLine($"PCL file has been converted to PDF: {outputPath}");
+        Console.WriteLine($"PCL file '{pclPath}' successfully converted to PDF at '{pdfPath}'.");
     }
 }

@@ -8,46 +8,72 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // PDF that already contains Quantity, UnitPrice and Total fields
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF inside a using block (ensures proper disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the existing PDF (lifecycle rule: use using for disposal)
+        using (Document doc = new Document(inputPath))
         {
-            // Define the button rectangle (left, bottom, right, top)
-            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 530);
+            // Ensure form fields are recalculated automatically when a field changes
+            doc.Form.AutoRecalculate = true;
 
-            // Create a push button field on the document
+            // Quantity field
+            Aspose.Pdf.Rectangle qtyRect = new Aspose.Pdf.Rectangle(100, 700, 200, 720);
+            TextBoxField qtyField = new TextBoxField(doc, qtyRect)
+            {
+                PartialName = "Quantity",
+                Contents    = "0"
+            };
+            doc.Form.Add(qtyField);
+
+            // Unit price field
+            Aspose.Pdf.Rectangle priceRect = new Aspose.Pdf.Rectangle(100, 660, 200, 680);
+            TextBoxField priceField = new TextBoxField(doc, priceRect)
+            {
+                PartialName = "UnitPrice",
+                Contents    = "0"
+            };
+            doc.Form.Add(priceField);
+
+            // Total field (read‑only)
+            Aspose.Pdf.Rectangle totalRect = new Aspose.Pdf.Rectangle(100, 620, 200, 640);
+            TextBoxField totalField = new TextBoxField(doc, totalRect)
+            {
+                PartialName = "Total",
+                ReadOnly    = true,
+                Contents    = "0"
+            };
+            doc.Form.Add(totalField);
+
+            // Button that triggers the calculation
+            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 580, 200, 600);
             ButtonField calcButton = new ButtonField(doc, btnRect)
             {
-                PartialName   = "CalcButton",          // internal field name
-                NormalCaption = "Calculate Total"      // text shown on the button
+                PartialName = "CalcButton",
+                NormalCaption = "Calculate"
             };
 
-            // JavaScript that reads Quantity and UnitPrice fields, computes Total, and writes it back
-            string jsCode = @"
-                var qty   = this.getField('Quantity').value;
+            // Attach JavaScript to the button's activation action
+            string js = @"
+                var qty = this.getField('Quantity').value;
                 var price = this.getField('UnitPrice').value;
-                var total = qty * price;
+                var total = parseFloat(qty) * parseFloat(price);
                 this.getField('Total').value = total;
             ";
+            calcButton.OnActivated = new JavascriptAction(js);
 
-            // Assign the JavaScript to the button's mouse‑press action (valid property for AnnotationActionCollection)
-            calcButton.Actions.OnPressMouseBtn = new JavascriptAction(jsCode);
-
-            // Add the button to the form (page placement is already defined by the rectangle)
             doc.Form.Add(calcButton);
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // Save the modified PDF (lifecycle rule: save inside using)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with calculation button saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with calculation button saved to '{outputPath}'.");
     }
 }

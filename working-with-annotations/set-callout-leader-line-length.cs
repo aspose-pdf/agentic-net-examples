@@ -1,55 +1,62 @@
 using System;
-using System.Drawing; // Required for DefaultAppearance color
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text;          // for DefaultAppearance
+using System.Drawing;          // needed for DefaultAppearance color
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document
-        using (Document doc = new Document())
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Define the rectangle where the free‑text annotation will appear
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+        // Load the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Choose the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
 
-            // Create a DefaultAppearance (requires System.Drawing.Color)
+            // Create a DefaultAppearance for the free‑text annotation
+            // Note: the constructor expects System.Drawing.Color for the text color
             DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
 
-            // Create the free‑text annotation
-            FreeTextAnnotation freeText = new FreeTextAnnotation(page, rect, appearance)
+            // Define the rectangle where the annotation will be placed
+            // Fully qualify to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+            // Create the FreeTextAnnotation
+            FreeTextAnnotation ft = new FreeTextAnnotation(page, rect, appearance)
             {
-                Contents = "Sample free‑text annotation",
-                Color    = Aspose.Pdf.Color.Yellow   // Border color of the annotation
+                Contents = "Important note",
+                Color    = Aspose.Pdf.Color.Yellow,   // background color of the annotation
+                Title    = "Note"
             };
 
-            // Leader line length of 20 points: place the first callout point 20 points to the right of the annotation rectangle
-            double startX = rect.URX + 20;                         // 20‑point offset from the right edge
-            double startY = (rect.LLY + rect.URY) / 2;             // Vertically centered
-            double kneeX  = startX + 30;                           // Additional offset for the knee point
-            double kneeY  = startY + 30;
-            double endX   = kneeX + 30;                            // Final point of the callout line
-            double endY   = kneeY;
-
-            // Set the callout points (start, knee, end)
-            freeText.Callout = new Aspose.Pdf.Point[]
+            // Set the callout points.
+            // The first segment (leader line) will be 20 points long.
+            // Points are defined in user space coordinates (points).
+            ft.Callout = new Aspose.Pdf.Point[]
             {
-                new Aspose.Pdf.Point(startX, startY),
-                new Aspose.Pdf.Point(kneeX,  kneeY),
-                new Aspose.Pdf.Point(endX,   endY)
+                new Aspose.Pdf.Point(150, 525), // start point (inside the annotation)
+                new Aspose.Pdf.Point(170, 525), // knee point – 20 points away horizontally
+                new Aspose.Pdf.Point(200, 560)  // end point (pointing to the target)
             };
 
             // Add the annotation to the page
-            page.Annotations.Add(freeText);
+            page.Annotations.Add(ft);
 
-            // Save the PDF
-            doc.Save("FreeTextWithLeaderLine.pdf");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF created with free‑text annotation and 20‑point leader line.");
+        Console.WriteLine($"Free‑text annotation with 20‑point leader line saved to '{outputPath}'.");
     }
 }

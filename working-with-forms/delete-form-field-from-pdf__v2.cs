@@ -6,33 +6,26 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "OldPhoneNumber";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF, delete the specified form field, and save the result
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
-            {
-                // Delete the specified form field
-                doc.Form.Delete(fieldName);
+            // Delete the form field named "OldPhoneNumber"
+            doc.Form.Delete("OldPhoneNumber");
 
-                // Save the updated document
-                doc.Save(outputPath);
-            }
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"Form field '{fieldName}' deleted. Output saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Form field 'OldPhoneNumber' deleted. Saved to '{outputPath}'.");
     }
 }

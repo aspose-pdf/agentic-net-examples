@@ -8,39 +8,44 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "output_images";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "output_images";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Convert each PDF page to a separate PNG file using PdfConverter (Facade API)
-        using (PdfConverter converter = new PdfConverter())
+        // Prefix and suffix for sequential file names
+        string prefix = Path.Combine(outputFolder, "page_");
+        const string suffix = ".png";
+
+        // Load the PDF document inside a using block for proper disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Bind the source PDF
-            converter.BindPdf(inputPdf);
-
-            // Prepare the converter for image extraction
-            converter.DoConvert();
-
-            int pageNumber = 1;
-            // Iterate through all pages and save as PNG
-            while (converter.HasNextImage())
+            // Initialize the PdfConverter facade
+            using (PdfConverter converter = new PdfConverter())
             {
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
-                // Save current page image as PNG
-                converter.GetNextImage(outputPath, ImageFormat.Png);
-                pageNumber++;
+                // Bind the loaded document to the converter
+                converter.BindPdf(pdfDoc);
+                // Prepare the converter for image extraction
+                converter.DoConvert();
+
+                int pageNumber = 1;
+                // Iterate through all pages and save each as a PNG file
+                while (converter.HasNextImage())
+                {
+                    string outputPath = $"{prefix}{pageNumber}{suffix}";
+                    converter.GetNextImage(outputPath, ImageFormat.Png);
+                    pageNumber++;
+                }
             }
         }
 
-        Console.WriteLine("PDF to PNG conversion completed.");
+        Console.WriteLine("PDF pages have been successfully converted to PNG images.");
     }
 }

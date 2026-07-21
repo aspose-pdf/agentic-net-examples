@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -10,42 +10,37 @@ class Program
         const string inputPdf = "sample.pdf";
         const string outputFolder = "ExtractedImages";
 
-        // Ensure the input PDF exists – create a minimal one if it does not.
         if (!File.Exists(inputPdf))
         {
-            CreatePlaceholderPdf(inputPdf);
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
         }
 
-        // Make sure the output directory exists.
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Use PdfExtractor to pull images that are defined in the PDF resources.
+        // Use PdfExtractor (Facade) inside a using block for deterministic disposal
         using (PdfExtractor extractor = new PdfExtractor())
         {
+            // Bind the source PDF file
             extractor.BindPdf(inputPdf);
-            // Retrieve images that are stored as resources (not inline).
+
+            // Set the extraction mode to DefinedInResources (default, but set explicitly as requested)
             extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
+
+            // Perform the image extraction
             extractor.ExtractImage();
 
             int imageIndex = 1;
+            // Retrieve each extracted image and save it to the output folder
             while (extractor.HasNextImage())
             {
                 string outputPath = Path.Combine(outputFolder, $"image-{imageIndex}.png");
-                // Save the image in its original format; the file extension can stay .png for consistency.
                 extractor.GetNextImage(outputPath);
                 imageIndex++;
             }
         }
 
         Console.WriteLine("Image extraction completed.");
-    }
-
-    // Creates a minimal PDF file so the sample runs without requiring an external file.
-    private static void CreatePlaceholderPdf(string path)
-    {
-        var doc = new Document();
-        // Add an empty page – the document does not need any content for the extractor to work.
-        doc.Pages.Add();
-        doc.Save(path);
     }
 }

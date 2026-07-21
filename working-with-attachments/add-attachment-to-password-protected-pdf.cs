@@ -6,44 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf      = "protected.pdf";      // encrypted source
-        const string userPassword  = "user123";            // password to open
-        const string attachment    = "attach.txt";         // file to embed
-        const string outputPdf     = "protected_with_attachment.pdf";
+        const string inputPdfPath = "protected.pdf";      // existing password‑protected PDF
+        const string userPassword = "user123";           // password that opens the document
+        const string attachmentPath = "extra.docx";      // file to attach
+        const string outputPdfPath = "protected_with_attachment.pdf";
 
-        // Validate files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(attachment))
+
+        if (!File.Exists(attachmentPath))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachment}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
         try
         {
-            // Open the encrypted PDF using the correct password
-            using (Document doc = new Document(inputPdf, userPassword))
+            // Open the encrypted PDF using the user password.
+            using (Document pdfDoc = new Document(inputPdfPath, userPassword))
             {
-                // Create a file specification for the attachment (core API)
-                FileSpecification fileSpec = new FileSpecification(attachment)
-                {
-                    Description = "Sample attachment",
-                    // The name that will appear in the PDF attachment list
-                    Name = Path.GetFileName(attachment)
-                };
+                // Add the attachment as an embedded file.
+                pdfDoc.EmbeddedFiles.Add(new FileSpecification(attachmentPath, "Additional document"));
 
-                // Add the embedded file to the document
-                doc.EmbeddedFiles.Add(fileSpec);
-
-                // Save the modified PDF (encryption is preserved)
-                doc.Save(outputPdf);
+                // Save the PDF (still encrypted) with the new attachment.
+                pdfDoc.Save(outputPdfPath);
             }
 
-            Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
+            Console.WriteLine($"Attachment added and saved to '{outputPdfPath}'.");
         }
         catch (InvalidPasswordException ex)
         {

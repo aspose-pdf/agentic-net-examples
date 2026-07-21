@@ -1,50 +1,54 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        // Folder containing the PDF files to process
-        const string inputFolder = "pdfs";
-        // Root folder where extracted images will be saved
+        // Input directory containing PDF files
+        const string inputDirectory = "pdfs";
+        // Root output directory for extracted images
         const string outputRoot = "extracted_images";
 
-        if (!Directory.Exists(inputFolder))
+        // Ensure the output root exists
+        Directory.CreateDirectory(outputRoot);
+
+        // Verify that the input directory exists before enumerating files
+        if (!Directory.Exists(inputDirectory))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.WriteLine($"Input directory '{inputDirectory}' not found. No PDFs to process.");
             return;
         }
 
-        // Ensure the root output directory exists
-        Directory.CreateDirectory(outputRoot);
-
-        // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Iterate over all PDF files in the input directory
+        foreach (string pdfPath in Directory.GetFiles(inputDirectory, "*.pdf"))
         {
-            // Create a subfolder named after the PDF (without extension)
-            string pdfFileName = Path.GetFileNameWithoutExtension(pdfPath);
-            string pdfOutputDir = Path.Combine(outputRoot, pdfFileName);
-            Directory.CreateDirectory(pdfOutputDir);
+            // Create a subfolder named after the PDF file (without extension)
+            string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
+            string outputFolder = Path.Combine(outputRoot, pdfName);
+            Directory.CreateDirectory(outputFolder);
 
             // Use PdfExtractor to extract images from the current PDF
             using (PdfExtractor extractor = new PdfExtractor())
             {
-                extractor.BindPdf(pdfPath);      // Load the PDF
-                extractor.ExtractImage();        // Prepare image extraction
+                extractor.BindPdf(pdfPath);
+                extractor.ExtractImage();
 
                 int imageIndex = 1;
+#pragma warning disable CA1416 // 'ImageFormat.Jpeg' is platform‑specific; suppress for cross‑platform builds where the call is safe.
                 while (extractor.HasNextImage())
                 {
-                    // Save each extracted image as a JPEG file
-                    string imagePath = Path.Combine(pdfOutputDir, $"image-{imageIndex}.jpg");
-                    extractor.GetNextImage(imagePath); // Returns bool; ignored here
+                    // Save each extracted image as JPEG in the subfolder
+                    string imagePath = Path.Combine(outputFolder, $"image-{imageIndex}.jpg");
+                    extractor.GetNextImage(imagePath, ImageFormat.Jpeg);
                     imageIndex++;
                 }
+#pragma warning restore CA1416
             }
-
-            Console.WriteLine($"Images extracted from '{pdfPath}' to '{pdfOutputDir}'.");
         }
+
+        Console.WriteLine("Image extraction completed.");
     }
 }

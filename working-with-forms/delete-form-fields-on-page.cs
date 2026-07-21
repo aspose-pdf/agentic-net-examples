@@ -1,17 +1,14 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const int pageToClear = 5; // page numbers are 1‑based in Aspose.Pdf
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_cleared_page5.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,43 +16,33 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Open the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the requested page exists
-            if (pageToClear > doc.Pages.Count)
+            // Ensure the document has at least 5 pages
+            if (doc.Pages.Count < 5)
             {
-                Console.Error.WriteLine($"Document has only {doc.Pages.Count} pages. Cannot clear page {pageToClear}.");
+                Console.Error.WriteLine("Document does not contain page 5.");
                 return;
             }
 
-            // Get the target page
-            Page targetPage = doc.Pages[pageToClear];
+            // Get page 5
+            Page page5 = doc.Pages[5];
 
-            // Form fields are stored as WidgetAnnotation objects on the page.
-            // Collect all widget annotations on the page.
-            var widgetsOnPage = targetPage.Annotations
-                                          .OfType<WidgetAnnotation>()
-                                          .ToList(); // materialize to avoid modifying collection while iterating
+            // Retrieve all form fields that intersect the page rectangle
+            // GetFieldsInRect returns a collection of Field objects located on the page
+            var fieldsOnPage = doc.Form.GetFieldsInRect(page5.Rect);
 
-            // Remove each widget annotation and its associated form field.
-            foreach (WidgetAnnotation widget in widgetsOnPage)
+            // Delete each field found on page 5
+            foreach (Field field in fieldsOnPage)
             {
-                // In Aspose.Pdf the widget itself *is* the form field (it derives from Field).
-                // Cast to Field and delete it from the document's Form collection.
-                if (widget is Field field)
-                {
-                    doc.Form.Delete(field);
-                }
-
-                // Delete the annotation from the page.
-                targetPage.Annotations.Delete(widget);
+                doc.Form.Delete(field);
             }
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page {pageToClear} cleared of form fields and saved to '{outputPath}'.");
+        Console.WriteLine($"Page 5 cleared of form fields. Saved to '{outputPath}'.");
     }
 }

@@ -6,38 +6,44 @@ class Program
 {
     static void Main()
     {
-        // Directory containing source PDF files
-        const string inputDirectory = "input_pdfs";
+        // Directory containing source PDF files (relative to the executable folder)
+        const string inputDirectory = "InputPdfs";
         // Directory where modified PDFs will be saved
-        const string outputDirectory = "output_pdfs";
+        const string outputDirectory = "OutputPdfs";
 
-        if (!Directory.Exists(inputDirectory))
+        // Resolve full paths based on the current working directory for robustness
+        string inputDirFullPath = Path.GetFullPath(inputDirectory);
+        string outputDirFullPath = Path.GetFullPath(outputDirectory);
+
+        // Verify that the input directory exists; if not, inform the user and exit gracefully
+        if (!Directory.Exists(inputDirFullPath))
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
+            Console.WriteLine($"Input directory not found: '{inputDirFullPath}'. Please create it and place PDF files inside.");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputDirectory);
+        Directory.CreateDirectory(outputDirFullPath);
 
         // Process each PDF file in the input directory
-        foreach (string sourcePath in Directory.GetFiles(inputDirectory, "*.pdf"))
+        foreach (string inputPath in Directory.GetFiles(inputDirFullPath, "*.pdf"))
         {
-            string fileName = Path.GetFileName(sourcePath);
-            string destinationPath = Path.Combine(outputDirectory, fileName);
+            // Determine the output file path (keeps the original file name)
+            string outputPath = Path.Combine(outputDirFullPath, Path.GetFileName(inputPath));
 
-            // Use PdfContentEditor to modify viewer preferences
-            using (PdfContentEditor editor = new PdfContentEditor())
-            {
-                // Load the PDF file
-                editor.BindPdf(sourcePath);
-                // Set the viewer preference to full‑screen mode
-                editor.ChangeViewerPreference(ViewerPreference.PageModeFullScreen);
-                // Save the modified PDF
-                editor.Save(destinationPath);
-            }
+            // Create a PdfContentEditor instance (no IDisposable, so no using block needed)
+            PdfContentEditor editor = new PdfContentEditor();
 
-            Console.WriteLine($"Processed: {fileName}");
+            // Bind the source PDF file to the editor
+            editor.BindPdf(inputPath);
+
+            // Set the viewer preference to full‑screen mode
+            editor.ChangeViewerPreference(ViewerPreference.PageModeFullScreen);
+
+            // Save the modified PDF to the output location
+            editor.Save(outputPath);
         }
+
+        Console.WriteLine("All PDFs have been updated with full‑screen viewer preference.");
     }
 }

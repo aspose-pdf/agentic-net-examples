@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_with_transitions.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,27 +16,27 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the PdfPageEditor facade
-            using (PdfPageEditor editor = new PdfPageEditor())
+            // Create a PdfPageEditor facade bound to the loaded document
+            using (PdfPageEditor editor = new PdfPageEditor(doc))
             {
-                // Bind the document to the editor
-                editor.BindPdf(doc);
-
                 // Iterate through all pages (1‑based indexing)
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
                 {
-                    Page page = doc.Pages[i];
+                    // Retrieve the current page
+                    Page page = doc.Pages[pageNum];
 
-                    // Determine content type: image‑heavy vs text‑only
+                    // Determine a simple content type:
+                    // If the page contains at least one image, treat it as "image" content,
+                    // otherwise treat it as "text" content.
                     bool hasImages = page.Resources.Images.Count > 0;
 
-                    // Restrict editing to the current page
-                    editor.ProcessPages = new int[] { i };
+                    // Configure the editor to work on the current page only
+                    editor.ProcessPages = new int[] { pageNum };
 
-                    // Assign distinct transition types based on content
+                    // Assign a distinct transition type based on the content type
                     if (hasImages)
                     {
                         // Use a vertical blinds transition for image pages
@@ -48,15 +48,16 @@ class Program
                         editor.TransitionType = PdfPageEditor.DISSOLVE;
                     }
 
-                    // Set a uniform transition duration (in seconds)
-                    editor.TransitionDuration = 2;
+                    // Optional: set the duration of the transition (in seconds)
+                    // TransitionDuration expects an integer value (seconds), not a float.
+                    editor.TransitionDuration = 2; // 2 seconds
 
-                    // Apply the changes to the current page
+                    // Apply the changes for the current page
                     editor.ApplyChanges();
                 }
             }
 
-            // Save the modified PDF (save without explicit SaveOptions writes PDF)
+            // Save the modified document
             doc.Save(outputPath);
         }
 

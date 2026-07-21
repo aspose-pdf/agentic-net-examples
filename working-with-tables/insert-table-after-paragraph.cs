@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,51 +7,62 @@ class Program
 {
     static void Main()
     {
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string marker = "InsertTableHere";
+        const string markerText = "Insert table after this paragraph.";
 
-        // Create a new PDF document and add a page with a marker paragraph.
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            Page page = doc.Pages.Add();
-            // Add a paragraph that contains the marker text.
-            TextFragment markerParagraph = new TextFragment(marker);
-            page.Paragraphs.Add(markerParagraph);
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Locate the paragraph index that contains the marker.
-            int paragraphIndex = FindParagraphIndex(page, marker);
-            if (paragraphIndex < 0)
+        using (Document doc = new Document(inputPath))
+        {
+            // Work with the first page (adjust as needed)
+            Page page = doc.Pages[1];
+            int paragraphIndex = -1;
+
+            // Locate the paragraph that contains the marker text
+            for (int i = 0; i < page.Paragraphs.Count; i++)
             {
-                Console.WriteLine("Marker paragraph not found. No table inserted.");
-                doc.Save(outputPath);
-                return;
+                if (page.Paragraphs[i] is TextFragment tf && tf.Text.Contains(markerText))
+                {
+                    paragraphIndex = i;
+                    break;
+                }
             }
 
-            // Build a simple table with two columns.
-            Table table = new Table();
-            table.ColumnWidths = "100 100"; // two equal columns
-            Row row = table.Rows.Add();
-            row.Cells.Add("Cell 1");
-            row.Cells.Add("Cell 2");
+            if (paragraphIndex == -1)
+            {
+                Console.WriteLine("Target paragraph not found.");
+            }
+            else
+            {
+                // Build a simple 2x2 table
+                Table table = new Table
+                {
+                    // Optional: set column widths (in points)
+                    ColumnWidths = "120 120"
+                };
 
-            // Insert the table after the located paragraph.
-            page.Paragraphs.Insert(paragraphIndex + 1, table);
+                // Header row
+                Row header = table.Rows.Add();
+                header.Cells.Add("Header 1");
+                header.Cells.Add("Header 2");
 
-            // Save the modified PDF.
+                // Data row
+                Row data = table.Rows.Add();
+                data.Cells.Add("Cell 1");
+                data.Cells.Add("Cell 2");
+
+                // Insert the table immediately after the found paragraph
+                page.Paragraphs.Insert(paragraphIndex + 1, table);
+            }
+
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table inserted and saved to '{outputPath}'.");
-    }
-
-    // Returns the zero‑based index of the first paragraph containing the given text, or -1 if not found.
-    static int FindParagraphIndex(Page page, string searchText)
-    {
-        for (int i = 0; i < page.Paragraphs.Count; i++)
-        {
-            if (page.Paragraphs[i] is TextFragment tf && tf.Text.Contains(searchText))
-                return i;
-        }
-        return -1;
+        Console.WriteLine($"Saved updated PDF to '{outputPath}'.");
     }
 }

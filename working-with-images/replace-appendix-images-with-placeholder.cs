@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath      = "input.pdf";
+        const string outputPath     = "output.pdf";
         const string placeholderPath = "placeholder.jpg";
-        const int appendixStartPage = 5; // first page of the appendix (1‑based)
 
         if (!File.Exists(inputPath))
         {
@@ -23,32 +23,40 @@ class Program
             return;
         }
 
-        // Load the PDF
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Load placeholder image once into a memory stream (JPEG required)
-            using (FileStream placeholderStream = File.OpenRead(placeholderPath))
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                // Iterate over all pages that belong to the appendix
-                for (int pageIndex = appendixStartPage; pageIndex <= doc.Pages.Count; pageIndex++)
-                {
-                    Page page = doc.Pages[pageIndex];
-                    var images = page.Resources.Images; // XImageCollection
+                Page page = doc.Pages[pageNum];
 
-                    // Replace each image on the page with the placeholder
-                    for (int imgIndex = 1; imgIndex <= images.Count; imgIndex++)
+                // Detect if this page belongs to the appendix by searching for the word "Appendix"
+                TextAbsorber pageAbsorber = new TextAbsorber();
+                pageAbsorber.TextSearchOptions = new TextSearchOptions(true); // case‑insensitive
+                page.Accept(pageAbsorber);
+
+                if (pageAbsorber.Text != null &&
+                    pageAbsorber.Text.IndexOf("Appendix", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    // Replace every image on this page with the placeholder image
+                    var images = page.Resources.Images; // XImageCollection
+                    for (int imgIdx = 1; imgIdx <= images.Count; imgIdx++)
                     {
-                        // Reset stream position before each replace call
-                        placeholderStream.Position = 0;
-                        images.Replace(imgIndex, placeholderStream);
+                        // Open the placeholder stream for each replacement (required by Replace overload)
+                        using (FileStream placeholderStream = File.OpenRead(placeholderPath))
+                        {
+                            // XImageCollection.Replace replaces the image at the given 1‑based index
+                            images.Replace(imgIdx, placeholderStream);
+                        }
                     }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified document (lifecycle rule: use Save inside using)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Protected PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

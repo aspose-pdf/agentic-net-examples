@@ -1,60 +1,60 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // for ImagePlacementAbsorber
+using Aspose.Pdf.Text;
 
 class ReplaceImagesWithBanner
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";      // source PDF
-        const string outputPdfPath = "output.pdf";     // result PDF
-        const string bannerImgPath = "banner.jpg";    // banner image (JPEG)
+        const string inputPath  = "input.pdf";
+        const string bannerPath = "banner.jpg";   // JPEG banner image
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-        if (!File.Exists(bannerImgPath))
+        if (!File.Exists(bannerPath))
         {
-            Console.Error.WriteLine($"Banner image not found: {bannerImgPath}");
+            Console.Error.WriteLine($"Banner image not found: {bannerPath}");
             return;
         }
 
-        // Load the PDF document (using block ensures proper disposal)
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Get the last page (Aspose.Pdf uses 1‑based indexing)
+            // Get the last page (1‑based indexing)
             Page lastPage = doc.Pages[doc.Pages.Count];
 
             // Hide all existing images on the last page
             ImagePlacementAbsorber imgAbsorber = new ImagePlacementAbsorber();
             lastPage.Accept(imgAbsorber);
-            foreach (ImagePlacement imgPlacement in imgAbsorber.ImagePlacements)
+            foreach (ImagePlacement placement in imgAbsorber.ImagePlacements)
             {
-                imgPlacement.Hide(); // removes the image from the page content
+                placement.Hide(); // removes the image from the page
             }
 
-            // Add the banner image so it spans the full width of the page
-            using (FileStream bannerStream = File.OpenRead(bannerImgPath))
-            {
-                // Define a rectangle that covers the entire page area
-                // Use fully qualified Aspose.Pdf.Rectangle to avoid ambiguity
-                Aspose.Pdf.Rectangle pageRect = new Aspose.Pdf.Rectangle(
-                    0,                                   // lower‑left X
-                    0,                                   // lower‑left Y
-                    lastPage.MediaBox.Width,             // upper‑right X (page width)
-                    lastPage.MediaBox.Height);           // upper‑right Y (page height)
+            // Determine banner rectangle – full page width, fixed height (e.g., 100 points)
+            const double bannerHeight = 100.0;
+            Aspose.Pdf.Rectangle bannerRect = new Aspose.Pdf.Rectangle(
+                lastPage.Rect.LLX,                     // left
+                lastPage.Rect.LLY,                     // bottom
+                lastPage.Rect.URX,                     // right
+                lastPage.Rect.LLY + bannerHeight);     // top
 
-                // Add the banner image; the overload preserves aspect ratio
-                lastPage.AddImage(bannerStream, pageRect);
+            // Add the banner image to the page
+            using (FileStream bannerStream = File.OpenRead(bannerPath))
+            {
+                // AddImage places the image proportionally inside the rectangle
+                lastPage.AddImage(bannerStream, bannerRect);
             }
 
-            // Save the modified document
-            doc.Save(outputPdfPath);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Banner applied and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved with banner: {outputPath}");
     }
 }

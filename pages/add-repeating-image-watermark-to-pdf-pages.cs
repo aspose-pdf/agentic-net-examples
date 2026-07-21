@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPdf  = "input.pdf";          // source PDF
-        const string outputPdf = "watermarked.pdf";    // result PDF
-        const string watermarkImage = "logo.png";      // image to repeat
+        const string watermarkImage = "watermark.png"; // image to repeat
+        const string outputPdf = "output_watermarked.pdf";
 
         if (!File.Exists(inputPdf))
         {
@@ -23,40 +23,47 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule: wrap in using for deterministic disposal)
+        // Load the PDF (using statement ensures proper disposal)
         using (Document doc = new Document(inputPdf))
         {
             // Iterate over all pages
-            foreach (Page page in doc.Pages)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
+                Page page = doc.Pages[pageIndex];
+
                 // Page dimensions (points)
                 double pageWidth  = page.PageInfo.Width;
                 double pageHeight = page.PageInfo.Height;
 
-                // Load the image once to obtain its size
-                ImageStamp sampleStamp = new ImageStamp(watermarkImage);
-                double imgWidth  = sampleStamp.Width  > 0 ? sampleStamp.Width  : 100; // fallback width
-                double imgHeight = sampleStamp.Height > 0 ? sampleStamp.Height : 100; // fallback height
+                // Create a prototype stamp to obtain its natural size
+                ImageStamp prototype = new ImageStamp(watermarkImage);
+                // Optional: scale the watermark (e.g., 50% of original)
+                prototype.Width  = prototype.Width * 0.5;
+                prototype.Height = prototype.Height * 0.5;
+                prototype.Opacity = 0.3;          // semi‑transparent
+                prototype.Background = true;      // place behind page content
+
+                double stampWidth  = prototype.Width;
+                double stampHeight = prototype.Height;
 
                 // Define spacing between repeated watermarks
-                double hSpacing = imgWidth  + 50; // horizontal gap
-                double vSpacing = imgHeight + 50; // vertical gap
+                double hSpacing = 50; // horizontal gap
+                double vSpacing = 50; // vertical gap
 
-                // Loop to place stamps in a grid
-                for (double y = 0; y < pageHeight; y += vSpacing)
+                // Grid placement: start from bottom‑left corner
+                for (double y = 0; y < pageHeight; y += stampHeight + vSpacing)
                 {
-                    for (double x = 0; x < pageWidth; x += hSpacing)
+                    for (double x = 0; x < pageWidth; x += stampWidth + hSpacing)
                     {
-                        // Create a new stamp for each position
+                        // Create a fresh stamp for each position
                         ImageStamp stamp = new ImageStamp(watermarkImage)
                         {
-                            // Place the stamp at (x, y) from the bottom‑left corner
-                            XIndent = x,
-                            YIndent = y,
-                            // Draw behind page content
+                            Width      = stampWidth,
+                            Height     = stampHeight,
+                            Opacity    = 0.3,
                             Background = true,
-                            // Optional: make the watermark semi‑transparent
-                            Opacity = 0.3f
+                            XIndent    = x,
+                            YIndent    = y
                         };
 
                         // Add the stamp to the current page
@@ -65,7 +72,7 @@ class Program
                 }
             }
 
-            // Save the modified PDF (using rule: Document.Save)
+            // Save the modified PDF
             doc.Save(outputPdf);
         }
 

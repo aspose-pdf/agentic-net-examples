@@ -1,58 +1,58 @@
 # Accessibility and tagged PDFs
 
-> **Accessibility and tagged PDFs** in PDF using C# / .NET -- **45** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Accessibility and tagged PDFs** in PDF using C# / .NET -- **45** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `accessibility-and-tagged-pdfs`
 - Examples: 45
-- NuGet: `Aspose.PDF 26.6.0` -- target `net10.0`
+- NuGet: `Aspose.PDF 26.7.0` -- target `net10.0`
 
 ## Examples
 
 - [`add-actualtext-to-images.cs`](./add-actualtext-to-images.cs) -- Add actualtext to images
-- [`add-caption-note-to-figure-tagged-pdf.cs`](./add-caption-note-to-figure-tagged-pdf.cs) -- Add caption note to figure tagged pdf
-- [`add-custom-tags-to-pdf-table-cells.cs`](./add-custom-tags-to-pdf-table-cells.cs) -- Add custom tags to pdf table cells
+- [`add-caption-note-to-figure-in-tagged-pdf.cs`](./add-caption-note-to-figure-in-tagged-pdf.cs) -- Add caption note to figure in tagged pdf
+- [`add-custom-cell-tags-and-validate-pdf.cs`](./add-custom-cell-tags-and-validate-pdf.cs) -- Add custom cell tags and validate pdf
+- [`add-custom-tag-to-paragraph.cs`](./add-custom-tag-to-paragraph.cs) -- Add custom tag to paragraph
 - [`add-external-link-with-title-to-tagged-pdf.cs`](./add-external-link-with-title-to-tagged-pdf.cs) -- Add external link with title to tagged pdf
-- [`add-figure-title-and-alt-text-to-tagged-pdf.cs`](./add-figure-title-and-alt-text-to-tagged-pdf.cs) -- Add figure title and alt text to tagged pdf
+- [`add-figure-title-to-tagged-pdf.cs`](./add-figure-title-to-tagged-pdf.cs) -- Add figure title to tagged pdf
+- [`add-internal-link-element-to-tagged-pdf.cs`](./add-internal-link-element-to-tagged-pdf.cs) -- Add internal link element to tagged pdf
+- [`add-missing-language-attributes-to-pdf-structure.cs`](./add-missing-language-attributes-to-pdf-structure.cs) -- Add missing language attributes to pdf structure
 - [`add-note-element-to-paragraph.cs`](./add-note-element-to-paragraph.cs) -- Add note element to paragraph
 - [`add-page-break-to-tagged-pdf.cs`](./add-page-break-to-tagged-pdf.cs) -- Add page break to tagged pdf
-- [`add-paragraph-to-toci-tagged-pdf.cs`](./add-paragraph-to-toci-tagged-pdf.cs) -- Add paragraph to toci tagged pdf
+- [`add-paragraph-to-toci-element-actualtext.cs`](./add-paragraph-to-toci-element-actualtext.cs) -- Add paragraph to toci element actualtext
+- [`add-tagged-form-field-with-placeholder.cs`](./add-tagged-form-field-with-placeholder.cs) -- Add tagged form field with placeholder
 - [`add-tagged-table-to-pdf.cs`](./add-tagged-table-to-pdf.cs) -- Add tagged table to pdf
-- [`add-textbox-form-field-with-placeholder.cs`](./add-textbox-form-field-with-placeholder.cs) -- Add textbox form field with placeholder
 - [`apply-custom-row-borders-to-pdf-table.cs`](./apply-custom-row-borders-to-pdf-table.cs) -- Apply custom row borders to pdf table
-- [`batch-auto-tag-pdfs.cs`](./batch-auto-tag-pdfs.cs) -- Batch auto tag pdfs
-- [`batch-convert-pdfs-to-tagged-pdfa1b.cs`](./batch-convert-pdfs-to-tagged-pdfa1b.cs) -- Batch convert pdfs to tagged pdfa1b
-- [`batch-pdfa1b-validation-xml-dashboard.cs`](./batch-pdfa1b-validation-xml-dashboard.cs) -- Batch pdfa1b validation xml dashboard
+- [`batch-convert-untagged-pdfs-to-tagged.cs`](./batch-convert-untagged-pdfs-to-tagged.cs) -- Batch convert untagged pdfs to tagged
+- [`batch-pdf-validation-dashboard.cs`](./batch-pdf-validation-dashboard.cs) -- Batch pdf validation dashboard
+- [`batch-tag-pdfs-in-folder.cs`](./batch-tag-pdfs-in-folder.cs) -- Batch tag pdfs in folder
 - [`batch-validate-pdfs-xml-logs-summary-csv.cs`](./batch-validate-pdfs-xml-logs-summary-csv.cs) -- Batch validate pdfs xml logs summary csv
 - [`check-pdf-ua-compliance-and-log-result.cs`](./check-pdf-ua-compliance-and-log-result.cs) -- Check pdf ua compliance and log result
-- [`create-bullet-numbered-lists-tagged-pdf.cs`](./create-bullet-numbered-lists-tagged-pdf.cs) -- Create bullet numbered lists tagged pdf
-- [`create-form-field-and-associate-tagged-form-element.cs`](./create-form-field-and-associate-tagged-form-element.cs) -- Create form field and associate tagged form element
-- [`create-internal-page-link-tagged-pdf.cs`](./create-internal-page-link-tagged-pdf.cs) -- Create internal page link tagged pdf
-- [`create-merged-table-header-th-actualtext.cs`](./create-merged-table-header-th-actualtext.cs) -- Create merged table header th actualtext
-- [`create-pdf-tagged-heading-language.cs`](./create-pdf-tagged-heading-language.cs) -- Create pdf tagged heading language
+- [`convert-pdf-to-pdf-ua-with-auto-tagging.cs`](./convert-pdf-to-pdf-ua-with-auto-tagging.cs) -- Convert pdf to pdf ua with auto tagging
+- [`create-form-field-tag-accessibility.cs`](./create-form-field-tag-accessibility.cs) -- Create form field tag accessibility
+- [`create-merged-table-header-tagged-pdf.cs`](./create-merged-table-header-tagged-pdf.cs) -- Create merged table header tagged pdf
+- [`create-nested-table-in-paragraph.cs`](./create-nested-table-in-paragraph.cs) -- Create nested table in paragraph
+- [`create-pdf-with-tagged-heading.cs`](./create-pdf-with-tagged-heading.cs) -- Create pdf with tagged heading
+- [`create-tagged-list-in-pdf.cs`](./create-tagged-list-in-pdf.cs) -- Create tagged list in pdf
 - [`create-tagged-pdf-with-toc.cs`](./create-tagged-pdf-with-toc.cs) -- Create tagged pdf with toc
-- [`custom-tagged-paragraph-pdf.cs`](./custom-tagged-paragraph-pdf.cs) -- Custom tagged paragraph pdf
-- [`enable-auto-tagging-pdf-ua.cs`](./enable-auto-tagging-pdf-ua.cs) -- Enable auto tagging pdf ua
 - [`export-pdf-structure-tree-to-json.cs`](./export-pdf-structure-tree-to-json.cs) -- Export pdf structure tree to json
-- [`export-structure-tree-to-xml-report.cs`](./export-structure-tree-to-xml-report.cs) -- Export structure tree to xml report
-- [`extract-notes-from-tagged-pdf.cs`](./extract-notes-from-tagged-pdf.cs) -- Extract notes from tagged pdf
+- [`export-pdf-structure-tree-to-xml-xsl-report.cs`](./export-pdf-structure-tree-to-xml-xsl-report.cs) -- Export pdf structure tree to xml xsl report
+- [`export-tagged-pdf-content-to-json.cs`](./export-tagged-pdf-content-to-json.cs) -- Export tagged pdf content to json
+- [`extract-note-elements-to-text.cs`](./extract-note-elements-to-text.cs) -- Extract note elements to text
 - [`extract-pdf-links-to-csv.cs`](./extract-pdf-links-to-csv.cs) -- Extract pdf links to csv
-- [`extract-tagged-pdf-structure-to-json.cs`](./extract-tagged-pdf-structure-to-json.cs) -- Extract tagged pdf structure to json
 - [`extract-text-from-tagged-pdf.cs`](./extract-text-from-tagged-pdf.cs) -- Extract text from tagged pdf
-- [`filter-xml-errors-missing-alt-text.cs`](./filter-xml-errors-missing-alt-text.cs) -- Filter xml errors missing alt text
+- [`find-images-missing-alt-text.cs`](./find-images-missing-alt-text.cs) -- Find images missing alt text
 - [`iterate-tagged-pdf-structure-elements.cs`](./iterate-tagged-pdf-structure-elements.cs) -- Iterate tagged pdf structure elements
-- [`nested-table-inside-paragraph.cs`](./nested-table-inside-paragraph.cs) -- Nested table inside paragraph
+- [`modify-paragraph-actualtext-in-tagged-pdf.cs`](./modify-paragraph-actualtext-in-tagged-pdf.cs) -- Modify paragraph actualtext in tagged pdf
 - [`parse-xml-validation-report-summary.cs`](./parse-xml-validation-report-summary.cs) -- Parse xml validation report summary
-- [`propagate-language-to-tagged-pdf-elements.cs`](./propagate-language-to-tagged-pdf-elements.cs) -- Propagate language to tagged pdf elements
-- [`replace-note-element-in-tagged-pdf.cs`](./replace-note-element-in-tagged-pdf.cs) -- Replace note element in tagged pdf
-- [`set-actualtext-pronunciation-span.cs`](./set-actualtext-pronunciation-span.cs) -- Set actualtext pronunciation span
-- [`set-default-language-for-tagged-pdf-elements.cs`](./set-default-language-for-tagged-pdf-elements.cs) -- Set default language for tagged pdf elements
-- [`set-document-language-tagged-pdf.cs`](./set-document-language-tagged-pdf.cs) -- Set document language tagged pdf
-- [`set-paragraph-title-in-tagged-pdf.cs`](./set-paragraph-title-in-tagged-pdf.cs) -- Set paragraph title in tagged pdf
-- [`set-pdf-document-title-root-structure.cs`](./set-pdf-document-title-root-structure.cs) -- Set pdf document title root structure
-- [`style-table-cells-accessibility.cs`](./style-table-cells-accessibility.cs) -- Style table cells accessibility
-- [`update-paragraph-actualtext-in-tagged-pdf.cs`](./update-paragraph-actualtext-in-tagged-pdf.cs) -- Update paragraph actualtext in tagged pdf
-- [`update-paragraph-language-to-french.cs`](./update-paragraph-language-to-french.cs) -- Update paragraph language to french
-- [`validate-pdf-ua-compliance.cs`](./validate-pdf-ua-compliance.cs) -- Validate pdf ua compliance
+- [`propagate-language-to-tagged-pdf.cs`](./propagate-language-to-tagged-pdf.cs) -- Propagate language to tagged pdf
+- [`replace-note-elements-in-tagged-pdf.cs`](./replace-note-elements-in-tagged-pdf.cs) -- Replace note elements in tagged pdf
+- [`set-actualtext-span-pronunciation.cs`](./set-actualtext-span-pronunciation.cs) -- Set actualtext span pronunciation
+- [`set-document-language-in-tagged-pdf.cs`](./set-document-language-in-tagged-pdf.cs) -- Set document language in tagged pdf
+- [`set-paragraph-title-accessibility.cs`](./set-paragraph-title-accessibility.cs) -- Set paragraph title accessibility
+- [`set-root-structure-element-title.cs`](./set-root-structure-element-title.cs) -- Set root structure element title
+- [`style-table-cells-background-border-padding.cs`](./style-table-cells-background-border-padding.cs) -- Style table cells background border padding
+- [`update-structure-element-language-french.cs`](./update-structure-element-language-french.cs) -- Update structure element language french
+- [`validate-pdf-ua-compliance-xml-report.cs`](./validate-pdf-ua-compliance-xml-report.cs) -- Validate pdf ua compliance xml report
 
 ## See Also
 

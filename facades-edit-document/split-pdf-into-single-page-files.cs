@@ -6,24 +6,29 @@ class Program
 {
     static void Main()
     {
+        // Path to the edited PDF that contains annotations
         const string inputPdf = "edited.pdf";
-        // %NUM% will be replaced with the page number (1‑based) for each output file.
-        const string outputTemplate = "page%NUM%.pdf";
 
+        // Template for the output files.
+        // %NUM% will be replaced with the page number (1‑based).
+        const string outputTemplate = "output_page%NUM%.pdf";
+
+        // Verify that the source file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // PdfFileEditor does NOT implement IDisposable and has no Close method.
-        PdfFileEditor editor = new PdfFileEditor();
+        // PdfFileEditor provides the SplitToPages method which creates
+        // a separate PDF file for each page, preserving all page content
+        // including annotations.
+        PdfFileEditor pdfEditor = new PdfFileEditor();
 
-        // Split the PDF into single‑page documents and save them using the template.
-        // Each resulting file will contain the original page together with its annotations.
-        editor.SplitToPages(inputPdf, outputTemplate);
+        // This overload writes the split pages directly to disk using
+        // the provided filename template.
+        pdfEditor.SplitToPages(inputPdf, outputTemplate);
 
-        // No explicit resource release is required for PdfFileEditor.
-        Console.WriteLine("PDF successfully split into individual pages.");
+        Console.WriteLine("PDF has been split into individual pages.");
     }
 }

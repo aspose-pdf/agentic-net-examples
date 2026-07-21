@@ -14,36 +14,39 @@ class Program
         // Verify input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF document (create rule)
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
             // Get the first page (pages are 1‑based)
             Page page = doc.Pages[1];
 
-            // Create a text fragment that will hold the segment
-            TextFragment tf = new TextFragment();
-            tf.Position = new Position(100, 600); // place the text on the page
+            // Create a TextFragment that will hold the clickable segment
+            TextFragment fragment = new TextFragment("Click here");
+            fragment.Position = new Position(100, 600); // place on page
+            fragment.TextState.FontSize = 12;
+            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
+            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
 
-            // Create a text segment with the visible text
+            // Create a TextSegment (optional, can also use the default segment)
             TextSegment segment = new TextSegment("Click here");
-            // Assign a web hyperlink to the segment (URI action)
+            // Assign a web hyperlink to the segment
             segment.Hyperlink = new WebHyperlink("https://www.example.com");
+            // Replace the default segment with our customized one
+            fragment.Segments.Clear();
+            fragment.Segments.Add(segment);
 
-            // Add the segment to the fragment's segment collection
-            tf.Segments.Add(segment);
-
-            // Append the fragment (with the clickable segment) to the page
+            // Append the fragment to the page
             TextBuilder builder = new TextBuilder(page);
-            builder.AppendText(tf);
+            builder.AppendText(fragment);
 
-            // Save the modified PDF (save rule)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with clickable text: {outputPath}");
+        Console.WriteLine($"Clickable text added and saved to '{outputPath}'.");
     }
 }

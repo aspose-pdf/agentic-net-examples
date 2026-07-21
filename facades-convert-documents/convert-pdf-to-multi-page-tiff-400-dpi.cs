@@ -7,32 +7,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.tiff";
+        const string inputPdf = "input.pdf";
+        const string outputTiff = "output.tiff";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Use PdfConverter facade inside a using block to ensure proper disposal
+        // Use PdfConverter (Facade) to convert PDF pages to a single multi‑page TIFF
         using (PdfConverter converter = new PdfConverter())
         {
-            // Set the desired resolution (400 DPI) for high‑resolution output.
-            // PdfConverter.Resolution expects a Aspose.Pdf.Devices.Resolution object.
+            // Set high‑resolution (400 DPI) for archival quality.
+            // The Resolution property expects an Aspose.Pdf.Devices.Resolution instance.
             converter.Resolution = new Resolution(400);
 
             // Bind the source PDF file
-            converter.BindPdf(inputPath);
+            converter.BindPdf(inputPdf);
 
-            // Initialize the converter before conversion
+            // Prepare the converter (required before saving)
             converter.DoConvert();
 
-            // Convert all pages to a single multi‑page TIFF file
-            converter.SaveAsTIFF(outputPath);
+            // Save all pages as one TIFF file
+            converter.SaveAsTIFF(outputTiff);
         }
 
-        Console.WriteLine($"PDF successfully converted to TIFF at '{outputPath}' with 400 DPI.");
+        Console.WriteLine($"PDF successfully converted to TIFF: {outputTiff}");
     }
 }

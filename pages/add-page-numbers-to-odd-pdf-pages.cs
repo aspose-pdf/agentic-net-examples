@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;   // for TextState
+using Aspose.Pdf.Facades; // not required but safe for other facades if needed
 
 class Program
 {
@@ -16,33 +16,31 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (using statement ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over all pages (1‑based indexing)
+            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
             {
-                // Apply numbering only to odd‑numbered pages
-                if (i % 2 == 1)
+                // Apply page number stamp only on odd pages
+                if (pageNumber % 2 == 1)
                 {
-                    // Create a page number stamp; default format is "#"
+                    Page page = doc.Pages[pageNumber];
+
+                    // Create a PageNumberStamp; default format "#" will be replaced by the page number
                     PageNumberStamp stamp = new PageNumberStamp();
 
-                    // Position the stamp at the bottom‑center of the page
+                    // Optional: configure appearance and position
                     stamp.HorizontalAlignment = HorizontalAlignment.Center;
                     stamp.VerticalAlignment   = VerticalAlignment.Bottom;
-                    stamp.BottomMargin        = 20; // distance from the bottom edge
-
-                    // Optional styling
-                    stamp.TextState.FontSize        = 12;
-                    stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                    stamp.BottomMargin        = 20; // distance from bottom edge
 
                     // Add the stamp to the current page
-                    doc.Pages[i].AddStamp(stamp);
+                    page.AddStamp(stamp);
                 }
             }
 
-            // Save the modified document (PDF format)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

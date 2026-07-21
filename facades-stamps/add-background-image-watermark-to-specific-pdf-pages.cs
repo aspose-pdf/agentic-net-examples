@@ -7,45 +7,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string watermarkImagePath = "watermark.png";
+        // Input PDF, output PDF and watermark image paths
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string watermarkImage = "watermark.png";
 
-        // Verify required files exist
-        if (!File.Exists(inputPath))
+        // Verify files exist
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(watermarkImagePath))
+        if (!File.Exists(watermarkImage))
         {
-            Console.Error.WriteLine($"Watermark image not found: {watermarkImagePath}");
+            Console.Error.WriteLine($"Watermark image not found: {watermarkImage}");
             return;
         }
 
-        // Initialize the PdfFileStamp facade and specify source/target files
+        // Initialize PdfFileStamp facade and bind the source PDF
         PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.InputFile = inputPath;
-        fileStamp.OutputFile = outputPath;
+        fileStamp.BindPdf(inputPdf);               // Load source PDF
 
-        // Create a stamp object
+        // Create a stamp that will be used as a background watermark
         Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
 
-        // Use an image as the watermark content
-        stamp.BindImage(watermarkImagePath);
+        // Bind an image to the stamp (you could also use BindLogo for text)
+        stamp.BindImage(watermarkImage);
 
-        // Ensure the stamp is placed behind existing page content
+        // Make the stamp appear behind existing page content
         stamp.IsBackground = true;
 
         // Apply the stamp only to pages 2 through 5 (1‑based indexing)
         stamp.Pages = new int[] { 2, 3, 4, 5 };
 
-        // Add the configured stamp to the document
+        // Add the configured stamp to the PDF
         fileStamp.AddStamp(stamp);
 
-        // Persist changes and release resources
+        // Save the result to the output file
+        fileStamp.Save(outputPdf);
+
+        // Close the facade (releases resources)
         fileStamp.Close();
 
-        Console.WriteLine($"Background watermark applied to pages 2‑5 and saved as '{outputPath}'.");
+        Console.WriteLine($"Background watermark applied to pages 2‑5 and saved as '{outputPdf}'.");
     }
 }

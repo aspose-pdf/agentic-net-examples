@@ -17,33 +17,28 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            // Initialize TableAbsorber to locate tables
+            TableAbsorber absorber = new TableAbsorber();
+
+            // Extract tables from the entire document
+            absorber.Visit(doc);
+
+            // Create a copy of the TableList because Remove modifies the collection
+            var tables = absorber.TableList.ToList();
+
+            // Remove each absorbed table from its page
+            foreach (var table in tables)
             {
-                // Create a TableAbsorber to locate tables
-                TableAbsorber absorber = new TableAbsorber();
-                absorber.Visit(doc);
-
-                // Copy the list because Remove modifies the collection
-                var tables = absorber.TableList.ToList();
-
-                // Remove each absorbed table from its page
-                foreach (var table in tables)
-                {
-                    absorber.Remove(table);
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
+                absorber.Remove(table);
             }
 
-            Console.WriteLine($"Tables removed and saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"All tables removed. Saved to '{outputPath}'.");
     }
 }

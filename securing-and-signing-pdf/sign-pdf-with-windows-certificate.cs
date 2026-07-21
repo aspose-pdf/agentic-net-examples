@@ -8,9 +8,12 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
+        // Input PDF to be signed
+        const string inputPdfPath = "input.pdf";
+        // Output signed PDF
         const string outputPdfPath = "signed_output.pdf";
-        const string thumbprint    = "YOUR_CERT_THUMBPRINT"; // replace with actual thumbprint (no spaces)
+        // Thumbprint of the certificate in the Windows certificate store (no spaces, case‑insensitive)
+        const string certThumbprint = "YOUR_CERTIFICATE_THUMBPRINT";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -18,59 +21,55 @@ class Program
             return;
         }
 
-        // Locate the certificate in the CurrentUser\My store by thumbprint
-        X509Certificate2 cert = FindCertificateByThumbprint(thumbprint);
-        if (cert == null)
+        // Load the certificate from the CurrentUser\My store
+        X509Certificate2 certificate = GetCertificateByThumbprint(certThumbprint);
+        if (certificate == null)
         {
-            Console.Error.WriteLine($"Certificate with thumbprint '{thumbprint}' not found in the store.");
+            Console.Error.WriteLine($"Certificate with thumbprint '{certThumbprint}' not found.");
             return;
         }
 
-        // Create an ExternalSignature that uses the found certificate
-        ExternalSignature externalSig = new ExternalSignature(cert);
-        externalSig.Reason      = "Document approved";
-        externalSig.ContactInfo = "contact@example.com";
-        externalSig.Location    = "New York, USA";
-
-        // Open the PDF, add a signature field (if needed), and sign it
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Define the rectangle where the visible signature will appear
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
+            // Create a signature field on the first page (adjust rectangle as needed)
+            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            SignatureField sigField = new SignatureField(doc.Pages[1], sigRect);
+            // Add the signature field to the page annotations collection
+            doc.Pages[1].Annotations.Add(sigField);
 
-            // Create a signature field on the first page
-            SignatureField sigField = new SignatureField(pdfDoc.Pages[1], sigRect);
-            sigField.PartialName = "Signature1";
+            // Create an ExternalSignature that uses the X509Certificate2 from the store
+            ExternalSignature externalSig = new ExternalSignature(certificate);
+            // Optional: set appearance properties
+            externalSig.Reason = "Document approved";
+            externalSig.Location = "Office";
+            externalSig.ContactInfo = "contact@example.com";
 
-            // Add the signature field to the document's form
-            pdfDoc.Form.Add(sigField, 1);
-
-            // Sign the field using the external certificate
+            // Sign the document using the signature field
             sigField.Sign(externalSig);
 
-            // Save the signed PDF
-            pdfDoc.Save(outputPdfPath);
+            // Save the signed PDF (lifecycle rule: save inside using block)
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF signed successfully and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");
     }
 
-    // Helper method to locate a certificate by thumbprint in the CurrentUser\My store
-    private static X509Certificate2 FindCertificateByThumbprint(string thumbprint)
+    // Helper method to retrieve a certificate by thumbprint from the CurrentUser\My store
+    private static X509Certificate2 GetCertificateByThumbprint(string thumbprint)
     {
+        // Normalize thumbprint (remove spaces, make uppercase)
+        string normalizedThumbprint = thumbprint.Replace(" ", string.Empty).ToUpperInvariant();
+
         using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
         {
             store.Open(OpenFlags.ReadOnly);
-            foreach (X509Certificate2 cert in store.Certificates)
-            {
-                // Thumbprint may contain spaces; remove them and compare case‑insensitively
-                string cleanedThumb = cert.Thumbprint?.Replace(" ", string.Empty);
-                if (string.Equals(cleanedThumb, thumbprint.Replace(" ", string.Empty), StringComparison.OrdinalIgnoreCase))
-                {
-                    return cert;
-                }
-            }
+            X509Certificate2Collection found = store.Certificates.Find(
+                X509FindType.FindByThumbprint,
+                normalizedThumbprint,
+                validOnly: false);
+
+            return found.Count > 0 ? found[0] : null;
         }
-        return null;
     }
 }

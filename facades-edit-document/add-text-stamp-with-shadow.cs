@@ -7,42 +7,49 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string stampText  = "Confidential";
+        const string stampText = "Confidential";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // ----- Shadow stamp (gray, slightly offset) -----
-        TextStamp shadowStamp = new TextStamp(stampText);
-        shadowStamp.TextState.Font = FontRepository.FindFont("Helvetica");
-        shadowStamp.TextState.FontSize = 12;
-        shadowStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-        shadowStamp.HorizontalAlignment = HorizontalAlignment.Center;
-        shadowStamp.VerticalAlignment   = VerticalAlignment.Top;
-        shadowStamp.TopMargin = 10;               // same top margin as main stamp
-        shadowStamp.XIndent = 1;                  // slight horizontal offset for shadow effect
-        shadowStamp.YIndent = -1;                 // slight vertical offset (upwards) for shadow effect
+        // Load the source PDF (Document is disposed automatically)
+        using (Document doc = new Document(inputPath))
+        {
+            // Get the first page
+            Page firstPage = doc.Pages[1];
 
-        // ----- Main stamp (black) -----
-        TextStamp textStamp = new TextStamp(stampText);
-        textStamp.TextState.Font = FontRepository.FindFont("Helvetica");
-        textStamp.TextState.FontSize = 12;
-        textStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-        textStamp.HorizontalAlignment = HorizontalAlignment.Center;
-        textStamp.VerticalAlignment   = VerticalAlignment.Top;
-        textStamp.TopMargin = 10;
+            // ----- Shadow stamp (gray, slightly lower) -----
+            TextStamp shadowStamp = new TextStamp(stampText);
+            shadowStamp.TextState.Font = FontRepository.FindFont("Helvetica");
+            shadowStamp.TextState.FontSize = 12;
+            shadowStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray; // shadow color
+            shadowStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            shadowStamp.VerticalAlignment = VerticalAlignment.Top;
+            // Offset the shadow a few points down from the main stamp
+            shadowStamp.TopMargin = 12; // 2 points lower than the main stamp
 
-        // Load the PDF document and add the stamps to the first page (shadow first, then main)
-        Document pdfDocument = new Document(inputPath);
-        pdfDocument.Pages[1].AddStamp(shadowStamp);
-        pdfDocument.Pages[1].AddStamp(textStamp);
-        pdfDocument.Save(outputPath);
+            // ----- Main stamp (black) -----
+            TextStamp mainStamp = new TextStamp(stampText);
+            mainStamp.TextState.Font = FontRepository.FindFont("Helvetica");
+            mainStamp.TextState.FontSize = 12;
+            mainStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            mainStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            mainStamp.VerticalAlignment = VerticalAlignment.Top;
+            mainStamp.TopMargin = 10; // distance from the top edge
 
-        Console.WriteLine($"Text stamp added to '{outputPath}'.");
+            // Add both stamps to the first page (shadow first, then main)
+            firstPage.AddStamp(shadowStamp);
+            firstPage.AddStamp(mainStamp);
+
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Text stamp with shadow added. Output saved to '{outputPath}'.");
     }
 }

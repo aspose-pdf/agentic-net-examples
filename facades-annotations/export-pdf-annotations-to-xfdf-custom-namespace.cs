@@ -1,82 +1,66 @@
 using System;
 using System.IO;
 using System.Xml.Linq;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
+        // Input PDF containing annotations
         const string inputPdfPath = "input.pdf";
-        const string outputXfdfPath = "output_custom.xfdf";
-        const string customNamespace = "http://example.com/customxfdf";
 
+        // Desired output XFDF file path
+        const string outputXfdfPath = "custom_namespace.xfdf";
+
+        // Custom XFDF namespace required by enterprise standards
+        const string customNamespace = "http://mycompany.com/xfdf";
+
+        // Ensure the input PDF exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Use PdfAnnotationEditor facade to work with annotations
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Initialize the annotation editor and bind the PDF
-            PdfAnnotationEditor editor = new PdfAnnotationEditor();
-            editor.BindPdf(pdfDoc);
+            // Bind the PDF document to the editor
+            editor.BindPdf(inputPdfPath);
 
-            // Export annotations to a memory stream (XFDF format)
-            using (MemoryStream xfdfStream = new MemoryStream())
+            // Export annotations to an in‑memory stream (default XFDF)
+            using (MemoryStream tempStream = new MemoryStream())
             {
-                editor.ExportAnnotationsToXfdf(xfdfStream);
-                xfdfStream.Position = 0; // Reset stream position for reading
+                editor.ExportAnnotationsToXfdf(tempStream);
+                tempStream.Position = 0; // Reset for reading
 
-                // Load the exported XFDF XML
-                XDocument xfdfXml = XDocument.Load(xfdfStream);
+                // Load the XFDF XML
+                XDocument xfdfDoc = XDocument.Load(tempStream);
 
-                // Change the default namespace to the custom one
-                // Create a new root element with the custom namespace and copy existing content
-                XElement oldRoot = xfdfXml.Root;
-                XNamespace ns = customNamespace;
-                XElement newRoot = new XElement(ns + oldRoot.Name.LocalName,
-                    // Preserve attributes (if any) without namespace changes
-                    oldRoot.Attributes(),
-                    // Preserve child elements, updating their namespace as well
-                    UpdateNamespaceRecursive(oldRoot, ns));
+                // Replace the default namespace with the custom one
+                // Set the xmlns attribute on the root element
+                xfdfDoc.Root.SetAttributeValue("xmlns", customNamespace);
 
-                // Replace the document's root
-                xfdfXml = new XDocument(newRoot);
+                // If the document contains elements that explicitly use the old namespace,
+                // rename them to the new namespace as well
+                XNamespace oldNs = xfdfDoc.Root.GetDefaultNamespace();
+                XNamespace newNs = customNamespace;
 
-                // Save the modified XFDF to the desired file
-                xfdfXml.Save(outputXfdfPath);
+                foreach (XElement elem in xfdfDoc.Descendants())
+                {
+                    // Change element name to use the new namespace
+                    elem.Name = newNs + elem.Name.LocalName;
+                }
+
+                // Save the modified XFDF to the target file
+                xfdfDoc.Save(outputXfdfPath);
             }
 
-            // Close the editor (optional, as it does not hold unmanaged resources)
+            // Close the editor (optional, as using will dispose it)
             editor.Close();
         }
 
         Console.WriteLine($"Annotations exported with custom namespace to '{outputXfdfPath}'.");
-    }
-
-    // Recursively updates the namespace of an element and its descendants
-    private static object[] UpdateNamespaceRecursive(XElement element, XNamespace ns)
-    {
-        var updatedChildren = new System.Collections.Generic.List<object>();
-        foreach (var node in element.Nodes())
-        {
-            if (node is XElement child)
-            {
-                XElement newChild = new XElement(ns + child.Name.LocalName,
-                    child.Attributes(),
-                    UpdateNamespaceRecursive(child, ns));
-                updatedChildren.Add(newChild);
-            }
-            else
-            {
-                // Preserve text nodes, comments, etc.
-                updatedChildren.Add(node);
-            }
-        }
-        return updatedChildren.ToArray();
     }
 }

@@ -1,31 +1,32 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // FormEditor resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";   // PDF containing the dropdown field "Choices" on page 4
+        const string outputPdf = "output.pdf";  // PDF after the new item is added
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Initialize FormEditor with source and destination PDFs
-        using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
+        // FormEditor implements IDisposable, so wrap it in a using block.
+        // The constructor takes the source PDF and the destination PDF.
+        using (FormEditor formEditor = new FormEditor(inputPdf, outputPdf))
         {
-            // Add a new option to the dropdown (combo box) field named "Choices"
-            // For combo boxes the overload with a string array (label, export value) is required
-            formEditor.AddListItem("Choices", new string[] { "Option A", "Option A" });
+            // Add a new item "Option A" to the dropdown (combo box) field named "Choices".
+            // The field name must be the fully qualified name; here we assume "Choices" is sufficient.
+            formEditor.AddListItem("Choices", "Option A");
 
-            // Save the modified PDF
+            // Persist changes to the output file.
             formEditor.Save();
         }
 
-        Console.WriteLine($"Dropdown field updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Added \"Option A\" to dropdown \"Choices\" and saved as '{outputPdf}'.");
     }
 }

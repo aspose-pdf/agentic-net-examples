@@ -9,26 +9,29 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
+        // Load the PDF, modify, and save – wrapped in a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
             // Define the corporate brand color (example RGB 30,144,255)
             Aspose.Pdf.Color brandColor = Aspose.Pdf.Color.FromArgb(30, 144, 255);
 
-            // Apply the background color to every page (Aspose.Pdf uses 1‑based page indexing)
+            // Apply the background color to each page (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                doc.Pages[i].Background = brandColor;
+                Page page = doc.Pages[i];
+                page.Background = brandColor;
             }
 
-            // Save the modified PDF (PDF format does not require explicit SaveOptions)
+            // Optionally set the document‑wide background as well
+            doc.Background = brandColor;
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

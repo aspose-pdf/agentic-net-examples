@@ -8,7 +8,7 @@ class Program
     {
         const string inputPath = "signed.pdf";
         const string outputPath = "unsigned.pdf";
-        const string password = ""; // set if the PDF is password‑protected
+        const string password = ""; // set owner password if the PDF is encrypted
 
         if (!File.Exists(inputPath))
         {
@@ -18,20 +18,19 @@ class Program
 
         try
         {
-            // Load the PDF; supply the password only when needed
+            // Load the PDF; include password only when needed
             using (Document doc = string.IsNullOrEmpty(password)
-                                 ? new Document(inputPath)
-                                 : new Document(inputPath, password))
+                ? new Document(inputPath)
+                : new Document(inputPath, password))
             {
-                // EnableSignatureSanitization is true by default.
-                // When true, saving the document strips removable digital signatures.
+                // Enable sanitization to strip digital signatures during save
                 doc.EnableSignatureSanitization = true;
 
-                // Save the modified PDF – signatures are removed if the document permits it.
+                // Save the sanitized PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Unsigned PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Signature removed. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

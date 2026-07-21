@@ -1,94 +1,60 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // Facade classes for stamping
-using Aspose.Pdf;          // Core PDF types (e.g., Color)
+using Aspose.Pdf.Facades; // Facade classes: PdfFileStamp, Stamp
 
-// Configuration class for watermark settings
-public class WatermarkConfig
-{
-    // Path to the image file used as watermark
-    public string ImagePath { get; set; } = "watermark.png";
-
-    // Opacity of the watermark (0.0 = fully transparent, 1.0 = fully opaque)
-    public float Opacity { get; set; } = 0.5f;
-
-    // Whether the watermark should appear behind page content
-    public bool IsBackground { get; set; } = true;
-
-    // Position of the watermark on each page (in points)
-    public float PositionX { get; set; } = 100f; // left coordinate
-    public float PositionY { get; set; } = 500f; // bottom coordinate
-}
-
-// Main program that applies the watermark to all PDFs in a folder
 class Program
 {
     static void Main()
     {
-        // Folder containing PDFs to process
-        const string inputFolder = @"C:\PdfFolder";
+        // Folder containing source PDFs
+        const string inputFolder  = @"C:\Pdf\Input";
+        // Folder where watermarked PDFs will be saved
+        const string outputFolder = @"C:\Pdf\Output";
 
-        // Output folder for watermarked PDFs (can be the same as inputFolder)
-        const string outputFolder = @"C:\PdfFolder\Watermarked";
+        // Watermark configuration
+        const string watermarkImagePath = @"C:\Pdf\watermark.png"; // image used as watermark
+        const float opacity   = 0.5f;   // 0 = fully transparent, 1 = fully opaque
+        const float originX   = 100f;   // X coordinate of the watermark origin
+        const float originY   = 200f;   // Y coordinate of the watermark origin
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Load watermark configuration (could be read from a file; here we use defaults)
-        WatermarkConfig config = new WatermarkConfig();
-
-        // Validate that the watermark image exists
-        if (!File.Exists(config.ImagePath))
-        {
-            Console.Error.WriteLine($"Watermark image not found: {config.ImagePath}");
-            return;
-        }
-
         // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Build the output file name (original name with "_watermarked" suffix)
-            string outputPath = Path.Combine(
-                outputFolder,
-                Path.GetFileNameWithoutExtension(pdfPath) + "_watermarked.pdf");
+            // Prepare the output file path (same file name, different folder)
+            string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
 
-            try
-            {
-                // Initialize the PdfFileStamp facade
-                using (PdfFileStamp fileStamp = new PdfFileStamp())
-                {
-                    // Bind the source PDF file
-                    fileStamp.BindPdf(pdfPath);
+            // Initialize the PdfFileStamp facade
+            PdfFileStamp fileStamp = new PdfFileStamp();
 
-                    // Create a fully qualified Stamp instance
-                    Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+            // Bind the source PDF file
+            fileStamp.BindPdf(inputPath);
 
-                    // Bind the watermark image to the stamp
-                    stamp.BindImage(config.ImagePath);
+            // Create a Stamp object that will act as the watermark
+            Stamp stamp = new Stamp();
 
-                    // Set the position where the watermark will be placed (float values required)
-                    stamp.SetOrigin(config.PositionX, config.PositionY);
+            // Bind the watermark image to the stamp
+            stamp.BindImage(watermarkImagePath);
 
-                    // Configure appearance
-                    stamp.Opacity = config.Opacity;
-                    stamp.IsBackground = config.IsBackground;
+            // Position the watermark on the page
+            stamp.SetOrigin(originX, originY);
 
-                    // Add the stamp to the PDF
-                    fileStamp.AddStamp(stamp);
+            // Set visual properties
+            stamp.Opacity = opacity;          // transparency
+            stamp.IsBackground = true;        // render behind existing content
 
-                    // Save the watermarked PDF to the output path
-                    fileStamp.Save(outputPath);
+            // Add the stamp to the PDF
+            fileStamp.AddStamp(stamp);
 
-                    // Close the facade (optional, called automatically by using)
-                    fileStamp.Close();
-                }
+            // Save the watermarked PDF to the output location
+            fileStamp.Save(outputPath);
 
-                Console.WriteLine($"Watermarked PDF saved: {outputPath}");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+            // Close the facade (releases file handles)
+            fileStamp.Close();
         }
+
+        Console.WriteLine("Watermarking completed.");
     }
 }

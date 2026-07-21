@@ -8,11 +8,10 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string pdfPath = "form.pdf";
         const string compressedJsonPath = "data.json.gz";
-        const string outputPath = "output.pdf";
+        const string outputPath = "filled_form.pdf";
 
-        // Verify input files exist
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
@@ -26,18 +25,17 @@ class Program
 
         try
         {
-            // Load the PDF document (wrapped in using for deterministic disposal)
+            // Load the PDF document
             using (Document doc = new Document(pdfPath))
             {
-                // Open the compressed JSON file and decompress it on the fly
-                using (FileStream fs = new FileStream(compressedJsonPath, FileMode.Open, FileAccess.Read))
-                using (GZipStream gz = new GZipStream(fs, CompressionMode.Decompress))
+                // Decompress JSON and import form data
+                using (FileStream fileStream = new FileStream(compressedJsonPath, FileMode.Open, FileAccess.Read))
+                using (GZipStream gzip = new GZipStream(fileStream, CompressionMode.Decompress))
                 {
-                    // Import form fields from the decompressed JSON stream
-                    doc.Form.ImportFromJson(gz);
+                    doc.Form.ImportFromJson(gzip);
                 }
 
-                // Save the updated PDF document
+                // Save the updated PDF
                 doc.Save(outputPath);
             }
 

@@ -1,10 +1,10 @@
 # Facades metadata
 
-> **Facades metadata** in PDF using C# / .NET -- **40** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades metadata** in PDF using C# / .NET -- **40** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-metadata`
 - Examples: 40
-- NuGet: `Aspose.PDF 26.6.0` -- target `net10.0`
+- NuGet: `Aspose.PDF 26.7.0` -- target `net10.0`
 
 ## Examples
 

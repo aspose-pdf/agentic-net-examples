@@ -6,42 +6,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputPdf = "output.pdf";         // result PDF
-        const string bannerImg = "banner.jpg";         // new branding image (JPEG)
+        const string inputPdf = "input.pdf";
+        const string bannerPath = "banner.jpg";
+        const string outputPdf = "output.pdf";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(bannerImg))
+        if (!File.Exists(bannerPath))
         {
-            Console.Error.WriteLine($"Banner image not found: {bannerImg}");
+            Console.Error.WriteLine($"Banner image not found: {bannerPath}");
             return;
         }
+
+        // Load banner image bytes once to reuse for each replacement
+        byte[] bannerBytes = File.ReadAllBytes(bannerPath);
 
         // Load the PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Assume the index page is the first page (1‑based indexing)
+            // Index page is assumed to be the first page (1‑based indexing)
             Page indexPage = doc.Pages[1];
+            var images = indexPage.Resources.Images;
 
-            // Access the image collection of the page
-            XImageCollection images = indexPage.Resources.Images;
-
-            // Replace every existing image on the index page with the banner image
-            // The Replace method expects a 1‑based index and a Stream containing JPEG data
+            // Replace every image on the index page with the banner image
             for (int i = 1; i <= images.Count; i++)
             {
-                using (FileStream bannerStream = File.OpenRead(bannerImg))
+                using (MemoryStream ms = new MemoryStream(bannerBytes))
                 {
-                    images.Replace(i, bannerStream);
+                    images.Replace(i, ms);
                 }
             }
 
-            // Save the modified document
+            // Save the updated PDF
             doc.Save(outputPdf);
         }
 

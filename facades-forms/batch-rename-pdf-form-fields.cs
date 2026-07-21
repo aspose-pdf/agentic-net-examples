@@ -6,33 +6,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Open the PDF form and specify the output file
-        using (Form form = new Form(inputPath, outputPath))
-        {
-            // Iterate over all field names
-            foreach (string fieldName in form.FieldNames)
-            {
-                // Rename fields that start with "Old_"
-                if (fieldName.StartsWith("Old_"))
-                {
-                    string newName = "New_" + fieldName.Substring("Old_".Length);
-                    form.RenameField(fieldName, newName);
-                }
-            }
+        // Initialize the Form facade with source and destination PDFs
+        Form form = new Form(inputPdf, outputPdf);
 
-            // Save the updated PDF
-            form.Save();
+        // Loop through all form fields and rename those starting with "Old_"
+        foreach (string fieldName in form.FieldNames)
+        {
+            if (fieldName.StartsWith("Old_"))
+            {
+                string newName = "New_" + fieldName.Substring("Old_".Length);
+                form.RenameField(fieldName, newName);
+            }
         }
 
-        Console.WriteLine($"Renamed fields saved to '{outputPath}'.");
+        // Persist the changes to the output PDF
+        form.Save();
+
+        Console.WriteLine($"Fields renamed and saved to '{outputPdf}'.");
     }
 }

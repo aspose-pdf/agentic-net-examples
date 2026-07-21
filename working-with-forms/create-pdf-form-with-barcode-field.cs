@@ -1,7 +1,7 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -9,32 +9,33 @@ class Program
     {
         const string outputPath = "barcode_form.pdf";
 
-        // Create a new PDF document
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a page (evaluation mode allows up to 4 pages)
+            // Add a blank page to host the barcode field
             Page page = doc.Pages.Add();
 
-            // Define the rectangle for the barcode field
+            // Define the position and size of the barcode field
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create the barcode field on the page
-            BarcodeField barcodeField = new BarcodeField(page, rect)
-            {
-                Name = "ProductBarcode",
-                AlternateName = "Enter product identifier"
-            };
+            // Create a BarcodeField on the specified page and rectangle
+            BarcodeField barcodeField = new BarcodeField(page, rect);
 
-            // Add a Code128 barcode value
-            barcodeField.AddBarcode("1234567890");
+            // Set a name for the field (optional but useful for identification)
+            barcodeField.Name = "ProductBarcode";
 
-            // Add the field to the form, specifying the page number (1‑based)
-            doc.Form.Add(barcodeField, 1);
+            // Add a Code128 barcode with the desired value
+            // This also makes the field read‑only after the barcode is generated
+            barcodeField.AddBarcode("123456789012");
 
-            // Save the PDF
+            // Add the barcode field to the document's form collection
+            doc.Form.Add(barcodeField);
+
+            // Save the PDF containing the barcode form field
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF form with barcode saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with barcode form saved to '{outputPath}'.");
     }
 }

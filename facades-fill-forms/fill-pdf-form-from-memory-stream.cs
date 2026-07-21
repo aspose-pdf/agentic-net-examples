@@ -9,79 +9,69 @@ class Program
 {
     static void Main()
     {
-        // ---------------------------------------------------------------------
-        // 1. Create a PDF template *in memory* that contains the form fields we
-        //    want to fill. This removes the need for an external "template.pdf"
-        //    file and prevents FileNotFoundException in the sandbox.
-        // ---------------------------------------------------------------------
-        byte[] templateBytes;
-        using (var templateDoc = new Document())
+        // -------------------------------------------------------------------
+        // 1. Create a PDF template with the required form fields entirely in memory.
+        // -------------------------------------------------------------------
+        using (MemoryStream templateStream = new MemoryStream())
         {
-            var page = templateDoc.Pages.Add();
+            Document templateDoc = new Document();
+            Page page = templateDoc.Pages.Add();
 
-            // Create three text box fields whose PartialName matches the DataTable columns
-            var firstNameField = new TextBoxField(templateDoc)
+            // FirstName field
+            TextBoxField firstName = new TextBoxField(templateDoc.Pages[1], new Rectangle(100, 700, 300, 720))
             {
                 PartialName = "FirstName",
-                Rect = new Rectangle(100, 700, 300, 720) // left, bottom, right, top
+                Value = string.Empty
             };
-            var lastNameField = new TextBoxField(templateDoc)
+            page.Paragraphs.Add(firstName);
+
+            // LastName field
+            TextBoxField lastName = new TextBoxField(templateDoc.Pages[1], new Rectangle(100, 660, 300, 680))
             {
                 PartialName = "LastName",
-                Rect = new Rectangle(100, 650, 300, 670)
+                Value = string.Empty
             };
-            var emailField = new TextBoxField(templateDoc)
+            page.Paragraphs.Add(lastName);
+
+            // Email field
+            TextBoxField email = new TextBoxField(templateDoc.Pages[1], new Rectangle(100, 620, 300, 640))
             {
                 PartialName = "Email",
-                Rect = new Rectangle(100, 600, 300, 620)
+                Value = string.Empty
             };
+            page.Paragraphs.Add(email);
 
-            // Add the fields to the page
-            page.Paragraphs.Add(firstNameField);
-            page.Paragraphs.Add(lastNameField);
-            page.Paragraphs.Add(emailField);
+            // Save the template into the memory stream and rewind it.
+            templateDoc.Save(templateStream);
+            templateStream.Position = 0;
 
-            // Save the template to a byte array
-            using (var ms = new MemoryStream())
+            // -------------------------------------------------------------------
+            // 2. Fill the template using AutoFiller without touching the file system.
+            // -------------------------------------------------------------------
+            using (MemoryStream filledPdfStream = new MemoryStream())
+            using (AutoFiller autoFiller = new AutoFiller())
             {
-                templateDoc.Save(ms);
-                templateBytes = ms.ToArray();
-            }
-        }
+                // Bind the in‑memory template.
+                autoFiller.BindPdf(templateStream);
 
-        // ---------------------------------------------------------------------
-        // 2. Prepare the data that will be merged into the form fields.
-        // ---------------------------------------------------------------------
-        DataTable data = new DataTable("FormData");
-        data.Columns.Add("FirstName", typeof(string));
-        data.Columns.Add("LastName", typeof(string));
-        data.Columns.Add("Email", typeof(string));
+                // Prepare data that matches the form field names.
+                DataTable formData = new DataTable("FormData");
+                formData.Columns.Add("FirstName", typeof(string));
+                formData.Columns.Add("LastName", typeof(string));
+                formData.Columns.Add("Email", typeof(string));
 
-        DataRow row = data.NewRow();
-        row["FirstName"] = "John";
-        row["LastName"]  = "Doe";
-        row["Email"]     = "john.doe@example.com";
-        data.Rows.Add(row);
+                DataRow row = formData.NewRow();
+                row["FirstName"] = "John";
+                row["LastName"] = "Doe";
+                row["Email"] = "john.doe@example.com";
+                formData.Rows.Add(row);
 
-        // ---------------------------------------------------------------------
-        // 3. Fill the PDF using AutoFiller, working completely with streams.
-        // ---------------------------------------------------------------------
-        using (var inputStream = new MemoryStream(templateBytes))
-        using (var autoFiller = new AutoFiller())
-        {
-            // Bind the in‑memory template
-            autoFiller.BindPdf(inputStream);
+                // Import data and save the filled PDF to the output stream.
+                autoFiller.ImportDataTable(formData);
+                autoFiller.Save(filledPdfStream);
 
-            // Import the DataTable – column names must match field names (case‑sensitive)
-            autoFiller.ImportDataTable(data);
-
-            // Save the filled PDF to another memory stream
-            using (var outputStream = new MemoryStream())
-            {
-                autoFiller.Save(outputStream);
-
-                // Optional: write the result to a file so you can inspect it locally.
-                File.WriteAllBytes("filled_output.pdf", outputStream.ToArray());
+                // Example: write the result to a file (optional).
+                File.WriteAllBytes("filled.pdf", filledPdfStream.ToArray());
             }
         }
     }

@@ -1,13 +1,12 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
 
-class BatchAddHiddenField
+class Program
 {
     static void Main()
     {
-        // Folder containing the PDF forms
         const string inputFolder = "InputForms";
 
         if (!Directory.Exists(inputFolder))
@@ -17,41 +16,39 @@ class BatchAddHiddenField
         }
 
         // Process each PDF file in the folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
             try
             {
-                // ------------------------------------------------------------
-                // 1. Add a hidden text field named "ProcessedDate" to the PDF.
-                // ------------------------------------------------------------
-                // Load the document.
-                using (Document doc = new Document(pdfPath))
+                // Generate a new GUID for this document
+                string guidValue = Guid.NewGuid().ToString();
+
+                // Prepare output file name (overwrite original)
+                string outputPath = inputPath; // overwrite; change if a different name is desired
+
+                // Use FormEditor to add a hidden text field with the GUID as its initial value
+                using (FormEditor formEditor = new FormEditor())
                 {
-                    // Generate a GUID that will be stored in the hidden field.
-                    string guidValue = Guid.NewGuid().ToString();
+                    // Bind the source PDF
+                    formEditor.BindPdf(inputPath);
 
-                    // Create a zero‑size rectangle – the field will be invisible.
-                    Rectangle rect = new Rectangle(0, 0, 0, 0);
+                    // Add the hidden field on page 1; rectangle set to zero size (invisible)
+                    // AddField(FieldType, fieldName, initValue, pageNum, llx, lly, urx, ury)
+                    formEditor.AddField(FieldType.Text, "ProcessedDate", guidValue, 1, 0, 0, 0, 0);
 
-                    // Create the hidden text field.
-                    TextBoxField hiddenField = new TextBoxField(doc.Pages[1], rect)
-                    {
-                        PartialName = "ProcessedDate",
-                        Value = guidValue
-                    };
+                    // NOTE: The PropertyFlag.Hidden enum member does not exist in the current Aspose.PDF version.
+                    // The field is already invisible because its rectangle has zero size, so no additional flag is required.
+                    // If a future version adds a hidden flag, it can be set here using the appropriate enum value.
 
-                    // Add the field to the document's form collection.
-                    doc.Form.Add(hiddenField, 1);
-
-                    // Save the changes back to the original file.
-                    doc.Save(pdfPath);
+                    // Save the modified PDF (overwrites the original file)
+                    formEditor.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
+                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{Path.GetFileName(inputPath)}': {ex.Message}");
             }
         }
     }

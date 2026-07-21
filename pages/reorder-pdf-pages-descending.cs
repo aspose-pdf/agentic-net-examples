@@ -6,36 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "reordered_descending.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "sorted_desc.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Load the source PDF
-        using (Document sourceDoc = new Document(inputPath))
+        using (Document srcDoc = new Document(inputPath))
         {
-            // Create a new empty PDF document to hold pages in descending order
-            using (Document targetDoc = new Document())
+            // Create a new empty PDF to hold pages in the desired order
+            using (Document destDoc = new Document())
             {
-                // Pages are 1‑based; iterate from last to first
-                for (int i = sourceDoc.Pages.Count; i >= 1; i--)
+                // Add pages from the source document in descending order
+                // Page numbers are 1‑based, so start from Count and go down to 1
+                for (int i = srcDoc.Pages.Count; i >= 1; i--)
                 {
-                    // Add a copy of each page to the target document
-                    targetDoc.Pages.Add(sourceDoc.Pages[i]);
+                    // Add the page object to the destination document
+                    destDoc.Pages.Add(srcDoc.Pages[i]);
                 }
 
-                // Optional: balance the page tree for better performance
-                targetDoc.PageNodesToBalancedTree();
+                // Optional: reorganize the internal page tree for better performance
+                destDoc.PageNodesToBalancedTree();
 
                 // Save the reordered PDF
-                targetDoc.Save(outputPath);
+                destDoc.Save(outputPath);
             }
         }
 
-        Console.WriteLine($"Reordered PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Pages reordered descending and saved to '{outputPath}'.");
     }
 }

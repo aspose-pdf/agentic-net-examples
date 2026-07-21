@@ -8,49 +8,43 @@ class Program
     static void Main()
     {
         const string outputPdf = "invoice_zugferd.pdf";
-        const string xmlData   = "invoice.xml";
-        const string logFile   = "convert.log";
+        const string xmlData   = "invoice.xml";          // ZUGFeRD XML file
+        const string logFile   = "conversion.log";
 
-        // Ensure the ZUGFeRD XML file exists; create a minimal placeholder if missing.
-        if (!File.Exists(xmlData))
-        {
-            File.WriteAllText(xmlData, "<Invoice></Invoice>");
-        }
-
-        // Use absolute paths – Aspose.PDF expects a URI‑compatible string for BindXml and Convert.
-        string xmlPath  = Path.GetFullPath(xmlData);
-        string pdfPath  = Path.GetFullPath(outputPdf);
-        string logPath  = Path.GetFullPath(logFile);
-
-        // Create a new PDF document inside a using block for proper disposal.
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a single page to the document.
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Add a title to the invoice.
+            // Add invoice title
             TextFragment title = new TextFragment("Invoice");
             title.TextState.FontSize = 20;
+            title.TextState.Font = FontRepository.FindFont("Helvetica");
             title.Position = new Position(50, 800);
             page.Paragraphs.Add(title);
 
-            // Add some sample invoice details.
+            // Add sample invoice details
             TextFragment details = new TextFragment(
-                "Customer: Acme Corp\n" +
+                "Seller: Acme Corp\n" +
+                "Buyer: Globex Inc\n" +
                 "Amount: $1,234.56\n" +
-                "Date: 2026-07-02");
+                "Date: 2026-07-15");
+            details.TextState.FontSize = 12;
             details.Position = new Position(50, 750);
             page.Paragraphs.Add(details);
 
-            // Bind the ZUGFeRD XML data to the PDF. Use the absolute file path to avoid UriFormatException.
-            doc.BindXml(xmlPath);
+            // Embed the ZUGFeRD XML data into the PDF
+            if (File.Exists(xmlData))
+            {
+                doc.BindXml(xmlData);
+            }
 
-            // Convert the PDF to ZUGFeRD (PDF/A‑3U with embedded XML).
-            // The Convert method returns a boolean indicating success; we ignore it here.
-            doc.Convert(logPath, PdfFormat.ZUGFeRD, ConvertErrorAction.Delete);
+            // Convert the document to ZUGFeRD format (PDF with embedded XML)
+            doc.Convert(logFile, PdfFormat.ZUGFeRD, ConvertErrorAction.Delete);
 
-            // Save the final PDF invoice.
-            doc.Save(pdfPath);
+            // Save the resulting PDF
+            doc.Save(outputPdf);
         }
 
         Console.WriteLine($"ZUGFeRD invoice saved to '{outputPdf}'.");

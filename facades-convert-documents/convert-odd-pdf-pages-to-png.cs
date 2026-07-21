@@ -1,49 +1,53 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;          // For ImageFormat.Png
-using Aspose.Pdf.Facades;             // Facade classes (PdfConverter)
+using Aspose.Pdf;                     // Core API for accessing page count
+using Aspose.Pdf.Facades;            // Facade API for PDF‑to‑image conversion
+using System.Drawing.Imaging;        // ImageFormat enum for PNG output
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";               // Source PDF
-        const string outputDir = "OddPageImages";           // Folder for PNGs
+        const string inputPdf  = "input.pdf";          // Source PDF file
+        const string outputDir = "OddPageImages";      // Folder for PNG files
 
-        // Verify input file exists
+        // Verify the input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Use PdfConverter (IDisposable) – it will be disposed automatically
-        using (PdfConverter converter = new PdfConverter())
+        // Use Document (wrapped in using) to obtain the total page count
+        using (Document doc = new Document(inputPdf))
         {
-            // Bind the PDF file to the converter
-            converter.BindPdf(inputPdf);
-
-            // Total number of pages (1‑based indexing)
-            int pageCount = converter.Document.Pages.Count;
+            int totalPages = doc.Pages.Count;   // 1‑based indexing
 
             // Iterate over odd‑numbered pages only
-            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber += 2)
+            for (int pageNumber = 1; pageNumber <= totalPages; pageNumber += 2)
             {
-                // Restrict conversion to a single page
-                converter.StartPage = pageNumber;
-                converter.EndPage   = pageNumber;
+                // Each conversion uses a fresh PdfConverter instance (IDisposable)
+                using (PdfConverter converter = new PdfConverter())
+                {
+                    // Bind the source PDF file
+                    converter.BindPdf(inputPdf);
 
-                // Prepare the converter for the specified range
-                converter.DoConvert();
+                    // Restrict conversion to the current odd page
+                    converter.StartPage = pageNumber;
+                    converter.EndPage   = pageNumber;
 
-                // Build output file name (e.g., page_1.png, page_3.png, …)
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+                    // Prepare the converter
+                    converter.DoConvert();
 
-                // Save the page as PNG
-                converter.GetNextImage(outputPath, ImageFormat.Png);
+                    // Build the output file name (e.g., page_1.png, page_3.png, …)
+                    string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+
+                    // Save the page as PNG
+                    converter.GetNextImage(outputPath, ImageFormat.Png);
+                }
             }
         }
 

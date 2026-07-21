@@ -1,55 +1,57 @@
 using System;
 using System.IO;
 using Aspose.Pdf;                     // Core PDF API
-using Aspose.Pdf.Text;                // For HtmlFragment (inherits FormattedFragment)
+using Aspose.Pdf.Text;                // For HtmlFragment (inherits from FormattedFragment)
+using Aspose.Pdf.Facades;             // Not needed here but kept for completeness
 
 class Program
 {
     static void Main()
     {
-        // Paths for input (optional) and output PDF
-        const string outputPath = "HtmlInCell.pdf";
+        const string inputPath  = "template.pdf";   // optional existing PDF, can be empty
+        const string outputPath = "table_with_html.pdf";
 
-        // Create a new PDF document inside a using block for proper disposal
-        using (Document doc = new Document())
+        // Ensure the input file exists; if not, create a blank document.
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            using (Document blank = new Document())
+            {
+                blank.Pages.Add();                 // add a single empty page
+                blank.Save(inputPath);
+            }
+        }
 
-            // Create a table and define column widths (two columns for demonstration)
+        // Open the PDF (or blank template) inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPath))
+        {
+            // Create a table and add it to the first page.
             Table table = new Table
             {
-                ColumnWidths = "200 200"
+                ColumnWidths = "200"               // single column width
             };
+            doc.Pages[1].Paragraphs.Add(table);
 
-            // Add a row to the table
+            // Add a row to the table.
             Row row = table.Rows.Add();
 
-            // Add the first cell (plain text)
-            Cell cell1 = row.Cells.Add("Plain text cell");
+            // Add a cell to the row.
+            Cell cell = row.Cells.Add();
 
-            // Add the second cell where we will embed HTML markup
-            Cell cell2 = row.Cells.Add();
-
-            // Create an HtmlFragment with the desired HTML markup
-            // Example: bold text with a hyperlink
-            string html = "<b>Bold Text</b> and a <a href=\"https://www.example.com\">link</a>";
+            // Create an HtmlFragment with the desired markup.
+            // Example markup: a simple styled paragraph with a link.
+            string html = @"<p style='font-family:Arial; font-size:14pt; color:#0066CC;'>
+                                This is <b>bold</b> and <i>italic</i> text with a 
+                                <a href='https://www.example.com'>link</a>.
+                            </p>";
             HtmlFragment htmlFragment = new HtmlFragment(html);
 
-            // Optionally, set HtmlLoadOptions if you need custom base path or resource handling
-            // htmlFragment.HtmlLoadOptions = new HtmlLoadOptions { BasePath = "path/to/resources" };
+            // (Optional) customize loading options, e.g., set a base path for external resources.
+            // htmlFragment.HtmlLoadOptions = new HtmlLoadOptions { BasePath = "resources/" };
 
-            // Add the HtmlFragment to the cell's paragraph collection
-            // The Paragraphs property holds BaseParagraph objects, and HtmlFragment derives from FormattedFragment -> BaseParagraph
-            cell2.Paragraphs.Add(htmlFragment);
+            // Add the HtmlFragment to the cell's paragraph collection.
+            cell.Paragraphs.Add(htmlFragment);
 
-            // Ensure the cell respects the fragment's text state (optional but recommended)
-            cell2.IsOverrideByFragment = true;
-
-            // Add the table to the page's paragraphs collection
-            page.Paragraphs.Add(table);
-
-            // Save the PDF document (no SaveOptions needed for PDF format)
+            // Save the modified document.
             doc.Save(outputPath);
         }
 

@@ -16,22 +16,24 @@ class BatchReplace
             return;
         }
 
-        // Process each PDF file in the folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Get all PDF files in the folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        foreach (string pdfPath in pdfFiles)
         {
             try
             {
-                // Load the PDF document (lifecycle: using block ensures disposal)
+                // Load the PDF document (lifecycle rule: use using for deterministic disposal)
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Create a PdfContentEditor facade and bind the document
+                    // Create a PdfContentEditor facade and bind the loaded document
                     PdfContentEditor editor = new PdfContentEditor();
                     editor.BindPdf(doc);
 
-                    // Replace all occurrences of "Confidential" with "Public" (all pages)
+                    // Replace every occurrence of "Confidential" with "Public" on all pages
                     editor.ReplaceText("Confidential", "Public");
 
-                    // Save the modified document, overwriting the original file
+                    // Save the modified document back to the same file (lifecycle rule: use Document.Save)
                     doc.Save(pdfPath);
                 }
 
@@ -42,5 +44,7 @@ class BatchReplace
                 Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch replacement completed.");
     }
 }

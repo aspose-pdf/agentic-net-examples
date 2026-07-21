@@ -3,68 +3,63 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
-class Program
+class PdfToTiffConverter
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
-
-        // Output directory for TIFF images
-        const string outputDir = "TiffPages";
-
-        // Desired DPI (resolution) for the output images
-        const int dpi = 300;
-
-        // Validate input file
-        if (!File.Exists(inputPdfPath))
+        // Expected arguments: input PDF path, output directory, DPI
+        if (args.Length < 3)
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine("Usage: PdfToTiffConverter <input.pdf> <outputDir> <dpi>");
             return;
         }
 
-        // Ensure output directory exists
+        string inputPath = args[0];
+        string outputDir = args[1];
+        if (!int.TryParse(args[2], out int dpi) || dpi <= 0)
+        {
+            Console.Error.WriteLine("Invalid DPI value.");
+            return;
+        }
+
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+
         Directory.CreateDirectory(outputDir);
 
-        try
+        // Load the PDF document
+        using (Document pdfDocument = new Document(inputPath))
         {
-            // Load the PDF document (wrapped in using for deterministic disposal)
-            using (Document pdfDocument = new Document(inputPdfPath))
+            // Define high‑resolution settings
+            Resolution resolution = new Resolution(dpi);
+
+            // Optional TIFF settings (no compression, default depth)
+            TiffSettings tiffSettings = new TiffSettings
             {
-                // Set the resolution for the TIFF images
-                Resolution resolution = new Resolution(dpi);
+                Compression = CompressionType.None,
+                Depth = ColorDepth.Default,
+                Shape = ShapeType.Landscape,
+                SkipBlankPages = false
+            };
 
-                // Configure TIFF settings (no compression, default color depth, landscape orientation)
-                TiffSettings tiffSettings = new TiffSettings
+            // Initialize the TIFF device with the resolution and settings
+            TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
+
+            // Process each page (1‑based indexing)
+            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+            {
+                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.tif");
+                using (FileStream tiffStream = new FileStream(outputPath, FileMode.Create))
                 {
-                    Compression = CompressionType.None,
-                    Depth = ColorDepth.Default,
-                    Shape = ShapeType.Landscape,
-                    SkipBlankPages = false
-                };
-
-                // Create a TiffDevice with the specified resolution and settings
-                TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
-
-                // Iterate over each page (Aspose.Pdf uses 1‑based indexing)
-                for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
-                {
-                    // Build the output file name for the current page
-                    string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.tif");
-
-                    // Convert the current page to a TIFF image and write it to a file stream
-                    using (FileStream tiffStream = new FileStream(outputPath, FileMode.Create))
-                    {
-                        tiffDevice.Process(pdfDocument.Pages[pageNumber], tiffStream);
-                    }
-
-                    Console.WriteLine($"Page {pageNumber} saved as TIFF: {outputPath}");
+                    // Convert the current page to a TIFF image
+                    tiffDevice.Process(pdfDocument.Pages[pageNumber], tiffStream);
                 }
+
+                Console.WriteLine($"Page {pageNumber} saved as TIFF: {outputPath}");
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

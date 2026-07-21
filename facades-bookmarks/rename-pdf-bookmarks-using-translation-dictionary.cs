@@ -20,32 +20,25 @@ class Program
         var translationMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "Chapter 1", "Capítulo 1" },
-            { "Introduction", "Introducción" },
+            { "Chapter 2", "Capítulo 2" },
             { "Conclusion", "Conclusión" }
             // Add more mappings as needed
         };
 
-        // Use PdfBookmarkEditor to modify bookmarks
-        using (var editor = new PdfBookmarkEditor())
+        // Initialize the bookmark editor and bind the PDF
+        PdfBookmarkEditor editor = new PdfBookmarkEditor();
+        editor.BindPdf(inputPdf);
+
+        // Rename each bookmark according to the dictionary
+        foreach (var kvp in translationMap)
         {
-            // Bind the source PDF
-            editor.BindPdf(inputPdf);
-
-            // Rename each bookmark according to the dictionary
-            foreach (var kvp in translationMap)
-            {
-                string sourceTitle = kvp.Key;
-                string newTitle    = kvp.Value;
-
-                // ModifyBookmarks changes the title if the source bookmark exists
-                editor.ModifyBookmarks(sourceTitle, newTitle);
-            }
-
-            // Save the updated PDF
-            editor.Save(outputPdf);
-            // Close releases the bound document (optional because of using)
-            editor.Close();
+            // ModifyBookmarks changes all bookmarks with the source title to the destination title
+            editor.ModifyBookmarks(kvp.Key, kvp.Value);
         }
+
+        // Save the modified PDF and release resources
+        editor.Save(outputPdf);
+        editor.Close();
 
         Console.WriteLine($"Bookmarks renamed and saved to '{outputPdf}'.");
     }

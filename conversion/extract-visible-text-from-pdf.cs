@@ -3,44 +3,39 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class PdfToTextExtractor
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "extracted.txt";
+        const string inputPdfPath = "input.pdf";
+        const string outputTxtPath = "output.txt";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
-            {
-                // Create a TextAbsorber to extract visible text only
-                TextAbsorber absorber = new TextAbsorber();
+            // Create a TextAbsorber to extract visible text
+            TextAbsorber absorber = new TextAbsorber();
 
-                // Use the Pure formatting mode to get readable text without hidden layers
-                absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+            // Configure extraction to use the default (Pure) formatting mode,
+            // which extracts only the visible text content.
+            absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
 
-                // Apply the absorber to all pages
-                doc.Pages.Accept(absorber);
+            // Apply the absorber to all pages of the document
+            pdfDoc.Pages.Accept(absorber);
 
-                // Retrieve the extracted text
-                string extractedText = absorber.Text;
+            // Retrieve the extracted text
+            string extractedText = absorber.Text ?? string.Empty;
 
-                // Save the text to a file
-                File.WriteAllText(outputPath, extractedText);
-                Console.WriteLine($"Text extracted to '{outputPath}'.");
-            }
+            // Write the text to a .txt file
+            File.WriteAllText(outputTxtPath, extractedText);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Text extracted to '{outputTxtPath}'.");
     }
 }

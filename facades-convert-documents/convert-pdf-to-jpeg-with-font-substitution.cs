@@ -1,59 +1,56 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
 
 class PdfToJpegWithFontSubstitution
 {
     static void Main()
     {
-        // Input PDF, output folder and fallback font name
         const string inputPdfPath = "input.pdf";
-        const string outputFolder = "OutputImages";
-        const string fallbackFontName = "Arial";
+        const string outputFolder = "Images";
+        const string substituteFont = "Arial";
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // If the input PDF does not exist, create a simple one for demonstration purposes
         if (!File.Exists(inputPdfPath))
         {
-            using (Document sampleDoc = new Document())
-            {
-                Page page = sampleDoc.Pages.Add();
-                // Add a paragraph with some text using the fallback font
-                page.Paragraphs.Add(new TextFragment("Sample PDF created because 'input.pdf' was missing.")
-                {
-                    TextState = { Font = FontRepository.FindFont(fallbackFontName) }
-                });
-                sampleDoc.Save(inputPdfPath);
-            }
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            return;
         }
+
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
         // Load the source PDF
         using (Document srcDoc = new Document(inputPdfPath))
         {
-            // Register a font substitution for any missing fonts
-            FontRepository.Substitutions.Add(new SimpleFontSubstitution("MissingFont", fallbackFontName));
-
-            // Iterate through each page and convert it to a JPEG image
-            int pageNumber = 1;
-            foreach (Page page in srcDoc.Pages)
+            // Apply font substitution for missing fonts
+            PdfSaveOptions saveOptions = new PdfSaveOptions
             {
-                string outputImagePath = Path.Combine(outputFolder, $"page_{pageNumber}.jpg");
+                DefaultFontName = substituteFont
+            };
 
-                // Use Aspose's JpegDevice (does not rely on System.Drawing and avoids CA1416 warnings)
-                // Quality is supplied via the constructor overload, not a settable property.
-                JpegDevice jpegDevice = new JpegDevice(new Resolution(300), 90);
+            // Save the document with substituted fonts into a memory stream
+            using (MemoryStream pdfStream = new MemoryStream())
+            {
+                srcDoc.Save(pdfStream, saveOptions);
+                pdfStream.Position = 0; // Reset stream position for reading
 
-                using (MemoryStream imageStream = new MemoryStream())
+                // Convert each page to a JPEG image
+                using (PdfConverter converter = new PdfConverter())
                 {
-                    jpegDevice.Process(page, imageStream);
-                    File.WriteAllBytes(outputImagePath, imageStream.ToArray());
-                }
+                    converter.BindPdf(pdfStream);
+                    converter.DoConvert();
 
-                pageNumber++;
+                    int pageIndex = 1;
+                    while (converter.HasNextImage())
+                    {
+                        string outputPath = Path.Combine(outputFolder, $"page_{pageIndex}.jpg");
+                        // Save the current page as JPEG
+                        converter.GetNextImage(outputPath, ImageFormat.Jpeg);
+                        pageIndex++;
+                    }
+                }
             }
         }
 

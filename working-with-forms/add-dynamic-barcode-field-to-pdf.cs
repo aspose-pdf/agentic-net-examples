@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "template.pdf";
-        const string outputPath = "output_with_barcode.pdf";
+        const string inputPath  = "template.pdf";   // existing PDF with or without a barcode field
+        const string outputPath = "barcode_filled.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,39 +16,32 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Generate a unique value for the barcode (e.g., a GUID without hyphens)
+        string uniqueCode = Guid.NewGuid().ToString("N");
+
+        // Load the PDF, add a barcode field, set its value, and save
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least one page
-            if (doc.Pages.Count == 0)
-            {
-                Console.Error.WriteLine("The PDF has no pages.");
-                return;
-            }
+            // Define the rectangle where the barcode will be placed (llx, lly, urx, ury)
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Define the rectangle where the barcode field will be placed
-            // Parameters: left, bottom, width, height
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
-
-            // Create a barcode field on the first page
+            // Create a BarcodeField on the first page
             BarcodeField barcodeField = new BarcodeField(doc.Pages[1], rect);
 
-            // Generate a unique value for the barcode (e.g., a GUID without hyphens)
-            string uniqueValue = Guid.NewGuid().ToString("N");
+            // Add a Code128 barcode with the generated unique code
+            barcodeField.AddBarcode(uniqueCode);
 
-            // Populate the field with the barcode (Code128 is the default symbology)
-            barcodeField.AddBarcode(uniqueValue);
-
-            // Optionally assign a name to the field
+            // Optionally set a name for the field (useful for later reference)
             barcodeField.Name = "UniqueBarcode";
 
-            // Add the barcode field to the page's annotation collection
+            // Add the field to the page's annotations collection
             doc.Pages[1].Annotations.Add(barcodeField);
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Barcode field added and saved to '{outputPath}'.");
+        Console.WriteLine($"Barcode field populated with value '{uniqueCode}' and saved to '{outputPath}'.");
     }
 }

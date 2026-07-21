@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Optimization;
 
 class Program
 {
@@ -15,58 +16,27 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block (lifecycle rule)
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
-            {
-                // XImageCollection does NOT implement a dictionary – iterate by index
-                for (int i = 1; i <= page.Resources.Images.Count; i++)
-                {
-                    XImage img = page.Resources.Images[i];
+            // Create optimization options
+            OptimizationOptions opt = new OptimizationOptions();
 
-                    // Placeholder: obtain the size of the image in bytes.
-                    // In a real implementation you would extract the image stream
-                    // (e.g., via img.ImageInfo or other means) and measure its length.
-                    long imageSizeInBytes = GetImageSizePlaceholder(img);
+            // Enable image compression and set JPEG quality (e.g., 75%)
+            opt.ImageCompressionOptions.CompressImages = true;
+            opt.ImageCompressionOptions.ImageQuality   = 75; // 0‑100, higher = better quality
 
-                    // Replace only images larger than 2 MB
-                    if (imageSizeInBytes > 2 * 1024 * 1024)
-                    {
-                        // Placeholder: obtain the original image data as a stream.
-                        // Replace the image with a JPEG version (quality = 75%).
-                        // The Replace overload recompresses the image.
-                        using (MemoryStream originalImageStream = GetImageStreamPlaceholder(img))
-                        {
-                            // The Replace method with (index, stream, quality) recompresses to JPEG.
-                            page.Resources.Images.Replace(i, originalImageStream, quality: 75);
-                        }
-                    }
-                }
-            }
+            // Optionally limit the maximum resolution to avoid up‑scaling large images
+            opt.ImageCompressionOptions.MaxResolution = 1500; // DPI (adjust as needed)
 
-            // Save the modified PDF (lifecycle rule – use the provided Save method)
+            // Apply the optimization to the document.
+            // This will replace images (including those >2 MB) with compressed JPEG versions.
+            doc.OptimizeResources(opt);
+
+            // Save the optimized PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Compressed PDF saved to '{outputPath}'.");
-    }
-
-    // ------------------------------------------------------------------------
-    // Placeholder methods – replace with real implementations as needed.
-    // ------------------------------------------------------------------------
-    static long GetImageSizePlaceholder(XImage img)
-    {
-        // TODO: Extract the image bytes and return its length.
-        // Returning 0 forces the placeholder logic to skip replacement.
-        return 0;
-    }
-
-    static MemoryStream GetImageStreamPlaceholder(XImage img)
-    {
-        // TODO: Return a MemoryStream containing the original image bytes.
-        // For the placeholder we return an empty stream.
-        return new MemoryStream();
+        Console.WriteLine($"Optimized PDF saved to '{outputPath}'.");
     }
 }

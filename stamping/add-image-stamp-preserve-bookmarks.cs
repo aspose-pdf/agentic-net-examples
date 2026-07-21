@@ -1,53 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades; // for alignment enums
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string stampPath  = "stamp.png";
+        const string inputPdf   = "input.pdf";      // source PDF with bookmarks/outlines
+        const string stampImage = "logo.png";       // image to use as stamp
+        const string outputPdf  = "output.pdf";     // result PDF (bookmarks preserved)
 
-        if (!File.Exists(inputPath))
+        // Validate input files
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(stampImage))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampImage}");
             return;
         }
 
-        if (!File.Exists(stampPath))
+        // Load the existing PDF (bookmarks and outline are loaded automatically)
+        using (Document doc = new Document(inputPdf))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
-            return;
-        }
-
-        // Load the existing PDF (bookmarks and outline are kept)
-        using (Document doc = new Document(inputPath))
-        {
-            // Create an image stamp – configure its appearance as needed
-            ImageStamp imgStamp = new ImageStamp(stampPath)
+            // Create an image stamp – the same instance can be reused for all pages
+            ImageStamp imgStamp = new ImageStamp(stampImage)
             {
-                // Align stamp to the bottom‑right corner of each page
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment   = VerticalAlignment.Bottom,
-                // Make the stamp semi‑transparent
-                Opacity = 0.5,
-                // Optional margins from the page edges
-                RightMargin  = 10,
-                BottomMargin = 10
+                // Example visual settings – adjust as needed
+                Background          = false,                     // stamp on top of page content
+                Opacity             = 0.7f,                      // semi‑transparent
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center
             };
 
-            // Apply the stamp to every page; existing bookmarks/outlines remain unchanged
+            // Apply the stamp to every page; bookmarks/outlines remain untouched
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the modified PDF; existing bookmarks and outline are preserved
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image stamp added successfully. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Image stamp added. Output saved to '{outputPdf}'.");
     }
 }

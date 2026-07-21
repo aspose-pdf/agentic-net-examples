@@ -3,54 +3,52 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
-class Program
+class ExportPdfToBmp
 {
     static void Main()
     {
-        // Directory containing the PDF file
-        string dataDir = @"YOUR_DATA_DIRECTORY";
-        // PDF file name
-        string pdfFile = @"YOUR_PDF_FILE";
+        const string inputPdfPath = "input.pdf";
+        const string outputDir = "BmpPages";
 
-        string inputPath = Path.Combine(dataDir, pdfFile);
-        if (!File.Exists(inputPath))
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Create a minimal PDF if it does not already exist (prevents FileNotFoundException)
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            using (Document seed = new Document())
+            {
+                seed.Pages.Add(); // add a blank page
+                seed.Save(inputPdfPath);
+            }
         }
 
-        // Load the PDF document (lifecycle rule: use using)
-        using (Document pdfDocument = new Document(inputPath))
+        // Load the PDF document
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Create a Resolution object for 300 DPI
+            // Set resolution to 300 DPI
             Resolution resolution = new Resolution(300);
 
-            // Initialize BmpDevice with the desired resolution
-            BmpDevice bmpDevice = new BmpDevice(resolution);
-
-            // Optional: set high‑quality rendering options
-            bmpDevice.RenderingOptions = new RenderingOptions
+            // Initialise BmpDevice with the desired resolution and optional high‑quality options
+            BmpDevice bmpDevice = new BmpDevice(resolution)
             {
-                // Example settings (adjust if needed)
-                // AntiAliasing = true,
-                // TextAntiAliasing = true
+                RenderingOptions = new RenderingOptions
+                {
+                    // Uncomment if the version supports it:
+                    // AntiAliasing = true
+                }
             };
 
             // Iterate through all pages (1‑based indexing)
             for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                // Output BMP file path
-                string outPath = Path.Combine(dataDir, $"image{pageNumber}_out.bmp");
-
-                // Create the output stream (lifecycle rule: use using)
-                using (FileStream bmpStream = new FileStream(outPath, FileMode.Create))
+                string bmpPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
+                using (FileStream bmpStream = new FileStream(bmpPath, FileMode.Create))
                 {
-                    // Convert the page to BMP and write to the stream
                     bmpDevice.Process(pdfDocument.Pages[pageNumber], bmpStream);
                 }
+                Console.WriteLine($"Page {pageNumber} saved as BMP: {bmpPath}");
             }
         }
-
-        Console.WriteLine("PDF pages exported as BMP images at 300 DPI.");
     }
 }

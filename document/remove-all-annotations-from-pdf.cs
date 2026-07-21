@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -15,27 +16,22 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document (lifecycle rule: use Document constructor)
-            using (Document doc = new Document(inputPath))
+            // Pages are 1‑based; iterate through each page
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Pages are 1‑based (global rule)
-                for (int i = 1; i <= doc.Pages.Count; i++)
-                {
-                    // Delete all annotations on each page (AnnotationCollection.Delete)
-                    doc.Pages[i].Annotations.Delete();
-                }
+                Page page = doc.Pages[i];
 
-                // Save the cleaned PDF (lifecycle rule: use Document.Save)
-                doc.Save(outputPath);
+                // Delete all annotations on the current page
+                page.Annotations.Delete(); // AnnotationCollection.Delete() removes all annotations
             }
 
-            Console.WriteLine($"All annotations removed. Saved to '{outputPath}'.");
+            // Save the cleaned PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"All annotations removed. Saved to '{outputPath}'.");
     }
 }

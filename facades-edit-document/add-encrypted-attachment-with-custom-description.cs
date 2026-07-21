@@ -7,45 +7,72 @@ class Program
 {
     static void Main()
     {
-        // Paths for source PDF, attachment, intermediate and final files
-        const string inputPdf = "input.pdf";
-        const string attachmentFile = "attachment.pdf";
-        const string attachmentDescription = "Custom description for attachment";
-        const string tempPdfWithAttachment = "temp_with_attachment.pdf";
-        const string encryptedPdf = "encrypted_output.pdf";
+        // Input PDF, attachment file and output PDF paths
+        const string inputPdfPath = "input.pdf";
+        const string attachmentPath = "attachment.pdf";
+        const string outputPdfPath = "output_encrypted.pdf";
 
-        // Passwords for encryption (AES will be used)
+        // Passwords for encryption
         const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
-        // Verify that required files exist
-        if (!File.Exists(inputPdf) || !File.Exists(attachmentFile))
+        // Description for the attachment
+        const string attachmentDescription = "Custom description for the attached file";
+
+        // Ensure input files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("Input PDF or attachment file not found.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(attachmentPath))
+        {
+            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
-        // -------------------------------------------------
-        // Step 1: Add the attachment to the PDF (no annotation)
-        // -------------------------------------------------
-        using (PdfContentEditor editor = new PdfContentEditor())
+        try
         {
-            editor.BindPdf(inputPdf);                                   // Load the source PDF
-            editor.AddDocumentAttachment(attachmentFile, attachmentDescription); // Add attachment with description
-            editor.Save(tempPdfWithAttachment);                         // Save intermediate PDF
-        }
+            // -----------------------------------------------------------------
+            // Step 1: Add the attachment to the PDF using PdfContentEditor
+            // -----------------------------------------------------------------
+            PdfContentEditor editor = new PdfContentEditor();
+            editor.BindPdf(inputPdfPath);
+            // Add attachment without annotation, providing description
+            editor.AddDocumentAttachment(attachmentPath, attachmentDescription);
+            // Save the intermediate PDF (still unencrypted)
+            editor.Save(outputPdfPath);
+            editor.Close(); // Close the editor (optional, no IDisposable)
 
-        // -------------------------------------------------
-        // Step 2: Encrypt the PDF (including the attachment) using AES‑256
-        // -------------------------------------------------
-        using (PdfFileSecurity security = new PdfFileSecurity())
+            // -----------------------------------------------------------------
+            // Step 2: Encrypt the resulting PDF with AES-256 using PdfFileSecurity
+            // -----------------------------------------------------------------
+            PdfFileSecurity security = new PdfFileSecurity();
+            // Bind the PDF that we just saved
+            security.BindPdf(outputPdfPath);
+            // Encrypt with AES-256 (KeySize.x256 + Algorithm.AES) and allow printing
+            bool success = security.EncryptFile(
+                userPassword,
+                ownerPassword,
+                DocumentPrivilege.Print,
+                KeySize.x256,
+                Algorithm.AES);
+
+            if (!success)
+            {
+                Console.Error.WriteLine("Encryption failed.");
+                return;
+            }
+
+            // Save the encrypted PDF (overwrites the same file)
+            security.Save(outputPdfPath);
+            security.Close(); // Close the facade
+
+            Console.WriteLine($"Attachment added and PDF encrypted successfully: {outputPdfPath}");
+        }
+        catch (Exception ex)
         {
-            security.BindPdf(tempPdfWithAttachment);                    // Load PDF that now contains the attachment
-            // Encrypt with user/owner passwords, allow printing, AES‑256 algorithm
-            security.EncryptFile(userPassword, ownerPassword, DocumentPrivilege.Print, KeySize.x256, Algorithm.AES);
-            security.Save(encryptedPdf);                                // Save the encrypted PDF
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        Console.WriteLine($"Encrypted PDF with attachment saved to '{encryptedPdf}'.");
     }
 }

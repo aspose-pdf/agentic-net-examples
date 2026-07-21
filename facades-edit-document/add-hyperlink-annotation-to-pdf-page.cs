@@ -1,37 +1,39 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades;               // PdfContentEditor resides here
+using System.Drawing;                  // Required for Rectangle and Color types
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string outputPdf = "output.pdf";         // PDF with hyperlink
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Use PdfContentEditor to add a web link on page 2
+        // Define the clickable area on page 2 (left, top, width, height)
+        // Note: System.Drawing.Rectangle uses (x, y, width, height)
+        Rectangle linkRect = new Rectangle(100, 500, 200, 50);
+
+        // Use PdfContentEditor (implements IDisposable) inside a using block
         using (PdfContentEditor editor = new PdfContentEditor())
         {
             // Bind the existing PDF document
-            editor.BindPdf(inputPath);
+            editor.BindPdf(inputPdf);
 
-            // Define the clickable rectangle (x, y, width, height)
-            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 500, 200, 50);
-
-            // Create a web link that opens the specified URL when clicked on page 2
-            editor.CreateWebLink(rect, "https://example.com", 2);
+            // Create a web link that opens the specified URL when the rectangle is clicked
+            // Parameters: rectangle, URL, page number (1‑based), optional color (here omitted)
+            editor.CreateWebLink(linkRect, "https://example.com", 2);
 
             // Save the modified PDF
-            editor.Save(outputPath);
+            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Hyperlink added and saved to '{outputPath}'.");
+        Console.WriteLine($"Hyperlink added and saved to '{outputPdf}'.");
     }
 }

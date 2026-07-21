@@ -2,139 +2,109 @@ using System;
 using System.IO;
 using System.Xml;
 using System.Xml.Schema;
-using Aspose.Pdf; // Core PDF API only
+using Aspose.Pdf;
 
-class ZugferdExtractor
+class Program
 {
     static void Main()
     {
-        const string pdfPath = "invoice.pdf";          // Input PDF containing ZUGFeRD data
-        const string outputXmlPath = "zugferd.xml";    // Extracted XML file
-        const string xsdPath = "ZUGFeRD1p0.xsd";       // Path to the official ZUGFeRD XSD schema
+        const string inputPdfPath = "invoice.pdf";          // PDF containing ZUGFeRD XML
+        const string zugFerdXsdPath = "ZUGFeRD-invoice.xsd"; // Official ZUGFeRD XSD schema
+        const string extractedXmlPath = "extracted.xml";    // Where to save the extracted XML
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(xsdPath))
+        if (!File.Exists(zugFerdXsdPath))
         {
-            Console.Error.WriteLine($"XSD schema not found: {xsdPath}");
+            Console.Error.WriteLine($"XSD schema not found: {zugFerdXsdPath}");
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Load the PDF document (deterministic disposal with using)
-            using (Document pdfDoc = new Document(pdfPath))
+            // The ZUGFeRD XML is stored as an embedded file (usually with .xml extension)
+            // Iterate over all embedded files and pick the first XML file using reflection
+            bool xmlFound = false;
+            foreach (var embedded in pdfDocument.EmbeddedFiles)
             {
-                // ------------------------------------------------------------
-                // Extract the embedded ZUGFeRD XML using reflection.
-                // The core Aspose.Pdf API does not expose a concrete
-                // EmbeddedFile type, so we inspect the objects in the
-                // EmbeddedFiles collection at runtime.
-                // ------------------------------------------------------------
-                object xmlEmbedded = null;
-                foreach (var embedded in pdfDoc.EmbeddedFiles)
+                // Use reflection to read the "Name" property
+                var nameProp = embedded.GetType().GetProperty("Name");
+                if (nameProp == null) continue;
+                var name = nameProp.GetValue(embedded) as string;
+                if (string.IsNullOrEmpty(name)) continue;
+
+                if (name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
                 {
-                    var nameProp = embedded.GetType().GetProperty("Name");
-                    if (nameProp != null)
+                    // Extract the embedded XML into a memory stream via reflection
+                    using (MemoryStream xmlStream = new MemoryStream())
                     {
-                        var name = nameProp.GetValue(embedded) as string;
-                        if (!string.IsNullOrEmpty(name) &&
-                            name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+                        // The Save method that accepts a Stream is present on the embedded file object
+                        var saveMethod = embedded.GetType().GetMethod("Save", new[] { typeof(Stream) });
+                        if (saveMethod != null)
                         {
-                            xmlEmbedded = embedded;
-                            break;
+                            saveMethod.Invoke(embedded, new object[] { xmlStream });
                         }
-                    }
-                }
-
-                if (xmlEmbedded == null)
-                {
-                    Console.Error.WriteLine("No embedded XML (ZUGFeRD) file found in the PDF.");
-                    return;
-                }
-
-                // Try to call the Save(string) method directly.
-                var saveMethod = xmlEmbedded.GetType().GetMethod("Save", new[] { typeof(string) });
-                if (saveMethod != null)
-                {
-                    saveMethod.Invoke(xmlEmbedded, new object[] { outputXmlPath });
-                }
-                else
-                {
-                    // Fallback: obtain the raw stream from the FileSpecification.
-                    var fileSpecProp = xmlEmbedded.GetType().GetProperty("FileSpecification");
-                    var fileSpec = fileSpecProp?.GetValue(xmlEmbedded);
-                    var contentsProp = fileSpec?.GetType().GetProperty("Contents");
-                    var contents = contentsProp?.GetValue(fileSpec) as Stream;
-                    if (contents != null)
-                    {
-                        using (var outStream = File.Create(outputXmlPath))
+                        else
                         {
-                            contents.CopyTo(outStream);
+                            // Fallback: try the overload that accepts a file path
+                            var savePathMethod = embedded.GetType().GetMethod("Save", new[] { typeof(string) });
+                            if (savePathMethod != null)
+                            {
+                                savePathMethod.Invoke(embedded, new object[] { extractedXmlPath });
+                                // Load the saved file back into the stream for validation
+                                xmlStream.Write(File.ReadAllBytes(extractedXmlPath), 0, (int)new FileInfo(extractedXmlPath).Length);
+                            }
+                            else
+                            {
+                                Console.Error.WriteLine("Unable to extract embedded XML – no suitable Save method found.");
+                                return;
+                            }
                         }
+
+                        xmlStream.Position = 0;
+
+                        // Save the extracted XML to disk (optional, for inspection)
+                        File.WriteAllBytes(extractedXmlPath, xmlStream.ToArray());
+
+                        // Prepare the XSD schema set
+                        XmlSchemaSet schemaSet = new XmlSchemaSet();
+                        schemaSet.Add(null, zugFerdXsdPath);
+
+                        // Configure XML reader settings for schema validation
+                        XmlReaderSettings settings = new XmlReaderSettings
+                        {
+                            ValidationType = ValidationType.Schema,
+                            Schemas = schemaSet
+                        };
+                        settings.ValidationEventHandler += (sender, e) =>
+                        {
+                            // Report validation warnings and errors
+                            Console.WriteLine($"{e.Severity}: {e.Message}");
+                        };
+
+                        // Validate the XML against the schema
+                        using (XmlReader reader = XmlReader.Create(xmlStream, settings))
+                        {
+                            while (reader.Read()) { }
+                        }
+
+                        Console.WriteLine("ZUGFeRD XML extracted and validated successfully.");
                     }
-                    else
-                    {
-                        Console.Error.WriteLine("Unable to extract XML content from the embedded file.");
-                        return;
-                    }
+
+                    xmlFound = true;
+                    break; // Stop after the first matching embedded XML file
                 }
-
-                Console.WriteLine($"ZUGFeRD XML extracted to: {outputXmlPath}");
-
-                // Validate the extracted XML against the provided XSD schema.
-                bool isValid = ValidateXmlAgainstXsd(outputXmlPath, xsdPath);
-                Console.WriteLine(isValid ? "XML validation succeeded." : "XML validation failed. See errors above.");
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
 
-    // Validates an XML file against an XSD schema.
-    // Returns true if validation succeeds; otherwise false.
-    static bool ValidateXmlAgainstXsd(string xmlFilePath, string xsdFilePath)
-    {
-        bool isValid = true;
-
-        // Set up the schema set.
-        XmlSchemaSet schemas = new XmlSchemaSet();
-        schemas.Add(null, xsdFilePath);
-
-        // Configure XML reader settings for validation.
-        XmlReaderSettings settings = new XmlReaderSettings
-        {
-            ValidationType = ValidationType.Schema,
-            Schemas = schemas,
-            ValidationFlags = XmlSchemaValidationFlags.ReportValidationWarnings
-        };
-        settings.ValidationEventHandler += (sender, args) =>
-        {
-            // Treat warnings as errors for strict validation.
-            isValid = false;
-            Console.Error.WriteLine($"Validation {args.Severity}: {args.Message}");
-        };
-
-        // Parse and validate the XML.
-        using (XmlReader reader = XmlReader.Create(xmlFilePath, settings))
-        {
-            try
+            if (!xmlFound)
             {
-                while (reader.Read()) { /* reading triggers validation */ }
-            }
-            catch (XmlException xe)
-            {
-                isValid = false;
-                Console.Error.WriteLine($"XML parsing error: {xe.Message}");
+                Console.Error.WriteLine("No embedded ZUGFeRD XML file was found in the PDF.");
             }
         }
-
-        return isValid;
     }
 }

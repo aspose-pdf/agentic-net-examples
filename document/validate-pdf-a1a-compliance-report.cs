@@ -6,30 +6,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPath = "input.pdf";
         const string reportPath = "validation_report.txt";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
             // Load the PDF document
-            using (Document doc = new Document(inputPdf))
+            using (Document doc = new Document(inputPath))
             {
-                // Validate the document against PDF/A‑1A and write a detailed log
+                // Validate against PDF/A‑1A and write detailed log to reportPath
                 bool isCompliant = doc.Validate(reportPath, PdfFormat.PDF_A_1A);
 
-                Console.WriteLine($"Validation result: {(isCompliant ? "Compliant" : "Non‑compliant")}");
-                Console.WriteLine($"Detailed report saved to: {reportPath}");
+                // Output the validation outcome
+                Console.WriteLine($"PDF/A‑1A compliance: {(isCompliant ? "Compliant" : "Non‑compliant")}");
+                Console.WriteLine($"Validation report saved to: {reportPath}");
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Validation error: {ex.Message}");
         }
     }
 }

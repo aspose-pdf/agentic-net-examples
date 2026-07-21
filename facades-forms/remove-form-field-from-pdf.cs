@@ -6,37 +6,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
         const string fieldName = "ObsoleteField";
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        try
+        // FormEditor implements SaveableFacade, which is disposable.
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Create the FormEditor facade
-            using (FormEditor editor = new FormEditor())
-            {
-                // Load the PDF document
-                editor.BindPdf(inputPath);
+            // Bind the source PDF file.
+            formEditor.BindPdf(inputPdf);
 
-                // Remove the specified form field
-                editor.RemoveField(fieldName);
+            // Remove the specified form field.
+            formEditor.RemoveField(fieldName);
 
-                // Save the modified PDF
-                editor.Save(outputPath);
-            }
-
-            Console.WriteLine($"Field '{fieldName}' removed. Output saved to '{outputPath}'.");
+            // Save the modified PDF.
+            formEditor.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Field \"{fieldName}\" removed. Output saved to '{outputPdf}'.");
     }
 }

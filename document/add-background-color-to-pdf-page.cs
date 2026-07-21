@@ -16,39 +16,35 @@ class Program
             return;
         }
 
-        // Load the existing PDF
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Select the page to modify (first page)
+            // Choose the page to modify (first page in this example)
             Page page = doc.Pages[1];
 
-            // Get page dimensions
-            double pageWidth = page.Rect.Width;
-            double pageHeight = page.Rect.Height;
+            double pageWidth = page.PageInfo.Width;
+            double pageHeight = page.PageInfo.Height;
 
-            // Create a Graph container sized to the page
+            // Graph container – use the double constructor (obsolete float ctor removed)
             Graph graph = new Graph(pageWidth, pageHeight);
 
-            // Create a rectangle that covers the whole page (use drawing rectangle)
+            // Rectangle shape that covers the whole page – use Aspose.Pdf.Drawing.Rectangle (float parameters)
             var rect = new Aspose.Pdf.Drawing.Rectangle(
                 0f,
                 0f,
                 (float)pageWidth,
                 (float)pageHeight);
 
+            // Set visual properties via GraphInfo. Use ARGB for opacity.
             rect.GraphInfo = new GraphInfo
             {
-                // Semi‑transparent background (alpha 100 out of 255)
-                FillColor = Aspose.Pdf.Color.FromArgb(100, 0, 0, 255),
-                // No visible border
-                Color = Aspose.Pdf.Color.Transparent,
+                FillColor = Color.FromArgb(128, 255, 0, 0), // 50% transparent red
+                Color = Color.Transparent,                // no border color
                 LineWidth = 0f
             };
 
-            // Add the rectangle to the graph
+            // Add the rectangle to the graph and the graph to the page
             graph.Shapes.Add(rect);
-
-            // Add the graph to the page's content
             page.Paragraphs.Add(graph);
 
             // Save the modified PDF

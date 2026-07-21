@@ -7,31 +7,34 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "justified.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "justified_output.pdf";
 
-        // Create a new PDF document and ensure proper disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a single page
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
 
-            // Sample text to be justified
-            string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-                          "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        // Load the existing PDF (lifecycle rule: use Document constructor)
+        using (Document doc = new Document(inputPath))
+        {
+            // Get the first page (page indexing is 1‑based)
+            Page page = doc.Pages[1];
 
-            // Create a TextFragment with the sample text
-            TextFragment fragment = new TextFragment(text);
+            // Create a text fragment with the desired content
+            TextFragment fragment = new TextFragment("This text will be justified across the page width.");
 
-            // Set horizontal alignment to Justify during creation
+            // Set horizontal alignment to Justify (new document generation scenario)
             fragment.TextState.HorizontalAlignment = HorizontalAlignment.Justify;
 
-            // Add the fragment to the page
+            // Add the fragment to the page's paragraph collection
             page.Paragraphs.Add(fragment);
 
-            // Save the document
+            // Save the modified PDF (lifecycle rule: wrap in using, then Save)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Justified PDF saved to '{outputPath}'.");
     }
 }

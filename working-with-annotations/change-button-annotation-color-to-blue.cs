@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -21,17 +21,16 @@ class Program
         using (Document doc = new Document(inputPath))
         {
             // Iterate over all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageIndex];
+                Page page = doc.Pages[i];
 
-                // Iterate over each annotation on the page
-                foreach (Annotation annotation in page.Annotations)
+                // Iterate over all annotations on the page
+                foreach (Annotation ann in page.Annotations)
                 {
-                    // Check if the annotation is a button field (push button)
-                    if (annotation is ButtonField button)
+                    // Change the color of button annotations (ButtonField) to blue
+                    if (ann is ButtonField button)
                     {
-                        // Set the button color to blue
                         button.Color = Aspose.Pdf.Color.Blue;
                     }
                 }
@@ -41,6 +40,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with updated button colors to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with button colors changed to blue: '{outputPath}'.");
     }
 }

@@ -2,58 +2,41 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing;
 
-class RotateTextExample
+class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "rotated_text.pdf";
 
+        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF document
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page where the text will be placed
-            Page page = doc.Pages[1];
+            // Create a text fragment with the desired content
+            TextFragment textFragment = new TextFragment("Rotated Text");
 
-            // Create a TextFragment with the desired content
-            TextFragment fragment = new TextFragment("Rotated Text");
+            // Set the position where the text will be placed (X=100, Y=500)
+            textFragment.Position = new Position(100, 500);
 
-            // Set the position of the text on the page
-            fragment.Position = new Position(200, 500); // X=200, Y=500
+            // Rotate the text by 45 degrees using the TextState's Rotation property
+            textFragment.TextState.Rotation = 45; // angle in degrees
 
-            // NOTE: The TextState class in recent Aspose.Pdf versions does not expose a TextMatrix property.
-            // Rotation of a TextFragment can be achieved by using a Graph object with a transformation matrix
-            // or by applying a rotation matrix to the fragment via the TextFragment's TextState.
-            // The simplest compile‑time fix is to remove the invalid property access.
-            // If rotation is required, use the alternative approach shown below (commented out).
+            // Add the text fragment to the first page of the document
+            Page firstPage = doc.Pages[1];
+            firstPage.Paragraphs.Add(textFragment);
 
-            // Alternative rotation using a Graph (uncomment to use):
-            // double angleDegrees = 45.0;
-            // double angleRadians = angleDegrees * Math.PI / 180.0;
-            // var graph = new Graph(0, 0);
-            // graph.Matrix = new Matrix( Math.Cos(angleRadians), Math.Sin(angleRadians),
-            //                           -Math.Sin(angleRadians), Math.Cos(angleRadians),
-            //                           fragment.Position.X, fragment.Position.Y );
-            // var txt = new TextFragment("Rotated Text");
-            // txt.Position = new Position(0, 0); // Position is now handled by the matrix
-            // graph.Shapes.Add(txt);
-            // page.Paragraphs.Add(graph);
-
-            // Add the fragment to the page (no rotation applied in this simple example)
-            page.Paragraphs.Add(fragment);
-
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved with rotated text to '{outputPath}'.");
+        Console.WriteLine($"Rotated text PDF saved to '{outputPath}'.");
     }
 }

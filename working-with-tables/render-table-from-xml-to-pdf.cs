@@ -1,59 +1,32 @@
 using System;
-using System.Data;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core PDF API
+using Aspose.Pdf.Text;          // Required for text-related types (if needed)
 
 class Program
 {
     static void Main()
     {
-        // Paths for the XML definition and the resulting PDF.
-        const string xmlPath = "TableDefinition.xml";
-        const string pdfPath = "RenderedTable.pdf";
+        // Paths to the input XML definition and the output PDF.
+        const string xmlPath   = "table-definition.xml";
+        const string pdfPath   = "rendered-table.pdf";
 
+        // Verify that the XML file exists.
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"Input XML file not found: {xmlPath}");
             return;
         }
 
-        // Load the XML into a DataSet. The XML is expected to represent a table
-        // (e.g., rows and columns) that can be read into a DataTable.
-        DataSet dataSet = new DataSet();
-        dataSet.ReadXml(xmlPath);
+        // Load the XML representation of a PDF (which includes the Table definition)
+        // using XmlLoadOptions. This reconstructs the entire PDF structure,
+        // including the Table object, in memory.
+        XmlLoadOptions loadOptions = new XmlLoadOptions();
 
-        // Assume the first DataTable contains the table data.
-        if (dataSet.Tables.Count == 0)
+        using (Document pdfDocument = new Document(xmlPath, loadOptions))
         {
-            Console.Error.WriteLine("No tables found in the XML file.");
-            return;
-        }
-
-        DataTable sourceTable = dataSet.Tables[0];
-
-        // Create a new PDF document (creation rule).
-        using (Document pdfDocument = new Document())
-        {
-            // Add a page to the document.
-            Page page = pdfDocument.Pages.Add();
-
-            // Create a Table object.
-            Table table = new Table();
-
-            // Import the DataTable into the Aspose.Pdf.Table.
-            // - true  : import column names as the first row.
-            // - 0     : start importing at the first row of the target table.
-            // - 0     : start importing at the first column of the target table.
-            table.ImportDataTable(sourceTable, true, 0, 0);
-
-            // Optional styling (example: set a border and background color).
-            table.Border = new BorderInfo(BorderSide.All, 0.5f);
-            table.BackgroundColor = Aspose.Pdf.Color.LightGray;
-
-            // Add the table to the page's paragraph collection.
-            page.Paragraphs.Add(table);
-
-            // Save the PDF (saving rule).
+            // The document now contains the table as defined in the XML.
+            // Save the reconstructed PDF to the desired output file.
             pdfDocument.Save(pdfPath);
         }
 

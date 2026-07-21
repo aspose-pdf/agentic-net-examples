@@ -1,15 +1,16 @@
 using System;
 using System.IO;
-using System.Text;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";
-        const string outputDir  = "ExtractedImages";
-        const string keyword    = "YOUR_KEYWORD"; // replace with the desired keyword
+        const string inputPdf   = "input.pdf";               // source PDF
+        const string outputDir  = "ExtractedImages";         // folder for images
+        const string keyword    = "YOUR_KEYWORD_HERE";       // text to search for
 
         if (!File.Exists(inputPdf))
         {
@@ -17,51 +18,46 @@ class Program
             return;
         }
 
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Initialize the extractor facade
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Load the document once for text searching
+        using (Document doc = new Document(inputPdf))
         {
-            // Bind the PDF file
-            extractor.BindPdf(inputPdf);
-
-            // Total number of pages (Aspose.Pdf uses 1‑based indexing)
-            int pageCount = extractor.Document.Pages.Count;
-
-            // Iterate through each page
-            for (int page = 1; page <= pageCount; page++)
+            // Initialize the extractor once and bind the same PDF
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                // Limit operations to the current page
-                extractor.StartPage = page;
-                extractor.EndPage   = page;
+                extractor.BindPdf(inputPdf);
 
-                // ----- Extract text from the current page -----
-                extractor.ExtractText();
-
-                // Capture the extracted text into a string
-                string pageText;
-                using (MemoryStream textStream = new MemoryStream())
+                // Iterate through all pages (1‑based indexing)
+                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
                 {
-                    extractor.GetText(textStream);
-                    pageText = Encoding.UTF8.GetString(textStream.ToArray());
-                }
+                    // Search the current page for the keyword
+                    TextFragmentAbsorber absorber = new TextFragmentAbsorber(keyword);
+                    absorber.Visit(doc.Pages[pageNum]);
 
-                // Check for the keyword (case‑insensitive)
-                if (pageText.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    // ----- Extract images from the same page -----
-                    extractor.ExtractImage();
-
-                    int imageIndex = 1;
-                    while (extractor.HasNextImage())
+                    // If the keyword is found, extract images from this page only
+                    if (absorber.TextFragments.Count > 0)
                     {
-                        string imagePath = Path.Combine(
-                            outputDir,
-                            $"page{page}_img{imageIndex}.png"); // extension can be any supported image type
+                        // Restrict extraction to the current page
+                        extractor.StartPage = pageNum;
+                        extractor.EndPage   = pageNum;
 
-                        // Save the next image to file
-                        extractor.GetNextImage(imagePath);
-                        imageIndex++;
+                        // Perform image extraction for the defined range
+                        extractor.ExtractImage();
+
+                        int imageIndex = 1;
+                        // Retrieve all images found on this page
+                        while (extractor.HasNextImage())
+                        {
+                            string imagePath = Path.Combine(
+                                outputDir,
+                                $"page{pageNum}_img{imageIndex}.png");
+
+                            // Save the image; the method preserves the original format
+                            extractor.GetNextImage(imagePath);
+                            imageIndex++;
+                        }
                     }
                 }
             }

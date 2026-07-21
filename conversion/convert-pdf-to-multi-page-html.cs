@@ -1,43 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Aspose.Pdf contains Document, HtmlSaveOptions, etc.
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string outputHtml = "output.html";        // base name for HTML pages
 
-        // Output HTML file path (base name; actual pages will be saved as input_1.html, input_2.html, ...)
-        const string outputHtmlPath = "output.html";
-
-        // Verify that the source file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        try
         {
-            // Configure HTML save options
-            HtmlSaveOptions htmlOptions = new HtmlSaveOptions
+            // Load the PDF document
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                // Enable multi‑page output: each PDF page becomes a separate HTML file
-                SplitIntoPages = true,
+                // Configure HTML save options – enable one HTML file per PDF page
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+                {
+                    SplitIntoPages = true,
+                    // Optional: embed raster images as PNG inside SVG (Windows‑only GDI+ requirement)
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
+                };
 
-                // Optional: embed raster images as PNGs inside SVG wrappers (common choice)
-                RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
-            };
-
-            // Save the document as HTML using the configured options.
-            // The Save method with a SaveOptions argument ensures the output format is HTML,
-            // regardless of the file extension.
-            pdfDocument.Save(outputHtmlPath, htmlOptions);
+                // Save the document; multiple HTML files will be generated (output_1.html, output_2.html, …)
+                pdfDoc.Save(outputHtml, htmlOpts);
+                Console.WriteLine("PDF successfully converted to multi‑page HTML.");
+            }
         }
-
-        Console.WriteLine($"PDF successfully converted to multi‑page HTML at '{outputHtmlPath}'.");
+        catch (TypeInitializationException)
+        {
+            // HTML conversion uses GDI+ and is only supported on Windows.
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped on this platform.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

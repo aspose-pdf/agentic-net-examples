@@ -1,114 +1,114 @@
 # Facades documents
 
-> **Facades documents** in PDF using C# / .NET -- **101** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades documents** in PDF using C# / .NET -- **101** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-documents`
 - Examples: 101
-- NuGet: `Aspose.PDF 26.6.0` -- target `net10.0`
+- NuGet: `Aspose.PDF 26.7.0` -- target `net10.0`
 
 ## Examples
 
-- [`append-page-ranges-multiple-pdfs.cs`](./append-page-ranges-multiple-pdfs.cs) -- Append page ranges multiple pdfs
-- [`append-pdf-pages-to-another-document.cs`](./append-pdf-pages-to-another-document.cs) -- Append pdf pages to another document
-- [`apply-4up-layout-to-pdf-via-stream.cs`](./apply-4up-layout-to-pdf-via-stream.cs) -- Apply 4up layout to pdf via stream
+- [`append-pdf-pages-using-pdffileeditor.cs`](./append-pdf-pages-using-pdffileeditor.cs) -- Append pdf pages using pdffileeditor
 - [`batch-concatenate-pdfs.cs`](./batch-concatenate-pdfs.cs) -- Batch concatenate pdfs
 - [`batch-create-3x2-nup-pdfs.cs`](./batch-create-3x2-nup-pdfs.cs) -- Batch create 3x2 nup pdfs
+- [`batch-create-pdf-booklets-audit-logging.cs`](./batch-create-pdf-booklets-audit-logging.cs) -- Batch create pdf booklets audit logging
 - [`batch-delete-pages-from-pdfs.cs`](./batch-delete-pages-from-pdfs.cs) -- Batch delete pages from pdfs
 - [`batch-delete-pages-merge-pdfs.cs`](./batch-delete-pages-merge-pdfs.cs) -- Batch delete pages merge pdfs
-- [`batch-insert-page-ranges-into-pdf.cs`](./batch-insert-page-ranges-into-pdf.cs) -- Batch insert page ranges into pdf
-- [`batch-resize-pdfs-a5-booklet.cs`](./batch-resize-pdfs-a5-booklet.cs) -- Batch resize pdfs a5 booklet
+- [`batch-insert-page-ranges.cs`](./batch-insert-page-ranges.cs) -- Batch insert page ranges
 - [`batch-resize-pdfs-to-a4.cs`](./batch-resize-pdfs-to-a4.cs) -- Batch resize pdfs to a4
-- [`compare-file-path-and-stream-overloads-pdf-resizing.cs`](./compare-file-path-and-stream-overloads-pdf-resizing.cs) -- Compare file path and stream overloads pdf resizing
-- [`compare-memory-usage-file-path-stream-pdf-concatenation.cs`](./compare-memory-usage-file-path-stream-pdf-concatenation.cs) -- Compare memory usage file path stream pdf concatenation
-- [`concatenate-multiple-pdfs-measure-time.cs`](./concatenate-multiple-pdfs-measure-time.cs) -- Concatenate multiple pdfs measure time
+- [`compare-pdf-concatenation-overloads.cs`](./compare-pdf-concatenation-overloads.cs) -- Compare pdf concatenation overloads
 - [`concatenate-multiple-pdfs.cs`](./concatenate-multiple-pdfs.cs) -- Concatenate multiple pdfs
 - [`concatenate-multiple-pdfs__v2.cs`](./concatenate-multiple-pdfs__v2.cs) -- Concatenate multiple pdfs  v2
 - [`concatenate-pdfs-add-page-numbers.cs`](./concatenate-pdfs-add-page-numbers.cs) -- Concatenate pdfs add page numbers
-- [`concatenate-pdfs-from-memory-streams.cs`](./concatenate-pdfs-from-memory-streams.cs) -- Concatenate pdfs from memory streams
 - [`concatenate-pdfs-from-zip.cs`](./concatenate-pdfs-from-zip.cs) -- Concatenate pdfs from zip
 - [`concatenate-pdfs-preserve-metadata.cs`](./concatenate-pdfs-preserve-metadata.cs) -- Concatenate pdfs preserve metadata
-- [`concatenate-pdfs-using-streams.cs`](./concatenate-pdfs-using-streams.cs) -- Concatenate pdfs using streams
+- [`concatenate-pdfs-using-stream-overloads.cs`](./concatenate-pdfs-using-stream-overloads.cs) -- Concatenate pdfs using stream overloads
 - [`concatenate-pdfs-with-blank-pages.cs`](./concatenate-pdfs-with-blank-pages.cs) -- Concatenate pdfs with blank pages
-- [`concatenate-pdfs-with-blank-separator.cs`](./concatenate-pdfs-with-blank-separator.cs) -- Concatenate pdfs with blank separator
-- [`concatenate-split-pdfs.cs`](./concatenate-split-pdfs.cs) -- Concatenate split pdfs
-- [`concatenate-three-pdfs-pdffileeditor.cs`](./concatenate-three-pdfs-pdffileeditor.cs) -- Concatenate three pdfs pdffileeditor
-- [`concatenate-two-pdfs-using-pdffileeditor.cs`](./concatenate-two-pdfs-using-pdffileeditor.cs) -- Concatenate two pdfs using pdffileeditor
+- [`concatenate-split-pdfs-insertpages.cs`](./concatenate-split-pdfs-insertpages.cs) -- Concatenate split pdfs insertpages
+- [`concatenate-two-pdfs.cs`](./concatenate-two-pdfs.cs) -- Concatenate two pdfs
 - [`create-2up-pdf-layout.cs`](./create-2up-pdf-layout.cs) -- Create 2up pdf layout
+- [`create-4up-pdf-using-streams.cs`](./create-4up-pdf-using-streams.cs) -- Create 4up pdf using streams
 - [`create-a-function-that-generates-a-booklet-using-left-pages-from-the-first-half-of-the-source-pdf.cs`](./create-a-function-that-generates-a-booklet-using-left-pages-from-the-first-half-of-the-source-pdf.cs) -- Create a function that generates a booklet using left pages from the first half of the source pdf
-- [`create-booklet-a5-page-size.cs`](./create-booklet-a5-page-size.cs) -- Create booklet a5 page size
-- [`create-booklet-custom-page-order.cs`](./create-booklet-custom-page-order.cs) -- Create booklet custom page order
+- [`create-booklet-a5-pdf.cs`](./create-booklet-a5-pdf.cs) -- Create booklet a5 pdf
 - [`create-booklet-from-second-half-right-pages.cs`](./create-booklet-from-second-half-right-pages.cs) -- Create booklet from second half right pages
-- [`create-booklet-odd-left-pages.cs`](./create-booklet-odd-left-pages.cs) -- Create booklet odd left pages
+- [`create-booklet-left-odd-pages.cs`](./create-booklet-left-odd-pages.cs) -- Create booklet left odd pages
 - [`create-booklet-pdf-custom-page-size.cs`](./create-booklet-pdf-custom-page-size.cs) -- Create booklet pdf custom page size
-- [`create-booklet-pdf-delete-pages-resize.cs`](./create-booklet-pdf-delete-pages-resize.cs) -- Create booklet pdf delete pages resize
+- [`create-booklet-pdf-custom-page-size__v2.cs`](./create-booklet-pdf-custom-page-size__v2.cs) -- Create booklet pdf custom page size  v2
 - [`create-booklet-pdf-from-stream.cs`](./create-booklet-pdf-from-stream.cs) -- Create booklet pdf from stream
+- [`create-booklet-pdf-left-right-pages.cs`](./create-booklet-pdf-left-right-pages.cs) -- Create booklet pdf left right pages
+- [`create-booklet-pdf-using-pdffileeditor.cs`](./create-booklet-pdf-using-pdffileeditor.cs) -- Create booklet pdf using pdffileeditor
+- [`create-booklet-pdf-with-page-deletion.cs`](./create-booklet-pdf-with-page-deletion.cs) -- Create booklet pdf with page deletion
 - [`create-booklet-pdf-with-specified-page-order.cs`](./create-booklet-pdf-with-specified-page-order.cs) -- Create booklet pdf with specified page order
-- [`create-booklet-pdfs-various-page-sizes.cs`](./create-booklet-pdfs-various-page-sizes.cs) -- Create booklet pdfs various page sizes
-- [`create-booklet-with-custom-odd-even-pages.cs`](./create-booklet-with-custom-odd-even-pages.cs) -- Create booklet with custom odd even pages
-- [`create-booklet-with-nup-layout.cs`](./create-booklet-with-nup-layout.cs) -- Create booklet with nup layout
-- [`create-booklet-with-streams-custom-page-size.cs`](./create-booklet-with-streams-custom-page-size.cs) -- Create booklet with streams custom page size
+- [`create-custom-booklet-pdf.cs`](./create-custom-booklet-pdf.cs) -- Create custom booklet pdf
+- [`create-nup-and-booklet-pdf.cs`](./create-nup-and-booklet-pdf.cs) -- Create nup and booklet pdf
 - [`create-pdf-booklet-custom-page-order.cs`](./create-pdf-booklet-custom-page-order.cs) -- Create pdf booklet custom page order
-- [`create-pdf-booklet-with-audit-logging.cs`](./create-pdf-booklet-with-audit-logging.cs) -- Create pdf booklet with audit logging
 - [`create-pdf-booklet.cs`](./create-pdf-booklet.cs) -- Create pdf booklet
 - [`create-pdf-booklets.cs`](./create-pdf-booklets.cs) -- Create pdf booklets
-- [`delete-and-resize-pdf-pages.cs`](./delete-and-resize-pdf-pages.cs) -- Delete and resize pdf pages
-- [`delete-pages-3-4-from-pdfs.cs`](./delete-pages-3-4-from-pdfs.cs) -- Delete pages 3 4 from pdfs
 - [`delete-pages-and-create-booklet.cs`](./delete-pages-and-create-booklet.cs) -- Delete pages and create booklet
+- [`delete-pages-and-resize-pdf.cs`](./delete-pages-and-resize-pdf.cs) -- Delete pages and resize pdf
+- [`delete-pages-apply-two-up-layout.cs`](./delete-pages-apply-two-up-layout.cs) -- Delete pages apply two up layout
 - [`delete-pages-concatenate-pdfs.cs`](./delete-pages-concatenate-pdfs.cs) -- Delete pages concatenate pdfs
-- [`delete-pages-create-two-up-pdf.cs`](./delete-pages-create-two-up-pdf.cs) -- Delete pages create two up pdf
+- [`delete-pages-from-multiple-pdfs.cs`](./delete-pages-from-multiple-pdfs.cs) -- Delete pages from multiple pdfs
 - [`delete-pages-from-pdf-file-path.cs`](./delete-pages-from-pdf-file-path.cs) -- Delete pages from pdf file path
-- [`delete-pages-from-pdf-verify-count.cs`](./delete-pages-from-pdf-verify-count.cs) -- Delete pages from pdf verify count
-- [`delete-pages-resize-pdf.cs`](./delete-pages-resize-pdf.cs) -- Delete pages resize pdf
+- [`delete-pages-resize-pdf-contents.cs`](./delete-pages-resize-pdf-contents.cs) -- Delete pages resize pdf contents
 - [`delete-pdf-pages-get-size.cs`](./delete-pdf-pages-get-size.cs) -- Delete pdf pages get size
-- [`delete-pdf-pages-with-audit-logging.cs`](./delete-pdf-pages-with-audit-logging.cs) -- Delete pdf pages with audit logging
+- [`delete-pdf-pages.cs`](./delete-pdf-pages.cs) -- Delete pdf pages
 - [`delete-specific-pages-from-pdf.cs`](./delete-specific-pages-from-pdf.cs) -- Delete specific pages from pdf
-- [`delete-specific-pages-from-pdf__v2.cs`](./delete-specific-pages-from-pdf__v2.cs) -- Delete specific pages from pdf  v2
-- [`delete-specific-pages-pdf-error-handling.cs`](./delete-specific-pages-pdf-error-handling.cs) -- Delete specific pages pdf error handling
-- [`delete-specified-pages-from-pdfs.cs`](./delete-specified-pages-from-pdfs.cs) -- Delete specified pages from pdfs
+- [`delete-specific-pages-from-pdfs.cs`](./delete-specific-pages-from-pdfs.cs) -- Delete specific pages from pdfs
+- [`delete-specific-pages-with-error-handling.cs`](./delete-specific-pages-with-error-handling.cs) -- Delete specific pages with error handling
 - [`extract-first-n-pages-pdf-splitfromfirst.cs`](./extract-first-n-pages-pdf-splitfromfirst.cs) -- Extract first n pages pdf splitfromfirst
-- [`extract-first-pages-pdf-splitfromfirst.cs`](./extract-first-pages-pdf-splitfromfirst.cs) -- Extract first pages pdf splitfromfirst
+- [`extract-first-n-pages-using-splitfromfirst.cs`](./extract-first-n-pages-using-splitfromfirst.cs) -- Extract first n pages using splitfromfirst
+- [`insert-blank-separator-pages-when-merging-pdfs.cs`](./insert-blank-separator-pages-when-merging-pdfs.cs) -- Insert blank separator pages when merging pdfs
+- [`insert-image-into-pdf-and-save-modified-file.cs`](./insert-image-into-pdf-and-save-modified-file.cs) -- Insert image into pdf and save modified file
+- [`insert-page-range-into-pdf-using-streams.cs`](./insert-page-range-into-pdf-using-streams.cs) -- Insert page range into pdf using streams
 - [`insert-page-range-into-pdf.cs`](./insert-page-range-into-pdf.cs) -- Insert page range into pdf
-- [`insert-pages-at-beginning-using-pdffileeditor.cs`](./insert-pages-at-beginning-using-pdffileeditor.cs) -- Insert pages at beginning using pdffileeditor
-- [`insert-pages-from-pdf-stream.cs`](./insert-pages-from-pdf-stream.cs) -- Insert pages from pdf stream
-- [`insert-pages-into-middle-of-pdf.cs`](./insert-pages-into-middle-of-pdf.cs) -- Insert pages into middle of pdf
-- [`insert-pages-into-pdf-and-save.cs`](./insert-pages-into-pdf-and-save.cs) -- Insert pages into pdf and save
-- [`insert-pdf-pages-from-memory.cs`](./insert-pdf-pages-from-memory.cs) -- Insert pdf pages from memory
-- [`insert-selected-pdf-pages-using-streams.cs`](./insert-selected-pdf-pages-using-streams.cs) -- Insert selected pdf pages using streams
+- [`insert-pages-at-start-of-pdf.cs`](./insert-pages-at-start-of-pdf.cs) -- Insert pages at start of pdf
+- [`insert-pages-into-pdf-at-middle.cs`](./insert-pages-into-pdf-at-middle.cs) -- Insert pages into pdf at middle
+- [`insert-pages-into-pdf-in-memory.cs`](./insert-pages-into-pdf-in-memory.cs) -- Insert pages into pdf in memory
+- [`insert-pages-multiple-pdfs-into-base.cs`](./insert-pages-multiple-pdfs-into-base.cs) -- Insert pages multiple pdfs into base
+- [`insert-specific-pages-into-pdf-using-streams.cs`](./insert-specific-pages-into-pdf-using-streams.cs) -- Insert specific pages into pdf using streams
 - [`insert-specific-pages-into-pdf.cs`](./insert-specific-pages-into-pdf.cs) -- Insert specific pages into pdf
-- [`load-pdf-and-save.cs`](./load-pdf-and-save.cs) -- Load pdf and save
-- [`load-pdf-with-pdf-file-editor.cs`](./load-pdf-with-pdf-file-editor.cs) -- Load pdf with pdf file editor
+- [`load-pdf-and-save-with-aspose-pdf.cs`](./load-pdf-and-save-with-aspose-pdf.cs) -- Load pdf and save with aspose pdf
+- [`load-pdf-document-from-file.cs`](./load-pdf-document-from-file.cs) -- Load pdf document from file
+- [`log-pdf-page-deletions-audit.cs`](./log-pdf-page-deletions-audit.cs) -- Log pdf page deletions audit
+- [`measure-pdf-concatenation-performance.cs`](./measure-pdf-concatenation-performance.cs) -- Measure pdf concatenation performance
+- [`measure-pdf-resize-performance-path-vs-stream.cs`](./measure-pdf-resize-performance-path-vs-stream.cs) -- Measure pdf resize performance path vs stream
 - [`merge-multiple-pdf-streams.cs`](./merge-multiple-pdf-streams.cs) -- Merge multiple pdf streams
 - [`merge-multiple-pdfs-with-logging.cs`](./merge-multiple-pdfs-with-logging.cs) -- Merge multiple pdfs with logging
-- [`merge-pdf-streams-to-single-file.cs`](./merge-pdf-streams-to-single-file.cs) -- Merge pdf streams to single file
-- [`parallel-delete-pages-from-pdfs.cs`](./parallel-delete-pages-from-pdfs.cs) -- Parallel delete pages from pdfs
-- [`pdffileeditor-delete-out-of-range-test.cs`](./pdffileeditor-delete-out-of-range-test.cs) -- Pdffileeditor delete out of range test
+- [`merge-pdfs-from-memory-streams.cs`](./merge-pdfs-from-memory-streams.cs) -- Merge pdfs from memory streams
+- [`merge-pdfs-from-urls.cs`](./merge-pdfs-from-urls.cs) -- Merge pdfs from urls
+- [`merge-three-pdfs-using-pdffileeditor.cs`](./merge-three-pdfs-using-pdffileeditor.cs) -- Merge three pdfs using pdffileeditor
+- [`parallel-pdf-page-deletion.cs`](./parallel-pdf-page-deletion.cs) -- Parallel pdf page deletion
+- [`remove-first-and-last-pages-from-pdf.cs`](./remove-first-and-last-pages-from-pdf.cs) -- Remove first and last pages from pdf
 - [`remove-pages-from-multiple-pdfs-in-parallel.cs`](./remove-pages-from-multiple-pdfs-in-parallel.cs) -- Remove pages from multiple pdfs in parallel
-- [`remove-the-first-and-last-pages-of-a-pdf-using-an-integer-array-with-the-delete-method.cs`](./remove-the-first-and-last-pages-of-a-pdf-using-an-integer-array-with-the-delete-method.cs) -- Remove the first and last pages of a pdf using an integer array with the delete method
+- [`resize-and-merge-pdfs.cs`](./resize-and-merge-pdfs.cs) -- Resize and merge pdfs
 - [`resize-pdf-pages-to-custom-dimensions.cs`](./resize-pdf-pages-to-custom-dimensions.cs) -- Resize pdf pages to custom dimensions
-- [`resize-pdf-pages-to-custom-dimensions__v2.cs`](./resize-pdf-pages-to-custom-dimensions__v2.cs) -- Resize pdf pages to custom dimensions  v2
+- [`resize-pdf-pages-using-streams.cs`](./resize-pdf-pages-using-streams.cs) -- Resize pdf pages using streams
 - [`resize-pdf-to-letter-size.cs`](./resize-pdf-to-letter-size.cs) -- Resize pdf to letter size
-- [`resize-pdfs-and-merge.cs`](./resize-pdfs-and-merge.cs) -- Resize pdfs and merge
 - [`resize-pdfs-create-booklet.cs`](./resize-pdfs-create-booklet.cs) -- Resize pdfs create booklet
+- [`resize-pdfs-to-a5-and-create-booklet.cs`](./resize-pdfs-to-a5-and-create-booklet.cs) -- Resize pdfs to a5 and create booklet
+- [`rotate-first-pdf-page-save-to-memorystream.cs`](./rotate-first-pdf-page-save-to-memorystream.cs) -- Rotate first pdf page save to memorystream
 - [`rotate-pdf-landscape-create-booklet.cs`](./rotate-pdf-landscape-create-booklet.cs) -- Rotate pdf landscape create booklet
-- [`save-pdf-to-memorystream-using-pdfviewer.cs`](./save-pdf-to-memorystream-using-pdfviewer.cs) -- Save pdf to memorystream using pdfviewer
+- [`split-pdf-from-first-page-to-end-page.cs`](./split-pdf-from-first-page-to-end-page.cs) -- Split pdf from first page to end page
 - [`split-pdf-from-first-to-end-page.cs`](./split-pdf-from-first-to-end-page.cs) -- Split pdf from first to end page
-- [`split-pdf-from-first-to-end-page__v2.cs`](./split-pdf-from-first-to-end-page__v2.cs) -- Split pdf from first to end page  v2
 - [`split-pdf-from-page-to-end.cs`](./split-pdf-from-page-to-end.cs) -- Split pdf from page to end
 - [`split-pdf-from-page-to-end__v2.cs`](./split-pdf-from-page-to-end__v2.cs) -- Split pdf from page to end  v2
-- [`split-pdf-from-start-page-to-end.cs`](./split-pdf-from-start-page-to-end.cs) -- Split pdf from start page to end
+- [`split-pdf-from-start-page-to-end-using-streams.cs`](./split-pdf-from-start-page-to-end-using-streams.cs) -- Split pdf from start page to end using streams
 - [`split-pdf-from-start-to-end.cs`](./split-pdf-from-start-to-end.cs) -- Split pdf from start to end
 - [`split-pdf-into-bulk-page-ranges.cs`](./split-pdf-into-bulk-page-ranges.cs) -- Split pdf into bulk page ranges
 - [`split-pdf-into-bulk-page-sets.cs`](./split-pdf-into-bulk-page-sets.cs) -- Split pdf into bulk page sets
-- [`split-pdf-into-bulk-ranges.cs`](./split-pdf-into-bulk-ranges.cs) -- Split pdf into bulk ranges
-- [`split-pdf-into-individual-page-files.cs`](./split-pdf-into-individual-page-files.cs) -- Split pdf into individual page files
+- [`split-pdf-into-bulks-using-memorystreams.cs`](./split-pdf-into-bulks-using-memorystreams.cs) -- Split pdf into bulks using memorystreams
+- [`split-pdf-into-individual-page-pdfs.cs`](./split-pdf-into-individual-page-pdfs.cs) -- Split pdf into individual page pdfs
 - [`split-pdf-into-individual-page-streams.cs`](./split-pdf-into-individual-page-streams.cs) -- Split pdf into individual page streams
 - [`split-pdf-into-individual-pages.cs`](./split-pdf-into-individual-pages.cs) -- Split pdf into individual pages
-- [`split-pdf-into-individual-pages__v2.cs`](./split-pdf-into-individual-pages__v2.cs) -- Split pdf into individual pages  v2
 - [`split-pdf-into-multiple-page-ranges.cs`](./split-pdf-into-multiple-page-ranges.cs) -- Split pdf into multiple page ranges
 - [`split-pdf-into-single-page-pdfs.cs`](./split-pdf-into-single-page-pdfs.cs) -- Split pdf into single page pdfs
-- [`test-pdffileeditor-concatenate-empty-streams.cs`](./test-pdffileeditor-concatenate-empty-streams.cs) -- Test pdffileeditor concatenate empty streams
-- [`validate-makebooklet-null-pagesize.cs`](./validate-makebooklet-null-pagesize.cs) -- Validate makebooklet null pagesize
+- [`split-pdf-into-single-page-pdfs__v2.cs`](./split-pdf-into-single-page-pdfs__v2.cs) -- Split pdf into single page pdfs  v2
+- [`test-delete-throws-exception-out-of-range-pages.cs`](./test-delete-throws-exception-out-of-range-pages.cs) -- Test delete throws exception out of range pages
+- [`test-makebooklet-null-pagesize.cs`](./test-makebooklet-null-pagesize.cs) -- Test makebooklet null pagesize
+- [`test-pdffileeditor-concatenate-empty-input.cs`](./test-pdffileeditor-concatenate-empty-input.cs) -- Test pdffileeditor concatenate empty input
 - [`validate-pdf-concatenation-page-order.cs`](./validate-pdf-concatenation-page-order.cs) -- Validate pdf concatenation page order
+- [`validate-pdf-page-deletion.cs`](./validate-pdf-page-deletion.cs) -- Validate pdf page deletion
 
 ## See Also
 

@@ -1,47 +1,49 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";   // source PDF with form fields
-        const string jsonPath  = "data.json";   // JSON array containing field values
-        const string outputPath = "output.pdf"; // PDF after bulk import
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "filled.pdf";
 
-        if (!File.Exists(pdfPath))
+        // JSON string containing form field names and their values
+        string jsonData = @"{
+            ""FirstName"": ""John"",
+            ""LastName"": ""Doe"",
+            ""Age"": ""30""
+        }";
+
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(jsonPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"JSON not found: {jsonPath}");
-            return;
-        }
-
-        try
-        {
-            // Load the PDF document
-            using (Document doc = new Document(pdfPath))
+            // Convert the JSON string to a UTF‑8 memory stream
+            using (MemoryStream jsonStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonData)))
             {
-                // Open the JSON file as a stream and import all form fields at once
-                using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Open, FileAccess.Read))
-                {
-                    doc.Form.ImportFromJson(jsonStream);
-                }
+                // Import form field values from the JSON stream
+                var importResults = doc.Form.ImportFromJson(jsonStream);
 
-                // Save the updated PDF
-                doc.Save(outputPath);
+                // Optionally report how many fields were processed
+                int processed = 0;
+                foreach (var _ in importResults)
+                    processed++;
+
+                Console.WriteLine($"Imported data for {processed} form fields.");
             }
 
-            Console.WriteLine($"Form data imported successfully. Saved to '{outputPath}'.");
+            // Save the updated PDF
+            doc.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
     }
 }

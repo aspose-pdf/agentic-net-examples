@@ -19,23 +19,32 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Work with the first page (1‑based indexing)
+            // Select the page from which the vector graphic will be removed (first page)
             Page page = doc.Pages[1];
 
             // Absorb all vector graphics on the page
             GraphicsAbsorber absorber = new GraphicsAbsorber();
             absorber.Visit(page);
 
-            // Remove a specific vector graphic (e.g., the first one)
-            if (absorber.Elements.Count > 0)
+            // Check whether any vector graphics were found
+            if (absorber.Elements.Count == 0)
             {
-                // Each element is a GraphicElement; call Remove() to delete it
-                absorber.Elements[0].Remove();
-                Console.WriteLine("Removed a vector graphic from the page.");
+                Console.WriteLine("No vector graphics found on the page.");
             }
             else
             {
-                Console.WriteLine("No vector graphics found on the page.");
+                // Example: remove the first vector graphic found
+                int targetIndex = 0;
+                if (targetIndex < absorber.Elements.Count)
+                {
+                    // Remove this vector graphic from the page
+                    absorber.Elements[targetIndex].Remove();
+                    Console.WriteLine($"Removed vector graphic at index {targetIndex}.");
+                }
+                else
+                {
+                    Console.WriteLine($"Target index {targetIndex} is out of range. Total graphics: {absorber.Elements.Count}.");
+                }
             }
 
             // Save the modified PDF

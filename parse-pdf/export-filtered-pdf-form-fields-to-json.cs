@@ -1,7 +1,7 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Collections.Generic;
-using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -9,68 +9,61 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF with form fields
-        const string outputJson = "filtered_fields.json"; // result JSON file
-        const string prefix     = "Customer_";          // only fields starting with this prefix
+        const string inputPdfPath = "input.pdf";          // source PDF with form fields
+        const string outputJsonPath = "filtered_fields.json"; // output JSON file
+        const string fieldNamePrefix = "Customer_";       // prefix to filter field names
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Collect matching fields
+            // Collect fields whose names start with the specified prefix
             List<Field> matchingFields = new List<Field>();
-            foreach (Field field in doc.Form.Fields)
+            foreach (Field field in pdfDoc.Form.Fields)
             {
-                if (!string.IsNullOrEmpty(field?.FullName) && field.FullName.StartsWith(prefix, StringComparison.Ordinal))
+                if (!string.IsNullOrEmpty(field.Name) &&
+                    field.Name.StartsWith(fieldNamePrefix, StringComparison.Ordinal))
                 {
                     matchingFields.Add(field);
                 }
             }
 
-            // Prepare a simple DTO for JSON serialization
-            var fieldData = new List<object>();
-            foreach (Field field in matchingFields)
+            // Export the filtered fields to a single JSON array
+            using (FileStream fs = new FileStream(outputJsonPath, FileMode.Create, FileAccess.Write))
+            using (StreamWriter writer = new StreamWriter(fs, Encoding.UTF8))
             {
-                // Export the raw value of the field
-                object value = GetFieldValue(field);
-                fieldData.Add(new { Name = field.FullName, Value = value });
+                writer.WriteLine("["); // start of JSON array
+
+                for (int i = 0; i < matchingFields.Count; i++)
+                {
+                    Field field = matchingFields[i];
+
+                    // Export the individual field value to a temporary memory stream
+                    using (MemoryStream tempStream = new MemoryStream())
+                    {
+                        // ExportValueToJson writes a JSON object representing the field
+                        field.ExportValueToJson(tempStream, indented: true);
+                        string fieldJson = Encoding.UTF8.GetString(tempStream.ToArray());
+
+                        writer.Write(fieldJson);
+
+                        // Add a comma between objects, but not after the last one
+                        if (i < matchingFields.Count - 1)
+                            writer.WriteLine(",");
+                        else
+                            writer.WriteLine();
+                    }
+                }
+
+                writer.WriteLine("]"); // end of JSON array
             }
 
-            // Serialize to JSON (indented for readability)
-            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(fieldData, jsonOptions);
-
-            // Write JSON to the output file
-            File.WriteAllText(outputJson, json);
-            Console.WriteLine($"Exported {matchingFields.Count} fields to '{outputJson}'.");
-        }
-    }
-
-    // Helper to extract the value of a form field in a generic way
-    private static object GetFieldValue(Field field)
-    {
-        // Different field types expose their value via different properties
-        switch (field)
-        {
-            case TextBoxField txt:
-                return txt.Value;
-            case CheckboxField chk:
-                return chk.Checked;
-            case RadioButtonField rad:
-                return rad.Value;
-            case ListBoxField lst:
-                return lst.SelectedItems;
-            case ComboBoxField cmb:
-                return cmb.Value;
-            case ButtonField btn:
-                return btn.Value; // usually empty for buttons
-            default:
-                return field.Value; // fallback for other field types
+            Console.WriteLine($"Filtered fields exported to '{outputJsonPath}'.");
         }
     }
 }

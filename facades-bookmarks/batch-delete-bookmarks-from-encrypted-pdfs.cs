@@ -5,51 +5,60 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        // Input: folder containing encrypted PDFs
-        const string inputFolder  = @"C:\InputEncryptedPdfs";
-        // Output folder for PDFs with bookmarks removed
-        const string outputFolder = @"C:\OutputNoBookmarks";
-        // Password required to open the encrypted PDFs
-        const string pdfPassword  = "mySecretPassword";
+        // Expected arguments:
+        // 1. Input folder containing encrypted PDFs
+        // 2. Password to open the PDFs (user or owner password)
+        // 3. Output folder where processed PDFs will be saved
+        if (args.Length < 3)
+        {
+            Console.Error.WriteLine("Usage: <inputFolder> <password> <outputFolder>");
+            return;
+        }
+
+        string inputFolder = args[0];
+        string password = args[1];
+        string outputFolder = args[2];
 
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
             return;
         }
 
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        foreach (string inputPath in pdfFiles)
         {
-            string fileName   = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(outputFolder, fileName + "_nobookmarks.pdf");
+            string fileName = Path.GetFileName(inputPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
 
             try
             {
-                // Load the encrypted PDF using the password
-                using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath, pdfPassword))
+                // Open the encrypted PDF with the supplied password.
+                using (Document doc = new Document(inputPath, password))
                 {
-                    // Initialise the bookmark editor with the loaded document
-                    using (Aspose.Pdf.Facades.PdfBookmarkEditor editor = new Aspose.Pdf.Facades.PdfBookmarkEditor(doc))
+                    // Initialize the bookmark editor on the opened document.
+                    using (PdfBookmarkEditor editor = new PdfBookmarkEditor(doc))
                     {
-                        // Delete all bookmarks
+                        // Delete all bookmarks.
                         editor.DeleteBookmarks();
 
-                        // Save the modified PDF
+                        // Save the modified PDF (overwrites or creates a new file).
                         editor.Save(outputPath);
                     }
                 }
 
-                Console.WriteLine($"Processed: {inputPath} → {outputPath}");
+                Console.WriteLine($"Processed: {fileName}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Failed to process '{fileName}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Bookmark removal completed.");
     }
 }

@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_adjusted.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,7 +16,7 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for proper disposal
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
             // Iterate through all pages (1‑based indexing)
@@ -24,33 +24,35 @@ class Program
             {
                 Page page = doc.Pages[pageNum];
 
-                // Annotations collection also uses 1‑based indexing
-                for (int i = 1; i <= page.Annotations.Count; i++)
+                // Iterate over a copy of the annotation collection because we will modify items
+                int annotationCount = page.Annotations.Count;
+                for (int i = 1; i <= annotationCount; i++)
                 {
                     Annotation ann = page.Annotations[i];
 
                     // Process only SoundAnnotation instances
                     if (ann is SoundAnnotation soundAnn)
                     {
-                        // Original rectangle
-                        Aspose.Pdf.Rectangle oldRect = soundAnn.Rect;
+                        // Current rectangle
+                        Aspose.Pdf.Rectangle rect = soundAnn.Rect;
 
-                        // Compute center point
-                        double centerX = (oldRect.LLX + oldRect.URX) / 2.0;
-                        double centerY = (oldRect.LLY + oldRect.URY) / 2.0;
+                        // Compute center point using Aspose.Pdf.Rectangle properties (LLX, LLY, URX, URY)
+                        double centerX = (rect.LLX + rect.URX) / 2.0;
+                        double centerY = (rect.LLY + rect.URY) / 2.0;
 
-                        // Increase width and height by 20%
-                        double newWidth  = (oldRect.URX - oldRect.LLX) * 1.20;
-                        double newHeight = (oldRect.URY - oldRect.LLY) * 1.20;
+                        // Increase area by 20% → scale each dimension by sqrt(1.2)
+                        double scale = Math.Sqrt(1.2);
+                        double newWidth = (rect.URX - rect.LLX) * scale;
+                        double newHeight = (rect.URY - rect.LLY) * scale;
 
-                        // Build the expanded rectangle, keeping the same center
-                        double newLLX = centerX - newWidth  / 2.0;
-                        double newLLY = centerY - newHeight / 2.0;
-                        double newURX = centerX + newWidth  / 2.0;
-                        double newURY = centerY + newHeight / 2.0;
+                        // Build new rectangle keeping the same center
+                        double newLlx = centerX - newWidth / 2.0;
+                        double newLly = centerY - newHeight / 2.0;
+                        double newUrx = centerX + newWidth / 2.0;
+                        double newUry = centerY + newHeight / 2.0;
 
-                        // Assign the new rectangle back to the annotation
-                        soundAnn.Rect = new Aspose.Pdf.Rectangle(newLLX, newLLY, newURX, newURY);
+                        // Assign the expanded rectangle back to the annotation
+                        soundAnn.Rect = new Aspose.Pdf.Rectangle(newLlx, newLly, newUrx, newUry);
                     }
                 }
             }

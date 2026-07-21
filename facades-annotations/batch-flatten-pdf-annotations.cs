@@ -4,10 +4,10 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Input folder can be passed as first argument; default to "InputPdfs"
-        string inputFolder = args.Length > 0 ? args[0] : "InputPdfs";
+        // Folder containing the PDF files to process
+        const string inputFolder = @"C:\PdfFolder";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -15,23 +15,32 @@ class Program
             return;
         }
 
-        // Process each PDF file in the folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
-        {
-            string directory = Path.GetDirectoryName(pdfPath);
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-            string outputPath = Path.Combine(directory, $"{fileNameWithoutExt}_flattened.pdf");
+        // Get all PDF files in the folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
 
+        foreach (string pdfPath in pdfFiles)
+        {
             try
             {
-                // Create the facade, load the PDF, flatten annotations, and save
-                PdfAnnotationEditor editor = new PdfAnnotationEditor();   // create
-                editor.BindPdf(pdfPath);                                 // load
-                editor.FlatteningAnnotations();                          // flatten all annotations
-                editor.Save(outputPath);                                 // save
-                editor.Close();                                          // release resources
+                // Build the output file name with "_flattened" suffix
+                string directory = Path.GetDirectoryName(pdfPath);
+                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+                string outputPath = Path.Combine(directory, $"{fileNameWithoutExt}_flattened.pdf");
 
-                Console.WriteLine($"Flattened: {outputPath}");
+                // Use PdfAnnotationEditor to flatten annotations
+                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                {
+                    // Load the source PDF
+                    editor.BindPdf(pdfPath);
+
+                    // Flatten all annotations in the document
+                    editor.FlatteningAnnotations();
+
+                    // Save the flattened PDF to the new file
+                    editor.Save(outputPath);
+                }
+
+                Console.WriteLine($"Flattened: '{pdfPath}' → '{outputPath}'");
             }
             catch (Exception ex)
             {

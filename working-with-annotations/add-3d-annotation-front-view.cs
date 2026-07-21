@@ -8,69 +8,76 @@ class Program
     static void Main()
     {
         // Paths – adjust as needed
-        const string inputPdf   = "input.pdf";
-        const string outputPdf  = "output_with_3d.pdf";
-        const string model3d    = "model.u3d";   // 3‑D artwork file (U3D/PRC)
+        const string inputPdfPath   = "input.pdf";
+        const string outputPdfPath  = "output_with_3d.pdf";
+        const string threeDFilePath = "model.u3d"; // 3‑D artwork file (U3D, PRC, etc.)
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(model3d))
+        if (!File.Exists(threeDFilePath))
         {
-            Console.Error.WriteLine($"3‑D model not found: {model3d}");
+            Console.Error.WriteLine($"3‑D file not found: {threeDFilePath}");
             return;
         }
 
-        // Load the source PDF (document‑disposal‑with‑using rule)
-        using (Document doc = new Document(inputPdf))
+        // Open the PDF
+        using (Document doc = new Document(inputPdfPath))
         {
-            // -----------------------------------------------------------------
-            // 1. Create the 3‑D content object from the external file
-            // -----------------------------------------------------------------
-            PDF3DContent content = new PDF3DContent(model3d);
+            // Ensure there is at least one page
+            Page page = doc.Pages[1];
 
             // -----------------------------------------------------------------
-            // 2. Create the 3‑D artwork (default lighting & render mode)
+            // 1. Create the 3‑D content (the raw 3‑D file)
+            // -----------------------------------------------------------------
+            PDF3DContent content = new PDF3DContent(threeDFilePath);
+
+            // -----------------------------------------------------------------
+            // 2. Create the 3‑D artwork – use default lighting and render mode
             // -----------------------------------------------------------------
             PDF3DArtwork artwork = new PDF3DArtwork(doc, content);
 
             // -----------------------------------------------------------------
-            // 3. Define an initial view that shows the front of the model
-            //    – CameraPosition: identity matrix (default view direction)
-            //    – CameraOrbit: 0 (no orbit rotation)
+            // 3. Define a view that shows the front of the model
+            //    – Use an identity matrix for the camera position and zero orbit
             // -----------------------------------------------------------------
-            Matrix3D cameraPos = new Matrix3D(); // identity matrix
-            double cameraOrbit = 0.0;
-            PDF3DView frontView = new PDF3DView(doc, cameraPos, cameraOrbit, "FrontView");
+            Matrix3D cameraMatrix = new Matrix3D(); // identity matrix
+            double cameraOrbit = 0.0;               // no orbit rotation
+            PDF3DView frontView = new PDF3DView(doc, cameraMatrix, cameraOrbit, "FrontView");
+
+            // Optional: set a background colour for the view (white)
+            frontView.BackGroundColor = Aspose.Pdf.Color.White;
 
             // Add the view to the artwork's view array
             artwork.ViewArray.Add(frontView);
 
             // -----------------------------------------------------------------
-            // 4. Create the 3‑D annotation on the first page
+            // 4. Create the 3‑D annotation and place it on the page
             // -----------------------------------------------------------------
-            Page page = doc.Pages[1];
-            // Rectangle: left, bottom, width, height (using fully qualified type)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 400, 300, 600);
-            // Activation mode – show when the page is opened
-            PDF3DActivation activation = PDF3DActivation.activeWhenOpen;
+            // Define the rectangle where the annotation will appear
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 400, 400, 700);
 
-            PDF3DAnnotation annotation = new PDF3DAnnotation(page, rect, artwork, activation);
+            // Use the activation mode that makes the 3‑D model active when the page is opened
+            PDF3DAnnotation annotation = new PDF3DAnnotation(
+                page,
+                rect,
+                artwork,
+                PDF3DActivation.activeWhenOpen);
 
-            // Optional: set the default view index to the front view (index 0)
+            // Set the default view to the one we just created (index 0)
             annotation.SetDefaultViewIndex(0);
 
             // Add the annotation to the page
             page.Annotations.Add(annotation);
 
             // -----------------------------------------------------------------
-            // 5. Save the modified PDF (lifecycle rule)
+            // 5. Save the resulting PDF
             // -----------------------------------------------------------------
-            doc.Save(outputPdf);
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"3‑D annotation added and saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with 3‑D annotation saved to '{outputPdfPath}'.");
     }
 }

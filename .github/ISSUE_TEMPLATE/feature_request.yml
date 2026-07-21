@@ -1,0 +1,45 @@
+name: Feature Request
+description: Suggest an improvement to the tooling, docs, or agent surface
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for tooling improvements, agent-surface changes,
+        or repo-wide docs enhancements. For requesting a new example use
+        the "Request new example" template instead.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Describe the use case that motivates this feature request.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the change you'd like to see. Rough sketches, alternative approaches, or open questions are welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you consider? Why didn't you go with them?
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which area does this touch?
+      multiple: true
+      options:
+        - Example code (specific category)
+        - Root AGENTS.md
+        - Per-category AGENTS.md
+        - MCP server / agent surface
+        - README / docs
+        - Repo tooling (index.json, manifests, sitemap, etc.)
+        - Other
+    validations:
+      required: true

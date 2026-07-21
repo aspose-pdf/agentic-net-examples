@@ -6,42 +6,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string logoPath   = "logo.png";
+        const string inputPdf  = "input.pdf";
+        const string logoImage = "logo.png";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(logoImage))
+        {
+            Console.Error.WriteLine($"Logo image not found: {logoImage}");
             return;
         }
 
-        if (!File.Exists(logoPath))
-        {
-            Console.Error.WriteLine($"Logo image not found: {logoPath}");
-            return;
-        }
-
-        // Load the PDF document (lifecycle rule: use using)
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document (using rule: document-disposal-with-using)
+        using (Document doc = new Document(inputPdf))
         {
             // Create an image stamp from the logo file
-            ImageStamp logoStamp = new ImageStamp(logoPath);
+            ImageStamp stamp = new ImageStamp(logoImage);
 
-            // Set semi‑transparent opacity (0.0‑1.0)
-            logoStamp.Opacity = 0.5;
+            // Set semi‑transparent opacity (0.0 = fully transparent, 1.0 = opaque)
+            stamp.Opacity = 0.5;
 
-            // Position the stamp (center of the page)
-            logoStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            logoStamp.VerticalAlignment   = VerticalAlignment.Center;
+            // Position the stamp (optional – adjust as needed)
+            stamp.HorizontalAlignment = HorizontalAlignment.Left;
+            stamp.VerticalAlignment   = VerticalAlignment.Top;
+            stamp.LeftMargin = 20;   // distance from left edge
+            stamp.TopMargin  = 20;   // distance from top edge
 
             // Add the stamp to the first page (pages are 1‑based)
-            doc.Pages[1].AddStamp(logoStamp);
+            doc.Pages[1].AddStamp(stamp);
 
-            // Save the modified PDF (lifecycle rule: use Save)
-            doc.Save(outputPath);
+            // Save the modified PDF (PDF format, no SaveOptions needed)
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Semi‑transparent logo stamp added to first page and saved as '{outputPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
     }
 }

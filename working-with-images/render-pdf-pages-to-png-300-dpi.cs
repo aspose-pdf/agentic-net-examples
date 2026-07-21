@@ -1,51 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Devices; // PngDevice resides here
 
 class Program
 {
     static void Main()
     {
-        // Input PDF path
-        const string inputPath = "input.pdf";
-        // Output directory for PNG images
-        const string outputDir = "output_images";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "RenderedPngs";
 
-        if (!File.Exists(inputPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document pdfDocument = new Document(inputPath))
+        // Load PDF inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Create a Resolution object with 300 DPI
+            // Set up 300 DPI resolution for image rendering
             Resolution resolution = new Resolution(300);
-
-            // Initialize the PNG device with the desired resolution
             PngDevice pngDevice = new PngDevice(resolution);
 
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            // Iterate through all pages (1‑based indexing)
             for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                // Build the output file name for the current page
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
 
-                // Convert the page to PNG and write it to a file stream
+                // Render each page to PNG via a FileStream
                 using (FileStream pngStream = new FileStream(outputPath, FileMode.Create))
                 {
                     pngDevice.Process(pdfDocument.Pages[pageNumber], pngStream);
                 }
-
-                Console.WriteLine($"Page {pageNumber} saved as PNG: {outputPath}");
             }
         }
 
-        Console.WriteLine("All pages have been rendered to PNG at 300 DPI.");
+        Console.WriteLine("All pages have been rendered to PNG at 300 DPI.");
     }
 }

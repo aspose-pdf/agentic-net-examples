@@ -1,39 +1,40 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core PDF API
-using Aspose.Pdf.Facades;      // Facades namespace (required by task)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string imagePath  = "Photo.jpg";   // Input JPEG image
-        const string pdfPath    = "Photo.pdf";   // Output single‑page PDF
+        const string imagePath = "Photo.jpg";
+        const string outputPdf = "Photo.pdf";
 
-        // Verify the image file exists
         if (!File.Exists(imagePath))
         {
             Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Create a new PDF document and ensure deterministic disposal
-        using (Document pdfDoc = new Document())
+        // Create a new PDF document.
+        using (Document pdfDocument = new Document())
         {
-            // Add a blank page (default size, default margins)
-            pdfDoc.Pages.Add();
+            // Add a page with default margins.
+            Page page = pdfDocument.Pages.Add();
 
-            // Create an Image object, set its source file, and add it to the page
-            Image img = new Image
+            // Load the JPEG image.
+            Image image = new Image
             {
-                File = imagePath
+                ImageStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read)
             };
-            pdfDoc.Pages[1].Paragraphs.Add(img);
 
-            // Save the PDF document to the specified path
-            pdfDoc.Save(pdfPath);
+            // Add the image to the page. The image will be placed at the origin (0,0) and will keep its original size.
+            // If you need it centered or scaled, adjust the image's properties accordingly.
+            page.Paragraphs.Add(image);
+
+            // Save the PDF.
+            pdfDocument.Save(outputPdf);
         }
 
-        Console.WriteLine($"JPEG image '{imagePath}' successfully converted to PDF '{pdfPath}'.");
+        Console.WriteLine($"PDF created successfully: {outputPdf}");
     }
 }

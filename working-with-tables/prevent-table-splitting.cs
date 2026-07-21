@@ -1,6 +1,5 @@
 using System;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
@@ -8,41 +7,41 @@ class Program
     {
         const string outputPath = "table_no_split.pdf";
 
-        // Create a new PDF document and ensure proper disposal
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a single page to the document
+            // Add a single page (1‑based indexing)
             Page page = doc.Pages.Add();
 
             // Create a table and disable automatic splitting across pages
             Table table = new Table
             {
-                IsBroken = false,               // Prevent the table from breaking onto the next page
-                ColumnWidths = "100 100 100"    // Define three equal columns (optional)
+                IsBroken = false,                 // Force the table to stay on one page
+                ColumnWidths = "100 100 100"      // Simple column width definition
             };
 
-            // Add a header row
+            // Header row
             Row header = table.Rows.Add();
-            header.Cells.Add(new TextFragment("Header 1"));
-            header.Cells.Add(new TextFragment("Header 2"));
-            header.Cells.Add(new TextFragment("Header 3"));
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
+            header.Cells.Add("Header 3");
 
-            // Add enough rows to exceed a single page height (to demonstrate the effect)
-            for (int i = 1; i <= 30; i++)
+            // Add many rows to exceed a page height (if splitting were allowed)
+            for (int i = 0; i < 50; i++)
             {
                 Row row = table.Rows.Add();
-                row.Cells.Add(new TextFragment($"Row {i} Col 1"));
-                row.Cells.Add(new TextFragment($"Row {i} Col 2"));
-                row.Cells.Add(new TextFragment($"Row {i} Col 3"));
+                row.Cells.Add($"Row {i + 1} Col 1");
+                row.Cells.Add($"Row {i + 1} Col 2");
+                row.Cells.Add($"Row {i + 1} Col 3");
             }
 
-            // Insert the table into the page's paragraph collection
+            // Insert the table into the page's content
             page.Paragraphs.Add(table);
 
-            // Save the PDF document
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'. The table will stay on one page.");
+        Console.WriteLine($"PDF saved to '{outputPath}'. Table will not split across pages.");
     }
 }

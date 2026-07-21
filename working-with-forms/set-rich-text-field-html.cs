@@ -7,8 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";          // PDF containing a RichTextBox field
+        const string outputPath = "output.pdf";         // Resulting PDF
+        const string fieldName  = "RichTextField1";     // Name of the RichTextBox field
 
         if (!File.Exists(inputPath))
         {
@@ -16,28 +17,26 @@ class Program
             return;
         }
 
-        // Load the existing PDF
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least one page
-            Page page = doc.Pages[1];
+            // Retrieve the field by name and cast to RichTextBoxField
+            if (doc.Form[fieldName] is RichTextBoxField richField)
+            {
+                // Set the formatted (HTML) value – this markup will be rendered inside the field
+                richField.FormattedValue = "<b>Bold Text</b> <i>Italic Text</i> <u>Underlined</u>";
 
-            // Define the rectangle where the rich text box will appear
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
+                // Optionally set a default style (e.g., font family and size) for the field
+                richField.Style = "font-family:Helvetica; font-size:12pt;";
 
-            // Create a RichTextBoxField on the page
-            RichTextBoxField richTextField = new RichTextBoxField(page, rect);
-
-            // Set HTML markup to display formatted text inside the field
-            richTextField.FormattedValue = "<b>Bold Text</b> <i>Italic Text</i> <u>Underlined Text</u>";
-
-            // Add the field to the page's annotations collection
-            page.Annotations.Add(richTextField);
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+                // Save the modified document
+                doc.Save(outputPath);
+                Console.WriteLine($"Rich text field updated and saved to '{outputPath}'.");
+            }
+            else
+            {
+                Console.Error.WriteLine($"Field '{fieldName}' not found or is not a RichTextBoxField.");
+            }
         }
-
-        Console.WriteLine($"PDF saved with rich text field: {outputPath}");
     }
 }

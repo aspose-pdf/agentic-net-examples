@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - facades-documents
 
-> **Facades documents** in PDF using C# / .NET -- **101** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades documents** in PDF using C# / .NET -- **101** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,17 +23,19 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf.Facades;` (99/101 files) ← category-specific
-- `using Aspose.Pdf;` (36/101 files)
+- `using Aspose.Pdf.Facades;` (97/101 files) ← category-specific
+- `using Aspose.Pdf;` (37/101 files)
 - `using Aspose.Pdf.Text;` (6/101 files)
 - `using System;` (101/101 files)
-- `using System.IO;` (98/101 files)
-- `using System.Collections.Generic;` (15/101 files)
-- `using System.Linq;` (5/101 files)
+- `using System.IO;` (99/101 files)
+- `using System.Collections.Generic;` (16/101 files)
 - `using System.Diagnostics;` (3/101 files)
+- `using System.Threading.Tasks;` (3/101 files)
 - `using NUnit.Framework;` (2/101 files)
-- `using System.Threading.Tasks;` (2/101 files)
+- `using System.Linq;` (2/101 files)
+- `using System.Globalization;` (1/101 files)
 - `using System.IO.Compression;` (1/101 files)
+- `using System.Net.Http;` (1/101 files)
 
 ## Common Code Pattern
 
@@ -50,36 +52,36 @@ tool.Save("output.pdf");
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [append-page-ranges-multiple-pdfs](./append-page-ranges-multiple-pdfs.cs) | Append Page Ranges from Multiple PDFs Using TryAppend | `PdfFileEditor`, `TryAppend`, `LastException` | Demonstrates how to use Aspose.Pdf.Facades.PdfFileEditor.TryAppend to insert the same page range ... |
-| [append-pdf-pages-to-another-document](./append-pdf-pages-to-another-document.cs) | Append PDF Pages to Another Document | `Document`, `PdfFileEditor`, `Append` | Demonstrates how to append all pages from a source PDF to the end of a destination PDF using Aspo... |
-| [apply-4up-layout-to-pdf-via-stream](./apply-4up-layout-to-pdf-via-stream.cs) | Apply 4‑up Layout to PDF via Stream Overload | `PdfFileEditor`, `MakeNUp`, `Document` | Demonstrates using Aspose.Pdf.Facades.PdfFileEditor to create a 4‑up (2×2) PDF by processing inpu... |
-| [batch-concatenate-pdfs](./batch-concatenate-pdfs.cs) | Batch Concatenate PDFs in a Folder | `PdfFileEditor`, `Concatenate` | Shows how to gather all PDF files from a directory and merge them into a single PDF using Aspose.... |
-| [batch-create-3x2-nup-pdfs](./batch-create-3x2-nup-pdfs.cs) | Batch Create 3x2 N‑up PDFs | `PdfFileEditor`, `MakeNUp` | Processes all PDF files in a folder and generates N‑up versions with three columns and two rows u... |
-| [batch-delete-pages-from-pdfs](./batch-delete-pages-from-pdfs.cs) | Batch Delete Pages from Multiple PDFs | `PdfFileEditor`, `Delete` | Shows how to iterate over PDF files in a folder and remove specified pages from each document usi... |
+| [append-pdf-pages-using-pdffileeditor](./append-pdf-pages-using-pdffileeditor.cs) | Append PDF Pages Using PdfFileEditor | `Document`, `Pages`, `Count` | Demonstrates how to append all pages from a source PDF to the end of a destination PDF using Aspo... |
+| [batch-concatenate-pdfs](./batch-concatenate-pdfs.cs) | Batch Concatenate PDFs in a Folder | `PdfFileEditor`, `Concatenate` | Shows how to combine all PDF files from a specified directory into a single PDF document using As... |
+| [batch-create-3x2-nup-pdfs](./batch-create-3x2-nup-pdfs.cs) | Batch Create 3‑by‑2 N‑up PDFs | `PdfFileEditor`, `MakeNUp` | Demonstrates how to process multiple PDF files and generate N‑up versions with three columns and ... |
+| [batch-create-pdf-booklets-audit-logging](./batch-create-pdf-booklets-audit-logging.cs) | Batch Create PDF Booklets with Audit Logging | `PdfFileEditor`, `MakeBooklet`, `ConversionLog` | Demonstrates processing multiple PDF files, converting each into a booklet using Aspose.Pdf.Facad... |
+| [batch-delete-pages-from-pdfs](./batch-delete-pages-from-pdfs.cs) | Batch Delete Pages from Multiple PDFs | `PdfFileEditor`, `Delete` | Demonstrates how to loop through a directory of PDF files and delete specified pages from each do... |
 | [batch-delete-pages-merge-pdfs](./batch-delete-pages-merge-pdfs.cs) | Batch Delete Pages and Merge PDFs | `PdfFileEditor`, `Delete`, `Concatenate` | Shows how to remove specified pages from several PDF files and then concatenate the cleaned PDFs ... |
-| [batch-insert-page-ranges-into-pdf](./batch-insert-page-ranges-into-pdf.cs) | Batch Insert Page Ranges into PDF | `PdfFileEditor`, `Insert` | Demonstrates how to insert specific page ranges from multiple source PDFs into a single destinati... |
-| [batch-resize-pdfs-a5-booklet](./batch-resize-pdfs-a5-booklet.cs) | Batch Resize PDFs to A5 and Create Booklets | `PdfFileEditor`, `ResizeContents`, `MakeBooklet` | Shows how to iterate over PDF files in a folder, resize each page to A5 dimensions, and then gene... |
-| [batch-resize-pdfs-to-a4](./batch-resize-pdfs-to-a4.cs) | Batch Resize PDFs to A4 | `PdfPageEditor`, `BindPdf`, `ApplyChanges` | Shows how to iterate through a folder of PDF files and resize each document to A4 page size using... |
-| [compare-file-path-and-stream-overloads-pdf-resizin...](./compare-file-path-and-stream-overloads-pdf-resizing.cs) | Compare File‑Path and Stream Overloads for PDF Resizing | `PdfPageEditor`, `BindPdf`, `Save` | Demonstrates how to resize a large PDF using Aspose.Pdf.Facades.PdfPageEditor via both file‑path ... |
-| [compare-memory-usage-file-path-stream-pdf-concaten...](./compare-memory-usage-file-path-stream-pdf-concatenation.cs) | Compare Memory Usage of File-Path vs Stream Overloads for PD... | `Document`, `Page`, `TextFragment` | Creates two simple PDF files and concatenates them using Aspose.Pdf.Facades.PdfFileEditor, measur... |
-| [concatenate-multiple-pdfs-measure-time](./concatenate-multiple-pdfs-measure-time.cs) | Concatenate Multiple PDFs and Measure Execution Time | `PdfFileEditor`, `Concatenate`, `CloseConcatenatedStreams` | Demonstrates how to concatenate fifty small PDF files using Aspose.Pdf.Facades.PdfFileEditor stre... |
+| [batch-insert-page-ranges](./batch-insert-page-ranges.cs) | Batch Insert Page Ranges from Multiple PDFs | `PdfFileEditor`, `Insert` | Shows how to iteratively insert specific page ranges from several source PDFs into a base PDF usi... |
+| [batch-resize-pdfs-to-a4](./batch-resize-pdfs-to-a4.cs) | Batch Resize PDFs to A4 Using PdfPageEditor | `PdfPageEditor`, `BindPdf`, `Save` | Shows how to loop through all PDF files in a folder and resize each document to A4 page size usin... |
+| [compare-pdf-concatenation-overloads](./compare-pdf-concatenation-overloads.cs) | Compare PDF Concatenation Overloads (File Path vs Stream) | `Document`, `TextFragment`, `PdfFileEditor` | Demonstrates how to concatenate two PDFs using Aspose.Pdf's file‑path and stream overloads while ... |
 | [concatenate-multiple-pdfs](./concatenate-multiple-pdfs.cs) | Concatenate Multiple PDFs into a Single Document | `PdfFileEditor`, `Concatenate` | Demonstrates how to merge several PDF files into one using Aspose.Pdf.Facades.PdfFileEditor. The ... |
-| [concatenate-multiple-pdfs__v2](./concatenate-multiple-pdfs__v2.cs) | Concatenate Multiple PDFs into a Single Document | `PdfFileEditor`, `Concatenate`, `CloseConcatenatedStreams` | Shows how to merge several PDF files into one PDF using Aspose.Pdf.Facades.PdfFileEditor in a con... |
+| [concatenate-multiple-pdfs__v2](./concatenate-multiple-pdfs__v2.cs) | Concatenate Multiple PDFs into a Single Document | `PdfFileEditor`, `Concatenate`, `CloseConcatenatedStreams` | Shows how to merge several PDF files into one using Aspose.Pdf.Facades.PdfFileEditor with stream ... |
 | [concatenate-pdfs-add-page-numbers](./concatenate-pdfs-add-page-numbers.cs) | Concatenate PDFs and Add Page Numbers | `PdfFileEditor`, `Concatenate`, `PdfFileStamp` | Shows how to merge multiple PDF files into a single document and automatically insert page number... |
-| [concatenate-pdfs-from-memory-streams](./concatenate-pdfs-from-memory-streams.cs) | Concatenate PDFs from Memory Streams to a File | `Document`, `PdfFileEditor`, `Concatenate` | Shows how to merge multiple PDF documents held in memory streams into a single PDF file using Asp... |
-| [concatenate-pdfs-from-zip](./concatenate-pdfs-from-zip.cs) | Concatenate PDFs from a ZIP Archive and Save Back | `PdfFileEditor`, `Concatenate`, `CloseConcatenatedStreams` | The example reads all PDF files stored in a ZIP archive, merges them into a single PDF using Aspo... |
-| [concatenate-pdfs-preserve-metadata](./concatenate-pdfs-preserve-metadata.cs) | Concatenate PDFs and Preserve Original Metadata | `PdfFileEditor`, `Concatenate`, `PdfFileInfo` | Demonstrates how to merge multiple PDF files using Aspose.Pdf.Facades.PdfFileEditor while copying... |
-| [concatenate-pdfs-using-streams](./concatenate-pdfs-using-streams.cs) | Concatenate PDFs Using Streams | `PdfFileEditor`, `Concatenate`, `CloseConcatenatedStreams` | Shows how to merge multiple PDF files into a single PDF by passing input and output streams to As... |
-| [concatenate-pdfs-with-blank-pages](./concatenate-pdfs-with-blank-pages.cs) | Concatenate PDFs with Blank Page Separator | `Document`, `PdfFileEditor`, `Add` | Demonstrates how to merge multiple PDF files using Aspose.Pdf while automatically inserting a bla... |
-| [concatenate-pdfs-with-blank-separator](./concatenate-pdfs-with-blank-separator.cs) | Concatenate PDFs with Blank Separator Pages | `Document`, `PdfFileEditor`, `Add` | Shows how to create a one‑page blank PDF and insert it between multiple PDF documents while conca... |
-| [concatenate-split-pdfs](./concatenate-split-pdfs.cs) | Concatenate Split PDFs into a Single Document | `PdfFileEditor`, `Insert`, `Document` | Shows how to merge a series of split PDF files into one PDF by iteratively inserting pages using ... |
-| [concatenate-three-pdfs-pdffileeditor](./concatenate-three-pdfs-pdffileeditor.cs) | Concatenate Three PDFs with PdfFileEditor | `PdfFileEditor`, `Concatenate` | Demonstrates merging three PDF files into a single document using Aspose.Pdf.Facades.PdfFileEdito... |
-| [concatenate-two-pdfs-using-pdffileeditor](./concatenate-two-pdfs-using-pdffileeditor.cs) | Concatenate Two PDFs Using PdfFileEditor | `PdfFileEditor`, `Concatenate` | Demonstrates how to merge two existing PDF files into a single PDF using Aspose.Pdf's PdfFileEdit... |
-| [create-2up-pdf-layout](./create-2up-pdf-layout.cs) | Create 2-up PDF Layout Using PdfFileEditor | `PdfFileEditor`, `MakeNUp` | Demonstrates how to use Aspose.Pdf.Facades.PdfFileEditor to combine two pages side‑by‑side into a... |
+| [concatenate-pdfs-from-zip](./concatenate-pdfs-from-zip.cs) | Concatenate PDFs from a ZIP Archive and Update the Archive | `PdfFileEditor`, `Concatenate`, `CloseConcatenatedStreams` | The example extracts all PDF files from a ZIP archive, merges them into a single PDF using Aspose... |
+| [concatenate-pdfs-preserve-metadata](./concatenate-pdfs-preserve-metadata.cs) | Concatenate PDFs While Preserving Original Metadata | `PdfFileInfo`, `PdfFileEditor`, `Concatenate` | Demonstrates how to merge multiple PDF files using Aspose.Pdf.Facades.PdfFileEditor and then copy... |
+| [concatenate-pdfs-using-stream-overloads](./concatenate-pdfs-using-stream-overloads.cs) | Concatenate PDFs Using Stream Overloads | `PdfFileEditor`, `Concatenate`, `CloseConcatenatedStreams` | Shows how to merge multiple PDF files into a single document by passing file streams to Aspose.Pd... |
+| [concatenate-pdfs-with-blank-pages](./concatenate-pdfs-with-blank-pages.cs) | Concatenate PDFs with Blank Pages | `Document`, `Add`, `Save` | Shows how to merge multiple PDF files into a single document while automatically inserting a blan... |
+| [concatenate-split-pdfs-insertpages](./concatenate-split-pdfs-insertpages.cs) | Concatenate Split PDFs Using InsertPages | `Document`, `Page`, `TextFragment` | Demonstrates how to merge multiple split PDF files into a single document by iteratively insertin... |
+| [concatenate-two-pdfs](./concatenate-two-pdfs.cs) | Concatenate Two PDFs into a New PDF | `PdfFileEditor`, `Concatenate` | Shows how to merge two existing PDF files into a single PDF document using the Aspose.Pdf.Facades... |
+| [create-2up-pdf-layout](./create-2up-pdf-layout.cs) | Create 2‑up PDF Layout with Aspose.PdfFileEditor | `PdfFileEditor`, `MakeNUp` | Demonstrates how to use Aspose.Pdf.Facades.PdfFileEditor to generate a 2‑up (two pages per sheet)... |
+| [create-4up-pdf-using-streams](./create-4up-pdf-using-streams.cs) | Create a 4‑up PDF using PdfFileEditor and streams | `PdfFileEditor`, `MakeNUp` | Demonstrates applying a 4‑up (2 × 2) layout to a PDF via the PdfFileEditor.MakeNUp stream overloa... |
 | [create-a-function-that-generates-a-booklet-using-l...](./create-a-function-that-generates-a-booklet-using-left-pages-from-the-first-half-of-the-source-pdf.cs) | Create A Function That Generates A Booklet Using Left Pages ... | `PdfFileEditor` | Create A Function That Generates A Booklet Using Left Pages From The First Half Of The Source Pdf |
-| [create-booklet-a5-page-size](./create-booklet-a5-page-size.cs) | Create Booklet with Custom A5 Page Size | `PdfFileEditor`, `MakeBooklet`, `PageSize` | Demonstrates how to generate a booklet PDF with A5 page dimensions from an existing PDF using Asp... |
-| [create-booklet-custom-page-order](./create-booklet-custom-page-order.cs) | Create Booklet with Custom Left/Right Page Order | `Document`, `Page`, `TextFragment` | Demonstrates how to generate a simple PDF, define custom left and right page arrays, and use PdfF... |
-| [create-booklet-from-second-half-right-pages](./create-booklet-from-second-half-right-pages.cs) | Create Booklet from Second Half Right Pages | `Document`, `PdfFileEditor`, `MakeBooklet` | Shows how to generate a booklet PDF using only the right‑hand (odd) pages from the second half of... |
+| [create-booklet-a5-pdf](./create-booklet-a5-pdf.cs) | Create Booklet PDF with Custom A5 Page Size | `PdfFileEditor`, `MakeBooklet`, `PageSize` | Demonstrates how to generate a booklet from an existing PDF using the Aspose.Pdf.Facades.PdfFileE... |
+| [create-booklet-from-second-half-right-pages](./create-booklet-from-second-half-right-pages.cs) | Create Booklet from Second Half Right Pages | `Document`, `PdfFileEditor`, `MakeBooklet` | Shows how to generate a booklet PDF that includes only the odd‑numbered (right‑hand) pages from t... |
+| [create-booklet-left-odd-pages](./create-booklet-left-odd-pages.cs) | Create Booklet PDF with Left Pages as Odd Numbers | `Document`, `PdfFileEditor`, `MakeBooklet` | Shows how to use Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet to reorder pages and generate a boo... |
+| [create-booklet-pdf-custom-page-size](./create-booklet-pdf-custom-page-size.cs) | Create Booklet PDF with Custom Page Size Using Streams | `PdfFileEditor`, `MakeBooklet`, `PageSize` | Demonstrates how to generate a booklet PDF from an existing document using Aspose.Pdf's PdfFileEd... |
+| [create-booklet-pdf-custom-page-size__v2](./create-booklet-pdf-custom-page-size__v2.cs) | Create Booklet PDF with Custom Page Size | `PdfFileEditor`, `MakeBooklet`, `PageSize` | Demonstrates how to generate a booklet PDF from an existing PDF stream using a custom 5.5×8.5‑inc... |
+| [create-booklet-pdf-from-stream](./create-booklet-pdf-from-stream.cs) | Create Booklet PDF from Stream | `PdfFileEditor`, `MakeBooklet` | Shows how to use Aspose.Pdf.Facades to convert an input PDF stream into a booklet‑formatted PDF a... |
+| [create-booklet-pdf-left-right-pages](./create-booklet-pdf-left-right-pages.cs) | Create Booklet PDF with Custom Left/Right Page Order | `Document`, `Pages`, `Count` | Shows how to split a source PDF into odd (right‑hand) and even (left‑hand) page collections and g... |
+| [create-booklet-pdf-using-pdffileeditor](./create-booklet-pdf-using-pdffileeditor.cs) | Create Booklet PDF Using PdfFileEditor | `PdfFileEditor`, `MakeBooklet`, `Document` | Shows how to generate a booklet PDF from existing documents with Aspose.Pdf.Facades PdfFileEditor... |
+| [create-booklet-pdf-with-page-deletion](./create-booklet-pdf-with-page-deletion.cs) | Create Booklet PDF with Page Deletion and Resizing | `PdfFileEditor`, `Delete`, `ResizeContents` | Demonstrates how to delete specific pages, resize page contents, and convert a PDF into a booklet... |
 | ... | | | *and 71 more files* |
 
 ## Category Statistics
@@ -127,5 +129,5 @@ tool.Save("output.pdf");
 - Review code examples in this folder for facades-documents patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-07-05 | Run: `20260705_005655_3d29fa`
+Updated: 2026-07-17 | Run: `20260717_171638_da3b3e`
 <!-- AUTOGENERATED:END -->

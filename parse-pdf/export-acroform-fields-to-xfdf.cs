@@ -6,27 +6,26 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputXfdfPath = "output.xfdf";
+        const string inputPdf = "input.pdf";
+        const string outputXfdf = "output.xfdf";
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPdf))
         {
-            // Create a FileStream for the XFDF output
-            using (FileStream xfdfStream = new FileStream(outputXfdfPath, FileMode.Create, FileAccess.Write))
+            // Create a FileStream to write the XFDF data
+            using (FileStream xfdfStream = new FileStream(outputXfdf, FileMode.Create, FileAccess.Write))
             {
                 // Export all annotations (including AcroForm fields) to the XFDF stream
-                pdfDoc.ExportAnnotationsToXfdf(xfdfStream);
+                doc.ExportAnnotationsToXfdf(xfdfStream);
             }
         }
 
-        Console.WriteLine($"AcroForm fields exported to XFDF file: {outputXfdfPath}");
+        Console.WriteLine($"XFDF file created at '{outputXfdf}'.");
     }
 }

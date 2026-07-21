@@ -2,53 +2,61 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class ExportSelectedPages
+class Program
 {
     static void Main()
     {
         // Input PDF file
         const string inputPath = "input.pdf";
 
-        // Pages to export (1‑based indexing as required by Aspose.Pdf)
-        int[] pagesToExport = { 2, 4, 7 }; // example page numbers
+        // Directory where individual pages will be saved
+        const string outputDir = "ExportedPages";
 
-        // Verify input file exists
+        // Example list of pages to export (1‑based indexing)
+        int[] pagesToExport = { 1, 3, 5 };
+
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source document inside a using block for deterministic disposal
-        using (Document sourceDoc = new Document(inputPath))
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        try
         {
-            // Iterate over the requested page numbers
-            foreach (int pageNumber in pagesToExport)
+            // Load the source PDF (wrapped in using for deterministic disposal)
+            using (Document srcDoc = new Document(inputPath))
             {
-                // Validate page number range
-                if (pageNumber < 1 || pageNumber > sourceDoc.Pages.Count)
+                foreach (int pageNum in pagesToExport)
                 {
-                    Console.Error.WriteLine($"Page {pageNumber} is out of range. Skipping.");
-                    continue;
-                }
+                    // Validate page number (Aspose.Pdf uses 1‑based indexing)
+                    if (pageNum < 1 || pageNum > srcDoc.Pages.Count)
+                    {
+                        Console.Error.WriteLine($"Page {pageNum} is out of range.");
+                        continue;
+                    }
 
-                // Create a new empty document for the single page
-                using (Document singlePageDoc = new Document())
-                {
-                    // Add the selected page to the new document.
-                    // The page is copied preserving its size, rotation, and other attributes.
-                    singlePageDoc.Pages.Add(sourceDoc.Pages[pageNumber]);
+                    // Create a new document for the single page
+                    using (Document singleDoc = new Document())
+                    {
+                        // Add the selected page; this copies the page together with its size and orientation
+                        singleDoc.Pages.Add(srcDoc.Pages[pageNum]);
 
-                    // Build output file name (e.g., input_page_2.pdf)
-                    string outputPath = Path.Combine(
-                        Path.GetDirectoryName(inputPath) ?? string.Empty,
-                        $"{Path.GetFileNameWithoutExtension(inputPath)}_page_{pageNumber}.pdf");
+                        // Build the output file name
+                        string outPath = Path.Combine(outputDir, $"Page_{pageNum}.pdf");
 
-                    // Save the new document as PDF
-                    singlePageDoc.Save(outputPath);
-                    Console.WriteLine($"Exported page {pageNumber} to '{outputPath}'.");
+                        // Save the single‑page PDF
+                        singleDoc.Save(outPath);
+                        Console.WriteLine($"Saved page {pageNum} → {outPath}");
+                    }
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

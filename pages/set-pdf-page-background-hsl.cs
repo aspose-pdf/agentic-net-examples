@@ -5,43 +5,64 @@ class Program
 {
     static void Main()
     {
-        // Define HSL values (Hue: 0‑360, Saturation and Lightness: 0‑1)
-        double hue = 210;          // Example: a blue hue
-        double saturation = 0.75;  // 75% saturation
-        double lightness = 0.5;    // 50% lightness
-
-        // Convert HSL to RGB (components in 0‑1 range)
-        (double r, double g, double b) = HslToRgb(hue, saturation, lightness);
-
-        // Create a new PDF document and add a page
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            Page page = doc.Pages.Add();
+            // Add a blank page (1‑based indexing)
+            doc.Pages.Add();
 
-            // Set the page background color using the RGB values
-            page.Background = Color.FromRgb(r, g, b);
+            // Define HSL values (Hue: 0‑360, Saturation and Lightness: 0‑1)
+            double hue = 210.0;        // Example: blue hue
+            double saturation = 0.75;  // 75% saturation
+            double lightness = 0.60;   // 60% lightness
 
-            // Save the result
-            doc.Save("page_with_hsl_background.pdf");
+            // Convert HSL to Aspose.Pdf.Color (RGB conversion)
+            Aspose.Pdf.Color pageBg = ColorFromHsl(hue, saturation, lightness);
+
+            // Set the background color of the first page
+            doc.Pages[1].Background = pageBg;
+
+            // Save the PDF
+            string outputPath = "PageWithHslBackground.pdf";
+            doc.Save(outputPath);
+            Console.WriteLine($"PDF saved to '{outputPath}' with HSL background color.");
         }
     }
 
-    // Converts HSL to RGB where each component is in the range 0..1
-    static (double r, double g, double b) HslToRgb(double h, double s, double l)
+    // Helper method to convert HSL to Aspose.Pdf.Color (RGB based)
+    private static Aspose.Pdf.Color ColorFromHsl(double h, double s, double l)
     {
-        h = h % 360;
-        double c = (1 - Math.Abs(2 * l - 1)) * s;
-        double x = c * (1 - Math.Abs((h / 60) % 2 - 1));
-        double m = l - c / 2;
+        // Normalize hue to [0,1]
+        h = (h % 360 + 360) % 360; // ensure positive
+        h /= 360.0;
 
-        double r1 = 0, g1 = 0, b1 = 0;
-        if (h < 60) { r1 = c; g1 = x; b1 = 0; }
-        else if (h < 120) { r1 = x; g1 = c; b1 = 0; }
-        else if (h < 180) { r1 = 0; g1 = c; b1 = x; }
-        else if (h < 240) { r1 = 0; g1 = x; b1 = c; }
-        else if (h < 300) { r1 = x; g1 = 0; b1 = c; }
-        else { r1 = c; g1 = 0; b1 = x; }
+        double r, g, b;
 
-        return (r1 + m, g1 + m, b1 + m);
+        if (Math.Abs(s) < 0.000001)
+        {
+            // Achromatic (grey)
+            r = g = b = l;
+        }
+        else
+        {
+            double q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            double p = 2 * l - q;
+            r = HueToRgb(p, q, h + 1.0 / 3.0);
+            g = HueToRgb(p, q, h);
+            b = HueToRgb(p, q, h - 1.0 / 3.0);
+        }
+
+        // r, g, b are already in the 0‑1 range, pass them directly to Aspose.Pdf.Color
+        return Aspose.Pdf.Color.FromRgb(r, g, b);
+    }
+
+    private static double HueToRgb(double p, double q, double t)
+    {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1.0 / 6.0) return p + (q - p) * 6 * t;
+        if (t < 1.0 / 2.0) return q;
+        if (t < 2.0 / 3.0) return p + (q - p) * (2.0 / 3.0 - t) * 6;
+        return p;
     }
 }

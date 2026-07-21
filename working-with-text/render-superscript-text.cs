@@ -1,38 +1,38 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Operators;
 using Aspose.Pdf.Text;
 
-class SuperscriptExample
+class Program
 {
     static void Main()
     {
+        const string outputPath = "superscript.pdf";
+
         // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page to the document
+            // Add a single page
             Page page = doc.Pages.Add();
 
-            // ----- Normal baseline text -----
+            // Add normal text "E = mc"
             TextFragment normal = new TextFragment("E = mc");
-            normal.TextState.FontSize = 12;               // regular size
-            normal.TextState.Font = FontRepository.FindFont("Helvetica");
+            normal.TextState.FontSize = 12;               // regular font size
             page.Paragraphs.Add(normal);
 
-            // ----- Superscript text ("2") -----
-            TextFragment superscript = new TextFragment("2");
-            superscript.TextState.FontSize = 8;            // smaller than baseline
-            superscript.TextState.Font = FontRepository.FindFont("Helvetica");
-            // Raise the text relative to the baseline by enabling superscript
-            superscript.TextState.Superscript = true;
-            // Alternatively, you could set a manual rise using the SetTextRise operator:
-            // page.Operators.Add(new SetTextRise(4)); // positive rise value
-            // page.Paragraphs.Add(superscript);
-            page.Paragraphs.Add(superscript);
+            // Insert a superscript "2" by raising the text baseline
+            // Set a positive rise (e.g., 5 points) to move the text upward
+            page.Contents.Add(new SetTextRise(5));
+            // Show the superscript character
+            page.Contents.Add(new ShowText("2"));
+            // Reset the rise back to baseline for subsequent text
+            page.Contents.Add(new SetTextRise(0));
 
-            // Save the PDF to disk
-            doc.Save("superscript_output.pdf");
+            // Save the document (no explicit SaveOptions needed for PDF output)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with superscript text created successfully.");
+        Console.WriteLine($"Superscript PDF saved to '{outputPath}'.");
     }
 }

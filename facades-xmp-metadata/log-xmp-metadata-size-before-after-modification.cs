@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_modified.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,27 +16,27 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document within a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the XMP metadata facade bound to the loaded document
+            // Initialize the XMP metadata facade bound to the document
             PdfXmpMetadata xmp = new PdfXmpMetadata(doc);
 
-            // Retrieve the original XMP metadata as a byte array and log its size
+            // Retrieve original XMP metadata and log its size
             byte[] originalData = xmp.GetXmpMetadata();
             Console.WriteLine($"Original XMP size: {originalData.Length} bytes");
 
-            // Modify the XMP metadata – add a custom property (key/value pair)
-            xmp.Add("custom:Modified", "true");
+            // Modify the XMP metadata (add a custom field)
+            xmp.Add("my:customField", "CustomValue");
 
-            // Retrieve the modified XMP metadata and log its new size
+            // Retrieve modified XMP metadata and log its size
             byte[] modifiedData = xmp.GetXmpMetadata();
             Console.WriteLine($"Modified XMP size: {modifiedData.Length} bytes");
 
-            // Save the updated PDF document (persisting XMP changes)
+            // Save the updated PDF (XMP changes are persisted)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

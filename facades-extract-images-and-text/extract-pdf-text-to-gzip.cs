@@ -7,38 +7,33 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string pdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputGz = "output.txt.gz";
 
-        // Output GZip file path (compressed text)
-        const string gzipPath = "output.txt.gz";
-
-        // Ensure the input file exists
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Use PdfExtractor facade to extract text from the PDF
+        // Initialize the PDF extractor facade
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF document to the extractor
-            extractor.BindPdf(pdfPath);
+            // Bind the source PDF file
+            extractor.BindPdf(inputPdf);
 
-            // Perform text extraction (Unicode encoding by default)
+            // Extract all text using Unicode encoding
             extractor.ExtractText();
 
-            // Create the output file stream for the compressed data
-            using (FileStream fileStream = new FileStream(gzipPath, FileMode.Create, FileAccess.Write))
-            // Wrap the file stream with GZipStream for compression
-            using (GZipStream gzipStream = new GZipStream(fileStream, CompressionMode.Compress))
+            // Create the output file stream and wrap it with GZip compression
+            using (FileStream fileStream = new FileStream(outputGz, FileMode.Create, FileAccess.Write))
+            using (GZipStream gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal))
             {
-                // Write the extracted text directly into the GZip stream
+                // Write the extracted text directly into the compressed stream
                 extractor.GetText(gzipStream);
             }
         }
 
-        Console.WriteLine($"Text extracted and compressed to: {gzipPath}");
+        Console.WriteLine($"Extracted text saved to compressed file: {outputGz}");
     }
 }

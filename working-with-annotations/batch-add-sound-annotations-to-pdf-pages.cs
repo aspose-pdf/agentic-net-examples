@@ -7,45 +7,69 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_sound.pdf";
+        // Input PDF and output PDF paths
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output_with_sound_annotations.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Assume audio files are named audio1.wav, audio2.wav, ... in the same directory as the executable
-        using (Document doc = new Document(inputPath))
+        // Prepare an array of audio files – one per page.
+        // Adjust the paths/names as needed for your environment.
+        string[] audioFiles = new string[]
         {
-            // Iterate pages using 1‑based indexing
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            "audio_page1.wav",
+            "audio_page2.wav",
+            "audio_page3.wav",
+            // Add more entries if the PDF has more pages
+        };
+
+        try
+        {
+            // Load the existing PDF document (lifecycle rule: use Document constructor)
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                Page page = doc.Pages[i];
+                int pageCount = pdfDoc.Pages.Count; // 1‑based indexing (global rule)
 
-                // Define the annotation rectangle (left, bottom, right, top)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 150, 550);
-
-                // Build the audio file name for the current page
-                string audioFile = $"audio{i}.wav";
-
-                if (!File.Exists(audioFile))
+                // Ensure we have an audio file for each page
+                if (audioFiles.Length < pageCount)
                 {
-                    Console.Error.WriteLine($"Audio file not found for page {i}: {audioFile}");
-                    continue; // Skip this page if the audio file is missing
+                    Console.Error.WriteLine("Not enough audio files supplied for the number of pages.");
+                    return;
                 }
 
-                // Create the sound annotation and add it to the page
-                SoundAnnotation soundAnn = new SoundAnnotation(page, rect, audioFile);
-                soundAnn.Icon = SoundIcon.Speaker; // Optional: set the icon displayed on the page
-                page.Annotations.Add(soundAnn);
+                // Iterate over each page and add a SoundAnnotation
+                for (int i = 1; i <= pageCount; i++)
+                {
+                    Page page = pdfDoc.Pages[i];
+
+                    // Define the annotation rectangle (left, bottom, right, top)
+                    // Adjust coordinates as needed.
+                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 120, 120);
+
+                    // Create the SoundAnnotation using the constructor (page, rect, soundFile)
+                    SoundAnnotation soundAnn = new SoundAnnotation(page, rect, audioFiles[i - 1]);
+
+                    // Optional: set an icon (Speaker or Mic) – default is Speaker
+                    // soundAnn.Icon = SoundIcon.Mic;
+
+                    // Add the annotation to the page's annotation collection
+                    page.Annotations.Add(soundAnn);
+                }
+
+                // Save the modified PDF (lifecycle rule: use Document.Save)
+                pdfDoc.Save(outputPdfPath);
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF with sound annotations saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Saved PDF with sound annotations to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

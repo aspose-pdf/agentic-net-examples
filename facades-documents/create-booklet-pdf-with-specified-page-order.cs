@@ -12,7 +12,7 @@ class Program
         const string outputPath = "booklet.pdf";
 
         // Define left and right page sequences for the booklet
-        int[] leftPages = new int[] { 1, 2, 3, 4, 5 };
+        int[] leftPages  = new int[] { 1, 2, 3, 4, 5 };
         int[] rightPages = new int[] { 6, 7, 8, 9, 10 };
 
         // Verify that the input file exists
@@ -28,12 +28,8 @@ class Program
 
         // Report the outcome
         if (result)
-        {
-            Console.WriteLine($"Booklet successfully created at '{outputPath}'.");
-        }
+            Console.WriteLine($"Booklet created successfully: {outputPath}");
         else
-        {
             Console.Error.WriteLine("Failed to create booklet.");
-        }
     }
 }

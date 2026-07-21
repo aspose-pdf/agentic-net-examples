@@ -3,48 +3,47 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Vector;
 
-class Program
+class BatchVectorGraphicsExtractor
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Input directory containing PDF files (first argument or default)
-        string inputDirectory = args.Length > 0 ? args[0] : "InputPdfs";
-        // Output root directory where extracted SVGs will be stored (second argument or default)
-        string outputRoot = args.Length > 1 ? args[1] : "ExtractedVectorGraphics";
+        // Directory containing the source PDF files
+        const string inputDirectory = @"C:\PdfInput";
 
-        // Ensure the output root exists
-        Directory.CreateDirectory(outputRoot);
+        // Base directory where extracted SVGs will be stored
+        const string outputBaseDirectory = @"C:\PdfVectorGraphics";
 
-        // Verify that the input directory exists before trying to enumerate files
-        if (!Directory.Exists(inputDirectory))
-        {
-            Console.WriteLine($"Input directory '{inputDirectory}' does not exist. No PDFs to process.");
-            return;
-        }
+        // Ensure the output base directory exists
+        Directory.CreateDirectory(outputBaseDirectory);
 
         // Process each PDF file in the input directory
         foreach (string pdfPath in Directory.GetFiles(inputDirectory, "*.pdf"))
         {
-            // Create a dedicated folder for this PDF (named after the file without extension)
+            // Folder name based on the PDF file name (without extension)
             string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
-            string pdfOutputFolder = Path.Combine(outputRoot, pdfName);
+            string pdfOutputFolder = Path.Combine(outputBaseDirectory, pdfName);
             Directory.CreateDirectory(pdfOutputFolder);
 
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document document = new Document(pdfPath))
+            // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+            using (Document doc = new Document(pdfPath))
             {
-                // Iterate pages using 1‑based indexing as required by Aspose.Pdf
-                for (int pageIndex = 1; pageIndex <= document.Pages.Count; pageIndex++)
+                // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
                 {
-                    Page page = document.Pages[pageIndex];
+                    Page page = doc.Pages[pageIndex];
 
-                    // Create a sub‑folder for each page's extracted graphics
-                    string pageFolder = Path.Combine(pdfOutputFolder, $"Page_{pageIndex}");
-                    Directory.CreateDirectory(pageFolder);
+                    // Check if the page contains vector graphics
+                    if (page.HasVectorGraphics())
+                    {
+                        // Create a sub‑folder for this page's SVG files
+                        string pageFolder = Path.Combine(pdfOutputFolder, $"Page_{pageIndex}");
+                        Directory.CreateDirectory(pageFolder);
 
-                    // Use SvgExtractor to extract all vector graphics from the page into files
-                    SvgExtractor extractor = new SvgExtractor();
-                    extractor.Extract(page, pageFolder);
+                        // Extract all vector graphics on the page to separate SVG files
+                        // SvgExtractor.Extract(Page, string) writes one SVG file per graphic element
+                        SvgExtractor extractor = new SvgExtractor();
+                        extractor.Extract(page, pageFolder);
+                    }
                 }
             }
 

@@ -3,27 +3,25 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_datefield.pdf";
+        const string outputPath = "output_with_date.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF inside a using block for proper disposal
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle where the date field will appear (left, bottom, width, height)
-            // Fully qualify to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 250, 730);
+            // Define the rectangle where the date field will appear (coordinates are in points)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
             // Create a DateField on the first page
             DateField dateField = new DateField(doc.Pages[1], rect);
@@ -31,12 +29,15 @@ class Program
             // Set the display format for the date and time
             dateField.DateFormat = "dd/MM/yyyy HH:mm:ss";
 
-            // Add JavaScript that updates the field value each time the PDF is opened
-            // The script uses util.printd to format the current date/time
-            string js = "event.value = util.printd('dd/mm/yyyy HH:MM:ss', new Date());";
-            dateField.ExecuteFieldJavaScript(new JavascriptAction(js));
+            // Initialize the field with the current date and time
+            dateField.Value = DateTime.Now;
 
-            // Add the field to the document's form collection
+            // Add JavaScript that updates the field each time the document is opened or the field is viewed
+            dateField.ExecuteFieldJavaScript(
+                new JavascriptAction("event.value = new Date().toLocaleString();")
+            );
+
+            // Add the field to the document's form
             doc.Form.Add(dateField);
 
             // Save the modified PDF

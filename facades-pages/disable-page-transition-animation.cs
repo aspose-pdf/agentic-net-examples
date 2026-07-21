@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,25 +16,22 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF into the page editor
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Create a PdfPageEditor bound to the loaded document
-            PdfPageEditor editor = new PdfPageEditor(doc);
+            editor.BindPdf(inputPath);
 
-            // Specify that only page 6 should be processed (pages are 1‑based)
+            // Edit only page 6 (1‑based indexing)
             editor.ProcessPages = new int[] { 6 };
 
-            // Set the transition duration to zero seconds to disable animation
+            // Disable transition animation by setting duration to zero seconds
             editor.TransitionDuration = 0;
 
-            // Apply the changes to the document
+            // Apply the changes and save the result
             editor.ApplyChanges();
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Transition duration disabled for page 6. Saved to '{outputPath}'.");
+        Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
     }
 }

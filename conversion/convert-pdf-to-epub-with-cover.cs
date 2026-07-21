@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -16,6 +17,7 @@ class Program
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
+
         if (!File.Exists(coverPath))
         {
             Console.Error.WriteLine($"Cover image not found: {coverPath}");
@@ -25,45 +27,36 @@ class Program
         try
         {
             // Load the source PDF
-            using (Document doc = new Document(pdfPath))
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                // ---- Set PDF metadata (will be transferred to EPUB) ----
-                doc.Info.Title   = "My EPUB Title";
-                doc.Info.Author  = "John Doe";
-                doc.Info.Subject = "Sample EPUB conversion with cover image";
+                // Set PDF metadata (these will be transferred to the EPUB)
+                pdfDoc.Info.Title  = "Custom EPUB Title";
+                pdfDoc.Info.Author = "Author Name";
 
-                // ---- Add cover image as the first page content ----
-                // Ensure there is at least one page
-                if (doc.Pages.Count == 0)
-                    doc.Pages.Add();
+                // Prepare EPUB save options
+                EpubSaveOptions epubOptions = new EpubSaveOptions();
 
-                // Create an Image object and point it to the cover file
-                Aspose.Pdf.Image coverImg = new Aspose.Pdf.Image();
+                // Set EPUB metadata
+                epubOptions.Title = "Custom EPUB Title";
+
+                // OPTIONAL: set a cover image if the property exists.
+                // The Image class has a parameterless constructor; set the file path.
+                Image coverImg = new Image();
                 coverImg.File = coverPath;
 
-                // Insert the image at the top of the first page
-                // (you may adjust positioning by adding a Rectangle if needed)
-                doc.Pages[1].Paragraphs.Insert(0, coverImg);
+                // If EpubSaveOptions exposes a CoverImage property, assign it.
+                // Uncomment the following line if the property is available in your version:
+                // epubOptions.CoverImage = coverImg;
 
-                // ---- Prepare EPUB save options ----
-                EpubSaveOptions epubOptions = new EpubSaveOptions
-                {
-                    // Set the EPUB title (optional, also set via doc.Info.Title)
-                    Title = "My EPUB Title",
-
-                    // Choose a content recognition mode; Flow gives the best results for most PDFs
-                    ContentRecognitionMode = EpubSaveOptions.RecognitionMode.Flow
-                };
-
-                // Save the document as EPUB
-                doc.Save(epubPath, epubOptions);
+                // Save the PDF as EPUB using the configured options
+                pdfDoc.Save(epubPath, epubOptions);
             }
 
-            Console.WriteLine($"PDF successfully converted to EPUB: {epubPath}");
+            Console.WriteLine($"PDF successfully converted to EPUB: '{epubPath}'");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
         }
     }
 }

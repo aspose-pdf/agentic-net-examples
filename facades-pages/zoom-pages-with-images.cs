@@ -10,56 +10,54 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output_zoomed.pdf";
-        const float zoomFactor  = 0.5f; // 50% zoom
+        const float zoomFactor = 1.5f; // 150% zoom for pages that contain images
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Collect page numbers that contain at least one image
-        List<int> pagesWithImages = new List<int>();
-
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Collect page numbers (1‑based) that contain at least one image
+            List<int> pagesWithImages = new List<int>();
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Absorb image placements on the current page
-                ImagePlacementAbsorber imgAbsorber = new ImagePlacementAbsorber();
-                doc.Pages[pageNum].Accept(imgAbsorber);
-
-                // If any image is found, remember this page number
-                if (imgAbsorber.ImagePlacements.Count > 0)
+                Page page = doc.Pages[i];
+                if (page.Resources.Images.Count > 0)
                 {
-                    pagesWithImages.Add(pageNum);
+                    pagesWithImages.Add(i);
                 }
             }
-        }
 
-        // If no pages contain images, simply copy the source file
-        if (pagesWithImages.Count == 0)
-        {
-            File.Copy(inputPath, outputPath, true);
-            Console.WriteLine("No images found – source PDF copied unchanged.");
-            return;
-        }
+            // If no pages contain images, just save the original document
+            if (pagesWithImages.Count == 0)
+            {
+                Console.WriteLine("No images found in the document. Saving unchanged file.");
+                doc.Save(outputPath);
+                return;
+            }
 
-        // Apply zoom only to the identified pages using PdfPageEditor
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            // Bind the original PDF file
-            editor.BindPdf(inputPath);
+            // Apply zoom only to the identified pages using PdfPageEditor (Facade API)
+            using (PdfPageEditor editor = new PdfPageEditor())
+            {
+                // Bind the already loaded Document instance
+                editor.BindPdf(doc);
 
-            // Restrict editing to pages that have images
-            editor.ProcessPages = pagesWithImages.ToArray();
+                // Specify which pages to edit
+                editor.ProcessPages = pagesWithImages.ToArray();
 
-            // Set the desired zoom factor (1.0 = 100%)
-            editor.Zoom = zoomFactor;
+                // Set the desired zoom coefficient (1.0 = 100%)
+                editor.Zoom = zoomFactor;
 
-            // Apply the changes and save the result
-            editor.ApplyChanges();
-            editor.Save(outputPath);
+                // Apply the changes to the document
+                editor.ApplyChanges();
+            }
+
+            // Save the modified document
+            doc.Save(outputPath);
         }
 
         Console.WriteLine($"Zoom applied to pages with images. Output saved to '{outputPath}'.");

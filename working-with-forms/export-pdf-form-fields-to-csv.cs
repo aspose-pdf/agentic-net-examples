@@ -1,91 +1,73 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Text.Json;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string csvPath = "output.csv";
+        const string inputPath = "input.pdf";
+        const string csvPath   = "form_fields.csv";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle: load within using)
-        using (Document doc = new Document(pdfPath))
+        try
         {
-            // Export form fields to JSON using a memory stream
-            using (MemoryStream jsonStream = new MemoryStream())
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                doc.Form.ExportToJson(jsonStream);
-                jsonStream.Position = 0;
-
-                using (StreamReader reader = new StreamReader(jsonStream))
+                // If the document has no form fields, exit early
+                if (doc.Form == null || doc.Form.Count == 0)
                 {
-                    string json = reader.ReadToEnd();
-                    WriteCsvFromJson(json, csvPath);
+                    Console.WriteLine("No form fields found in the PDF.");
+                    return;
                 }
+
+                // Create (or overwrite) the CSV file
+                using (StreamWriter writer = new StreamWriter(csvPath, false))
+                {
+                    // Write CSV header line
+                    writer.WriteLine("Name,FullName,PartialName,Value,FieldType,ReadOnly,Required");
+
+                    // Iterate over each form field (Field is the base class for all AcroForm fields)
+                    foreach (Field field in doc.Form)
+                    {
+                        // Gather required properties; use null‑coalescing for optional values
+                        string name       = EscapeCsv(field.Name);
+                        string fullName   = EscapeCsv(field.FullName);
+                        string partial    = EscapeCsv(field.PartialName);
+                        string value      = EscapeCsv(field.Value?.ToString() ?? string.Empty);
+                        string fieldType  = EscapeCsv(field.GetType().Name);
+                        string readOnly   = field.ReadOnly ? "True" : "False";
+                        string required   = field.Required ? "True" : "False";
+
+                        // Write a single CSV record
+                        writer.WriteLine($"{name},{fullName},{partial},{value},{fieldType},{readOnly},{required}");
+                    }
+                }
+
+                Console.WriteLine($"Form fields exported to '{csvPath}'.");
             }
         }
-
-        Console.WriteLine($"CSV saved to '{csvPath}'.");
-    }
-
-    // Parses the JSON exported by Aspose.Pdf and writes a simple CSV file
-    static void WriteCsvFromJson(string json, string csvPath)
-    {
-        using (JsonDocument doc = JsonDocument.Parse(json))
+        catch (Exception ex)
         {
-            JsonElement root = doc.RootElement;
-            if (root.ValueKind != JsonValueKind.Array)
-            {
-                Console.Error.WriteLine("Unexpected JSON format: root element is not an array.");
-                return;
-            }
-
-            var fieldNames = new List<string>();
-            var fieldValues = new List<string>();
-
-            foreach (JsonElement element in root.EnumerateArray())
-            {
-                // Aspose.Pdf typically uses "FullName" for the field name and "Value" for its content
-                string name = element.GetProperty("FullName").GetString() ?? string.Empty;
-                string value = element.GetProperty("Value").GetString() ?? string.Empty;
-
-                fieldNames.Add(name);
-                fieldValues.Add(value);
-            }
-
-            // Write CSV (lifecycle: save using StreamWriter)
-            using (StreamWriter writer = new StreamWriter(csvPath, false, Encoding.UTF8))
-            {
-                writer.WriteLine(string.Join(",", EscapeCsv(fieldNames)));
-                writer.WriteLine(string.Join(",", EscapeCsv(fieldValues)));
-            }
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 
-    // Escapes CSV fields according to RFC 4180
-    static IEnumerable<string> EscapeCsv(IEnumerable<string> fields)
+    // Helper to escape commas, quotes and line breaks according to CSV rules
+    static string EscapeCsv(string input)
     {
-        foreach (var field in fields)
+        if (input.Contains("\"") || input.Contains(",") || input.Contains("\n") || input.Contains("\r"))
         {
-            if (field.Contains(",") || field.Contains("\"") || field.Contains("\n"))
-            {
-                string escaped = field.Replace("\"", "\"\"");
-                yield return $"\"{escaped}\"";
-            }
-            else
-            {
-                yield return field;
-            }
+            string escaped = input.Replace("\"", "\"\"");
+            return $"\"{escaped}\"";
         }
+        return input;
     }
 }

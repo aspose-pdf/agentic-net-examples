@@ -2,56 +2,48 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class PdfSplitter
+class Program
 {
-    // Splits a PDF file into individual pages and returns an array of MemoryStream,
-    // each stream contains a single‑page PDF document.
-    public static MemoryStream[] SplitPdfToPages(string inputPdfPath)
-    {
-        if (!File.Exists(inputPdfPath))
-            throw new FileNotFoundException($"Input PDF not found: {inputPdfPath}");
-
-        // Open the source PDF as a read‑only stream.
-        using (FileStream inputStream = new FileStream(inputPdfPath, FileMode.Open, FileAccess.Read))
-        {
-            // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly.
-            PdfFileEditor editor = new PdfFileEditor();
-
-            // SplitToPages returns an array of MemoryStream, each representing one page.
-            MemoryStream[] pageStreams = editor.SplitToPages(inputStream);
-
-            // The input stream is closed by the using block; the returned MemoryStreams remain open.
-            return pageStreams;
-        }
-    }
-
-    // Example usage.
     static void Main()
     {
-        const string sourcePdf = "sample.pdf";
+        const string inputPath = "input.pdf";
+        const string outputDir = "SplitPages";
 
-        try
+        // Verify the source PDF exists
+        if (!File.Exists(inputPath))
         {
-            MemoryStream[] pages = SplitPdfToPages(sourcePdf);
-            Console.WriteLine($"PDF split into {pages.Length} pages.");
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Optionally save each page to a separate file for verification.
-            for (int i = 0; i < pages.Length; i++)
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Open the source PDF as a read‑only stream
+        using (FileStream sourceStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
+        {
+            // PdfFileEditor provides the SplitToPages method that returns an array of MemoryStream,
+            // each containing a single‑page PDF document.
+            PdfFileEditor editor = new PdfFileEditor();
+            MemoryStream[] pageStreams = editor.SplitToPages(sourceStream);
+
+            // Iterate over the returned streams and write each page to a separate file.
+            for (int i = 0; i < pageStreams.Length; i++)
             {
-                string outPath = $"page_{i + 1}.pdf";
+                // Reset the position to the beginning before copying.
+                pageStreams[i].Position = 0;
+
+                string outPath = Path.Combine(outputDir, $"page_{i + 1}.pdf");
                 using (FileStream outFile = new FileStream(outPath, FileMode.Create, FileAccess.Write))
                 {
-                    pages[i].WriteTo(outFile);
+                    pageStreams[i].CopyTo(outFile);
                 }
 
-                // Reset position if the stream will be reused later.
-                pages[i].Position = 0;
+                // Dispose the individual page stream after it has been saved.
+                pageStreams[i].Dispose();
+
                 Console.WriteLine($"Saved page {i + 1} to {outPath}");
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

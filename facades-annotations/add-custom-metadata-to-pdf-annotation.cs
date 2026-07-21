@@ -17,56 +17,55 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: wrap in using)
+        // Load the PDF document (lifecycle rule: use using)
         using (Document doc = new Document(inputPath))
         {
             // -----------------------------------------------------------------
-            // 1. Create a new TextAnnotation on the first page
+            // 1. Add a new TextAnnotation with a unique name
             // -----------------------------------------------------------------
-            Page page = doc.Pages[1]; // 1‑based indexing (global rule)
             // Fully qualified rectangle to avoid ambiguity
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-            TextAnnotation txtAnn = new TextAnnotation(page, rect)
+            TextAnnotation txtAnn = new TextAnnotation(doc.Pages[1], rect)
             {
-                Title    = "Note",
+                Name     = "CustomMetaAnn",          // unique identifier
+                Title    = "Note Title",
                 Contents = "This annotation carries custom metadata.",
-                Color    = Aspose.Pdf.Color.Yellow,
-                // Use the Name property to identify the annotation later
-                Name     = "CustomMetaAnn"
+                // Use the Subject property to store a custom key/value pair
+                Subject  = "CustomKey=CustomValue"
             };
             // Add the annotation to the page
-            page.Annotations.Add(txtAnn);
+            doc.Pages[1].Annotations.Add(txtAnn);
 
             // -----------------------------------------------------------------
-            // 2. Extend the annotation dictionary with custom metadata.
-            //    Aspose.Pdf does not expose a direct dictionary API for annotations,
-            //    but the Subject field can be used to store arbitrary key/value data.
-            //    Here we store a JSON string as an example.
-            // -----------------------------------------------------------------
-            string customMetaJson = "{\"Author\":\"John Doe\",\"ReviewStatus\":\"Approved\"}";
-
-            // Prepare a temporary annotation containing only the fields we want to modify.
-            // The Name must match the existing annotation's Name.
-            TextAnnotation modifyAnn = new TextAnnotation(page, rect)
-            {
-                Name    = txtAnn.Name,   // target annotation
-                Subject = customMetaJson // custom metadata stored in Subject
-            };
-
-            // -----------------------------------------------------------------
-            // 3. Use PdfAnnotationEditor (Facades API) to modify the annotation.
+            // 2. Use PdfAnnotationEditor to modify the annotation dictionary
+            //    (the editor works with the underlying PDF structure)
             // -----------------------------------------------------------------
             using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                // Bind the same document instance to the editor.
+                // Bind the same document instance to the editor
                 editor.BindPdf(doc);
-                // Modify the annotation on page 1 (page range: 1 to 1).
-                editor.ModifyAnnotations(1, 1, modifyAnn);
+                // Modify the annotation on page 1 (page indexes are 1‑based)
+                // The editor will update the fields present in the provided annotation object.
+                editor.ModifyAnnotations(1, 1, txtAnn);
+                // No explicit close needed; using will dispose.
             }
 
             // -----------------------------------------------------------------
-            // 4. Save the updated PDF (lifecycle rule: save inside using)
+            // 3. Add custom document‑level metadata (optional, demonstrates Facades usage)
             // -----------------------------------------------------------------
+            using (PdfFileInfo fileInfo = new PdfFileInfo())
+            {
+                fileInfo.BindPdf(doc);
+                fileInfo.SetMetaInfo("CustomDocMeta", "DocMetaValue");
+                // Save changes to the same document instance
+                fileInfo.SaveNewInfo(outputPath);
+            }
+
+            // -----------------------------------------------------------------
+            // 4. Save the modified PDF (lifecycle rule: save inside using)
+            // -----------------------------------------------------------------
+            // If the document was already saved via PdfFileInfo, this call will
+            // simply write any remaining changes.
             doc.Save(outputPath);
         }
 

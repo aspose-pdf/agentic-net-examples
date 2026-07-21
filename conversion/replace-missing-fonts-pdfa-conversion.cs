@@ -7,9 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_pdfa.pdf";
-        const string conversionLog = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -20,18 +19,35 @@ class Program
         // Load the source PDF
         using (Document doc = new Document(inputPath))
         {
-            // ---------------------------------------------------------------
-            // Configure font substitution: replace missing fonts with fallback fonts
-            // ---------------------------------------------------------------
-            // Example: if the source PDF uses "MissingFont", replace it with "Arial"
-            FontRepository.Substitutions.Add(
-                new SimpleFontSubstitution("MissingFont", "Arial"));
+            // -----------------------------------------------------------------
+            // Configure PDF/A conversion options
+            // -----------------------------------------------------------------
+            // Convert to PDF/A‑1B (you can choose another PDF/A level if required)
+            PdfFormatConversionOptions convOpts = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B)
+            {
+                // Enable default font substitution when embedding fails
+                FontEmbeddingOptions = { UseDefaultSubstitution = true },
 
-            // ---------------------------------------------------------------
-            // Convert to PDF/A-1B (PDF/A compliance) using Document.Convert overload
-            // ---------------------------------------------------------------
-            // The Convert method creates a conversion log and applies the required PDF/A rules.
-            doc.Convert(conversionLog, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+                // Optional: reduce file size by subsetting fonts
+                OptimizeFileSize = true
+            };
+
+            // -----------------------------------------------------------------
+            // Register fallback font substitutions
+            // -----------------------------------------------------------------
+            // Example: replace any missing "TimesNewRomanPSMT" with "Arial"
+            // Add as many SimpleFontSubstitution entries as needed.
+            FontRepository.Substitutions.Add(
+                new SimpleFontSubstitution("TimesNewRomanPSMT", "Arial", false));
+
+            // Example: replace any missing "Helvetica" with "LiberationSans"
+            FontRepository.Substitutions.Add(
+                new SimpleFontSubstitution("Helvetica", "LiberationSans", false));
+
+            // -----------------------------------------------------------------
+            // Perform the conversion
+            // -----------------------------------------------------------------
+            doc.Convert(convOpts);
 
             // Save the resulting PDF/A document
             doc.Save(outputPath);

@@ -1,46 +1,47 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // required for HtmlFragment (inherits from FormattedFragment)
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Paths for output PDF
+        const string outputPath = "HtmlFragmentWithCss.pdf";
+
+        // Create a new PDF document
         using (Document doc = new Document())
         {
             // Add a blank page to the document
             Page page = doc.Pages.Add();
 
-            // Define CSS rules to control font, color, and spacing
-            string css = @"
+            // Define HTML with embedded CSS to control font, color, and spacing
+            string htmlContent = @"
                 <style>
-                    p {
-                        font-family: Arial, Helvetica, sans-serif; /* Font */
-                        color: #003366;                           /* Text color */
-                        line-height: 1.6;                         /* Line spacing */
-                        margin-top: 12pt;                         /* Top margin */
-                        margin-bottom: 12pt;                      /* Bottom margin */
+                    .styledText {
+                        font-family: Arial, Helvetica, sans-serif;   /* Font */
+                        color: #0033CC;                               /* Text color */
+                        margin: 15px 0 10px 0;                        /* Top, right, bottom, left margins */
+                        line-height: 1.5;                             /* Line spacing */
                     }
-                </style>";
+                </style>
+                <div class='styledText'>
+                    This is a sample paragraph styled with embedded CSS.
+                </div>";
 
-            // HTML content that will be rendered using the above CSS
-            string htmlContent = $"{css}<p>This paragraph is styled with embedded CSS.</p>";
-
-            // Create an HtmlFragment with the combined CSS and HTML
+            // Create an HtmlFragment from the HTML string
             HtmlFragment htmlFragment = new HtmlFragment(htmlContent);
 
-            // Optionally, customize HtmlLoadOptions for this fragment (e.g., base path for resources)
-            // htmlFragment.HtmlLoadOptions = new HtmlLoadOptions { BasePath = "resources" };
+            // Optionally set horizontal alignment for the fragment (centered)
+            htmlFragment.HorizontalAlignment = HorizontalAlignment.Center;
 
             // Add the HtmlFragment to the page's paragraph collection
             page.Paragraphs.Add(htmlFragment);
 
-            // Save the resulting PDF
-            string outputPath = "StyledHtmlFragment.pdf";
+            // Save the PDF document
             doc.Save(outputPath);
-            Console.WriteLine($"PDF saved to '{outputPath}'.");
         }
+
+        Console.WriteLine($"PDF with styled HtmlFragment saved to '{outputPath}'.");
     }
 }

@@ -18,10 +18,10 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the AcroForm collection
+            // Access the AcroForm of the document
             Form form = doc.Form;
 
-            // Check if the document contains any form fields
+            // If the document contains no form fields, report it
             if (form.Count == 0)
             {
                 Console.WriteLine("No form fields found in the document.");
@@ -31,14 +31,15 @@ class Program
             // Enumerate all fields using the Fields property
             foreach (Field field in form.Fields)
             {
-                // The Name property holds the field's identifier
+                // Field.Name provides the field's partial name; FullName gives the qualified name
                 Console.WriteLine($"Field Name: {field.Name}");
             }
 
             // Alternative enumeration using the form's enumerator (commented out)
-            // foreach (WidgetAnnotation widget in form)
+            // var enumerator = form.GetEnumerator();
+            // while (enumerator.MoveNext())
             // {
-            //     if (widget is Field f)
+            //     if (enumerator.Current is Field f)
             //         Console.WriteLine($"Field Name: {f.Name}");
             // }
         }

@@ -1,51 +1,50 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // source PDF
-        const string outputPdf = "output.pdf";     // result PDF with background image
-        const string bgImage   = "background.png"; // background image file (any supported format)
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string imagePath  = "background.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(bgImage))
+        if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Background image not found: {bgImage}");
+            Console.Error.WriteLine($"Background image not found: {imagePath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Iterate over all pages
             foreach (Page page in doc.Pages)
             {
-                // Create an image stamp from the background image file
-                ImageStamp imgStamp = new ImageStamp(bgImage)
-                {
-                    // Place the stamp behind the page content
-                    Background = true,
-                    // Set opacity to 30 % (0.3)
-                    Opacity = 0.3
-                };
+                // Create a background artifact
+                BackgroundArtifact bgArtifact = new BackgroundArtifact();
 
-                // Apply the stamp to the current page
-                page.AddStamp(imgStamp);
+                // Set the background image (file path)
+                bgArtifact.SetImage(imagePath);
+
+                // Set opacity to 30% (0.3)
+                bgArtifact.Opacity = 0.3;
+
+                // Add the artifact to the page
+                page.Artifacts.Add(bgArtifact);
             }
 
-            // Save the modified document
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Background image added to all pages. Saved as '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with background image to '{outputPath}'.");
     }
 }

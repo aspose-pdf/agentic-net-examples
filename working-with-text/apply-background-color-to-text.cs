@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,29 +16,25 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a text fragment with the desired content
+            // Create a TextFragment with the desired text
             TextFragment fragment = new TextFragment("Highlighted text");
 
-            // Set the background color of the text via TextState
+            // Set the background color on the fragment's TextState BEFORE adding it to the page
             fragment.TextState.BackgroundColor = Aspose.Pdf.Color.Yellow;
 
-            // Optional: set additional text properties
-            fragment.TextState.FontSize = 14;
-            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
-
-            // Position the text on the page (coordinates are in points)
+            // Position the fragment on the page (coordinates are in points)
             fragment.Position = new Position(100, 700);
 
-            // Add the fragment to the first page of the document
+            // Add the fragment to the first page (pages are 1‑based)
             doc.Pages[1].Paragraphs.Add(fragment);
 
-            // Save the modified PDF
+            // Save the modified document (PDF format)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with background-colored text to '{outputPath}'.");
+        Console.WriteLine($"Document saved to '{outputPath}'.");
     }
 }

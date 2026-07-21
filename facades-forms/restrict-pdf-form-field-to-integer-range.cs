@@ -1,42 +1,43 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // PDF containing the "Score" field
-        const string outputPdf = "output.pdf";  // PDF after applying restrictions
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // FormEditor works with two files: source and destination.
-        // It implements IDisposable, so wrap it in a using block.
-        using (FormEditor formEditor = new FormEditor(inputPdf, outputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Limit the field to a maximum of 3 characters (enough for 0‑100).
-            // This also ensures only digits can be entered because the field is a NumberField.
+            // Initialize FormEditor on the loaded document
+            FormEditor formEditor = new FormEditor(doc);
+
+            // Limit the field to a maximum of 3 characters (enough for values 0‑100)
             formEditor.SetFieldLimit("Score", 3);
 
-            // Add JavaScript validation to enforce the numeric range 0‑100.
-            // The script runs when the field loses focus.
+            // Add JavaScript to enforce integer range 0‑100
             string js = @"
-                if (event.value < 0 || event.value > 100) {
-                    app.alert('Score must be between 0 and 100');
-                    event.rc = false; // reject the entered value
-                }
-            ";
+                var val = parseInt(event.value, 10);
+                if (isNaN(val) || val < 0 || val > 100) {
+                    app.alert('Score must be an integer between 0 and 100.');
+                    event.rc = false;
+                }";
             formEditor.AddFieldScript("Score", js);
 
-            // Persist changes to the output file.
-            formEditor.Save();
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Field \"Score\" configured and saved to '{outputPdf}'.");
+        Console.WriteLine($"Field 'Score' configured and saved to '{outputPath}'.");
     }
 }

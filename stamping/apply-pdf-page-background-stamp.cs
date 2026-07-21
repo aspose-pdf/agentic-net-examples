@@ -6,56 +6,52 @@ class Program
 {
     static void Main()
     {
-        // Paths for the target PDF, the PDF page to use as background, and the result.
-        const string targetPdfPath    = "target.pdf";
-        const string backgroundPdfPath = "background.pdf";
-        const string outputPdfPath    = "output.pdf";
+        const string targetPath = "target.pdf";          // PDF to be stamped
+        const string backgroundPath = "background.pdf"; // PDF containing the background page
+        const string outputPath = "stamped_output.pdf";
 
-        // Ensure input files exist.
-        if (!File.Exists(targetPdfPath))
+        if (!File.Exists(targetPath))
         {
-            Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
+            Console.Error.WriteLine($"Target PDF not found: {targetPath}");
             return;
         }
-        if (!File.Exists(backgroundPdfPath))
+        if (!File.Exists(backgroundPath))
         {
-            Console.Error.WriteLine($"Background PDF not found: {backgroundPdfPath}");
+            Console.Error.WriteLine($"Background PDF not found: {backgroundPath}");
             return;
         }
 
-        // Load both documents inside using blocks for deterministic disposal.
-        using (Document targetDoc = new Document(targetPdfPath))
-        using (Document backgroundDoc = new Document(backgroundPdfPath))
+        // Load the document that will receive the stamp
+        using (Document targetDoc = new Document(targetPath))
+        // Load the document that provides the stamp page
+        using (Document bgDoc = new Document(backgroundPath))
         {
-            // Choose the page from the background PDF that will be used as the stamp.
-            // Aspose.Pdf uses 1‑based indexing for pages.
-            Page stampSourcePage = backgroundDoc.Pages[1];
+            // Select the page from the background document to use as stamp (first page here)
+            Page bgPage = bgDoc.Pages[1];
 
-            // Iterate over each page of the target document and apply the stamp.
-            for (int i = 1; i <= targetDoc.Pages.Count; i++)
+            // Apply the background stamp to each page of the target document
+            for (int i = 1; i <= targetDoc.Pages.Count; i++) // 1‑based indexing
             {
                 Page targetPage = targetDoc.Pages[i];
 
-                // Create a new PdfPageStamp using the source page.
-                PdfPageStamp pageStamp = new PdfPageStamp(stampSourcePage)
+                // Create a PdfPageStamp using the selected background page
+                PdfPageStamp stamp = new PdfPageStamp(bgPage)
                 {
-                    // Place the stamp behind the page content.
-                    Background = true,
-
-                    // Optional: adjust opacity, scaling, or alignment as needed.
-                    Opacity = 0.5f,               // 50% transparent
+                    Background = true,                         // place behind existing content
+                    Width = targetPage.Rect.Width,              // scale to target page width
+                    Height = targetPage.Rect.Height,            // scale to target page height
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Center
+                    VerticalAlignment = VerticalAlignment.Center
                 };
 
-                // Apply the stamp to the current page.
-                targetPage.AddStamp(pageStamp);
+                // Add the stamp to the current page
+                targetPage.AddStamp(stamp);
             }
 
-            // Save the modified document.
-            targetDoc.Save(outputPdfPath);
+            // Save the stamped document
+            targetDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with background stamp: {outputPdfPath}");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

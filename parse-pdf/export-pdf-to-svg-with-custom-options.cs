@@ -7,14 +7,8 @@ class Program
 {
     static void Main()
     {
-        // Input PDF containing vector graphics.
         const string inputPdf = "input.pdf";
-
-        // Output SVG file for the whole document.
         const string outputSvg = "output.svg";
-
-        // Directory to store extracted SVG graphics per page.
-        const string extractionDir = "ExtractedSvgs";
 
         if (!File.Exists(inputPdf))
         {
@@ -22,63 +16,46 @@ class Program
             return;
         }
 
-        // Ensure the extraction directory exists.
-        Directory.CreateDirectory(extractionDir);
-
-        // -----------------------------------------------------------------
-        // 1. Export the entire PDF to a single SVG file with custom options.
-        // -----------------------------------------------------------------
+        // Load the PDF document inside a using block for deterministic disposal.
         using (Document pdfDoc = new Document(inputPdf))
         {
             // Configure SVG save options.
-            // ScaleToPixels converts typographic points to pixel units (useful for DPI control).
-            // IsMultiThreading enables parallel processing of pages for faster conversion.
+            // ScaleToPixels converts typographic points to pixels, effectively controlling DPI.
+            // IsMultiThreading enables parallel processing for faster conversion.
+            // CacheGlyphs improves performance when many fonts are used.
             SvgSaveOptions svgOptions = new SvgSaveOptions
             {
                 ScaleToPixels = true,
-                IsMultiThreading = true
-                // Additional options such as CacheGlyphs can be set here if needed.
+                IsMultiThreading = true,
+                CacheGlyphs = true
             };
 
-            // Save the whole document as SVG using the configured options.
+            // Save the entire document as an SVG file using the custom options.
             pdfDoc.Save(outputSvg, svgOptions);
-        }
+            Console.WriteLine($"Document saved as SVG to '{outputSvg}'.");
 
-        // -----------------------------------------------------------------
-        // 2. Extract vector graphics from each page using SvgExtractor with
-        //    custom extraction options (e.g., stroke width, grouping, DPI).
-        // -----------------------------------------------------------------
-        using (Document pdfDoc = new Document(inputPdf))
-        {
-            // Prepare extraction options.
-            SvgExtractionOptions extractionOptions = new SvgExtractionOptions
+            // OPTIONAL: Extract vector graphics from the first page with custom extraction settings.
+            if (pdfDoc.Pages.Count > 0)
             {
-                // Do not automatically group subpaths; each subpath will be a separate SVG.
-                AutoGrouping = false,
+                Page page = pdfDoc.Pages[1];
 
-                // Minimum stroke width in the resulting SVG (helps when original PDF uses very thin lines).
-                MinStrokeWidth = 0.5,
+                // Set up extraction options (e.g., minimum stroke width, automatic grouping).
+                SvgExtractionOptions extractionOpts = new SvgExtractionOptions
+                {
+                    MinStrokeWidth = 0.8,   // enforce a minimum stroke width in the resulting SVG.
+                    AutoGrouping = true,    // let the extractor group subpaths automatically.
+                    GroupStrength = 0.9     // stronger grouping for cleaner SVG output.
+                };
 
-                // When true, only subpaths completely inside ExtractionAreaBound are kept.
-                StrictExtractionAreaBoundCheck = false
-            };
+                // Create an extractor using the defined options.
+                SvgExtractor extractor = new SvgExtractor(extractionOpts);
 
-            // Create an extractor with the above options.
-            SvgExtractor extractor = new SvgExtractor(extractionOptions);
-
-            // Iterate through all pages and extract their vector graphics.
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
-            {
-                Page page = pdfDoc.Pages[pageNum];
-
-                // Extract all SVG images from the current page to separate files.
-                // The method creates one SVG file per vector graphic found on the page.
-                string pageDir = Path.Combine(extractionDir, $"Page_{pageNum}");
-                Directory.CreateDirectory(pageDir);
-                extractor.Extract(page, pageDir);
+                // Extract each vector graphic on the page to separate SVG files in a folder.
+                string graphicsFolder = "PageGraphics";
+                Directory.CreateDirectory(graphicsFolder);
+                extractor.Extract(page, graphicsFolder);
+                Console.WriteLine($"Vector graphics from page 1 extracted to folder '{graphicsFolder}'.");
             }
         }
-
-        Console.WriteLine("SVG export and vector graphic extraction completed.");
     }
 }

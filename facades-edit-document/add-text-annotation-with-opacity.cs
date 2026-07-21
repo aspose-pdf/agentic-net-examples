@@ -2,47 +2,41 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "annotated.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        using (Document doc = new Document(inputPath))
         {
-            // Create a simple text annotation on the first page
+            // Create a text annotation on the first page
             Page page = doc.Pages[1];
-            // Fully qualified rectangle to avoid ambiguity
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            TextAnnotation annotation = new TextAnnotation(page, rect)
+            Rectangle rect = new Rectangle(100, 500, 300, 550);
+            TextAnnotation textAnn = new TextAnnotation(page, rect)
             {
-                Title    = "Note",
-                Contents = "Subtle visual effect",
-                // Set opacity to 0.75 (range 0..1)
-                Opacity  = 0.75
-                // Note: Blend mode (e.g., Multiply) is not exposed directly on
-                // the annotation API. If needed, it can be configured via PDF
-                // graphics state when using low‑level drawing APIs.
+                Contents = "Sample annotation",
+                Color    = Color.Yellow,
+                Opacity  = 0.75 // Set opacity to 75%
+                // Note: BlendMode is not supported in the current Aspose.PDF version.
             };
 
             // Add the annotation to the page
-            page.Annotations.Add(annotation);
+            page.Annotations.Add(textAnn);
 
             // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with annotation opacity set to 0.75: '{outputPdf}'");
+        Console.WriteLine($"Annotation added with opacity 0.75. Saved to '{outputPath}'.");
     }
 }

@@ -3,53 +3,64 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class ExportFormFieldAppearances
+class Program
 {
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
+        const string outputFolder = "FieldAppearances";
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the source PDF containing the form fields
-        using (Aspose.Pdf.Document sourceDoc = new Aspose.Pdf.Document(inputPdfPath))
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        try
         {
-            // Iterate over each field in the form
-            foreach (Aspose.Pdf.Forms.Field field in sourceDoc.Form.Fields)
+            // Load the source PDF containing form fields
+            using (Document srcDoc = new Document(inputPdfPath))
             {
-                // Create a fresh copy of the source document for each field
-                // (so that added pages do not accumulate)
-                using (Aspose.Pdf.Document tempDoc = new Aspose.Pdf.Document(inputPdfPath))
+                // Iterate over each form field (Field) in the document
+                foreach (Field field in srcDoc.Form)
                 {
-                    // Add a new blank page where the appearance will be placed
-                    Aspose.Pdf.Page appearancePage = tempDoc.Pages.Add();
-
-                    // Use the field's original rectangle for placement
-                    Aspose.Pdf.Rectangle fieldRect = field.Rect;
-
-                    // Add the field's appearance to the newly added page
-                    // This copies the appearance stream onto the page
-                    tempDoc.Form.AddFieldAppearance(field, appearancePage.Number, fieldRect);
-
-                    // Extract only the page that contains the appearance into a separate document
-                    using (Aspose.Pdf.Document singlePageDoc = new Aspose.Pdf.Document())
+                    // Create a new single‑page PDF to hold the field's appearance
+                    using (Document appearanceDoc = new Document())
                     {
-                        // Pages are 1‑based indexed
-                        singlePageDoc.Pages.Add(appearancePage);
-                        // Build a safe file name from the field's full name
-                        string safeFieldName = field.FullName.Replace("/", "_").Replace("\\", "_");
-                        string outputPath = $"{safeFieldName}_appearance.pdf";
+                        // Add a blank page – Aspose.Pdf does not add one automatically for a new Document
+                        appearanceDoc.Pages.Add();
 
-                        // Save the appearance as an independent PDF file
-                        singlePageDoc.Save(outputPath);
-                        Console.WriteLine($"Exported appearance of field '{field.FullName}' to '{outputPath}'.");
+                        // Copy the field's appearance onto page 1 at the same rectangle
+                        // The rectangle is taken from the original field
+                        appearanceDoc.Form.AddFieldAppearance(field, 1, field.Rect);
+
+                        // Build a safe file name from the field's full name
+                        string safeName = MakeFileSystemSafeName(field.FullName);
+                        string outputPath = Path.Combine(outputFolder, $"{safeName}.pdf");
+
+                        // Save the appearance PDF
+                        appearanceDoc.Save(outputPath);
+                        Console.WriteLine($"Exported appearance for field '{field.FullName}' to '{outputPath}'.");
                     }
                 }
             }
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    // Helper to replace characters that are invalid in file names
+    static string MakeFileSystemSafeName(string name)
+    {
+        foreach (char c in Path.GetInvalidFileNameChars())
+        {
+            name = name.Replace(c, '_');
+        }
+        return string.IsNullOrWhiteSpace(name) ? "UnnamedField" : name;
     }
 }

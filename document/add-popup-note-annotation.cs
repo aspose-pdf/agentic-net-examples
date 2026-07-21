@@ -16,40 +16,40 @@ class Program
             return;
         }
 
-        // Load the existing PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document (using statement ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (page indexing is 1‑based)
+            // Choose the page where the annotation will be placed (first page in this example)
             Page page = doc.Pages[1];
 
-            // Define the rectangle where the annotation will appear
+            // Define the rectangle for the visible sticky‑note icon
             // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 600);
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 120, 520);
 
-            // Create a TextAnnotation (the sticky‑note icon that the user sees)
+            // Create a TextAnnotation (the sticky‑note icon)
             TextAnnotation textAnn = new TextAnnotation(page, rect)
             {
-                Icon     = TextIcon.Comment,          // icon displayed on the page
-                Title    = "Quick Note",              // title shown in the popup window
-                Contents = "Hover to see details.",   // short tooltip text
-                Open     = false                      // popup is closed by default
+                Title    = "Note",                     // Title shown in the popup window title bar
+                Contents = "Brief note shown on the page.", // Text shown when the icon is clicked
+                Icon     = TextIcon.Comment,           // Icon type (Comment, Note, etc.)
+                Open     = false                       // Do not open automatically
             };
 
             // Create a PopupAnnotation that holds the detailed information
             PopupAnnotation popup = new PopupAnnotation(page, rect)
             {
-                Contents = "This is the detailed information that appears when the user hovers over the note annotation.",
-                Open     = false                      // keep it closed until the user activates it
+                Contents = "This is the detailed information displayed when the user hovers over the note.",
+                Open     = false                       // Initially closed; shown on hover/click
             };
 
             // Associate the popup with its parent text annotation
             popup.Parent = textAnn;
+            textAnn.Popup = popup;
 
-            // Add both annotations to the page's annotation collection
+            // Add the text annotation (which now references the popup) to the page
             page.Annotations.Add(textAnn);
-            page.Annotations.Add(popup);
 
-            // Save the modified PDF (lifecycle rule: save inside using block)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

@@ -7,41 +7,49 @@ class Program
 {
     static void Main()
     {
+        // Path to the source PDF file
         const string pdfPath = "input.pdf";
 
+        // Ensure the file exists before processing
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Extract text from the PDF using PdfExtractor
-        using (PdfExtractor extractor = new PdfExtractor())
+        // StringWriter will hold the extracted text for logging purposes
+        using (StringWriter logWriter = new StringWriter())
         {
-            extractor.BindPdf(pdfPath);          // Load the PDF
-            extractor.ExtractText();             // Perform Unicode text extraction
-
-            // Capture the extracted text into a memory stream
-            using (MemoryStream ms = new MemoryStream())
+            // PdfExtractor is a Facade class; it implements IDisposable
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                extractor.GetText(ms);           // Write text bytes to the stream
-                ms.Position = 0;                 // Reset for reading
+                // Bind the PDF file to the extractor
+                extractor.BindPdf(pdfPath);
 
-                // Read the stream using Unicode encoding
-                using (StreamReader reader = new StreamReader(ms, Encoding.Unicode))
+                // Extract text using the default Unicode encoding
+                extractor.ExtractText();
+
+                // Capture the extracted text into a memory stream
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    string extracted = reader.ReadToEnd();
+                    // Save the extracted text to the stream
+                    extractor.GetText(ms);
 
-                    // Write the text to a StringWriter (suitable for logging frameworks)
-                    using (StringWriter stringWriter = new StringWriter())
+                    // Reset stream position to read from the beginning
+                    ms.Position = 0;
+
+                    // Read the stream using the appropriate encoding (Unicode)
+                    using (StreamReader reader = new StreamReader(ms, Encoding.Unicode))
                     {
-                        stringWriter.Write(extracted);
-
-                        // Example: output to console (replace with logger as needed)
-                        Console.WriteLine(stringWriter.ToString());
+                        // Write the extracted text into the StringWriter
+                        logWriter.Write(reader.ReadToEnd());
                     }
                 }
             }
+
+            // Example: output the captured text to console (or pass to a logging framework)
+            Console.WriteLine("Extracted Text:");
+            Console.WriteLine(logWriter.ToString());
         }
     }
 }

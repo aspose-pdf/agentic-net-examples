@@ -1,48 +1,49 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;                 // Core API for Document
+using Aspose.Pdf.Facades;        // Facades namespace (required by task)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string xmpFilePath   = "metadata.xmp";
-        const string outputPdfPath = "output.pdf";
+        const string inputPdfPath  = "input.pdf";   // Source PDF
+        const string xmpFilePath   = "metadata.xmp"; // External XMP file
+        const string outputPdfPath = "output.pdf";  // Result PDF
 
+        // Verify files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(xmpFilePath))
         {
             Console.Error.WriteLine($"XMP file not found: {xmpFilePath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Replace the existing XMP metadata with the external XMP file
-            using (FileStream xmpStream = File.OpenRead(xmpFilePath))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                pdfDoc.SetXmpMetadata(xmpStream);
-            }
+                // Open the external XMP file as a stream
+                using (FileStream xmpStream = File.OpenRead(xmpFilePath))
+                {
+                    // Replace the existing XMP metadata with the new stream
+                    pdfDoc.SetXmpMetadata(xmpStream);
+                }
 
-            // Save the updated PDF. Using PdfFileInfo facade to ensure the XMP block is written.
-            PdfFileInfo fileInfo = new PdfFileInfo(inputPdfPath);
-            bool saved = fileInfo.SaveNewInfoWithXmp(outputPdfPath);
-
-            // Fallback to direct save if the facade method fails
-            if (!saved)
-            {
+                // Save the modified PDF
                 pdfDoc.Save(outputPdfPath);
             }
-        }
 
-        Console.WriteLine($"PDF saved with replaced XMP metadata to '{outputPdfPath}'.");
+            Console.WriteLine($"XMP metadata replaced successfully. Output saved to '{outputPdfPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

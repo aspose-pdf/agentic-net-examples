@@ -1,57 +1,56 @@
 using System;
 using System.Data;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document
+        const string outputPath = "MultiPageTable.pdf";
+
+        // Create a new empty PDF document
         using (Document doc = new Document())
         {
-            // Add a page to the document (first page)
+            // Add a single page – the table will automatically create additional pages as needed
             Page page = doc.Pages.Add();
 
-            // Create a table that will automatically break across pages
+            // Create a table and enable breaking across pages
             Table table = new Table
             {
-                // Define column widths (in points)
-                ColumnWidths = "50 150 250",
-                // Enable automatic breaking across pages
-                IsBroken = true,
-                // Repeat the first row (header) on each new page fragment
-                RepeatingRowsCount = 1
+                IsBroken = true,               // allow the table to split over multiple pages
+                RepeatingRowsCount = 1,        // repeat the first row (header) on each new page
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f) // optional visual styling
             };
 
-            // ----- Header row -----
-            Row header = table.Rows.Add();
-            header.Cells.Add("ID");
-            header.Cells.Add("Name");
-            header.Cells.Add("Description");
+            // Define column widths (optional, adjust as needed)
+            table.ColumnWidths = "50 100 100 100 100";
 
-            // ----- Populate data rows -----
-            DataTable data = new DataTable();
-            data.Columns.Add("ID", typeof(int));
-            data.Columns.Add("Name", typeof(string));
-            data.Columns.Add("Description", typeof(string));
+            // Build a DataTable with many rows to force pagination
+            DataTable dt = new DataTable();
+            dt.Columns.Add("ID", typeof(int));
+            dt.Columns.Add("Name", typeof(string));
+            dt.Columns.Add("Category", typeof(string));
+            dt.Columns.Add("Price", typeof(decimal));
+            dt.Columns.Add("Quantity", typeof(int));
 
-            // Generate enough rows to span multiple pages
+            // Populate with sample data (e.g., 200 rows)
             for (int i = 1; i <= 200; i++)
             {
-                data.Rows.Add(i, $"Item {i}", $"Description for item {i}");
+                dt.Rows.Add(i, $"Item {i}", $"Category {((i - 1) % 5) + 1}", Math.Round(10.0 + i * 0.5, 2), i % 10 + 1);
             }
 
-            // Import the data rows into the table (skip column names because header already added)
-            // Parameters: DataTable, isColumnNamesImported, firstFilledRow, firstFilledColumn
-            table.ImportDataTable(data, false, 0, 0);
+            // Import the DataTable into the Aspose.Pdf.Table
+            // First row will be column names (header)
+            table.ImportDataTable(dt, true, 0, 0);
 
             // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF (extension determines PDF output)
-            doc.Save("MultiPageTable.pdf");
+            // Save the document (PDF format)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with multi‑page table created successfully.");
+        Console.WriteLine($"PDF with multi‑page table saved to '{outputPath}'.");
     }
 }

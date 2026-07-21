@@ -6,28 +6,30 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string oldName    = "OldName";
+        const string newName    = "NewName";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Rename the form field using FormEditor (Aspose.Pdf.Facades)
-        using (FormEditor formEditor = new FormEditor())
+        // Use FormEditor facade to rename a form field
+        using (FormEditor editor = new FormEditor())
         {
-            // Load the source PDF
-            formEditor.BindPdf(inputPdf);
+            // Load the PDF document
+            editor.BindPdf(inputPath);
 
-            // Rename the field from OldName to NewName
-            formEditor.RenameField("OldName", "NewName");
+            // Rename the field throughout the document
+            editor.RenameField(oldName, newName);
 
-            // Save the updated PDF
-            formEditor.Save(outputPdf);
+            // Save the modified PDF
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Field renamed and saved to '{outputPdf}'.");
+        Console.WriteLine($"Field '{oldName}' renamed to '{newName}' and saved as '{outputPath}'.");
     }
 }

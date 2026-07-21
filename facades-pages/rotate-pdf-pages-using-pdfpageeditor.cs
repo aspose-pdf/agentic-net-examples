@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "rotated.pdf";
+        const string outputPath = "rotated_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,22 +15,23 @@ class Program
             return;
         }
 
-        // Create the PdfPageEditor facade
-        PdfPageEditor editor = new PdfPageEditor();
+        // PdfPageEditor is a facade for page-level operations (rotate, zoom, etc.)
+        using (PdfPageEditor editor = new PdfPageEditor())
+        {
+            // Load the source PDF into the editor
+            editor.BindPdf(inputPath);
 
-        // Load the PDF document into the facade
-        editor.BindPdf(inputPath);
+            // Set rotation for all pages.
+            // Allowed values are 0, 90, 180, or 270 degrees.
+            editor.Rotation = 90;
 
-        // Set rotation for all pages (allowed values: 0, 90, 180, 270)
-        editor.Rotation = 90; // rotate pages 90 degrees clockwise
+            // Apply the pending changes to the underlying document
+            editor.ApplyChanges();
 
-        // Apply the rotation changes
-        editor.ApplyChanges();
+            // Save the modified PDF. No SaveOptions needed for PDF output.
+            editor.Save(outputPath);
+        }
 
-        // Save the rotated PDF
-        editor.Save(outputPath);
-
-        // Release resources held by the facade
-        editor.Close();
+        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
     }
 }

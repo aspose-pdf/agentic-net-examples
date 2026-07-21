@@ -6,66 +6,55 @@ class Program
 {
     static void Main()
     {
-        // Input PDF, pages to extract, rotation angle, and final output PDF
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "rotated_selected_pages.pdf";
-        int[] pagesToExtract = new int[] { 2, 4, 5 }; // example page numbers (1‑based)
-        int rotationAngle = 90; // must be 0, 90, 180 or 270
+        // Input PDF, temporary extracted PDF, and final output PDF paths
+        const string inputPdf = "input.pdf";
+        const string tempPdf = "temp_extracted.pdf";
+        const string outputPdf = "rotated_output.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        // Pages to extract (1‑based indexing)
+        int[] selectedPages = new int[] { 2, 4, 5 };
+
+        // Desired rotation angle (must be 0, 90, 180 or 270)
+        int rotationAngle = 90;
+
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // Step 1: Extract the selected pages to a temporary PDF file
-        // -----------------------------------------------------------------
-        string tempExtractPath = Path.GetTempFileName(); // creates a temp file with .tmp extension
-        try
+        // ------------------------------------------------------------
+        // Step 1: Extract the selected pages into a temporary PDF file
+        // ------------------------------------------------------------
+        PdfFileEditor fileEditor = new PdfFileEditor();
+        bool extracted = fileEditor.Extract(inputPdf, selectedPages, tempPdf);
+        if (!extracted)
         {
-            // PdfFileEditor.Extract writes the selected pages to the specified file
-            PdfFileEditor fileEditor = new PdfFileEditor();
-            bool extractSuccess = fileEditor.Extract(inputPdfPath, pagesToExtract, tempExtractPath);
-            if (!extractSuccess)
-            {
-                Console.Error.WriteLine("Page extraction failed.");
-                return;
-            }
-
-            // -----------------------------------------------------------------
-            // Step 2: Rotate the extracted pages and save the final PDF
-            // -----------------------------------------------------------------
-            using (PdfPageEditor pageEditor = new PdfPageEditor())
-            {
-                // Bind the temporary PDF that contains only the extracted pages
-                pageEditor.BindPdf(tempExtractPath);
-
-                // Rotate all pages in the extracted document
-                pageEditor.ProcessPages = new int[pageEditor.GetPages()]; // allocate array for all pages
-                for (int i = 0; i < pageEditor.ProcessPages.Length; i++)
-                {
-                    // Pages are 1‑based; fill the array with page numbers 1..Count
-                    pageEditor.ProcessPages[i] = i + 1;
-                }
-                pageEditor.Rotation = rotationAngle;
-
-                // Apply the rotation changes
-                pageEditor.ApplyChanges();
-
-                // Save the modified document to the final output path
-                pageEditor.Save(outputPdfPath);
-            }
-
-            Console.WriteLine($"Successfully created '{outputPdfPath}' with rotated pages.");
+            Console.Error.WriteLine("Failed to extract selected pages.");
+            return;
         }
-        finally
+
+        // ------------------------------------------------------------
+        // Step 2: Rotate the pages of the extracted PDF
+        // ------------------------------------------------------------
+        using (PdfPageEditor pageEditor = new PdfPageEditor())
         {
-            // Clean up the temporary file
-            if (File.Exists(tempExtractPath))
-            {
-                try { File.Delete(tempExtractPath); } catch { /* ignore cleanup errors */ }
-            }
+            // Bind the temporary PDF to the editor
+            pageEditor.BindPdf(tempPdf);
+
+            // Apply the rotation to all pages (default processes every page)
+            pageEditor.Rotation = rotationAngle;
+
+            // Commit the changes
+            pageEditor.ApplyChanges();
+
+            // Save the rotated PDF to the final output path
+            pageEditor.Save(outputPdf);
         }
+
+        // Clean up the temporary file
+        try { File.Delete(tempPdf); } catch { }
+
+        Console.WriteLine($"Rotated PDF created at: {outputPdf}");
     }
 }

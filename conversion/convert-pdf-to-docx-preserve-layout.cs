@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputDocx = "output.docx";
 
         if (!File.Exists(inputPdf))
@@ -15,22 +15,22 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document pdfDocument = new Document(inputPdf))
         {
-            // Configure save options for DOCX conversion
-            DocSaveOptions saveOptions = new DocSaveOptions
+            // Configure save options to preserve layout (standard recognition) and output DOCX
+            var saveOptions = new DocSaveOptions
             {
-                // Preserve the original layout (standard/text‑box mode)
-                Mode   = DocSaveOptions.RecognitionMode.Textbox,
-                // Specify the desired output format
-                Format = DocSaveOptions.DocFormat.DocX
+                // Specify DOCX output format
+                Format = DocSaveOptions.DocFormat.DocX,
+                // Optional: use standard recognition mode to keep layout
+                // Mode = DocSaveOptions.RecognitionMode.Standard
             };
 
-            // Save the document as DOCX using the explicit save options
+            // Save the document using the specified options
             pdfDocument.Save(outputDocx, saveOptions);
         }
 
-        Console.WriteLine($"Conversion completed: '{outputDocx}'");
+        Console.WriteLine($"PDF successfully converted to DOCX: {outputDocx}");
     }
 }

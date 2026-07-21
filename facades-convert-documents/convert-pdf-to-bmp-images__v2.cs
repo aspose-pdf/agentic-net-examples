@@ -1,48 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices;
-using System.Drawing.Imaging;
+using Aspose.Pdf;                     // Document, etc.
+using Aspose.Pdf.Devices;            // BmpDevice for rasterization
 
 class PdfToBmpConverter
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "BmpPages";
+        // Input PDF file path
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        // Output directory for BMP images
+        const string outputDir = "BmpImages";
+
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Verify the source PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Load the PDF document
+        Document pdfDocument = new Document(pdfPath);
 
-        // PdfConverter implements IDisposable, so wrap it in a using block
-        using (PdfConverter converter = new PdfConverter())
+        // Create a BmpDevice once (it does not implement IDisposable, so no using block)
+        BmpDevice bmpDevice = new BmpDevice(200, 200);
+
+        // Iterate through each page and rasterize it to a BMP image at 200 DPI
+        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
         {
-            // Bind the source PDF file
-            converter.BindPdf(inputPdfPath);
+            string bmpPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
 
-            // In recent Aspose.Pdf versions font substitution for missing fonts is enabled by default.
-            // If you need to customise substitution you can work with FontRepository/FontSettings instead.
-
-            // Set a higher resolution for better image quality
-            converter.Resolution = new Resolution(300);
-
-            // Prepare the converter
-            converter.DoConvert();
-
-            int pageNumber = 1;
-            // Iterate through all pages and save each as a BMP image
-            while (converter.HasNextImage())
+            // Use a using block only for the FileStream (which *does* implement IDisposable)
+            using (FileStream imageStream = new FileStream(bmpPath, FileMode.Create, FileAccess.Write))
             {
-                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.bmp");
-                // Save the current page as BMP – use System.Drawing.Imaging.ImageFormat
-                converter.GetNextImage(outputPath, ImageFormat.Bmp);
-                pageNumber++;
+                // Render the current page into the BMP stream
+                bmpDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
             }
         }
 

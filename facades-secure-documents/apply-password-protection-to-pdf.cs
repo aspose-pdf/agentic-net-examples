@@ -7,45 +7,33 @@ class Program
 {
     static void Main()
     {
-        // Input PDF (must exist) and output PDF paths
-        const string inputPath  = "input.pdf";
-        const string outputPath = "protected_output.pdf";
+        const string inputPath  = "input.pdf";      // source PDF
+        const string outputPath = "protected.pdf";  // destination PDF
+        const string userPassword  = "user123";    // password required to open the file
+        const string ownerPassword = "owner123";   // password required to change permissions
 
-        // Passwords to apply
-        const string userPassword  = "user123";
-        const string ownerPassword = "owner123";
-
-        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
-        {
-            // Initialize the PdfFileSecurity facade with source and destination files
-            PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath);
+        // PdfFileSecurity works directly on files, no Document object is created.
+        // The constructor (inputFile, outputFile) initializes the facade.
+        PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
 
-            // Apply encryption:
-            //   - userPassword: password required to open the document
-            //   - ownerPassword: password required to change permissions
-            //   - DocumentPrivilege.Print: allow printing only (other actions are denied)
-            //   - KeySize.x256: use 256‑bit AES encryption (strongest supported)
-            bool success = security.EncryptFile(
-                userPassword,
-                ownerPassword,
-                DocumentPrivilege.Print,
-                KeySize.x256);
+        // Encrypt the PDF:
+        //   - DocumentPrivilege.Print allows printing.
+        //   - KeySize.x256 selects 256‑bit AES encryption.
+        bool encrypted = fileSecurity.EncryptFile(
+            userPassword,
+            ownerPassword,
+            DocumentPrivilege.Print,
+            KeySize.x256);
 
-            if (success)
-                Console.WriteLine($"PDF encrypted successfully and saved to '{outputPath}'.");
-            else
-                Console.Error.WriteLine("Encryption failed (method returned false).");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during encryption: {ex.Message}");
-        }
+        if (encrypted)
+            Console.WriteLine($"PDF encrypted successfully: {outputPath}");
+        else
+            Console.Error.WriteLine("Failed to encrypt the PDF.");
     }
 }

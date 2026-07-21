@@ -1,36 +1,36 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Aspose.Pdf namespace contains Document and related types
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputXml = "output.xml";
+        const string inputPdfPath  = "input.pdf";   // Path to the source PDF
+        const string outputXmlPath = "output.xml";  // Desired XML output file
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPdf))
+        // Verify that the input file exists before proceeding
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Error: PDF file not found at '{inputPdfPath}'.");
             return;
         }
 
         try
         {
-            // Load the PDF document (lifecycle: load)
-            using (Document doc = new Document(inputPdf))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Export the internal XML representation (lifecycle: save)
-                doc.SaveXml(outputXml);
+                // Save the internal XML representation of the PDF
+                pdfDoc.SaveXml(outputXmlPath);
             }
 
-            Console.WriteLine($"XML representation saved to '{outputXml}'.");
+            Console.WriteLine($"XML representation saved to '{outputXmlPath}'.");
         }
         catch (Exception ex)
         {
-            // Handle any errors that occur during processing
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Catch any unexpected errors (e.g., corrupted PDF, I/O issues)
+            Console.Error.WriteLine($"Error during XML extraction: {ex.Message}");
         }
     }
 }

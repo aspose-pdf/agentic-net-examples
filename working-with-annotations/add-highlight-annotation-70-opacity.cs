@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "highlighted.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,29 +16,32 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            // Choose the page to annotate (first page in this example)
             Page page = doc.Pages[1];
 
-            // Define the rectangle area to be highlighted
+            // Define the rectangle area for the highlight annotation
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
 
-            // Create a highlight annotation with 70% opacity
+            // Create the highlight annotation
             HighlightAnnotation highlight = new HighlightAnnotation(page, rect)
             {
-                Opacity = 0.7,                     // 70% opacity for subtle emphasis
-                Color = Aspose.Pdf.Color.Yellow    // Optional: set highlight color
+                // Set opacity to 70% (value range 0..1)
+                Opacity = 0.7,
+                // Optional: set the highlight color
+                Color = Color.Yellow
             };
 
             // Add the annotation to the page
             page.Annotations.Add(highlight);
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use Save)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Highlight annotation saved to '{outputPath}'.");
+        Console.WriteLine($"Highlight annotation with 70% opacity saved to '{outputPath}'.");
     }
 }

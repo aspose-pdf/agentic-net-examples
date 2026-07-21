@@ -1,42 +1,51 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades;          // PdfAnnotationEditor
+using Aspose.Pdf;                 // AnnotationType (if needed)
 
-class Program
+class DeleteAndExportAnnotations
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string xfdfPath = "remaining_annotations.xfdf";
+        // Input PDF containing annotations
+        const string inputPdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        // PDF after removing the specified annotation type
+        const string outputPdfPath = "output_cleaned.pdf";
+
+        // XFDF file that will contain the remaining annotations
+        const string outputXfdfPath = "remaining_annotations.xfdf";
+
+        // Ensure the source file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Initialize the annotation editor and bind the PDF document
+        // Use PdfAnnotationEditor to manipulate annotations
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            editor.BindPdf(inputPdf);
+            // Load the PDF document into the editor
+            editor.BindPdf(inputPdfPath);
 
-            // Delete all annotations of the specified type (e.g., Text annotations)
-            editor.DeleteAnnotations("Text");
+            // Delete all annotations of a specific type, e.g., "Highlight"
+            // Available type names are the same as those used in Adobe Acrobat
+            editor.DeleteAnnotations("Highlight");
 
-            // Save the PDF after deletion
-            editor.Save(outputPdf);
+            // Save the PDF after deletion (optional, but demonstrates the change)
+            editor.Save(outputPdfPath);
 
             // Export the remaining annotations to an XFDF file
-            using (FileStream xfdfStream = File.Create(xfdfPath))
+            using (FileStream xfdfStream = File.Create(outputXfdfPath))
             {
+                // Export all annotations that are still present in the document
                 editor.ExportAnnotationsToXfdf(xfdfStream);
             }
-
-            // Close the editor (optional, handled by using)
-            editor.Close();
         }
 
-        Console.WriteLine($"Deleted 'Text' annotations, saved PDF to '{outputPdf}', and exported remaining annotations to '{xfdfPath}'.");
+        Console.WriteLine($"Annotations of type 'Highlight' removed.");
+        Console.WriteLine($"Cleaned PDF saved to: {outputPdfPath}");
+        Console.WriteLine($"Remaining annotations exported to XFDF: {outputXfdfPath}");
     }
 }

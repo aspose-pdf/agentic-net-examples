@@ -1,46 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // retained for potential future use
+using Aspose.Pdf.Tagged;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string pdfPath = "input.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputDocxPath = "output.docx";
+        const string languageCode = "en-US"; // language for hyphenation
 
-        // Output DOCX file path
-        const string docxPath = "output.docx";
-
-        // Verify the source file exists
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document and convert it to DOCX.
-        // The conversion automatically applies language‑aware hyphenation.
-        using (Document pdfDocument = new Document(pdfPath))
+        try
         {
-            var saveOptions = new DocSaveOptions
+            // Load the source PDF
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Export as DOCX format – correct enum value
-                Format = DocSaveOptions.DocFormat.DocX,
+                // Set the document language – this influences hyphenation during conversion
+                ITaggedContent tagged = pdfDoc.TaggedContent;
+                tagged.SetLanguage(languageCode);
 
-                // Optional: improve paragraph detection and bullet handling
-                RecognizeBullets = true,
-                RelativeHorizontalProximity = 2.5f,
-                AddReturnToLineEnd = true
-                // The "Mode" property has been removed in recent versions; the default
-                // flow recognition (which includes hyphenation) is applied automatically.
-            };
+                // Configure DOCX save options
+                DocSaveOptions docxOptions = new DocSaveOptions
+                {
+                    // Output format: DOCX (enum value is DocX, not Docx)
+                    Format = DocSaveOptions.DocFormat.DocX,
+                    // Use full flow recognition for better editability and hyphenation
+                    // (Mode property has been removed in recent versions)
+                    RecognizeBullets = true,
+                    RelativeHorizontalProximity = 2.5f
+                };
 
-            // Save the converted document
-            pdfDocument.Save(docxPath, saveOptions);
+                // Save as DOCX with the specified options
+                pdfDoc.Save(outputDocxPath, docxOptions);
+            }
+
+            Console.WriteLine($"PDF successfully converted to DOCX: '{outputDocxPath}'");
         }
-
-        Console.WriteLine($"PDF successfully converted to DOCX with hyphenation settings: {docxPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

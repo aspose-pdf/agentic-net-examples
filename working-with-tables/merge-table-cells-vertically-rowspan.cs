@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,42 +7,33 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "table_rowspan.pdf";
-
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
             // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table with three equal-width columns
-            Table table = new Table
-            {
-                ColumnWidths = "100 100 100",
-                Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
-            };
+            // Create a table and add it to the page
+            Table table = new Table();
             page.Paragraphs.Add(table);
 
-            // First row
+            // Add two rows to the table
             Row row1 = table.Rows.Add();
-
-            // Cell that will span two rows (merge with the cell directly below)
-            Cell spanningCell = row1.Cells.Add("Spanning Cell");
-            spanningCell.RowSpan = 2; // Set RowSpan to merge with the next row
-
-            // Remaining cells in the first row
-            row1.Cells.Add("R1C2");
-            row1.Cells.Add("R1C3");
-
-            // Second row (the first column is omitted because of the rowspan)
             Row row2 = table.Rows.Add();
-            row2.Cells.Add("R2C2");
-            row2.Cells.Add("R2C3");
 
-            // Save the PDF document
+            // Add a cell to the first row and set its RowSpan to 2
+            // This merges the cell with the cell directly below it
+            Cell mergedCell = row1.Cells.Add("Merged Cell");
+            mergedCell.RowSpan = 2; // Merge with the cell below
+
+            // Add remaining cells to complete the table layout
+            row1.Cells.Add("Cell 1-2");
+            row2.Cells.Add("Cell 2-2");
+
+            // Save the PDF to a file
+            string outputPath = "TableWithRowSpan.pdf";
             doc.Save(outputPath);
+            Console.WriteLine($"PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

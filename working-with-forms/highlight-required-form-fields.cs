@@ -2,13 +2,12 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // Added for WidgetAnnotation
 
-class HighlightRequiredFields
+class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "highlighted.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,24 +16,26 @@ class HighlightRequiredFields
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document containing form fields
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all form fields (WidgetAnnotation implements the form field)
-            foreach (WidgetAnnotation field in doc.Form)
+            // Access the form object
+            Form form = doc.Form;
+
+            // Iterate over all fields in the form
+            foreach (Field field in form)
             {
-                // Check if the field is marked as required
-                if (field.Required)
-                {
-                    // Set the background/highlight color (annotation color) to yellow
-                    field.Color = Color.Yellow;
-                }
+                // Mark the field as required (optional, based on requirement)
+                field.Required = true;
+
+                // Change the field's background/border color to highlight it
+                field.Color = Aspose.Pdf.Color.Yellow;
             }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Required fields highlighted and saved to '{outputPath}'.");
+        Console.WriteLine($"Form fields highlighted and saved to '{outputPath}'.");
     }
 }

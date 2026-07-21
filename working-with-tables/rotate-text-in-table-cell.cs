@@ -1,48 +1,44 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class RotateCellTextExample
 {
     static void Main()
     {
-        // Input and output file paths
-        const string outputPath = "rotated_cell_table.pdf";
-
-        // Create a new PDF document
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Create a table and add it to the page
-            Table table = new Table
-            {
-                // Optional: set table width or other properties here
-                ColumnWidths = "200 200"
-            };
-            page.Paragraphs.Add(table);
+            // Create a table with a single column
+            Table table = new Table();
+            // ColumnWidths is a string property – set it directly (comma‑separated for multiple columns)
+            table.ColumnWidths = "200"; // set column width
 
             // Add a row to the table
             Row row = table.Rows.Add();
+            // Optional: control row height if needed
+            // row.FixedRowHeight = 100; // or row.MinRowHeight = 50;
 
             // Add a cell to the row
             Cell cell = row.Cells.Add();
 
-            // Create a TextFragment with the desired text
+            // Create a TextFragment and rotate its text
             TextFragment tf = new TextFragment("Rotated Text");
+            tf.TextState.Rotation = 45; // angle in degrees (0‑360)
 
-            // Set the rotation angle (in degrees) on the TextFragment's TextState
-            tf.TextState.Rotation = 45; // rotate 45 degrees
-
-            // Add the TextFragment to the cell's paragraphs collection
+            // Add the rotated text fragment to the cell
             cell.Paragraphs.Add(tf);
 
-            // Save the PDF
-            doc.Save(outputPath);
+            // Add the table to the page
+            page.Paragraphs.Add(table);
+
+            // Save the PDF (Document.Save without SaveOptions always writes PDF)
+            doc.Save("RotatedCellText.pdf");
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine("PDF with rotated cell text saved as 'RotatedCellText.pdf'.");
     }
 }

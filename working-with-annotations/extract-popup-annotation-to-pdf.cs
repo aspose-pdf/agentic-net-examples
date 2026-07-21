@@ -3,73 +3,89 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF containing popup annotation
-        const string outputPdf = "popup_extracted.pdf"; // PDF that will contain the extracted popup
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "popup_extracted.pdf";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Open the source document (lifecycle rule: wrap in using)
+        // Open the source PDF
         using (Document srcDoc = new Document(inputPdf))
         {
-            // Prepare a new PDF to hold the popup content
-            using (Document popupDoc = new Document())
+            PopupAnnotation popup = null;
+
+            // Search for the first PopupAnnotation in the document
+            for (int i = 1; i <= srcDoc.Pages.Count; i++)
             {
-                // Add a blank page to the new document
-                Page newPage = popupDoc.Pages.Add();
-
-                // Flag to indicate whether any popup was found
-                bool popupFound = false;
-
-                // Iterate over all pages (1‑based indexing)
-                for (int pageIdx = 1; pageIdx <= srcDoc.Pages.Count; pageIdx++)
+                Page page = srcDoc.Pages[i];
+                for (int j = 1; j <= page.Annotations.Count; j++)
                 {
-                    Page srcPage = srcDoc.Pages[pageIdx];
-
-                    // Iterate over annotations on the current page (1‑based)
-                    for (int annIdx = 1; annIdx <= srcPage.Annotations.Count; annIdx++)
+                    Annotation ann = page.Annotations[j];
+                    if (ann is PopupAnnotation pa)
                     {
-                        Annotation ann = srcPage.Annotations[annIdx];
-
-                        // Identify PopupAnnotation instances
-                        if (ann is PopupAnnotation popup)
-                        {
-                            popupFound = true;
-
-                            // Retrieve the textual content of the popup
-                            string popupText = popup.Contents ?? string.Empty;
-
-                            // Create a TextFragment with the popup text
-                            TextFragment tf = new TextFragment(popupText)
-                            {
-                                // Optional styling
-                                TextState = { FontSize = 12, Font = FontRepository.FindFont("Helvetica") }
-                            };
-
-                            // Add the text fragment to the new page
-                            newPage.Paragraphs.Add(tf);
-                        }
+                        popup = pa;
+                        break;
                     }
                 }
+                if (popup != null) break;
+            }
 
-                if (!popupFound)
+            if (popup == null)
+            {
+                Console.WriteLine("No PopupAnnotation found in the document.");
+                return;
+            }
+
+            // Create a new PDF that will contain the popup's contents
+            using (Document newDoc = new Document())
+            {
+                // Add a blank page
+                Page newPage = newDoc.Pages.Add();
+
+                // Add the popup text as a TextFragment
+                TextFragment tf = new TextFragment(popup.Contents ?? string.Empty)
                 {
-                    Console.WriteLine("No popup annotations were found in the source PDF.");
-                    return;
+                    // Position the text near the top-left of the page
+                    Position = new Position(50, newPage.PageInfo.Height - 50)
+                };
+                newPage.Paragraphs.Add(tf);
+
+                // Optionally, preserve the open state as a visual cue
+                if (popup.Open)
+                {
+                    // Create a rectangle that mimics the popup bounds
+                    var drawRect = new Aspose.Pdf.Drawing.Rectangle(
+                        (float)popup.Rect.LLX,
+                        (float)popup.Rect.LLY,
+                        (float)(popup.Rect.URX - popup.Rect.LLX),
+                        (float)(popup.Rect.URY - popup.Rect.LLY));
+
+                    drawRect.GraphInfo = new GraphInfo
+                    {
+                        Color = Color.LightGray,
+                        LineWidth = 1f
+                    };
+
+                    // Graph constructor expects double values
+                    Graph graph = new Graph(400.0, 200.0);
+                    graph.Shapes.Add(drawRect);
+                    newPage.Paragraphs.Add(graph);
                 }
 
-                // Save the new PDF containing the extracted popup content
-                popupDoc.Save(outputPdf);
-                Console.WriteLine($"Popup annotation content saved to '{outputPdf}'.");
+                // Save the new PDF containing the popup annotation data
+                newDoc.Save(outputPdf);
             }
+
+            Console.WriteLine($"Popup annotation extracted and saved to '{outputPdf}'.");
         }
     }
 }

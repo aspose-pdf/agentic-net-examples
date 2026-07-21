@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -9,7 +10,7 @@ class Program
         // Path to the source PDF file
         const string pdfPath = "input.pdf";
 
-        // Verify the source file exists
+        // Verify the PDF exists
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
@@ -17,36 +18,38 @@ class Program
         }
 
         // Create a temporary folder for extracted images
-        string tempFolder = Path.Combine(Path.GetTempPath(), "PdfImages_" + Guid.NewGuid().ToString("N"));
+        string tempFolder = Path.Combine(Path.GetTempPath(),
+                                         "PdfImages_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(tempFolder);
 
-        // Use PdfExtractor (Facade) to extract images
-        using (PdfExtractor extractor = new PdfExtractor())
+        try
         {
-            // Bind the PDF document
-            extractor.BindPdf(pdfPath);
-
-            // Use default extraction mode (DefinedInResources) – no need to set explicitly
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-            // Iterate through all extracted images
-            while (extractor.HasNextImage())
+            // Initialize the PdfExtractor facade
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                // Build output file name (e.g., image-1.pdf, image-2.pdf, ...)
-                string outputFile = Path.Combine(tempFolder, $"image-{imageIndex}.pdf");
+                // Bind the PDF document
+                extractor.BindPdf(pdfPath);
 
-                // Extract the next image to the file
-                bool success = extractor.GetNextImage(outputFile);
-                if (!success)
+                // Use default extraction mode (DefinedInResources)
+                extractor.ExtractImage();
+
+                // Extract each image and save it as PNG in the temporary folder
+                int imageIndex = 1;
+                while (extractor.HasNextImage())
                 {
-                    Console.Error.WriteLine($"Failed to extract image #{imageIndex}");
+                    string imagePath = Path.Combine(tempFolder,
+                                                    $"image_{imageIndex}.png");
+                    // Save the next image in PNG format
+                    extractor.GetNextImage(imagePath, ImageFormat.Png);
+                    imageIndex++;
                 }
-
-                imageIndex++;
             }
-        }
 
-        Console.WriteLine($"Images extracted to temporary folder: {tempFolder}");
+            Console.WriteLine($"Images extracted to: {tempFolder}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+        }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf.Facades;
 
@@ -15,24 +16,25 @@ class Program
             return;
         }
 
-        // Use PdfPageEditor from Aspose.Pdf.Facades to rotate specific pages
+        // PdfPageEditor is a facade for page-level editing (rotation, zoom, etc.)
         using (PdfPageEditor editor = new PdfPageEditor())
         {
             // Load the source PDF
             editor.BindPdf(inputPath);
 
-            // Define rotations: pages 3, 5, and 7 will be rotated by 180 degrees
-            editor.PageRotations = new System.Collections.Generic.Dictionary<int, int>
+            // Define rotations: key = page number (1‑based), value = rotation in degrees
+            var rotations = new Dictionary<int, int>
             {
                 { 3, 180 },
                 { 5, 180 },
                 { 7, 180 }
             };
+            editor.PageRotations = rotations;
 
             // Apply the rotation changes
             editor.ApplyChanges();
 
-            // Save the resulting PDF
+            // Save the modified document
             editor.Save(outputPath);
         }
 

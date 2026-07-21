@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "flattened_output.pdf";
+        const string outputPath = "flattened.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,36 +16,37 @@ class Program
             return;
         }
 
-        // Load the PDF, fill form fields, flatten them, and save.
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document contains a form.
+            // Fill form fields if they exist
             if (doc.Form != null && doc.Form.Count > 0)
             {
-                // Set a text field named "Name".
+                // Text field "Name"
                 if (doc.Form["Name"] is TextBoxField nameField)
                 {
                     nameField.Value = "John Doe";
                 }
 
-                // Set a checkbox field named "Subscribe".
-                if (doc.Form["Subscribe"] is CheckboxField subscribeField)
+                // Checkbox field "Agree"
+                if (doc.Form["Agree"] is CheckboxField agreeField)
                 {
-                    subscribeField.Checked = true;
+                    agreeField.Checked = true;
                 }
 
-                // Set a radio button group named "Gender".
-                if (doc.Form["Gender"] is RadioButtonField genderField)
+                // Combo box field "Country"
+                if (doc.Form["Country"] is ComboBoxField countryField)
                 {
-                    // Use the Value property to set the selected option by its export value.
-                    genderField.Value = "Male";
+                    // The selected value is set via the Value property.
+                    // The list of possible items is stored in countryField.Options.
+                    countryField.Value = "USA";
                 }
             }
 
-            // Flatten all form fields so their values become part of the page content.
-            doc.Form.Flatten();
+            // Flatten all form fields – they become part of the page content and are no longer editable
+            doc.Flatten();
 
-            // Save the flattened PDF.
+            // Save the flattened PDF
             doc.Save(outputPath);
         }
 

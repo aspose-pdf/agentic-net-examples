@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_centered.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,25 +19,29 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the PdfPageEditor with the loaded document
-            PdfPageEditor editor = new PdfPageEditor(doc);
+            // Initialize the PdfPageEditor facade
+            using (PdfPageEditor editor = new PdfPageEditor())
+            {
+                // Bind the loaded document to the editor
+                editor.BindPdf(doc);
 
-            // Apply changes only to page 5
-            editor.ProcessPages = new int[] { 5 };
+                // Specify that only page 5 should be edited (1‑based indexing)
+                editor.ProcessPages = new int[] { 5 };
 
-            // Center the original PDF content on the result page
-            editor.HorizontalAlignment = HorizontalAlignment.Center;
+                // Center the original content on the result page
+                editor.HorizontalAlignment = HorizontalAlignment.Center;
 
-            // Set the display duration of the edited page to 4 seconds
-            editor.DisplayDuration = 4;
+                // Set the display duration for the edited page to 4 seconds
+                editor.DisplayDuration = 4;
 
-            // Apply the modifications
-            editor.ApplyChanges();
+                // Apply the changes to the document
+                editor.ApplyChanges();
 
-            // Save the modified document
-            doc.Save(outputPath);
+                // Save the modified document
+                editor.Save(outputPath);
+            }
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Page alignment and duration updated. Saved to '{outputPath}'.");
     }
 }

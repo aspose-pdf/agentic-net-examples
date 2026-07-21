@@ -7,44 +7,50 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "template.pdf";
-        const string inputXmlPath = "data.xml";
-        const string outputPdfPath = "filled.pdf";
+        const string inputPdfPath  = "template.pdf";   // PDF with AcroForm fields
+        const string inputXmlPath  = "data.xml";       // XML source data
+        const string outputPdfPath = "filled.pdf";     // Resulting PDF
 
-        // Verify that the required files exist before proceeding.
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF template not found: '{inputPdfPath}'.");
+            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
             return;
         }
 
         if (!File.Exists(inputXmlPath))
         {
-            Console.Error.WriteLine($"XML data file not found: '{inputXmlPath}'.");
+            Console.Error.WriteLine($"XML not found: {inputXmlPath}");
             return;
         }
 
-        // Load the XML document once.
+        // Load XML document once
         XmlDocument xmlDoc = new XmlDocument();
         xmlDoc.Load(inputXmlPath);
 
-        // Initialize the Form facade with the source PDF.
+        // Initialize the Form facade on the source PDF
         using (Form form = new Form(inputPdfPath))
         {
-            // Iterate over all AcroForm field names.
+            // Iterate over all AcroForm field names
             foreach (string fieldName in form.FieldNames)
             {
-                // Locate the XML node that matches the field name.
-                XmlNode? node = xmlDoc.SelectSingleNode($"//{fieldName}");
+                // Build an XPath that selects an element whose name matches the field name
+                // Adjust the XPath as needed for your XML structure
+                string xpath = $"//*[local-name() = '{fieldName}']";
+
+                XmlNode node = xmlDoc.SelectSingleNode(xpath);
                 if (node != null)
                 {
-                    // Guard against a possible null InnerText.
                     string value = node.InnerText ?? string.Empty;
+                    // Fill the field with the extracted value
                     form.FillField(fieldName, value);
+                }
+                else
+                {
+                    Console.WriteLine($"No XML value found for field '{fieldName}'.");
                 }
             }
 
-            // Save the updated PDF to the desired output file.
+            // Save the filled PDF to the desired output file
             form.Save(outputPdfPath);
         }
 

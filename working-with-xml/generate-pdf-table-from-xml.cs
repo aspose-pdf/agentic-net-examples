@@ -2,61 +2,60 @@ using System;
 using System.Data;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class ReportGenerator
 {
     static void Main()
     {
-        // Paths for the source XML data and the output PDF report
-        const string xmlPath = "reportData.xml";
+        // Paths for input XML and output PDF
+        const string xmlPath = "report_data.xml";
         const string pdfPath = "report.pdf";
 
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML data file not found: {xmlPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Load the XML file using XmlLoadOptions (required for Aspose.Pdf)
-        XmlLoadOptions xmlLoadOptions = new XmlLoadOptions();
-        using (Document doc = new Document(xmlPath, xmlLoadOptions))
+        // Load the XML into a DataSet (tabular data)
+        DataSet dataSet = new DataSet();
+        dataSet.ReadXml(xmlPath);
+
+        // Assume the first DataTable contains the data to report
+        if (dataSet.Tables.Count == 0)
         {
-            // Parse the same XML into a DataSet to obtain a DataTable
-            // (DataSet.ReadXml can read the XML structure into relational tables)
-            DataSet dataSet = new DataSet();
-            dataSet.ReadXml(xmlPath);
-            if (dataSet.Tables.Count == 0)
-            {
-                Console.Error.WriteLine("No tables found in the XML data.");
-                return;
-            }
-
-            DataTable dataTable = dataSet.Tables[0]; // Use the first table
-
-            // Create a new page for the report
-            Page page = doc.Pages.Add();
-
-            // Create a Table object and set basic appearance
-            Aspose.Pdf.Table table = new Aspose.Pdf.Table
-            {
-                // Adjust columns to fit the content automatically
-                ColumnAdjustment = ColumnAdjustment.AutoFitToContent,
-                // Optional: set a border for visual clarity
-                Border = new BorderInfo(BorderSide.All, 1, Aspose.Pdf.Color.Black)
-            };
-
-            // Import the DataTable into the Aspose.Pdf.Table
-            // The first row will contain column names, start at row 0, column 0.
-            table.ImportDataTable(dataTable, true, 0, 0);
-
-            // Add the table to the page's paragraphs collection
-            page.Paragraphs.Add(table);
-
-            // Save the resulting PDF document
-            doc.Save(pdfPath);
+            Console.Error.WriteLine("No tables found in the XML file.");
+            return;
         }
 
-        Console.WriteLine($"Report generated successfully: {pdfPath}");
+        DataTable tableData = dataSet.Tables[0];
+
+        // Create a new PDF document
+        using (Document pdfDoc = new Document())
+        {
+            // Add a page to the document
+            Page page = pdfDoc.Pages.Add();
+
+            // Create a Table object
+            Table pdfTable = new Table();
+
+            // Optional: set table appearance
+            // Use BorderInfo (the correct class for table borders in recent Aspose.Pdf versions)
+            pdfTable.DefaultCellBorder = new BorderInfo(BorderSide.All);
+            pdfTable.DefaultCellPadding = new MarginInfo(5, 5, 5, 5);
+            pdfTable.Alignment = HorizontalAlignment.Center;
+
+            // Import the DataTable into the PDF table.
+            // Parameters: (DataTable, import column names, first row, first column)
+            pdfTable.ImportDataTable(tableData, true, 0, 0);
+
+            // Add the table to the page
+            page.Paragraphs.Add(pdfTable);
+
+            // Save the PDF document
+            pdfDoc.Save(pdfPath);
+        }
+
+        Console.WriteLine($"Report generated: {pdfPath}");
     }
 }

@@ -1,68 +1,54 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core PDF API – HtmlLoadOptions is in this namespace
+using Aspose.Pdf;
 
 class ReplacePdfPageWithHtml
 {
     static void Main()
     {
-        // Input files
-        const string pdfInputPath  = "source.pdf";   // Existing PDF
-        const string htmlInputPath = "newpage.html"; // HTML content to convert
-        const string pdfOutputPath = "result.pdf";   // Output PDF with replaced page
+        // Input PDF, HTML source and output PDF paths.
+        const string pdfPath   = "input.pdf";
+        const string htmlPath  = "page.html";
+        const string outputPdf = "output.pdf";
 
-        // Page number to replace (1‑based indexing as per Aspose.Pdf)
-        const int pageToReplace = 2;
+        // 1‑based index of the page to be replaced.
+        const int pageIndexToReplace = 2;
 
-        // Validate input files
-        if (!File.Exists(pdfInputPath))
+        // Ensure source files exist.
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfInputPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(htmlInputPath))
+        if (!File.Exists(htmlPath))
         {
-            Console.Error.WriteLine($"HTML not found: {htmlInputPath}");
+            Console.Error.WriteLine($"HTML not found: {htmlPath}");
             return;
         }
 
-        try
+        // Load the original PDF document.
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Load the original PDF document
-            using (Document sourceDoc = new Document(pdfInputPath))
+            // Load the HTML content and convert it to a PDF document.
+            // HtmlLoadOptions resides directly in the Aspose.Pdf namespace.
+            using (Document htmlDoc = new Document(htmlPath, new HtmlLoadOptions()))
             {
-                // Load the HTML file and convert it to a PDF document
-                // HtmlLoadOptions is required for HTML‑to‑PDF conversion
-                using (Document htmlDoc = new Document(htmlInputPath, new HtmlLoadOptions()))
-                {
-                    // Ensure the source PDF actually has the page we want to replace
-                    if (pageToReplace < 1 || pageToReplace > sourceDoc.Pages.Count)
-                    {
-                        Console.Error.WriteLine($"Page {pageToReplace} is out of range. PDF has {sourceDoc.Pages.Count} pages.");
-                        return;
-                    }
+                // The HTML conversion creates a PDF with at least one page.
+                // Grab the first (and only) generated page.
+                Page generatedPage = htmlDoc.Pages[1];
 
-                    // Get the first page generated from the HTML (could be multiple pages)
-                    // For simplicity we take the first page; adjust as needed.
-                    Page newPage = htmlDoc.Pages[1];
+                // Remove the page that should be replaced.
+                // Aspose.Pdf uses 1‑based indexing for pages.
+                pdfDoc.Pages.Delete(pageIndexToReplace);
 
-                    // Remove the target page from the source PDF
-                    sourceDoc.Pages.Delete(pageToReplace);
-
-                    // Insert the new page at the same position
-                    // Insert uses 1‑based indexing; the new page will become pageToReplace
-                    sourceDoc.Pages.Insert(pageToReplace, newPage);
-                }
-
-                // Save the modified PDF (uses the standard Save method – no extra SaveOptions needed)
-                sourceDoc.Save(pdfOutputPath);
+                // Insert the generated page at the same position.
+                pdfDoc.Pages.Insert(pageIndexToReplace, generatedPage);
             }
 
-            Console.WriteLine($"Page {pageToReplace} replaced successfully. Output saved to '{pdfOutputPath}'.");
+            // Save the modified PDF.
+            pdfDoc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Page {pageIndexToReplace} replaced successfully. Output saved to '{outputPdf}'.");
     }
 }

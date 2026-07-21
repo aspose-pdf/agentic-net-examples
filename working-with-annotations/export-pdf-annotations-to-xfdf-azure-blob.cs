@@ -1,65 +1,45 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Aspose.Pdf core API
-using Azure.Storage.Blobs;            // Azure Blob Storage SDK (stubbed for compilation)
+using Aspose.Pdf;
+using Azure.Storage.Blobs;
 
-// ---------------------------------------------------------------------------
-// Minimal stubs for Azure.Storage.Blobs – only the members used in this sample.
-// In a real project add the official Azure.Storage.Blobs NuGet package.
-// ---------------------------------------------------------------------------
+// Minimal stubs for Azure.Storage.Blobs to allow compilation without the actual NuGet package.
+// In a real project, reference the official Azure.Storage.Blobs package instead.
 namespace Azure.Storage.Blobs
 {
-    public class BlobContainerClient
+    public class BlobServiceClient
     {
         private readonly string _connectionString;
+        public BlobServiceClient(string connectionString) => _connectionString = connectionString;
+        public BlobContainerClient GetBlobContainerClient(string containerName) => new BlobContainerClient(containerName);
+    }
+
+    public class BlobContainerClient
+    {
         private readonly string _containerName;
-
-        public BlobContainerClient(string connectionString, string containerName)
-        {
-            _connectionString = connectionString;
-            _containerName = containerName;
-        }
-
-        // In the real SDK this creates the container if it does not exist.
-        // Here it is a no‑op because the stub writes to the local file system.
-        public void CreateIfNotExists()
-        {
-            // No operation – placeholder for real SDK behavior.
-        }
-
-        public BlobClient GetBlobClient(string blobName)
-        {
-            return new BlobClient(_containerName, blobName);
-        }
+        public BlobContainerClient(string containerName) => _containerName = containerName;
+        public void CreateIfNotExists() { /* No‑op for stub */ }
+        public BlobClient GetBlobClient(string blobName) => new BlobClient(_containerName, blobName);
     }
 
     public class BlobClient
     {
         private readonly string _containerName;
         private readonly string _blobName;
-
         public BlobClient(string containerName, string blobName)
         {
             _containerName = containerName;
             _blobName = blobName;
         }
-
-        // Mimics BlobClient.Upload – writes the stream to a local folder so the
-        // sample can be executed without the real Azure SDK.
+        // Simple stub that writes the stream to a local file under a folder named after the container.
         public void Upload(Stream content, bool overwrite = false)
         {
-            // Resolve a local path like "output/<container>/<blob>"
-            string basePath = Path.Combine(Directory.GetCurrentDirectory(), "output");
-            string containerPath = Path.Combine(basePath, _containerName);
-            Directory.CreateDirectory(containerPath);
-            string filePath = Path.Combine(containerPath, _blobName);
-
-            // If overwrite is false and the file exists, throw to emulate SDK behaviour.
-            if (!overwrite && File.Exists(filePath))
+            string directory = Path.Combine(Directory.GetCurrentDirectory(), _containerName);
+            Directory.CreateDirectory(directory);
+            string filePath = Path.Combine(directory, _blobName);
+            if (File.Exists(filePath) && !overwrite)
                 throw new IOException($"Blob '{_blobName}' already exists in container '{_containerName}'.");
-
-            // Write the stream to the file.
-            using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
             {
                 content.CopyTo(fileStream);
             }
@@ -74,41 +54,38 @@ class Program
         // Path to the source PDF file containing annotations
         const string pdfPath = "input.pdf";
 
-        // Azure Blob Storage connection details (placeholder values)
-        const string connectionString = "DefaultEndpointsProtocol=https;AccountName=YOUR_ACCOUNT;AccountKey=YOUR_KEY;EndpointSuffix=core.windows.net";
-        const string containerName   = "xfdf-annotations";
-        const string blobName        = "annotations.xfdf";
+        // Azure Blob Storage configuration (replace with your actual values)
+        string connectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
+        string containerName    = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONTAINER");
 
-        // Ensure the source PDF exists – create a minimal document if it does not.
-        if (!File.Exists(pdfPath))
+        if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(containerName))
         {
-            using (Document placeholder = new Document())
-            {
-                // Add a single blank page so ExportAnnotationsToXfdf has a document to work with.
-                placeholder.Pages.Add();
-                placeholder.Save(pdfPath);
-            }
+            Console.Error.WriteLine("Missing Azure Storage configuration.");
+            return;
         }
 
-        // Load the PDF document (lifecycle: load)
+        // Load the PDF document
         using (Document doc = new Document(pdfPath))
         {
-            // Export all annotations to XFDF using a memory stream (lifecycle: export)
+            // Export annotations to an in‑memory XFDF stream
             using (MemoryStream xfdfStream = new MemoryStream())
             {
                 doc.ExportAnnotationsToXfdf(xfdfStream);
-                xfdfStream.Position = 0; // Reset stream position before upload
+                xfdfStream.Position = 0; // Reset stream for reading
 
-                // Ensure the target container exists
-                BlobContainerClient container = new BlobContainerClient(connectionString, containerName);
+                // Prepare Azure Blob client (stub or real client if the package is referenced)
+                BlobServiceClient blobService = new BlobServiceClient(connectionString);
+                BlobContainerClient container = blobService.GetBlobContainerClient(containerName);
                 container.CreateIfNotExists();
 
-                // Upload the XFDF stream to the specified blob (cloud storage)
+                // Determine the blob name (same as PDF but with .xfdf extension)
+                string blobName = Path.GetFileNameWithoutExtension(pdfPath) + ".xfdf";
                 BlobClient blob = container.GetBlobClient(blobName);
+
+                // Upload the XFDF stream to the blob storage
                 blob.Upload(xfdfStream, overwrite: true);
+                Console.WriteLine($"Annotations exported to XFDF and uploaded as '{blobName}'.");
             }
         }
-
-        Console.WriteLine("Annotations exported to XFDF and uploaded to cloud storage.");
     }
 }

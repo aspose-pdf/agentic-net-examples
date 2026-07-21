@@ -1,50 +1,70 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";      // PDF to receive the tiled background
-        const string patternPdfPath = "pattern.pdf";    // PDF containing the pattern page
-        const string outputPdfPath  = "output.pdf";
+        // Input PDF to which the tiled watermark will be applied
+        const string inputPdfPath = "input.pdf";
+        // PDF file that contains the pattern page (first page will be used as the tile)
+        const string patternPdfPath = "pattern.pdf";
+        // Output PDF with the tiled watermark background
+        const string outputPdfPath = "output_tiled_watermark.pdf";
 
-        if (!File.Exists(inputPdfPath) || !File.Exists(patternPdfPath))
+        // Verify that the required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("Input or pattern PDF not found.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(patternPdfPath))
+        {
+            Console.Error.WriteLine($"Pattern PDF not found: {patternPdfPath}");
             return;
         }
 
-        // Load the document that will receive the watermark artifact
-        using (Document targetDoc = new Document(inputPdfPath))
-        // Load the document that provides the pattern page
-        using (Document patternDoc = new Document(patternPdfPath))
+        try
         {
-            // Assume the first page of the pattern PDF is the tile to repeat
-            Page patternPage = patternDoc.Pages[1];
-
-            // Create a WatermarkArtifact instance
-            WatermarkArtifact watermark = new WatermarkArtifact();
-
-            // Use the pattern page as the content of the artifact
-            watermark.SetPdfPage(patternPage);
-
-            // Place the artifact behind page contents and make it semi‑transparent
-            watermark.IsBackground = true;
-            watermark.Opacity = 0.5; // 0 = fully transparent, 1 = fully opaque
-
-            // Add the same artifact to every page of the target document.
-            // The artifact will be tiled automatically because it represents a PDF page.
-            foreach (Page page in targetDoc.Pages)
+            // Load the source document (the one to be watermarked)
+            using (Document doc = new Document(inputPdfPath))
+            // Load the pattern document (contains the page that will be used as a tile)
+            using (Document patternDoc = new Document(patternPdfPath))
             {
-                page.Artifacts.Add(watermark);
+                // Retrieve the first page of the pattern document.
+                // Aspose.Pdf uses 1‑based indexing for pages.
+                Page patternPage = patternDoc.Pages[1];
+
+                // Iterate over every page of the target document and add a WatermarkArtifact.
+                foreach (Page page in doc.Pages)
+                {
+                    // Create a new WatermarkArtifact instance.
+                    WatermarkArtifact watermark = new WatermarkArtifact();
+
+                    // Set the artifact to be placed behind the page contents.
+                    watermark.IsBackground = true;
+
+                    // Optional: set opacity (0.0 = fully transparent, 1.0 = fully opaque).
+                    watermark.Opacity = 0.5f;
+
+                    // Use the pattern page as the content of the artifact.
+                    // This embeds the pattern as a reusable XForm.
+                    watermark.SetPdfPage(patternPage);
+
+                    // Add the artifact to the current page.
+                    page.Artifacts.Add(watermark);
+                }
+
+                // Save the modified document. Document.Save without SaveOptions writes PDF.
+                doc.Save(outputPdfPath);
             }
 
-            // Save the modified document
-            targetDoc.Save(outputPdfPath);
+            Console.WriteLine($"Tiled watermark applied successfully. Output saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Tiled watermark artifact applied and saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

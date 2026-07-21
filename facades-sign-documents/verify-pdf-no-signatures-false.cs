@@ -1,34 +1,43 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Path to the PDF that has no digital signatures
-        const string inputPdf = "unsigned.pdf";
+        const string inputPath = "unsigned.pdf";
 
-        // Ensure the file exists before attempting to bind it
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.WriteLine($"File '{inputPdf}' not found.");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the PdfFileSignature facade and bind the PDF file
-        PdfFileSignature pdfSignature = new PdfFileSignature();
-        pdfSignature.BindPdf(inputPdf);
+        // Initialize the facade for signature operations
+        PdfFileSignature pdfSign = new PdfFileSignature();
 
-        // Check if the document contains any signatures (expected: false)
-        bool containsSignature = pdfSignature.ContainsSignature();
+        // Bind the PDF file to the facade (load operation)
+        pdfSign.BindPdf(inputPath);
 
-        // Verify a signature by name using the non‑obsolete API.
-        // Since the PDF has no signatures, this should return false.
-        bool isSignatureValid = pdfSignature.VerifySignature("Signature1");
-
-        // Output the results
+        // Check that the document contains no signatures
+        bool containsSignature = pdfSign.ContainsSignature();
         Console.WriteLine($"ContainsSignature: {containsSignature}");
-        Console.WriteLine($"VerifySignature result: {isSignatureValid}");
+
+        // VerifySigned should return false when there is no signature.
+        // An empty string is used as the signature name because none exist.
+        bool isSignatureValid = pdfSign.VerifySigned(string.Empty);
+        Console.WriteLine($"VerifySigned (no signature) returned: {isSignatureValid}");
+
+        // Expected outcome: containsSignature == false && isSignatureValid == false
+        if (!containsSignature && !isSignatureValid)
+        {
+            Console.WriteLine("Verification succeeded: PDF without signatures returns false as expected.");
+        }
+        else
+        {
+            Console.WriteLine("Verification failed: Unexpected result.");
+        }
     }
 }

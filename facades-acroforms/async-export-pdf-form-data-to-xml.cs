@@ -3,52 +3,63 @@ using System.IO;
 using System.Threading.Tasks;
 using Aspose.Pdf.Facades;
 
-class Program
+public static class PdfFormExporter
 {
-    // Asynchronously exports form fields of a PDF to an XML file.
-    // The ExportXml method is synchronous, so it is wrapped in Task.Run
-    // to avoid blocking the UI thread.
-    static async Task ExportFormDataToXmlAsync(string pdfPath, string xmlPath)
+    /// <summary>
+    /// Asynchronously exports the form fields of a PDF document to an XML file.
+    /// The operation is performed on a background thread to avoid blocking the UI thread.
+    /// </summary>
+    /// <param name="pdfPath">Path to the source PDF file containing the form.</param>
+    /// <param name="xmlPath">Path where the exported XML will be saved.</param>
+    /// <returns>A task that completes when the export is finished.</returns>
+    public static async Task ExportFormDataToXmlAsync(string pdfPath, string xmlPath)
     {
-        // Validate input arguments.
         if (string.IsNullOrWhiteSpace(pdfPath))
             throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
+
         if (string.IsNullOrWhiteSpace(xmlPath))
             throw new ArgumentException("XML output path must be provided.", nameof(xmlPath));
+
+        // Ensure the source PDF exists before proceeding.
         if (!File.Exists(pdfPath))
-            throw new FileNotFoundException("PDF file not found.", pdfPath);
+            throw new FileNotFoundException($"PDF file not found: {pdfPath}");
 
-        // Run the blocking ExportXml operation on a background thread.
-        await Task.Run(() =>
+        // The Form class implements IDisposable, so we use a using block.
+        using (Form form = new Form(pdfPath))
+        // Open the output stream for the XML file.
+        using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Create, FileAccess.Write, FileShare.None))
         {
-            // Form implements IDisposable via SaveableFacade, so use using.
-            using (Form form = new Form(pdfPath))
-            // Create the output stream for the XML file.
-            using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Create, FileAccess.Write))
-            {
-                // Export the form data to the XML stream.
-                form.ExportXml(xmlStream);
-                // The using statements ensure both Form and FileStream are disposed.
-            }
-        });
+            // ExportXml is synchronous; run it on a thread‑pool thread.
+            await Task.Run(() => form.ExportXml(xmlStream)).ConfigureAwait(false);
+            // Ensure all data is flushed to disk.
+            await xmlStream.FlushAsync().ConfigureAwait(false);
+        }
     }
+}
 
-    // Example entry point demonstrating usage.
-    // In a UI application this method could be called from an event handler.
-    static async Task Main(string[] args)
+public class Program
+{
+    // Async entry point (C# 7.1+). Allows the demo to be run from the command line.
+    public static async Task Main(string[] args)
     {
-        // Example file paths (adjust as needed).
-        const string inputPdf = "PdfForm.pdf";
-        const string outputXml = "exported_form_data.xml";
+        // Expected arguments: <input.pdf> <output.xml>
+        if (args.Length < 2)
+        {
+            Console.WriteLine("Usage: <app> <input.pdf> <output.xml>");
+            return;
+        }
+
+        string pdfPath = args[0];
+        string xmlPath = args[1];
 
         try
         {
-            await ExportFormDataToXmlAsync(inputPdf, outputXml);
-            Console.WriteLine($"Form data exported successfully to '{outputXml}'.");
+            await PdfFormExporter.ExportFormDataToXmlAsync(pdfPath, xmlPath);
+            Console.WriteLine("Form data exported successfully.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during export: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

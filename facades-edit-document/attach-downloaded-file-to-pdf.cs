@@ -7,69 +7,68 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Async Main to allow awaiting the download (C# 7.1+)
     static async Task Main()
     {
-        // Paths for the source PDF and the output PDF
-        const string sourcePdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
+        const string inputPdfPath = "input.pdf";          // Existing PDF to modify
+        const string outputPdfPath = "output.pdf";        // Resulting PDF with attachment
+        const string fileUrl = "https://example.com/file.bin"; // URL of the file to attach
+        const string attachmentName = "downloaded.bin";   // Name that will appear in the PDF
+        const string description = "File downloaded from network";
 
-        // URL of the file to download and attach (replace with a valid URL)
-        const string fileUrl = "https://example.com/file.bin";
-
-        // Name and description for the attachment inside the PDF
-        const string attachmentName = "file.bin";
-        const string attachmentDescription = "File downloaded from network";
-
-        // Ensure the source PDF exists – create an empty one if it does not.
-        if (!File.Exists(sourcePdfPath))
+        // ------------------------------------------------------------
+        // Create a minimal PDF so the sandbox has a file to open.
+        // ------------------------------------------------------------
+        using (var seed = new Document())
         {
-            using var emptyDoc = new Document();
-            emptyDoc.Pages.Add(); // add a blank page so the PDF is valid
-            emptyDoc.Save(sourcePdfPath);
-            Console.WriteLine($"Source PDF not found. Created empty placeholder at '{sourcePdfPath}'.");
+            seed.Pages.Add(); // add a blank page
+            seed.Save(inputPdfPath);
         }
 
-        // Download the file into a byte array – handle possible HTTP errors gracefully
-        byte[]? fileBytes = null;
-        try
+        byte[]? fileBytes = null; // nullable to silence CS8600 warning
+        // Download the file into a byte array – handle non‑successful status codes gracefully
+        using (HttpClient client = new HttpClient())
         {
-            using var httpClient = new HttpClient();
-            HttpResponseMessage response = await httpClient.GetAsync(fileUrl);
-            response.EnsureSuccessStatusCode(); // throws if status is not 2xx
-            fileBytes = await response.Content.ReadAsByteArrayAsync();
-        }
-        catch (HttpRequestException ex)
-        {
-            Console.WriteLine($"Failed to download attachment from '{fileUrl}'. Reason: {ex.Message}");
-            Console.WriteLine("The PDF will be saved without the attachment.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Unexpected error while downloading the file: {ex.Message}");
-            Console.WriteLine("The PDF will be saved without the attachment.");
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(fileUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    fileBytes = await response.Content.ReadAsByteArrayAsync();
+                }
+                else
+                {
+                    Console.WriteLine($"Warning: Unable to download file. HTTP {(int)response.StatusCode} {response.ReasonPhrase}. Attachment will be skipped.");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Error downloading file: {ex.Message}. Attachment will be skipped.");
+            }
         }
 
-        // Initialize the PdfContentEditor facade and bind the source PDF
+        // Bind the source PDF document
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            editor.BindPdf(sourcePdfPath);
+            editor.BindPdf(inputPdfPath);
 
-            // Add the attachment only if we successfully retrieved the bytes
+            // Add the attachment only if we actually have data
             if (fileBytes != null && fileBytes.Length > 0)
             {
-                using var attachmentStream = new MemoryStream(fileBytes);
-                editor.AddDocumentAttachment(attachmentStream, attachmentName, attachmentDescription);
-                Console.WriteLine($"Attachment '{attachmentName}' added to the PDF.");
+                using (MemoryStream attachmentStream = new MemoryStream(fileBytes))
+                {
+                    editor.AddDocumentAttachment(attachmentStream, attachmentName, description);
+                }
             }
             else
             {
-                Console.WriteLine("No attachment was added because the download failed or returned empty content.");
+                Console.WriteLine("No attachment added because the download failed or returned empty content.");
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (or the original PDF if no attachment was added)
             editor.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF processing completed. Output file: '{outputPdfPath}'.");
+        Console.WriteLine($"Process completed. Result saved to '{outputPdfPath}'.");
     }
 }

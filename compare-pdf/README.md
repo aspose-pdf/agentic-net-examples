@@ -1,41 +1,42 @@
 # Compare PDF
 
-> **Compare PDF** in PDF using C# / .NET -- **28** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Compare PDF** in PDF using C# / .NET -- **29** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `compare-pdf`
-- Examples: 28
-- NuGet: `Aspose.PDF 26.6.0` -- target `net10.0`
+- Examples: 29
+- NuGet: `Aspose.PDF 26.7.0` -- target `net10.0`
 
 ## Examples
 
-- [`compare-a-large-batch-of-pdfs-using-parallel-processing-limiting-concurrency-to-avoid-excessive-memory-consumption.cs`](./compare-a-large-batch-of-pdfs-using-parallel-processing-limiting-concurrency-to-avoid-excessive-memory-consumption.cs) -- Compare a large batch of pdfs using parallel processing limiting concurrency to avoid excessive memory consumption
-- [`compare-encrypted-pdfs-with-passwords.cs`](./compare-encrypted-pdfs-with-passwords.cs) -- Compare encrypted pdfs with passwords
-- [`compare-pdf-documents-page-by-page-diff.cs`](./compare-pdf-documents-page-by-page-diff.cs) -- Compare pdf documents page by page diff
-- [`compare-pdf-font-differences.cs`](./compare-pdf-font-differences.cs) -- Compare pdf font differences
-- [`compare-pdf-text-ignore-compression.cs`](./compare-pdf-text-ignore-compression.cs) -- Compare pdf text ignore compression
+- [`compare-encrypted-pdfs-side-by-side.cs`](./compare-encrypted-pdfs-side-by-side.cs) -- Compare encrypted pdfs side by side
+- [`compare-pdf-documents-page-by-page.cs`](./compare-pdf-documents-page-by-page.cs) -- Compare pdf documents page by page
 - [`compare-pdfs-different-page-sizes.cs`](./compare-pdfs-different-page-sizes.cs) -- Compare pdfs different page sizes
-- [`compare-pdfs-from-memory-streams.cs`](./compare-pdfs-from-memory-streams.cs) -- Compare pdfs from memory streams
+- [`compare-pdfs-excluding-footer-areas.cs`](./compare-pdfs-excluding-footer-areas.cs) -- Compare pdfs excluding footer areas
+- [`compare-pdfs-font-differences.cs`](./compare-pdfs-font-differences.cs) -- Compare pdfs font differences
+- [`compare-pdfs-from-streams.cs`](./compare-pdfs-from-streams.cs) -- Compare pdfs from streams
+- [`compare-pdfs-ignore-compression.cs`](./compare-pdfs-ignore-compression.cs) -- Compare pdfs ignore compression
 - [`compare-pdfs-ignore-signature-fields.cs`](./compare-pdfs-ignore-signature-fields.cs) -- Compare pdfs ignore signature fields
-- [`compare-pdfs-log-differences.cs`](./compare-pdfs-log-differences.cs) -- Compare pdfs log differences
-- [`compare-pdfs-text-differences.cs`](./compare-pdfs-text-differences.cs) -- Compare pdfs text differences
+- [`compare-pdfs-including-form-field-values.cs`](./compare-pdfs-including-form-field-values.cs) -- Compare pdfs including form field values
+- [`compare-pdfs-log-diff-operations.cs`](./compare-pdfs-log-diff-operations.cs) -- Compare pdfs log diff operations
 - [`compare-pdfs-unicode-text-differences.cs`](./compare-pdfs-unicode-text-differences.cs) -- Compare pdfs unicode text differences
-- [`compare-pdfs-with-form-fields.cs`](./compare-pdfs-with-form-fields.cs) -- Compare pdfs with form fields
-- [`compare-specific-page-range-pdfs.cs`](./compare-specific-page-range-pdfs.cs) -- Compare specific page range pdfs
-- [`compare-specific-pages-pdf.cs`](./compare-specific-pages-pdf.cs) -- Compare specific pages pdf
+- [`compare-selected-page-range-pdfs.cs`](./compare-selected-page-range-pdfs.cs) -- Compare selected page range pdfs
+- [`compare-selected-pdf-pages.cs`](./compare-selected-pdf-pages.cs) -- Compare selected pdf pages
+- [`compare-two-pdfs-and-generate-visual-diff.cs`](./compare-two-pdfs-and-generate-visual-diff.cs) -- Compare two pdfs and generate visual diff
+- [`compare-two-pdfs-visual-diff.cs`](./compare-two-pdfs-visual-diff.cs) -- Compare two pdfs visual diff
+- [`create-diff-pdf-using-graphicalpdfcomparer.cs`](./create-diff-pdf-using-graphicalpdfcomparer.cs) -- Create diff pdf using graphicalpdfcomparer
 - [`exclude-annotations-from-pdf-comparison.cs`](./exclude-annotations-from-pdf-comparison.cs) -- Exclude annotations from pdf comparison
-- [`exclude-areas-side-by-side-pdf-comparison.cs`](./exclude-areas-side-by-side-pdf-comparison.cs) -- Exclude areas side by side pdf comparison
-- [`exclude-footer-areas-from-pdf-comparison.cs`](./exclude-footer-areas-from-pdf-comparison.cs) -- Exclude footer areas from pdf comparison
-- [`extract-image-differences-between-pdf-pages.cs`](./extract-image-differences-between-pdf-pages.cs) -- Extract image differences between pdf pages
-- [`generate-diff-pdf-compare-two-pdfs.cs`](./generate-diff-pdf-compare-two-pdfs.cs) -- Generate diff pdf compare two pdfs
-- [`generate-diff-pdf-with-highlight-verification.cs`](./generate-diff-pdf-with-highlight-verification.cs) -- Generate diff pdf with highlight verification
-- [`generate-json-diff-report-pdf-comparison.cs`](./generate-json-diff-report-pdf-comparison.cs) -- Generate json diff report pdf comparison
-- [`generate-pdf-comparison-images-zip.cs`](./generate-pdf-comparison-images-zip.cs) -- Generate pdf comparison images zip
+- [`exclude-areas-from-pdf-comparison.cs`](./exclude-areas-from-pdf-comparison.cs) -- Exclude areas from pdf comparison
+- [`generate-diff-pdf-highlighted-text-changes.cs`](./generate-diff-pdf-highlighted-text-changes.cs) -- Generate diff pdf highlighted text changes
+- [`generate-pdf-difference-image.cs`](./generate-pdf-difference-image.cs) -- Generate pdf difference image
 - [`generate-visual-diff-pdf.cs`](./generate-visual-diff-pdf.cs) -- Generate visual diff pdf
-- [`parallel-pdf-comparison.cs`](./parallel-pdf-comparison.cs) -- Parallel pdf comparison
-- [`preserve-metadata-when-comparing-pdfs.cs`](./preserve-metadata-when-comparing-pdfs.cs) -- Preserve metadata when comparing pdfs
+- [`multi-threaded-pdf-comparison.cs`](./multi-threaded-pdf-comparison.cs) -- Multi threaded pdf comparison
+- [`parallel-batch-pdf-comparison.cs`](./parallel-batch-pdf-comparison.cs) -- Parallel batch pdf comparison
+- [`pdf-diff-images-to-zip.cs`](./pdf-diff-images-to-zip.cs) -- Pdf diff images to zip
+- [`pdf-diff-report-json.cs`](./pdf-diff-report-json.cs) -- Pdf diff report json
+- [`preserve-pdf-metadata-after-comparison.cs`](./preserve-pdf-metadata-after-comparison.cs) -- Preserve pdf metadata after comparison
 - [`replace-changed-text-in-pdf.cs`](./replace-changed-text-in-pdf.cs) -- Replace changed text in pdf
 - [`set-custom-image-similarity-tolerance-pdf-comparison.cs`](./set-custom-image-similarity-tolerance-pdf-comparison.cs) -- Set custom image similarity tolerance pdf comparison
-- [`universal-pdf-comparison.cs`](./universal-pdf-comparison.cs) -- Universal pdf comparison
+- [`write-pdf-diff-to-http-response.cs`](./write-pdf-diff-to-http-response.cs) -- Write pdf diff to http response
 
 ## See Also
 

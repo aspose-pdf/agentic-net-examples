@@ -10,7 +10,7 @@ class Program
         const string inputPath = "input.pdf";
         // Page number from which to start the split (1‑based indexing)
         const int startPage = 5;
-        // Output PDF file path (the rear part of the document)
+        // Output PDF file path that will contain pages from startPage to the end
         const string outputPath = "rear_part.pdf";
 
         // Verify that the source file exists
@@ -22,11 +22,11 @@ class Program
 
         try
         {
-            // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly
+            // PdfFileEditor does NOT implement IDisposable, so do NOT use a using block
             PdfFileEditor editor = new PdfFileEditor();
 
             // Split from the specified start page to the end of the document
-            // The method returns true on success; we can optionally check the result
+            // The method returns true on success, false otherwise
             bool success = editor.SplitToEnd(inputPath, startPage, outputPath);
 
             if (success)
@@ -36,7 +36,6 @@ class Program
         }
         catch (Exception ex)
         {
-            // Handle any unexpected errors (e.g., invalid page number, I/O issues)
             Console.Error.WriteLine($"Error during split: {ex.Message}");
         }
     }

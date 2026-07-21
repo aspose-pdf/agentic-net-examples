@@ -1,43 +1,42 @@
 using System;
-using System.Drawing; // required for Color
+using System.Drawing; // needed for System.Drawing.Color
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // optional, kept for completeness
+using Aspose.Pdf.Annotations; // DefaultAppearance class
+using Aspose.Pdf.Forms;        // TextBoxField and Form
 
-class SetFieldDefaultAppearance
+class Program
 {
     static void Main()
     {
-        // Create a new PDF document inside a using block for deterministic disposal
+        const string outputPath = "output.pdf";
+
+        // Create a new PDF document with a single page (seed PDF created inline)
         using (Document doc = new Document())
         {
-            // Add a blank page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Define the rectangle where the form field will be placed
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the field rectangle (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
 
-            // Create a text box field on the page
-            TextBoxField textField = new TextBoxField(page, fieldRect);
+            // Create a text box form field
+            TextBoxField field = new TextBoxField(page, rect)
+            {
+                PartialName = "MyField",
+                Value = "Sample text"
+            };
 
-            // Set the default appearance (font, size, color) using System.Drawing.Color
-            textField.DefaultAppearance = new DefaultAppearance(
-                "Helvetica",          // font name
-                12,                    // font size
-                System.Drawing.Color.Blue); // text color (System.Drawing.Color required)
-
-            // Optionally set a name and initial value for the field
-            textField.PartialName = "SampleField";
-            textField.Value = "Default text";
+            // Set the default appearance (font, size, color)
+            // DefaultAppearance(string fontName, double fontSize, System.Drawing.Color textColor)
+            DefaultAppearance da = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Blue);
+            field.DefaultAppearance = da;
 
             // Add the field to the document's form collection
-            doc.Form.Add(textField);
+            doc.Form.Add(field);
 
-            // Save the PDF (no SaveOptions needed for PDF output)
-            doc.Save("field_with_default_appearance.pdf");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF created with a form field that has a custom DefaultAppearance.");
+        Console.WriteLine($"PDF saved with updated field default appearance: {outputPath}");
     }
 }

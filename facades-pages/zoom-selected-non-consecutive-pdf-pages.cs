@@ -7,41 +7,35 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-
-        // Define the non‑consecutive pages (1‑based) to which the zoom will be applied
-        int[] pagesToEdit = new int[] { 1, 3, 5 };
-        // Desired zoom factor (1.0 = 100%)
-        double zoomFactor = 1.5; // 150%
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the page editor facade
-            PdfPageEditor editor = new PdfPageEditor();
-            editor.BindPdf(doc);
+            // Bind the document to a page editor
+            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            {
+                // Select non‑consecutive pages (1‑based indexing)
+                editor.ProcessPages = new int[] { 1, 3, 5 };
 
-            // Specify which pages to process
-            editor.ProcessPages = pagesToEdit;
+                // Apply a common zoom factor (e.g., 150%) – float literal required
+                editor.Zoom = 1.5f;
 
-            // Apply a common zoom factor to the selected pages
-            // PdfPageEditor.Zoom expects an integer representing the percentage (e.g., 150 for 150%).
-            editor.Zoom = (int)(zoomFactor * 100);
+                // Apply the changes to the bound document
+                editor.ApplyChanges();
 
-            // Commit the changes to the document
-            editor.ApplyChanges();
-
-            // Save the modified PDF (lifecycle rule: use Save)
-            doc.Save(outputPath);
+                // Save the modified PDF
+                editor.Save(outputPath);
+            }
         }
 
-        Console.WriteLine($"Pages {string.Join(",", pagesToEdit)} zoomed to {zoomFactor * 100}% and saved to '{outputPath}'.");
+        Console.WriteLine($"Selected pages zoomed and saved to '{outputPath}'.");
     }
 }

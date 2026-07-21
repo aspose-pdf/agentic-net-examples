@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 
 class Program
@@ -8,34 +9,37 @@ class Program
     {
         const string inputPath = "input.pdf";
 
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for proper disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Iterate through each page (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Iterate over all images on the current page
+                Page page = doc.Pages[i];
+
+                // Iterate over all XImage objects on the page
                 foreach (XImage img in page.Resources.Images)
                 {
-                    // Retrieve alternative text for the image on this page
+                    // Retrieve alternative text(s) for the image on this page
                     List<string> altTexts = img.GetAlternativeText(page);
 
+                    // Log each alternative text entry; if none, indicate missing alt text
                     if (altTexts != null && altTexts.Count > 0)
                     {
                         foreach (string alt in altTexts)
                         {
-                            Console.WriteLine($"Page {page.Number}, Image \"{img.Name}\": Alt Text = \"{alt}\"");
+                            Console.WriteLine($"Page {i}, Image \"{img.Name}\": Alt Text = \"{alt}\"");
                         }
                     }
                     else
                     {
-                        Console.WriteLine($"Page {page.Number}, Image \"{img.Name}\": No alternative text.");
+                        Console.WriteLine($"Page {i}, Image \"{img.Name}\": No alternative text set.");
                     }
                 }
             }

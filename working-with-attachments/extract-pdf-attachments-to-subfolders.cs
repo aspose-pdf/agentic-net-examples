@@ -6,76 +6,72 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputRoot = "Attachments";
+        const string inputPdfPath = "input.pdf";
+        const string outputRootFolder = "Attachments";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the root folder for extracted attachments exists
-        Directory.CreateDirectory(outputRoot);
+        // Ensure the root output folder exists
+        Directory.CreateDirectory(outputRootFolder);
 
-        try
+        // Load the PDF document (wrapped in using for proper disposal)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document (wrapped in using for deterministic disposal)
-            using (Document doc = new Document(inputPath))
+            // If there are no embedded files, inform the user and exit
+            if (pdfDoc.EmbeddedFiles == null || pdfDoc.EmbeddedFiles.Count == 0)
             {
-                int index = 1;
+                Console.WriteLine("No attachments found in the PDF.");
+                return;
+            }
 
-                // Iterate over each embedded file in the PDF
-                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
+            int attachmentIndex = 1;
+
+            // Iterate over each embedded file using reflection to avoid a direct reference to the EmbeddedFile type
+            foreach (object embeddedObj in pdfDoc.EmbeddedFiles)
+            {
+                var embeddedType = embeddedObj.GetType();
+                var nameProp = embeddedType.GetProperty("Name");
+                var contentProp = embeddedType.GetProperty("Content");
+
+                string embeddedName = nameProp?.GetValue(embeddedObj) as string ?? string.Empty;
+                byte[] embeddedContent = contentProp?.GetValue(embeddedObj) as byte[];
+
+                // If we cannot retrieve the content, skip this entry
+                if (embeddedContent == null)
                 {
-                    if (fileSpec == null || fileSpec.Contents == null)
-                        continue; // skip invalid entries
-
-                    // Create a unique subfolder for this attachment
-                    string safeName = SanitizeFileName(fileSpec.Name);
-                    string subFolder = Path.Combine(outputRoot, $"Attachment_{index}_{safeName}");
-                    Directory.CreateDirectory(subFolder);
-
-                    // Determine the file name to write (fallback if name is missing)
-                    string fileName = string.IsNullOrEmpty(fileSpec.Name)
-                        ? $"attachment_{index}"
-                        : fileSpec.Name;
-
-                    string filePath = Path.Combine(subFolder, fileName);
-
-                    // Write the embedded file's binary content to disk
-                    using (Stream content = fileSpec.Contents)
-                    {
-                        // Ensure the stream is at the beginning
-                        if (content.CanSeek)
-                            content.Position = 0;
-
-                        using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-                        {
-                            content.CopyTo(fs);
-                        }
-                    }
-
-                    Console.WriteLine($"Extracted '{fileName}' to '{subFolder}'");
-                    index++;
+                    Console.WriteLine($"Skipping attachment #{attachmentIndex} because its content could not be read.");
+                    attachmentIndex++;
+                    continue;
                 }
+
+                // Determine a safe folder name for the attachment
+                string baseFolderName = Path.GetFileNameWithoutExtension(embeddedName);
+                if (string.IsNullOrWhiteSpace(baseFolderName))
+                {
+                    baseFolderName = $"Attachment_{attachmentIndex}";
+                }
+
+                // Create a subfolder for this attachment
+                string attachmentFolder = Path.Combine(outputRootFolder, baseFolderName);
+                Directory.CreateDirectory(attachmentFolder);
+
+                // Determine the file name to write (fallback if Name is empty)
+                string fileName = string.IsNullOrWhiteSpace(embeddedName)
+                    ? $"attachment_{attachmentIndex}"
+                    : embeddedName;
+
+                string outputFilePath = Path.Combine(attachmentFolder, fileName);
+
+                // Write the attachment's binary content to the file
+                File.WriteAllBytes(outputFilePath, embeddedContent);
+
+                Console.WriteLine($"Saved attachment '{embeddedName}' to '{outputFilePath}'");
+                attachmentIndex++;
             }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
-
-    // Removes characters that are invalid in file or folder names
-    static string SanitizeFileName(string name)
-    {
-        if (string.IsNullOrEmpty(name))
-            return string.Empty;
-
-        foreach (char c in Path.GetInvalidFileNameChars())
-            name = name.Replace(c, '_');
-
-        return name;
     }
 }

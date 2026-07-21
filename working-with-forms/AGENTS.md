@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - working-with-forms
 
-> **Working with forms** in PDF using C# / .NET -- **239** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with forms** in PDF using C# / .NET -- **230** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,37 +23,32 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (237/239 files) ← category-specific
-- `using Aspose.Pdf.Forms;` (184/239 files) ← category-specific
-- `using Aspose.Pdf.Annotations;` (76/239 files)
-- `using Aspose.Pdf.Text;` (19/239 files)
-- `using Aspose.Pdf.Drawing;` (18/239 files)
-- `using Aspose.Pdf.Facades;` (4/239 files)
-- `using System;` (239/239 files)
-- `using System.IO;` (216/239 files)
-- `using System.Xml;` (19/239 files)
-- `using System.Collections.Generic;` (18/239 files)
-- `using System.Drawing;` (7/239 files)
-- `using System.Text;` (6/239 files)
-- `using System.Xml.Linq;` (6/239 files)
-- `using System.Threading.Tasks;` (4/239 files)
-- `using System.Linq;` (3/239 files)
-- `using System.Net.Http;` (3/239 files)
-- `using System.Data;` (2/239 files)
-- `using System.IO.Compression;` (2/239 files)
-- `using System.Net;` (2/239 files)
-- `using System.Text.Json;` (2/239 files)
-- `using System.Threading;` (2/239 files)
-- `using System.Xml.Xsl;` (2/239 files)
-- `using NUnit.Framework;` (1/239 files)
-- `using System.Data.SqlClient;` (1/239 files)
-- `using System.Drawing.Imaging;` (1/239 files)
-- `using System.Globalization;` (1/239 files)
-- `using System.Net.Http.Headers;` (1/239 files)
-- `using System.Reflection;` (1/239 files)
-- `using System.Security.Cryptography;` (1/239 files)
-- `using System.Text.Json.Nodes;` (1/239 files)
-- `using System.Xml.Schema;` (1/239 files)
+- `using Aspose.Pdf;` (227/230 files) ← category-specific
+- `using Aspose.Pdf.Forms;` (181/230 files) ← category-specific
+- `using Aspose.Pdf.Annotations;` (74/230 files)
+- `using Aspose.Pdf.Drawing;` (10/230 files)
+- `using Aspose.Pdf.Text;` (9/230 files)
+- `using Aspose.Pdf.Facades;` (2/230 files)
+- `using Aspose.Pdf.Comparison;` (1/230 files)
+- `using System;` (230/230 files)
+- `using System.IO;` (203/230 files)
+- `using System.Xml;` (17/230 files)
+- `using System.Collections.Generic;` (15/230 files)
+- `using System.Linq;` (6/230 files)
+- `using System.Text;` (5/230 files)
+- `using System.Threading.Tasks;` (5/230 files)
+- `using System.Drawing;` (4/230 files)
+- `using System.Xml.Linq;` (4/230 files)
+- `using System.IO.Compression;` (2/230 files)
+- `using System.Net.Http;` (2/230 files)
+- `using Newtonsoft.Json;` (1/230 files)
+- `using Newtonsoft.Json.Linq;` (1/230 files)
+- `using System.Reflection;` (1/230 files)
+- `using System.Security.Cryptography;` (1/230 files)
+- `using System.Text.Json;` (1/230 files)
+- `using System.Threading;` (1/230 files)
+- `using System.Xml.Schema;` (1/230 files)
+- `using System.Xml.Xsl;` (1/230 files)
 
 ## Common Code Pattern
 
@@ -71,40 +66,40 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-auto-updating-date-time-field-to-pdf](./add-auto-updating-date-time-field-to-pdf.cs) | Add Auto‑Updating Date/Time Field to PDF | `Document`, `Rectangle`, `DateField` | Shows how to insert a DateField into a PDF and attach JavaScript so the field displays the curren... |
-| [add-blank-page-to-pdf-form](./add-blank-page-to-pdf-form.cs) | Add Blank Page to PDF Form | `Document`, `Page`, `PageInfo` | Shows how to load an existing PDF form, append a new blank page, and save the document while pres... |
-| [add-calculated-sum-field-to-pdf-form](./add-calculated-sum-field-to-pdf-form.cs) | Add Calculated Sum Field to PDF Form Using JavaScript | `Document`, `Form`, `NumberField` | Demonstrates creating numeric form fields and a calculated field that sums them with JavaScript i... |
-| [add-calculated-total-field-to-pdf-form](./add-calculated-total-field-to-pdf-form.cs) | Add Calculated Total Field to PDF Form | `Document`, `Page`, `Rectangle` | Shows how to create a PDF with Quantity and Unit Price number fields and a read‑only Total field ... |
-| [add-calculation-button-to-pdf-form](./add-calculation-button-to-pdf-form.cs) | Add Calculation Button to PDF Form | `Document`, `ButtonField`, `JavascriptAction` | Shows how to insert a push‑button into an existing PDF form and attach JavaScript that reads Quan... |
-| [add-checkbox-field-to-pdf-form](./add-checkbox-field-to-pdf-form.cs) | Add Checkbox Field to PDF Form | `Document`, `Rectangle`, `CheckboxField` | Shows how to load an existing PDF, create a CheckboxField named 'AgreeTerms', add it to the docum... |
-| [add-date-picker-field-to-pdf](./add-date-picker-field-to-pdf.cs) | Add Date Picker Field to PDF with JavaScript | `Document`, `Rectangle`, `DateField` | Shows how to create a DateField on an existing PDF, set its display format, and attach JavaScript... |
-| [add-date-picker-field-with-current-date](./add-date-picker-field-with-current-date.cs) | Add Date Picker Field with Current Date to PDF | `Document`, `Rectangle`, `DateField` | Shows how to insert a date picker form field into an existing PDF and set its default value to th... |
-| [add-dynamic-barcode-field-to-pdf](./add-dynamic-barcode-field-to-pdf.cs) | Add Dynamic Barcode Field to PDF | `Document`, `BarcodeField`, `Rectangle` | Demonstrates loading a PDF, creating a barcode form field with a runtime‑generated GUID, and savi... |
-| [add-formatted-currency-field-to-pdf](./add-formatted-currency-field-to-pdf.cs) | Add Formatted Currency Field to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to create a PDF form with a NumberField that displays a currency value formatted... |
-| [add-hidden-ip-field-to-pdf](./add-hidden-ip-field-to-pdf.cs) | Add Hidden IP Address Field to PDF with JavaScript | `Document`, `TextBoxField`, `AnnotationFlags` | Demonstrates how to insert a hidden text box form field into a PDF and attach JavaScript that can... |
-| [add-hidden-session-identifier-field-to-pdf](./add-hidden-session-identifier-field-to-pdf.cs) | Add Hidden Session Identifier Field to PDF | `Document`, `TextBoxField`, `Rectangle` | Shows how to insert a hidden, read‑only text box field into an existing PDF to store a session id... |
-| [add-http-post-submit-button-to-pdf](./add-http-post-submit-button-to-pdf.cs) | Add HTTP POST Submit Button to PDF Form | `Document`, `ButtonField`, `SubmitFormAction` | Demonstrates creating a push‑button field in a PDF and configuring a SubmitFormAction to send the... |
-| [add-ipv4-validation-to-pdf-textbox](./add-ipv4-validation-to-pdf-textbox.cs) | Add IPv4 Validation to PDF Text Box Field | `Document`, `Page`, `Rectangle` | Demonstrates creating a PDF with a text box form field and attaching JavaScript that validates th... |
-| [add-javascript-email-validation-to-pdf-form](./add-javascript-email-validation-to-pdf-form.cs) | Add JavaScript Email Validation to PDF Form | `Document`, `Form`, `TextBoxField` | Demonstrates how to create or locate an 'Email' text field in a PDF form and attach JavaScript th... |
-| [add-javascript-listener-to-pdf-form-field](./add-javascript-listener-to-pdf-form-field.cs) | Add JavaScript Listener to PDF Form Field | `Document`, `Field`, `JavascriptAction` | Shows how to attach a JavaScript action to a PDF form field using Aspose.Pdf so the script runs w... |
-| [add-listbox-to-pdf-form](./add-listbox-to-pdf-form.cs) | Add List Box to PDF AcroForm | `Document`, `Page`, `Rectangle` | Demonstrates how to create a PDF document, add a page, and insert a ListBoxField with country opt... |
-| [add-localized-label-to-pdf](./add-localized-label-to-pdf.cs) | Add Localized Label to PDF Using JavaScript Dictionary | `Document`, `Page`, `Rectangle` | Demonstrates how to embed a JavaScript dictionary of translations in a PDF and update a form fiel... |
-| [add-multiline-feedback-text-field](./add-multiline-feedback-text-field.cs) | Add Multiline Feedback Text Field to PDF | `Document`, `Rectangle`, `TextBoxField` | Demonstrates how to insert a multiline TextBoxField named 'Feedback' with a 500‑character limit i... |
-| [add-new-page-with-acroform-fields](./add-new-page-with-acroform-fields.cs) | Add New Page with AcroForm Fields to PDF | `Document`, `Add`, `TextBoxField` | Shows how to append a blank page to an existing PDF and place fresh AcroForm fields (a text box a... |
-| [add-numeric-field-with-range-validation](./add-numeric-field-with-range-validation.cs) | Add Numeric Field with Range Validation to PDF | `Document`, `Page`, `Rectangle` | Demonstrates creating a numeric form field in a PDF and attaching JavaScript to ensure the entere... |
-| [add-paymentmethod-radio-button-group](./add-paymentmethod-radio-button-group.cs) | Add PaymentMethod Radio Button Group to PDF | `Document`, `Page`, `RadioButtonField` | Demonstrates how to create a radio button group named 'PaymentMethod' with 'Credit' and 'Debit' o... |
-| [add-progress-bar-field-to-pdf-form](./add-progress-bar-field-to-pdf-form.cs) | Add Progress Bar Field to PDF Form | `Document`, `Form`, `TextBoxField` | Shows how to insert a read‑only TextBoxField into a PDF form and update its value and color to ac... |
-| [add-reset-button-to-pdf-form](./add-reset-button-to-pdf-form.cs) | Add Reset Button to PDF Form | `Document`, `ButtonField`, `JavascriptAction` | Shows how to insert a push button into a PDF that clears all form fields when clicked by using a ... |
-| [add-signature-field-to-pdf-form](./add-signature-field-to-pdf-form.cs) | Add Signature Field to PDF Form | `Document`, `Rectangle`, `SignatureField` | Shows how to insert a visible signature field into an existing PDF document using Aspose.Pdf, inc... |
-| [add-signature-field-with-image-appearance](./add-signature-field-with-image-appearance.cs) | Add Signature Field with Image Appearance to PDF | `Document`, `SignatureField`, `ImageStamp` | Shows how to create a signature form field named 'ClientSignature' in a PDF and set its visual ap... |
-| [add-submit-button-to-pdf-form](./add-submit-button-to-pdf-form.cs) | Add Submit Button to PDF Form | `Document`, `ButtonField`, `SubmitFormAction` | Shows how to create a push button on a PDF page and configure it to post all form fields to a spe... |
-| [add-submit-button-to-pdf-form__v2](./add-submit-button-to-pdf-form__v2.cs) | Add Submit Button to PDF Form | `Document`, `Page`, `Rectangle` | Shows how to create a push button field in a PDF that posts form data to a specified URL using As... |
-| [add-submit-button-with-validation-to-pdf](./add-submit-button-with-validation-to-pdf.cs) | Add Submit Button with Validation JavaScript to PDF | `Document`, `ButtonField`, `JavascriptAction` | Loads an existing PDF, creates a button field, attaches JavaScript that validates required form f... |
-| [add-tooltip-to-pdf-form-field](./add-tooltip-to-pdf-form-field.cs) | Add Tooltip to PDF Form Field | `Document`, `Page`, `Rectangle` | Demonstrates creating (or loading) a PDF, adding a TextBox form field, setting its tooltip via th... |
-| ... | | | *and 209 more files* |
+| [add-acroform-textbox-absolute-coordinates](./add-acroform-textbox-absolute-coordinates.cs) | Add AcroForm TextBox at Absolute Coordinates | `Document`, `Page`, `Rectangle` | Demonstrates creating a PDF with an AcroForm text box field positioned using absolute coordinates... |
+| [add-auto-updating-date-time-field-to-pdf](./add-auto-updating-date-time-field-to-pdf.cs) | Add Auto‑Updating Date/Time Field to PDF | `Document`, `DateField`, `JavascriptAction` | Shows how to insert a DateField into a PDF and attach JavaScript so the field automatically displ... |
+| [add-blank-page-to-pdf-form](./add-blank-page-to-pdf-form.cs) | Add Blank Page to PDF Form | `Document`, `Pages`, `Add` | Shows how to load an existing PDF form, append a new blank page, and save the document while pres... |
+| [add-calculated-total-field-to-pdf-form](./add-calculated-total-field-to-pdf-form.cs) | Add Calculated Total Field to PDF Form | `Document`, `Form`, `NumberField` | Demonstrates how to add numeric fields to a PDF form and use JavaScript to calculate a running to... |
+| [add-calculation-button-to-pdf-form](./add-calculation-button-to-pdf-form.cs) | Add Calculation Button to PDF Form | `Document`, `TextBoxField`, `ButtonField` | Shows how to create quantity, unit price, and total fields in a PDF and attach JavaScript to a bu... |
+| [add-checkbox-field-to-pdf-form](./add-checkbox-field-to-pdf-form.cs) | Add Checkbox Field to PDF Form | `Document`, `Page`, `Rectangle` | Shows how to load an existing PDF, create a CheckboxField named 'AgreeTerms', add it to the docum... |
+| [add-date-picker-field-current-date](./add-date-picker-field-current-date.cs) | Add Date Picker Field with Current Date to PDF | `Document`, `Page`, `Rectangle` | Shows how to insert a date picker form field into an existing PDF and set its default value to th... |
+| [add-date-picker-field-to-pdf](./add-date-picker-field-to-pdf.cs) | Add Date Picker Field to PDF with JavaScript | `Document`, `Form`, `DateField` | Shows how to insert a DateField into a PDF, configure its display format, and attach a JavaScript... |
+| [add-dynamic-barcode-field-to-pdf](./add-dynamic-barcode-field-to-pdf.cs) | Add Dynamic Barcode Field to PDF | `Document`, `Rectangle`, `BarcodeField` | Shows how to generate a unique value at runtime and insert it as a Code128 barcode field into a P... |
+| [add-email-validation-to-pdf-form](./add-email-validation-to-pdf-form.cs) | Add JavaScript Email Validation to a PDF Form Field | `Document`, `Page`, `Rectangle` | Loads an existing PDF, creates a TextBox form field for an email address, attaches a JavaScript v... |
+| [add-hidden-ip-field-to-pdf](./add-hidden-ip-field-to-pdf.cs) | Add Hidden IP Field to PDF with JavaScript | `Document`, `TextBoxField`, `Rectangle` | Shows how to create a hidden text box form field in a PDF and set its value to the user's IP addr... |
+| [add-hidden-session-identifier-field-to-pdf](./add-hidden-session-identifier-field-to-pdf.cs) | Add Hidden Session Identifier Field to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to insert a hidden, read‑only text box form field into a PDF to store a session ... |
+| [add-ipv4-validation-to-pdf-textbox](./add-ipv4-validation-to-pdf-textbox.cs) | Add IPv4 Validation to PDF TextBox Field | `Document`, `Page`, `Rectangle` | Shows how to create a PDF with a text box form field and attach JavaScript that validates the ent... |
+| [add-javascript-listener-to-pdf-form-field](./add-javascript-listener-to-pdf-form-field.cs) | Add JavaScript Listener to PDF Form Field | `Document`, `Field`, `JavascriptAction` | Shows how to attach a JavaScript action to a PDF form field that fires when the field's value cha... |
+| [add-locale-translation-to-pdf-form-label](./add-locale-translation-to-pdf-form-label.cs) | Add Locale‑Based Translation to PDF Form Labels with JavaScr... | `Document`, `Page`, `TextBoxField` | Demonstrates how to create a PDF with form fields and use a document‑level JavaScript dictionary ... |
+| [add-multiline-feedback-text-field](./add-multiline-feedback-text-field.cs) | Add Multiline Feedback Text Field to PDF | `Document`, `Page`, `Rectangle` | Shows how to create a PDF document with a multiline text box form field named 'Feedback' and enfo... |
+| [add-new-page-with-acroform-fields](./add-new-page-with-acroform-fields.cs) | Add New Page with AcroForm Fields to PDF | `Document`, `Page`, `Rectangle` | Shows how to append a blank page to an existing PDF and place fresh AcroForm text box and checkbo... |
+| [add-numeric-field-range-validation](./add-numeric-field-range-validation.cs) | Add Numeric Field with Range Validation to PDF | `Document`, `NumberField`, `Rectangle` | Demonstrates creating a NumberField in a PDF, restricting input characters, and attaching JavaScr... |
+| [add-payment-method-radio-button-group](./add-payment-method-radio-button-group.cs) | Add Payment Method Radio Button Group to PDF | `Document`, `Page`, `RadioButtonField` | Demonstrates how to create a PDF form with a radio button group named 'PaymentMethod' containing ... |
+| [add-progress-bar-to-pdf-form](./add-progress-bar-to-pdf-form.cs) | Add Progress Bar to PDF Form | `Document`, `ButtonField`, `TextBoxField` | Shows how to create a progress bar field in a PDF form and update its value with JavaScript as th... |
+| [add-readonly-date-field-to-pdf](./add-readonly-date-field-to-pdf.cs) | Add Read‑Only Date Field to PDF Form | `Document`, `Page`, `Rectangle` | Shows how to create a DateField in a PDF, set its initial value, and mark it as read‑only using A... |
+| [add-reset-button-to-pdf-form](./add-reset-button-to-pdf-form.cs) | Add Reset Button to PDF Form | `Document`, `Form`, `ButtonField` | Shows how to insert a push‑button into an existing PDF that clears all user‑entered form data by ... |
+| [add-reset-button-to-pdf-form__v2](./add-reset-button-to-pdf-form__v2.cs) | Add Reset Button to PDF Form | `Document`, `ButtonField`, `JavascriptAction` | Shows how to place a push button on an existing PDF form that clears all user‑entered data by exe... |
+| [add-signature-field-to-pdf-form](./add-signature-field-to-pdf-form.cs) | Add Signature Field to PDF Form | `Document`, `Form`, `Rectangle` | Shows how to insert a signature field into an existing PDF document using Aspose.Pdf so users can... |
+| [add-signature-field-with-image-stamp](./add-signature-field-with-image-stamp.cs) | Add Signature Field with Image Stamp to PDF | `Document`, `SignatureField`, `ImageStamp` | Shows how to create a signature form field named 'ClientSignature' in a PDF and set its visual ap... |
+| [add-submit-button-http-post-pdf](./add-submit-button-http-post-pdf.cs) | Add Submit Button with HTTP POST to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to create a push button in a PDF that submits form data using the HTTP POST meth... |
+| [add-submit-button-post-form-data-xfdf](./add-submit-button-post-form-data-xfdf.cs) | Add Submit Button to PDF to Post Form Data as XFDF | `Document`, `ButtonField`, `SubmitFormAction` | Demonstrates how to create a submit button in a PDF form that posts the form data to a remote XML... |
+| [add-submit-button-to-pdf-form](./add-submit-button-to-pdf-form.cs) | Add Submit Button to PDF Form | `Document`, `Form`, `ButtonField` | Shows how to create a push button on a PDF form that posts all form field data to a specified URL... |
+| [add-submit-button-to-pdf-form__v2](./add-submit-button-to-pdf-form__v2.cs) | Add Submit Button to PDF Form | `Document`, `Form`, `ButtonField` | Shows how to create a push button in a PDF form that posts the form data to a specified URL using... |
+| [add-submit-button-to-pdf](./add-submit-button-to-pdf.cs) | Add Submit Button with URL Action to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to programmatically create a push button on a PDF page and assign a SubmitFormAc... |
+| ... | | | *and 200 more files* |
 
 ## Category Statistics
-- Total examples: 239
+- Total examples: 230
 
 ## Category-Specific Tips
 
@@ -148,5 +143,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for working-with-forms patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-07-05 | Run: `20260705_005655_3d29fa`
+Updated: 2026-07-17 | Run: `20260717_171638_da3b3e`
 <!-- AUTOGENERATED:END -->

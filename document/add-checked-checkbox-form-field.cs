@@ -12,25 +12,28 @@ class Program
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Define the position and size of the checkbox (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
+            // Define the rectangle for the checkbox (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 120, 620);
 
-            // Create a checkbox field on the specified page and rectangle
+            // Create the checkbox field on the page
             CheckboxField checkbox = new CheckboxField(page, rect);
 
-            // Set the default state of the checkbox to checked
-            checkbox.Checked = true; // Equivalent to setting Value = "On"
+            // Set the default state to checked
+            checkbox.Checked = true;          // or: checkbox.Value = "On";
 
-            // Add the checkbox field to the document's form collection
+            // Optionally set a name for the field (used for form data)
+            checkbox.Name = "MyCheckBox";
+
+            // Add the checkbox to the document's form collection
             doc.Form.Add(checkbox);
 
-            // Save the PDF document
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with a checked checkbox saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with checked checkbox saved to '{outputPath}'.");
     }
 }

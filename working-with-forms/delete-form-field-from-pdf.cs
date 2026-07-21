@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -8,7 +9,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName  = "MyField"; // name of the form field to delete
+        const string fieldName  = "myField";
 
         if (!File.Exists(inputPath))
         {
@@ -16,16 +17,24 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (wrapped in using for proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Delete the form field by its name
-            doc.Form.Delete(fieldName);
+            // Check if the field exists before attempting deletion
+            if (doc.Form.HasField(fieldName))
+            {
+                doc.Form.Delete(fieldName); // Delete the field by its name
+                Console.WriteLine($"Deleted field '{fieldName}'.");
+            }
+            else
+            {
+                Console.WriteLine($"Field '{fieldName}' not found.");
+            }
 
-            // Save the modified PDF
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Field '{fieldName}' deleted. Saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

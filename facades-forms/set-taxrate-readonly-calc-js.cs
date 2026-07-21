@@ -2,42 +2,61 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Bind the PDF to a FormEditor instance
-        using (FormEditor formEditor = new FormEditor())
+        // Load the PDF document and bind it to a FormEditor facade
+        using (Document doc = new Document(inputPdf))
+        using (FormEditor formEditor = new FormEditor(doc))
         {
-            formEditor.BindPdf(inputPath);
-
-            // Make the "TaxRate" field read‑only
+            // 1. Make the "TaxRate" field read‑only
             formEditor.SetFieldAttribute("TaxRate", PropertyFlag.ReadOnly);
 
-            // JavaScript that calculates TaxRate based on Subtotal (e.g., 10% tax)
-            string js = @"
-                var subtotal = this.getField('Subtotal').value;
-                if (subtotal) {
-                    this.getField('TaxRate').value = (subtotal * 0.1).toFixed(2);
-                }";
+            // 2. Add JavaScript to calculate TaxRate = Subtotal * 0.1
+            // Retrieve the field object from the document pages
+            NumberField taxField = null;
+            foreach (Page page in doc.Pages)
+            {
+                foreach (WidgetAnnotation widget in page.Annotations)
+                {
+                    if (widget is NumberField nf && nf.FullName == "TaxRate")
+                    {
+                        taxField = nf;
+                        break;
+                    }
+                }
+                if (taxField != null) break;
+            }
 
-            // Attach the script to the "TaxRate" field
-            formEditor.AddFieldScript("TaxRate", js);
+            if (taxField != null)
+            {
+                // JavaScript uses the Acrobat JS API: event.value is the field's value,
+                // this.getField('Subtotal').value retrieves the Subtotal field's value.
+                string js = "event.value = this.getField('Subtotal').value * 0.1;";
+                taxField.Actions.OnCalculate = new JavascriptAction(js);
+            }
+            else
+            {
+                Console.Error.WriteLine("TaxRate field not found.");
+            }
 
             // Save the modified PDF
-            formEditor.Save(outputPath);
+            formEditor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPdf}'.");
     }
 }

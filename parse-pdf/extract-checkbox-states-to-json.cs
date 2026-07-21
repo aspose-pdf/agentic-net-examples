@@ -9,40 +9,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "checkbox_states.json";
+        const string inputPdfPath = "input.pdf";
+        const string outputJsonPath = "checkbox_states.json";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document (using the standard Document constructor)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Collect the checked state of each checkbox field
+            // Prepare a list to hold the boolean states of all checkbox fields
             List<bool> checkboxStates = new List<bool>();
 
-            foreach (Field field in doc.Form.Fields)
+            // Iterate over all form fields in the AcroForm. The Form collection implements IEnumerable<Field>.
+            foreach (Field field in doc.Form)
             {
+                // Check if the current field is a CheckboxField
                 if (field is CheckboxField checkbox)
                 {
-                    // The Checked property returns true if the box is selected
+                    // The Checked property indicates whether the box is selected
                     checkboxStates.Add(checkbox.Checked);
                 }
             }
 
             // Serialize the boolean list to JSON
-            string json = JsonSerializer.Serialize(checkboxStates, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
+            string json = JsonSerializer.Serialize(checkboxStates, new JsonSerializerOptions { WriteIndented = true });
 
-            // Write JSON to the output file
-            File.WriteAllText(outputJson, json);
+            // Write the JSON output to a file
+            File.WriteAllText(outputJsonPath, json);
+            Console.WriteLine($"Checkbox states saved to '{outputJsonPath}'.");
         }
-
-        Console.WriteLine($"Checkbox states exported to '{outputJson}'.");
     }
 }

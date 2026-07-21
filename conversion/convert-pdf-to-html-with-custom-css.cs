@@ -6,67 +6,51 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath  = "input.pdf";   // source PDF
-        const string htmlPath = "output.html"; // generated HTML
-        const string cssPath  = "custom.css"; // custom CSS to apply
+        const string pdfPath = "input.pdf";
+        const string htmlPath = "output.html";
+
+        // Directory where the HTML file and the CSS file will be written.
+        string outputDir = Path.GetDirectoryName(Path.GetFullPath(htmlPath));
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        if (!File.Exists(cssPath))
-        {
-            Console.Error.WriteLine($"CSS not found: {cssPath}");
-            return;
-        }
+        // Custom CSS that should style the generated HTML.
+        const string customCss = @"
+body { font-family: Arial, sans-serif; background-color: #f9f9f9; }
+.my_prefix_1 { color: #ff0000; font-weight: bold; }
+";
 
         try
         {
-            // Load PDF and convert to HTML using HtmlSaveOptions
             using (Document pdfDoc = new Document(pdfPath))
             {
-                HtmlSaveOptions htmlOpts = new HtmlSaveOptions();
-                // Example setting – embed raster images as PNG inside SVG wrappers
-                htmlOpts.RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg;
-                pdfDoc.Save(htmlPath, htmlOpts);
+                // Configure HTML conversion options.
+                HtmlSaveOptions saveOptions = new HtmlSaveOptions();
+
+                // Optional: set a prefix for generated CSS class names.
+                saveOptions.CssClassNamesPrefix = "my_prefix_";
+
+                // Provide a custom strategy for saving the CSS file.
+                saveOptions.CustomCssSavingStrategy = new HtmlSaveOptions.CssSavingStrategy(info =>
+                {
+                    string cssFilePath = Path.Combine(outputDir, info.SupposedURL);
+                    File.WriteAllText(cssFilePath, customCss);
+                });
+
+                // Perform the conversion.
+                pdfDoc.Save(htmlPath, saveOptions);
             }
 
-            // Read the custom CSS content
-            string customCss = File.ReadAllText(cssPath);
-
-            // Load the generated HTML
-            string htmlContent = File.ReadAllText(htmlPath);
-
-            // Insert the CSS into the <head> section (if present)
-            const string headTag = "<head>";
-            int headPos = htmlContent.IndexOf(headTag, StringComparison.OrdinalIgnoreCase);
-            if (headPos >= 0)
-            {
-                int insertPos = headPos + headTag.Length;
-                string styleBlock = $"\n<style>\n{customCss}\n</style>\n";
-                htmlContent = htmlContent.Insert(insertPos, styleBlock);
-            }
-            else
-            {
-                // Fallback: prepend a <style> block at the beginning of the file
-                string styleBlock = $"<style>\n{customCss}\n</style>\n";
-                htmlContent = styleBlock + htmlContent;
-            }
-
-            // Save the modified HTML back to disk
-            File.WriteAllText(htmlPath, htmlContent);
-            Console.WriteLine($"Conversion completed. HTML saved to '{htmlPath}' with custom CSS applied.");
-        }
-        catch (TypeInitializationException)
-        {
-            // HTML conversion relies on GDI+ and is Windows‑only
-            Console.Error.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped.");
+            Console.WriteLine($"PDF successfully converted to HTML: {htmlPath}");
+            Console.WriteLine("Custom CSS applied.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

@@ -1,28 +1,29 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Document, Page, Rotation
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "rotated.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "rotated_page4.pdf";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document (wrapped in using for proper disposal)
         using (Document doc = new Document(inputPath))
         {
             // Ensure the document has at least four pages (1‑based indexing)
             if (doc.Pages.Count >= 4)
             {
-                // Rotate page 4 by 90 degrees clockwise
-                doc.Pages[4].Rotate = Aspose.Pdf.Rotation.on90;
+                // Rotate the fourth page 90 degrees clockwise
+                doc.Pages[4].Rotate = Rotation.on90;
             }
             else
             {

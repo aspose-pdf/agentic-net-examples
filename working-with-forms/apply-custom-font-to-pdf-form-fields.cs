@@ -1,18 +1,16 @@
 using System;
 using System.IO;
-using System.Drawing;                     // Required for System.Drawing.Color
+using System.Drawing; // Required for System.Drawing.Color
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // for DefaultAppearance
+using Aspose.Pdf.Forms;        // for Field handling
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fontName   = "Arial";   // replace with your custom font name
-        const double fontSize   = 12;        // desired font size
 
         if (!File.Exists(inputPath))
         {
@@ -20,21 +18,23 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all form fields
-            foreach (Field field in doc.Form)
+            // Name of the custom font to apply (must be installed or available to Aspose.Pdf)
+            string customFontName = "Arial";
+
+            // Loop through all form fields and set their default appearance
+            foreach (Field field in doc.Form.Fields)
             {
-                // Set a new DefaultAppearance for each field.
-                // DefaultAppearance constructor requires System.Drawing.Color for the text color.
-                field.DefaultAppearance = new DefaultAppearance(fontName, fontSize, System.Drawing.Color.Black);
+                // Apply the custom font, size 12, black color (System.Drawing.Color required)
+                field.DefaultAppearance = new DefaultAppearance(customFontName, 12, System.Drawing.Color.Black);
             }
 
-            // Save the modified PDF (lifecycle rule: use Save without extra options for PDF output)
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Custom font applied to all form fields. Saved as '{outputPath}'.");
+        Console.WriteLine($"Custom font applied to all form fields and saved as '{outputPath}'.");
     }
 }

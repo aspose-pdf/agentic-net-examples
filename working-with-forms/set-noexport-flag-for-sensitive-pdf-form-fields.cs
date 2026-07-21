@@ -16,25 +16,26 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all form fields in the document
+            // Iterate through all form fields in the document
             foreach (Field field in doc.Form.Fields)
             {
-                // Identify sensitive fields (example: name contains "Sensitive")
+                // Identify sensitive fields by name (adjust as needed)
                 if (field.FullName != null &&
-                    field.FullName.IndexOf("Sensitive", StringComparison.OrdinalIgnoreCase) >= 0)
+                    (field.FullName.Equals("SSN", StringComparison.OrdinalIgnoreCase) ||
+                     field.FullName.Equals("CreditCard", StringComparison.OrdinalIgnoreCase)))
                 {
-                    // Set the Exportable flag to false (NoExport) to exclude from exported data
+                    // Set the NoExport flag – Exportable = false prevents the field from being exported
                     field.Exportable = false;
                 }
             }
 
-            // Save the updated PDF (lifecycle rule: save within using block)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with NoExport flags applied: {outputPath}");
+        Console.WriteLine($"PDF saved with NoExport flags to '{outputPath}'.");
     }
 }

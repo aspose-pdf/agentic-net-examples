@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - working-with-attachments
 
-> **Working with attachments** in PDF using C# / .NET -- **49** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with attachments** in PDF using C# / .NET -- **50** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,27 +23,26 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (48/49 files) ← category-specific
-- `using Aspose.Pdf.Annotations;` (14/49 files)
-- `using Aspose.Pdf.Drawing;` (2/49 files)
-- `using Aspose.Pdf.AI;` (1/49 files)
-- `using Aspose.Pdf.Devices;` (1/49 files)
-- `using Aspose.Pdf.Optimization;` (1/49 files)
-- `using Aspose.Pdf.Text;` (1/49 files)
-- `using System;` (49/49 files)
-- `using System.IO;` (48/49 files)
-- `using System.Collections.Generic;` (7/49 files)
-- `using System.Threading.Tasks;` (2/49 files)
-- `using NUnit.Framework;` (1/49 files)
-- `using System.Diagnostics;` (1/49 files)
-- `using System.IO.Compression;` (1/49 files)
-- `using System.Linq;` (1/49 files)
-- `using System.Net.Http;` (1/49 files)
-- `using System.Reflection;` (1/49 files)
-- `using System.Security.Cryptography;` (1/49 files)
-- `using System.Text.Json;` (1/49 files)
-- `using System.Threading;` (1/49 files)
-- `using System.Xml.Linq;` (1/49 files)
+- `using Aspose.Pdf;` (49/50 files) ← category-specific
+- `using Aspose.Pdf.Annotations;` (13/50 files)
+- `using Aspose.Pdf.Drawing;` (2/50 files)
+- `using Aspose.Pdf.Text;` (2/50 files)
+- `using Aspose.Pdf.Devices;` (1/50 files)
+- `using Aspose.Pdf.Facades;` (1/50 files)
+- `using Aspose.Pdf.Optimization;` (1/50 files)
+- `using System;` (50/50 files)
+- `using System.IO;` (49/50 files)
+- `using System.Collections.Generic;` (8/50 files)
+- `using NUnit.Framework;` (1/50 files)
+- `using System.Collections.Concurrent;` (1/50 files)
+- `using System.Diagnostics;` (1/50 files)
+- `using System.IO.Compression;` (1/50 files)
+- `using System.Net.Http;` (1/50 files)
+- `using System.Security.Cryptography;` (1/50 files)
+- `using System.Text.Json;` (1/50 files)
+- `using System.Threading;` (1/50 files)
+- `using System.Threading.Tasks;` (1/50 files)
+- `using System.Xml.Linq;` (1/50 files)
 
 ## Common Code Pattern
 
@@ -61,40 +60,40 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-attachment-to-password-protected-pdf](./add-attachment-to-password-protected-pdf.cs) | Add Attachment to Password-Protected PDF | `Document`, `FileSpecification`, `EmbeddedFiles` | Demonstrates opening an encrypted PDF with a user password, embedding a file as an attachment, an... |
-| [add-file-attachment-to-pdf-with-error-handling](./add-file-attachment-to-pdf-with-error-handling.cs) | Add File Attachment to PDF with Error Handling | `Document`, `Save`, `FileSpecification` | Demonstrates verifying the existence of a PDF and an attachment file, then adding the attachment ... |
-| [add-file-attachment-to-pdf](./add-file-attachment-to-pdf.cs) | Add File Attachment to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to load an existing PDF, create a FileSpecification for a file, embed it as a Fi... |
-| [add-file-attachment-to-pdf__v2](./add-file-attachment-to-pdf__v2.cs) | Add File Attachment to PDF and Save to Output Folder | `Document`, `FileSpecification`, `EmbeddedFiles` | Demonstrates loading a PDF, embedding an external file as an attachment using FileSpecification, ... |
-| [add-file-attachment-with-mime-validation](./add-file-attachment-with-mime-validation.cs) | Add File Attachment with MIME Type Validation to PDF | `Document`, `FileSpecification`, `FileAttachmentAnnotation` | The example verifies that a file's extension maps to an allowed MIME type before embedding it as ... |
-| [add-file-attachments-with-custom-description](./add-file-attachments-with-custom-description.cs) | Add File Attachments with Custom Description and MIME Type | `Document`, `Save`, `Page` | Demonstrates how to attach files to a PDF, set a custom description (tooltip) and let Aspose.Pdf ... |
-| [add-in-memory-attachment-to-pdf](./add-in-memory-attachment-to-pdf.cs) | Add In-Memory Attachment to PDF using Aspose.Pdf | `Document`, `Add`, `FileSpecification` | Demonstrates how to embed a file into a PDF directly from a MemoryStream, avoiding any temporary ... |
-| [add-multiple-attachments-to-pdf](./add-multiple-attachments-to-pdf.cs) | Add Multiple Attachments to a PDF | `Document`, `FileSpecification`, `EmbeddedFilesCollection` | Shows how to load a PDF with Aspose.Pdf, iterate a collection of file paths, embed each file as a... |
-| [add-multiple-files-to-pdf-portfolio](./add-multiple-files-to-pdf-portfolio.cs) | Add Multiple Files to PDF Portfolio | `Document`, `EmbeddedFileCollection`, `FileSpecification` | Creates a PDF portfolio and embeds every file from a specified folder into the document using a s... |
-| [add-nested-pdf-to-portfolio](./add-nested-pdf-to-portfolio.cs) | Add Nested PDF to an Existing PDF Portfolio | `Document`, `FileSpecification`, `Add` | Demonstrates how to embed another PDF file as a nested item inside an existing PDF Portfolio usin... |
-| [add-pdf-attachment-with-retry](./add-pdf-attachment-with-retry.cs) | Add File Attachment to PDF with Retry on Network Share | `Document`, `FileSpecification`, `Rectangle` | Demonstrates how to attach a file to the first page of a PDF stored on a network share and implem... |
-| [add-thumbnails-to-pdf-pages](./add-thumbnails-to-pdf-pages.cs) | Add Thumbnails to PDF Pages | `Document`, `Page`, `ThumbnailDevice` | Demonstrates generating a thumbnail image for each page of a PDF using Aspose.Pdf's ThumbnailDevi... |
-| [add-unicode-filename-attachment-to-pdf](./add-unicode-filename-attachment-to-pdf.cs) | Add Unicode Filename Attachment to PDF | `Document`, `Page`, `Rectangle` | Shows how to attach a file to a PDF with a Unicode filename using Aspose.Pdf, creating a file att... |
-| [add-word-document-to-pdf-portfolio](./add-word-document-to-pdf-portfolio.cs) | Add Word Document to PDF Portfolio | `Document`, `FileSpecification`, `EmbeddedFiles` | Shows how to embed a Word (.docx) file into a PDF portfolio using Aspose.Pdf's EmbeddedFiles coll... |
-| [apply-custom-visual-template-to-pdf-portfolio](./apply-custom-visual-template-to-pdf-portfolio.cs) | Apply Custom Visual Template to PDF Portfolio | `Document`, `Page`, `Graph` | Shows how to add a full‑page graphical background and a header text to each page of an existing P... |
-| [attach-remote-file-to-pdf](./attach-remote-file-to-pdf.cs) | Attach Remote File to PDF as File Attachment Annotation | `Document`, `Page`, `Rectangle` | Downloads a file from a remote URL into memory and embeds it in a PDF as a file attachment annota... |
-| [batch-add-attachment-to-pdfs](./batch-add-attachment-to-pdfs.cs) | Batch Add Attachment to PDFs | `Document`, `FileSpecification`, `EmbeddedFiles` | Shows how to loop through a directory of PDF files and embed the same external file as an attachm... |
-| [batch-extract-pdf-attachments-zip](./batch-extract-pdf-attachments-zip.cs) | Batch Extract PDF Attachments and Create a ZIP Archive | `Document`, `EmbeddedFiles`, `EmbeddedFileCollection` | Shows how to iterate over a folder of PDFs, extract embedded files with Aspose.Pdf, and package a... |
-| [compress-pdf-portfolio-optimization](./compress-pdf-portfolio-optimization.cs) | Compress PDF Portfolio Using Optimization Options | `Document`, `OptimizationOptions`, `OptimizeResources` | Loads an existing PDF portfolio, enables object compression via OptimizationOptions, and saves th... |
-| [create-pdf-portfolio-with-embedded-files](./create-pdf-portfolio-with-embedded-files.cs) | Create PDF Portfolio with Embedded Files | `Document`, `Collection`, `FileSpecification` | Demonstrates how to convert an existing PDF into a portfolio by adding multiple embedded files us... |
-| [create-pdf-portfolio](./create-pdf-portfolio.cs) | Create PDF Portfolio with Embedded Files | `Document`, `Collection`, `FileSpecification` | Shows how to create a PDF portfolio and embed existing files such as PDFs, DOCX, and images as at... |
-| [delete-pdf-attachment-by-filename](./delete-pdf-attachment-by-filename.cs) | Delete PDF Attachment by Filename | `Document`, `EmbeddedFiles`, `Delete` | Demonstrates how to remove an embedded file from a PDF by specifying its filename using Aspose.Pdf. |
-| [delete-pdf-outline-items-by-title](./delete-pdf-outline-items-by-title.cs) | Delete PDF Outline Items by Title | `Document`, `OutlineCollection`, `Delete` | Demonstrates how to remove outline (bookmark) entries from a PDF by matching their title text ins... |
-| [embed-attachment-and-metadata](./embed-attachment-and-metadata.cs) | Embed Attachment and Custom Metadata into PDF | `Document`, `FileSpecification`, `Add` | Demonstrates how to embed a file as an attachment in a PDF and add custom metadata about the atta... |
-| [embed-file-from-byte-array-into-pdf](./embed-file-from-byte-array-into-pdf.cs) | Embed a File from Byte Array into a PDF | `Document`, `Page`, `FileSpecification` | Demonstrates how to create a FileSpecification from a byte array using a MemoryStream and attach ... |
-| [embed-hidden-xml-metadata-attachment](./embed-hidden-xml-metadata-attachment.cs) | Embed Hidden XML Metadata as PDF Attachment | `Document`, `Page`, `FileSpecification` | Shows how to serialize XML metadata to a memory stream, wrap it in a FileSpecification, and embed... |
-| [embed-image-into-pdf-portfolio](./embed-image-into-pdf-portfolio.cs) | Embed Image into PDF Portfolio with Display Name | `Document`, `Collection`, `FileSpecification` | Demonstrates how to create a PDF portfolio, embed an image file as an attachment, and set a custo... |
+| [add-attachment-to-password-protected-pdf](./add-attachment-to-password-protected-pdf.cs) | Add Attachment to Password-Protected PDF | `Document`, `FileSpecification`, `Add` | Shows how to open an encrypted PDF with a user password, embed a file as an attachment, and save ... |
+| [add-attachment-to-pdf-and-save](./add-attachment-to-pdf-and-save.cs) | Add Attachment to PDF and Save to Output Folder | `Document`, `FileSpecification`, `EmbeddedFilesCollection` | Shows how to load a PDF, embed a file as an attachment, and save the updated document to a specif... |
+| [add-custom-descriptions-to-pdf-attachments](./add-custom-descriptions-to-pdf-attachments.cs) | Add Custom Descriptions to PDF Attachments | `Document`, `FileSpecification`, `EmbeddedFiles` | Shows how to embed files into a PDF and assign a custom description (and MIME type) to each attac... |
+| [add-extract-remove-pdf-attachments](./add-extract-remove-pdf-attachments.cs) | Add, Extract, and Remove PDF Attachments with Timing | `Document`, `Page`, `FileSpecification` | Demonstrates how to add a file attachment annotation to a PDF, extract the attached file, and rem... |
+| [add-file-attachment-to-pdf-with-error-handling](./add-file-attachment-to-pdf-with-error-handling.cs) | Add File Attachment to PDF with Error Handling | `Document`, `Page`, `Rectangle` | Demonstrates how to attach a file to a PDF using Aspose.Pdf while checking for missing source fil... |
+| [add-file-attachment-to-pdf](./add-file-attachment-to-pdf.cs) | Add File Attachment Annotation to PDF | `Document`, `Page`, `Rectangle` | Demonstrates loading an existing PDF, creating a FileSpecification and a FileAttachmentAnnotation... |
+| [add-file-attachment-with-retry](./add-file-attachment-with-retry.cs) | Add File Attachment to PDF with Retry Logic | `Document`, `Page`, `FileSpecification` | Demonstrates attaching a file to a PDF using Aspose.Pdf and implementing retry handling for I/O e... |
+| [add-image-watermark-to-pdf-pages](./add-image-watermark-to-pdf-pages.cs) | Add Image Watermark to All PDF Pages | `Document`, `Page`, `WatermarkArtifact` | Shows how to load a PDF with Aspose.Pdf, iterate through each page, create a WatermarkArtifact fr... |
+| [add-in-memory-attachment-to-pdf](./add-in-memory-attachment-to-pdf.cs) | Add In-Memory Attachment to PDF Using Aspose.Pdf | `Document`, `Add`, `FileSpecification` | Demonstrates how to embed a file into a PDF using a MemoryStream, avoiding any intermediate disk ... |
+| [add-multiple-attachments-to-pdf](./add-multiple-attachments-to-pdf.cs) | Add Multiple Attachments to a PDF | `Document`, `FileSpecification`, `EmbeddedFiles` | Demonstrates how to embed several files into a PDF by iterating a collection of file paths and sa... |
+| [add-nested-pdf-to-portfolio](./add-nested-pdf-to-portfolio.cs) | Add Nested PDF to Existing PDF Portfolio | `Document`, `Collection`, `FileSpecification` | Shows how to embed a PDF file as a nested item inside an existing PDF Portfolio (collection) usin... |
+| [add-unicode-file-attachment-to-pdf](./add-unicode-file-attachment-to-pdf.cs) | Add Unicode File Attachment to PDF | `Document`, `Page`, `FileSpecification` | Demonstrates creating a PDF (if missing), attaching a file with a Unicode display name using a Fi... |
+| [add-word-document-to-pdf-portfolio](./add-word-document-to-pdf-portfolio.cs) | Add a Word Document to a PDF Portfolio | `Document`, `FileSpecification`, `EmbeddedFiles` | Shows how to embed a Word (.docx) file into a PDF document using Aspose.Pdf, turning the PDF into... |
+| [apply-visual-template-to-pdf-portfolio](./apply-visual-template-to-pdf-portfolio.cs) | Apply Visual Template to PDF Portfolio Pages | `Document`, `Page`, `Graph` | Demonstrates how to load an existing PDF Portfolio, add a semi‑transparent header graphic and tit... |
+| [attach-binary-file-to-pdf](./attach-binary-file-to-pdf.cs) | Attach Binary File to PDF from Byte Array | `Document`, `FileSpecification`, `FileAttachmentAnnotation` | Demonstrates creating a FileSpecification from a byte array, embedding it in a PDF document, and ... |
+| [attach-remote-file-to-pdf](./attach-remote-file-to-pdf.cs) | Attach Remote File to PDF as File Attachment Annotation | `Document`, `Page`, `Rectangle` | Downloads a file from a remote URL into memory and embeds it in a PDF as a file‑attachment annota... |
+| [attachment-removal-integration-tests](./attachment-removal-integration-tests.cs) | Attachment Removal Integration Tests |  | Shows how to write NUnit integration tests that verify removing, clearing, and removing by index ... |
+| [batch-add-attachment-to-pdfs](./batch-add-attachment-to-pdfs.cs) | Batch Add Attachment to PDFs | `Document`, `FileSpecification`, `EmbeddedFiles` | Demonstrates how to iterate through a folder of PDF files and embed the same attachment into each... |
+| [batch-extract-pdf-attachments-to-zip](./batch-extract-pdf-attachments-to-zip.cs) | Batch Extract PDF Attachments to ZIP Archive | `Document`, `EmbeddedFiles`, `EmbeddedFile` | Demonstrates how to iterate through multiple PDF files, extract all embedded file attachments, an... |
+| [compress-pdf-portfolio-with-optimization](./compress-pdf-portfolio-with-optimization.cs) | Compress PDF Portfolio Using Optimization Options | `Document`, `OptimizationOptions`, `OptimizeResources` | Shows how to open an existing PDF Portfolio, enable object compression via OptimizationOptions, a... |
+| [convert-pdf-to-portfolio-with-embedded-files](./convert-pdf-to-portfolio-with-embedded-files.cs) | Convert PDF to Portfolio with Embedded Files | `Document`, `FileSpecification`, `EmbeddedFiles` | Demonstrates how to load a regular PDF, embed multiple files, and automatically convert it into a... |
+| [create-pdf-portfolio-with-attachments](./create-pdf-portfolio-with-attachments.cs) | Create PDF Portfolio with Attachments | `Document`, `Page`, `TextFragment` | Demonstrates how to build a PDF Portfolio by creating a document, adding a page with text, embedd... |
+| [create-pdf-portfolio-with-multiple-embedded-files](./create-pdf-portfolio-with-multiple-embedded-files.cs) | Create PDF Portfolio with Multiple Embedded Files | `Document`, `FileSpecification`, `Add` | Demonstrates how to add several files of different types to a PDF portfolio in a single loop usin... |
+| [delete-pdf-attachment-by-filename](./delete-pdf-attachment-by-filename.cs) | Delete PDF Attachment by Filename | `Document`, `EmbeddedFileCollection`, `Delete` | Demonstrates how to remove an embedded file from a PDF by specifying its filename using Aspose.Pdf. |
+| [delete-pdf-outline-items-matching-text](./delete-pdf-outline-items-matching-text.cs) | Delete PDF Outline Items Matching Text | `Document`, `OutlineItemCollection`, `OutlineCollection` | Loads a PDF, searches its outline (bookmark) entries for a specific description text, and removes... |
+| [embed-attachment-metadata-in-pdf](./embed-attachment-metadata-in-pdf.cs) | Embed Attachment and Add Metadata to PDF Document Info | `Document`, `FileSpecification`, `DocumentInfo` | Demonstrates how to embed a file into a PDF using Aspose.Pdf, store custom attachment metadata in... |
+| [embed-hidden-xml-metadata-attachment](./embed-hidden-xml-metadata-attachment.cs) | Embed Hidden XML Metadata as PDF Attachment | `Document`, `FileSpecification`, `FileAttachmentAnnotation` | Creates or loads a PDF, builds an XML document with metadata, serializes it to a stream, and embe... |
+| [embed-image-into-pdf-portfolio](./embed-image-into-pdf-portfolio.cs) | Embed Image into PDF Portfolio with Display Name | `Document`, `FileSpecification`, `EmbeddedFiles` | Demonstrates how to embed an image file into a PDF portfolio and assign a custom display name usi... |
+| [extract-attachment-by-name-from-pdf](./extract-attachment-by-name-from-pdf.cs) | Extract Attachment by Name from PDF | `Document`, `FileSpecification`, `EmbeddedFiles` | The example creates a PDF with an embedded file, then loads the PDF, locates the attachment by it... |
 | [extract-attachments-from-encrypted-pdf](./extract-attachments-from-encrypted-pdf.cs) | Extract Attachments from Encrypted PDF | `Document`, `Decrypt`, `EmbeddedFiles` | Shows how to open an encrypted PDF with a password, decrypt it, and extract all embedded file att... |
-| [extract-embedded-attachment-from-pdf](./extract-embedded-attachment-from-pdf.cs) | Extract Embedded Attachment from PDF | `Document`, `FileSpecification`, `EmbeddedFilesCollection` | Shows how to locate an embedded file in a PDF by its name and save it to a target directory using... |
-| [extract-embedded-files-from-pdf-portfolio](./extract-embedded-files-from-pdf-portfolio.cs) | Extract Embedded Files from PDF Portfolio | `Document`, `EmbeddedFileCollection`, `EmbeddedFile` | Demonstrates how to load a PDF portfolio with Aspose.Pdf, enumerate its embedded files, preserve ... |
-| ... | | | *and 19 more files* |
+| ... | | | *and 20 more files* |
 
 ## Category Statistics
-- Total examples: 49
+- Total examples: 50
 
 ## Category-Specific Tips
 
@@ -134,5 +133,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for working-with-attachments patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-07-05 | Run: `20260705_005655_3d29fa`
+Updated: 2026-07-17 | Run: `20260717_171638_da3b3e`
 <!-- AUTOGENERATED:END -->

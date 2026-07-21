@@ -1,58 +1,47 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";   // source PDF
-        const string stampImg = "logo.png";    // image to use as stamp
-        const string outputPdf = "stamped_output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "stamped_output.pdf";
+        const string imagePath  = "stamp.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(stampImg))
+        if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        using (Document doc = new Document(inputPath))
         {
-            // Create an image stamp from the file
-            ImageStamp imgStamp = new ImageStamp(stampImg)
-            {
-                // Position the stamp (example: bottom‑right corner)
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment   = VerticalAlignment.Bottom,
-                // Optional visual tweaks
-                Opacity = 0.5f
-            };
-
-            // ImageStamp does not have a Margin property – use XIndent/YIndent instead.
-            // Here we emulate a 10‑point margin from the right and bottom edges.
-            imgStamp.XIndent = 10f; // horizontal offset (points)
-            imgStamp.YIndent = 10f; // vertical offset (points)
-
-            // Apply the stamp to every page
+            // Add the same image stamp to every page
             foreach (Page page in doc.Pages)
             {
+                ImageStamp imgStamp = new ImageStamp(imagePath);
+                // Position the stamp (example: top‑right corner)
+                imgStamp.HorizontalAlignment = HorizontalAlignment.Right;
+                imgStamp.VerticalAlignment   = VerticalAlignment.Top;
+                imgStamp.Opacity = 0.5f; // semi‑transparent
+
+                // Apply the stamp to the current page
                 page.AddStamp(imgStamp);
             }
 
-            // Page labels are preserved automatically; no extra work required.
-
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // Save the PDF; page labels are preserved automatically
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Image stamp added. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Image stamp applied and saved to '{outputPath}'.");
     }
 }

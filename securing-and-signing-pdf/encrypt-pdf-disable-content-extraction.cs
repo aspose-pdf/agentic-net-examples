@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // CryptoAlgorithm, Permissions, Document are in this namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "encrypted.pdf";
-        const string userPassword  = "user123";
+        const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
@@ -19,16 +19,16 @@ class Program
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
+            // Load the PDF inside a using block for proper disposal
             using (Document doc = new Document(inputPath))
             {
-                // Set permissions: allow printing only, do NOT include ExtractContent
-                Permissions perms = Permissions.PrintDocument;
+                // Disable all permissions (including content extraction) by setting no flags
+                Permissions perms = (Permissions)0;
 
-                // Encrypt with AES-256 (preferred algorithm)
+                // Encrypt using the recommended AES-256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                // Save the encrypted PDF
+                // Save the encrypted document
                 doc.Save(outputPath);
             }
 

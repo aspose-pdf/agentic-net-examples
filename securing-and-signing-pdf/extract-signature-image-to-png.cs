@@ -1,67 +1,54 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;          // for ImageFormat
-using System.Linq;                     // for Any()
-using Aspose.Pdf;                     // core PDF classes
-using Aspose.Pdf.Forms;               // SignatureField
+using System.Drawing.Imaging;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
-class ExtractSignatureImage
+class Program
 {
     static void Main()
     {
-        const string pdfPath   = "signed_document.pdf";
-        const string fieldName = "Signature1";   // name of the signature field
+        const string inputPdf = "signed_document.pdf";
+        const string signatureFieldName = "Signature1"; // replace with actual field name
         const string outputPng = "signature_image.png";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF document
-            using (Document doc = new Document(pdfPath))
+            // Retrieve the signature field by name
+            if (doc.Form[signatureFieldName] is SignatureField sigField)
             {
-                // Verify that the form contains a field with the requested name
-                bool fieldExists = doc?.Form?.Fields?.Any(f => f.Name == fieldName) ?? false;
-                if (!fieldExists)
+                // Extract the signature appearance image as a JPEG-encoded stream
+                using (Stream jpegStream = sigField.ExtractImage())
                 {
-                    Console.Error.WriteLine($"Signature field '{fieldName}' not found.");
-                    return;
-                }
-
-                // Retrieve the field and cast it to SignatureField
-                SignatureField sigField = doc.Form[fieldName] as SignatureField;
-                if (sigField == null)
-                {
-                    Console.Error.WriteLine($"Field '{fieldName}' is not a signature field.");
-                    return;
-                }
-
-                // Extract the image as PNG (the overload accepts System.Drawing.Imaging.ImageFormat)
-                using (Stream imgStream = sigField.ExtractImage(ImageFormat.Png))
-                {
-                    if (imgStream == null)
+                    if (jpegStream == null)
                     {
-                        Console.Error.WriteLine("No image found in the signature appearance.");
+                        Console.Error.WriteLine("No signature image found in the field.");
                         return;
                     }
 
-                    // Write the PNG stream to a file
-                    using (FileStream fileOut = new FileStream(outputPng, FileMode.Create, FileAccess.Write))
+                    // Ensure the stream position is at the beginning
+                    jpegStream.Position = 0;
+
+                    // Load the JPEG stream into a System.Drawing.Image (fully qualified to avoid ambiguity)
+                    using (System.Drawing.Image img = System.Drawing.Image.FromStream(jpegStream))
                     {
-                        imgStream.CopyTo(fileOut);
+                        // Save the image as PNG
+                        img.Save(outputPng, ImageFormat.Png);
+                        Console.WriteLine($"Signature image saved to '{outputPng}'.");
                     }
                 }
-
-                Console.WriteLine($"Signature image saved to '{outputPng}'.");
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            else
+            {
+                Console.Error.WriteLine($"Signature field '{signatureFieldName}' not found or is not a SignatureField.");
+            }
         }
     }
 }

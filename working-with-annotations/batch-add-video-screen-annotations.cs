@@ -7,56 +7,58 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_video.pdf";
-        const string videoPath  = "sample.mp4";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_with_video.pdf";
+        const string videoPath = "sample.mp4";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
+
         if (!File.Exists(videoPath))
         {
             Console.Error.WriteLine($"Video file not found: {videoPath}");
             return;
         }
 
-        // Placeholder video dimensions – replace with actual values if known
-        const double videoWidthPx  = 640;
-        const double videoHeightPx = 360;
-        double aspect = videoWidthPx / videoHeightPx; // width / height
-
-        using (Document doc = new Document(inputPath))
+        // Wrap Document in a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
+            // Desired width for the video annotation (in points)
+            const double annotationWidth = 300.0;
+            // Assume a 16:9 aspect ratio for the video
+            const double aspectRatio = 16.0 / 9.0;
+            double annotationHeight = annotationWidth / aspectRatio;
+
+            // Add a ScreenAnnotation to each page
             foreach (Page page in doc.Pages)
             {
-                // Desired annotation width: half of page width
-                double rectWidth  = page.PageInfo.Width / 2;
-                double rectHeight = rectWidth / aspect; // maintain aspect ratio
+                // Position the annotation at the top‑left corner of the page
+                double llx = 50; // lower‑left X
+                double lly = page.PageInfo.Height - 50 - annotationHeight; // lower‑left Y
+                double urx = llx + annotationWidth; // upper‑right X
+                double ury = lly + annotationHeight; // upper‑right Y
 
-                // Position rectangle with a margin from top‑left corner
-                double llx = 50;                                 // left
-                double lly = page.PageInfo.Height - rectHeight - 50; // bottom
-                double urx = llx + rectWidth;                    // right
-                double ury = lly + rectHeight;                   // top
-
-                // Fully qualified rectangle to avoid ambiguity
+                // Fully qualified Rectangle to avoid ambiguity
                 Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
 
-                // Create screen annotation that plays the video
-                ScreenAnnotation screen = new ScreenAnnotation(page, rect, videoPath);
-                screen.Title    = "Video Annotation";
-                screen.Contents = "Click to play video";
+                // Create the screen annotation first
+                ScreenAnnotation screenAnn = new ScreenAnnotation(page, rect, videoPath);
+                // Optional visual styling
+                screenAnn.Color = Aspose.Pdf.Color.LightGray;
+                // Border must be set after the annotation instance exists
+                screenAnn.Border = new Border(screenAnn) { Width = 1 };
 
-                // Add the annotation to the page
-                page.Annotations.Add(screen);
+                // Add the annotation to the page's annotation collection
+                page.Annotations.Add(screenAnn);
             }
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with video annotations to '{outputPath}'.");
+        Console.WriteLine($"Video annotations added. Output saved to '{outputPdf}'.");
     }
 }

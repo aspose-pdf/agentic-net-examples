@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        // Folder containing the PDF files to process
+        // Folder containing PDF files
         const string folderPath = @"C:\PdfFolder";
 
         if (!Directory.Exists(folderPath))
@@ -20,17 +20,12 @@ class Program
         {
             try
             {
-                // Initialize the annotation editor facade
+                // Bind the PDF, delete all annotations, and overwrite the file
                 using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
                 {
-                    // Bind the current PDF file
-                    editor.BindPdf(pdfFile);
-
-                    // Delete all annotations in the document
-                    editor.DeleteAnnotations();
-
-                    // Overwrite the original file with the cleaned version
-                    editor.Save(pdfFile);
+                    editor.BindPdf(pdfFile);          // Load the PDF into the facade
+                    editor.DeleteAnnotations();       // Remove all annotations
+                    editor.Save(pdfFile);             // Overwrite the original file
                 }
 
                 Console.WriteLine($"Processed: {Path.GetFileName(pdfFile)}");

@@ -6,29 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string sourcePdf = "source.pdf";
-        const string targetPdf = "target.pdf";
-        const string xfdfFile  = "annotations.xfdf";
+        // Paths for source PDF, destination PDF and the intermediate XFDF file
+        const string sourcePdfPath = "source.pdf";
+        const string targetPdfPath = "target.pdf";
+        const string xfdfPath       = "annotations.xfdf";
+        const string outputPdfPath  = "target_with_annotations.pdf";
 
-        if (!File.Exists(sourcePdf) || !File.Exists(targetPdf))
+        // Ensure source and target files exist
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine("Source or target PDF not found.");
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            return;
+        }
+        if (!File.Exists(targetPdfPath))
+        {
+            Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
             return;
         }
 
-        // Export all annotations from the source PDF to an XFDF file
-        using (Document srcDoc = new Document(sourcePdf))
+        // Export annotations from the source PDF to an XFDF file
+        using (Document sourceDoc = new Document(sourcePdfPath))
         {
-            srcDoc.ExportAnnotationsToXfdf(xfdfFile);
+            sourceDoc.ExportAnnotationsToXfdf(xfdfPath);
         }
 
         // Import the XFDF annotations into the target PDF and save the result
-        using (Document tgtDoc = new Document(targetPdf))
+        using (Document targetDoc = new Document(targetPdfPath))
         {
-            tgtDoc.ImportAnnotationsFromXfdf(xfdfFile);
-            tgtDoc.Save("target_with_annotations.pdf");
+            targetDoc.ImportAnnotationsFromXfdf(xfdfPath);
+            targetDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine("Annotations exported to XFDF and imported into target PDF successfully.");
+        Console.WriteLine($"Annotations exported to '{xfdfPath}' and imported into '{outputPdfPath}'.");
     }
 }

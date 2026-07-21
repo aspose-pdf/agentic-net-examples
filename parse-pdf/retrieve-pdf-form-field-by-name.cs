@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "form.pdf";
-        const string fieldName = "MyTextField";
+        const string inputPath = "input.pdf";   // Path to the PDF containing the form
+        const string fieldName = "MyField";     // Name of the field to retrieve
 
         if (!File.Exists(inputPath))
         {
@@ -16,21 +16,23 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle handled by using)
+        // Load the document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the form field by its name using the Form indexer.
-            // The indexer returns a WidgetAnnotation, so cast it to Aspose.Pdf.Forms.Field.
+            // The Form indexer returns a WidgetAnnotation; cast it to Field.
             Field? formField = doc.Form[fieldName] as Field;
-
             if (formField != null)
             {
-                Console.WriteLine($"Field '{fieldName}' found. Current value: {formField.Value}");
+                // Example: output the current value of the field
+                Console.WriteLine($"Field \"{fieldName}\" value: {formField.Value}");
             }
             else
             {
-                Console.WriteLine($"Field '{fieldName}' not found in the document.");
+                Console.WriteLine($"Field \"{fieldName}\" was not found or is not a form field.");
             }
+
+            // No changes are made, but if you need to persist modifications, call Save here
+            // doc.Save("output.pdf");
         }
     }
 }

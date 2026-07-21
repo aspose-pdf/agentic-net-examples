@@ -6,51 +6,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF file
-        const string outputDir = "SplitPages";         // folder for individual pages
+        // Input PDF file path
+        const string inputPdfPath = "input.pdf";
 
-        // Verify the source file exists
-        if (!File.Exists(inputPdf))
+        // Output folder where each page PDF will be saved
+        const string outputFolder = "SplitPages";
+
+        // Verify input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        try
-        {
-            // Create the PdfFileEditor facade
-            PdfFileEditor editor = new PdfFileEditor();
+        // File name template – %NUM% will be replaced with the page number (1‑based)
+        string fileNameTemplate = Path.Combine(outputFolder, "page%NUM%.pdf");
 
-            // Split the PDF into single‑page streams
-            MemoryStream[] pageStreams = editor.SplitToPages(inputPdf);
+        // Use PdfFileEditor (facade) to split the PDF into single‑page documents
+        PdfFileEditor pdfEditor = new PdfFileEditor();
+        pdfEditor.SplitToPages(inputPdfPath, fileNameTemplate);
 
-            // Iterate over the returned streams and write each to a uniquely named file
-            for (int i = 0; i < pageStreams.Length; i++)
-            {
-                // Build a file name like "page_1.pdf", "page_2.pdf", etc.
-                string outPath = Path.Combine(outputDir, $"page_{i + 1}.pdf");
-
-                // Reset the stream position before copying
-                pageStreams[i].Position = 0;
-
-                // Write the stream content to the file
-                using (FileStream fileStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
-                {
-                    pageStreams[i].CopyTo(fileStream);
-                }
-
-                // Dispose the individual memory stream
-                pageStreams[i].Dispose();
-
-                Console.WriteLine($"Saved page {i + 1} → {outPath}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during split: {ex.Message}");
-        }
+        Console.WriteLine($"PDF has been split into individual pages in folder: {outputFolder}");
     }
 }

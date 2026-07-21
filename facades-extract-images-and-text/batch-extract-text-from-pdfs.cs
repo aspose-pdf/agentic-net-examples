@@ -2,20 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class Program
+class BatchPdfTextExtractor
 {
     static void Main()
     {
-        // Folder containing source PDFs
-        const string inputFolder = "InputPdfs";
+        // Folder containing PDF files
+        const string inputFolder = @"C:\PdfInput";
         // Folder where extracted text files will be saved
-        const string outputFolder = "ExtractedTexts";
-
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
-        }
+        const string outputFolder = @"C:\PdfOutput";
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
@@ -23,23 +17,25 @@ class Program
         // Process each PDF file in the input folder
         foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-            string txtPath = Path.Combine(outputFolder, baseName + ".txt");
-
             try
             {
-                // PdfExtractor implements IDisposable, so use a using block
+                // Build the output text file path (same base name as the PDF)
+                string txtPath = Path.Combine(
+                    outputFolder,
+                    Path.GetFileNameWithoutExtension(pdfPath) + ".txt");
+
+                // Use PdfExtractor to extract text
                 using (PdfExtractor extractor = new PdfExtractor())
                 {
-                    // Load the PDF file into the extractor
+                    // Bind the PDF file to the extractor
                     extractor.BindPdf(pdfPath);
-                    // Extract all text (Unicode encoding is default)
+                    // Extract all text using Unicode encoding (default)
                     extractor.ExtractText();
-                    // Write the extracted text to a .txt file with the same base name
+                    // Save the extracted text to the .txt file
                     extractor.GetText(txtPath);
                 }
 
-                Console.WriteLine($"Extracted text: '{pdfPath}' → '{txtPath}'");
+                Console.WriteLine($"Extracted text from '{pdfPath}' to '{txtPath}'.");
             }
             catch (Exception ex)
             {

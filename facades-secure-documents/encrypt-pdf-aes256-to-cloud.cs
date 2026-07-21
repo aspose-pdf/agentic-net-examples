@@ -3,59 +3,71 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class PdfEncryptionUtility
+namespace PdfEncryption
 {
     /// <summary>
-    /// Encrypts a PDF using AES‑256 and writes the result to the specified destination (e.g., a cloud storage bucket).
+    /// Provides PDF encryption functionality using AES‑256.
     /// </summary>
-    /// <param name="inputFile">Path to the source PDF.</param>
-    /// <param name="outputFile">Path where the encrypted PDF will be saved (cloud bucket URI or local path).</param>
-    /// <param name="userPassword">User password (can be empty for no user password).</param>
-    /// <param name="ownerPassword">Owner password (can be empty; a random one will be generated).</param>
-    public static void EncryptPdf(string inputFile, string outputFile, string userPassword, string ownerPassword)
+    public static class PdfEncryptionUtility
     {
-        // Verify that the source file exists.
-        if (!File.Exists(inputFile))
+        /// <summary>
+        /// Encrypts a PDF file using AES‑256 and writes the encrypted PDF to a cloud storage stream.
+        /// </summary>
+        /// <param name="inputPdfPath">Full path to the source PDF file.</param>
+        /// <param name="outputStream">Stream representing the destination in the cloud storage bucket.</param>
+        /// <param name="userPassword">User password (can be null or empty).</param>
+        /// <param name="ownerPassword">Owner password (can be null or empty).</param>
+        public static void EncryptPdfToCloud(string inputPdfPath, Stream outputStream, string userPassword, string ownerPassword)
         {
-            Console.Error.WriteLine($"Input file not found: {inputFile}");
-            return;
-        }
+            if (string.IsNullOrEmpty(inputPdfPath))
+                throw new ArgumentException("Input PDF path must be provided.", nameof(inputPdfPath));
+            if (outputStream == null)
+                throw new ArgumentNullException(nameof(outputStream));
 
-        // PdfFileSecurity implements IDisposable, so wrap it in a using block.
-        using (PdfFileSecurity security = new PdfFileSecurity(inputFile, outputFile))
-        {
-            // Define the desired privileges for the encrypted document.
-            // Here we allow printing; adjust as needed.
-            DocumentPrivilege privilege = DocumentPrivilege.Print;
-
-            // Encrypt using a 256‑bit key with the AES algorithm.
-            // The method returns true on success.
-            bool encrypted = security.EncryptFile(
-                userPassword,
-                ownerPassword,
-                privilege,
-                KeySize.x256,
-                Algorithm.AES);
-
-            if (!encrypted)
+            // PdfFileSecurity implements IDisposable via SaveableFacade, so use a using block.
+            using (PdfFileSecurity fileSecurity = new PdfFileSecurity())
             {
-                Console.Error.WriteLine("Encryption failed.");
-                return;
+                // Bind the source PDF file to the facade.
+                fileSecurity.BindPdf(inputPdfPath);
+
+                // Encrypt using AES‑256 (KeySize.x256) and the AES algorithm.
+                // DocumentPrivilege.Print is used as an example; adjust as needed.
+                fileSecurity.EncryptFile(
+                    userPassword,
+                    ownerPassword,
+                    DocumentPrivilege.Print,
+                    KeySize.x256,
+                    Algorithm.AES);
+
+                // Save the encrypted PDF directly to the provided cloud stream.
+                fileSecurity.Save(outputStream);
             }
         }
-
-        // The encrypted PDF is now saved at the output location.
-        Console.WriteLine($"Encrypted PDF saved to: {outputFile}");
     }
 
-    static void Main()
+    /// <summary>
+    /// Minimal entry point required for a console‑type project.
+    /// </summary>
+    internal class Program
     {
-        // Example usage:
-        string sourcePdf = "input.pdf";                     // Local source PDF.
-        string destination = "gs://my-bucket/encrypted.pdf"; // Destination URI (cloud bucket) or local path.
-        string userPwd = "user123";
-        string ownerPwd = "owner123";
-
-        EncryptPdf(sourcePdf, destination, userPwd, ownerPwd);
+        static void Main(string[] args)
+        {
+            // The project is primarily a library; the Main method is kept empty to satisfy the compiler.
+            // Uncomment and adapt the following block to perform a quick test.
+            //
+            // if (args.Length < 2)
+            // {
+            //     Console.WriteLine("Usage: PdfEncryption <inputPdfPath> <outputPath>");
+            //     return;
+            // }
+            //
+            // string inputPath = args[0];
+            // string outputPath = args[1];
+            // using (var outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+            // {
+            //     PdfEncryptionUtility.EncryptPdfToCloud(inputPath, outStream, "userPwd", "ownerPwd");
+            // }
+            // Console.WriteLine("Encryption completed.");
+        }
     }
 }

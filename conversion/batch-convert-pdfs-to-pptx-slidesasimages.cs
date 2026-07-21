@@ -1,55 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
-class Program
+class BatchPdfToPptx
 {
     static void Main()
     {
-        // Folder containing source PDF files
-        const string inputFolder = "InputPdfs";
-        // Folder where converted PPTX files will be placed
-        const string outputFolder = "OutputPptx";
-
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
-        }
+        // Directory containing the source PDF files
+        const string inputDirectory = @"C:\PdfInput";
+        // Directory where the resulting PPTX files will be saved
+        const string outputDirectory = @"C:\PptxOutput";
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDirectory);
 
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        // Get all PDF files in the input directory (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf");
 
         foreach (string pdfPath in pdfFiles)
         {
-            // Build the output PPTX file name (same base name, .pptx extension)
-            string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-            string pptxPath = Path.Combine(outputFolder, baseName + ".pptx");
+            // Derive the output PPTX file name from the PDF file name
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            string pptxPath = Path.Combine(outputDirectory, fileNameWithoutExt + ".pptx");
 
-            try
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDocument = new Document(pdfPath))
             {
-                // Load the PDF document inside a using block for deterministic disposal
-                using (Document pdfDoc = new Document(pdfPath))
+                // Initialize PPTX save options and enable rasterized slide output
+                PptxSaveOptions saveOptions = new PptxSaveOptions
                 {
-                    // Configure PPTX save options – enable rasterized slide output
-                    PptxSaveOptions saveOptions = new PptxSaveOptions
-                    {
-                        SlidesAsImages = true
-                    };
+                    SlidesAsImages = true // each slide will be rendered as an image
+                };
 
-                    // Save as PPTX using the explicit save options (required for non‑PDF formats)
-                    pdfDoc.Save(pptxPath, saveOptions);
-                }
+                // Save the document as PPTX using the explicit save options
+                pdfDocument.Save(pptxPath, saveOptions);
+            }
 
-                Console.WriteLine($"Converted: {pdfPath} → {pptxPath}");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error converting '{pdfPath}': {ex.Message}");
-            }
+            Console.WriteLine($"Converted '{pdfPath}' → '{pptxPath}'");
         }
+
+        Console.WriteLine("Batch conversion completed.");
     }
 }

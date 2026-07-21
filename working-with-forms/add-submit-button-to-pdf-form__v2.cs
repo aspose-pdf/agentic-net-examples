@@ -17,37 +17,32 @@ class Program
             return;
         }
 
-        // Load the existing PDF (Document is disposed automatically by using)
+        // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page where the button will be placed (first page in this example)
-            Page page = doc.Pages[1];
+            // Ensure the document has a form object
+            Form form = doc.Form;
 
-            // Define the button rectangle (left, bottom, right, top)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
+            // Define the button rectangle (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle buttonRect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
 
-            // Create the push button field on the selected page
-            ButtonField submitButton = new ButtonField(page, rect)
-            {
-                Name = "SubmitForm",                 // Field name
-                AlternateCaption = "Submit",         // Text shown when button is pressed
-                NormalCaption = "Submit",            // Text shown normally
-                Color = Aspose.Pdf.Color.LightGray   // Optional visual styling
-            };
+            // Create a push button on the first page
+            Page firstPage = doc.Pages[1];
+            ButtonField submitButton = new ButtonField(firstPage, buttonRect);
 
-            // Create a SubmitFormAction that posts to the desired URL
-            SubmitFormAction submitAction = new SubmitFormAction
-            {
-                // Url property expects a FileSpecification, not a raw string
-                Url = new FileSpecification("https://api.example.com/submit")
-                // Additional flags (e.g., ExportFormat, SubmitPdf) can be set via the Flags property if needed
-            };
+            // Set the field name and visible caption
+            submitButton.PartialName      = "SubmitForm";
+            submitButton.AlternateCaption = "Submit";
 
-            // Assign the action to the button's activation event
+            // Create a submit-form action that posts to the desired URL
+            SubmitFormAction submitAction = new SubmitFormAction();
+            submitAction.Url = new FileSpecification("https://api.example.com/submit");
+
+            // Assign the action to the button activation event
             submitButton.OnActivated = submitAction;
 
-            // Add the button field to the document's form collection
-            doc.Form.Add(submitButton);
+            // Add the button to the document's form (page number is optional here)
+            form.Add(submitButton, 1);
 
             // Save the modified PDF
             doc.Save(outputPath);

@@ -6,10 +6,15 @@ class Program
 {
     static void Main()
     {
+        // Input PDF (must be encrypted with an owner password)
         const string inputPath = "input.pdf";
+        // Output PDF with the new owner password
         const string outputPath = "output.pdf";
-        const string oldOwnerPassword = "oldOwnerPassword";
-        const string newOwnerPassword = "newOwnerPassword";
+
+        // Original owner password (required to authorize the change)
+        const string currentOwnerPassword = "oldOwnerPass";
+        // New owner password to set
+        const string newOwnerPassword = "newOwnerPass";
 
         if (!File.Exists(inputPath))
         {
@@ -19,19 +24,21 @@ class Program
 
         try
         {
-            // Initialize PdfFileSecurity with source and destination files.
+            // Initialize the PdfFileSecurity facade with source and destination files
             using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
             {
                 // Change only the owner password.
-                // Pass null for newUserPassword to keep the existing user password unchanged.
-                bool changed = security.ChangePassword(oldOwnerPassword, null, newOwnerPassword);
-                if (!changed)
+                // Pass null or empty string for newUserPassword to keep the existing user password unchanged.
+                // The method preserves all existing privileges.
+                bool changed = security.ChangePassword(currentOwnerPassword, null, newOwnerPassword);
+
+                if (changed)
                 {
-                    Console.Error.WriteLine("Failed to update the owner password.");
+                    Console.WriteLine($"Owner password updated successfully. Output saved to '{outputPath}'.");
                 }
                 else
                 {
-                    Console.WriteLine($"Owner password updated successfully. Output saved to '{outputPath}'.");
+                    Console.Error.WriteLine("Failed to change the owner password.");
                 }
             }
         }

@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        // Input and output PDF file paths
+        // Paths to the source PDF (100‑page document) and the output PDF
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_resized.pdf";
+        const string outputPath = "output.pdf";
 
         // Verify that the source file exists
         if (!File.Exists(inputPath))
@@ -17,21 +17,21 @@ class Program
             return;
         }
 
-        // Create the PdfFileEditor facade
+        // Create the PdfFileEditor facade (no IDisposable implementation)
         PdfFileEditor fileEditor = new PdfFileEditor();
 
-        // Add 10% margins on all sides for all pages (pages = null)
-        // left, right, top, bottom margins are specified in percents of the original page size
+        // Add a 10 % margin on all four sides of every page.
+        // Passing null for the pages array processes all pages in the document.
+        const double marginPercent = 10.0; // 10 % margin
         bool success = fileEditor.AddMarginsPct(
-            source:      inputPath,
-            destination: outputPath,
-            pages:       null,   // null processes every page in the document
-            leftMargin:  10,     // 10% left margin
-            rightMargin: 10,     // 10% right margin
-            topMargin:   10,     // 10% top margin
-            bottomMargin:10);    // 10% bottom margin
+            inputPath,          // source PDF
+            outputPath,         // destination PDF
+            null,               // null = all pages
+            marginPercent,      // left margin (% of page width)
+            marginPercent,      // right margin (% of page width)
+            marginPercent,      // top margin (% of page height)
+            marginPercent);     // bottom margin (% of page height)
 
-        // Report the result
         if (success)
         {
             Console.WriteLine($"Resized PDF saved to '{outputPath}'.");

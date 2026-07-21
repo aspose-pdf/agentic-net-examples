@@ -2,68 +2,64 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class PortfolioExtractor
+class Program
 {
-    /// <summary>
-    /// Extracts all embedded files from a PDF portfolio and saves them to the specified directory.
-    /// </summary>
-    /// <param name="pdfPath">Path to the source PDF file.</param>
-    /// <param name="outputDirectory">Directory where extracted files will be saved.</param>
-    public static void ExtractEmbeddedFiles(string pdfPath, string outputDirectory)
+    static void Main()
     {
-        if (!File.Exists(pdfPath))
+        const string inputPdf = "portfolio.pdf";
+        const string outputDir = "ExtractedFiles";
+
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists.
-        Directory.CreateDirectory(outputDirectory);
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document (wrapped in using for proper disposal).
-        using (Document doc = new Document(pdfPath))
+        try
         {
-            // The EmbeddedFiles property gives access to the collection of embedded files.
-            EmbeddedFileCollection embeddedFiles = doc.EmbeddedFiles;
-
-            // If there are no embedded files, inform the user.
-            if (embeddedFiles == null || embeddedFiles.Count == 0)
+            using (Document doc = new Document(inputPdf))
             {
-                Console.WriteLine("No embedded files found in the PDF.");
-                return;
-            }
-
-            // Iterate over each embedded file and save it.
-            foreach (object embeddedObj in embeddedFiles)
-            {
-                // Use dynamic to avoid compile‑time dependency on the EmbeddedFile type.
-                dynamic embeddedFile = embeddedObj;
-
-                // The Name property holds the original file name.
-                string fileName = embeddedFile.Name as string;
-                if (string.IsNullOrEmpty(fileName))
+                // Iterate over embedded files using reflection to avoid direct dependency on the EmbeddedFile type
+                foreach (var embedded in doc.EmbeddedFiles)
                 {
-                    // Fallback to a generated name if the original is missing.
-                    fileName = Guid.NewGuid().ToString();
+                    // Get the file name
+                    var nameProp = embedded.GetType().GetProperty("Name");
+                    string fileName = nameProp?.GetValue(embedded) as string;
+                    if (string.IsNullOrEmpty(fileName))
+                        continue;
+
+                    // Build the output path
+                    string filePath = Path.Combine(outputDir, fileName);
+
+                    // Invoke the Save(string) method via reflection
+                    var saveMethod = embedded.GetType().GetMethod("Save", new[] { typeof(string) });
+                    if (saveMethod != null)
+                    {
+                        saveMethod.Invoke(embedded, new object[] { filePath });
+                        Console.WriteLine($"Saved embedded file: {filePath}");
+                    }
+                    else
+                    {
+                        // Fallback: try to extract the raw stream if Save method is unavailable
+                        var fileSpecProp = embedded.GetType().GetProperty("FileSpecification");
+                        var fileSpec = fileSpecProp?.GetValue(embedded);
+                        var contentsProp = fileSpec?.GetType().GetProperty("Contents");
+                        var contents = contentsProp?.GetValue(fileSpec) as Stream;
+                        if (contents != null)
+                        {
+                            using (var outStream = File.Create(filePath))
+                                contents.CopyTo(outStream);
+                            Console.WriteLine($"Saved embedded file (stream fallback): {filePath}");
+                        }
+                    }
                 }
-
-                // Build the full path for the extracted file.
-                string outputPath = Path.Combine(outputDirectory, fileName);
-
-                // Save the embedded file to disk.
-                embeddedFile.Save(outputPath);
-
-                Console.WriteLine($"Extracted: {fileName} -> {outputPath}");
             }
         }
-    }
-
-    // Example usage.
-    static void Main()
-    {
-        const string pdfPath = "portfolio.pdf";          // Input PDF portfolio
-        const string outputDir = "ExtractedFiles";       // Destination folder
-
-        ExtractEmbeddedFiles(pdfPath, outputDir);
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error extracting embedded files: {ex.Message}");
+        }
     }
 }

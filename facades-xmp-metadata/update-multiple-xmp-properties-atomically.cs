@@ -1,41 +1,40 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;   // PdfFileInfo, PdfXmpMetadata
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Ensure the source PDF exists – create a minimal one if it does not.
         if (!File.Exists(inputPath))
         {
-            using (Document doc = new Document())
-            {
-                doc.Pages.Add(); // add a blank page
-                doc.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Load the PDF document.
-        Document pdf = new Document(inputPath);
+        // Load PDF file information facade
+        using (PdfFileInfo fileInfo = new PdfFileInfo(inputPath))
+        {
+            // Load XMP metadata facade bound to the same PDF
+            using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+            {
+                xmp.BindPdf(inputPath);
 
-        // Register the XMP namespace that will be used for the properties.
-        // The RegisterNamespaceUri method adds a prefix‑URI mapping for XMP metadata.
-        pdf.Metadata.RegisterNamespaceUri("xmp", "http://ns.adobe.com/xap/1.0/");
+                // Add multiple XMP properties in a single transaction
+                xmp.Add("xmp:CreatorTool", "MyCustomTool");
+                xmp.Add("xmp:Nickname", "SampleNick");
+                xmp.Add("xmp:CreateDate", DateTime.UtcNow);
+                xmp.Add("xmp:ModifyDate", DateTime.UtcNow);
 
-        // Add / update multiple XMP properties in a single transaction.
-        // DateTime values are converted to ISO‑8601 strings because XMP expects string literals.
-        pdf.Metadata["xmp:CreatorTool"] = "MyApplication";
-        pdf.Metadata["xmp:CreateDate"]   = DateTime.UtcNow.ToString("o");
-        pdf.Metadata["xmp:ModifyDate"]   = DateTime.UtcNow.ToString("o");
-        pdf.Metadata["xmp:Nickname"]    = "SampleDoc";
-
-        // Persist the changes atomically.
-        pdf.Save(outputPath);
-
-        Console.WriteLine($"XMP properties updated and saved to '{outputPath}'.");
+                // Save all changes atomically; other metadata remains untouched
+                bool saved = fileInfo.SaveNewInfoWithXmp(outputPath);
+                Console.WriteLine(saved
+                    ? $"XMP metadata updated and saved to '{outputPath}'."
+                    : "Failed to save updated XMP metadata.");
+            }
+        }
     }
 }

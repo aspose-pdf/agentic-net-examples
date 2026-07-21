@@ -11,24 +11,29 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Create the bookmark editor
+        // Initialize the bookmark editor facade
         PdfBookmarkEditor editor = new PdfBookmarkEditor();
 
-        // Load the PDF document
-        editor.BindPdf(inputPath);
+        try
+        {
+            // Load the PDF document
+            editor.BindPdf(inputPath);
 
-        // Delete all bookmarks
-        editor.DeleteBookmarks();
+            // Delete all bookmarks from the document
+            editor.DeleteBookmarks();
 
-        // Save the modified PDF
-        editor.Save(outputPath);
-
-        // Release resources
-        editor.Close();
+            // Save the modified PDF
+            editor.Save(outputPath);
+        }
+        finally
+        {
+            // Release resources held by the facade
+            editor.Close();
+        }
 
         Console.WriteLine($"All bookmarks removed. Saved to '{outputPath}'.");
     }

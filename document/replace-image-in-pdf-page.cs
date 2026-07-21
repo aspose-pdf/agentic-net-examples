@@ -15,38 +15,53 @@ class Program
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
+
         if (!File.Exists(newImagePath))
         {
             Console.Error.WriteLine($"Replacement image not found: {newImagePath}");
             return;
         }
 
-        // Load the PDF document (using rule for loading)
-        using (Document doc = new Document(inputPdfPath))
+        try
         {
-            // Select the page that contains the image to replace (1‑based indexing)
-            Page page = doc.Pages[1];
-
-            // Verify that the page actually has image resources
-            if (page.Resources.Images.Count == 0)
+            // Load the existing PDF document
+            using (Document doc = new Document(inputPdfPath))
             {
-                Console.WriteLine("No images found on the selected page.");
-                doc.Save(outputPdfPath); // Save unchanged document
-                return;
+                // Work with the first page (adjust as needed)
+                Page page = doc.Pages[1];
+
+                // Check if the page already contains image resources
+                if (page.Resources.Images.Count > 0)
+                {
+                    // XImageCollection uses 1‑based indexing.
+                    int imageIndex = 1; // replace the first image
+
+                    // Replace the image resource while preserving its placement on the page
+                    using (FileStream imgStream = File.OpenRead(newImagePath))
+                    {
+                        page.Resources.Images.Replace(imageIndex, imgStream);
+                    }
+                }
+                else
+                {
+                    // No existing images – add the new image at a default location
+                    using (FileStream imgStream = File.OpenRead(newImagePath))
+                    {
+                        // Define a rectangle where the image will be placed
+                        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 300);
+                        page.AddImage(imgStream, rect);
+                    }
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPdfPath);
             }
 
-            // Replace the first image resource while preserving its placement.
-            // XImageCollection uses 1‑based indexing, so index = 1 replaces the first image.
-            int imageIndex = 1;
-            using (FileStream newImgStream = File.OpenRead(newImagePath))
-            {
-                page.Resources.Images.Replace(imageIndex, newImgStream);
-            }
-
-            // Save the modified PDF (using rule for saving)
-            doc.Save(outputPdfPath);
+            Console.WriteLine($"Image replaced successfully. Output saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Image successfully replaced. Output saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

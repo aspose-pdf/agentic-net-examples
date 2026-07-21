@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputDir = "ExtractedMedia";
+        const string inputPdf = "input.pdf";
+        const string outputRoot = "ExtractedMedia";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,50 +16,55 @@ class Program
             return;
         }
 
-        // Ensure the base output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure the root output folder exists.
+        Directory.CreateDirectory(outputRoot);
 
-        // Load the PDF document (using block ensures proper disposal)
+        // Load the PDF document.
         using (Document doc = new Document(inputPdf))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Pages are 1‑based.
             for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
                 Page page = doc.Pages[pageNum];
-                int annotationIndex = 0;
 
-                // Iterate over annotations on the current page
-                foreach (Annotation ann in page.Annotations)
+                // Annotations collection is also 1‑based.
+                for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
                 {
-                    // Identify RichMediaAnnotation instances
-                    if (ann is RichMediaAnnotation richMedia)
-                    {
-                        annotationIndex++;
+                    Annotation ann = page.Annotations[annIdx];
 
-                        // Build a folder path: OutputDir/Page_{pageNum}/Annotation_{annotationIndex}
-                        string pageFolder = Path.Combine(outputDir, $"Page_{pageNum}");
-                        string annFolder  = Path.Combine(pageFolder, $"Annotation_{annotationIndex}");
+                    // Process only RichMediaAnnotation instances.
+                    if (ann is RichMediaAnnotation richAnn)
+                    {
+                        // Create a folder hierarchy: /ExtractedMedia/Page_{n}/Annotation_{i}
+                        string annFolder = Path.Combine(outputRoot, $"Page_{pageNum}", $"Annotation_{annIdx}");
                         Directory.CreateDirectory(annFolder);
 
-                        // Determine a file name for the embedded media
-                        // Prefer the annotation's Name; fall back to a generic name
-                        string fileName = !string.IsNullOrEmpty(richMedia.Name)
-                                          ? richMedia.Name
-                                          : $"RichMedia_{annotationIndex}";
-
-                        // Append appropriate extension if known (optional)
-                        // Here we simply use .bin for unknown types
-                        string filePath = Path.Combine(annFolder, $"{fileName}.bin");
-
-                        // The Content property returns a Stream containing the media data
-                        // Copy the stream to a file on disk
-                        using (Stream contentStream = richMedia.Content)
-                        using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                        // Determine a file name. Use the annotation's Name if set; otherwise generate a GUID.
+                        string fileName = richAnn.Name;
+                        if (string.IsNullOrWhiteSpace(fileName))
                         {
-                            contentStream.CopyTo(fileStream);
+                            fileName = Guid.NewGuid().ToString() + ".bin";
                         }
 
-                        Console.WriteLine($"Extracted media to: {filePath}");
+                        string outPath = Path.Combine(annFolder, fileName);
+
+                        // The Content property provides a Stream with the embedded media.
+                        // Guard against null streams.
+                        using (Stream contentStream = richAnn.Content)
+                        {
+                            if (contentStream != null)
+                            {
+                                // Ensure the stream is positioned at the start.
+                                if (contentStream.CanSeek)
+                                    contentStream.Position = 0;
+
+                                // Write the stream to a file.
+                                using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                                {
+                                    contentStream.CopyTo(fs);
+                                }
+                            }
+                        }
                     }
                 }
             }

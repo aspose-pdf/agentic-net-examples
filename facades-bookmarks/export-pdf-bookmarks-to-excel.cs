@@ -1,92 +1,97 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades; // PdfBookmarkEditor, Bookmark, Bookmarks
 
-class Program
+class ExportBookmarksToExcel
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputExcelPath = "bookmarks.xlsx";
+        const string pdfPath   = "input.pdf";
+        const string excelPath = "bookmarks.xlsx"; // CSV content; Excel can open it
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Load source PDF and extract its bookmarks
-        using (Document srcDoc = new Document(inputPdfPath))
+        // Extract bookmarks from the PDF
+        List<BookmarkInfo> bookmarkInfos = new List<BookmarkInfo>();
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            PdfBookmarkEditor editor = new PdfBookmarkEditor();
-            editor.BindPdf(srcDoc);
-            Bookmarks rootBookmarks = editor.ExtractBookmarks(); // all levels
-
-            // Create a new PDF that will hold the bookmark data as a table
-            using (Document outDoc = new Document())
-            {
-                // Add a blank page
-                Page page = outDoc.Pages.Add();
-
-                // Create a table with three columns: Title, Level, Destination
-                Table table = new Table
-                {
-                    ColumnWidths = "200 80 80", // adjust as needed
-                    Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
-                };
-
-                // Header row
-                Row header = table.Rows.Add();
-                header.Cells.Add("Title");
-                header.Cells.Add("Level");
-                header.Cells.Add("Destination Page");
-                // Style header (bold)
-                foreach (Cell cell in header.Cells)
-                {
-                    cell.DefaultCellTextState = new TextState
-                    {
-                        FontSize = 12,
-                        FontStyle = FontStyles.Bold,
-                        ForegroundColor = Aspose.Pdf.Color.White
-                    };
-                    cell.BackgroundColor = Aspose.Pdf.Color.Gray;
-                }
-
-                // Recursively add bookmark rows
-                AddBookmarkRows(rootBookmarks, table, 1);
-
-                // Add the table to the page
-                page.Paragraphs.Add(table);
-
-                // Save the result as an Excel workbook using ExcelSaveOptions
-                ExcelSaveOptions excelOpts = new ExcelSaveOptions();
-                outDoc.Save(outputExcelPath, excelOpts);
-            }
-
-            Console.WriteLine($"Bookmarks exported to Excel file: {outputExcelPath}");
+            editor.BindPdf(pdfPath);
+            // Get all bookmarks (recursive)
+            Bookmarks rootBookmarks = editor.ExtractBookmarks();
+            // Walk the bookmark tree
+            TraverseBookmarks(rootBookmarks, 1, bookmarkInfos);
         }
+
+        // Write the data to a CSV file that Excel can open
+        using (var writer = new StreamWriter(excelPath))
+        {
+            // Header row
+            writer.WriteLine("Title,Level,Destination Page");
+
+            // Data rows
+            foreach (var info in bookmarkInfos)
+            {
+                // Escape commas and quotes in the title
+                string safeTitle = EscapeCsvField(info.Title);
+                writer.WriteLine($"{safeTitle},{info.Level},{info.DestinationPage}");
+            }
+        }
+
+        Console.WriteLine($"Bookmarks exported to '{excelPath}'.");
     }
 
-    // Recursive helper to walk the bookmark hierarchy
-    static void AddBookmarkRows(Bookmarks bookmarks, Table table, int level)
+    // Helper class to hold bookmark details
+    private class BookmarkInfo
+    {
+        public string Title { get; set; }
+        public int Level { get; set; }
+        public int DestinationPage { get; set; }
+    }
+
+    // Recursively traverse Aspose.Pdf.Facades.Bookmarks collection
+    private static void TraverseBookmarks(Bookmarks bookmarks, int currentLevel, List<BookmarkInfo> list)
     {
         foreach (Bookmark bm in bookmarks)
         {
-            Row row = table.Rows.Add();
-            // Title cell
-            row.Cells.Add(bm.Title ?? string.Empty);
-            // Level cell
-            row.Cells.Add(level.ToString());
-            // Destination page cell (if set)
-            row.Cells.Add(bm.PageNumber > 0 ? bm.PageNumber.ToString() : string.Empty);
+            // Some Bookmark objects may not have a page number (e.g., external URLs);
+            // default to 0 when unavailable.
+            int pageNumber = bm.PageNumber;
 
-            // Process child bookmarks (if any)
+            list.Add(new BookmarkInfo
+            {
+                Title = bm.Title,
+                Level = currentLevel,
+                DestinationPage = pageNumber
+            });
+
+            // If the bookmark has child items, recurse with increased level
             if (bm.ChildItem != null && bm.ChildItem.Count > 0)
             {
-                AddBookmarkRows(bm.ChildItem, table, level + 1);
+                TraverseBookmarks(bm.ChildItem, currentLevel + 1, list);
             }
+        }
+    }
+
+    // Simple CSV field escaper (handles commas, quotes and newlines)
+    private static string EscapeCsvField(string field)
+    {
+        if (field == null)
+            return string.Empty;
+
+        bool mustQuote = field.Contains(",") || field.Contains('"') || field.Contains('\n') || field.Contains('\r');
+        if (mustQuote)
+        {
+            string escaped = field.Replace("\"", "\"\"");
+            return $"\"{escaped}\"";
+        }
+        else
+        {
+            return field;
         }
     }
 }

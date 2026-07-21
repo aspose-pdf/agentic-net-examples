@@ -6,82 +6,57 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "invoice.pdf";
-        const string outputXml = "ZUGFeRD.xml";
+        const string pdfPath = "invoice.pdf";          // input PDF containing ZUGFeRD XML
+        const string xmlOutput = "ZUGFeRD.xml";        // file to save the extracted XML
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {pdfPath}");
             return;
         }
 
         try
         {
             // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdf))
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                // Ensure there are embedded files
-                if (pdfDoc.EmbeddedFiles == null || pdfDoc.EmbeddedFiles.Count == 0)
-                {
-                    Console.WriteLine("No embedded files found in the PDF.");
-                    return;
-                }
+                bool extracted = false;
 
-                // Search for the ZUGFeRD XML attachment using reflection (EmbeddedFile class is in a restricted namespace)
-                object xmlEmbeddedFile = null;
-                foreach (var embedded in pdfDoc.EmbeddedFiles)
+                // Access embedded files via the EmbeddedFiles collection
+                if (pdfDoc.EmbeddedFiles != null)
                 {
-                    var nameProp = embedded.GetType().GetProperty("Name");
-                    if (nameProp != null)
+                    foreach (FileSpecification fileSpec in pdfDoc.EmbeddedFiles)
                     {
-                        var name = nameProp.GetValue(embedded) as string;
-                        if (!string.IsNullOrEmpty(name) && name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+                        // ZUGFeRD data is stored as an XML attachment (commonly ends with .xml)
+                        if (!string.IsNullOrEmpty(fileSpec.Name) &&
+                            fileSpec.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
                         {
-                            xmlEmbeddedFile = embedded;
-                            break;
+                            // Ensure the stream is positioned at the beginning
+                            if (fileSpec.Contents.CanSeek)
+                                fileSpec.Contents.Position = 0;
+
+                            // Write the XML stream to the desired output file
+                            using (FileStream outStream = new FileStream(xmlOutput, FileMode.Create, FileAccess.Write))
+                            {
+                                fileSpec.Contents.CopyTo(outStream);
+                            }
+
+                            Console.WriteLine($"Extracted ZUGFeRD XML to '{xmlOutput}'.");
+                            extracted = true;
+                            break; // assuming only one ZUGFeRD XML attachment
                         }
                     }
                 }
 
-                if (xmlEmbeddedFile == null)
+                if (!extracted)
                 {
-                    Console.WriteLine("ZUGFeRD XML attachment not found in the PDF.");
-                    return;
+                    Console.WriteLine("No XML attachment (ZUGFeRD) found in the PDF.");
                 }
-
-                // Try to invoke the Save(string) method directly
-                var saveMethod = xmlEmbeddedFile.GetType().GetMethod("Save", new[] { typeof(string) });
-                if (saveMethod != null)
-                {
-                    saveMethod.Invoke(xmlEmbeddedFile, new object[] { outputXml });
-                }
-                else
-                {
-                    // Fallback: retrieve the file specification stream and copy its contents
-                    var fileSpecProp = xmlEmbeddedFile.GetType().GetProperty("FileSpecification");
-                    var fileSpec = fileSpecProp?.GetValue(xmlEmbeddedFile);
-                    var contentsProp = fileSpec?.GetType().GetProperty("Contents");
-                    var contents = contentsProp?.GetValue(fileSpec) as Stream;
-                    if (contents != null)
-                    {
-                        using (var outStream = File.Create(outputXml))
-                        {
-                            contents.CopyTo(outStream);
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Unable to extract the XML content from the embedded file.");
-                        return;
-                    }
-                }
-
-                Console.WriteLine($"ZUGFeRD XML extracted to '{outputXml}'.");
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
         }
     }
 }

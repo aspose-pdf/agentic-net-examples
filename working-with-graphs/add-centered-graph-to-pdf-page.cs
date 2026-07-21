@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -6,42 +7,45 @@ class Program
 {
     static void Main()
     {
-        // Output PDF path
-        const string outputPath = "graph_centered.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document and ensure proper disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page (first page is index 1)
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a Graph with desired width and height (double values as required)
-            // Example size: 200x150 points
-            Graph graph = new Graph(200.0, 150.0)
-            {
-                // Center the graph horizontally and vertically on the page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center
-            };
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Access the first page (1‑based indexing)
+            Page page = doc.Pages[1];
 
-            // Add a rectangle shape to the graph to visualize it
-            // Use Aspose.Pdf.Drawing.Rectangle (expects float parameters)
-            var rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 200f, 150f);
+            // Create a graph with desired width and height (points)
+            Graph graph = new Graph(200, 100);
+
+            // Align the graph to the center of the page
+            graph.HorizontalAlignment = HorizontalAlignment.Center;
+            graph.VerticalAlignment   = VerticalAlignment.Center;
+
+            // Example shape: a rectangle inside the graph
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0, 0, 200, 100);
             rect.GraphInfo = new GraphInfo
             {
-                FillColor = Color.LightGray,
-                Color     = Color.Black,
-                LineWidth = 1f
+                FillColor = Aspose.Pdf.Color.LightGray,
+                Color     = Aspose.Pdf.Color.Black,
+                LineWidth = 1
             };
             graph.Shapes.Add(rect);
 
             // Add the graph to the page's Paragraphs collection
             page.Paragraphs.Add(graph);
 
-            // Save the document as PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with centered graph saved to '{outputPath}'.");
+        Console.WriteLine($"Graph added and saved to '{outputPath}'.");
     }
 }

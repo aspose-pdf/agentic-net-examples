@@ -1,36 +1,34 @@
 using System;
 using System.IO;
 using System.IO.Compression;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
+        // Paths for input PDF and compressed JSON output
         const string inputPdfPath = "input.pdf";
         const string outputGzipPath = "formdata.json.gz";
 
+        // Ensure the input file exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document (using the standard Document constructor)
+        // Open the PDF document inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Prepare options for JSON export (no indentation to keep size small)
-            ExportFieldsToJsonOptions jsonOptions = new ExportFieldsToJsonOptions
-            {
-                WriteIndented = false
-            };
-
-            // Open the target file and wrap it with GZipStream for compression
+            // Create the output file stream for the .gz file
             using (FileStream fileStream = new FileStream(outputGzipPath, FileMode.Create, FileAccess.Write))
-            using (GZipStream gzipStream = new GZipStream(fileStream, CompressionMode.Compress))
+            // Wrap the file stream with GZipStream to compress data on the fly
+            using (GZipStream gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal))
             {
-                // Export all form fields to JSON and write directly into the compressed stream
-                pdfDoc.Form.ExportToJson(gzipStream, jsonOptions);
+                // Export all form fields to JSON directly into the GZipStream.
+                // The optional ExportFieldsToJsonOptions parameter is omitted (defaults to null).
+                pdfDoc.Form.ExportToJson(gzipStream);
             }
         }
 

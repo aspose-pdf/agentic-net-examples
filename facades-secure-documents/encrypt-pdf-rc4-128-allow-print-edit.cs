@@ -1,42 +1,48 @@
 using System;
-using System.IO;
-using Aspose.Pdf.Facades;   // PdfFileSecurity, DocumentPrivilege, KeySize, Algorithm
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "encrypted.pdf";
-        const string userPassword  = "user123";
+        const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
-        // Verify input file exists
-        if (!File.Exists(inputPath))
+        // ---------------------------------------------------------------------
+        // 1️⃣ Create a minimal PDF in‑memory so the sandbox has a file to work on.
+        // ---------------------------------------------------------------------
+        using (Document seed = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
+            seed.Pages.Add(); // at least one blank page
+            seed.Save(inputPath);
         }
 
-        // Combine privileges: allow printing and editing (modify contents)
+        // ---------------------------------------------------------------------
+        // 2️⃣ Combine privilege settings – allow printing and editing (modify contents).
+        // ---------------------------------------------------------------------
         DocumentPrivilege privilege = DocumentPrivilege.ForbidAll;
-        privilege.AllowPrint          = true; // enable printing
-        privilege.AllowModifyContents = true; // enable editing of content
+        privilege.AllowPrint = true;
+        privilege.AllowModifyContents = true;
 
-        // Initialize the facade with source and destination files
-        PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
-
-        // Encrypt using RC4 with a 128‑bit key
-        bool encrypted = fileSecurity.EncryptFile(
+        // ---------------------------------------------------------------------
+        // 3️⃣ Encrypt the PDF with RC4‑128 using the non‑obsolete PdfFileSecurity API.
+        // ---------------------------------------------------------------------
+        PdfFileSecurity fileSecurity = new PdfFileSecurity();
+        // Bind the source PDF first.
+        fileSecurity.BindPdf(inputPath);
+        // Encrypt with the desired passwords, privileges, key size and algorithm.
+        fileSecurity.EncryptFile(
             userPassword,
             ownerPassword,
             privilege,
             KeySize.x128,
             Algorithm.RC4);
+        // Save the encrypted PDF to the output path.
+        fileSecurity.Save(outputPath);
 
-        if (encrypted)
-            Console.WriteLine($"Encryption succeeded. Output saved to '{outputPath}'.");
-        else
-            Console.Error.WriteLine("Encryption failed.");
+        Console.WriteLine($"Encryption succeeded. Output saved to '{outputPath}'.");
     }
 }

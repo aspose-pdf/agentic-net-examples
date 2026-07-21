@@ -1,54 +1,64 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations; // for ImageStamp alignment enums
 
 class Program
 {
     static void Main()
     {
-        // Input PDF, output PPTX and logo image paths
-        const string pdfPath   = "input.pdf";
-        const string pptxPath  = "output.pptx";
-        const string logoPath  = "company_logo.png";
+        const string inputPdf   = "input.pdf";   // source PDF
+        const string logoImage  = "logo.png";    // company logo
+        const string outputPptx = "output.pptx"; // resulting PPTX
 
-        // Verify files exist
-        if (!File.Exists(pdfPath))
+        // Verify required files exist
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(logoPath))
+        if (!File.Exists(logoImage))
         {
-            Console.Error.WriteLine($"Logo image not found: {logoPath}");
+            Console.Error.WriteLine($"Logo image not found: {logoImage}");
             return;
         }
 
-        // Load the PDF, add the logo to each page, then convert to PPTX
-        using (Document pdfDoc = new Document(pdfPath))
+        try
         {
-            // Prepare an ImageStamp for the logo
-            ImageStamp logoStamp = new ImageStamp(logoPath)
+            // Load the PDF document
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                // Place the logo in the lower‑right corner of each page
-                Background = false,
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment   = VerticalAlignment.Bottom,
-                // Use individual margin properties (Margin object does not exist)
-                RightMargin = 20,
-                BottomMargin = 20
-            };
+                // Prepare an ImageStamp that will be placed on every page
+                ImageStamp logoStamp = new ImageStamp(logoImage)
+                {
+                    // Place the logo as a foreground element (not a background watermark)
+                    Background = false,
+                    // Semi‑transparent so it doesn't obscure page content
+                    Opacity = 0.5f,
+                    // Center the logo horizontally and position it near the top
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Top,
+                    // Optional offsets (in points) from the alignment position
+                    XIndent = 0,
+                    YIndent = 20
+                };
 
-            // Apply the stamp to every page
-            foreach (Page page in pdfDoc.Pages)
-            {
-                page.AddStamp(logoStamp);
+                // Apply the stamp to each page of the PDF
+                foreach (Page page in pdfDoc.Pages)
+                {
+                    page.AddStamp(logoStamp);
+                }
+
+                // Convert the modified PDF to PPTX
+                PptxSaveOptions pptxOptions = new PptxSaveOptions();
+                pdfDoc.Save(outputPptx, pptxOptions);
             }
 
-            // Convert the modified PDF to PPTX
-            PptxSaveOptions pptxOptions = new PptxSaveOptions();
-            pdfDoc.Save(pptxPath, pptxOptions);
+            Console.WriteLine($"Conversion complete. PPTX saved to '{outputPptx}'.");
         }
-
-        Console.WriteLine($"PDF converted to PPTX with logo added: {pptxPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

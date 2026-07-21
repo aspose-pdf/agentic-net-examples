@@ -11,21 +11,28 @@ class Program
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Initialize the Form facade with the PDF containing the form fields
-        using (Form pdfForm = new Form(inputPdf))
+        try
         {
-            // Create a file stream for the XML output
-            using (FileStream xmlStream = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
+            // Initialize the Form facade with the source PDF
+            using (Form form = new Form(inputPdf))
             {
-                // Export all form field values (except button fields) to the XML stream
-                pdfForm.ExportXml(xmlStream);
+                // Create the output XML file stream
+                using (FileStream xmlStream = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
+                {
+                    // Export all form field values to the XML stream
+                    form.ExportXml(xmlStream);
+                }
             }
-        }
 
-        Console.WriteLine($"Form data exported to '{outputXml}'.");
+            Console.WriteLine($"Form fields exported successfully to '{outputXml}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during export: {ex.Message}");
+        }
     }
 }

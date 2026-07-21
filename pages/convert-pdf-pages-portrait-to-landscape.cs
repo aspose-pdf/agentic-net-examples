@@ -7,34 +7,34 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "landscape_output.pdf";
+        const string outputPath = "output_landscape.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (using the required lifecycle rule)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Pages are 1‑based; iterate through all pages
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Calculate current width and height from the MediaBox
-                double width  = page.MediaBox.URX - page.MediaBox.LLX;
-                double height = page.MediaBox.URY - page.MediaBox.LLY;
+                // Get current MediaBox dimensions
+                double currentWidth  = page.MediaBox.Width;
+                double currentHeight = page.MediaBox.Height;
 
                 // Swap width and height to make the page landscape
-                page.SetPageSize(height, width);
+                page.SetPageSize(currentHeight, currentWidth);
             }
 
-            // Save the modified document (using the required lifecycle rule)
+            // Save the modified document as PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Pages converted to landscape and saved to '{outputPath}'.");
+        Console.WriteLine($"Converted PDF saved to '{outputPath}'.");
     }
 }
