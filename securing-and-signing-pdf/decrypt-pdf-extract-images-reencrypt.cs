@@ -1,82 +1,73 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "encrypted_input.pdf";   // existing encrypted PDF
-        const string userPassword = "user123";               // password that opens the PDF
-        const string newOwnerPassword = "newOwner456";       // new owner password to set
-        const string outputPdfPath = "reencrypted_output.pdf";
+        // Paths and passwords – adjust as needed
+        const string inputPdfPath      = "encrypted_input.pdf";
+        const string outputPdfPath     = "reencrypted_output.pdf";
+        const string originalPassword  = "oldOwnerPass";   // password to open the encrypted PDF
+        const string newOwnerPassword  = "newOwnerPass";   // password to set after re‑encryption
 
-        // Directory to store extracted images
-        const string imagesOutputDir = "ExtractedImages";
-
+        // Ensure the input file exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the images output folder exists
-        Directory.CreateDirectory(imagesOutputDir);
-
-        // Open the encrypted PDF using the user password
-        using (Document doc = new Document(inputPdfPath, userPassword))
+        try
         {
-            // Decrypt the document so it can be saved without protection
-            doc.Decrypt();
-
-            // -----------------------------------------------------------------
-            // Extract all images from the PDF and save them to files
-            // -----------------------------------------------------------------
-            int imageCounter = 1;
-            foreach (Page page in doc.Pages) // 1‑based page indexing
+            // Open the encrypted PDF using the existing password
+            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPdfPath, originalPassword))
             {
-                // XImageCollection is enumerable; iterate directly
-                foreach (XImage img in page.Resources.Images)
+                // Decrypt the document (removes encryption in memory)
+                doc.Decrypt();
+
+                // -----------------------------------------------------------------
+                // Extract all images from the PDF and save them as separate files
+                // -----------------------------------------------------------------
+                int imageIndex = 0;
+                foreach (Aspose.Pdf.Page page in doc.Pages)
                 {
-                    // Build a unique file name for each image
-                    string imagePath = Path.Combine(
-                        imagesOutputDir,
-                        $"Page{page.Number}_Image{imageCounter}.png"); // default to PNG
-
-                    // Save the image to disk via a FileStream (XImage.Save expects a Stream)
-                    using (FileStream fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
+                    // The Images collection yields XImage objects directly (no dictionary)
+                    foreach (Aspose.Pdf.XImage img in page.Resources.Images)
                     {
-                        img.Save(fs);
+                        // Build a unique filename for each extracted image
+                        string imageFileName = $"image_{imageIndex}.png";
+
+                        // Save the image to disk
+                        using (FileStream imgStream = new FileStream(imageFileName, FileMode.Create, FileAccess.Write))
+                        {
+                            img.Save(imgStream);
+                        }
+
+                        Console.WriteLine($"Extracted image saved to: {imageFileName}");
+                        imageIndex++;
                     }
-
-                    Console.WriteLine($"Saved image: {imagePath}");
-                    imageCounter++;
                 }
+
+                // -----------------------------------------------------------------
+                // Re‑encrypt the PDF with a new owner password
+                // -----------------------------------------------------------------
+                // Define desired permissions (example: allow printing and content extraction)
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+
+                // Encrypt with an empty user password and the new owner password
+                doc.Encrypt(userPassword: "", ownerPassword: newOwnerPassword, permissions: perms, cryptoAlgorithm: CryptoAlgorithm.AESx256);
+
+                // Save the re‑encrypted PDF
+                doc.Save(outputPdfPath);
+                Console.WriteLine($"Re‑encrypted PDF saved to: {outputPdfPath}");
             }
-
-            // -----------------------------------------------------------------
-            // Re‑encrypt the PDF with a new owner password
-            // -----------------------------------------------------------------
-            Permissions perms = Permissions.PrintDocument |
-                                 Permissions.ModifyContent |
-                                 Permissions.ExtractContent |
-                                 Permissions.AssembleDocument;
-
-            // User password left empty (no user password), new owner password set
-            doc.Encrypt(string.Empty, newOwnerPassword, perms, CryptoAlgorithm.AESx256);
-
-            // Save the re‑encrypted PDF
-            doc.Save(outputPdfPath);
         }
-
-        Console.WriteLine($"Re‑encrypted PDF saved to: {outputPdfPath}");
-    }
-
-    // Helper retained for possible future use – currently returns a fixed PNG extension
-    private static string GetImageExtension(XImage img)
-    {
-        // Aspose.Pdf.XImage does not expose an ImageFormat property.
-        // For simplicity we always use PNG as the output format.
-        return ".png";
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

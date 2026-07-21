@@ -7,56 +7,63 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";          // source PDF
-        const string outputPdfPath  = "signed.pdf";         // signed PDF
-        const string certificatePath = "certificate.pfx";   // PKCS#12 certificate
-        const string certificatePassword = "password";      // certificate password
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "signed_output.pdf";
+        const string certPath      = "certificate.pfx";
+        const string certPassword  = "password";
 
-        // Verify that required files exist
+        // Verify input files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(certificatePath))
+        if (!File.Exists(certPath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        // Load the PDF from a file stream (core API, no Facades)
-        using (FileStream pdfStream = File.OpenRead(inputPdfPath))
-        using (Document doc = new Document(pdfStream))
+        try
         {
-            // Create a signature field on the first page.
-            // Fully qualify Rectangle to avoid ambiguity with System.Drawing.
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 200, 150);
-            SignatureField sigField = new SignatureField(doc.Pages[1], rect)
+            // Load PDF from a file stream
+            using (FileStream pdfStream = File.OpenRead(inputPdfPath))
+            using (Document pdfDoc = new Document(pdfStream))
             {
-                PartialName = "Signature1"   // field identifier
-            };
-            // Add the field to the document's form collection.
-            doc.Form.Add(sigField);
+                // Create a signature field on the first page
+                // Rectangle(left, bottom, width, height)
+                Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 200, 150);
+                SignatureField sigField = new SignatureField(pdfDoc.Pages[1], sigRect)
+                {
+                    PartialName = "Signature1"
+                };
+                // Add the signature field to the document's form collection
+                pdfDoc.Form.Add(sigField);
 
-            // Create a PKCS#7 detached signature object.
-            // Using the (string pfx, string password) ctor embeds the certificate info.
-            PKCS7Detached pkcs7 = new PKCS7Detached(certificatePath, certificatePassword)
-            {
-                Reason      = "Approved for release",
-                Location    = "New York",
-                ContactInfo = "john.doe@example.com",
-                // Optional: set appearance properties, timestamps, etc.
-                ShowProperties = true
-            };
+                // Prepare the PKCS#7 detached signature object
+                using (FileStream certStream = File.OpenRead(certPath))
+                {
+                    // Use the constructor that takes a certificate stream and password
+                    PKCS7Detached pkcs7 = new PKCS7Detached(certStream, certPassword);
 
-            // Sign the field. The overload without certificate parameters works because
-            // the PKCS7Detached instance already contains the certificate data.
-            sigField.Sign(pkcs7);
+                    // Set optional signature properties
+                    pkcs7.Reason      = "Document approved";
+                    pkcs7.Location    = "New York, USA";
+                    pkcs7.ContactInfo = "john.doe@example.com";
+                    pkcs7.Date        = DateTime.UtcNow;
 
-            // Save the signed PDF.
-            doc.Save(outputPdfPath);
+                    // Sign the document using the signature field
+                    sigField.Sign(pkcs7);
+                }
+
+                // Save the signed PDF
+                pdfDoc.Save(outputPdfPath);
+                Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");
+            }
         }
-
-        Console.WriteLine($"PDF signed successfully and saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

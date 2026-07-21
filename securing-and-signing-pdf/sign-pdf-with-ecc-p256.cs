@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,62 +7,52 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF
-        const string outputPdf  = "signed_output.pdf"; // signed PDF
-        const string pfxPath    = "ecc_certificate.pfx"; // P‑256 ECC certificate
-        const string pfxPassword = "password";          // certificate password
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "signed_output.pdf";
+        const string pfxPath = "ecc_key.pfx";
+        const string pfxPassword = "password";
 
+        // Verify required files exist
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
         if (!File.Exists(pfxPath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
+            Console.Error.WriteLine($"PFX file not found: {pfxPath}");
             return;
         }
 
-        // Load the PDF document
+        // Open the PFX containing an ECC P‑256 private key
+        using (FileStream pfxStream = File.OpenRead(pfxPath))
+        // Load the PDF document (wrapped in using for deterministic disposal)
         using (Document doc = new Document(inputPdf))
         {
-            // Define the rectangle where the visible signature will appear
-            // (left, bottom, width, height) – values are in points (1/72 inch)
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 200, 100);
+            // Choose the page where the signature field will be placed
+            Page page = doc.Pages[1];
 
-            // Create a signature field on the first page
-            // SignatureField(Document, Rectangle) places the field on the first page by default
-            SignatureField sigField = new SignatureField(doc, sigRect)
-            {
-                // Optional visual appearance settings
-                Color = Aspose.Pdf.Color.LightGray,
-                // The field name must be unique within the document
-                Name = "Signature1"
-            };
-            // Add the field to the page's annotations collection
-            doc.Pages[1].Annotations.Add(sigField);
+            // Define the signature field rectangle (fully qualified to avoid ambiguity)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Load the ECC certificate (P‑256 curve) from the PFX file
-            X509Certificate2 cert = new X509Certificate2(pfxPath, pfxPassword,
-                X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable);
+            // Create a signature field and add it to the document form
+            SignatureField signatureField = new SignatureField(page, rect);
+            signatureField.PartialName = "Signature1";
+            doc.Form.Add(signatureField);
 
-            // Create an ExternalSignature which will use the ECC private key
-            ExternalSignature eccSignature = new ExternalSignature(cert)
-            {
-                // Set signature metadata (optional)
-                Reason      = "Document approved",
-                ContactInfo = "john.doe@example.com",
-                Location    = "New York, USA",
-                Date        = DateTime.UtcNow
-            };
+            // Create a PKCS7 signature object using the ECC certificate
+            PKCS7 pkcs7 = new PKCS7(pfxStream, pfxPassword);
+            pkcs7.Reason = "Document approved";
+            pkcs7.Location = "Office";
+            pkcs7.ContactInfo = "email@example.com";
 
-            // Sign the document using the signature field and the ECC signature object
-            sigField.Sign(eccSignature);
+            // Sign the field with the ECC key (compact signature size)
+            signatureField.Sign(pkcs7);
 
             // Save the signed PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF signed successfully and saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF signed and saved to '{outputPdf}'.");
     }
 }

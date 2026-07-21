@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - securing-and-signing-pdf
 
-> **Securing and signing PDF** in PDF using C# / .NET -- **84** verified, compile-tested examples for **Aspose.PDF for .NET** 26.6.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Securing and signing PDF** in PDF using C# / .NET -- **78** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,31 +23,24 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (84/84 files) ← category-specific
-- `using Aspose.Pdf.Forms;` (55/84 files) ← category-specific
-- `using Aspose.Pdf.Security;` (13/84 files)
-- `using Aspose.Pdf.Annotations;` (4/84 files)
-- `using Aspose.Pdf.Drawing;` (4/84 files)
-- `using Aspose.Pdf.Text;` (3/84 files)
-- `using Aspose.Pdf.Signatures;` (1/84 files)
-- `using System;` (84/84 files)
-- `using System.IO;` (83/84 files)
-- `using System.Security.Cryptography.X509Certificates;` (15/84 files)
-- `using System.Collections.Generic;` (6/84 files)
-- `using System.Linq;` (5/84 files)
-- `using System.Security.Cryptography;` (3/84 files)
-- `using System.Drawing.Imaging;` (2/84 files)
-- `using System.Reflection;` (2/84 files)
-- `using System.Text;` (2/84 files)
-- `using Azure.Storage.Blobs;` (1/84 files)
-- `using System.Collections;` (1/84 files)
-- `using System.Data;` (1/84 files)
-- `using System.Data.SqlClient;` (1/84 files)
-- `using System.Drawing;` (1/84 files)
-- `using System.IO.Compression;` (1/84 files)
-- `using System.Net.Http;` (1/84 files)
-- `using System.Threading.Tasks;` (1/84 files)
-- `using System.Xml;` (1/84 files)
+- `using Aspose.Pdf;` (78/78 files) ← category-specific
+- `using Aspose.Pdf.Forms;` (50/78 files) ← category-specific
+- `using Aspose.Pdf.Security;` (10/78 files)
+- `using Aspose.Pdf.Text;` (4/78 files)
+- `using Aspose.Pdf.Annotations;` (3/78 files)
+- `using Aspose.Pdf.Drawing;` (1/78 files)
+- `using Aspose.Pdf.Signatures;` (1/78 files)
+- `using System;` (78/78 files)
+- `using System.IO;` (77/78 files)
+- `using System.Security.Cryptography.X509Certificates;` (13/78 files)
+- `using System.Collections.Generic;` (9/78 files)
+- `using System.Linq;` (4/78 files)
+- `using System.Security.Cryptography;` (3/78 files)
+- `using System.Drawing.Imaging;` (1/78 files)
+- `using System.IO.Compression;` (1/78 files)
+- `using System.Security.Cryptography.Pkcs;` (1/78 files)
+- `using System.Text;` (1/78 files)
+- `using System.Xml;` (1/78 files)
 
 ## Common Code Pattern
 
@@ -65,40 +58,40 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-visible-digital-signature-second-page](./add-visible-digital-signature-second-page.cs) | Add Visible Digital Signature to PDF Second Page | `Document`, `PageInfo`, `Rectangle` | The example loads a PDF, creates a visible signature field on the bottom‑right corner of the seco... |
-| [apply-invisible-digital-signature-with-timestamp](./apply-invisible-digital-signature-with-timestamp.cs) | Apply Invisible Digital Signature with Timestamp to PDF | `Document`, `SignatureField`, `PKCS7` | Demonstrates adding an invisible PKCS#7 digital signature that records the signing time while pre... |
-| [apply-pkcs7-detached-signature-to-pdf](./apply-pkcs7-detached-signature-to-pdf.cs) | Apply PKCS#7 Detached Signature to PDF | `Document`, `SignatureField`, `PKCS7Detached` | The example loads a PDF from a file stream, adds a signature field, and applies a PKCS#7 detached... |
-| [batch-decrypt-pdf-lookup-table](./batch-decrypt-pdf-lookup-table.cs) | Batch Decrypt Password-Protected PDFs Using a Lookup Table | `Document`, `Document(string, string)`, `Decrypt` | Demonstrates how to decrypt multiple password‑protected PDF files in a folder by using a dictiona... |
-| [batch-encrypt-and-sign-pdfs](./batch-encrypt-and-sign-pdfs.cs) | Batch Encrypt and Sign PDFs | `Document`, `Encrypt`, `Permissions` | Shows how to encrypt multiple PDF files with AES‑256 and then apply a PKCS#7 digital signature to... |
-| [batch-encrypt-pdfs-archive-zip](./batch-encrypt-pdfs-archive-zip.cs) | Batch Encrypt PDFs and Archive to ZIP | `Document`, `Encrypt`, `Save` | Shows how to encrypt multiple PDF files with unique passwords using Aspose.Pdf and then package t... |
-| [batch-encrypt-pdfs-by-filename](./batch-encrypt-pdfs-by-filename.cs) | Batch Encrypt PDFs with Passwords Derived from File Names | `Document`, `Encrypt`, `Save` | The example iterates through all PDF files in a folder, derives a password from each file name, e... |
-| [batch-encrypt-pdfs-with-date-hashed-passwords](./batch-encrypt-pdfs-with-date-hashed-passwords.cs) | Batch Encrypt PDFs with Date-Based Hashed Passwords | `Document`, `Permissions`, `CryptoAlgorithm` | Demonstrates how to encrypt multiple PDF files in a folder using Aspose.Pdf, generating a unique ... |
-| [batch-sign-and-compress-pdfs](./batch-sign-and-compress-pdfs.cs) | Batch Sign and Compress PDFs | `Document`, `SignatureField`, `PKCS7` | Shows how to iterate through a folder of PDF files, add a visible digital signature using a PFX c... |
-| [batch-sign-pdfs-by-doc-type](./batch-sign-pdfs-by-doc-type.cs) | Batch Sign PDFs Using Document-Type Certificates | `Document`, `SignatureField`, `PKCS7` | Demonstrates how to sign multiple PDF files in a batch, selecting the appropriate X.509 certifica... |
-| [batch-sign-pdfs-using-metadata](./batch-sign-pdfs-using-metadata.cs) | Batch Sign PDFs Using Document Metadata | `Document`, `Page`, `Rectangle` | Demonstrates how to iterate over PDF files, read a metadata value (Title) to choose a certificate... |
-| [batch-sign-pdfs-with-certificate](./batch-sign-pdfs-with-certificate.cs) | Batch Sign PDFs with Certificate and Timestamp | `Document`, `SignatureField`, `Rectangle` | Shows how to iterate over PDF files in a folder, add a signature field, apply a PKCS#7 digital si... |
-| [batch-sign-pdfs-with-unique-visible-signature-imag...](./batch-sign-pdfs-with-unique-visible-signature-image.cs) | Batch Sign PDFs with Unique Visible Signature Image | `Document`, `SignatureField`, `PKCS1` | The example iterates through PDF files in a folder, adds a signature field to each document, and ... |
-| [certify-pdf-append-only-signature](./certify-pdf-append-only-signature.cs) | Certify PDF with Append-Only Signature to Allow Adding Pages | `Document`, `Rectangle`, `SignatureField` | Shows how to create a DocMDP certification signature using Aspose.Pdf, set the document to append... |
-| [certify-pdf-no-changes](./certify-pdf-no-changes.cs) | Certify PDF with No-Changes Permission | `Document`, `PKCS1`, `DocMDPSignature` | Shows how to apply a certification signature to a PDF that disallows any further modifications us... |
-| [certify-pdf-prevent-further-signatures](./certify-pdf-prevent-further-signatures.cs) | Certify PDF with DocMDP and Prevent Further Signatures | `Document`, `PKCS1`, `DocMDPSignature` | Shows how to apply a DocMDP certification signature to a PDF using Aspose.Pdf, making the documen... |
-| [compute-verify-pdf-hash-before-after-signing](./compute-verify-pdf-hash-before-after-signing.cs) | Compute and Verify PDF Hash Before and After Signing | `Document`, `PKCS7Detached`, `SignatureField` | Demonstrates how to calculate a SHA‑256 hash of a PDF, apply a PKCS#7 detached signature, extract... |
-| [custom-pdf-security-disable-copy-paste-watermark](./custom-pdf-security-disable-copy-paste-watermark.cs) | Custom PDF Security with Disabled Copy‑Paste and Watermark | `Document`, `Encrypt`, `Permissions` | Demonstrates how to implement a simple custom security handler to disable copy‑paste via PDF perm... |
-| [custom-security-handler-logging-pdf-access](./custom-security-handler-logging-pdf-access.cs) | Custom Security Handler Logging PDF Access | `Document`, `ICustomSecurityHandler`, `EncryptionParameters` | Demonstrates how to implement a custom ICustomSecurityHandler that logs encryption and decryption... |
-| [decrypt-pdf-certificate-hardware-token](./decrypt-pdf-certificate-hardware-token.cs) | Decrypt PDF Encrypted with Certificate Using Hardware Token | `Document`, `CertificateEncryptionOptions`, `Decrypt` | Shows how to open a PDF that was encrypted with a public certificate and decrypt it by locating t... |
-| [decrypt-pdf-extract-embedded-images](./decrypt-pdf-extract-embedded-images.cs) | Decrypt PDF and Extract Embedded Images | `Document`, `Decrypt`, `Page` | Shows how to open an encrypted PDF with a user password, decrypt it, and extract all images from ... |
-| [decrypt-pdf-extract-images-reencrypt](./decrypt-pdf-extract-images-reencrypt.cs) | Decrypt PDF, Extract Images, and Re‑encrypt with New Owner P... | `Document`, `Decrypt`, `Page` | Demonstrates opening an encrypted PDF with a user password, decrypting it, extracting all embedde... |
-| [decrypt-pdf-multi-signature-re-sign](./decrypt-pdf-multi-signature-re-sign.cs) | Decrypt PDF and Re‑sign Multiple Signature Fields with Diffe... | `Document`, `Decrypt`, `SignatureField` | The example opens an encrypted PDF using a password, extracts all signature fields, and re‑signs ... |
-| [decrypt-pdf-update-metadata](./decrypt-pdf-update-metadata.cs) | Decrypt PDF with Owner Password and Update Metadata | `Document`, `DocumentInfo`, `Decrypt()` | The example demonstrates opening an encrypted PDF using the owner password, removing its encrypti... |
-| [decrypt-pdf-with-owner-password](./decrypt-pdf-with-owner-password.cs) | Decrypt PDF with Owner Password | `Document`, `Decrypt`, `Save` | Demonstrates opening an encrypted PDF using the owner password, decrypting it, and saving the unp... |
-| [download-sign-upload-pdf-azure-blob](./download-sign-upload-pdf-azure-blob.cs) | Download PDF, Apply Digital Signature, and Upload to Azure B... | `Document`, `SignatureField`, `PKCS7` | The example downloads a PDF (or creates a blank one), adds a signature field, signs it with a PFX... |
-| [encrypt-pdf-aes256-user-owner-passwords](./encrypt-pdf-aes256-user-owner-passwords.cs) | Encrypt PDF with AES‑256 and Set User/Owner Passwords | `Document`, `Permissions`, `CryptoAlgorithm` | Demonstrates how to load a PDF, apply AES‑256 encryption, define user and owner passwords, set pe... |
-| [encrypt-pdf-allow-copy-block-print](./encrypt-pdf-allow-copy-block-print.cs) | Encrypt PDF and Allow Copying While Blocking Printing | `Document`, `Permissions`, `CryptoAlgorithm` | The example loads a PDF, encrypts it with user and owner passwords, sets permissions to allow con... |
-| [encrypt-pdf-allow-printing-copying](./encrypt-pdf-allow-printing-copying.cs) | Encrypt PDF and Allow Printing & Copying | `Document`, `Permissions`, `CryptoAlgorithm` | Demonstrates how to encrypt a PDF using AES‑256 with user and owner passwords, while granting per... |
-| [encrypt-pdf-disable-content-extraction](./encrypt-pdf-disable-content-extraction.cs) | Encrypt PDF and Disable Content Extraction | `Document`, `Permissions`, `CryptoAlgorithm` | Shows how to encrypt a PDF with user and owner passwords, set permissions to allow only printing ... |
-| ... | | | *and 54 more files* |
+| [add-digital-signature-to-pdf](./add-digital-signature-to-pdf.cs) | Add Digital Signature to PDF | `Document`, `Rectangle`, `SignatureField` | Shows how to load a PDF, create a signature field, apply a PKCS#1 digital signature from a PFX ce... |
+| [add-empty-signature-field-to-pdf](./add-empty-signature-field-to-pdf.cs) | Add Empty Signature Field to PDF and List Existing Signature... | `Document`, `SignatureField`, `Rectangle` | The example loads a PDF, enumerates any existing signature fields, creates a new empty signature ... |
+| [add-visible-digital-signature-second-page](./add-visible-digital-signature-second-page.cs) | Add Visible Digital Signature to PDF Second Page | `Document`, `Page`, `Rectangle` | Loads a PDF, creates a visible signature field at the bottom‑right corner of the second page, and... |
+| [add-warning-overlay-disable-copy-paste](./add-warning-overlay-disable-copy-paste.cs) | Add Warning Overlay and Disable Copy‑Paste in PDF | `Document`, `TextStamp`, `FindFont` | The example loads a PDF, adds a semi‑transparent "CONFIDENTIAL – DO NOT COPY" text stamp to every... |
+| [apply-invisible-digital-signature](./apply-invisible-digital-signature.cs) | Apply Invisible Digital Signature to PDF with Timestamp | `Document`, `SignatureField`, `PKCS7` | Demonstrates how to add an invisible PKCS#7 digital signature to a PDF, recording the signing tim... |
+| [apply-pkcs7-detached-signature-to-pdf](./apply-pkcs7-detached-signature-to-pdf.cs) | Apply PKCS#7 Detached Signature to a PDF | `Document`, `SignatureField`, `PKCS7Detached` | Demonstrates loading a PDF from a file stream, creating a signature field, configuring a PKCS#7 d... |
+| [batch-decrypt-pdf-lookup](./batch-decrypt-pdf-lookup.cs) | Batch Decrypt Password-Protected PDFs Using a Lookup Table | `Document`, `InvalidPasswordException`, `Document(string, string)` | Demonstrates how to decrypt multiple password‑protected PDF files in a folder by reading file‑spe... |
+| [batch-encrypt-and-sign-pdfs](./batch-encrypt-and-sign-pdfs.cs) | Batch Encrypt and Sign PDFs | `Document`, `Encrypt`, `Permissions` | Demonstrates how to encrypt multiple PDF files with AES‑256 and then apply a PKCS#7 digital signa... |
+| [batch-encrypt-pdfs-archive-zip](./batch-encrypt-pdfs-archive-zip.cs) | Batch Encrypt PDFs and Archive to ZIP | `Document`, `Encrypt`, `Permissions` | Demonstrates how to encrypt multiple PDF files with unique passwords using Aspose.Pdf and then pa... |
+| [batch-encrypt-pdfs-by-filename](./batch-encrypt-pdfs-by-filename.cs) | Batch Encrypt PDFs Using File Name Passwords | `Document`, `Encrypt`, `Save` | Shows how to encrypt every PDF in a folder with Aspose.Pdf, using the file name as both user and ... |
+| [batch-encrypt-pdfs-deterministic-passwords](./batch-encrypt-pdfs-deterministic-passwords.cs) | Batch Encrypt PDFs with Deterministic Passwords | `Document`, `Encrypt`, `Permissions` | Demonstrates how to encrypt all PDF files in a folder using Aspose.Pdf, generating a password fro... |
+| [batch-sign-and-compress-pdfs](./batch-sign-and-compress-pdfs.cs) | Batch Sign and Compress PDFs | `Document`, `SignatureField`, `PKCS7` | Shows how to iterate through a folder of PDF files, add a PKCS#7 digital signature field, optimiz... |
+| [batch-sign-pdfs-metadata-certificate](./batch-sign-pdfs-metadata-certificate.cs) | Batch Sign PDFs Using Metadata-Driven Certificate Selection | `Document`, `Page`, `Rectangle` | The example loads each PDF, reads its Title metadata, selects a matching certificate, adds a sign... |
+| [batch-sign-pdfs-with-certificate](./batch-sign-pdfs-with-certificate.cs) | Batch Sign PDFs with Certificate and Timestamp | `Document`, `Page`, `SignatureField` | Demonstrates how to sign all PDF files in a folder using a PFX certificate and a timestamp author... |
+| [batch-sign-pdfs-with-document-type-certificates](./batch-sign-pdfs-with-document-type-certificates.cs) | Batch Sign PDFs with Document-Type Certificates | `Document`, `PKCS7`, `SignatureField` | Demonstrates signing a batch of PDF files using Aspose.Pdf, selecting a PKCS#7 certificate based ... |
+| [certify-pdf-allow-annotations](./certify-pdf-allow-annotations.cs) | Create a Certified PDF Signature Allowing Annotations | `Document`, `Rectangle`, `SignatureField` | Shows how to add a signature field to a PDF and sign it with a PKCS#1 certificate using Aspose.Pd... |
+| [custom-security-handler-logging](./custom-security-handler-logging.cs) | Custom Security Handler with Logging for Encrypted PDF | `Document`, `ICustomSecurityHandler`, `EncryptionParameters` | Demonstrates how to implement a custom ICustomSecurityHandler that logs password checks and encry... |
+| [custom-security-handler-restrict-copy-paste](./custom-security-handler-restrict-copy-paste.cs) | Apply Custom Security Handler to Restrict Copy‑Paste in PDF | `Document`, `Encrypt`, `Save` | Demonstrates how to implement a simple custom security handler and use it with Aspose.Pdf to encr... |
+| [decrypt-pdf-extract-images-reencrypt](./decrypt-pdf-extract-images-reencrypt.cs) | Decrypt PDF, Extract Images, and Re‑encrypt with New Owner P... | `Document`, `Decrypt`, `Encrypt` | The example opens an encrypted PDF using the existing owner password, removes the encryption, ext... |
+| [decrypt-pdf-resign-multiple-certificates](./decrypt-pdf-resign-multiple-certificates.cs) | Decrypt PDF and Re‑sign All Signature Fields with Multiple C... | `Document`, `Decrypt`, `SignatureField` | The example opens an encrypted PDF, extracts every signature field, and re‑signs each field using... |
+| [decrypt-pdf-update-metadata](./decrypt-pdf-update-metadata.cs) | Decrypt PDF with Owner Password and Update Metadata | `Document`, `Decrypt()`, `Info` | Shows how to open an encrypted PDF using the owner password, remove its encryption, modify docume... |
+| [decrypt-pdf-using-certificate-token](./decrypt-pdf-using-certificate-token.cs) | Decrypt PDF Using Certificate from Hardware Token | `Document`, `CertificateEncryptionOptions`, `Decrypt` | Shows how to open a PDF encrypted with a certificate, retrieve the private key from a hardware to... |
+| [decrypt-pdf-with-owner-password](./decrypt-pdf-with-owner-password.cs) | Decrypt PDF with Owner Password using Aspose.Pdf | `Document`, `ctor(string, string)`, `Decrypt()` | Shows how to open an encrypted PDF with the owner password, remove its encryption, and save the d... |
+| [encrypt-pdf-aes256](./encrypt-pdf-aes256.cs) | Encrypt PDF with AES‑256 and Passwords | `Document`, `Permissions`, `CryptoAlgorithm` | Demonstrates loading a PDF, applying AES‑256 encryption with user and owner passwords, setting ba... |
+| [encrypt-pdf-allow-copy-block-print](./encrypt-pdf-allow-copy-block-print.cs) | Encrypt PDF and Allow Copy While Blocking Printing | `Document`, `Permissions`, `CryptoAlgorithm` | The example loads a PDF, encrypts it with AES‑256, sets permissions to allow content extraction (... |
+| [encrypt-pdf-certificate-sign](./encrypt-pdf-certificate-sign.cs) | Encrypt PDF with Certificate and Digitally Sign It | `Document`, `Page`, `TextFragment` | Demonstrates how to encrypt a PDF using a certificate's public key and then apply a PKCS#7 digita... |
+| [encrypt-pdf-disable-content-extraction](./encrypt-pdf-disable-content-extraction.cs) | Encrypt PDF and Disable Content Extraction | `Document`, `Permissions`, `Encrypt` | Demonstrates how to encrypt a PDF with AES‑256 using Aspose.Pdf, set an empty permissions set to ... |
+| [encrypt-pdf-disable-printing](./encrypt-pdf-disable-printing.cs) | Encrypt PDF with User Password and Disable Printing | `Document`, `Encrypt`, `Permissions` | Demonstrates how to encrypt a PDF with a user password, set an owner password, restrict permissio... |
+| [encrypt-pdf-owner-password-edit-only](./encrypt-pdf-owner-password-edit-only.cs) | Encrypt PDF with Owner Password for Editing Only | `Document`, `Permissions`, `CryptoAlgorithm` | Shows how to encrypt a PDF using Aspose.Pdf so it can be viewed without a password while requirin... |
+| [encrypt-pdf-owner-password-high-res-printing](./encrypt-pdf-owner-password-high-res-printing.cs) | Encrypt PDF with Owner Password and Allow High-Resolution Pr... | `Document`, `Permissions`, `CryptoAlgorithm` | The example loads a PDF, encrypts it using an owner password, permits high‑resolution printing wh... |
+| ... | | | *and 48 more files* |
 
 ## Category Statistics
-- Total examples: 84
+- Total examples: 78
 
 ## General Tips
 - See parent [AGENTS.md](../AGENTS.md) for:
@@ -109,5 +102,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for securing-and-signing-pdf patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-07-05 | Run: `20260705_005655_3d29fa`
+Updated: 2026-07-17 | Run: `20260717_171638_da3b3e`
 <!-- AUTOGENERATED:END -->

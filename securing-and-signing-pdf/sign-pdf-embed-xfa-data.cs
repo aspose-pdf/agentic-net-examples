@@ -8,78 +8,68 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";          // source PDF
-        const string outputPdfPath  = "signed_output.pdf"; // signed PDF
-        const string certPath       = "certificate.pfx";   // signing certificate
-        const string certPassword   = "password";          // certificate password
-        const string xfaDataPath    = "custom_xfa.xml";    // custom XFA data
+        const string inputPdfPath   = "input.pdf";
+        const string outputPdfPath  = "signed_output.pdf";
+        const string pfxPath        = "certificate.pfx";
+        const string pfxPassword    = "pfxPassword";
 
-        if (!File.Exists(inputPdfPath))
+        // Custom XFA data to embed (replace with actual XFA XML)
+        const string xfaXml = @"<?xml version='1.0' encoding='UTF-8'?>
+<xfa:datasets xmlns:xfa='http://www.xfa.org/schema/xfa-data/1.0/'>
+  <xfa:data>
+    <myField>Custom Value</myField>
+  </xfa:data>
+</xfa:datasets>";
+
+        if (!File.Exists(inputPdfPath) || !File.Exists(pfxPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(certPath))
-        {
-            Console.Error.WriteLine($"Certificate file not found: {certPath}");
-            return;
-        }
-        if (!File.Exists(xfaDataPath))
-        {
-            Console.Error.WriteLine($"XFA data file not found: {xfaDataPath}");
+            Console.Error.WriteLine("Required file not found.");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF (using the standard Document constructor)
+        using (Document doc = new Document(inputPdfPath))
         {
-            // ------------------------------------------------------------
-            // Embed custom XFA form data into the document
-            // ------------------------------------------------------------
-            XmlDocument xfaXml = new XmlDocument();
-            xfaXml.Load(xfaDataPath);
-            // Assign the XFA data to the form (core API)
-            pdfDoc.Form.AssignXfa(xfaXml);
+            // -------------------------------------------------
+            // 1. Embed custom XFA data into the form (if any)
+            // -------------------------------------------------
+            XmlDocument xfaDoc = new XmlDocument();
+            xfaDoc.LoadXml(xfaXml);
+            // AssignXfa sets the XFA stream of the document
+            doc.Form.AssignXfa(xfaDoc);
 
-            // ------------------------------------------------------------
-            // Create a signature field on the first page
-            // ------------------------------------------------------------
-            // Fully qualified rectangle to avoid ambiguity with System.Drawing
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
-            // The constructor can take the Document and rectangle
-            SignatureField sigField = new SignatureField(pdfDoc, sigRect)
+            // -------------------------------------------------
+            // 2. Create a signature field on the first page
+            // -------------------------------------------------
+            // Fully qualified Rectangle to avoid ambiguity
+            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            SignatureField sigField = new SignatureField(doc, sigRect);
+            // Add the signature field to the page's annotation collection
+            doc.Pages[1].Annotations.Add(sigField);
+
+            // -------------------------------------------------
+            // 3. Prepare the signature object (PKCS#7)
+            // -------------------------------------------------
+            // Use the concrete PKCS7 class (Signature is abstract)
+            PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword)
             {
-                PartialName = "Signature1", // field name
-                // Optional visual properties
-                Color = Aspose.Pdf.Color.LightGray,
-                Contents = "Signature"
-            };
-            // Add the signature field annotation to page 1 (1‑based indexing)
-            pdfDoc.Pages[1].Annotations.Add(sigField);
-
-            // ------------------------------------------------------------
-            // Prepare the digital signature object
-            // ------------------------------------------------------------
-            // PKCS1 signature uses a PFX file and password
-            PKCS1 pkcs1Signature = new PKCS1(certPath, certPassword)
-            {
-                Reason      = "Document approved",
-                ContactInfo = "contact@example.com",
-                Location    = "Office"
-                // Date defaults to current time; can be set explicitly if needed
+                Reason       = "Document approval",
+                Location     = "Office",
+                ContactInfo  = "contact@example.com",
+                Date         = DateTime.UtcNow
             };
 
-            // ------------------------------------------------------------
-            // Sign the document using the created signature field
-            // ------------------------------------------------------------
-            sigField.Sign(pkcs1Signature);
+            // -------------------------------------------------
+            // 4. Sign the document using the signature field
+            // -------------------------------------------------
+            sigField.Sign(pkcs7);
 
-            // ------------------------------------------------------------
-            // Save the signed PDF
-            // ------------------------------------------------------------
-            pdfDoc.Save(outputPdfPath);
+            // -------------------------------------------------
+            // 5. Save the signed PDF
+            // -------------------------------------------------
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF signed and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");
     }
 }

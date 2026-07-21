@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "protected.pdf";
-        const string ownerPassword = "owner123";
+        const string inputPath = "encrypted.pdf";
         const string outputPath = "decrypted.pdf";
+        const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
         {
@@ -18,13 +18,13 @@ class Program
 
         try
         {
-            // Open the encrypted PDF using the owner password
+            // Open the encrypted PDF with the owner password (full access)
             using (Document doc = new Document(inputPath, ownerPassword))
             {
-                // Decrypt the document (no parameters required)
+                // Decrypt the document; after this the PDF is no longer encrypted
                 doc.Decrypt();
 
-                // Save the decrypted PDF (can overwrite or write to a new file)
+                // Save the decrypted PDF (can overwrite the original or write to a new file)
                 doc.Save(outputPath);
             }
 

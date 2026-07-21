@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // CryptoAlgorithm, Permissions, Document
 
 class Program
 {
@@ -19,12 +19,16 @@ class Program
 
         try
         {
-            // Load the PDF, encrypt it, and save.
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Allow copying (ExtractContent) but do NOT allow printing.
+                // Allow copying (ExtractContent) but do NOT include PrintDocument permission
                 Permissions perms = Permissions.ExtractContent;
+
+                // Encrypt with AES-256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
+                // Save the encrypted PDF
                 doc.Save(outputPath);
             }
 

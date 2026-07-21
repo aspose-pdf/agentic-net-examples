@@ -8,56 +8,63 @@ class BatchSignAndCompress
     static void Main()
     {
         // Folder containing PDFs to process
-        const string inputFolder = @"C:\InputPdfs";
+        const string inputFolder = "InputPdfs";
         // Folder where signed & compressed PDFs will be saved
-        const string outputFolder = @"C:\SignedPdfs";
-
+        const string outputFolder = "SignedCompressed";
         // Path to the PFX certificate and its password
-        const string pfxPath = @"C:\Certificates\mycert.pfx";
-        const string pfxPassword = "certPassword";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "password";
 
-        // Ensure output directory exists
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
+
         Directory.CreateDirectory(outputFolder);
 
         // Process each PDF file in the input folder
-        foreach (string pdfFile in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = Path.GetFileName(pdfFile);
-            string outputPath = Path.Combine(outputFolder, fileName);
+            string fileName = Path.GetFileName(pdfPath);
+            string outPath = Path.Combine(outputFolder, fileName);
 
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfFile))
+            try
             {
-                // Create a visible signature field on the first page
-                // Fully qualify Rectangle to avoid ambiguity with System.Drawing.Rectangle
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-                // Add the signature field to page 1
-                SignatureField signatureField = new SignatureField(doc.Pages[1], rect);
-
-                // Initialize the digital signature using the PFX file (concrete PKCS7 class)
-                PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword)
+                // Load the PDF document (lifecycle rule: use using for disposal)
+                using (Document doc = new Document(pdfPath))
                 {
-                    Reason = "Document approved",
-                    Location = "Company HQ",
-                    ContactInfo = "contact@example.com",
-                    // The Date property is optional; if needed, set it explicitly
-                    // Date = DateTime.UtcNow // PKCS7 uses the current time by default
-                };
+                    // Add a signature field on the first page (coordinates: llx, lly, urx, ury)
+                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
+                    SignatureField sigField = new SignatureField(doc.Pages[1], rect)
+                    {
+                        PartialName = "Signature1"
+                    };
+                    doc.Form.Add(sigField);
 
-                // Apply the signature to the field
-                signatureField.Sign(pkcs7);
+                    // Create a concrete PKCS7 signature object from the PFX file
+                    PKCS7 pkcs7 = new PKCS7(certPath, certPassword)
+                    {
+                        Reason = "Document approved",
+                        Location = "Company HQ"
+                    };
 
-                // Compress the signed document by optimizing its resources
-                doc.OptimizeResources();
+                    // Apply the digital signature to the field
+                    sigField.Sign(pkcs7);
 
-                // Save the signed and compressed PDF
-                doc.Save(outputPath);
+                    // Compress the signed PDF by optimizing resources
+                    doc.OptimizeResources();
+
+                    // Save the signed and compressed PDF (PDF format, no extra SaveOptions needed)
+                    doc.Save(outPath);
+                }
+
+                Console.WriteLine($"Processed: {fileName}");
             }
-
-            Console.WriteLine($"Processed: {fileName}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
+            }
         }
-
-        Console.WriteLine("Batch signing and compression completed.");
     }
 }
