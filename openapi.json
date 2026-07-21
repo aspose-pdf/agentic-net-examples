@@ -1,0 +1,431 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Examples MCP Server",
+    "description": "MCP-powered retrieval-augmented code generation server for Aspose SDKs.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mcp/generate": {
+      "post": {
+        "tags": [
+          "MCP API"
+        ],
+        "summary": "Generate Code Using MCP",
+        "description": "Generate source code using retrieval-augmented generation (RAG).\n\n    This function executes the complete MCP generation pipeline:\n\n    - Resolves routing for product/platform\n    - Selects retrieval strategy\n    - Retrieves relevant knowledge chunks\n    - Builds structured context\n    - Constructs LLM prompt\n    - Generates final code output\n\n    Args:\n        task (str):\n            Natural language description of the requested operation.\n            Example: \"Create a clustered column chart and export to PDF\".\n\n        product (str):\n            Product identifier (example: \"slides\", \"pdf\", \"words\").\n\n        platform (str):\n            Platform identifier (example: \"net\", \"java\", \"python\").\n\n        retrieval_mode (Optional[str]):\n            Retrieval strategy selector.\n\n            Supported values:\n            - \"embedding\"\n            - \"keyword\"\n            - \"hybrid\"\n            - \"planner\"\n\n            If None, embedding retrieval is used by default.\n\n        limit (int):\n            Maximum number of chunks to retrieve from the vector database.\n\n        include_chunks (bool):\n            If True, raw retrieved chunks are included in the API response\n            for debugging and inspection purposes.\n\n        exclude_namespaces (Optional[List[str]]):\n            Optional list of namespaces to exclude from retrieval\n            (useful for precision filtering).\n\n    Returns:\n        dict:\n            Structured response containing:\n\n            - product\n            - platform\n            - weaviate_class\n            - retrieval_mode\n            - generated_code\n            - optionally retrieved chunks\n\n    Raises:\n        ValueError:\n            If routing resolution fails or invalid parameters are provided.\n\n        RuntimeError:\n            If LLM generation fails.",
+        "operationId": "mcp_generate_mcp_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MCPGenerateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/retrieve": {
+      "post": {
+        "tags": [
+          "MCP API"
+        ],
+        "summary": "Retrieve Knowledge Chunks Only",
+        "description": "Retrieve knowledge chunks without invoking the LLM.\n\n    This function is intended for:\n\n    - Debugging retrieval quality\n    - UI preview of grounding content\n    - Evaluation of chunk relevance\n    - Retrieval pipeline testing\n\n    No code generation is performed.\n\n    Args:\n        task (str):\n            Natural language search query.\n\n        product (str):\n            Product identifier.\n\n        platform (str):\n            Platform identifier.\n\n        retrieval_mode (Optional[str]):\n            Retrieval strategy to use.\n\n        limit (int):\n            Maximum number of chunks to return.\n\n        exclude_namespaces (Optional[List[str]]):\n            Optional list of namespaces to exclude.\n\n    Returns:\n        dict:\n            Structured retrieval response containing:\n\n            - product\n            - platform\n            - weaviate_class\n            - retrieval_mode\n            - chunks (list of RetrievedChunk dictionaries)",
+        "operationId": "mcp_retrieve_mcp_retrieve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MCPRetrieveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "Home",
+        "operationId": "home__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{product}/{platform}": {
+      "get": {
+        "summary": "Route Page",
+        "operationId": "route_page__product___platform__get",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Product"
+            }
+          },
+          {
+            "name": "platform",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Platform"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Route Generate",
+        "operationId": "route_generate__product___platform__post",
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Product"
+            }
+          },
+          {
+            "name": "platform",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Platform"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_route_generate__product___platform__post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Body_route_generate__product___platform__post": {
+        "properties": {
+          "task": {
+            "type": "string",
+            "title": "Task"
+          },
+          "retrieval_mode": {
+            "type": "string",
+            "title": "Retrieval Mode",
+            "default": "embedding"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit",
+            "default": 15
+          },
+          "include_chunks": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Include Chunks"
+          },
+          "exclude_namespaces": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exclude Namespaces"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task"
+        ],
+        "title": "Body_route_generate__product___platform__post"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "MCPGenerateRequest": {
+        "properties": {
+          "task": {
+            "type": "string",
+            "title": "Task",
+            "description": "Natural language task description"
+          },
+          "product": {
+            "type": "string",
+            "title": "Product",
+            "description": "Aspose product name (pdf, slides, words)"
+          },
+          "platform": {
+            "type": "string",
+            "title": "Platform",
+            "description": "SDK platform (net, java, python)"
+          },
+          "retrieval_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retrieval Mode",
+            "description": "Retrieval strategy: embedding | keyword | planner"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit",
+            "description": "Maximum chunks to retrieve",
+            "default": 15
+          },
+          "include_chunks": {
+            "type": "boolean",
+            "title": "Include Chunks",
+            "description": "Include raw retrieved chunks in response",
+            "default": false
+          },
+          "exclude_namespaces": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exclude Namespaces",
+            "description": "Namespaces to exclude during retrieval"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task",
+          "product",
+          "platform"
+        ],
+        "title": "MCPGenerateRequest"
+      },
+      "MCPRetrieveRequest": {
+        "properties": {
+          "task": {
+            "type": "string",
+            "title": "Task",
+            "description": "Natural language retrieval query"
+          },
+          "product": {
+            "type": "string",
+            "title": "Product",
+            "description": "Aspose product name"
+          },
+          "platform": {
+            "type": "string",
+            "title": "Platform",
+            "description": "SDK platform"
+          },
+          "retrieval_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retrieval Mode",
+            "description": "Retrieval strategy: embedding | keyword | planner"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit",
+            "description": "Maximum chunks to retrieve",
+            "default": 5
+          },
+          "exclude_namespaces": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exclude Namespaces",
+            "description": "Namespaces to exclude"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task",
+          "product",
+          "platform"
+        ],
+        "title": "MCPRetrieveRequest"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

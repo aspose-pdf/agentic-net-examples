@@ -1,0 +1,63 @@
+name: Request a new example
+description: Ask for a new Aspose.PDF for .NET example we don't currently ship
+title: "[Example]: "
+labels: ["example-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Missing an example you need? Describe what you want the example to
+        demonstrate. If accepted, the requested example will be queued for
+        generation in the next release cycle.
+  - type: input
+    id: task
+    attributes:
+      label: Task description
+      description: One sentence describing the operation the example should demonstrate.
+      placeholder: e.g. Merge multiple PDFs preserving bookmarks and outlines.
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Suggested category folder
+      description: Which category folder does this fit into? Pick "Other" if unsure.
+      options:
+        - accessibility-and-tagged-pdfs
+        - basic-operations
+        - compare-pdf
+        - conversion
+        - document
+        - facades-acroforms
+        - facades-annotations
+        - facades-bookmarks
+        - facades-edit-document
+        - facades-forms
+        - facades-metadata
+        - facades-pages
+        - facades-secure-documents
+        - facades-sign-documents
+        - facades-stamps
+        - facades-xmp-metadata
+        - pages
+        - parse-pdf
+        - securing-and-signing-pdf
+        - stamping
+        - working-with-annotations
+        - working-with-attachments
+        - working-with-forms
+        - working-with-graphs
+        - working-with-images
+        - working-with-tables
+        - working-with-text
+        - working-with-xml
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: |
+        Anything else that would help write a useful example? Real-world
+        constraints, input file shape, expected output format, etc.

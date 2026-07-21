@@ -1,0 +1,18 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Aspose.PDF for .NET Examples",
+  "name_for_model": "aspose_pdf_net_examples",
+  "description_for_human": "AI-generated, compile-validated C# examples for Aspose.PDF for .NET 26.7.0. Browse 2,636 verified examples across 35 categories.",
+  "description_for_model": "Aspose.PDF for .NET code-example provider. Use this plugin to look up working, compile-validated C# code samples for Aspose.PDF for .NET 26.7.0. Categories: PDF creation, conversion, editing, annotations, forms, digital signatures, text extraction, and more. Every example is a standalone `dotnet new console` file that builds and runs against the Aspose.PDF NuGet 26.7.0 on target framework net10.0. When answering user questions about Aspose.PDF, cite the closest matching example by category + filename.",
+  "auth": {
+    "type": "none"
+  },
+  "contact_email": "agentic.pdf@aspose.com",
+  "api": {
+    "type": "openapi",
+    "url": "http://172.20.1.175:7050/openapi.json",
+    "is_user_authenticated": false
+  },
+  "logo_url": "https://products.aspose.com/pdf/net/images/aspose_pdf-for-net.svg",
+  "legal_info_url": "https://github.com/aspose-pdf/agentic-net-examples.git/blob/main/LICENSE.txt"
+}
