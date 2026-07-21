@@ -17,37 +17,36 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF and obtain the tagged‑content helper
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Set language and title (optional)
+            // Optional: set language and title for the tagged PDF
             tagged.SetLanguage("en-US");
             tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
             // Get the root structure element (no cast needed)
             StructureElement root = tagged.RootElement;
 
-            // Create a paragraph element and set its text
+            // Create a paragraph element and set its main text
             ParagraphElement paragraph = tagged.CreateParagraphElement();
-            paragraph.SetText("This is a main paragraph that will contain a note.");
+            paragraph.SetText("This is the main paragraph text.");
 
-            // Append the paragraph to the root
-            root.AppendChild(paragraph);
-
-            // Create a note element (supplemental information)
+            // Create a note element (footnote/endnote) and set its supplemental text
             NoteElement note = tagged.CreateNoteElement();
-            note.SetText("This is the supplemental note providing additional context.");
+            note.SetText("Supplemental information provided as a note.");
 
-            // Append the note as a child of the paragraph
-            paragraph.AppendChild(note); // bool parameter omitted (default true)
+            // Attach the note as a child of the paragraph
+            paragraph.AppendChild(note);   // bool parameter omitted – default is true
+
+            // Add the paragraph (with its note) to the document structure
+            root.AppendChild(paragraph);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with note element: {outputPath}");
+        Console.WriteLine($"PDF saved with note element: '{outputPath}'");
     }
 }

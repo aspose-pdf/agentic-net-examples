@@ -10,7 +10,9 @@ class PdfComparisonDemo
         // Input PDF files (different page sizes)
         const string pdfPath1 = "documentA.pdf";
         const string pdfPath2 = "documentB.pdf";
-        const string resultPath = "comparison_result.pdf";
+
+        // Output comparison PDF (pages aligned and compared)
+        const string resultPath = "comparisonResult.pdf";
 
         // Verify input files exist
         if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
@@ -19,54 +21,37 @@ class PdfComparisonDemo
             return;
         }
 
-        try
+        // Load both documents inside using blocks for deterministic disposal
+        using (Document doc1 = new Document(pdfPath1))
+        using (Document doc2 = new Document(pdfPath2))
         {
-            // Load both documents
-            using (Document doc1 = new Document(pdfPath1))
-            using (Document doc2 = new Document(pdfPath2))
+            // For demonstration we compare the first page of each document.
+            // If the documents have multiple pages, you could iterate over them similarly.
+            Page page1 = doc1.Pages[1];
+            Page page2 = doc2.Pages[1];
+
+            // Align page sizes: make page2 the same size as page1.
+            // PageInfo.Width and Height are mutable and affect the page dimensions.
+            page2.PageInfo.Width = page1.PageInfo.Width;
+            page2.PageInfo.Height = page1.PageInfo.Height;
+
+            // Optional: adjust the MediaBox/TrimBox if needed (usually PageInfo is sufficient)
+            // page2.MediaBox = page1.MediaBox;
+
+            // Create the graphical comparer
+            GraphicalPdfComparer comparer = new GraphicalPdfComparer
             {
-                // Ensure both documents have at least one page
-                if (doc1.Pages.Count == 0 || doc2.Pages.Count == 0)
-                {
-                    Console.Error.WriteLine("One of the PDFs does not contain any pages.");
-                    return;
-                }
+                // Example customizations (default values are fine)
+                // Color = Aspose.Pdf.Color.Red;
+                // Resolution = 150;
+                // Threshold = 0;
+            };
 
-                // Work with the first page of each document for this demo
-                Page page1 = doc1.Pages[1];
-                Page page2 = doc2.Pages[1];
-
-                // Determine a common size (use the larger width and height)
-                double commonWidth = Math.Max(page1.PageInfo.Width, page2.PageInfo.Width);
-                double commonHeight = Math.Max(page1.PageInfo.Height, page2.PageInfo.Height);
-
-                // Resize both pages to the common dimensions
-                page1.PageInfo.Width = commonWidth;
-                page1.PageInfo.Height = commonHeight;
-
-                page2.PageInfo.Width = commonWidth;
-                page2.PageInfo.Height = commonHeight;
-
-                // Optional: center original content after resizing (preserve aspect)
-                // Here we simply keep the content at its original position.
-                // More sophisticated alignment can be done by translating the page contents.
-
-                // Perform graphical comparison and save the result PDF
-                GraphicalPdfComparer comparer = new GraphicalPdfComparer();
-                comparer.ComparePagesToPdf(page1, page2, resultPath);
-
-                Console.WriteLine($"Comparison completed. Result saved to '{resultPath}'.");
-            }
+            // Perform the comparison and write the result to a PDF file.
+            // This method throws ArgumentException if page sizes differ, but we have aligned them.
+            comparer.ComparePagesToPdf(page1, page2, resultPath);
         }
-        catch (ArgumentException argEx)
-        {
-            // Thrown if pages still differ in size after adjustments or invalid arguments
-            Console.Error.WriteLine($"Argument error: {argEx.Message}");
-        }
-        catch (Exception ex)
-        {
-            // General error handling
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Comparison completed. Result saved to '{resultPath}'.");
     }
 }

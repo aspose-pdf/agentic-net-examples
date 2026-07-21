@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
+using Aspose.Pdf.Tagged;               // ITaggedContent
+using Aspose.Pdf.LogicalStructure;    // StructureElement, TableElement, etc.
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "tagged_table.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,44 +17,48 @@ class Program
             return;
         }
 
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content API
+            // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Root element of the structure tree
+            // Optional: set language for the tagged PDF
+            tagged.SetLanguage("en-US");
+
+            // Get the root of the structure tree (no cast needed)
             StructureElement root = tagged.RootElement;
 
-            // Create a table element and attach it to the root
+            // Create a Table element and attach it to the root
             TableElement table = tagged.CreateTableElement();
             root.AppendChild(table);
 
-            // Create table body
+            // Create a Table Body element and attach it to the table
             TableTBodyElement tbody = tagged.CreateTableTBodyElement();
             table.AppendChild(tbody);
 
-            // Build 3 rows × 4 columns
-            for (int row = 1; row <= 3; row++)
+            // Create three rows, each with four cells
+            for (int rowIndex = 0; rowIndex < 3; rowIndex++)
             {
-                // Create a table row
-                TableTRElement tr = tagged.CreateTableTRElement();
-                tbody.AppendChild(tr);
+                // Create a table row and attach it to the body
+                TableTRElement row = tagged.CreateTableTRElement();
+                tbody.AppendChild(row);
 
-                for (int col = 1; col <= 4; col++)
+                // Create four cells for the current row
+                for (int colIndex = 0; colIndex < 4; colIndex++)
                 {
-                    // Create a table cell and set its text
-                    TableTDElement td = tagged.CreateTableTDElement();
-                    td.SetText($"R{row}C{col}");
-                    tr.AppendChild(td);
+                    TableTDElement cell = tagged.CreateTableTDElement();
+                    // Set the visible text of the cell
+                    cell.SetText($"R{rowIndex + 1}C{colIndex + 1}");
+                    // Attach the cell to the current row
+                    row.AppendChild(cell);
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (no PreSave needed)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Tagged PDF with table saved to '{outputPath}'.");
+        Console.WriteLine($"Table added and saved to '{outputPath}'.");
     }
 }
