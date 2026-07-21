@@ -6,55 +6,53 @@ class Program
 {
     static void Main()
     {
-        // Input PDF and output PDF paths
-        const string inputPdf  = "input.pdf";
+        // Input and output PDF files
+        const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
 
-        // Example list of image files to add
-        string[] imageFiles = new string[]
-        {
-            "image1.jpg",
-            "image2.png",
-            "missing.jpg"   // this will trigger an exception
-        };
+        // List of image file paths to add
+        string[] imagePaths = { "image1.jpg", "image2.png", "missing.jpg" };
 
-        // Ensure the source PDF exists
+        // Verify the source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Create the PdfFileMend facade (create rule)
-        PdfFileMend mender = new PdfFileMend(inputPdf, outputPdf);
+        // Initialize PdfFileMend with source and destination files
+        PdfFileMend mend = new PdfFileMend(inputPdf, outputPdf);
 
-        // Add each image to page 1 at specified coordinates
-        foreach (string imgPath in imageFiles)
+        // Target page and rectangle coordinates (lower‑left and upper‑right)
+        int targetPage = 1;
+        float lowerLeftX = 10f;
+        float lowerLeftY = 10f;
+        float upperRightX = 100f;
+        float upperRightY = 100f;
+
+        // Process each image, handling any exceptions that occur
+        foreach (string imgPath in imagePaths)
         {
             try
             {
-                // Verify image file exists before attempting to add
-                if (!File.Exists(imgPath))
-                    throw new FileNotFoundException("Image file not found.", imgPath);
-
-                // AddImage returns true on success; coordinates are example values
-                bool added = mender.AddImage(imgPath, 1, 10, 10, 200, 200);
+                // Attempt to add the image; AddImage returns true on success
+                bool added = mend.AddImage(imgPath, targetPage, lowerLeftX, lowerLeftY, upperRightX, upperRightY);
                 if (!added)
                 {
-                    // If AddImage returns false, treat it as a failure
-                    Console.Error.WriteLine($"Failed to add image (method returned false): {imgPath}");
+                    // The method reported failure without throwing
+                    Console.Error.WriteLine($"AddImage returned false for: {imgPath}");
                 }
             }
             catch (Exception ex)
             {
-                // Log the problematic image path and exception details
+                // Log the problematic image file path and the exception message
                 Console.Error.WriteLine($"Error adding image '{imgPath}': {ex.Message}");
             }
         }
 
-        // Close the facade to finalize the output PDF (save rule)
-        mender.Close();
+        // Finalize and write the output PDF
+        mend.Close();
 
-        Console.WriteLine($"Image insertion completed. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Processing complete. Output saved to '{outputPdf}'.");
     }
 }
