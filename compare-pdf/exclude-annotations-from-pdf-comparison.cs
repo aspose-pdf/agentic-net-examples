@@ -3,60 +3,56 @@ using System.IO;
 using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Comparison;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string firstPdfPath  = "first.pdf";
-        const string secondPdfPath = "second.pdf";
-        const string resultPdfPath = "comparison_result.pdf";
+        const string file1 = "doc1.pdf";
+        const string file2 = "doc2.pdf";
+        const string result = "comparison_result.pdf";
 
-        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
+        if (!File.Exists(file1) || !File.Exists(file2))
         {
-            Console.Error.WriteLine("One or both input files not found.");
+            Console.Error.WriteLine("Input files not found.");
             return;
         }
 
-        // Load the two documents inside using blocks for proper disposal
-        using (Document doc1 = new Document(firstPdfPath))
-        using (Document doc2 = new Document(secondPdfPath))
+        // Load both PDFs inside using blocks for proper disposal
+        using (Aspose.Pdf.Document doc1 = new Aspose.Pdf.Document(file1))
+        using (Aspose.Pdf.Document doc2 = new Aspose.Pdf.Document(file2))
         {
-            // Collect annotation rectangles from the first document
-            List<Aspose.Pdf.Rectangle> excludeAreas1 = new List<Aspose.Pdf.Rectangle>();
-            for (int i = 1; i <= doc1.Pages.Count; i++)
+            // Gather annotation rectangles from the first document
+            List<Aspose.Pdf.Rectangle> exclude1 = new List<Aspose.Pdf.Rectangle>();
+            foreach (Aspose.Pdf.Page page in doc1.Pages)
             {
-                Page page = doc1.Pages[i];
-                foreach (Annotation annot in page.Annotations)
+                foreach (Aspose.Pdf.Annotations.Annotation annot in page.Annotations)
                 {
-                    // The bounding rectangle of the annotation
-                    excludeAreas1.Add(annot.Rect);
+                    exclude1.Add(annot.Rect);
                 }
             }
 
-            // Collect annotation rectangles from the second document
-            List<Aspose.Pdf.Rectangle> excludeAreas2 = new List<Aspose.Pdf.Rectangle>();
-            for (int i = 1; i <= doc2.Pages.Count; i++)
+            // Gather annotation rectangles from the second document
+            List<Aspose.Pdf.Rectangle> exclude2 = new List<Aspose.Pdf.Rectangle>();
+            foreach (Aspose.Pdf.Page page in doc2.Pages)
             {
-                Page page = doc2.Pages[i];
-                foreach (Annotation annot in page.Annotations)
+                foreach (Aspose.Pdf.Annotations.Annotation annot in page.Annotations)
                 {
-                    excludeAreas2.Add(annot.Rect);
+                    exclude2.Add(annot.Rect);
                 }
             }
 
-            // Set up comparison options to exclude the collected areas
-            ComparisonOptions options = new ComparisonOptions
+            // Configure comparison options to exclude the collected annotation areas
+            Aspose.Pdf.Comparison.SideBySideComparisonOptions options = new Aspose.Pdf.Comparison.SideBySideComparisonOptions
             {
-                ExcludeAreas1 = excludeAreas1.ToArray(),
-                ExcludeAreas2 = excludeAreas2.ToArray()
+                ExcludeAreas1 = exclude1.ToArray(),
+                ExcludeAreas2 = exclude2.ToArray()
             };
 
-            // Perform page‑by‑page text comparison and save the result
-            TextPdfComparer.CompareDocumentsPageByPage(doc1, doc2, options, resultPdfPath);
+            // Perform side‑by‑side comparison and save the result
+            Aspose.Pdf.Comparison.SideBySidePdfComparer.Compare(doc1, doc2, result, options);
         }
 
-        Console.WriteLine($"Comparison completed. Result saved to '{resultPdfPath}'.");
+        Console.WriteLine($"Comparison saved to '{result}'.");
     }
 }
