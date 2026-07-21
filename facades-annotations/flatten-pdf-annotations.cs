@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -16,23 +15,26 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Initialize the annotation editor and bind the loaded document
-            PdfAnnotationEditor editor = new PdfAnnotationEditor();
-            editor.BindPdf(doc);
+            // Initialize the annotation editor facade
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            {
+                // Load the PDF document
+                editor.BindPdf(inputPath);
 
-            // Flatten all annotations in the document
-            editor.FlatteningAnnotations();
+                // Flatten all annotations (make them non‑editable visual elements)
+                editor.FlatteningAnnotations();
 
-            // Save the flattened PDF
-            editor.Save(outputPath);
+                // Save the flattened PDF
+                editor.Save(outputPath);
+            }
 
-            // Close the editor (optional, Dispose will be called by GC)
-            editor.Close();
+            Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

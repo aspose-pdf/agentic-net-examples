@@ -1,36 +1,30 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "flattened_output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "flattened_output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document with deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // PdfAnnotationEditor provides methods to work with annotations.
+        // FlatteningAnnotations() converts all interactive annotations to static graphics
+        // while preserving their visual appearance.
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Initialize the annotation editor facade on the loaded document
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor(doc))
-            {
-                // Flatten all annotations – this converts them to static graphics
-                // while preserving their visual appearance.
-                editor.FlatteningAnnotations();
-
-                // Save the resulting PDF
-                editor.Save(outputPath);
-            }
+            editor.BindPdf(inputPdf);                 // Load the source PDF
+            editor.FlatteningAnnotations();          // Preserve appearance, remove interactivity
+            editor.Save(outputPdf);                   // Save the result
         }
 
-        Console.WriteLine($"Annotations flattened and saved to '{outputPath}'.");
+        Console.WriteLine($"Annotations flattened and saved to '{outputPdf}'.");
     }
 }
