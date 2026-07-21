@@ -7,25 +7,36 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document
+        const string outputPath = "aligned_text.pdf";
+
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a blank page (1‑based indexing)
+            // Add a blank page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
             // Create a text fragment with the desired content
-            TextFragment fragment = new TextFragment("This text is left‑aligned.");
+            TextFragment tf = new TextFragment("Left aligned text example.");
 
-            // Set the horizontal alignment of the text to Left
-            fragment.TextState.HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Left;
+            // Configure the text appearance
+            tf.TextState.Font = FontRepository.FindFont("Helvetica");
+            tf.TextState.FontSize = 12;
+            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Add the text fragment to the page
-            page.Paragraphs.Add(fragment);
+            // Align the text to the left margin
+            tf.TextState.HorizontalAlignment = HorizontalAlignment.Left;
 
-            // Save the document (PDF format)
-            doc.Save("AlignedLeft.pdf");
+            // Position the text within a rectangle on the page
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 750, 550, 800);
+            tf.Position = new Position(rect.LLX, rect.URY); // top‑left corner of the rectangle
+
+            // Add the fragment to the page's content
+            page.Paragraphs.Add(tf);
+
+            // Save the PDF (no SaveOptions needed for PDF output)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF created with left‑aligned text.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

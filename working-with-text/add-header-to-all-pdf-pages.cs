@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string headerText = "My Header";
+        const string headerText = "My Document Header";
 
         if (!File.Exists(inputPath))
         {
@@ -17,34 +17,41 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[i];
-
-                // Create a TextFragment that will act as the header
-                TextFragment header = new TextFragment(headerText)
+                // Loop through all pages (Aspose.Pdf uses 1‑based indexing)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    // Position the header near the top of the page (y coordinate is measured from the bottom)
-                    Position = new Position(0, page.PageInfo.Height - 20) // 20 points from the top edge
-                };
+                    Page page = doc.Pages[i];
 
-                // Configure the appearance of the header text
-                header.TextState.Font = FontRepository.FindFont("Helvetica");
-                header.TextState.FontSize = 12;
-                header.TextState.ForegroundColor = Color.Gray;
+                    // Create a HeaderFooter object for the page
+                    HeaderFooter header = new HeaderFooter();
 
-                // Add the header fragment to the page's paragraph collection
-                page.Paragraphs.Add(header);
+                    // Create a TextFragment that contains the header text and styling
+                    TextFragment tf = new TextFragment(headerText);
+                    tf.TextState.Font = FontRepository.FindFont("Helvetica");
+                    tf.TextState.FontSize = 12;
+                    tf.TextState.ForegroundColor = Color.DarkGray;
+
+                    // Add the TextFragment to the header's paragraph collection
+                    header.Paragraphs.Add(tf);
+
+                    // Assign the prepared header to the page
+                    page.Header = header;
+                }
+
+                // Save the modified document
+                doc.Save(outputPath);
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            Console.WriteLine($"Header added to all pages. Saved as '{outputPath}'.");
         }
-
-        Console.WriteLine($"Header added and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

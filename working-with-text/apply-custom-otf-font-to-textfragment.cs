@@ -7,11 +7,10 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string fontPath   = "MyFont.otf";      // OpenType font file
-        const string outputPath = "styled_text.pdf";
+        const string fontPath = "custom.otf";          // Path to the OTF font file
+        const string outputPath = "styled_text.pdf";   // Output PDF file
 
-        // Verify font file exists
+        // Verify that the font file exists
         if (!File.Exists(fontPath))
         {
             Console.Error.WriteLine($"Font file not found: {fontPath}");
@@ -20,30 +19,27 @@ class Program
 
         // Load the custom OTF font
         Font customFont = FontRepository.OpenFont(fontPath);
-        // Ensure the font will be embedded in the PDF
+        // Ensure the font is embedded in the PDF
         customFont.IsEmbedded = true;
 
-        // Create a new PDF document (wrapped in using for deterministic disposal)
+        // Create a new PDF document (wrapped in using for proper disposal)
         using (Document doc = new Document())
         {
-            // Add a blank page
+            // Add a blank page to the document
             Page page = doc.Pages.Add();
 
             // Create a TextFragment with the desired text
-            TextFragment tf = new TextFragment("Hello, Aspose.Pdf with custom OTF font!");
+            TextFragment tf = new TextFragment("Hello, Aspose PDF with OTF font!");
 
-            // Apply the loaded font to the TextFragment
-            tf.TextState.Font = customFont;
-            tf.TextState.FontSize = 24;                     // optional styling
-            tf.TextState.ForegroundColor = Color.Black;     // optional color
+            // Apply the custom font and additional styling
+            tf.TextState.Font = customFont;                     // Set the OTF font
+            tf.TextState.FontSize = 24;                         // Set font size
+            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Blue; // Set text color
 
-            // Position the text on the page (optional)
-            tf.Position = new Position(100, 700);
-
-            // Add the TextFragment to the page
+            // Add the TextFragment to the page's paragraph collection
             page.Paragraphs.Add(tf);
 
-            // Save the PDF document
+            // Save the document as PDF
             doc.Save(outputPath);
         }
 

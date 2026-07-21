@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // TextBuilder, TextParagraph, etc.
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -9,7 +9,6 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string watermarkText = "Rotated Text";
 
         if (!File.Exists(inputPath))
         {
@@ -23,31 +22,25 @@ class Program
             // Get the last page (1‑based indexing)
             Page lastPage = doc.Pages[doc.Pages.Count];
 
-            // Determine page dimensions
-            double pageWidth  = lastPage.PageInfo.Width;
-            double pageHeight = lastPage.PageInfo.Height;
+            // Define a rectangle positioned at the bottom‑right corner
+            // Adjust margins and rectangle size as needed
+            double margin      = 20;               // distance from page edges
+            double rectWidth   = 200;              // width of the text box
+            double rectHeight  = 50;               // height of the text box
+            double llx = lastPage.PageInfo.Width - rectWidth - margin; // lower‑left X
+            double lly = margin;                                 // lower‑left Y
+            double urx = llx + rectWidth;                        // upper‑right X
+            double ury = lly + rectHeight;                       // upper‑right Y
 
-            // Define a rectangle at the bottom‑right corner
-            // Example: 200 units wide, 50 units high, 20 units margin from edges
-            double rectWidth  = 200;
-            double rectHeight = 50;
-            double margin     = 20;
-
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
-                pageWidth  - margin - rectWidth, // lower‑left X
-                margin,                         // lower‑left Y
-                pageWidth  - margin,            // upper‑right X
-                margin + rectHeight);           // upper‑right Y
-
-            // Create a text paragraph, set its rectangle and rotation
+            // Create a text paragraph and set its rectangle and rotation
             TextParagraph paragraph = new TextParagraph
             {
-                Rectangle = rect,
-                Rotation  = 45 // rotate 45 degrees (any angle you need)
+                Rectangle = new Aspose.Pdf.Rectangle(llx, lly, urx, ury),
+                Rotation  = 45 // rotate 45 degrees (any angle is allowed)
             };
 
             // Add the desired text line
-            paragraph.AppendLine(watermarkText);
+            paragraph.AppendLine("Rotated Text");
 
             // Append the paragraph to the page using TextBuilder
             TextBuilder builder = new TextBuilder(lastPage);

@@ -1,47 +1,39 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // needed for TextFragment, TextState, HorizontalAlignment
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "centered.pdf";
+        const string outputPath = "centered_text.pdf";
 
-        // Ensure there is a PDF to work with; create a blank one if missing
-        if (!File.Exists(inputPath))
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            using (Document blankDoc = new Document())
-            {
-                blankDoc.Pages.Add(); // add a single page
-                blankDoc.Save(inputPath);
-            }
-        }
+            // Add a blank page
+            Page page = doc.Pages.Add();
 
-        // Load the PDF
-        using (Document doc = new Document(inputPath))
-        {
-            // Pages are 1‑based
-            Page page = doc.Pages[1];
+            // Create a TextFragment with the desired content
+            TextFragment fragment = new TextFragment("This text is centered on the page.");
 
-            // Create a text fragment
-            TextFragment fragment = new TextFragment("Centered Text on the Page");
+            // Configure the TextState to use center alignment
+            fragment.TextState.HorizontalAlignment = HorizontalAlignment.Center;
 
-            // Configure the TextState
+            // Optionally set font and size for better visibility
             fragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            fragment.TextState.FontSize = 24;
+            fragment.TextState.FontSize = 14;
             fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
-            fragment.TextState.HorizontalAlignment = HorizontalAlignment.Center; // center alignment
 
-            // Set vertical position (X is ignored when centered)
-            fragment.Position = new Position(0, 500);
+            // Position the fragment (the rectangle defines the area where the text will be placed)
+            // Here we use the whole page width; Y coordinate is set to roughly the middle of the page.
+            fragment.Position = new Position(0, page.PageInfo.Height / 2);
 
-            // Add the fragment to the page
+            // Add the fragment to the page's paragraphs collection
             page.Paragraphs.Add(fragment);
 
-            // Save the result
+            // Save the PDF
             doc.Save(outputPath);
         }
 

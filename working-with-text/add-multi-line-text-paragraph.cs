@@ -8,38 +8,38 @@ class Program
     {
         const string outputPath = "output.pdf";
 
-        // Create a new PDF document and ensure proper disposal
+        // Create a new PDF document and add a page
         using (Document doc = new Document())
         {
-            // Add a page first (Aspose.Pdf starts with an empty Pages collection)
             Page page = doc.Pages.Add();
 
-            // Create a TextParagraph instance
+            // Create a multi‑line TextParagraph
             TextParagraph paragraph = new TextParagraph();
 
             // Define the rectangle where the paragraph will be placed
-            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 600, 300, 750);
+            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 600, 400, 800);
 
-            // Set word‑wrap mode to wrap by words
+            // Enable word wrapping by words
             paragraph.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
 
-            // Optional visual properties
+            // Optional visual settings
             paragraph.HorizontalAlignment = HorizontalAlignment.Center;
-            paragraph.VerticalAlignment = VerticalAlignment.Top;
-            paragraph.Margin = new MarginInfo { Top = 5, Bottom = 5, Left = 5, Right = 5 };
+            paragraph.VerticalAlignment   = VerticalAlignment.Top;
+            // Use MarginInfo (not Margin) for paragraph margins
+            paragraph.Margin = new MarginInfo(5, 5, 5, 5);
 
-            // Begin edit to improve performance while adding lines
+            // Populate the paragraph with lines
             paragraph.BeginEdit();
             paragraph.AppendLine("The quick brown fox jumps over the lazy dog.");
             paragraph.AppendLine("Second line of the paragraph.");
-            paragraph.AppendLine("Third line, demonstrating multi‑line text.");
+            paragraph.AppendLine("Third line with more text.");
             paragraph.EndEdit();
 
             // Append the paragraph to the page using TextBuilder
             TextBuilder builder = new TextBuilder(page);
             builder.AppendParagraph(paragraph);
 
-            // Save the PDF document
+            // Save the PDF
             doc.Save(outputPath);
         }
 

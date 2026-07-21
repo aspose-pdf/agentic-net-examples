@@ -16,29 +16,31 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
             // Iterate over all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Create a text fragment that will serve as the watermark
+                Page page = doc.Pages[i];
+
+                // Create a text fragment for the watermark
                 TextFragment watermark = new TextFragment("CONFIDENTIAL");
-                // Position the text (coordinates are in points)
-                watermark.Position = new Position(200, 400);
-                // Set visual appearance
-                watermark.TextState.Font = FontRepository.FindFont("Helvetica");
+                // Position the text (center of the page)
+                watermark.Position = new Position(page.PageInfo.Width / 2, page.PageInfo.Height / 2);
+                // Set visual properties
                 watermark.TextState.FontSize = 72;
-                watermark.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
+                watermark.TextState.Font = FontRepository.FindFont("Helvetica");
+                watermark.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
                 // Rotate the text (e.g., 45 degrees)
                 watermark.TextState.Rotation = 45;
 
-                // Append the text fragment to the current page using TextBuilder
+                // Append the watermark to the current page using TextBuilder
                 TextBuilder builder = new TextBuilder(page);
                 builder.AppendText(watermark);
             }
 
-            // Save the modified document as PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

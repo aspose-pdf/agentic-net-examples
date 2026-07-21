@@ -16,28 +16,28 @@ class Program
             return;
         }
 
-        // Load the existing PDF
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Ensure there is at least one page
-            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
+            // Access the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
 
-            // Create a text fragment with the desired content
-            TextFragment tf = new TextFragment("Sample spaced text");
+            // Create a text fragment with the content to insert
+            TextFragment tf = new TextFragment("Sample text with custom word spacing");
 
-            // Configure the text appearance and word spacing
+            // Configure the TextState: font, size, color, and word spacing
             tf.TextState.Font = FontRepository.FindFont("Helvetica");
             tf.TextState.FontSize = 14;
-            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Blue; // corrected property
+            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
             tf.TextState.WordSpacing = 2.0f; // increase spacing between words
 
-            // Position the text on the page
+            // Set the position where the text will appear on the page
             tf.Position = new Position(100, 700);
 
-            // Add the fragment to the page
+            // Add the configured text fragment to the page's paragraph collection
             page.Paragraphs.Add(tf);
 
-            // Save the modified PDF
+            // Save the modified PDF to the specified output path
             doc.Save(outputPath);
         }
 
