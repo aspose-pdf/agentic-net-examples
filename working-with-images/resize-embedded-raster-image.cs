@@ -1,48 +1,42 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core PDF API
-using Aspose.Pdf.Text;          // For text-related types if needed
+using Aspose.Pdf;               // Core PDF API (Document, Page, Image, etc.)
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // PDF containing the raster image
-        const string outputPath = "output_resized.pdf";
+        const string inputPath  = "input.pdf";          // source PDF containing the raster image
+        const string outputPath = "output_resized.pdf"; // destination PDF after resizing
 
+        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Open the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[pageIndex];
-
-                // Scan the page's paragraph collection for Image objects
+                // Iterate through all paragraph objects on the page
+                // Image objects are stored as paragraphs of type Aspose.Pdf.Image
                 for (int i = 1; i <= page.Paragraphs.Count; i++)
                 {
-                    // The Paragraphs collection also uses 1‑based indexing
                     if (page.Paragraphs[i] is Image img)
                     {
-                        // Set desired dimensions (in points; 1 point = 1/72 inch)
-                        // Example: resize to 200x150 points
-                        img.FixWidth  = 200;   // Width
-                        img.FixHeight = 150;   // Height
-
-                        // Optional: adjust alignment if needed
-                        img.HorizontalAlignment = HorizontalAlignment.Center;
-                        img.VerticalAlignment   = VerticalAlignment.Center;
+                        // Set the desired dimensions (values are in points; 1 point = 1/72 inch)
+                        // Adjust these numbers to the required size
+                        img.FixWidth  = 200; // new width
+                        img.FixHeight = 150; // new height
                     }
                 }
             }
 
-            // Save the modified PDF (no SaveOptions needed for PDF output)
+            // Save the modified document (Document.Save(string) always writes PDF)
             doc.Save(outputPath);
         }
 

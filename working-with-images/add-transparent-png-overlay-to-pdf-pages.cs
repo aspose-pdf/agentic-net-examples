@@ -1,15 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;               // Core API (Document, Page, ImageStamp, etc.)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string overlayPng = "overlay.png";   // transparent PNG
-        const string outputPdf = "output.pdf";
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string overlayPng = "overlay.png";       // transparent PNG to overlay
+        const string outputPdf = "output.pdf";         // result PDF
 
         if (!File.Exists(inputPdf))
         {
@@ -23,28 +22,32 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (lifecycle rule: use Document constructor)
         using (Document doc = new Document(inputPdf))
         {
-            // Create an ImageStamp for the PNG overlay
-            ImageStamp pngStamp = new ImageStamp(overlayPng)
-            {
-                // Ensure the stamp is placed on top (Background = false is default)
-                Background = false,
-                // Adjust opacity if needed (0.0 = fully transparent, 1.0 = opaque)
-                Opacity = 0.5f,
-                // Center the overlay on each page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center
-            };
-
-            // Add the stamp to every page
+            // Iterate over each page and add the PNG as a stamp.
             foreach (Page page in doc.Pages)
             {
-                page.AddStamp(pngStamp);
+                // Create an ImageStamp from the PNG file.
+                ImageStamp stamp = new ImageStamp(overlayPng)
+                {
+                    // Ensure the stamp is placed above existing content.
+                    // Background = false (default) means top layer.
+                    Background = false,
+
+                    // Optional: control opacity (0.0 = fully transparent, 1.0 = opaque).
+                    Opacity = 0.8f,
+
+                    // Position the stamp – here we center it on the page.
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Center
+                };
+
+                // Add the stamp to the current page (rule: call AddStamp per page).
+                page.AddStamp(stamp);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use Document.Save).
             doc.Save(outputPdf);
         }
 

@@ -6,11 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";      // source PDF
-        const string outputPath = "output.pdf";     // result PDF
-        const string patternPath = "pattern.png";   // background pattern image
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string patternPath = "pattern.png";
 
-        // Ensure the input files exist
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPath}");
@@ -22,32 +21,34 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
+                Page page = doc.Pages[i];
+
                 // Create a background artifact for the page
                 BackgroundArtifact bgArtifact = new BackgroundArtifact();
 
-                // Set the image for the artifact (can use a file path or a stream)
+                // Assign the pattern image (file path)
                 bgArtifact.SetImage(patternPath);
+
+                // Place the artifact behind page contents
+                bgArtifact.IsBackground = true;
 
                 // Set opacity to 5 percent (0.05)
                 bgArtifact.Opacity = 0.05;
-
-                // Place the artifact behind the page content
-                bgArtifact.IsBackground = true;
 
                 // Add the artifact to the page's artifact collection
                 page.Artifacts.Add(bgArtifact);
             }
 
-            // Save the modified document
+            // Save the modified PDF (lifecycle rule: use Save inside using)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Background pattern applied and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with background pattern saved to '{outputPath}'.");
     }
 }

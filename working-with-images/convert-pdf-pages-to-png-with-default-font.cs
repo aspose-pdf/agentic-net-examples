@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputDir = "PageImages";
+        const string outputDir = "Images";
 
         if (!File.Exists(inputPdf))
         {
@@ -18,29 +18,30 @@ class Program
 
         Directory.CreateDirectory(outputDir);
 
-        using (Document pdfDoc = new Document(inputPdf))
+        // Create rendering options with the desired default font.
+        var renderingOptions = new RenderingOptions
         {
-            // Define the resolution for the output images (e.g., 300 DPI)
-            var resolution = new Resolution(300);
+            DefaultFontName = "Arial"
+        };
 
-            // Loop through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+        // Load the PDF document.
+        using (Document doc = new Document(inputPdf))
+        {
+            // Create a PNG device and attach the rendering options.
+            var pngDevice = new PngDevice();
+            pngDevice.RenderingOptions = renderingOptions;
+
+            // Convert each page to a PNG image.
+            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
             {
-                string outputPath = Path.Combine(outputDir, $"Page_{pageNumber}.png");
-
-                // Create a PNG device for the current page
-                var pngDevice = new PngDevice(resolution);
-
-                // Set the default font name to be used when a font is missing
-                pngDevice.RenderingOptions = new RenderingOptions
+                string imagePath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+                using (FileStream imageStream = new FileStream(imagePath, FileMode.Create))
                 {
-                    DefaultFontName = "Arial"
-                };
-
-                // Render the page to the PNG file
-                pngDevice.Process(pdfDoc.Pages[pageNumber], outputPath);
-                Console.WriteLine($"Saved page {pageNumber} as image → {outputPath}");
+                    pngDevice.Process(doc.Pages[pageNumber], imageStream);
+                }
             }
         }
+
+        Console.WriteLine($"Pages converted to images in '{outputDir}'.");
     }
 }
