@@ -16,18 +16,24 @@ class Program
             return;
         }
 
+        // Load the PDF document (generated from XML) inside a using block for proper disposal
         using (Document doc = new Document(pdfPath))
         {
-            // Configure extraction to produce plain text
+            // Set extraction options to obtain plain text (Pure formatting mode)
             TextExtractionOptions extractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+
+            // Create a TextAbsorber with the specified options
             TextAbsorber absorber = new TextAbsorber(extractionOptions);
 
-            // Extract text from all pages
+            // Extract text from all pages of the document
             doc.Pages.Accept(absorber);
 
-            // Save extracted text
-            File.WriteAllText(outputTxt, absorber.Text);
-            Console.WriteLine($"Extracted text saved to '{outputTxt}'.");
+            // Retrieve the extracted text
+            string extractedText = absorber.Text;
+
+            // Save the plain text to a file for indexing purposes
+            File.WriteAllText(outputTxt, extractedText);
+            Console.WriteLine($"Text extracted to '{outputTxt}'.");
         }
     }
 }

@@ -1,15 +1,18 @@
 using System;
 using System.IO;
+using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath      = "input.xml";
-        const string outputPdf    = "output.pdf";
-        const int   maxCharsPerPage = 1000; // threshold for page break
+        // Input XML file that will be converted to PDF
+        const string xmlPath = "input.xml";
+        // Output PDF file with conditional page breaks
+        const string outputPdfPath = "output.pdf";
+        // Threshold for content length (characters) that triggers a page break
+        const int lengthThreshold = 1000;
 
         if (!File.Exists(xmlPath))
         {
@@ -17,38 +20,41 @@ class Program
             return;
         }
 
-        // Load XML into a PDF document using XmlLoadOptions (load rule)
-        using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
+        // Load the XML into a PDF document using XmlLoadOptions
+        XmlLoadOptions xmlLoadOptions = new XmlLoadOptions();
+        using (Document pdfDoc = new Document(xmlPath, xmlLoadOptions))
         {
-            // Iterate over pages (1‑based indexing)
-            // Use a while loop because inserting pages changes the page count
-            int pageIndex = 1;
-            while (pageIndex <= doc.Pages.Count)
-            {
-                // Extract text from the current page
-                TextAbsorber absorber = new TextAbsorber();
-                doc.Pages[pageIndex].Accept(absorber);
-                string pageText = absorber.Text ?? string.Empty;
+            // Parse the XML separately to evaluate content lengths
+            XDocument xDoc = XDocument.Load(xmlPath);
+            // Assume each top‑level element (e.g., <Section>) maps to a page in order
+            var sections = xDoc.Root?.Elements() ?? new XElement[0];
 
-                // If the text length exceeds the threshold, insert a blank page before the next page
-                if (pageText.Length > maxCharsPerPage)
+            // Iterate through sections and insert a blank page after the corresponding PDF page
+            // when the text length exceeds the defined threshold.
+            // Page numbers in Aspose.Pdf are 1‑based.
+            int pageIndex = 1; // start with first page
+            foreach (var section in sections)
+            {
+                // Compute the length of the textual content of the current XML element
+                int contentLength = section.Value?.Length ?? 0;
+
+                if (contentLength > lengthThreshold)
                 {
-                    // Insert an empty page after the current page
-                    // Insert method inserts at the specified position; we add after current page
-                    doc.Pages.Insert(pageIndex + 1);
-                    // Skip the newly inserted blank page
-                    pageIndex += 2;
-                }
-                else
-                {
+                    // Insert an empty page after the current page.
+                    // The Insert method returns the newly created page, but we do not need it further.
+                    pdfDoc.Pages.Insert(pageIndex + 1);
+                    // Advance the index to skip the inserted blank page
                     pageIndex++;
                 }
+
+                // Move to the next original page
+                pageIndex++;
             }
 
-            // Save the modified PDF (save rule)
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with conditional page breaks to '{outputPdfPath}'.");
     }
 }

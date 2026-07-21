@@ -6,38 +6,30 @@ class Program
 {
     static void Main()
     {
-        // Paths for input XML and output PDF
-        const string xmlPath   = "input.xml";
-        const string pdfPath   = "output.pdf";
+        // Paths to the source XML and the resulting PDF
+        const string xmlPath = "input.xml";
+        const string pdfPath = "output.pdf";
 
+        // Ensure the XML file exists
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"Input file not found: {xmlPath}");
+            Console.Error.WriteLine($"File not found: {xmlPath}");
             return;
         }
 
-        // Load XML with explicit XmlLoadOptions (required for XML import)
+        // Load the XML using XmlLoadOptions (required for XML import)
         XmlLoadOptions loadOptions = new XmlLoadOptions();
 
-        // Use the recommended lifecycle pattern: wrap Document in a using block
+        // Wrap the Document in a using block for deterministic disposal
         using (Document doc = new Document(xmlPath, loadOptions))
         {
-            // Viewer preferences -------------------------------------------------
-            // Resize the viewer window to fit the first displayed page
+            // Viewer preference: resize the window to fit the first displayed page
             doc.FitWindow = true;
 
-            // Optional: center the window on the screen when opened
-            doc.CenterWindow = true;
-
-            // Optional: hide UI elements for a cleaner view
-            doc.HideMenubar   = false;
-            doc.HideToolBar   = false;
-            doc.HideWindowUI  = false;
-
-            // Optional: set the initial page mode (e.g., no outlines)
+            // Optional: set the page mode (e.g., no side panels)
             doc.PageMode = PageMode.UseNone;
 
-            // Save the resulting PDF
+            // Save the document as PDF
             doc.Save(pdfPath);
         }
 
