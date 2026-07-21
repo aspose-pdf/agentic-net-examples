@@ -7,66 +7,65 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF
-        const string outputPdf  = "signed_locked.pdf"; // result PDF
-        const string pfxPath    = "certificate.pfx";   // signing certificate
-        const string pfxPassword = "password";         // certificate password
+        // Input PDF, output PDF and signing certificate
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "signed_output.pdf";
+        const string pfxPath = "certificate.pfx";
+        const string pfxPassword = "pfxPassword";
 
-        // Ensure the source file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(pfxPath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
             return;
         }
 
-        // Load the PDF (using the mandatory lifecycle rule)
+        // Load the PDF document (lifecycle rule: load)
         using (Document doc = new Document(inputPdf))
         {
-            // -----------------------------------------------------------------
-            // 1. Create a visible signature field on page 1
-            // -----------------------------------------------------------------
-            // Fully qualified rectangle to avoid ambiguity with System.Drawing
+            // Define the rectangle where the visible signature field will appear
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
             Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+            // Create a signature field on the document (constructor overload Document, Rectangle)
             SignatureField sigField = new SignatureField(doc, sigRect)
             {
-                Name        = "Signature1",
+                // Set a name for the field (used as identifier)
                 PartialName = "Signature1",
                 // Optional tooltip shown in PDF viewers
                 AlternateName = "Document Signature"
             };
 
-            // Add the field to page 1 of the form
-            doc.Form.Add(sigField, 1);
+            // Add the field to the form
+            doc.Form.Add(sigField);
 
-            // -----------------------------------------------------------------
-            // 2. Prepare the digital signature object (visible appearance is
-            //    provided automatically by the signature field)
-            // -----------------------------------------------------------------
-            // Use the concrete PKCS7 class – Signature is abstract.
+            // Add a visible appearance for the field on page 1
+            // This renders the field rectangle so the user can see where to sign
+            doc.Form.AddFieldAppearance(sigField, 1, sigRect);
+
+            // Create a concrete PKCS#7 signature object using the PFX certificate
             PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword)
             {
-                Reason      = "Approved",
-                Location    = "Head Office",
-                ContactInfo = "contact@example.com"
+                Reason = "Approved by author",
+                Location = "Head Office",
+                ContactInfo = "author@example.com"
             };
 
-            // -----------------------------------------------------------------
-            // 3. Sign the document using the created field
-            // -----------------------------------------------------------------
+            // Sign the document using the created signature field
             sigField.Sign(pkcs7);
 
-            // -----------------------------------------------------------------
-            // 4. Lock the document after signing (no further modifications)
-            // -----------------------------------------------------------------
-            // Prevent further changes to existing signatures – only append is allowed.
+            // Lock the document after signing so further modifications invalidate the signature
+            // Setting SignaturesAppendOnly forces incremental updates only (no content changes)
             doc.Form.SignaturesAppendOnly = true;
 
-            // -----------------------------------------------------------------
-            // 5. Save the signed and locked PDF (using the mandatory lifecycle rule)
-            // -----------------------------------------------------------------
+            // Save the signed and locked PDF (lifecycle rule: save)
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Signed and locked PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
     }
 }

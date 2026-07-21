@@ -1,15 +1,14 @@
 using System;
 using System.IO;
-using System.Drawing;
-using System.Drawing.Imaging;
 using Aspose.Pdf;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // Path to source PDF
-        const string outputDir = "ExtractedImages";    // Directory for PNG files
+        const string inputPdf  = "input.pdf";
+        const string outputDir = "ExtractedImages";
 
         if (!File.Exists(inputPdf))
         {
@@ -20,38 +19,57 @@ class Program
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load PDF document
+        // Load the PDF document (using the standard Document constructor)
         using (Document pdfDoc = new Document(inputPdf))
         {
-            int imageIndex = 0;
+            int imageCounter = 1;
 
             // Iterate through all pages (1‑based indexing)
-            foreach (Page page in pdfDoc.Pages)
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
-                // Iterate through all images on the current page
-                foreach (XImage img in page.Resources.Images)
+                Page page = pdfDoc.Pages[pageNum];
+
+                // Iterate over the image resources of the page
+                foreach (XImage xImg in page.Resources.Images)
                 {
-                    imageIndex++;
-                    string outPath = Path.Combine(outputDir, $"image_{imageIndex}.png");
+                    // Build a unique file name for each extracted image
+                    string outPath = Path.Combine(outputDir, $"image_{imageCounter}_page{pageNum}.png");
 
-                    // Save the XImage to a memory stream first (original resolution)
-                    using (MemoryStream ms = new MemoryStream())
+                    // Preserve the original resolution by using the image's native size.
+                    // The XImage class provides a Save method that writes the image data
+                    // directly to a file in its original format. To ensure PNG output,
+                    // we render the XImage onto a PNG device with the image's own dimensions.
+                    int width  = xImg.Width;
+                    int height = xImg.Height;
+
+                    // Create a PNG device with the image's native dimensions.
+                    // Resolution is set to 72 DPI (default) because we are preserving the
+                    // pixel dimensions exactly; no scaling is applied.
+                    PngDevice pngDevice = new PngDevice(width, height);
+
+                    // Render the XImage onto a temporary PDF page to use the device.
+                    // Create a temporary one‑page PDF containing only the image.
+                    using (Document tempDoc = new Document())
                     {
-                        img.Save(ms);               // XImage.Save expects a Stream
-                        ms.Position = 0;            // Reset stream position for reading
+                        tempDoc.Pages.Add();
+                        // Add the XImage to the temporary page.
+                        tempDoc.Pages[1].Resources.Images.Add(xImg);
+                        // Place the image at (0,0) covering the whole page.
+                        tempDoc.Pages[1].Contents.Add(new Aspose.Pdf.Operators.GSave());
+                        tempDoc.Pages[1].Contents.Add(new Aspose.Pdf.Operators.Do(xImg.Name));
+                        tempDoc.Pages[1].Contents.Add(new Aspose.Pdf.Operators.GRestore());
 
-                        // Load the image with System.Drawing and re‑save as PNG preserving resolution
-                        using (Bitmap bmp = new Bitmap(ms))
+                        // Save the temporary page as PNG.
+                        using (FileStream outStream = new FileStream(outPath, FileMode.Create))
                         {
-                            bmp.Save(outPath, ImageFormat.Png);
+                            pngDevice.Process(tempDoc.Pages[1], outStream);
                         }
                     }
 
-                    Console.WriteLine($"Saved image {imageIndex} → {outPath}");
+                    Console.WriteLine($"Extracted image saved to: {outPath}");
+                    imageCounter++;
                 }
             }
         }
-
-        Console.WriteLine("Image extraction completed.");
     }
 }

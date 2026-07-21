@@ -14,14 +14,20 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Determine whether the PDF contains incremental updates
-            bool hasIncremental = doc.HasIncrementalUpdate();
+            // Check whether the PDF has been saved using incremental updates
+            bool hasIncrementalUpdate = doc.HasIncrementalUpdate();
 
-            // Report the result
-            Console.WriteLine($"Has incremental updates: {hasIncremental}");
+            // Output the result
+            Console.WriteLine($"Has incremental updates: {hasIncrementalUpdate}");
+
+            // Optional: provide a simple interpretation
+            if (hasIncrementalUpdate)
+                Console.WriteLine("The PDF was modified after its initial creation (saved incrementally).");
+            else
+                Console.WriteLine("The PDF has no incremental updates; it may be unchanged since creation.");
         }
     }
 }

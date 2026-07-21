@@ -1,53 +1,50 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API (Document, Page, PdfPageStamp, etc.)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the template (background) PDF and the resulting PDF.
-        const string templatePath = "template.pdf";
-        const string outputPath   = "output.pdf";
+        const string templatePath = "template.pdf";   // PDF page to be used as background
+        const string outputPath   = "output.pdf";    // Resulting PDF
+        const int    pageCount    = 5;               // Number of pages to create
 
-        // Number of pages to generate in the new document.
-        const int pageCount = 5;
-
-        // Verify that the template file exists.
         if (!File.Exists(templatePath))
         {
-            Console.Error.WriteLine($"Template PDF not found: {templatePath}");
+            Console.Error.WriteLine($"Template file not found: {templatePath}");
             return;
         }
 
-        // Load the template PDF that will serve as the background.
+        // Load the template PDF (contains the background page)
         using (Document templateDoc = new Document(templatePath))
         {
-            // Get the first page of the template (1‑based indexing).
-            Page templatePage = templateDoc.Pages[1];
-
-            // Create a new empty PDF document.
-            using (Document newDoc = new Document())
+            // Create a new empty PDF document
+            using (Document outputDoc = new Document())
             {
-                // Add the desired number of pages, stamping each with the template background.
+                // Use the first page of the template as the background source
+                Page backgroundPage = templateDoc.Pages[1];
+
                 for (int i = 1; i <= pageCount; i++)
                 {
-                    // Add a blank page to the new document.
-                    Page page = newDoc.Pages.Add();
+                    // Add a new blank page to the output document
+                    Page newPage = outputDoc.Pages.Add();
 
-                    // Create a stamp that uses the template page as its content.
-                    PdfPageStamp stamp = new PdfPageStamp(templatePage)
+                    // Ensure the new page has the same size and margins as the background page
+                    newPage.PageInfo = backgroundPage.PageInfo;
+
+                    // Create a stamp that uses the background page
+                    PdfPageStamp stamp = new PdfPageStamp(backgroundPage)
                     {
-                        // Place the stamp behind the page content so it acts as a background.
-                        Background = true
+                        Background = true   // place stamp behind any future content
                     };
 
-                    // Apply the stamp to the current page.
-                    page.AddStamp(stamp);
+                    // Apply the stamp to the newly created page
+                    newPage.AddStamp(stamp);
                 }
 
-                // Save the resulting PDF.
-                newDoc.Save(outputPath);
+                // Save the resulting PDF
+                outputDoc.Save(outputPath);
                 Console.WriteLine($"PDF created with background template: {outputPath}");
             }
         }

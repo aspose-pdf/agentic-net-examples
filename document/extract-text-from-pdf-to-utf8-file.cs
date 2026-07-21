@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
+        const string inputPdfPath = "input.pdf";
         const string outputTxtPath = "output.txt";
 
         if (!File.Exists(inputPdfPath))
@@ -17,29 +17,22 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
-            {
-                // Create a TextAbsorber to extract text from the whole document
-                TextAbsorber absorber = new TextAbsorber();
+            // Create a TextAbsorber to extract text from the document
+            TextAbsorber absorber = new TextAbsorber();
 
-                // Accept the absorber for all pages
-                pdfDoc.Pages.Accept(absorber);
+            // Extract text from all pages
+            pdfDoc.Pages.Accept(absorber);
 
-                // Retrieve the extracted text
-                string extractedText = absorber.Text ?? string.Empty;
+            // Retrieve the extracted text
+            string extractedText = absorber.Text ?? string.Empty;
 
-                // Write the text to a UTF-8 encoded file
-                File.WriteAllText(outputTxtPath, extractedText, Encoding.UTF8);
-            }
-
-            Console.WriteLine($"Text extracted to '{outputTxtPath}'.");
+            // Write the text to a UTF-8 encoded file
+            File.WriteAllText(outputTxtPath, extractedText, Encoding.UTF8);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Text extracted to '{outputTxtPath}'.");
     }
 }

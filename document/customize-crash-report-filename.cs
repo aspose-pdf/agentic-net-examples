@@ -1,5 +1,5 @@
 using System;
-using Aspose.Pdf;
+using Aspose.Pdf; // Provides CrashReportOptions and PdfException
 
 class Program
 {
@@ -7,24 +7,24 @@ class Program
     {
         try
         {
-            // Simulate an error that we want to report
-            throw new InvalidOperationException("Demo exception for crash report");
+            // Simulate an operation that throws an exception
+            throw new InvalidOperationException("Sample error for crash report generation");
         }
         catch (Exception ex)
         {
-            // Create crash‑report options based on the caught exception
+            // Create CrashReportOptions based on the caught exception
             CrashReportOptions options = new CrashReportOptions(ex);
 
             // Set a custom message that will be included in the HTML report
-            options.CustomMessage = "Additional context: processing step X failed.";
+            options.CustomMessage = "Additional context: processing file 'Sample.pdf' with user ID 12345";
 
-            // Optionally override the default file name
-            options.CrashReportFilename = "MyCrashReport.html";
+            // (Optional) Override the default report filename
+            options.CrashReportFilename = "CustomCrashReport.html";
 
-            // Generate the crash report
+            // Generate the crash report HTML file
             PdfException.GenerateCrashReport(options);
 
-            // Show where the report was saved
+            // Inform the user where the report was saved
             Console.WriteLine("Crash report generated at: " + options.CrashReportPath);
         }
     }

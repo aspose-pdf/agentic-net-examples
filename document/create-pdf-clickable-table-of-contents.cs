@@ -10,70 +10,75 @@ class Program
     {
         const string outputPath = "TableOfContents.pdf";
 
-        // Create a new PDF document
+        // Create a new PDF document and ensure proper disposal.
         using (Document doc = new Document())
         {
-            // -------------------------------------------------
-            // 1. Add a page that will contain the Table of Contents
-            // -------------------------------------------------
+            // -----------------------------------------------------------------
+            // 1. Add a page that will contain the Table of Contents (TOC).
+            // -----------------------------------------------------------------
             Page tocPage = doc.Pages.Add();
 
-            // -------------------------------------------------
-            // 2. Add two sections with headings on separate pages
-            // -------------------------------------------------
-            // Section 1
-            Page sec1Page = doc.Pages.Add();
-            TextFragment sec1Heading = new TextFragment("Section 1: Introduction")
-            {
-                TextState = { FontSize = 24, Font = FontRepository.FindFont("Helvetica"), ForegroundColor = Color.Blue }
-            };
-            sec1Heading.Position = new Position(50, 750);
-            sec1Page.Paragraphs.Add(sec1Heading);
+            // -----------------------------------------------------------------
+            // 2. Define some sections – each will be on its own page.
+            // -----------------------------------------------------------------
+            const int sectionCount = 3;
+            Page[] sectionPages = new Page[sectionCount];
 
-            // Section 2
-            Page sec2Page = doc.Pages.Add();
-            TextFragment sec2Heading = new TextFragment("Section 2: Details")
+            for (int i = 0; i < sectionCount; i++)
             {
-                TextState = { FontSize = 24, Font = FontRepository.FindFont("Helvetica"), ForegroundColor = Color.Blue }
-            };
-            sec2Heading.Position = new Position(50, 750);
-            sec2Page.Paragraphs.Add(sec2Heading);
+                // Add a new page for the section.
+                Page secPage = doc.Pages.Add();
+                sectionPages[i] = secPage;
 
-            // -------------------------------------------------
-            // 3. Create TOC entries with clickable links
-            // -------------------------------------------------
-            // Helper to add a TOC line and its link
-            void AddTocEntry(string title, int targetPageIndex)
+                // Add a heading to the section page.
+                TextFragment heading = new TextFragment($"Section {i + 1}");
+                heading.Position = new Position(50, 750); // top-left position.
+                heading.TextState.FontSize = 24;
+                heading.TextState.Font = FontRepository.FindFont("Helvetica");
+                heading.TextState.ForegroundColor = Color.Black;
+                secPage.Paragraphs.Add(heading);
+            }
+
+            // -----------------------------------------------------------------
+            // 3. Build the TOC entries with clickable links.
+            // -----------------------------------------------------------------
+            double startX = 50;   // left margin.
+            double startY = 750;  // starting vertical position.
+            double lineHeight = 30;
+
+            for (int i = 0; i < sectionCount; i++)
             {
-                // Position for the TOC entry on the TOC page
-                double yPos = 700 - (targetPageIndex - 2) * 30; // simple vertical spacing
-
-                // Add visible text for the TOC entry
-                TextFragment tocEntry = new TextFragment(title)
-                {
-                    TextState = { FontSize = 14, Font = FontRepository.FindFont("Helvetica"), ForegroundColor = Color.Black }
-                };
-                tocEntry.Position = new Position(50, yPos);
+                // Text for the TOC entry.
+                string entryText = $"Section {i + 1}";
+                TextFragment tocEntry = new TextFragment(entryText);
+                tocEntry.Position = new Position(startX, startY - i * lineHeight);
+                tocEntry.TextState.FontSize = 12;
+                tocEntry.TextState.Font = FontRepository.FindFont("Helvetica");
+                tocEntry.TextState.ForegroundColor = Color.Blue;
                 tocPage.Paragraphs.Add(tocEntry);
 
-                // Define a rectangle that covers the TOC text (approximate)
-                Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(45, yPos - 5, 300, yPos + 15);
+                // Approximate rectangle that covers the entry text.
+                // Width is estimated; height is based on font size.
+                double rectWidth = 200;
+                double rectHeight = 12; // approximate height for 12pt font.
+                Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(
+                    startX,
+                    startY - i * lineHeight - rectHeight,
+                    startX + rectWidth,
+                    startY - i * lineHeight
+                );
 
-                // Create a link annotation that points to the target heading page
+                // Create a link annotation that points to the corresponding section page.
                 LinkAnnotation link = new LinkAnnotation(tocPage, linkRect);
-                // Use an explicit destination (fit the whole page)
-                link.Destination = new FitExplicitDestination(doc.Pages[targetPageIndex]);
-                link.Color = Color.Blue; // optional visual cue
+                // Use an explicit destination (GoToAction) as required by the rule set.
+                link.Action = new GoToAction(sectionPages[i]);
+                link.Color = Color.Transparent; // make the link invisible.
                 tocPage.Annotations.Add(link);
             }
 
-            // Add entries: note that page indexing is 1‑based
-            AddTocEntry("1. Introduction", 2); // Section 1 is on page 2
-            AddTocEntry("2. Details", 3);      // Section 2 is on page 3
-
-            // -------------------------------------------------
-            // 4. Save the document
-            // -------------------------------------------------
+            // -----------------------------------------------------------------
+            // 4. Save the PDF document.
+            // -----------------------------------------------------------------
             doc.Save(outputPath);
         }
 

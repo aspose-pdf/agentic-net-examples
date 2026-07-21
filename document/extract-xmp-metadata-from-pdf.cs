@@ -6,26 +6,25 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputXml = "metadata.xml";
+        const string inputPdfPath = "input.pdf";
+        const string outputXmlPath = "metadata.xml";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Create a file stream for the XML output
-            using (FileStream xmlStream = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
+            // Create (or overwrite) the output XML file and write the XMP metadata into it
+            using (FileStream xmlStream = new FileStream(outputXmlPath, FileMode.Create, FileAccess.Write))
             {
-                // Extract the embedded XMP metadata into the stream
                 pdfDoc.GetXmpMetadata(xmlStream);
             }
         }
 
-        Console.WriteLine($"XMP metadata saved to '{outputXml}'.");
+        Console.WriteLine($"XMP metadata extracted to: {outputXmlPath}");
     }
 }

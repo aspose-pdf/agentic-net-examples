@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // ImageStamp and related enums are here
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF
-        const string outputPdf = "output.pdf";  // result PDF with header
-        const string logoPath  = "company_logo.png"; // logo image file
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_with_header.pdf";
+        const string logoPath  = "company_logo.png";
 
         if (!File.Exists(inputPdf))
         {
@@ -23,24 +22,28 @@ class Program
             return;
         }
 
-        // Load the existing PDF document inside a using block for deterministic disposal
+        // Load the existing PDF document inside a using block for proper disposal.
         using (Document doc = new Document(inputPdf))
         {
-            // Create an ImageStamp that will be used as the header logo.
-            // ImageStamp lives in Aspose.Pdf.Drawing, not in the Facades namespace.
-            ImageStamp logoStamp = new ImageStamp(logoPath)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing).
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Center the stamp horizontally and place it at the top of the page.
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Top,
-                // Optional small offset from the top edge.
-                YIndent = 10
-                // No IsBackground property in current API – default is foreground (over page content).
-            };
+                Page page = doc.Pages[i];
 
-            // Apply the stamp to every page in the document.
-            foreach (Page page in doc.Pages)
-            {
+                // Create an ImageStamp for the logo.
+                ImageStamp logoStamp = new ImageStamp(logoPath)
+                {
+                    // Place the stamp at the top center of the page.
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Top,
+
+                    // Optional visual tweaks.
+                    Background = false,          // Draw over page content.
+                    Opacity    = 0.9f,           // Slightly transparent.
+                    TopMargin  = 10,             // Distance from the top edge.
+                };
+
+                // Add the stamp to the current page.
                 page.AddStamp(logoStamp);
             }
 
