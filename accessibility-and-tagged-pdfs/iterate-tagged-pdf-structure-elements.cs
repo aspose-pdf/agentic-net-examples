@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
 using Aspose.Pdf.LogicalStructure;
@@ -17,46 +16,45 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content via the ITaggedContent interface
+            // Access the tagged content interface
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Root element of the logical structure (no cast needed)
+            // Get the root structure element (no cast required)
             StructureElement root = tagged.RootElement;
 
-            // Recursively walk the structure tree and log details
-            WalkStructure(root);
+            Console.WriteLine("Structure elements:");
+            WalkStructure(root, 0);
         }
     }
 
-    // Recursive traversal of structure elements
-    static void WalkStructure(StructureElement element, int depth = 0)
+    // Recursive traversal of the structure tree
+    static void WalkStructure(StructureElement element, int depth)
     {
         string indent = new string(' ', depth * 2);
 
-        // Retrieve Title and Language (both may be null)
-        string title    = element.Title    ?? "(none)";
-        string language = element.Language ?? "(none)";
+        // Retrieve properties; Title, Language, and custom tag (if available)
+        string title = element.Title ?? string.Empty;
+        string language = element.Language ?? string.Empty;
+        string customTag = string.Empty;
 
-        // Custom tag retrieval – not exposed directly, so use reflection if a 'Tag' property exists
-        string customTag = "(none)";
-        PropertyInfo tagProp = element.GetType().GetProperty("Tag", BindingFlags.Public | BindingFlags.Instance);
-        if (tagProp != null)
+        // Attempt to get the custom tag name; SetTag exists, GetTag is not documented
+        // but many versions expose a GetTag() method. Use it if available.
+        try
         {
-            object value = tagProp.GetValue(element);
-            if (value is string s && !string.IsNullOrEmpty(s))
-                customTag = s;
+            // This call will compile only if GetTag() exists; otherwise it will be ignored.
+            customTag = (element as dynamic).GetTag() ?? string.Empty;
         }
+        catch { /* ignore if method not present */ }
 
-        // Log the information
         Console.WriteLine($"{indent}Element: {element.GetType().Name}");
         Console.WriteLine($"{indent}  Title   : {title}");
         Console.WriteLine($"{indent}  Language: {language}");
         Console.WriteLine($"{indent}  Tag     : {customTag}");
 
-        // Iterate over child elements using the ChildElements collection
+        // Recurse into child elements
         foreach (Element child in element.ChildElements)
         {
             if (child is StructureElement se)

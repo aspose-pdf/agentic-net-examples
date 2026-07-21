@@ -1,8 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using System.Collections.Generic;
 
 class Program
 {
@@ -11,61 +11,56 @@ class Program
         // Path to the XML validation report
         const string xmlPath = "validation_report.xml";
 
-        // Verify that the file exists before attempting to load it
+        // Path where the summary will be saved
+        const string summaryPath = "error_summary.txt";
+
+        // Verify that the input file exists
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"File not found: {xmlPath}");
             return;
         }
 
-        // Load the XML document into memory
-        XDocument doc = XDocument.Load(xmlPath);
+        // Load the XML document
+        XDocument xmlDoc = XDocument.Load(xmlPath);
 
-        // --------------------------------------------------------------------
-        // Extract error codes – assumes the report uses <ErrorCode> elements.
-        // Trim whitespace and ignore empty entries.
-        // --------------------------------------------------------------------
-        List<string> errorCodes = doc.Descendants("ErrorCode")
-                                     .Select(e => e.Value.Trim())
-                                     .Where(v => !string.IsNullOrEmpty(v))
-                                     .ToList();
+        // Extract error codes.
+        // This works for two common patterns:
+        //   <Error Code="E001" ... />
+        //   <Error><Code>E001</Code></Error>
+        IEnumerable<string> codes = xmlDoc
+            .Descendants("Error")
+            .Select(e => (string)e.Attribute("Code") ?? (string)e.Element("Code"))
+            .Where(c => !string.IsNullOrWhiteSpace(c));
 
-        // --------------------------------------------------------------------
-        // Extract violation messages – assumes the report uses <Violation> elements.
-        // --------------------------------------------------------------------
-        List<string> violations = doc.Descendants("Violation")
-                                     .Select(e => e.Value.Trim())
-                                     .Where(v => !string.IsNullOrEmpty(v))
-                                     .ToList();
-
-        // --------------------------------------------------------------------
-        // Summarize error codes: count occurrences of each distinct code.
-        // --------------------------------------------------------------------
-        var errorCodeSummary = errorCodes
-                               .GroupBy(code => code)
-                               .Select(g => new { Code = g.Key, Count = g.Count() })
-                               .OrderByDescending(x => x.Count);
-
-        // --------------------------------------------------------------------
-        // Summarize violations: count occurrences of each distinct message.
-        // --------------------------------------------------------------------
-        var violationSummary = violations
-                               .GroupBy(v => v)
-                               .Select(g => new { Text = g.Key, Count = g.Count() })
-                               .OrderByDescending(x => x.Count);
-
-        // Output the results
-        Console.WriteLine("Error Code Summary:");
-        foreach (var item in errorCodeSummary)
+        // Count how many times each code appears
+        var frequency = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        foreach (string code in codes)
         {
-            Console.WriteLine($"  {item.Code}: {item.Count}");
+            if (frequency.ContainsKey(code))
+                frequency[code]++;
+            else
+                frequency[code] = 1;
         }
 
-        Console.WriteLine();
-        Console.WriteLine("Common Violation Summary:");
-        foreach (var item in violationSummary)
+        // Prepare a human‑readable summary
+        var summaryLines = new List<string>
         {
-            Console.WriteLine($"  \"{item.Text}\": {item.Count}");
+            "Error Code Summary:"
+        };
+        foreach (var kvp in frequency.OrderByDescending(k => k.Value))
+        {
+            summaryLines.Add($"{kvp.Key}: {kvp.Value}");
         }
+
+        // Write the summary to the console
+        foreach (string line in summaryLines)
+        {
+            Console.WriteLine(line);
+        }
+
+        // Persist the summary to a text file
+        File.WriteAllLines(summaryPath, summaryLines);
+        Console.WriteLine($"Summary saved to {summaryPath}");
     }
 }
