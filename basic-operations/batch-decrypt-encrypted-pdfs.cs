@@ -6,12 +6,12 @@ class Program
 {
     static void Main()
     {
-        // Folder containing the encrypted PDFs
+        // Folder containing encrypted PDFs
         const string inputFolder = "EncryptedPdfs";
-        // Folder where decrypted copies will be saved
+        // Folder where decrypted PDFs will be saved
         const string outputFolder = "DecryptedPdfs";
         // Shared owner password for all PDFs in the batch
-        const string ownerPassword = "owner123";
+        const string ownerPassword = "ownerPassword123";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -24,8 +24,8 @@ class Program
         // Process each PDF file in the input folder
         foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(outputFolder, $"{fileName}_decrypted.pdf");
+            string fileName = Path.GetFileName(inputPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
 
             try
             {
@@ -39,15 +39,15 @@ class Program
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Decrypted: {inputPath} → {outputPath}");
+                Console.WriteLine($"Decrypted: {fileName} → {outputPath}");
             }
             catch (InvalidPasswordException ex)
             {
-                Console.Error.WriteLine($"Invalid password for '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Invalid password for file '{fileName}': {ex.Message}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing file '{fileName}': {ex.Message}");
             }
         }
     }

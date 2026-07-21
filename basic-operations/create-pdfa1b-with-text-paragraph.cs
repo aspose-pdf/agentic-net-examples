@@ -7,18 +7,22 @@ class Program
     static void Main()
     {
         const string outputPath = "output_pdfa1b.pdf";
+        const string logPath = "conversion_log.xml";
 
-        // Create a new PDF document (initially empty)
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add the first page (Aspose.Pdf does NOT create a default page for a new document)
-            Page page = doc.Pages.Add();
+            // Add a blank page (Aspose.Pdf uses 1‑based page indexing)
+            doc.Pages.Add();
 
-            // Build a text paragraph
+            // Get the first page
+            Page page = doc.Pages[1];
+
+            // Create a text paragraph
             TextParagraph paragraph = new TextParagraph();
 
             // Define the rectangle where the paragraph will be placed
-            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 600, 500, 700);
+            paragraph.Rectangle = new Rectangle(100, 600, 500, 700);
 
             // Enable word wrapping by words
             paragraph.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
@@ -32,14 +36,12 @@ class Program
             builder.AppendParagraph(paragraph);
 
             // Convert the document to PDF/A‑1b (PDF/A‑1b compliance)
-            // Optional log file for conversion errors
-            string logPath = "conversion_log.xml";
             doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
 
             // Save the PDF/A‑1b document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF/A‑1b document saved to '{outputPath}'.");
+        Console.WriteLine($"PDF/A‑1b file saved to '{outputPath}'.");
     }
 }
