@@ -1,62 +1,18 @@
 {
   "category": "compare-pdf",
-  "nuget_version": "26.6.0",
-  "last_updated": "2026-07-05T08:04:46Z",
+  "nuget_version": "26.7.0",
+  "last_updated": "2026-07-18T00:21:28Z",
   "examples": {
-    "compare-specific-page-range-pdfs": {
-      "title": "Compare Specific Page Range of Two PDFs",
-      "filename": "compare-specific-page-range-pdfs.cs",
-      "description": "Loads two PDF files, defines a start and end page, and compares each page within that range using Aspose.Pdf's comparison API, reporting the number of differences per page.",
+    "compare-selected-page-range-pdfs": {
+      "title": "Compare Selected Page Range of Two PDFs",
+      "filename": "compare-selected-page-range-pdfs.cs",
+      "description": "Loads two PDF documents, adjusts a user‑defined page range, and performs a text‑based comparison on each page within that range.",
       "tags": [
-        "pdf-comparison",
+        "pdf",
+        "comparison",
         "page-range",
-        "aspose-pdf",
-        "csharp",
-        "text-diff"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Comparison.ComparisonOptions",
-        "Aspose.Pdf.Comparison.TextPdfComparer.ComparePages",
-        "Aspose.Pdf.Comparison.DiffOperation",
-        "Aspose.Pdf.PageCollection"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
-      "status": "verified"
-    },
-    "compare-pdf-documents-page-by-page-diff": {
-      "title": "Compare PDF Documents Page by Page and Generate Diff PDF",
-      "filename": "compare-pdf-documents-page-by-page-diff.cs",
-      "description": "Demonstrates how to compare two PDF files page‑by‑page using Aspose.Pdf's default ComparisonOptions and save the resulting differences as a diff PDF.",
-      "tags": [
-        "pdf-comparison",
-        "diff",
-        "pages",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Comparison.ComparisonOptions",
-        "Aspose.Pdf.Comparison.TextPdfComparer.CompareDocumentsPageByPage",
-        "Aspose.Pdf.Comparison.DiffOperation",
-        "Aspose.Pdf.Pages"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:04:46Z",
-      "status": "verified"
-    },
-    "compare-specific-pages-pdf": {
-      "title": "Compare Specific Pages of Two PDFs",
-      "filename": "compare-specific-pages-pdf.cs",
-      "description": "Demonstrates how to compare selected pages of two PDF documents using Aspose.Pdf's comparison API, including page validation and collection of diff operations.",
-      "tags": [
-        "pdf-comparison",
-        "selected-pages",
-        "aspose-pdf",
-        "diff",
-        "csharp"
+        "text-diff",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -66,34 +22,67 @@
         "Aspose.Pdf.Comparison.DiffOperation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
-    "exclude-areas-side-by-side-pdf-comparison": {
-      "title": "Exclude Areas in Side‑by‑Side PDF Comparison",
-      "filename": "exclude-areas-side-by-side-pdf-comparison.cs",
-      "description": "Shows how to compare two PDF files side‑by‑side with Aspose.Pdf while excluding specified rectangular regions from each document.",
+    "compare-pdf-documents-page-by-page": {
+      "title": "Compare PDF Documents Page by Page and Generate Diff PDF",
+      "filename": "compare-pdf-documents-page-by-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-07-18T00:21:28Z",
+      "status": "verified"
+    },
+    "compare-selected-pdf-pages": {
+      "title": "Compare Selected PDF Pages Using Aspose.Pdf",
+      "filename": "compare-selected-pdf-pages.cs",
+      "description": "Demonstrates how to compare specific pages from two PDF documents by extracting those pages into temporary documents and using the side‑by‑side comparer provided by Aspose.Pdf.",
       "tags": [
         "pdf-comparison",
-        "exclude-areas",
-        "side-by-side",
+        "selected-pages",
         "aspose-pdf",
+        "side-by-side",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Comparison.SideBySidePdfComparer",
         "Aspose.Pdf.Comparison.SideBySideComparisonOptions",
-        "Aspose.Pdf.Comparison.SideBySidePdfComparer.Compare",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.Pages",
+        "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
+      "status": "verified"
+    },
+    "exclude-areas-from-pdf-comparison": {
+      "title": "Exclude Areas from PDF Side‑by‑Side Comparison",
+      "filename": "exclude-areas-from-pdf-comparison.cs",
+      "description": "Shows how to define rectangular regions to exclude from both PDFs and perform a side‑by‑side comparison using Aspose.Pdf.Comparison.",
+      "tags": [
+        "pdf-comparison",
+        "exclude-areas",
+        "rectangle",
+        "side-by-side",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Comparison.SideBySideComparisonOptions",
+        "Aspose.Pdf.Comparison.SideBySidePdfComparer",
+        "Aspose.Pdf.Comparison.SideBySidePdfComparer.Compare"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
     "exclude-annotations-from-pdf-comparison": {
       "title": "Exclude Annotations from PDF Comparison",
       "filename": "exclude-annotations-from-pdf-comparison.cs",
-      "description": "Demonstrates collecting annotation bounding rectangles from two PDFs and configuring ComparisonOptions to exclude those areas during a page‑by‑page text comparison.",
+      "description": "Shows how to collect annotation bounding rectangles from two PDFs and configure side‑by‑side comparison to ignore those areas using Aspose.Pdf.",
       "tags": [
         "pdf-comparison",
         "annotations",
@@ -106,131 +95,134 @@
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Annotations.Annotation",
         "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Comparison.ComparisonOptions",
-        "Aspose.Pdf.Comparison.TextPdfComparer.CompareDocumentsPageByPage"
+        "Aspose.Pdf.Comparison.SideBySideComparisonOptions",
+        "Aspose.Pdf.Comparison.SideBySidePdfComparer.Compare"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
-    "exclude-footer-areas-from-pdf-comparison": {
-      "title": "Exclude Footer Areas from PDF Comparison",
-      "filename": "exclude-footer-areas-from-pdf-comparison.cs",
-      "description": "Demonstrates how to define rectangular footer regions and exclude them from a side‑by‑side PDF comparison using Aspose.Pdf.",
+    "compare-pdfs-excluding-footer-areas": {
+      "title": "Compare PDFs While Excluding Footer Areas",
+      "filename": "compare-pdfs-excluding-footer-areas.cs",
+      "description": "Demonstrates how to exclude rectangular footer regions from a side‑by‑side PDF comparison using Aspose.Pdf's comparison options.",
       "tags": [
         "pdf-comparison",
         "exclude-areas",
         "footer",
-        "side-by-side",
-        "aspose-pdf"
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Comparison.SideBySideComparisonOptions",
-        "Aspose.Pdf.Comparison.SideBySidePdfComparer.Compare",
-        "Aspose.Pdf.PageInfo"
+        "Aspose.Pdf.Comparison.SideBySidePdfComparer.Compare"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
-    "compare-pdfs-text-differences": {
-      "title": "Compare Two PDFs and Generate Text Difference Report",
-      "filename": "compare-pdfs-text-differences.cs",
-      "description": "Loads two PDF files and uses Aspose.Pdf.Comparison's TextPdfComparer to perform a flat text comparison, outputting the number of differences and optionally creating a side‑by‑side visual report. The example notes that case‑insensitive comparison must be handled manually.",
+    "compare-two-pdfs-and-generate-visual-diff": {
+      "title": "Compare Two PDFs and Generate a Visual Diff",
+      "filename": "compare-two-pdfs-and-generate-visual-diff.cs",
+      "description": "Loads two PDF files, compares them with Aspose.Pdf.Comparison, saves a diff PDF, and prints basic text‑difference statistics.",
       "tags": [
-        "pdf-comparison",
-        "text-diff",
-        "aspose-pdf",
-        "csharp",
-        "case-insensitive"
+        "pdf",
+        "comparison",
+        "diff",
+        "statistics",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Comparison.ComparisonOptions",
         "Aspose.Pdf.Comparison.TextPdfComparer.CompareFlatDocuments",
-        "Aspose.Pdf.Comparison.DiffOperation"
+        "Aspose.Pdf.Comparison.TextPdfComparer.CreateComparisonStatistics",
+        "Aspose.Pdf.Comparison.DiffOperation",
+        "Aspose.Pdf.Comparison.TextItemComparisonStatistics"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
     "set-custom-image-similarity-tolerance-pdf-comparison": {
       "title": "Set Custom Image Similarity Tolerance for PDF Comparison",
       "filename": "set-custom-image-similarity-tolerance-pdf-comparison.cs",
-      "description": "Demonstrates how to compare two PDFs containing scanned images using Aspose.Pdf's GraphicalPdfComparer with a custom tolerance threshold and export the differences as PNG images.",
+      "description": "Demonstrates how to compare two PDFs containing scanned images using Aspose.Pdf's GraphicalPdfComparer with a custom similarity tolerance.",
       "tags": [
         "pdf-comparison",
         "image-tolerance",
         "graphical-comparer",
-        "csharp",
-        "aspose-pdf"
+        "aspose-pdf",
+        "scanned-images"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Comparison.GraphicalPdfComparer",
         "Aspose.Pdf.Comparison.GraphicalPdfComparer.Threshold",
-        "Aspose.Pdf.Comparison.GraphicalPdfComparer.CompareDocumentsToImages",
+        "Aspose.Pdf.Comparison.GraphicalPdfComparer.CompareDocumentsToPdf",
         "Aspose.Pdf.Comparison.ComparisonOptions"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
-    "compare-pdfs-with-form-fields": {
+    "compare-pdfs-including-form-field-values": {
       "title": "Compare PDFs Including Form Field Values",
-      "filename": "compare-pdfs-with-form-fields.cs",
-      "description": "Demonstrates how to compare two PDF documents that contain form fields using Aspose.Pdf, ensuring that field values are taken into account and producing a visual diff PDF.",
+      "filename": "compare-pdfs-including-form-field-values.cs",
+      "description": "Shows how to compare two PDF files with Aspose.Pdf while taking AcroForm field values into account, producing a side‑by‑side visual diff and retrieving raw page‑level differences.",
       "tags": [
         "pdf-comparison",
         "form-fields",
         "aspose-pdf",
-        "csharp",
-        "visual-diff"
+        "side-by-side",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Comparison.ComparisonOptions",
-        "Aspose.Pdf.Comparison.ComparisonOptions.ExcludeTables",
-        "Aspose.Pdf.Comparison.TextPdfComparer",
+        "Aspose.Pdf.Comparison.SideBySideComparisonOptions",
+        "Aspose.Pdf.Comparison.SideBySidePdfComparer.Compare",
         "Aspose.Pdf.Comparison.TextPdfComparer.CompareDocumentsPageByPage"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
     "compare-pdfs-ignore-signature-fields": {
       "title": "Compare PDFs While Ignoring Signature Fields",
       "filename": "compare-pdfs-ignore-signature-fields.cs",
-      "description": "Shows how to compare two PDF documents with Aspose.Pdf and treat digital signature fields as unchanged regions by excluding their rectangles from the comparison.",
+      "description": "Demonstrates how to compare two PDF documents, verify their digital signatures, and exclude signature field regions from the visual diff using Aspose.Pdf.",
       "tags": [
         "pdf-comparison",
         "digital-signature",
         "exclude-areas",
         "aspose-pdf",
-        "c#"
+        "text-comparison"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Comparison.ComparisonOptions",
         "Aspose.Pdf.Comparison.TextPdfComparer.CompareDocumentsPageByPage",
-        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Annotations.SignatureField",
+        "Aspose.Pdf.Signatures.SignaturesCompromiseDetector",
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
     "compare-pdfs-different-page-sizes": {
-      "title": "Compare PDFs with Different Page Sizes",
+      "title": "Align and Compare PDF Pages with Different Sizes",
       "filename": "compare-pdfs-different-page-sizes.cs",
-      "description": "Loads two PDFs with differing page dimensions, resizes their first pages to a common size, and performs a graphical comparison using Aspose.Pdf's GraphicalPdfComparer, saving the result PDF.",
+      "description": "The example loads two PDF documents, adjusts the second page to match the first page's dimensions, and uses Aspose.Pdf's GraphicalPdfComparer to compare the pages and generate a comparison PDF.",
       "tags": [
         "pdf-comparison",
         "page-size",
-        "graphical-comparison",
         "aspose-pdf",
+        "graphical-comparer",
         "csharp"
       ],
       "apis_used": [
@@ -241,34 +233,35 @@
         "Aspose.Pdf.Comparison.GraphicalPdfComparer.ComparePagesToPdf"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
-    "compare-pdf-text-ignore-compression": {
-      "title": "Compare PDF Text While Ignoring Compression Differences",
-      "filename": "compare-pdf-text-ignore-compression.cs",
-      "description": "Demonstrates how to compare two PDFs that have identical textual content but different compression settings using Aspose.Pdf, producing a flat text diff that is unaffected by compression.",
+    "compare-pdfs-ignore-compression": {
+      "title": "Compare PDFs Ignoring Compression Differences",
+      "filename": "compare-pdfs-ignore-compression.cs",
+      "description": "Shows how to compare two PDFs that use different compression settings, focusing on textual differences and producing both a visual diff PDF and a JSON diff report.",
       "tags": [
         "pdf-comparison",
         "text-diff",
         "compression",
-        "aspose.pdf",
-        "csharp"
+        "json-output",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Comparison.ComparisonOptions",
         "Aspose.Pdf.Comparison.TextPdfComparer.CompareFlatDocuments",
-        "Aspose.Pdf.Comparison.DiffOperation"
+        "Aspose.Pdf.Comparison.DiffOperation",
+        "Aspose.Pdf.Comparison.JsonDiffOutputGenerator.GenerateOutput"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
     "compare-pdfs-unicode-text-differences": {
-      "title": "Compare PDFs with Unicode Text Differences",
+      "title": "Detect Unicode Text Differences Between PDFs",
       "filename": "compare-pdfs-unicode-text-differences.cs",
-      "description": "Demonstrates using Aspose.Pdf's Comparison API to detect Unicode text differences between two PDFs with different language encodings and generate a visual diff PDF.",
+      "description": "Demonstrates how to compare two PDF files with different language encodings (e.g., English and Russian) using Aspose.Pdf.Comparison to detect Unicode text differences and generate a visual diff PDF.",
       "tags": [
         "pdf-comparison",
         "unicode",
@@ -280,69 +273,65 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Comparison.ComparisonOptions",
         "Aspose.Pdf.Comparison.TextPdfComparer.CompareFlatDocuments",
-        "Aspose.Pdf.Comparison.DiffOperation",
-        "Aspose.Pdf.Comparison.ComparisonMode"
+        "Aspose.Pdf.Comparison.DiffOperation"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
-    "compare-pdf-font-differences": {
-      "title": "Compare PDFs for Font Differences Using Aspose.Pdf",
-      "filename": "compare-pdf-font-differences.cs",
-      "description": "Loads two PDF files, compares them with Aspose.Pdf.Comparison to detect font changes as separate diff operations, and optionally generates a JSON report of the differences.",
+    "compare-pdfs-font-differences": {
+      "title": "Compare PDFs for Font Differences and Generate JSON Report",
+      "filename": "compare-pdfs-font-differences.cs",
+      "description": "Shows how to compare two PDF files, filter out font‑related differences, and export the diff operations to a JSON report using Aspose.Pdf.",
       "tags": [
         "pdf-comparison",
-        "fonts",
-        "aspose.pdf",
-        "diff-operations",
-        "json-report"
+        "font-differences",
+        "json-report",
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Comparison.ComparisonOptions",
         "Aspose.Pdf.Comparison.TextPdfComparer.CompareFlatDocuments",
         "Aspose.Pdf.Comparison.DiffOperation",
-        "Aspose.Pdf.Comparison.JsonDiffOutputGenerator"
+        "Aspose.Pdf.Comparison.JsonDiffOutputGenerator.GenerateOutput"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
-    "compare-encrypted-pdfs-with-passwords": {
-      "title": "Compare Encrypted PDFs with Passwords Using Aspose.Pdf",
-      "filename": "compare-encrypted-pdfs-with-passwords.cs",
-      "description": "Demonstrates opening password‑protected PDF files by providing user passwords to the Document constructors and performing a side‑by‑side visual comparison, saving the result PDF.",
+    "compare-encrypted-pdfs-side-by-side": {
+      "title": "Compare Encrypted PDFs with Side‑by‑Side Visual Result",
+      "filename": "compare-encrypted-pdfs-side-by-side.cs",
+      "description": "Demonstrates loading password‑protected PDF files, comparing them using Aspose.Pdf's side‑by‑side comparer, and saving a visual diff PDF.",
       "tags": [
         "pdf-comparison",
         "encrypted-pdf",
-        "password-protection",
         "side-by-side",
-        "aspose-pdf"
+        "password",
+        "aspnet"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Comparison.SideBySidePdfComparer.Compare",
         "Aspose.Pdf.Comparison.SideBySideComparisonOptions",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Permissions",
-        "Aspose.Pdf.CryptoAlgorithm",
-        "Aspose.Pdf.Document.Encrypt"
+        "Aspose.Pdf.Comparison.ComparisonOptions",
+        "Aspose.Pdf.Comparison.TextPdfComparer.CompareFlatDocuments"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
-    "compare-pdfs-from-memory-streams": {
-      "title": "Compare PDFs from Memory Streams and Generate Diff PDF",
-      "filename": "compare-pdfs-from-memory-streams.cs",
-      "description": "Loads two PDF documents directly from MemoryStream objects, compares them page by page using Aspose.Pdf's GraphicalPdfComparer, and returns a diff PDF as a MemoryStream without creating temporary files.",
+    "compare-pdfs-from-streams": {
+      "title": "Compare PDFs from Streams and Generate Diff PDF",
+      "filename": "compare-pdfs-from-streams.cs",
+      "description": "Shows how to load two PDF documents from in‑memory streams, perform a visual page‑by‑page comparison using GraphicalPdfComparer, and write the resulting diff PDF to a MemoryStream without creating temporary files.",
       "tags": [
         "pdf-comparison",
         "memory-stream",
+        "visual-diff",
         "aspose-pdf",
-        "graphical-diff",
         "csharp"
       ],
       "apis_used": [
@@ -353,58 +342,36 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
+      "status": "verified"
+    },
+    "write-pdf-diff-to-http-response": {
+      "title": "Write PDF Diff Directly to HTTP Response Stream",
+      "filename": "write-pdf-diff-to-http-response.cs",
+      "description": "Demonstrates comparing two PDFs side‑by‑side and writing the resulting diff PDF directly to a provided output stream, suitable for ASP.NET Core response bodies.",
+      "tags": [
+        "pdf-comparison",
+        "side-by-side",
+        "output-stream",
+        "aspnet-core",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Comparison.SideBySideComparisonOptions",
+        "Aspose.Pdf.Comparison.SideBySidePdfComparer.Compare"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
     "generate-visual-diff-pdf": {
       "title": "Generate Visual Diff PDF Using GraphicalPdfComparer",
       "filename": "generate-visual-diff-pdf.cs",
-      "description": "Demonstrates how to compare two PDF files and create a visual diff PDF with Aspose.Pdf's GraphicalPdfComparer.",
+      "description": "Demonstrates how to compare two PDF documents visually and create a diff PDF using Aspose.Pdf's GraphicalPdfComparer.",
       "tags": [
         "pdf-comparison",
         "visual-diff",
-        "aspose-pdf",
-        "csharp",
-        "document-comparison"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Comparison.GraphicalPdfComparer",
-        "Aspose.Pdf.Comparison.GraphicalPdfComparer.CompareDocumentsToPdf"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:04:46Z",
-      "status": "verified"
-    },
-    "extract-image-differences-between-pdf-pages": {
-      "title": "Extract Image Differences Between Two PDF Pages",
-      "filename": "extract-image-differences-between-pdf-pages.cs",
-      "description": "Demonstrates how to compare the first pages of two PDF documents using Aspose.Pdf's GraphicalPdfComparer and save the source, destination, and optional diff images.",
-      "tags": [
-        "pdf-comparison",
-        "image-diff",
-        "aspose-pdf",
-        "csharp",
-        "graphical-comparer"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Comparison.GraphicalPdfComparer",
-        "Aspose.Pdf.Comparison.GraphicalPdfComparer.GetDifference",
-        "Aspose.Pdf.Comparison.ImagesDifference"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
-      "status": "verified"
-    },
-    "generate-diff-pdf-compare-two-pdfs": {
-      "title": "Generate Diff PDF by Comparing Two PDFs",
-      "filename": "generate-diff-pdf-compare-two-pdfs.cs",
-      "description": "Demonstrates how to use Aspose.Pdf's GraphicalPdfComparer to compare two PDF documents and create a highlighted diff PDF saved to a specified folder.",
-      "tags": [
-        "pdf-comparison",
-        "diff-pdf",
         "aspose-pdf",
         "csharp",
         "graphical-comparer"
@@ -416,57 +383,100 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
-    "generate-diff-pdf-with-highlight-verification": {
-      "title": "Generate Diff PDF with Highlight Verification",
-      "filename": "generate-diff-pdf-with-highlight-verification.cs",
-      "description": "Shows how to compare two PDFs using GraphicalPdfComparer, generate a diff PDF with highlighted changes, and verify that the highlight color matches the default documentation value.",
+    "generate-pdf-difference-image": {
+      "title": "Generate Visual Difference Image Between Two PDFs",
+      "filename": "generate-pdf-difference-image.cs",
+      "description": "Demonstrates how to compare the first pages of two PDF files using Aspose.Pdf's GraphicalPdfComparer, obtain an ImagesDifference object, and save a PNG that visualizes the pixel‑wise differences.",
       "tags": [
         "pdf-comparison",
-        "highlight",
-        "annotation",
-        "diff",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Comparison.GraphicalPdfComparer",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Annotations.HighlightAnnotation",
-        "Aspose.Pdf.Page"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
-      "status": "verified"
-    },
-    "generate-json-diff-report-pdf-comparison": {
-      "title": "Generate JSON Diff Report for PDF Comparison",
-      "filename": "generate-json-diff-report-pdf-comparison.cs",
-      "description": "This example demonstrates how to compare two PDF documents using Aspose.Pdf's text comparison and generate a JSON report of the differences.",
-      "tags": [
-        "pdf-comparison",
-        "json-report",
+        "image-difference",
         "aspose-pdf",
-        "diff-operations",
+        "graphical-comparer",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Comparison.TextPdfComparer.CompareDocumentsPageByPage",
-        "Aspose.Pdf.Comparison.ComparisonOptions",
-        "Aspose.Pdf.Comparison.JsonDiffOutputGenerator",
-        "Aspose.Pdf.Comparison.JsonDiffOutputGenerator.GenerateOutput"
+        "Aspose.Pdf.Comparison.GraphicalPdfComparer",
+        "Aspose.Pdf.Comparison.ImagesDifference",
+        "Aspose.Pdf.Comparison.GraphicalPdfComparer.GetDifference",
+        "Aspose.Pdf.Comparison.ImagesDifference.GetDestinationImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:21:28Z",
+      "status": "verified"
+    },
+    "create-diff-pdf-using-graphicalpdfcomparer": {
+      "title": "Create Diff PDF Using GraphicalPdfComparer",
+      "filename": "create-diff-pdf-using-graphicalpdfcomparer.cs",
+      "description": "Loads two PDF files, compares them with Aspose.Pdf's GraphicalPdfComparer, and saves a diff PDF that highlights the changes to a specified folder.",
+      "tags": [
+        "pdf-comparison",
+        "diff-pdf",
+        "aspose-pdf",
+        "csharp",
+        "graphicalpdfcomparer"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Comparison.GraphicalPdfComparer",
+        "Aspose.Pdf.Comparison.GraphicalPdfComparer.CompareDocumentsToPdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
+      "status": "verified"
+    },
+    "generate-diff-pdf-highlighted-text-changes": {
+      "title": "Generate Diff PDF with Highlighted Text Changes",
+      "filename": "generate-diff-pdf-highlighted-text-changes.cs",
+      "description": "Demonstrates comparing two PDFs, creating a diff PDF with highlighted text changes using Aspose.Pdf, and verifying that the highlight colour matches the default yellow.",
+      "tags": [
+        "pdf-comparison",
+        "highlight",
+        "diff",
+        "aspose-pdf",
+        "verification"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Comparison.ComparisonOptions",
+        "Aspose.Pdf.Comparison.TextPdfComparer.CompareDocumentsPageByPage",
+        "Aspose.Pdf.Comparison.PdfOutputGenerator.GenerateOutput",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Color.Yellow"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:21:28Z",
+      "status": "verified"
+    },
+    "pdf-diff-report-json": {
+      "title": "Generate PDF Difference Report in JSON",
+      "filename": "pdf-diff-report-json.cs",
+      "description": "The example loads two PDF files, compares page count and page dimensions, records any differences, and writes a JSON report of the diff operations.",
+      "tags": [
+        "pdf",
+        "diff",
+        "json",
+        "aspose-pdf",
+        "comparison"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.PageInfo.Width",
+        "Aspose.Pdf.PageInfo.Height"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
     "replace-changed-text-in-pdf": {
-      "title": "Replace Changed Text in PDF with Original Text",
+      "title": "Replace Changed Text in PDF Using DiffOperation",
       "filename": "replace-changed-text-in-pdf.cs",
-      "description": "Demonstrates how to compare two PDFs, extract the original text using DiffOperation objects, and create a new PDF where changed text is replaced with the source text.",
+      "description": "Compares two PDF pages, extracts the original text from the first PDF via DiffOperation objects, and replaces the changed content on the second PDF with the original text.",
       "tags": [
         "pdf-comparison",
         "diffoperation",
@@ -477,88 +487,86 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Comparison.TextPdfComparer.ComparePages",
+        "Aspose.Pdf.Comparison.ComparisonOptions",
         "Aspose.Pdf.Comparison.DiffOperation",
         "Aspose.Pdf.Comparison.TextPdfComparer.AssemblySourcePageText",
-        "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Text.FontRepository"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
-    "compare-pdfs-log-differences": {
-      "title": "Compare PDFs and Log Differences by Page",
-      "filename": "compare-pdfs-log-differences.cs",
-      "description": "Shows how to compare two PDF documents page‑by‑page with Aspose.Pdf, extract diff operations, and write an audit log containing the operation type and page number.",
+    "compare-pdfs-log-diff-operations": {
+      "title": "Compare PDFs and Log Diff Operations by Page",
+      "filename": "compare-pdfs-log-diff-operations.cs",
+      "description": "Demonstrates how to compare two PDF documents page‑by‑page using Aspose.Pdf and write an audit log that records each diff operation type together with its page number.",
       "tags": [
         "pdf-comparison",
         "audit-log",
-        "page-diff",
+        "diff-operation",
         "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Comparison.ComparisonOptions",
+        "Aspose.Pdf.Comparison.TextPdfComparer",
         "Aspose.Pdf.Comparison.TextPdfComparer.CompareDocumentsPageByPage",
         "Aspose.Pdf.Comparison.DiffOperation",
         "Aspose.Pdf.Comparison.DiffOperation.Operation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
-    "universal-pdf-comparison": {
-      "title": "Universal PDF Comparison with Visual Diff",
-      "filename": "universal-pdf-comparison.cs",
-      "description": "Demonstrates how to compare two PDF files using Aspose.Pdf's TextPdfComparer to detect differences—including embedded multimedia—and generate a visual diff PDF.",
+    "compare-two-pdfs-visual-diff": {
+      "title": "Compare Two PDFs and Generate Visual Diff",
+      "filename": "compare-two-pdfs-visual-diff.cs",
+      "description": "Loads two PDF files, compares them with Aspose.Pdf's flat document comparison, saves a PDF that highlights the differences, and prints a summary of the diff operations.",
       "tags": [
         "pdf-comparison",
         "visual-diff",
         "aspose-pdf",
-        "text-comparison",
-        "multimedia"
+        "csharp",
+        "document-comparison"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Comparison.TextPdfComparer",
-        "Aspose.Pdf.Comparison.TextPdfComparer.CompareFlatDocuments",
         "Aspose.Pdf.Comparison.ComparisonOptions",
+        "Aspose.Pdf.Comparison.TextPdfComparer.CompareFlatDocuments",
         "Aspose.Pdf.Comparison.DiffOperation"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
-    "preserve-metadata-when-comparing-pdfs": {
-      "title": "Preserve Metadata When Comparing PDFs with Aspose",
-      "filename": "preserve-metadata-when-comparing-pdfs.cs",
-      "description": "Demonstrates how to compare two PDF files using Aspose.Pdf, generate a diff PDF, and copy all original document metadata—including custom properties—into the diff document.",
+    "preserve-pdf-metadata-after-comparison": {
+      "title": "Preserve PDF Metadata After Comparison",
+      "filename": "preserve-pdf-metadata-after-comparison.cs",
+      "description": "Shows how to compare two PDFs side‑by‑side using Aspose.Pdf and then copy the original document's metadata to the generated diff PDF.",
       "tags": [
         "pdf-comparison",
         "metadata",
         "aspose-pdf",
-        "diff-pdf",
+        "side-by-side",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Comparison.TextPdfComparer.CompareDocumentsPageByPage",
-        "Aspose.Pdf.Comparison.ComparisonOptions",
-        "Aspose.Pdf.DocumentInfo"
+        "Aspose.Pdf.Comparison.SideBySidePdfComparer",
+        "Aspose.Pdf.Comparison.SideBySideComparisonOptions",
+        "Aspose.Pdf.Document.Info",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
-    "parallel-pdf-comparison": {
-      "title": "Parallel PDF Comparison Using Aspose.Pdf",
-      "filename": "parallel-pdf-comparison.cs",
-      "description": "Demonstrates how to compare multiple PDF pairs concurrently with Aspose.Pdf's side‑by‑side comparer using Task parallelism.",
+    "multi-threaded-pdf-comparison": {
+      "title": "Multi‑Threaded PDF Comparison with Aspose.Pdf",
+      "filename": "multi-threaded-pdf-comparison.cs",
+      "description": "Demonstrates how to compare multiple PDF pairs concurrently using Aspose.Pdf's side‑by‑side comparison API and .NET tasks, saving each result to a separate file.",
       "tags": [
         "pdf-comparison",
         "multithreading",
@@ -573,29 +581,40 @@
         "Aspose.Pdf.Comparison.SideBySidePdfComparer.Compare"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     },
-    "compare-a-large-batch-of-pdfs-using-parallel-processing-limiting-concurrency-to-avoid-excessive-memory-consumption": {
-      "title": "Compare A Large Batch Of Pdfs Using Parallel Processing Limiting Concurrency To Avoid Excessive Memory Consumption",
-      "filename": "compare-a-large-batch-of-pdfs-using-parallel-processing-limiting-concurrency-to-avoid-excessive-memory-consumption.cs",
-      "description": "",
-      "tags": [],
-      "apis_used": [],
-      "difficulty": "",
-      "generated_at": "2026-07-05T08:04:46Z",
-      "status": "verified"
-    },
-    "generate-pdf-comparison-images-zip": {
-      "title": "Generate PDF Comparison Images and Zip Them",
-      "filename": "generate-pdf-comparison-images-zip.cs",
-      "description": "Demonstrates how to compare two PDFs using Aspose.Pdf's GraphicalPdfComparer, export the visual differences as PNG images, and package the resulting images into a ZIP archive.",
+    "parallel-batch-pdf-comparison": {
+      "title": "Parallel Batch PDF Comparison with Concurrency Limit",
+      "filename": "parallel-batch-pdf-comparison.cs",
+      "description": "Compares multiple PDF files against a baseline PDF in parallel while limiting the degree of parallelism to control memory usage, and saves side‑by‑side comparison results.",
       "tags": [
         "pdf-comparison",
-        "image-export",
-        "zip",
+        "parallel-processing",
+        "concurrency",
         "aspose-pdf",
-        "graphical-comparer"
+        "batch"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Comparison.SideBySideComparisonOptions",
+        "Aspose.Pdf.Comparison.SideBySidePdfComparer",
+        "Aspose.Pdf.Comparison.SideBySidePdfComparer.Compare"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:21:28Z",
+      "status": "verified"
+    },
+    "pdf-diff-images-to-zip": {
+      "title": "Generate PDF Diff Images and Zip Them",
+      "filename": "pdf-diff-images-to-zip.cs",
+      "description": "Demonstrates how to compare two PDFs with Aspose.Pdf, create visual diff images, and package the images into a ZIP archive for easy distribution.",
+      "tags": [
+        "pdf-comparison",
+        "diff-images",
+        "zip-archive",
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -603,7 +622,7 @@
         "Aspose.Pdf.Comparison.GraphicalPdfComparer.CompareDocumentsToImages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:04:46Z",
+      "generated_at": "2026-07-18T00:21:28Z",
       "status": "verified"
     }
   }
