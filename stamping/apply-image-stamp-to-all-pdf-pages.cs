@@ -6,34 +6,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
-        const string stampImg  = "logo.png";
+        const string stampImage = "stamp.png";
 
+        // Verify input files exist
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(stampImg))
+        if (!File.Exists(stampImage))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImage}");
             return;
         }
 
-        // Load the PDF document with deterministic disposal
+        // Load the PDF document (disposed automatically)
         using (Document doc = new Document(inputPdf))
         {
-            // Create a reusable ImageStamp
-            ImageStamp imgStamp = new ImageStamp(stampImg)
+            // Create an ImageStamp and configure its appearance
+            ImageStamp imgStamp = new ImageStamp(stampImage)
             {
-                // Position the stamp at the top‑right corner of each page
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment   = VerticalAlignment.Top,
-                Opacity = 0.5f,
-                // Optional scaling
-                Width  = 100,
-                Height = 50
+                Background = false,                     // Stamp on top of page content
+                Opacity = 0.5,                          // 50% transparent
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
             };
 
             // Apply the stamp to every page using a foreach loop
@@ -42,7 +40,7 @@ class Program
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (writes PDF regardless of extension)
             doc.Save(outputPdf);
         }
 

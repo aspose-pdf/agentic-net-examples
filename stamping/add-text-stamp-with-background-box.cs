@@ -2,14 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing; // needed for HorizontalAlignment, VerticalAlignment, etc.
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_stamp.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,39 +16,27 @@ class Program
             return;
         }
 
-        // Load the PDF document (wrapped in using for proper disposal)
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Define text appearance (white text on a dark background)
-            TextState textState = new TextState
-            {
-                Font = FontRepository.FindFont("Helvetica"),
-                FontSize = 14,
-                ForegroundColor = Aspose.Pdf.Color.White,
-                BackgroundColor = Aspose.Pdf.Color.Black
-            };
+            // Create a text stamp with the desired text
+            TextStamp stamp = new TextStamp("CONFIDENTIAL");
 
-            // Create a TextStamp with the defined TextState
-            TextStamp stamp = new TextStamp("CONFIDENTIAL", textState)
-            {
-                // Render as graphic operators so the background box is drawn
-                Draw = true,
-                // Place the stamp behind the page content
-                Background = true,
-                // Semi‑transparent background (0.0 = fully transparent, 1.0 = opaque)
-                Opacity = 0.6f,
-                // Center the stamp on each page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                // Size of the background box
-                Width = 200,
-                Height = 50,
-                // TextAlignment enum is not available in older Aspose.Pdf versions.
-                // If using a newer version, uncomment the line below.
-                // TextAlignment = Aspose.Pdf.Text.TextAlignment.Center
-            };
+            // Configure text appearance
+            stamp.TextState.Font = FontRepository.FindFont("Helvetica");
+            stamp.TextState.FontSize = 24;
+            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.White;          // Text color
+            stamp.TextState.BackgroundColor = Aspose.Pdf.Color.Black;          // Background box color
+            stamp.TextState.FontStyle = FontStyles.Bold;
 
-            // Apply the stamp to every page in the document
+            // Position the stamp in the center of each page
+            stamp.HorizontalAlignment = HorizontalAlignment.Center;
+            stamp.VerticalAlignment   = VerticalAlignment.Center;
+
+            // Optional: make the stamp semi‑transparent
+            stamp.Opacity = 0.6f;
+
+            // Add the stamp to every page
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(stamp);
@@ -59,6 +46,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with text stamp: {outputPath}");
     }
 }

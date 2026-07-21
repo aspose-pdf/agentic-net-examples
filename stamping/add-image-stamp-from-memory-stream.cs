@@ -6,54 +6,56 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath      = "input.pdf";   // source PDF
-        const string imagePath    = "logo.png";    // image to stamp
-        const string outputPath   = "output.pdf";  // stamped PDF
+        // Input PDF path, output PDF path, and image file path (used to create the memory stream)
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string imageFilePath = "logo.png";
 
-        // Ensure source files exist
-        if (!File.Exists(pdfPath))
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(imagePath))
+        if (!File.Exists(imageFilePath))
         {
-            Console.Error.WriteLine($"Image not found: {imagePath}");
+            Console.Error.WriteLine($"Image file not found: {imageFilePath}");
             return;
         }
 
-        // Load the PDF document (creation & loading rule)
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load image into a memory stream
-            using (FileStream fileStream = File.OpenRead(imagePath))
-            using (MemoryStream memoryStream = new MemoryStream())
+            // Read the image into a memory stream (the stream will be disposed after stamping)
+            using (FileStream imgFileStream = File.OpenRead(imageFilePath))
+            using (MemoryStream imgMemoryStream = new MemoryStream())
             {
-                fileStream.CopyTo(memoryStream);
-                memoryStream.Position = 0; // reset for reading
+                imgFileStream.CopyTo(imgMemoryStream);
+                imgMemoryStream.Position = 0; // reset to beginning
 
-                // Create an ImageStamp from the memory stream (constructor rule)
-                ImageStamp imgStamp = new ImageStamp(memoryStream)
+                // Create an ImageStamp from the memory stream
+                ImageStamp imgStamp = new ImageStamp(imgMemoryStream)
                 {
-                    // Position the stamp at the center of each page
+                    // Example positioning and appearance settings
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment   = VerticalAlignment.Center,
-                    // Optional visual settings
-                    Opacity = 0.6,
-                    Background = false
+                    Opacity             = 0.5,          // semi‑transparent
+                    Background          = false,        // stamp on top of page content
+                    // Optional: set alternative text for accessibility
+                    AlternativeText     = "Company logo"
                 };
 
-                // Apply the stamp to every page in the document
-                foreach (Page page in doc.Pages)
+                // Apply the stamp to each page in the document
+                foreach (Page page in pdfDoc.Pages)
                 {
                     page.AddStamp(imgStamp);
                 }
             }
 
-            // Save the modified PDF (saving rule)
-            doc.Save(outputPath);
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Image stamp applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Image stamp added from memory stream and saved to '{outputPdfPath}'.");
     }
 }

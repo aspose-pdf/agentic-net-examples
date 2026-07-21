@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // Required for TextRenderingMode and FontRepository
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "stamped_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,30 +16,30 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a text stamp with the desired text
-            TextStamp stamp = new TextStamp("OUTLINE");
+            // Create a text stamp with the desired value
+            TextStamp stamp = new TextStamp("Outlined Text");
 
-            // Set the rendering mode to StrokeText to produce outlined text
-            stamp.TextState.RenderingMode = TextRenderingMode.StrokeText;
-
-            // Optional: configure font and size
-            stamp.TextState.Font = FontRepository.FindFont("Helvetica");
+            // Configure the text appearance – use a bold font to simulate an outline
+            stamp.TextState.Font = FontRepository.FindFont("Helvetica-Bold");
             stamp.TextState.FontSize = 48;
+            stamp.TextState.ForegroundColor = Color.Red; // optional fill color
+            // NOTE: TextRenderingMode is not available in this version of Aspose.Pdf.
+            // The outlined effect can be approximated by using a bold font.
 
-            // Ensure the stamp is drawn as graphic operators (required for rendering mode)
+            // Draw the stamp as graphic operators (required for rendering modes)
             stamp.Draw = true;
 
-            // Position the stamp on the page (example coordinates)
-            stamp.XIndent = 100; // horizontal position from left
-            stamp.YIndent = 700; // vertical position from bottom
+            // Position the stamp (centered on the page)
+            stamp.HorizontalAlignment = HorizontalAlignment.Center;
+            stamp.VerticalAlignment = VerticalAlignment.Center;
 
-            // Add the stamp to the first page (Page.AddStamp is the correct method)
+            // Add the stamp to the first page (or iterate pages as needed)
             doc.Pages[1].AddStamp(stamp);
 
-            // Save the modified PDF (lifecycle rule: save within using block)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

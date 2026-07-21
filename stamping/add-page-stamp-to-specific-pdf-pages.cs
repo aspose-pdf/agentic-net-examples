@@ -6,32 +6,28 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // source document
-        const string stampPdf  = "stamp.pdf";      // PDF containing the page to be used as a stamp
-        const string outputPdf = "output.pdf";     // result document
+        const string inputPath  = "input.pdf";
+        const string outputPath = "stamped_output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(stampPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            Console.Error.WriteLine($"Stamp file not found: {stampPdf}");
-            return;
-        }
+            // Choose a page to use as the stamp source (e.g., the first page)
+            Aspose.Pdf.Page sourcePage = doc.Pages[1];
 
-        // Load the source PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
-        {
-            // Create a PdfPageStamp from the first page of the stamp PDF
-            // (page index is 1‑based)
-            PdfPageStamp pageStamp = new PdfPageStamp(stampPdf, 1);
-
-            // Optional: configure stamp appearance (e.g., make it semi‑transparent)
-            pageStamp.Opacity = 0.5f;
-            pageStamp.Background = false; // draw on top of page content
+            // Create a PdfPageStamp from the source page
+            PdfPageStamp pageStamp = new PdfPageStamp(sourcePage)
+            {
+                // Example: place the stamp as background and set opacity
+                Background = true,
+                Opacity    = 0.5f
+            };
 
             // Apply the stamp to pages 5 through 10 (inclusive)
             // Ensure we do not exceed the actual page count
@@ -40,15 +36,14 @@ class Program
 
             for (int i = start; i <= end; i++)
             {
-                // Each page in the collection is 1‑based
-                Page targetPage = doc.Pages[i];
-                targetPage.AddStamp(pageStamp);
+                // Each target page receives the same stamp
+                doc.Pages[i].AddStamp(pageStamp);
             }
 
             // Save the modified document
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

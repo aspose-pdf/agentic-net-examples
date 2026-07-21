@@ -6,12 +6,11 @@ class Program
 {
     static void Main()
     {
-        // Input PDF and image to be used as a stamp
-        const string inputPdfPath  = "input.pdf";
-        const string stampImagePath = "stamp.png";
-        const string outputPdfPath = "output.pdf";
+        const string inputPdfPath   = "input.pdf";
+        const string outputPdfPath  = "output.pdf";
+        const string stampImagePath = "logo.png";
 
-        // Verify that required files exist
+        // Verify required files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
@@ -23,22 +22,22 @@ class Program
             return;
         }
 
-        // Load the PDF document (using block ensures proper disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Create an ImageStamp – this stamp will render the image on the page
+            // Create an ImageStamp with a fixed size (points) that does not depend on page dimensions
             ImageStamp imgStamp = new ImageStamp(stampImagePath)
             {
-                // Set the stamp to appear behind the page content
-                Background = true,
+                Width  = 100, // Fixed width (≈1.39 inches)
+                Height = 50,  // Fixed height (≈0.69 inches)
 
-                // Optional visual settings
-                Opacity = 0.5,                                 // 50% transparent
+                // Position the stamp consistently on every page
                 HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                BottomMargin        = 20   // Distance from the bottom edge
             };
 
-            // Apply the stamp to every page in the document
+            // Apply the same stamp to each page
             foreach (Page page in pdfDoc.Pages)
             {
                 page.AddStamp(imgStamp);
@@ -48,6 +47,6 @@ class Program
             pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Stamp applied and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPdfPath}'.");
     }
 }

@@ -6,47 +6,49 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string imagePath  = "logo.png";
+        const string inputPdfPath  = "input.pdf";
+        const string imageFilePath = "logo.png";
+        const string outputPdfPath = "output.pdf";
 
-        // Unicode alternative text (e.g., Japanese, English, Arabic)
-        const string altText = "ロゴ画像 – Logo image – صورة الشعار";
-
-        if (!File.Exists(inputPath))
+        // Verify that the source PDF and image exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(imageFilePath))
+        {
+            Console.Error.WriteLine($"Image file not found: {imageFilePath}");
             return;
         }
 
-        if (!File.Exists(imagePath))
-        {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
-            return;
-        }
-
-        // Load the PDF document (lifecycle rule: use using)
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document (wrapped in using for deterministic disposal)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
             // Create an ImageStamp from the image file
-            ImageStamp imgStamp = new ImageStamp(imagePath);
+            ImageStamp stamp = new ImageStamp(imageFilePath);
 
-            // Set Unicode alternative text for accessibility
-            imgStamp.AlternativeText = altText;
+            // Set Unicode alternative text for multilingual accessibility
+            stamp.AlternativeText = "示例图像 – مثال صورة – пример изображения";
+
+            // Position the stamp (example: bottom‑right corner of the page)
+            // XIndent/YIndent are measured from the bottom‑left corner of the page
+            stamp.XIndent = 400; // adjust horizontal position as needed
+            stamp.YIndent = 50;  // adjust vertical position as needed
 
             // Optional visual settings
-            imgStamp.HorizontalAlignment = HorizontalAlignment.Right;
-            imgStamp.VerticalAlignment   = VerticalAlignment.Top;
-            imgStamp.Opacity = 0.8f; // semi‑transparent
+            stamp.Opacity = 0.8f; // semi‑transparent
 
-            // Add the stamp to the first page (Page.AddStamp)
-            Page page = doc.Pages[1];
-            page.AddStamp(imgStamp);
+            // Apply the stamp to every page in the document
+            foreach (Page page in pdfDoc.Pages)
+            {
+                page.AddStamp(stamp);
+            }
 
-            // Save the modified PDF (document-disposal-with-using rule)
-            doc.Save(outputPath);
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Image stamp with alternative text saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with image stamp saved to '{outputPdfPath}'.");
     }
 }
