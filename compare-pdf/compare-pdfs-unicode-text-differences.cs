@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Comparison;
 
@@ -10,7 +10,7 @@ class Program
     {
         const string pdfPath1 = "doc_en.pdf";
         const string pdfPath2 = "doc_ru.pdf";
-        const string resultPath = "comparison_result.pdf";
+        const string resultPdfPath = "comparison_result.pdf";
 
         if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
         {
@@ -18,31 +18,24 @@ class Program
             return;
         }
 
-        // Load the two PDF documents inside using blocks for deterministic disposal.
+        // Load the two PDF documents
         using (Document doc1 = new Document(pdfPath1))
         using (Document doc2 = new Document(pdfPath2))
         {
-            // Configure comparison options.
-            ComparisonOptions options = new ComparisonOptions
-            {
-                // Compare the whole page content; no extraction area is set.
-                ExtractionArea = null
-                // Default ComparisonMode (Normal) correctly handles Unicode characters.
-            };
+            // Configure comparison options (default settings are sufficient for Unicode detection)
+            ComparisonOptions options = new ComparisonOptions();
 
-            // Perform a flat (whole‑document) text comparison.
-            // The overload with a result path also creates a PDF visualizing the differences.
-            List<DiffOperation> diffs = TextPdfComparer.CompareFlatDocuments(doc1, doc2, options, resultPath);
+            // Perform a flat text comparison and save a visual diff PDF
+            List<DiffOperation> diffs = TextPdfComparer.CompareFlatDocuments(doc1, doc2, options, resultPdfPath);
 
-            // Report the detected differences.
-            Console.WriteLine($"Unicode text differences detected: {diffs.Count}");
+            // Output the detected differences
+            Console.WriteLine($"Detected {diffs.Count} text differences:");
             foreach (DiffOperation diff in diffs)
             {
-                // DiffOperation typically provides the type of edit and the affected text.
-                Console.WriteLine($"{diff.Operation}: \"{diff.Text}\"");
+                Console.WriteLine(diff);
             }
-
-            Console.WriteLine($"Comparison result PDF saved to '{resultPath}'.");
         }
+
+        Console.WriteLine($"Comparison result saved to '{resultPdfPath}'.");
     }
 }

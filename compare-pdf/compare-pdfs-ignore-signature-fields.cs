@@ -2,66 +2,83 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Comparison;
 using Aspose.Pdf.Forms;
 
-class PdfSignatureComparison
+class PdfSignatureAwareComparer
 {
     static void Main()
     {
-        // Input PDF files that contain digital signatures
-        const string pdfPath1 = "signed1.pdf";
-        const string pdfPath2 = "signed2.pdf";
+        const string firstPdfPath  = "document1.pdf";
+        const string secondPdfPath = "document2.pdf";
+        const string resultPdfPath = "comparison_result.pdf";
 
-        // Path where the comparison result PDF will be saved
-        const string resultPath = "comparison_result.pdf";
-
-        // Verify that input files exist
-        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
+        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
         {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
+            Console.Error.WriteLine("One or both input files are missing.");
             return;
         }
 
-        // Load the two documents inside using blocks for deterministic disposal
-        using (Document doc1 = new Document(pdfPath1))
-        using (Document doc2 = new Document(pdfPath2))
+        // Load both documents inside using blocks for deterministic disposal
+        using (Document doc1 = new Document(firstPdfPath))
+        using (Document doc2 = new Document(secondPdfPath))
         {
-            // Prepare comparison options
-            ComparisonOptions options = new ComparisonOptions();
+            // OPTIONAL: verify digital signatures are not compromised
+            VerifySignatures(doc1, "Document 1");
+            VerifySignatures(doc2, "Document 2");
 
-            // Collect signature field rectangles from the first document
-            options.ExcludeAreas1 = GetSignatureRectangles(doc1).ToArray();
+            // Gather signature field rectangles from each document
+            List<Aspose.Pdf.Rectangle> sigAreas1 = GetSignatureFieldRectangles(doc1);
+            List<Aspose.Pdf.Rectangle> sigAreas2 = GetSignatureFieldRectangles(doc2);
 
-            // Collect signature field rectangles from the second document
-            options.ExcludeAreas2 = GetSignatureRectangles(doc2).ToArray();
+            // Configure comparison options to exclude those areas
+            ComparisonOptions options = new ComparisonOptions
+            {
+                ExcludeAreas1 = sigAreas1.ToArray(),
+                ExcludeAreas2 = sigAreas2.ToArray()
+            };
 
-            // Perform the comparison, treating signature fields as unchanged regions
-            // The result PDF will be written to 'resultPath'
-            TextPdfComparer.CompareDocumentsPageByPage(doc1, doc2, options, resultPath);
+            // Perform page‑by‑page text comparison, saving the visual diff PDF
+            TextPdfComparer.CompareDocumentsPageByPage(doc1, doc2, options, resultPdfPath);
 
-            Console.WriteLine($"Comparison completed. Result saved to '{resultPath}'.");
+            Console.WriteLine($"Comparison completed. Result saved to '{resultPdfPath}'.");
         }
     }
 
-    /// <summary>
-    /// Retrieves the rectangles of all signature fields present in a PDF document.
-    /// </summary>
-    /// <param name="doc">The PDF document to inspect.</param>
-    /// <returns>A list of Rectangle objects representing the signature field locations.</returns>
-    private static List<Rectangle> GetSignatureRectangles(Document doc)
+    // Extracts the rectangles of all signature fields in a document
+    private static List<Aspose.Pdf.Rectangle> GetSignatureFieldRectangles(Document doc)
     {
-        var rects = new List<Rectangle>();
-        if (doc?.Form?.Fields == null)
-            return rects;
+        var rects = new List<Aspose.Pdf.Rectangle>();
 
-        foreach (var field in doc.Form.Fields)
+        foreach (Page page in doc.Pages)
         {
-            if (field is SignatureField sigField && sigField.Rect != null)
+            // Signature fields appear in the page's Annotations collection
+            foreach (Annotation ann in page.Annotations)
             {
-                rects.Add(sigField.Rect);
+                if (ann is SignatureField sigField)
+                {
+                    // Use the Rect property (Aspose.Pdf.Rectangle) directly
+                    rects.Add(sigField.Rect);
+                }
             }
         }
+
         return rects;
+    }
+
+    // Checks for compromised signatures and reports the result
+    private static void VerifySignatures(Document doc, string docName)
+    {
+        SignaturesCompromiseDetector detector = new SignaturesCompromiseDetector(doc);
+        if (detector.Check(out var result))
+        {
+            Console.WriteLine($"{docName}: No compromised signatures detected.");
+        }
+        else
+        {
+            Console.WriteLine($"{docName}: Compromised signatures detected!");
+            // Additional handling could be added here (e.g., logging details)
+        }
     }
 }
