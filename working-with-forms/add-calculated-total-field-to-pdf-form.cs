@@ -3,76 +3,61 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "InvoiceWithTotal.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Define rectangles for the fields (left, bottom, width, height)
-            // Quantity field
-            Rectangle qtyRect = new Rectangle(100, 700, 150, 20);
-            // Unit Price field
-            Rectangle priceRect = new Rectangle(300, 700, 150, 20);
-            // Total Price field (calculated)
-            Rectangle totalRect = new Rectangle(500, 700, 150, 20);
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            Form form = doc.Form;
 
-            // Create Quantity field (NumberField)
-            NumberField qtyField = new NumberField(page, qtyRect)
-            {
-                PartialName = "Quantity",
-                Value = "0"
-            };
-            // Create Unit Price field (NumberField)
-            NumberField priceField = new NumberField(page, priceRect)
-            {
-                PartialName = "UnitPrice",
-                Value = "0"
-            };
-            // Create Total field (NumberField) – this will be calculated
-            NumberField totalField = new NumberField(page, totalRect)
-            {
-                PartialName = "Total",
-                ReadOnly = true // user should not edit directly
-            };
+            // Create first numeric field
+            NumberField field1 = new NumberField(doc, new Aspose.Pdf.Rectangle(100, 700, 200, 720));
+            field1.PartialName = "Field1";
+            field1.Value = "0";
+            form.Add(field1);
 
-            // Add fields to the form (page numbers are 1‑based)
-            doc.Form.Add(qtyField, 1);
-            doc.Form.Add(priceField, 1);
-            doc.Form.Add(totalField, 1);
+            // Create second numeric field
+            NumberField field2 = new NumberField(doc, new Aspose.Pdf.Rectangle(100, 650, 200, 670));
+            field2.PartialName = "Field2";
+            field2.Value = "0";
+            form.Add(field2);
 
-            // Ensure the form recalculates automatically when any field changes
-            doc.Form.AutoRecalculate = true;
+            // Create third numeric field
+            NumberField field3 = new NumberField(doc, new Aspose.Pdf.Rectangle(100, 600, 200, 620));
+            field3.PartialName = "Field3";
+            field3.Value = "0";
+            form.Add(field3);
 
-            // JavaScript to calculate Total = Quantity * UnitPrice
-            string js = @"
-                var qty = this.getField('Quantity').value;
-                var price = this.getField('UnitPrice').value;
-                // Convert to numbers to avoid string concatenation
-                qty = parseFloat(qty);
-                price = parseFloat(price);
-                if (!isNaN(qty) && !isNaN(price)) {
-                    this.getField('Total').value = (qty * price).toFixed(2);
-                } else {
-                    this.getField('Total').value = '';
-                }
-            ";
+            // Create total field that sums the three numeric fields
+            NumberField totalField = new NumberField(doc, new Aspose.Pdf.Rectangle(100, 550, 200, 570));
+            totalField.PartialName = "Total";
+            totalField.ReadOnly = true; // make the total field read‑only
 
-            // Assign the calculation script to the Total field
+            // JavaScript to calculate the running total
+            string js = "event.value = " +
+                        "parseFloat(this.getField('Field1').value || 0) + " +
+                        "parseFloat(this.getField('Field2').value || 0) + " +
+                        "parseFloat(this.getField('Field3').value || 0);";
+
             totalField.Actions.OnCalculate = new JavascriptAction(js);
+            form.Add(totalField);
 
-            // Save the PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with calculated Total field saved to '{outputPath}'.");
+        Console.WriteLine($"Calculated field added and saved to '{outputPath}'.");
     }
 }

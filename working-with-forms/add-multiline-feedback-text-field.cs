@@ -7,31 +7,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        // Output PDF file path
+        const string outputPath = "FeedbackForm.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a blank page to the document
+            Aspose.Pdf.Page page = doc.Pages.Add();
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Define the position and size of the text field (lower‑left‑x, lower‑left‑y, upper‑right‑x, upper‑right‑y)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 600);
+            // Define the rectangle where the text field will appear
+            // (llx, lly) = lower‑left corner, (urx, ury) = upper‑right corner
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 400, 600);
 
-            // Create a multiline TextBoxField on the first page
-            TextBoxField feedbackField = new TextBoxField(doc.Pages[1], rect);
-            feedbackField.Name = "Feedback";   // field name
-            feedbackField.Multiline = true;    // allow multiple lines
-            feedbackField.MaxLen = 500;        // limit to 500 characters
+            // Create a multiline text box field named "Feedback"
+            Aspose.Pdf.Forms.TextBoxField feedbackField = new Aspose.Pdf.Forms.TextBoxField(page, fieldRect);
+            feedbackField.Name = "Feedback";          // field identifier
+            feedbackField.Multiline = true;           // allow multiple lines
+            feedbackField.MaxLen = 500;               // limit to 500 characters
 
-            // Add the field to the form
-            doc.Form.Add(feedbackField);
+            // Optional: set a visible border color (helps users see the field)
+            feedbackField.Color = Aspose.Pdf.Color.Black;
 
-            // Save the updated PDF
+            // Save the PDF with the new form field
             doc.Save(outputPath);
         }
 

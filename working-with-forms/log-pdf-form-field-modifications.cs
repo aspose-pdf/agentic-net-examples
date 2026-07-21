@@ -9,7 +9,7 @@ class Program
     {
         const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
-        const string logFile = "form_modifications.log";
+        const string logPath = "field_modifications.log";
 
         if (!File.Exists(inputPdf))
         {
@@ -17,65 +17,49 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Open the log file for appending audit entries
+        using (StreamWriter logWriter = new StreamWriter(logPath, append: true))
         {
-            Form form = doc.Form;
-
-            // Open the log file (append mode) and record each change
-            using (StreamWriter log = new StreamWriter(logFile, append: true))
+            // Load the PDF document (lifecycle rule: use using for disposal)
+            using (Document doc = new Document(inputPdf))
             {
-                // 1. Modify the value of an existing field
-                const string existingFieldName = "CustomerName";
-                if (form.HasField(existingFieldName))
+                // Access the form object
+                Form form = doc.Form;
+
+                // Iterate over all fields in the form
+                foreach (Field field in form)
                 {
-                    // The Form indexer returns a WidgetAnnotation; cast to Field
-                    Field? field = form[existingFieldName] as Field;
-                    if (field != null)
+                    // Record the original value of the field
+                    string originalValue = field.Value?.ToString() ?? string.Empty;
+                    logWriter.WriteLine($"{DateTime.UtcNow:u} - Field '{field.FullName}' original value: '{originalValue}'");
+
+                    // Example modification for a text box field
+                    if (field is TextBoxField textBox)
                     {
-                        string oldValue = field.Value?.ToString() ?? string.Empty;
-                        string newValue = "John Doe";
-                        field.Value = newValue;
-                        log.WriteLine($"{DateTime.UtcNow:u} Set Value - Field: {existingFieldName}, Old: '{oldValue}', New: '{newValue}'");
+                        string newValue = "Updated";
+                        textBox.Value = newValue; // modify the field
+
+                        // Log the modification
+                        logWriter.WriteLine($"{DateTime.UtcNow:u} - Field '{field.FullName}' new value: '{newValue}'");
                     }
-                }
-
-                // 2. Add a new text box field to page 1
-                TextBoxField newField = new TextBoxField(doc)
-                {
-                    PartialName = "NewComment",
-                    Rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550),
-                    Value = "Initial comment"
-                };
-                form.Add(newField, 1); // page numbers are 1‑based
-                log.WriteLine($"{DateTime.UtcNow:u} Add Field - Name: {newField.PartialName}, Page: 1, Rect: {newField.Rect}");
-
-                // 3. Delete an existing field
-                const string fieldToDelete = "ObsoleteField";
-                if (form.HasField(fieldToDelete))
-                {
-                    form.Delete(fieldToDelete);
-                    log.WriteLine($"{DateTime.UtcNow:u} Delete Field - Name: {fieldToDelete}");
-                }
-
-                // 4. Change the ReadOnly flag of a field
-                const string roFieldName = "Agreement";
-                if (form.HasField(roFieldName))
-                {
-                    Field? roField = form[roFieldName] as Field;
-                    if (roField != null)
+                    // Example modification for a check box field
+                    else if (field is CheckboxField checkBox)
                     {
-                        bool oldFlag = roField.ReadOnly;
-                        roField.ReadOnly = false;
-                        log.WriteLine($"{DateTime.UtcNow:u} Set ReadOnly - Field: {roFieldName}, Old: {oldFlag}, New: false");
+                        bool newState = !checkBox.Checked; // toggle the state
+                        checkBox.Checked = newState;       // modify the field
+
+                        // Log the modification
+                        logWriter.WriteLine($"{DateTime.UtcNow:u} - Field '{field.FullName}' checked set to: {newState}");
                     }
+                    // Additional field types can be handled here
                 }
+
+                // Save the modified PDF (lifecycle rule: save inside using)
+                doc.Save(outputPdf);
+                logWriter.WriteLine($"{DateTime.UtcNow:u} - Document saved to '{outputPdf}'");
             }
-
-            // Save the modified PDF
-            doc.Save(outputPdf);
         }
 
-        Console.WriteLine("Form modifications have been logged and the PDF saved.");
+        Console.WriteLine("Form field modifications have been logged.");
     }
 }

@@ -8,53 +8,66 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";          // PDF with a signature field
-        const string xmlPath = "signatureData.xml";  // XML containing signature data (XFA)
-        const string pfxPath = "certificate.pfx";    // PFX file with signing certificate
-        const string pfxPassword = "password";       // Password for the PFX file
-        const string outputPath = "signed_output.pdf"; // Resulting signed PDF
+        const string pdfPath = "input.pdf";          // PDF containing a signature field
+        const string xmlPath = "signatureData.xml"; // XML with digital signature data (XFA)
+        const string pfxPath = "certificate.pfx";   // Certificate used for signing
+        const string pfxPassword = "pfxPassword";   // Password for the PFX file
+        const string outputPdf = "signed_output.pdf";
 
-        // Verify required files exist
-        if (!File.Exists(pdfPath) || !File.Exists(xmlPath) || !File.Exists(pfxPath))
+        // Verify that required files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine("One or more required files are missing.");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
+        }
+        if (!File.Exists(xmlPath))
+        {
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
+            return;
+        }
+        if (!File.Exists(pfxPath))
+        {
+            Console.Error.WriteLine($"PFX not found: {pfxPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document (lifecycle: create → load → save)
         using (Document doc = new Document(pdfPath))
         {
-            // Load the XML that holds the digital signature data (XFA)
+            // Load the XML containing the signature data
             XmlDocument xfaXml = new XmlDocument();
             xfaXml.Load(xmlPath);
 
-            // Assign the XFA data to the PDF form
+            // Assign the XFA data to the PDF form.
+            // This imports the digital signature information stored in the XML.
             doc.Form.AssignXfa(xfaXml);
 
-            // Locate the signature field by its full name and cast to the proper type
-            Field? field = doc.Form["Signature1"] as Field;
-            if (field is SignatureField signatureField)
-            {
-                // Use a concrete implementation of the abstract Signature class
-                PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword)
-                {
-                    Reason = "Document approved",
-                    Location = "Office",
-                    ContactInfo = "contact@example.com"
-                };
+            // Locate the signature field by its full name.
+            const string signatureFieldName = "Signature1";
 
-                // Apply the signature to the field
-                signatureField.Sign(pkcs7);
-            }
-            else
+            // Retrieve the field; if it does not exist or is not a SignatureField, handle the error.
+            var sigField = doc.Form[signatureFieldName] as SignatureField;
+            if (sigField == null)
             {
-                Console.Error.WriteLine("Signature field 'Signature1' not found in the document.");
+                Console.Error.WriteLine($"Signature field '{signatureFieldName}' not found or is not a signature field.");
+                return;
             }
 
-            // Save the signed PDF (lifecycle rule: save inside using block)
-            doc.Save(outputPath);
+            // Use a concrete PKCS7 signature object (Signature is abstract).
+            PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword)
+            {
+                Reason = "Document signed",
+                Location = "Office",
+                ContactInfo = "contact@example.com"
+            };
+
+            // Apply the signature to the field.
+            sigField.Sign(pkcs7);
+
+            // Save the signed PDF.
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
     }
 }

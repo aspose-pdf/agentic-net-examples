@@ -16,18 +16,21 @@ class Program
             return;
         }
 
-        // Load the existing PDF inside a using block for deterministic disposal
+        // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
-            // Define the position and size of the checkbox (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+            // Ensure there is at least one page to place the checkbox
+            Page page = doc.Pages[1];
+
+            // Define the position and size of the checkbox (llx, lly, urx, ury)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
 
-            // Create a new checkbox field on the document
-            CheckboxField checkbox = new CheckboxField(doc, rect);
-            checkbox.Name = "AgreeTerms";   // Set the field name
-            checkbox.Checked = false;       // Default state (unchecked)
+            // Create the checkbox field on the specified page
+            CheckboxField checkbox = new CheckboxField(page, rect);
+            checkbox.Name = "AgreeTerms";                     // field name
+            checkbox.AlternateName = "Agree to terms";        // tooltip / alternate name
 
-            // Add the field to the form
+            // Add the checkbox to the document's form
             doc.Form.Add(checkbox);
 
             // Save the modified PDF

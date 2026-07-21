@@ -7,51 +7,29 @@ class Program
 {
     static void Main()
     {
-        // Input PDF containing form fields
-        const string inputPdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputJson = "form_schema.json";
 
-        // Output JSON file that will contain the form schema
-        const string outputJsonPath = "form_schema.json";
-
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Prepare export options (optional – here we request indented JSON for readability)
+            // Configure JSON export options (optional)
             ExportFieldsToJsonOptions jsonOptions = new ExportFieldsToJsonOptions
             {
-                WriteIndented = true
+                WriteIndented = true,          // Produce readable, indented JSON
+                ExportPasswordValue = false    // Do not include password values in the output
             };
 
-            // Export the form fields to JSON using a file stream (lifecycle rule: use using for the stream)
-            using (FileStream jsonStream = new FileStream(outputJsonPath, FileMode.Create, FileAccess.Write))
-            {
-                // Export all form fields; the method returns serialization results which can be inspected if needed
-                IEnumerable<FieldSerializationResult> results = pdfDoc.Form.ExportToJson(jsonStream, jsonOptions);
-
-                // Optionally, iterate over results to report any warnings or errors
-                foreach (var result in results)
-                {
-                    if (result.FieldSerializationStatus != FieldSerializationStatus.Success)
-                    {
-                        Console.WriteLine($"Field '{result.FieldFullName}' serialization status: {result.FieldSerializationStatus}");
-                        foreach (string warning in result.WarningMessages)
-                            Console.WriteLine($"  Warning: {warning}");
-                        foreach (string error in result.ErrorMessages)
-                            Console.WriteLine($"  Error: {error}");
-                    }
-                }
-            }
-
-            // No additional Save() call is required because ExportToJson writes directly to the provided stream
+            // Export all form field definitions to a JSON file
+            doc.Form.ExportToJson(outputJson, jsonOptions);
         }
 
-        Console.WriteLine($"Form schema exported to '{outputJsonPath}'.");
+        Console.WriteLine($"Form definitions exported to '{outputJson}'.");
     }
 }

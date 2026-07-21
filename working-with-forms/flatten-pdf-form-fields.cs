@@ -6,29 +6,28 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "flattened.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "plain_output.pdf";
 
-        // Verify the source PDF exists.
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal.
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Flatten all form fields: their values become static content on the pages.
+                // Remove all form fields and keep their visual values
                 doc.Flatten();
 
-                // Save the resulting PDF.
+                // Save the resulting non‑interactive PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Plain PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "MyTextField"; // name of the form field to remove
+        const string fieldName  = "MyTextField"; // name of the field to remove
 
         if (!File.Exists(inputPath))
         {
@@ -17,18 +17,17 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the field reference by name – the Form indexer returns a WidgetAnnotation,
-            // so we need to cast it to Aspose.Pdf.Forms.Field (or use the 'as' operator).
-            Field field = doc.Form[fieldName] as Field;
+            // The Form indexer returns a WidgetAnnotation.  Use it only to test existence
+            // and then delete the field by name (or cast to Field if you need field‑specific members).
+            var annotation = doc.Form[fieldName];
 
-            if (field != null)
+            if (annotation != null)
             {
-                // Remove the field from the form. The Form class provides a Delete method that
-                // accepts a Field instance.
-                doc.Form.Delete(field);
+                // Remove the field from the form using its name
+                doc.Form.Delete(fieldName);
                 Console.WriteLine($"Field '{fieldName}' removed.");
             }
             else

@@ -1,56 +1,62 @@
 using System;
 using System.IO;
 using System.Xml;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core PDF API – XmlSaveOptions is now in this namespace
 
-class ExportFormDataToXml
+class ExportFormData
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";          // source PDF with form fields
-        const string tempXmlPath = "temp_form_data.xml"; // intermediate XML file
-        const string outputXmlPath = "form_data_custom.xml"; // final XML with custom root
-        const string customRootName = "ExternalSystemFormData"; // required root element name
+        const string inputPdfPath = "input.pdf";          // source PDF containing form fields
+        const string outputXmlPath = "formdata.xml";      // target XML file
+        const string customRoot = "ExternalSystemForm"; // required root element name
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Export the form data (including XFA if present) to XML.
-            // Non‑PDF format requires explicit SaveOptions (rule: save-to-non-pdf-always-use-save-options).
-            XmlSaveOptions xmlOptions = new XmlSaveOptions();
-            pdfDoc.Save(tempXmlPath, xmlOptions);
+            // Export the PDF structure (including form data) to XML in memory
+            XmlSaveOptions xmlOpts = new XmlSaveOptions(); // default options, now in Aspose.Pdf namespace
+            using (MemoryStream xmlStream = new MemoryStream())
+            {
+                pdfDoc.Save(xmlStream, xmlOpts);   // write XML to the stream
+                xmlStream.Position = 0;            // reset for reading
+
+                // Load the generated XML into an XmlDocument for manipulation
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(xmlStream);
+
+                // Rename the root element to match the external system's requirement
+                XmlElement oldRoot = xmlDoc.DocumentElement;
+                XmlElement newRoot = xmlDoc.CreateElement(customRoot);
+
+                // Preserve any attributes from the original root
+                if (oldRoot.HasAttributes)
+                {
+                    foreach (XmlAttribute attr in oldRoot.Attributes)
+                        newRoot.Attributes.Append((XmlAttribute)attr.CloneNode(true));
+                }
+
+                // Move all child nodes from the old root to the new root
+                while (oldRoot.HasChildNodes)
+                {
+                    XmlNode child = oldRoot.FirstChild;
+                    oldRoot.RemoveChild(child);
+                    newRoot.AppendChild(child);
+                }
+
+                // Replace the old root with the new one in the document
+                xmlDoc.ReplaceChild(newRoot, oldRoot);
+
+                // Save the modified XML to the desired file
+                xmlDoc.Save(outputXmlPath);
+                Console.WriteLine($"Form data exported to XML with root '{customRoot}' at '{outputXmlPath}'.");
+            }
         }
-
-        // Load the generated XML, rename the root element, and save to the final location.
-        XmlDocument xmlDoc = new XmlDocument();
-        xmlDoc.Load(tempXmlPath);
-
-        // Preserve the original root's child nodes.
-        XmlNode oldRoot = xmlDoc.DocumentElement;
-        XmlElement newRoot = xmlDoc.CreateElement(customRootName);
-
-        // Import all child nodes from the old root into the new root.
-        foreach (XmlNode child in oldRoot.ChildNodes)
-        {
-            XmlNode imported = xmlDoc.ImportNode(child, true);
-            newRoot.AppendChild(imported);
-        }
-
-        // Replace the old root with the new custom root.
-        xmlDoc.ReplaceChild(newRoot, oldRoot);
-
-        // Save the transformed XML to the desired output file.
-        xmlDoc.Save(outputXmlPath);
-
-        // Clean up the temporary file.
-        try { File.Delete(tempXmlPath); } catch { /* ignore cleanup errors */ }
-
-        Console.WriteLine($"Form data exported to XML with custom root '{customRootName}': {outputXmlPath}");
     }
 }

@@ -1,39 +1,47 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
-using Aspose.Pdf.Text;          // Required for text handling if needed
+using System.Xml;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Paths for input PDF and output XML file
-        const string inputPdfPath  = "input.pdf";
-        const string outputXmlPath = "formData.xml";
+        const string pdfPath = "input.pdf";
+        const string xmlOutputPath = "formdata.xml";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found at '{inputPdfPath}'.");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(pdfPath))
         {
-            // Load the PDF document (core API, no Facades)
-            using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(inputPdfPath))
-            {
-                // The core Document API provides a SaveXml method that writes the
-                // complete PDF model (including form fields) to an XML file.
-                // This can be used for offline collection of form data.
-                pdfDoc.SaveXml(outputXmlPath);
+            // Create an XML document to hold the field data
+            XmlDocument xmlDoc = new XmlDocument();
+            XmlElement root = xmlDoc.CreateElement("FormData");
+            xmlDoc.AppendChild(root);
 
-                Console.WriteLine($"Form data exported to XML: '{outputXmlPath}'.");
+            // Iterate over all form fields using the Fields collection
+            foreach (Field field in doc.Form.Fields)
+            {
+                // Field name (partial name) and its current value
+                string fieldName = field.PartialName;
+                string fieldValue = field.Value?.ToString() ?? string.Empty;
+
+                XmlElement fieldElement = xmlDoc.CreateElement("Field");
+                fieldElement.SetAttribute("name", fieldName);
+                fieldElement.InnerText = fieldValue;
+                root.AppendChild(fieldElement);
             }
+
+            // Save the XML document to the specified path
+            xmlDoc.Save(xmlOutputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Exception: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form data successfully saved to '{xmlOutputPath}'.");
     }
 }

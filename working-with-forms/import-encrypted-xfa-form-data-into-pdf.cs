@@ -4,109 +4,96 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
-    // Example symmetric key and IV for AES decryption (must match the encryption used)
-    // AES-256 requires a 32‑byte key; IV is 16 bytes.
-    private static readonly byte[] _key = Encoding.UTF8.GetBytes("0123456789ABCDEF0123456789ABCDEF");
-    private static readonly byte[] _iv  = Encoding.UTF8.GetBytes("ABCDEF0123456789");
-
     static void Main()
     {
-        // Paths for the PDF, the encrypted XML containing form data, and the output PDF
-        const string pdfPath = "form.pdf";
+        // -----------------------------------------------------------------
+        // Prepare sample files (input PDF and encrypted XML) for the sandbox
+        // -----------------------------------------------------------------
+        const string pdfPath = "input.pdf";
         const string encryptedXmlPath = "data.xml.enc";
-        const string outputPdfPath = "form_filled.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        // ------------------------------------------------------------
-        // Ensure an encrypted XML file exists – create a sample one if missing.
-        // ------------------------------------------------------------
-        if (!File.Exists(encryptedXmlPath))
+        // Sample AES key (32 bytes) and IV (16 bytes). In a real scenario replace
+        // these with your actual key/IV values.
+        byte[] aesKey = Encoding.UTF8.GetBytes("0123456789ABCDEF0123456789ABCDEF"); // 32 bytes
+        byte[] aesIv  = Encoding.UTF8.GetBytes("0123456789ABCDEF");               // 16 bytes
+
+        // -----------------------------------------------------------------
+        // 1. Create a minimal PDF that contains a form (required for XFA import)
+        // -----------------------------------------------------------------
+        using (Document seedPdf = new Document())
         {
-            CreateSampleEncryptedXml(encryptedXmlPath);
-            Console.WriteLine($"Sample encrypted XML created at '{encryptedXmlPath}'.");
+            // Add a page so the document is not empty
+            seedPdf.Pages.Add();
+
+            // Add a simple text box field – the presence of a form is enough
+            // Correct constructor: TextBoxField(Page, Rectangle)
+            TextBoxField txt = new TextBoxField(seedPdf.Pages[1], new Rectangle(100, 600, 300, 650))
+            {
+                PartialName = "SampleField",
+                Value = ""
+            };
+            seedPdf.Form.Add(txt);
+
+            seedPdf.Save(pdfPath);
         }
 
-        // ------------------------------------------------------------
-        // Decrypt the XML file into an XmlDocument
-        // ------------------------------------------------------------
-        XmlDocument xmlDoc = new XmlDocument();
-        try
+        // -----------------------------------------------------------------
+        // 2. Create a tiny XFA XML document and encrypt it to "data.xml.enc"
+        // -----------------------------------------------------------------
+        string xfaXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                        "<xfa:datasets xmlns:xfa=\"http://www.xfa.org/schema/xfa-data/1.0/\"></xfa:datasets>";
+        byte[] plainBytes = Encoding.UTF8.GetBytes(xfaXml);
+
+        using (Aes aes = Aes.Create())
         {
-            using (FileStream encryptedStream = File.OpenRead(encryptedXmlPath))
+            aes.Key = aesKey;
+            aes.IV = aesIv;
+            aes.Padding = PaddingMode.PKCS7;
+            aes.Mode = CipherMode.CBC;
+
+            using (FileStream encStream = new FileStream(encryptedXmlPath, FileMode.Create, FileAccess.Write))
+            using (CryptoStream cryptoStream = new CryptoStream(encStream, aes.CreateEncryptor(), CryptoStreamMode.Write))
+            {
+                cryptoStream.Write(plainBytes, 0, plainBytes.Length);
+                cryptoStream.FlushFinalBlock();
+            }
+        }
+
+        // -----------------------------------------------------------------
+        // 3. Decrypt the XML file back into an XmlDocument
+        // -----------------------------------------------------------------
+        XmlDocument xmlDoc = new XmlDocument();
+        using (FileStream encryptedStream = File.OpenRead(encryptedXmlPath))
+        using (Aes aes = Aes.Create())
+        {
+            aes.Key = aesKey;
+            aes.IV = aesIv;
+            aes.Padding = PaddingMode.PKCS7;
+            aes.Mode = CipherMode.CBC;
+
+            using (CryptoStream cryptoStream = new CryptoStream(encryptedStream, aes.CreateDecryptor(), CryptoStreamMode.Read))
             using (MemoryStream decryptedStream = new MemoryStream())
             {
-                using (Aes aes = Aes.Create())
-                {
-                    aes.Key = _key;
-                    aes.IV  = _iv;
-
-                    using (CryptoStream crypto = new CryptoStream(encryptedStream, aes.CreateDecryptor(), CryptoStreamMode.Read))
-                    {
-                        crypto.CopyTo(decryptedStream);
-                    }
-                }
+                cryptoStream.CopyTo(decryptedStream);
                 decryptedStream.Position = 0;
                 xmlDoc.Load(decryptedStream);
             }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error during XML decryption/loading: {ex.Message}");
-            return;
-        }
 
-        // ------------------------------------------------------------
-        // Load the target PDF (create a blank one if it does not exist)
-        // ------------------------------------------------------------
-        Document pdfDoc;
-        if (File.Exists(pdfPath))
-        {
-            pdfDoc = new Document(pdfPath);
-        }
-        else
-        {
-            pdfDoc = new Document();
-            pdfDoc.Pages.Add(); // add a blank page so the document is not empty
-            Console.WriteLine($"PDF '{pdfPath}' not found – a new blank PDF will be used.");
-        }
-
-        // Assign the decrypted XFA data to the PDF form (if the PDF actually contains a form)
-        try
+        // -----------------------------------------------------------------
+        // 4. Load the PDF and assign the decrypted XFA data
+        // -----------------------------------------------------------------
+        using (Document pdfDoc = new Document(pdfPath))
         {
             pdfDoc.Form.AssignXfa(xmlDoc);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"AssignXfa failed: {ex.Message}");
-            // Continue – the PDF may not have an XFA form.
+            pdfDoc.Save(outputPdfPath);
         }
 
-        // Save the result
-        pdfDoc.Save(outputPdfPath);
-        Console.WriteLine($"Form data imported and PDF saved to '{outputPdfPath}'.");
-    }
-
-    /// <summary>
-    /// Creates a tiny XML document, encrypts it with AES‑256 using the predefined key/IV,
-    /// and writes the ciphertext to the specified file path.
-    /// </summary>
-    private static void CreateSampleEncryptedXml(string outputPath)
-    {
-        // Simple XML that mimics XFA form data
-        string sampleXml = "<?xml version='1.0' encoding='UTF-8'?><xfa:datasets xmlns:xfa='http://www.xfa.org/schema/xfa-data/1.0/'><xfa:data><field1>Value1</field1><field2>Value2</field2></xfa:data></xfa:datasets>";
-        byte[] plainBytes = Encoding.UTF8.GetBytes(sampleXml);
-
-        using (Aes aes = Aes.Create())
-        {
-            aes.Key = _key;
-            aes.IV  = _iv;
-            using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-            using (CryptoStream crypto = new CryptoStream(outStream, aes.CreateEncryptor(), CryptoStreamMode.Write))
-            {
-                crypto.Write(plainBytes, 0, plainBytes.Length);
-            }
-        }
+        Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
     }
 }

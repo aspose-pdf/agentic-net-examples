@@ -20,48 +20,37 @@ class Program
         using (Document doc = new Document(inputPdfPath))
         {
             // Open a CSV writer
-            using (StreamWriter writer = new StreamWriter(outputCsvPath, false))
+            using (StreamWriter writer = new StreamWriter(outputCsvPath, false, System.Text.Encoding.UTF8))
             {
                 // Write CSV header
-                writer.WriteLine("FullName,PartialName,Value,PageIndex,Rect");
+                writer.WriteLine("FieldName,Value");
 
                 // Iterate over all form fields
                 foreach (Field field in doc.Form.Fields)
                 {
-                    // Common field properties
-                    string fullName = field.FullName ?? string.Empty;
-                    string partialName = field.PartialName ?? string.Empty;
+                    string name = field.FullName ?? string.Empty;
                     string value = field.Value?.ToString() ?? string.Empty;
 
-                    // A Field itself is a WidgetAnnotation, so we can access visual properties directly
-                    int pageIndex = field.PageIndex; // 1‑based page index
-                    Aspose.Pdf.Rectangle rect = field.Rect;
-                    string rectStr = $"{rect.LLX},{rect.LLY},{rect.URX},{rect.URY}";
+                    // Escape values that may contain commas, quotes or newlines
+                    string escapedName = EscapeCsv(name);
+                    string escapedValue = EscapeCsv(value);
 
-                    // Escape commas and quotes for CSV compliance
-                    string escFullName = EscapeCsv(fullName);
-                    string escPartialName = EscapeCsv(partialName);
-                    string escValue = EscapeCsv(value);
-                    string escRect = EscapeCsv(rectStr);
-
-                    // Write CSV line for this field
-                    writer.WriteLine($"{escFullName},{escPartialName},{escValue},{pageIndex},{escRect}");
+                    writer.WriteLine($"{escapedName},{escapedValue}");
                 }
             }
-        }
 
-        Console.WriteLine($"Form fields exported to '{outputCsvPath}'.");
+            Console.WriteLine($"Form fields exported to '{outputCsvPath}'.");
+        }
     }
 
-    // Helper to escape CSV fields containing commas, quotes or new lines
-    static string EscapeCsv(string field)
+    // Helper to escape CSV fields according to RFC 4180
+    static string EscapeCsv(string text)
     {
-        if (field.Contains('"'))
-            field = field.Replace("\"", "\"\"");
-
-        if (field.Contains(',') || field.Contains('"') || field.Contains('\n'))
-            field = $"\"{field}\"";
-
-        return field;
+        if (text.Contains("\"") || text.Contains(",") || text.Contains("\n") || text.Contains("\r"))
+        {
+            text = text.Replace("\"", "\"\"");
+            return $"\"{text}\"";
+        }
+        return text;
     }
 }

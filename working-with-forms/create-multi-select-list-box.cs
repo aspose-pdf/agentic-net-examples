@@ -1,22 +1,21 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "listbox.pdf";
-
         // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Define the rectangle for the list box (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+            // Define the rectangle for the list box field
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
 
             // Create a ListBox field on the page
             ListBoxField listBox = new ListBoxField(page, rect);
@@ -25,21 +24,21 @@ class Program
             listBox.MultiSelect = true;
 
             // Add options to the list box
-            listBox.AddOption("Option A");
-            listBox.AddOption("Option B");
-            listBox.AddOption("Option C");
-            listBox.AddOption("Option D");
+            listBox.AddOption("Option 1");
+            listBox.AddOption("Option 2");
+            listBox.AddOption("Option 3");
+            listBox.AddOption("Option 4");
 
             // Select multiple items (indices are 1‑based)
-            listBox.SelectedItems = new int[] { 1, 3, 4 }; // selects "Option A", "Option C", "Option D"
+            listBox.SelectedItems = new int[] { 1, 3, 4 };
 
-            // Add the list box field to the document's form
+            // Add the field to the document's form
             doc.Form.Add(listBox);
 
-            // Save the PDF document
-            doc.Save(outputPath);
+            // Save the PDF
+            doc.Save("MultiSelectListBox.pdf");
         }
 
-        Console.WriteLine($"PDF with multiselect list box saved to '{outputPath}'.");
+        Console.WriteLine("PDF with multi‑select list box created.");
     }
 }

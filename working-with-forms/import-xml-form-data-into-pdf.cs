@@ -1,57 +1,68 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using System.Xml;
 
 class Program
 {
-    static void Main()
+    // Entry point
+    static async Task Main()
     {
-        const string pdfPath   = "input.pdf";   // source PDF with form fields
-        const string xmlPath   = "data.xml";    // XML file containing form data
-        const string outputPdf = "filled_output.pdf";
+        // Paths to the source PDF and the output PDF
+        const string sourcePdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        // Verify input files exist
-        if (!File.Exists(pdfPath))
+        // URL of the XML form data (replace with actual endpoint)
+        const string xmlDataUrl = "https://example.com/formdata.xml";
+
+        // Validate source PDF existence
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
-            return;
-        }
-        if (!File.Exists(xmlPath))
-        {
-            Console.Error.WriteLine($"XML not found: {xmlPath}");
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
             return;
         }
 
+        // Download the XML data from the network stream
+        XmlDocument xmlDoc = await DownloadXmlAsync(xmlDataUrl);
+        if (xmlDoc == null)
+        {
+            Console.Error.WriteLine("Failed to download or parse XML form data.");
+            return;
+        }
+
+        // Load the PDF document
+        using (Document pdfDoc = new Document(sourcePdfPath))
+        {
+            // Assign the XFA data to the form (core API, no Facades)
+            pdfDoc.Form.AssignXfa(xmlDoc);
+
+            // Save the updated PDF
+            pdfDoc.Save(outputPdfPath);
+        }
+
+        Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
+    }
+
+    // Helper method to download XML from a URL and load it into an XmlDocument
+    private static async Task<XmlDocument> DownloadXmlAsync(string url)
+    {
         try
         {
-            // Load the PDF document (lifecycle: load)
-            using (Document pdfDoc = new Document(pdfPath))
+            using (HttpClient client = new HttpClient())
+            using (Stream stream = await client.GetStreamAsync(url))
             {
-                // Load the XML data into an XmlDocument
-                XmlDocument xmlData = new XmlDocument();
-                xmlData.Load(xmlPath);
-
-                // If the PDF contains an XFA form, assign the XML data to it.
-                // This updates matching fields automatically.
-                if (pdfDoc.Form.HasXfa)
-                {
-                    pdfDoc.Form.AssignXfa(xmlData);
-                }
-                else
-                {
-                    Console.WriteLine("PDF does not contain an XFA form; no data imported.");
-                }
-
-                // Save the updated PDF (lifecycle: save)
-                pdfDoc.Save(outputPdf);
-                Console.WriteLine($"Form data imported and saved to '{outputPdf}'.");
+                XmlDocument doc = new XmlDocument();
+                doc.Load(stream);
+                return doc;
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error downloading XML: {ex.Message}");
+            return null;
         }
     }
 }

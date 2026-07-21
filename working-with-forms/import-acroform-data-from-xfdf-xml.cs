@@ -7,17 +7,16 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath   = "input.pdf";
-        const string xmlDataPath    = "updatedData.xml";
-        const string outputPdfPath  = "output.pdf";
+        const string pdfPath      = "input.pdf";          // source PDF with AcroForm
+        const string xmlDataPath  = "updatedData.xml";    // XFDF/XML containing form data
+        const string outputPath   = "output.pdf";         // PDF after data import
 
-        // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
+
         if (!File.Exists(xmlDataPath))
         {
             Console.Error.WriteLine($"XML data file not found: {xmlDataPath}");
@@ -27,23 +26,23 @@ class Program
         try
         {
             // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
+            using (Document doc = new Document(pdfPath))
             {
-                // Open the XFDF/XML stream containing form field values
+                // Open the XFDF/XML stream and import field values into the document
                 using (FileStream xmlStream = File.OpenRead(xmlDataPath))
                 {
-                    // Import field values from the XFDF (XML) into the PDF's AcroForm
-                    XfdfReader.ReadFields(xmlStream, pdfDoc);
+                    // Core API method that reads field values from an XFDF (XML) stream
+                    XfdfReader.ReadFields(xmlStream, doc);
                 }
 
                 // Save the updated PDF
-                pdfDoc.Save(outputPdfPath);
-                Console.WriteLine($"Form data imported successfully. Saved to '{outputPdfPath}'.");
+                doc.Save(outputPath);
+                Console.WriteLine($"Form data imported and saved to '{outputPath}'.");
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during import: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

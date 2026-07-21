@@ -2,14 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // needed for Border
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_signed.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed_form.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,28 +17,27 @@ class Program
             return;
         }
 
-        // Load the existing PDF document inside a using block for proper disposal
+        // Load the PDF inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle (llx, lly, urx, ury) where the signature field will appear
+            // Access the form object (creates one if it doesn't exist)
+            Form form = doc.Form;
+
+            // Define the rectangle where the signature field will appear
+            // (lower‑left‑x, lower‑left‑y, upper‑right‑x, upper‑right‑y)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
 
-            // Create a signature field on the document
-            SignatureField sigField = new SignatureField(doc, rect)
+            // Create a signature field on the document (first page by default)
+            SignatureField signatureField = new SignatureField(doc, rect)
             {
-                PartialName   = "Signature1",          // field name
-                AlternateName = "Sign Here",          // tooltip shown in Acrobat
-                // Optional: set a visible border color (border color is taken from the annotation itself)
-                Color = Aspose.Pdf.Color.Black
+                PartialName = "Signature1",      // field name used in scripts or later signing
+                AlternateName = "Sign Here"      // tooltip shown in PDF viewers
             };
 
-            // Border must be created with the parent annotation (the signature field) as a constructor argument
-            sigField.Border = new Border(sigField) { Width = 1 };
+            // Add the field to the form on page 1 (pages are 1‑based)
+            form.Add(signatureField, 1);
 
-            // Add the signature field to the form collection of the document
-            doc.Form.Add(sigField);
-
-            // Save the modified PDF with the new signature field
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

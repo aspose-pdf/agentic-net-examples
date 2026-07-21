@@ -1,62 +1,52 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "FormWithBarcode.pdf";
-
-        // Create a new PDF document and add a page
+        // Create a new PDF document
         using (Document doc = new Document())
         {
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Define rectangles for the fields (coordinates: llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rectField1 = new Aspose.Pdf.Rectangle(100, 700, 300, 720);
-            Aspose.Pdf.Rectangle rectField2 = new Aspose.Pdf.Rectangle(100, 650, 300, 670);
-            Aspose.Pdf.Rectangle rectBarcode = new Aspose.Pdf.Rectangle(100, 550, 300, 620);
+            // Define rectangles for the form fields (coordinates: llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rectFirstName = new Aspose.Pdf.Rectangle(50, 750, 250, 770);
+            Aspose.Pdf.Rectangle rectLastName  = new Aspose.Pdf.Rectangle(50, 720, 250, 740);
+            Aspose.Pdf.Rectangle rectBarcode   = new Aspose.Pdf.Rectangle(50, 650, 250, 690);
 
-            // Create first text box field
-            TextBoxField field1 = new TextBoxField(doc, rectField1)
-            {
-                Name = "FirstName",
-                PartialName = "FirstName",
-                Value = "John"
-            };
-            // Add the field to the form on page 1
-            doc.Form.Add(field1, 1);
+            // Create a text box field for First Name
+            TextBoxField firstNameField = new TextBoxField(page, rectFirstName);
+            firstNameField.PartialName = "FirstName";
+            firstNameField.Value = "John";               // default value (can be changed later)
+            doc.Form.Add(firstNameField);
 
-            // Create second text box field
-            TextBoxField field2 = new TextBoxField(doc, rectField2)
-            {
-                Name = "LastName",
-                PartialName = "LastName",
-                Value = "Doe"
-            };
-            doc.Form.Add(field2, 1);
+            // Create a text box field for Last Name
+            TextBoxField lastNameField = new TextBoxField(page, rectLastName);
+            lastNameField.PartialName = "LastName";
+            lastNameField.Value = "Doe";                 // default value (can be changed later)
+            doc.Form.Add(lastNameField);
 
-            // Create a barcode field
-            BarcodeField barcodeField = new BarcodeField(page, rectBarcode)
-            {
-                Name = "FullNameBarcode",
-                PartialName = "FullNameBarcode"
-            };
-            doc.Form.Add(barcodeField, 1);
+            // Create a barcode field that will hold the concatenated string
+            BarcodeField barcodeField = new BarcodeField(page, rectBarcode);
+            barcodeField.PartialName = "FullBarcode";
 
             // Concatenate the values of the two text fields
-            string concatenatedValue = $"{field1.Value}{field2.Value}";
+            string concatenatedValue = $"{firstNameField.Value}{lastNameField.Value}";
 
-            // Generate the barcode (Code128) from the concatenated string
+            // Generate the barcode (Code128 is the default symbology)
             barcodeField.AddBarcode(concatenatedValue);
 
-            // Save the PDF document
-            doc.Save(outputPath);
+            // Add the barcode field to the form
+            doc.Form.Add(barcodeField);
+
+            // Save the PDF with the form fields
+            doc.Save("FormWithBarcode.pdf");
         }
 
-        Console.WriteLine($"PDF form with barcode saved to '{outputPath}'.");
+        Console.WriteLine("PDF form with barcode field created successfully.");
     }
 }

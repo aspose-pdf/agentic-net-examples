@@ -2,16 +2,16 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // needed for WidgetAnnotation type
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input_form.pdf";   // existing PDF with a form field
-        const string outputPath = "output_form.pdf"; // PDF after duplication
+        const string inputPath  = "input.pdf";   // source PDF with a form
+        const string outputPath = "output.pdf";  // destination PDF
         const string sourceFieldName = "TextField1"; // name of the field to duplicate
-        const int duplicateCount = 5;                 // how many copies to create
+        const int copies = 5;                    // how many copies to create
+        const int pageNumber = 1;                // 1‑based page index where copies will be placed
 
         if (!File.Exists(inputPath))
         {
@@ -19,52 +19,43 @@ class Program
             return;
         }
 
-        // Load the PDF document (using block ensures proper disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the form object
-            Form form = doc.Form;
+            Form form = doc.Form; // access the form object
 
-            // Retrieve the field that will be duplicated – the Form indexer returns a WidgetAnnotation,
-            // so we must cast it to Aspose.Pdf.Forms.Field explicitly.
-            Field originalField = form[sourceFieldName] as Field;
-            if (originalField == null)
+            // Verify that the source field exists
+            if (!form.HasField(sourceFieldName))
             {
-                Console.Error.WriteLine($"Field '{sourceFieldName}' not found or is not a form field.");
+                Console.Error.WriteLine($"Field '{sourceFieldName}' not found in the document.");
                 return;
             }
 
-            // originalField.PageIndex is 1‑based (same as doc.Pages indexing)
-            int pageNumber = originalField.PageIndex;
+            // Retrieve the original field (cast to Field because the indexer returns WidgetAnnotation)
+            Field originalField = (Field)form[sourceFieldName];
 
-            for (int i = 1; i <= duplicateCount; i++)
+            // Duplicate the field multiple times
+            for (int i = 1; i <= copies; i++)
             {
-                // Create a new unique partial name for the copy
-                string newPartialName = $"{sourceFieldName}_{i}";
+                // New partial name for the duplicated field
+                string newPartialName = $"{sourceFieldName}_Copy{i}";
 
-                // Form.Add returns a WidgetAnnotation that represents the visual widget of the field.
-                // Cast it back to Field to work with field‑specific members.
-                WidgetAnnotation widget = form.Add(originalField, newPartialName, pageNumber);
-                Field copiedField = widget as Field;
-                if (copiedField == null)
-                {
-                    // If the cast fails, skip this iteration – this should not happen for standard fields.
-                    continue;
-                }
+                // Add creates a copy of the original field and places it on the specified page
+                Field newField = form.Add(originalField, newPartialName, pageNumber);
 
-                // Optionally adjust the position of each copy to avoid overlap.
-                // Here we shift each copy 20 points downwards.
-                copiedField.Rect = new Rectangle(
-                    originalField.Rect.LLX,
-                    originalField.Rect.LLY - i * 20,
-                    originalField.Rect.URX,
-                    originalField.Rect.URY - i * 20);
+                // Optionally offset the rectangle to avoid overlapping fields
+                // Shift each copy 20 points to the right
+                newField.Rect = new Aspose.Pdf.Rectangle(
+                    originalField.Rect.LLX + i * 20,
+                    originalField.Rect.LLY,
+                    originalField.Rect.URX + i * 20,
+                    originalField.Rect.URY);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (PDF format, no SaveOptions needed)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Duplicated field saved to '{outputPath}'.");
+        Console.WriteLine($"Duplicated fields saved to '{outputPath}'.");
     }
 }

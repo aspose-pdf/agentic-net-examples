@@ -2,64 +2,64 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string outputPdf = "SignedForm.pdf";
-        const string certPath  = "certificate.pfx";
-        const string certPassword = "password";
+        // Paths for the output PDF, the certificate (PFX) and its password
+        const string outputPdfPath = "signed_form.pdf";
+        const string pfxPath = "certificate.pfx";
+        const string pfxPassword = "pfxPassword";
 
         // Ensure the certificate file exists
-        if (!File.Exists(certPath))
+        if (!File.Exists(pfxPath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {certPath}");
+            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
             return;
         }
 
-        // Create a new PDF document
+        // Create a new PDF document (empty) and add a page
         using (Document doc = new Document())
         {
-            // Add a blank page (1‑based indexing)
+            // Add a blank page to host the signature field
             Page page = doc.Pages.Add();
 
-            // Define the rectangle for the signature field (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the rectangle for the signature field (left, bottom, right, top)
+            var sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
             // Create the signature field on the page
-            SignatureField sigField = new SignatureField(page, sigRect)
+            var sigField = new SignatureField(page, sigRect)
             {
-                // Optional: set a name and tooltip (alternate name)
-                Name = "Signature1",
-                AlternateName = "Please sign here"
+                Name = "Signature1",               // field name
+                AlternateName = "Sign Here",       // tooltip
+                Required = true,                    // make it required
+                ReadOnly = false                    // allow signing
             };
 
-            // Add the field to the page's annotations collection
-            page.Annotations.Add(sigField);
+            // Add the signature field to the document's form collection
+            doc.Form.Add(sigField);
 
-            // Prepare the PKCS#7 signature object using the certificate
-            PKCS7 pkcs7Signature = new PKCS7(certPath, certPassword)
+            // Use the core‑API PKCS1 class for signing (no Facades, no Aspose.Pdf.Signature namespace)
+            var pkcs1 = new PKCS1(pfxPath, pfxPassword)
             {
-                Reason      = "Document approval",
-                ContactInfo = "signer@example.com",
-                Location    = "New York"
-                // ShowProperties is true by default – it will display signer info in the appearance
+                Reason = "Document approval",
+                Location = "Office",
+                ContactInfo = "contact@example.com"
             };
 
-            // Sign the document using the created signature field
-            sigField.Sign(pkcs7Signature);
+            // Sign the document using the signature field
+            sigField.Sign(pkcs1);
 
-            // OPTIONAL: Verify the signature immediately after signing
+            // Verify the signature – simple verification that returns true if the signature is cryptographically valid
             bool isValid = sigField.Signature.Verify();
-            Console.WriteLine($"Signature verification result: {isValid}");
+
+            Console.WriteLine($"Signature verification result: {(isValid ? "Valid" : "Invalid")}");
 
             // Save the signed PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");
     }
 }

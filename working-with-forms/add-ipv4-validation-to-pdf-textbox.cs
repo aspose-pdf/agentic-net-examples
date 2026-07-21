@@ -1,14 +1,16 @@
 using System;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document
+        const string outputPath = "IpAddressForm.pdf";
+
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
             // Add a page to the document
@@ -20,37 +22,33 @@ class Program
 
             // Create a text box field for the IP address
             TextBoxField ipField = new TextBoxField(page, fieldRect);
-            ipField.PartialName = "IpAddress";          // Field name
-            ipField.Value = "";                         // Default/placeholder value
-            ipField.Color = Color.Black;                 // Border color (annotation's own color)
-            ipField.Border = new Border(ipField)        // Add a visible border
-            {
-                Width = 1
-            };
+            ipField.PartialName = "IPField";
+            ipField.Contents = "Enter IPv4 address";
+            ipField.Color = Aspose.Pdf.Color.LightGray;
 
-            // Add the field to the document's form collection (not directly to page annotations)
-            doc.Form.Add(ipField);
+            // NOTE: The AllowedChars property is not available in the current Aspose.Pdf version.
+            // If character restriction is required, it can be enforced via JavaScript validation.
 
-            // JavaScript code that validates the field value against an IPv4 regex
-            // The script runs when the field loses focus (OnValidate event)
+            // Set a JavaScript validation action that runs when the field loses focus
+            // The script uses a regular expression to validate IPv4 format
             string js = @"
-                var ip = this.getField('IpAddress').value;
-                var pattern = /^(25[0-5]|2[0-4]\d|[01]?\d\d?)\.
-                               (25[0-5]|2[0-4]\d|[01]?\d\d?)\.
-                               (25[0-5]|2[0-4]\d|[01]?\d\d?)\.
-                               (25[0-5]|2[0-4]\d|[01]?\d\d?)$/;
-                if (!pattern.test(ip)) {
-                    app.alert('Invalid IP address format. Please enter a valid IPv4 address.');
+                var ip = this.getField('IPField').value;
+                var regex = /^(\\d{1,3}\\.){3}\\d{1,3}$/;
+                if (!regex.test(ip)) {
+                    app.alert('Invalid IPv4 address. Please enter a value like 192.168.0.1');
+                    // Optionally clear the field
+                    this.getField('IPField').value = '';
                 }
             ";
-
-            // Assign the JavaScript validation action to the field's OnValidate event
             ipField.Actions.OnValidate = new JavascriptAction(js);
 
-            // Save the PDF to a file
-            doc.Save("IpAddressValidation.pdf");
+            // Add the field to the document's form collection
+            doc.Form.Add(ipField);
+
+            // Save the PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with IPv4 validation field created successfully.");
+        Console.WriteLine($"PDF with IP address validation saved to '{outputPath}'.");
     }
 }
