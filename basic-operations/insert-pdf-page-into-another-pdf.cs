@@ -9,7 +9,8 @@ class Program
         const string sourcePath = "source.pdf";   // PDF containing the page to insert
         const string targetPath = "target.pdf";   // PDF into which the page will be inserted
         const string outputPath = "merged.pdf";   // Resulting PDF
-        const int insertPosition = 2;             // 1‑based position in target where the page will be placed
+        const int sourcePageNumber = 1;           // Page number in source (1‑based)
+        const int insertPosition = 2;             // Position in target where page will be inserted (1‑based)
 
         if (!File.Exists(sourcePath))
         {
@@ -24,21 +25,26 @@ class Program
 
         try
         {
-            // Load both documents inside using blocks for deterministic disposal
+            // Load the source document (the page to be inserted)
             using (Document sourceDoc = new Document(sourcePath))
-            using (Document targetDoc = new Document(targetPath))
             {
-                // Retrieve the page to be inserted (first page of source)
-                Page pageToInsert = sourceDoc.Pages[1]; // Pages are 1‑based
+                // Load the target document (where the page will be inserted)
+                using (Document targetDoc = new Document(targetPath))
+                {
+                    // Retrieve the page from the source document (1‑based indexing)
+                    Page pageToInsert = sourceDoc.Pages[sourcePageNumber];
 
-                // Insert the page into the target document at the specified position
-                targetDoc.Pages.Insert(insertPosition, pageToInsert);
+                    // Insert the page into the target document at the specified position
+                    // Insert overload: Insert(int pageNumber, Page entity)
+                    targetDoc.Pages.Insert(insertPosition, pageToInsert);
 
-                // Save the modified target document
-                targetDoc.Save(outputPath);
+                    // Save the modified target document
+                    targetDoc.Save(outputPath);
+                }
             }
 
-            Console.WriteLine($"Page inserted successfully. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Inserted page {sourcePageNumber} from '{sourcePath}' into '{targetPath}' at position {insertPosition}.");
+            Console.WriteLine($"Result saved as '{outputPath}'.");
         }
         catch (Exception ex)
         {

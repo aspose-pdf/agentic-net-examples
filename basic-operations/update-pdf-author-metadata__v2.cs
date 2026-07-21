@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,16 +15,16 @@ class Program
             return;
         }
 
-        // Get the current user name from the environment
-        string currentUser = Environment.UserName;
-
-        // Load the PDF, update the Author metadata, and save
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            doc.Info.Author = currentUser;
+            // Replace the Author metadata with the current user name
+            doc.Info.Author = Environment.UserName;
+
+            // Save the updated document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Author updated to '{currentUser}' and saved to '{outputPath}'.");
+        Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
     }
 }

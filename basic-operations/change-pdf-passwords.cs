@@ -1,17 +1,24 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPath       = "protected.pdf";          // existing password‑protected PDF
-        const string outputPath      = "updated.pdf";            // file to save with new credentials
-        const string oldOwnerPassword = "ownerOld";              // current owner password (must be known)
-        const string newUserPassword  = "userNew";               // desired new user password
-        const string newOwnerPassword = "ownerNew";              // desired new owner password
+        // Paths to the source PDF and the output PDF
+        const string inputPath  = "protected_input.pdf";
+        const string outputPath = "updated_password.pdf";
 
+        // Existing passwords
+        const string currentOwnerPassword = "owner123";   // Owner password required to change passwords
+        const string currentUserPassword  = "user123";   // Current user password (optional for opening)
+
+        // New passwords to set
+        const string newUserPassword  = "newUser456";
+        const string newOwnerPassword = "newOwner456";
+
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
@@ -20,17 +27,18 @@ class Program
 
         try
         {
-            // Open the PDF using the current owner password.
-            using (Document doc = new Document(inputPath, oldOwnerPassword))
+            // Open the password‑protected PDF using the owner password (or any valid password)
+            using (Document doc = new Document(inputPath, currentOwnerPassword))
             {
-                // Change passwords: provide the current owner password, then the new user and owner passwords.
-                doc.ChangePasswords(oldOwnerPassword, newUserPassword, newOwnerPassword);
+                // Change passwords: first argument is the owner password,
+                // followed by the new user password and the new owner password.
+                doc.ChangePasswords(currentOwnerPassword, newUserPassword, newOwnerPassword);
 
-                // Save the document with the updated credentials.
+                // Save the document with the updated credentials
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Password updated and saved to '{outputPath}'.");
+            Console.WriteLine($"PDF saved with new passwords to '{outputPath}'.");
         }
         catch (InvalidPasswordException ex)
         {
