@@ -7,23 +7,26 @@ class Program
 {
     static void Main()
     {
+        // Input PDF file path
         const string inputPdf = "input.pdf";
+        // Output multi‑page TIFF file path
         const string outputTiff = "output.tif";
 
+        // Verify that the source PDF exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (Document implements IDisposable)
-        using (Document pdfDocument = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Create a TiffDevice with default settings (uses default compression)
+            // Create a TiffDevice with default settings (default compression)
             TiffDevice tiffDevice = new TiffDevice();
 
-            // Convert all pages of the PDF into a single multi‑page TIFF file
-            tiffDevice.Process(pdfDocument, outputTiff);
+            // Convert the entire PDF (all pages) to a single multi‑page TIFF file
+            tiffDevice.Process(pdfDoc, outputTiff);
         }
 
         Console.WriteLine($"Multi‑page TIFF saved to '{outputTiff}'.");

@@ -6,13 +6,15 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdf  = "input.pdf";
         const string outputXps = "output.xps";
 
-        // Define custom page size (width x height) in points.
-        // Example: Landscape Letter size (11" x 8.5") -> 11*72 = 792, 8.5*72 = 612
-        double customWidth  = 11 * 72; // 792 points
-        double customHeight = 8.5 * 72; // 612 points
+        // Desired page size: 8.5 x 11 inches (points: 1 inch = 72 points)
+        double width  = 8.5 * 72; // 612 points
+        double height = 11  * 72; // 792 points
+
+        // Set orientation: true = landscape, false = portrait
+        bool landscape = true;
 
         if (!File.Exists(inputPdf))
         {
@@ -20,26 +22,30 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block (deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Apply the custom size and orientation to every page (1‑based indexing)
-            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+            // Apply custom size and orientation to every page
+            foreach (Page page in doc.Pages)
             {
-                Page page = pdfDoc.Pages[i];
-                // Use PageInfo to set dimensions and orientation
-                page.PageInfo.Width = customWidth;
-                page.PageInfo.Height = customHeight;
-                page.PageInfo.IsLandscape = true; // optional, width > height already implies landscape
+                if (landscape)
+                {
+                    // Swap dimensions for landscape orientation
+                    page.SetPageSize(height, width);
+                    page.PageInfo.IsLandscape = true;
+                }
+                else
+                {
+                    page.SetPageSize(width, height);
+                    page.PageInfo.IsLandscape = false;
+                }
             }
 
-            // Initialize XPS save options
-            XpsSaveOptions xpsOptions = new XpsSaveOptions();
-
-            // Save the document as XPS using the explicit save options
-            pdfDoc.Save(outputXps, xpsOptions);
+            // Save as XPS using explicit XpsSaveOptions
+            XpsSaveOptions saveOptions = new XpsSaveOptions();
+            doc.Save(outputXps, saveOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to XPS with custom page size: {outputXps}");
+        Console.WriteLine($"PDF successfully converted to XPS: {outputXps}");
     }
 }

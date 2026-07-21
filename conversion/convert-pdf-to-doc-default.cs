@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.doc";
 
         if (!File.Exists(inputPath))
@@ -18,15 +18,15 @@ class Program
         // Load the PDF document
         using (Document pdfDoc = new Document(inputPath))
         {
-            // Prepare save options for DOC format (default recognition settings)
+            // Prepare DOC save options with default recognition settings
             DocSaveOptions saveOptions = new DocSaveOptions
             {
-                // Explicitly set the output format to DOC (optional, defaults to DOC)
+                // Explicitly set the output format to .doc
                 Format = DocSaveOptions.DocFormat.Doc
-                // No additional settings are required for default text extraction
+                // All other properties retain their defaults for basic text extraction
             };
 
-            // Save the document as DOC using the specified options
+            // Save the document as DOC using the explicit save options
             pdfDoc.Save(outputPath, saveOptions);
         }
 

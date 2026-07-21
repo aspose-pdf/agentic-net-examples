@@ -1,43 +1,42 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core PDF API (Document, HtmlSaveOptions, etc.)
 
-class PdfToHtmlConverter
+class PdfToSinglePageHtml
 {
     static void Main()
     {
         // Input PDF file path
-        const string pdfPath = "input.pdf";
+        const string inputPdfPath  = "input.pdf";
 
-        // Output HTML file path (single-page HTML)
-        const string htmlPath = "output.html";
+        // Output HTML file path (single HTML file containing all pages)
+        const string outputHtmlPath = "output.html";
 
-        if (!File.Exists(pdfPath))
+        // Verify the input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found at '{pdfPath}'.");
+            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
             return;
         }
 
         try
         {
             // Load the PDF document
-            using (Document pdfDocument = new Document(pdfPath))
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Initialize HTML save options
-                HtmlSaveOptions htmlOptions = new HtmlSaveOptions
-                {
-                    // Preserve fonts in all formats (WOFF, TTF, EOT) for maximum compatibility
-                    FontSavingMode = HtmlSaveOptions.FontSavingModes.SaveInAllFormats,
+                // Initialize HTML save options.
+                // No special options are required for a single‑page HTML output;
+                // by default Aspose.Pdf creates one HTML file that contains all pages.
+                HtmlSaveOptions htmlOptions = new HtmlSaveOptions();
 
-                    // Ensure the result is a single HTML file
-                    SplitIntoPages = false
-                };
+                // Optional: preserve fonts as Web Open Font Format (WOFF) to ensure they are embedded.
+                // htmlOptions.FontSavingMode = HtmlSaveOptions.FontSavingModes.AlwaysSaveAsWOFF;
 
-                // Save the PDF as a single-page HTML preserving layout and fonts
-                pdfDocument.Save(htmlPath, htmlOptions);
+                // Save the PDF as a single HTML file.
+                pdfDoc.Save(outputHtmlPath, htmlOptions);
             }
 
-            Console.WriteLine($"PDF successfully converted to HTML: '{htmlPath}'.");
+            Console.WriteLine($"PDF successfully converted to HTML: '{outputHtmlPath}'");
         }
         catch (Exception ex)
         {

@@ -6,37 +6,39 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputHtmlPath = "output.html";
+        const string inputPdf  = "input.pdf";
+        const string outputHtml = "output.html";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         try
         {
-            // Load the PDF document
-            using (Document pdfDocument = new Document(inputPdfPath))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                // Configure HTML save options
-                HtmlSaveOptions htmlOptions = new HtmlSaveOptions
+                // Configure HTML save options with SVG compression enabled
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
-                    // Compress any SVG graphics found during conversion
                     CompressSvgGraphicsIfAny = true
                 };
 
-                // Save as HTML with the specified options
-                pdfDocument.Save(outputHtmlPath, htmlOptions);
+                // Save as HTML; passing HtmlSaveOptions ensures non‑PDF output
+                pdfDoc.Save(outputHtml, htmlOpts);
+                Console.WriteLine($"PDF successfully converted to HTML: {outputHtml}");
             }
-
-            Console.WriteLine($"PDF successfully converted to HTML: '{outputHtmlPath}'");
         }
+        // HTML conversion relies on GDI+ and may fail on non‑Windows platforms
         catch (TypeInitializationException)
         {
-            // HTML conversion requires GDI+ and is only supported on Windows
             Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+        }
+        catch (DllNotFoundException)
+        {
+            Console.WriteLine("GDI+ library not found. HTML conversion is Windows‑only.");
         }
         catch (Exception ex)
         {

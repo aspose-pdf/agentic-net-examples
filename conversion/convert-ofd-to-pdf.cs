@@ -1,16 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Aspose.Pdf namespace contains Document, OfdLoadOptions, etc.
 
 class Program
 {
     static void Main()
     {
-        // Input OFD file and desired PDF output paths
         const string inputPath = "input.ofd";
         const string outputPath = "output.pdf";
 
-        // Verify the source file exists
+        // Verify the source OFD file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
@@ -20,7 +19,10 @@ class Program
         try
         {
             // Load the OFD file using the appropriate load options
-            using (Document doc = new Document(inputPath, new OfdLoadOptions()))
+            OfdLoadOptions loadOptions = new OfdLoadOptions();
+
+            // Wrap Document in a using block for deterministic disposal
+            using (Document doc = new Document(inputPath, loadOptions))
             {
                 // Save the loaded document as PDF (default settings)
                 doc.Save(outputPath);
@@ -30,8 +32,7 @@ class Program
         }
         catch (Exception ex)
         {
-            // Report any errors that occur during loading or saving
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
         }
     }
 }

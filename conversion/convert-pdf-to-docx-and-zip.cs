@@ -2,81 +2,59 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string pdfPath = "input.pdf";
+        const string pdfPath  = "input.pdf";   // source PDF
+        const string docxPath = "output.docx"; // intermediate DOCX
+        const string zipPath  = "output.zip";  // final ZIP archive
 
-        // Intermediate DOCX file path
-        const string docxPath = "output.docx";
-
-        // Final ZIP archive path
-        const string zipPath = "output.zip";
-
-        // -----------------------------------------------------------------
-        // Ensure the source PDF exists – create a minimal one if it does not.
-        // -----------------------------------------------------------------
+        // Verify source PDF exists
         if (!File.Exists(pdfPath))
         {
-            using (Document sample = new Document())
-            {
-                // Add a single page with a simple text fragment.
-                Page page = sample.Pages.Add();
-                TextFragment tf = new TextFragment("Sample PDF generated because 'input.pdf' was missing.")
-                {
-                    Position = new Position(100, 700),
-                    TextState = { FontSize = 12 }
-                };
-                page.Paragraphs.Add(tf);
-                sample.Save(pdfPath);
-                Console.WriteLine($"Created placeholder PDF at '{pdfPath}'.");
-            }
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            return;
         }
 
-        // -----------------------------------------------------------------
-        // Convert PDF to DOCX using Aspose.Pdf
-        // -----------------------------------------------------------------
-        using (Document pdfDocument = new Document(pdfPath))
+        // ---------- Convert PDF to DOCX ----------
+        // Document is disposed automatically via using (lifecycle rule)
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Configure DOCX save options
+            // SaveOptions are required for non‑PDF output (save-to-non-pdf rule)
             DocSaveOptions saveOptions = new DocSaveOptions
             {
-                // Export as DOCX (not the older DOC format)
+                // Export as DOCX format
                 Format = DocSaveOptions.DocFormat.DocX,
-
-                // Use the Flow recognition mode for maximum editability
+                // Use full flow recognition for better editability
                 Mode = DocSaveOptions.RecognitionMode.Flow,
-
-                // Enable bullet recognition (optional, improves results)
                 RecognizeBullets = true
             };
 
-            // Save the converted document
-            pdfDocument.Save(docxPath, saveOptions);
+            pdfDoc.Save(docxPath, saveOptions);
         }
 
-        // -----------------------------------------------------------------
-        // Compress the resulting DOCX into a ZIP archive
-        // -----------------------------------------------------------------
-        using (FileStream zipStream = new FileStream(zipPath, FileMode.Create))
+        // Verify DOCX was created
+        if (!File.Exists(docxPath))
         {
-            using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Create))
-            {
-                // Add the DOCX file to the archive
-                archive.CreateEntryFromFile(
-                    docxPath,
-                    Path.GetFileName(docxPath),
-                    CompressionLevel.Optimal);
-            }
+            Console.Error.WriteLine($"DOCX file was not created: {docxPath}");
+            return;
         }
 
-        // Optional: clean up the intermediate DOCX file if no longer needed
-        // File.Delete(docxPath);
+        // ---------- Compress DOCX into a ZIP ----------
+        // Remove existing ZIP if present to avoid exceptions
+        if (File.Exists(zipPath))
+            File.Delete(zipPath);
 
-        Console.WriteLine($"PDF converted to DOCX and compressed into '{zipPath}'.");
+        // Create a ZIP archive and add the DOCX file
+        using (FileStream zipStream = new FileStream(zipPath, FileMode.Create))
+        using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Create))
+        {
+            // The entry name inside the ZIP is just the file name
+            archive.CreateEntryFromFile(docxPath, Path.GetFileName(docxPath));
+        }
+
+        Console.WriteLine($"PDF successfully converted to DOCX and compressed to ZIP: {zipPath}");
     }
 }

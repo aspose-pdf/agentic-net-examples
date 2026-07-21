@@ -6,42 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa.pdf";
-        const string logPath    = "conversion.log";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
+        // Create conversion options for PDF/A (PDF/A‑1B) with error handling.
+        PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+
+        // Enable automatic tagging during conversion.
+        options.AutoTaggingSettings = new AutoTaggingSettings
+        {
+            EnableAutoTagging = true
+            // Additional AutoTaggingSettings can be configured here if needed.
+        };
+
+        // Load the source PDF, convert it using the options, and save the PDF/A output.
         using (Document doc = new Document(inputPath))
         {
-            // Create conversion options for PDF/A output.
-            // This constructor sets the log file, target PDF format and error handling action.
-            PdfFormatConversionOptions options = new PdfFormatConversionOptions(
-                logPath,
-                PdfFormat.PDF_A_1B,
-                ConvertErrorAction.Delete);
-
-            // Assign auto‑tagging settings. Use the default settings and ensure auto‑tagging is enabled.
-            options.AutoTaggingSettings = AutoTaggingSettings.Default;
-            options.AutoTaggingSettings.EnableAutoTagging = true;
-
-            // Perform the conversion. The method returns true on success.
             bool converted = doc.Convert(options);
             if (!converted)
             {
-                Console.Error.WriteLine("Conversion failed. See the log file for details.");
-                return;
+                Console.Error.WriteLine("Conversion failed. Check the log for details.");
             }
 
-            // Save the converted PDF/A document.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF/A document saved to '{outputPath}'.");
+        Console.WriteLine($"PDF/A file saved to '{outputPath}'.");
     }
 }

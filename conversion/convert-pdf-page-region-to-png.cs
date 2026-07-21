@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Drawing;
+using System.Drawing.Imaging;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
@@ -7,58 +9,63 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";   // source PDF
-        const string pngPath   = "region.png";  // output PNG
-        const int    pageIndex = 1;             // 1‑based page number
+        const string inputPdf = "input.pdf";
+        const string outputPng = "region.png";
 
-        // Define the region to extract (left, bottom, right, top) in points.
-        // Adjust these values to the desired rectangle.
-        const double left   = 100;
-        const double bottom = 200;
-        const double right  = 300;
-        const double top    = 400;
-
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document.
-        using (Document pdfDocument = new Document(pdfPath))
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Ensure the requested page exists.
-            if (pageIndex < 1 || pageIndex > pdfDocument.Pages.Count)
+            // Choose the page (1‑based index)
+            Page page = pdfDoc.Pages[1];
+
+            // Define the region in PDF points (1 point = 1/72 inch)
+            // Example: rectangle from (100, 500) to (300, 700)
+            Aspose.Pdf.Rectangle pdfRect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+
+            // Convert the whole page to PNG in a memory stream
+            using (MemoryStream fullPngStream = page.ConvertToPNGMemoryStream())
             {
-                Console.Error.WriteLine("Invalid page number.");
-                return;
+                // Load the PNG into a Bitmap for cropping
+                using (Bitmap fullBitmap = new Bitmap(fullPngStream))
+                {
+                    // Determine the resolution used by the conversion (default 150 DPI)
+                    const int resolution = 150;
+                    // Convert PDF points to pixel coordinates
+                    int left   = (int)Math.Round(pdfRect.LLX * resolution / 72.0);
+                    int bottom = (int)Math.Round(pdfRect.LLY * resolution / 72.0);
+                    int right  = (int)Math.Round(pdfRect.URX * resolution / 72.0);
+                    int top    = (int)Math.Round(pdfRect.URY * resolution / 72.0);
+
+                    // In GDI+ the origin (0,0) is top‑left, so we need to flip the Y axis
+                    int height = fullBitmap.Height;
+                    int cropY = height - top;
+                    int cropHeight = top - bottom;
+                    int cropX = left;
+                    int cropWidth = right - left;
+
+                    // Ensure the crop rectangle is within the bitmap bounds
+                    System.Drawing.Rectangle cropRect = new System.Drawing.Rectangle(
+                        Math.Max(cropX, 0),
+                        Math.Max(cropY, 0),
+                        Math.Min(cropWidth, fullBitmap.Width - Math.Max(cropX, 0)),
+                        Math.Min(cropHeight, fullBitmap.Height - Math.Max(cropY, 0)));
+
+                    // Crop the region
+                    using (Bitmap regionBitmap = fullBitmap.Clone(cropRect, fullBitmap.PixelFormat))
+                    {
+                        // Save the cropped region as PNG
+                        regionBitmap.Save(outputPng, ImageFormat.Png);
+                    }
+                }
             }
-
-            Page page = pdfDocument.Pages[pageIndex];
-
-            // Preserve the original CropBox so we can restore it later.
-            Aspose.Pdf.Rectangle originalCropBox = page.CropBox;
-
-            // Set the CropBox to the desired region.
-            // CropBox expects a rectangle defined by lower‑left (llx,lly) and upper‑right (urx,ury) coordinates.
-            page.CropBox = new Aspose.Pdf.Rectangle(left, bottom, right, top);
-
-            // Create a PNG device with desired resolution (e.g., 300 DPI).
-            Resolution resolution = new Resolution(300);
-            PngDevice pngDevice = new PngDevice(resolution);
-
-            // Convert the cropped page to a PNG image stored in a memory stream.
-            using (MemoryStream pngStream = new MemoryStream())
-            {
-                pngDevice.Process(page, pngStream);
-                // Write the PNG bytes to the output file.
-                File.WriteAllBytes(pngPath, pngStream.ToArray());
-            }
-
-            // Restore the original CropBox (optional, in case the document is used later).
-            page.CropBox = originalCropBox;
         }
 
-        Console.WriteLine($"Region saved as PNG: {pngPath}");
+        Console.WriteLine($"Region PNG saved to '{outputPng}'.");
     }
 }

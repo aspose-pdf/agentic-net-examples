@@ -6,37 +6,42 @@ class Program
 {
     static void Main()
     {
-        // Directory containing the source XML, XSL‑FO stylesheet and the output PDF.
-        const string dataDir = @"YOUR_DATA_DIRECTORY";
+        // Directory containing the source files.
+        string dataDir = @"YOUR_DATA_DIRECTORY";
 
-        // Paths to the XML input, the XSL‑FO stylesheet and the resulting PDF.
-        string xmlPath = Path.Combine(dataDir, "input.xml");
-        string xslPath = Path.Combine(dataDir, "transform.xsl");
-        string pdfPath = Path.Combine(dataDir, "output.pdf");
+        // Path to the XML file to be converted.
+        string xmlFile = Path.Combine(dataDir, "input.xml");
 
-        // Verify that the required files exist.
-        if (!File.Exists(xmlPath))
+        // Path to the XSL-FO (XSL) stylesheet that defines the transformation.
+        string xslFile = Path.Combine(dataDir, "transform.xsl");
+
+        // Desired output PDF file path.
+        string pdfFile = Path.Combine(dataDir, "output.pdf");
+
+        // Verify that the input files exist.
+        if (!File.Exists(xmlFile))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlFile}");
             return;
         }
-        if (!File.Exists(xslPath))
+
+        if (!File.Exists(xslFile))
         {
-            Console.Error.WriteLine($"XSL‑FO file not found: {xslPath}");
+            Console.Error.WriteLine($"XSL file not found: {xslFile}");
             return;
         }
 
-        // Load the XML file and apply the XSL‑FO transformation.
-        // XmlLoadOptions can be constructed with the XSL‑FO file path.
-        XmlLoadOptions loadOptions = new XmlLoadOptions(xslPath);
+        // Initialize XmlLoadOptions with the XSL stylesheet.
+        // The constructor XmlLoadOptions(string xslFile) sets the XSL data used for the transformation.
+        XmlLoadOptions loadOptions = new XmlLoadOptions(xslFile);
 
-        // Use a using block to ensure the Document is disposed properly.
-        using (Document pdfDocument = new Document(xmlPath, loadOptions))
+        // Load the XML file, applying the XSL transformation, and create a PDF document.
+        using (Document pdfDocument = new Document(xmlFile, loadOptions))
         {
             // Save the resulting PDF.
-            pdfDocument.Save(pdfPath);
+            pdfDocument.Save(pdfFile);
         }
 
-        Console.WriteLine($"PDF created successfully at: {pdfPath}");
+        Console.WriteLine($"XML successfully converted to PDF: {pdfFile}");
     }
 }

@@ -1,26 +1,27 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core PDF API
+using Aspose.Pdf;
 
-class Program
+class PdfToPptx
 {
     static void Main()
     {
+        // Paths for input PDF and output PPTX
         const string pdfPath = "input.pdf";
-        const string pptxPath = "output.pptx";
+        const string outputPptxPath = "output.pptx";
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Convert PDF to PPTX using Aspose.Pdf (no Aspose.Slides required)
-        using (Document pdfDoc = new Document(pdfPath))
+        // Convert PDF to PPTX using Aspose.Pdf only (no Aspose.Slides required)
+        using (var pdfDocument = new Document(pdfPath))
         {
-            pdfDoc.Save(pptxPath, SaveFormat.Pptx);
+            pdfDocument.Save(outputPptxPath, SaveFormat.Pptx);
         }
 
-        Console.WriteLine($"PPTX file saved at '{pptxPath}'.");
+        Console.WriteLine($"Conversion completed. Output saved to '{outputPptxPath}'.");
     }
 }

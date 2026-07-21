@@ -7,37 +7,32 @@ class Program
 {
     static void Main()
     {
-        // Directory containing the PDF file
-        const string dataDir = @"YOUR_DATA_DIRECTORY";
-        // PDF file name
-        const string pdfFile = @"YOUR_PDF_FILE";
+        const string inputPath = "input.pdf";
+        const string outputDir = "output_images";
 
-        string pdfPath = Path.Combine(dataDir, pdfFile);
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(pdfPath))
+        Directory.CreateDirectory(outputDir);
+
+        using (Document pdfDocument = new Document(inputPath))
         {
             // BmpDevice with default resolution
             BmpDevice bmpDevice = new BmpDevice();
 
-            // Iterate over all pages (1‑based indexing)
             for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                string outputPath = Path.Combine(dataDir, $"image{pageNumber}_out.bmp");
-
-                // Save each page as a BMP image
-                using (FileStream bmpStream = new FileStream(outputPath, FileMode.Create))
+                string outPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
+                using (FileStream bmpStream = new FileStream(outPath, FileMode.Create))
                 {
                     bmpDevice.Process(pdfDocument.Pages[pageNumber], bmpStream);
                 }
             }
         }
 
-        Console.WriteLine("PDF successfully converted to BMP images.");
+        Console.WriteLine("PDF to BMP conversion completed.");
     }
 }

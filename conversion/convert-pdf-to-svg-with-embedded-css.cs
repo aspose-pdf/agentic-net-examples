@@ -1,40 +1,34 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core PDF API
-using Aspose.Pdf.Facades;      // For DocumentDevice (if needed)
+using Aspose.Pdf;
 
-// Convert a PDF file to SVG format and embed CSS styles (handled internally by the SVG exporter)
-class PdfToSvgConverter
+class Program
 {
     static void Main()
     {
-        // Input and output file paths
         const string inputPdfPath  = "input.pdf";
         const string outputSvgPath = "output.svg";
 
-        // Verify that the source PDF exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Load the PDF document
-        using (Document pdfDocument = new Document(inputPdfPath))
+        using (Aspose.Pdf.Document pdfDocument = new Aspose.Pdf.Document(inputPdfPath))
         {
             // Initialize SVG save options
-            SvgSaveOptions svgOptions = new SvgSaveOptions();
+            Aspose.Pdf.SvgSaveOptions svgOptions = new Aspose.Pdf.SvgSaveOptions();
 
-            // Enable glyph caching to improve conversion speed (optional)
-            svgOptions.CacheGlyphs = true;
-
-            // The SVG exporter embeds necessary CSS styles automatically.
-            // No explicit property is required; the exporter handles style embedding.
+            // CSS styles are embedded by default in the generated SVG.
+            // If additional control is needed, properties such as
+            // ScaleToPixels, CompressOutputToZipArchive, etc., can be set here.
 
             // Save the document as SVG
             pdfDocument.Save(outputSvgPath, svgOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to SVG: '{outputSvgPath}'");
+        Console.WriteLine($"PDF successfully converted to SVG: {outputSvgPath}");
     }
 }
