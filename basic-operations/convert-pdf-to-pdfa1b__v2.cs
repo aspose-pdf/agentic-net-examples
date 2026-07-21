@@ -6,35 +6,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";          // Source PDF
-        const string outputPath = "output_pdfa1b.pdf"; // PDF/A‑1b result
-        const string logPath = "conversion_log.xml";   // Optional conversion log
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_pdfa1b.pdf";
 
-        // Verify source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the source PDF and convert it to PDF/A‑1b compliance.
+        // The Convert method embeds any missing fonts automatically.
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document (using the recommended lifecycle pattern)
-            using (Document doc = new Document(inputPath))
-            {
-                // Convert to PDF/A‑1b; missing fonts are embedded automatically.
-                // ConvertErrorAction.Delete removes objects that prevent compliance.
-                doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+            // Optional: path for a conversion log that contains details of any issues.
+            const string conversionLog = "conversion_log.xml";
 
-                // Save the converted document
-                doc.Save(outputPath);
-            }
+            // Convert the document to PDF/A‑1b. ConvertErrorAction.Delete removes objects that prevent compliance.
+            doc.Convert(conversionLog, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
 
-            Console.WriteLine($"PDF successfully converted to PDF/A‑1b: {outputPath}");
+            // Save the compliant document.
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF/A‑1b file saved to '{outputPath}'.");
     }
 }

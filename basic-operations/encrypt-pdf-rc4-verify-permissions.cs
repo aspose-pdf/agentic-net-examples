@@ -1,18 +1,16 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API namespace
-using Aspose.Pdf.Text;          // For Permissions enum (if needed)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath      = "input.pdf";
-        const string encryptedPath  = "encrypted.pdf";
-        const string decryptedPath  = "decrypted.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "encrypted.pdf";
 
-        const string userPassword   = "user123";
-        const string ownerPassword  = "owner123";
+        const string userPassword  = "user123";
+        const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
         {
@@ -21,51 +19,58 @@ class Program
         }
 
         // -----------------------------------------------------------------
-        // 1. Load the source PDF and encrypt it using RC4 (128‑bit) algorithm.
-        //    No copying permission is granted – we set Permissions to 0
-        //    (or only allow printing if desired).  The CryptoAlgorithm
-        //    enum must be used; CryptographicStandard is NOT valid.
+        // Encrypt the PDF with RC4 (128‑bit) and disable all permissions
+        // (i.e., no copying, printing, etc.).
         // -----------------------------------------------------------------
         using (Document doc = new Document(inputPath))
         {
-            // Permissions = 0 means no special rights (no printing, no copying, etc.)
+            // No permissions granted – cast 0 to the Flags enum.
             Permissions noPermissions = (Permissions)0;
 
-            // Encrypt with RC4 128‑bit algorithm
+            // Encrypt using RC4 128‑bit algorithm.
             doc.Encrypt(userPassword, ownerPassword, noPermissions, CryptoAlgorithm.RC4x128);
 
-            // Save the encrypted PDF
-            doc.Save(encryptedPath);
+            // Save the encrypted document.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document encrypted and saved to '{encryptedPath}'.");
-
         // -----------------------------------------------------------------
-        // 2. Verify the encryption by opening the file with the user password.
-        //    If the password is correct the document can be opened; otherwise
-        //    an exception will be thrown.  After opening we decrypt it to
-        //    demonstrate that the document was indeed encrypted.
+        // Verify the security settings:
+        //   1. Opening without a password should fail.
+        //   2. Opening with the correct user password should succeed.
         // -----------------------------------------------------------------
+        // 1. Attempt to open without a password – expect InvalidPasswordException.
         try
         {
-            using (Document encryptedDoc = new Document(encryptedPath, userPassword))
+            using (Document _ = new Document(outputPath))
             {
-                // Decrypt the document (no parameters required)
-                encryptedDoc.Decrypt();
-
-                // Save the decrypted version (optional verification step)
-                encryptedDoc.Save(decryptedPath);
+                // If we reach here, the document was not protected as expected.
+                Console.Error.WriteLine("Verification failed: document opened without a password.");
             }
-
-            Console.WriteLine($"Encryption verified. Decrypted copy saved to '{decryptedPath}'.");
         }
         catch (InvalidPasswordException)
         {
-            Console.Error.WriteLine("Failed to open the encrypted PDF – password is incorrect.");
+            Console.WriteLine("Verification passed: opening without a password throws InvalidPasswordException.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"An error occurred while verifying encryption: {ex.Message}");
+            Console.Error.WriteLine($"Unexpected error during verification (no password): {ex.Message}");
+        }
+
+        // 2. Open with the correct user password and ensure we can read the page count.
+        try
+        {
+            using (Document encryptedDoc = new Document(outputPath, userPassword))
+            {
+                // Decrypt is optional here; the document is already opened with the password.
+                // encryptedDoc.Decrypt(); // not required for verification
+
+                Console.WriteLine($"Verification passed: document opened with user password. Page count = {encryptedDoc.Pages.Count}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Verification failed: could not open with user password. {ex.Message}");
         }
     }
 }
