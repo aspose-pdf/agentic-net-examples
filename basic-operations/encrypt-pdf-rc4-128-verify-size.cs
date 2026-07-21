@@ -6,36 +6,41 @@ class Program
 {
     static void Main()
     {
+        // Paths for the original and encrypted PDF files
         const string inputPath = "input.pdf";
-        const string encryptedPath = "encrypted_rc4x128.pdf";
+        const string encryptedPath = "encrypted_rc4_128.pdf";
 
+        // Passwords for encryption
+        const string userPassword = "user123";
+        const string ownerPassword = "owner123";
+
+        // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the original PDF inside a using block for deterministic disposal
+        // Record the original file size
+        long originalSize = new FileInfo(inputPath).Length;
+
+        // Encrypt the PDF using 128‑bit RC4 (CryptoAlgorithm.RC4x128)
         using (Document doc = new Document(inputPath))
         {
             // Define permissions (example: allow printing and content extraction)
             Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-            // Encrypt using 128‑bit RC4 algorithm
-            doc.Encrypt(
-                userPassword: "user123",
-                ownerPassword: "owner123",
-                permissions: perms,
-                cryptoAlgorithm: CryptoAlgorithm.RC4x128);
+            // Apply encryption
+            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.RC4x128);
 
-            // Save the encrypted PDF
+            // Save the encrypted document
             doc.Save(encryptedPath);
         }
 
-        // Compare file sizes to verify that encryption increased the file size slightly
-        long originalSize = new FileInfo(inputPath).Length;
+        // Record the encrypted file size
         long encryptedSize = new FileInfo(encryptedPath).Length;
 
+        // Output size information and verification result
         Console.WriteLine($"Original size:  {originalSize} bytes");
         Console.WriteLine($"Encrypted size: {encryptedSize} bytes");
 
@@ -45,7 +50,7 @@ class Program
         }
         else
         {
-            Console.WriteLine("File size did not increase; encryption may not have been applied correctly.");
+            Console.WriteLine("File size did not increase; unexpected.");
         }
     }
 }
