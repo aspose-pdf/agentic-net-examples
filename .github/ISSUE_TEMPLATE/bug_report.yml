@@ -1,0 +1,71 @@
+name: Bug Report
+description: Report a bug in one of the example .cs files or in the generated docs
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report! Please fill in as
+        much detail as possible so we can reproduce and fix quickly.
+  - type: input
+    id: category
+    attributes:
+      label: Category folder
+      description: Which category folder is the buggy example in?
+      placeholder: e.g. working-with-forms
+    validations:
+      required: true
+  - type: input
+    id: filename
+    attributes:
+      label: File name
+      description: Which .cs file has the issue?
+      placeholder: e.g. add-checkbox-field-to-pdf-form.cs
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the incorrect behaviour. Include the exact error message if any.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce this? Ideally with a minimal input PDF and dotnet command line.
+      placeholder: |
+        1. `dotnet run` the example
+        2. observe error / output
+    validations:
+      required: true
+  - type: input
+    id: dotnet-version
+    attributes:
+      label: .NET SDK version
+      description: Output of `dotnet --version`
+      placeholder: e.g. 10.0.100
+    validations:
+      required: true
+  - type: input
+    id: aspose-version
+    attributes:
+      label: Aspose.PDF NuGet version
+      placeholder: e.g. 26.6.0
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: e.g. Windows 11 / macOS 14.5 / Ubuntu 24.04
+    validations:
+      required: true

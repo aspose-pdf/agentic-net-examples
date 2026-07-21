@@ -1,12 +1,12 @@
 {
   "name": "Aspose.PDF for .NET Examples Agent",
-  "description": "AI agent that generates, compiles, and validates C# code examples for Aspose.PDF for .NET 26.6.0. 2,684 build-verified examples across 34 categories.",
-  "version": "26.6.0",
+  "description": "AI agent that generates, compiles, and validates C# code examples for Aspose.PDF for .NET 26.7.0. 2,636 build-verified examples across 35 categories.",
+  "version": "26.7.0",
   "url": "https://github.com/aspose-pdf/agentic-net-examples.git",
-  "api_base_url": "http://faisalabad-examples-mcp.dynabic.com:7002",
-  "mcp_endpoint": "http://faisalabad-examples-mcp.dynabic.com:7002/mcp/agent/generate",
-  "openapi_url": "http://faisalabad-examples-mcp.dynabic.com:7002/openapi.json",
-  "docs_url": "http://faisalabad-examples-mcp.dynabic.com:7002/docs",
+  "api_base_url": "http://172.20.1.175:7050",
+  "mcp_endpoint": "http://172.20.1.175:7050/mcp/generate",
+  "openapi_url": "http://172.20.1.175:7050/openapi.json",
+  "docs_url": "http://172.20.1.175:7050/docs",
   "capabilities": [
     "Generate verified C# code examples for Aspose.PDF for .NET",
     "Browse build-validated examples organised by category (text, tables, forms, security, ...)",
@@ -42,7 +42,7 @@
     },
     {
       "name": "Compare PDF",
-      "examples": 28
+      "examples": 29
     },
     {
       "name": "Conversion",
@@ -50,7 +50,7 @@
     },
     {
       "name": "Document",
-      "examples": 122
+      "examples": 117
     },
     {
       "name": "Facades AcroForms",
@@ -58,7 +58,7 @@
     },
     {
       "name": "Facades annotations",
-      "examples": 107
+      "examples": 106
     },
     {
       "name": "Facades bookmarks",
@@ -66,7 +66,7 @@
     },
     {
       "name": "Facades convert documents",
-      "examples": 40
+      "examples": 36
     },
     {
       "name": "Facades documents",
@@ -78,7 +78,7 @@
     },
     {
       "name": "Facades extract images and text",
-      "examples": 84
+      "examples": 83
     },
     {
       "name": "Facades fill forms",
@@ -86,7 +86,7 @@
     },
     {
       "name": "Facades forms",
-      "examples": 88
+      "examples": 85
     },
     {
       "name": "Facades metadata",
@@ -98,7 +98,7 @@
     },
     {
       "name": "Facades secure documents",
-      "examples": 39
+      "examples": 38
     },
     {
       "name": "Facades sign documents",
@@ -106,51 +106,55 @@
     },
     {
       "name": "Facades stamps",
-      "examples": 47
+      "examples": 48
     },
     {
       "name": "Facades texts and images",
-      "examples": 29
+      "examples": 28
     },
     {
       "name": "Facades XMP metadata",
-      "examples": 45
+      "examples": 44
     },
     {
       "name": "Graphs ZUGFeRD operators",
-      "examples": 89
+      "examples": 82
     },
     {
       "name": "Pages",
-      "examples": 99
+      "examples": 100
     },
     {
       "name": "Parse PDF",
-      "examples": 64
+      "examples": 63
     },
     {
       "name": "Securing and signing PDF",
-      "examples": 84
+      "examples": 78
     },
     {
       "name": "Stamping",
       "examples": 50
     },
     {
+      "name": "Uncategorized",
+      "examples": 1
+    },
+    {
       "name": "Working with annotations",
-      "examples": 162
+      "examples": 156
     },
     {
       "name": "Working with attachments",
-      "examples": 49
+      "examples": 50
     },
     {
       "name": "Working with forms",
-      "examples": 239
+      "examples": 230
     },
     {
       "name": "Working with graphs",
-      "examples": 79
+      "examples": 77
     },
     {
       "name": "Working with images",
@@ -158,11 +162,11 @@
     },
     {
       "name": "Working with tables",
-      "examples": 98
+      "examples": 96
     },
     {
       "name": "Working with text",
-      "examples": 76
+      "examples": 73
     },
     {
       "name": "Working with XML",
@@ -172,7 +176,7 @@
   "product": {
     "name": "Aspose.PDF for .NET",
     "nuget_package": "Aspose.PDF",
-    "nuget_version": "26.6.0",
+    "nuget_version": "26.7.0",
     "target_framework": "net10.0"
   },
   "links": {
