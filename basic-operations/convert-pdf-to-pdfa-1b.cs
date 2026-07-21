@@ -6,24 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa1b.pdf";
-        const string logPath    = "conversion_log.txt";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF
+        // Load the source PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Convert to PDF/A‑1b, logging any conversion issues
-            // ConvertErrorAction.Delete removes objects that cannot be converted
-            doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+            // Configure conversion options for PDF/A‑1b
+            PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B);
+            // Preserve original structure and embedded fonts (default behavior)
+            // Ensure no size‑optimisation that could drop fonts
+            options.OptimizeFileSize = false;
 
-            // Save the converted document; embedded fonts and structure are retained
+            // Convert the document to PDF/A‑1b
+            bool converted = doc.Convert(options);
+            if (!converted)
+            {
+                Console.Error.WriteLine("Conversion to PDF/A‑1b failed.");
+                return;
+            }
+
+            // Save the converted PDF/A‑1b document
             doc.Save(outputPath);
         }
 
