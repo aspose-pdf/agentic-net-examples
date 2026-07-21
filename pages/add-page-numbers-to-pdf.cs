@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // Required for FontRepository
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "paged_output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,27 +15,19 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create a PageNumberStamp with the desired format.
-            // "Page # of #" – first # is current page, second # is total page count.
-            PageNumberStamp pageNumberStamp = new PageNumberStamp("Page # of #");
+            // Create a page number stamp
+            PageNumberStamp stamp = new PageNumberStamp();
+            stamp.StartingNumber      = 1;                         // start numbering at 1
+            stamp.HorizontalAlignment = HorizontalAlignment.Center; // center horizontally
+            stamp.VerticalAlignment   = VerticalAlignment.Bottom;   // place at bottom (optional)
 
-            // Optional: set appearance (font, size, color)
-            pageNumberStamp.TextState.Font = FontRepository.FindFont("Helvetica");
-            pageNumberStamp.TextState.FontSize = 12;
-            pageNumberStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-            // Position the stamp at the bottom center of each page
-            pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            pageNumberStamp.VerticalAlignment = VerticalAlignment.Bottom;
-            pageNumberStamp.BottomMargin = 20; // distance from bottom edge
-
-            // Apply the stamp to every page in the document
+            // Apply the stamp to every page
             foreach (Page page in doc.Pages)
             {
-                page.AddStamp(pageNumberStamp);
+                page.AddStamp(stamp);
             }
 
             // Save the modified PDF

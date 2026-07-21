@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_cropped.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,34 +15,34 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Margins to trim (points). Adjust as needed.
+        const double leftMargin   = 36; // 0.5 inch
+        const double rightMargin  = 36;
+        const double topMargin    = 36;
+        const double bottomMargin = 36;
+
+        // Load the PDF inside a using block for deterministic disposal.
         using (Document doc = new Document(inputPath))
         {
-            // Define the amount to trim from each side (points; 1 inch = 72 points)
-            const double marginLeft   = 36; // 0.5 inch
-            const double marginRight  = 36;
-            const double marginTop    = 36;
-            const double marginBottom = 36;
-
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            // Pages collection uses 1‑based indexing.
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Get the original media box (full page size)
+                // Original page size.
                 Aspose.Pdf.Rectangle mediaBox = page.MediaBox;
 
-                // Calculate new CropBox coordinates by subtracting the margins
-                double llx = mediaBox.LLX + marginLeft;
-                double lly = mediaBox.LLY + marginBottom;
-                double urx = mediaBox.URX - marginRight;
-                double ury = mediaBox.URY - marginTop;
+                // Compute new CropBox coordinates by removing the margins.
+                double llx = mediaBox.LLX + leftMargin;
+                double lly = mediaBox.LLY + bottomMargin;
+                double urx = mediaBox.URX - rightMargin;
+                double ury = mediaBox.URY - topMargin;
 
-                // Set the CropBox to the new rectangle
+                // Set the CropBox. Fully qualify Rectangle to avoid ambiguity.
                 page.CropBox = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
             }
 
-            // Save the modified PDF
+            // Save the modified document.
             doc.Save(outputPath);
         }
 

@@ -15,35 +15,34 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Verify the document has at least nine pages
-            if (doc.Pages.Count < 9)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine("The document contains fewer than 9 pages.");
-                return;
+                // Move page 9 to the first position using Insert/Delete (PageCollection has no Move method)
+                int sourceIndex = 9;   // 1‑based index of the page to move
+                int targetIndex = 1;   // 1‑based index where the page should be placed
+
+                // Retrieve the page to move
+                Page pageToMove = doc.Pages[sourceIndex];
+
+                // Insert the page at the target position
+                doc.Pages.Insert(targetIndex, pageToMove);
+
+                // Delete the original occurrence of the page (adjusted after insertion)
+                int deleteIndex = sourceIndex >= targetIndex ? sourceIndex + 1 : sourceIndex;
+                doc.Pages.Delete(deleteIndex);
+
+                // Save the modified document
+                doc.Save(outputPath);
             }
 
-            // Move page 9 to the first position (1‑based indexing)
-            int sourceIndex = 9;   // original position of the page to move
-            int targetIndex = 1;   // desired new position
-
-            // Retrieve the page reference
-            Page pageToMove = doc.Pages[sourceIndex];
-
-            // Insert the page at the target position
-            doc.Pages.Insert(targetIndex, pageToMove);
-
-            // Delete the original occurrence of the page.
-            // After insertion, the original page shifts one position forward if source >= target.
-            int deleteIndex = sourceIndex >= targetIndex ? sourceIndex + 1 : sourceIndex;
-            doc.Pages.Delete(deleteIndex);
-
-            // Save the updated PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Page 9 moved to first position. Saved as '{outputPath}'.");
         }
-
-        Console.WriteLine($"Page 9 moved to first position. Saved as '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

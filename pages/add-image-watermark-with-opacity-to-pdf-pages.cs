@@ -6,48 +6,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "output.pdf";
-        const string watermarkImgPath = "watermark.png";
+        const string inputPdf   = "input.pdf";      // source PDF
+        const string watermark  = "logo.png";       // watermark image file
+        const string outputPdf  = "watermarked.pdf"; // result PDF
 
-        // Verify input files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(watermarkImgPath))
-        {
-            Console.Error.WriteLine($"Watermark image not found: {watermarkImgPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPdfPath))
+        if (!File.Exists(watermark))
         {
-            // Apply the watermark to each page
+            Console.Error.WriteLine($"Watermark image not found: {watermark}");
+            return;
+        }
+
+        // Load the PDF document (lifecycle: load)
+        using (Document doc = new Document(inputPdf))
+        {
+            // Iterate over all pages and apply the image stamp
             foreach (Page page in doc.Pages)
             {
-                // Create a watermark artifact
-                WatermarkArtifact wm = new WatermarkArtifact();
+                // Create an ImageStamp with the watermark image
+                ImageStamp imgStamp = new ImageStamp(watermark)
+                {
+                    // Set opacity to 20% (0.2)
+                    Opacity = 0.2,
+                    // Place the stamp behind the page content (optional)
+                    Background = false,
+                    // Center the stamp on the page (optional)
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Center
+                };
 
-                // Set the image for the watermark
-                wm.SetImage(watermarkImgPath);
-
-                // Set opacity to 20% (0.2)
-                wm.Opacity = 0.2;
-
-                // Place the watermark on top of page content
-                wm.IsBackground = false;
-
-                // Add the artifact to the page
-                page.Artifacts.Add(wm);
+                // Add the stamp to the current page (lifecycle: modify)
+                page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF (lifecycle rule: use Save)
-            doc.Save(outputPdfPath);
+            // Save the modified PDF (lifecycle: save)
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
     }
 }

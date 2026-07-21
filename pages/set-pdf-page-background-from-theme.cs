@@ -1,14 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Aspose.Pdf namespace contains Document, Page, Color, etc.
+using System.Text.Json;
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF
-        const string outputPdf = "output.pdf";  // destination PDF
-        const string configPath = "theme.config"; // simple config file containing the theme name
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string configPath = "themeConfig.json";
 
         // Validate input files
         if (!File.Exists(inputPdf))
@@ -22,40 +23,46 @@ class Program
             return;
         }
 
-        // Read the theme name (first line of the config file)
-        string theme = File.ReadAllText(configPath).Trim();
+        // Load theme configuration (expects JSON like { "Theme": "Dark" })
+        string json = File.ReadAllText(configPath);
+        ThemeConfig cfg = JsonSerializer.Deserialize<ThemeConfig>(json);
 
-        // Map theme names to background colors
-        Aspose.Pdf.Color bgColor;
-        switch (theme.ToLowerInvariant())
-        {
-            case "dark":
-                bgColor = Aspose.Pdf.Color.Black;
-                break;
-            case "light":
-                bgColor = Aspose.Pdf.Color.White;
-                break;
-            case "blue":
-                bgColor = Aspose.Pdf.Color.LightBlue;
-                break;
-            default:
-                // Fallback color if the theme is unknown
-                bgColor = Aspose.Pdf.Color.LightGray;
-                break;
-        }
+        // Determine background color based on the selected theme
+        Aspose.Pdf.Color bgColor = GetColorForTheme(cfg?.Theme);
 
-        // Load the PDF, set each page's background, and save
-        using (Document doc = new Document(inputPdf)) // document-disposal-with-using rule
+        // Load the PDF document (lifecycle rule: use using for disposal)
+        using (Document doc = new Document(inputPdf))
         {
-            // Pages are 1‑based (page-indexing-one-based rule)
+            // Apply the background color to every page (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                doc.Pages[i].Background = bgColor; // Page.Background property
+                Aspose.Pdf.Page page = doc.Pages[i];
+                page.Background = bgColor;
             }
 
-            doc.Save(outputPdf); // save as PDF (no SaveOptions needed for PDF)
+            // Save the modified PDF (standard Save overload)
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with '{theme}' theme background to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved to '{outputPdf}' with background color {bgColor}.");
+    }
+
+    // Maps a theme name to an Aspose.Pdf.Color instance
+    static Aspose.Pdf.Color GetColorForTheme(string theme)
+    {
+        return theme?.Trim().ToLowerInvariant() switch
+        {
+            "dark"   => Aspose.Pdf.Color.Black,
+            "light"  => Aspose.Pdf.Color.White,
+            "blue"   => Aspose.Pdf.Color.LightBlue,
+            "sepia"  => Aspose.Pdf.Color.LightGray,
+            _        => Aspose.Pdf.Color.White // default fallback
+        };
+    }
+
+    // Simple POCO for deserializing the JSON configuration
+    private class ThemeConfig
+    {
+        public string Theme { get; set; }
     }
 }

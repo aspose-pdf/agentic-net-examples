@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
 
 class Program
 {
@@ -17,7 +17,7 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based; Pages.Count returns the total number of pages
+            // Pages are 1‑based; Count gives the total number of pages
             int pageCount = doc.Pages.Count;
 
             // Output the page count to the console

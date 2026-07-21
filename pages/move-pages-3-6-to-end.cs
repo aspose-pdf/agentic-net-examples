@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 
 class Program
@@ -15,30 +16,27 @@ class Program
             return;
         }
 
-        // Load the source PDF
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least 6 pages
+            // Verify the document has at least 6 pages (pages are 1‑based)
             if (doc.Pages.Count < 6)
             {
-                Console.Error.WriteLine("Document does not contain enough pages to perform the operation.");
+                Console.Error.WriteLine("Document contains fewer than 6 pages.");
                 return;
             }
 
-            // Collect pages 3 through 6 (1‑based indexing)
-            Page[] pagesToMove = new Page[4];
-            for (int i = 0; i < 4; i++)
-                pagesToMove[i] = doc.Pages[3 + i]; // pages 3,4,5,6
+            // Collect pages 3 through 6 (skip first two, then take four)
+            var pagesToMove = doc.Pages
+                                 .Skip(2)   // pages 1 and 2 are skipped
+                                 .Take(4)   // pages 3,4,5,6 are taken
+                                 .ToList(); // materialize as a List<Page>
 
-            // Insert the collected pages at the end of the document
-            // Insert position is Count+1 because Insert expects a 1‑based index
+            // Insert the collected pages at the end of the document.
+            // Insert expects a 1‑based index; Count+1 places them after the last page.
             doc.Pages.Insert(doc.Pages.Count + 1, pagesToMove);
 
-            // Delete the original pages 3‑6 (they are now duplicated at the end)
-            // Deleting after insertion ensures the newly inserted pages stay at the end
-            doc.Pages.Delete(new int[] { 3, 4, 5, 6 });
-
-            // Save the modified PDF
+            // Save the reordered PDF
             doc.Save(outputPath);
         }
 

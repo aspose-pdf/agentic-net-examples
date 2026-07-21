@@ -1,15 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API (Document, Page, PageNumberStamp, etc.)
-using Aspose.Pdf.Text;          // For NumberingStyle enum and TextState
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations; // for page.AddStamp extension
+using Aspose.Pdf.Facades;   // not required but kept for completeness
 
 class InsertRomanPageNumbers
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // source PDF
-        const string outputPath = "output_roman.pdf";   // result PDF
-        const int introPageCount = 5;                   // number of introductory pages to number with Roman numerals
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_roman.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,28 +17,41 @@ class InsertRomanPageNumbers
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Number of introductory pages that should receive Roman numerals.
+        // Adjust this value according to the document structure.
+        const int introPageCount = 5;
+
+        // Load the PDF inside a using block to ensure proper disposal.
         using (Document doc = new Document(inputPath))
         {
-            // Create a PageNumberStamp that will be placed on each page
-            PageNumberStamp romanStamp = new PageNumberStamp();
-            romanStamp.NumberingStyle = NumberingStyle.NumeralsRomanUppercase; // I, II, III...
-            romanStamp.StartingNumber = 1;                                      // start at I
-            romanStamp.HorizontalAlignment = HorizontalAlignment.Center;        // centered horizontally
-            romanStamp.VerticalAlignment   = VerticalAlignment.Bottom;          // placed at bottom
-            romanStamp.BottomMargin = 20;                                       // distance from bottom edge
-            // Font size must be set via TextState (FontSize property on the stamp is read‑only)
-            romanStamp.TextState.FontSize = 12;                                 // readable size
-            romanStamp.TextState.ForegroundColor = Color.Black;                // black text
-
-            // Apply the stamp only to the introductory pages
+            // Iterate over the first 'introPageCount' pages (1‑based indexing).
             for (int i = 1; i <= Math.Min(introPageCount, doc.Pages.Count); i++)
             {
-                Page page = doc.Pages[i];   // 1‑based indexing
-                page.AddStamp(romanStamp);
+                Page page = doc.Pages[i];
+
+                // Create a PageNumberStamp for each page.
+                PageNumberStamp stamp = new PageNumberStamp
+                {
+                    // Use uppercase Roman numerals (I, II, III, ...).
+                    NumberingStyle = NumberingStyle.NumeralsRomanUppercase,
+
+                    // Position the stamp at the bottom center of the page.
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Bottom,
+
+                    // Optional margins to fine‑tune placement.
+                    BottomMargin = 20,
+
+                    // The format string must contain '#' which will be replaced
+                    // by the page number according to the selected NumberingStyle.
+                    Format = "#"
+                };
+
+                // Add the stamp to the current page.
+                page.AddStamp(stamp);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 

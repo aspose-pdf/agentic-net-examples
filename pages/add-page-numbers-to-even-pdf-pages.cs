@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text;   // for TextState if needed
 
 class Program
 {
@@ -16,22 +16,26 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document (using statement ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
+            // Iterate over pages using 1‑based indexing
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Apply numbering only to even pages
+                // Apply stamp only on even pages
                 if (i % 2 == 0)
                 {
                     // Create a page number stamp with default format "#"
                     PageNumberStamp stamp = new PageNumberStamp();
+
+                    // Position the stamp at the bottom‑center of the page
                     stamp.HorizontalAlignment = HorizontalAlignment.Center;
                     stamp.VerticalAlignment   = VerticalAlignment.Bottom;
-                    stamp.BottomMargin        = 20;                     // distance from bottom edge
-                    stamp.TextState.FontSize  = 12;                     // font size
-                    stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black; // text color
+
+                    // Optional: set visual appearance
+                    stamp.TextState.FontSize = 12;
+                    stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                    stamp.Opacity = 0.8f;   // semi‑transparent
 
                     // Add the stamp to the current page
                     doc.Pages[i].AddStamp(stamp);
@@ -42,6 +46,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with page numbers on even pages: '{outputPath}'.");
+        Console.WriteLine($"Even‑page numbers added. Output saved to '{outputPath}'.");
     }
 }

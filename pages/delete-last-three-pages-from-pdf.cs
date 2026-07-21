@@ -18,7 +18,6 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Determine the current number of pages (1‑based indexing)
             int pageCount = doc.Pages.Count;
 
             // Ensure there are at least three pages to delete
@@ -28,8 +27,8 @@ class Program
                 return;
             }
 
-            // Delete the last three pages starting from the highest index
-            // Deleting in descending order prevents index shifting after each removal
+            // Delete the last three pages. Page numbers are 1‑based, so start from the end.
+            // After each deletion the collection shrinks, so we delete in descending order.
             for (int i = pageCount; i > pageCount - 3; i--)
             {
                 doc.Pages.Delete(i);

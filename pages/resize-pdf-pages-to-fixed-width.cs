@@ -8,7 +8,6 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "resized_output.pdf";
-        const double targetWidth = 800.0; // points
 
         if (!File.Exists(inputPath))
         {
@@ -16,30 +15,33 @@ class Program
             return;
         }
 
-        // Load the PDF document (using the recommended lifecycle rule)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate pages using 1‑based indexing (global rule)
+            // Iterate over all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Original page dimensions
+                // Original page dimensions (points)
                 double originalWidth  = page.PageInfo.Width;
                 double originalHeight = page.PageInfo.Height;
 
-                // Compute scaling factor to achieve the target width
-                double scale = targetWidth / originalWidth;
-                double newHeight = originalHeight * scale;
+                // Desired fixed width
+                const double targetWidth = 800.0;
 
-                // Resize the page while preserving aspect ratio
-                page.SetPageSize(targetWidth, newHeight);
+                // Compute scaling factor to preserve aspect ratio
+                double scale = targetWidth / originalWidth;
+                double targetHeight = originalHeight * scale;
+
+                // Apply the new size to the page
+                page.SetPageSize(targetWidth, targetHeight);
             }
 
-            // Save the modified document (using the provided save rule)
+            // Save the modified document (PDF format)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Pages resized to width {targetWidth} points and saved to '{outputPath}'.");
+        Console.WriteLine($"Pages resized to width 800 points and saved to '{outputPath}'.");
     }
 }
