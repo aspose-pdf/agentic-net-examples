@@ -1,7 +1,6 @@
 using System;
-using System.IO;
-using Aspose.Pdf;               // for DefaultMetadataProperties enum
-using Aspose.Pdf.Facades;      // for PdfXmpMetadata
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -10,24 +9,24 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPath))
+        // Ensure the source file exists
+        if (!System.IO.File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the XMP metadata facade, bind it to the PDF,
-        // remove the Nickname element, and save the updated PDF.
+        // Use PdfXmpMetadata facade to manipulate XMP metadata
         using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            // Load the PDF into the facade
+            // Load the PDF document into the facade
             xmp.BindPdf(inputPath);
 
-            // Remove the Nickname element using the enum overload
+            // Remove the Nickname element from XMP metadata
+            // Two overloads are available; using the enum version is type‑safe
             xmp.Remove(DefaultMetadataProperties.Nickname);
 
-            // Persist the changes to a new file
+            // Save the modified PDF back to disk
             xmp.Save(outputPath);
         }
 

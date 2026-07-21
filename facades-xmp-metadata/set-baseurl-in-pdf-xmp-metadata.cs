@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -16,17 +17,16 @@ class Program
             return;
         }
 
-        // Bind to the PDF and modify its XMP metadata
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-        {
-            xmp.BindPdf(inputPath);
+        // Bind the existing PDF to the XMP metadata facade
+        PdfXmpMetadata xmp = new PdfXmpMetadata();
+        xmp.BindPdf(inputPath);
 
-            // Set the BaseURL property (xmp:BaseURL) in the XMP metadata
-            xmp.Add("xmp:BaseURL", baseUrl);
+        // Set the BaseURL property in the XMP metadata
+        xmp.Add(DefaultMetadataProperties.BaseURL, new XmpValue(baseUrl));
 
-            // Save the updated PDF with the new metadata
-            xmp.Save(outputPath);
-        }
+        // Save the PDF with the updated metadata
+        xmp.Save(outputPath);
+        xmp.Close();
 
         Console.WriteLine($"BaseURL set to '{baseUrl}' and saved as '{outputPath}'.");
     }

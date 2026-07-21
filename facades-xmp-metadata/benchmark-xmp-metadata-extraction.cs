@@ -6,40 +6,34 @@ class Program
 {
     static void Main()
     {
-        // Path to the large PDF (500+ pages)
-        const string pdfPath = "large_document.pdf";
+        const string inputPdf = "large_input.pdf";
 
-        // Verify the file exists before proceeding
-        if (!System.IO.File.Exists(pdfPath))
+        if (!System.IO.File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Stopwatch for benchmarking
-        Stopwatch sw = new Stopwatch();
+        // Warm‑up: bind once to avoid first‑time overhead affecting the measurement
+        using (PdfXmpMetadata warmup = new PdfXmpMetadata())
+        {
+            warmup.BindPdf(inputPdf);
+            warmup.GetXmpMetadata();
+        }
 
-        // Create the XMP metadata facade
-        PdfXmpMetadata xmp = new PdfXmpMetadata();
+        // Benchmark the XMP metadata extraction
+        Stopwatch sw = Stopwatch.StartNew();
 
-        // Start timing
-        sw.Start();
+        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        {
+            xmp.BindPdf(inputPdf);
+            byte[] metadataBytes = xmp.GetXmpMetadata(); // read full XMP metadata
+            // Optionally, you could process the bytes here (e.g., convert to string)
+            // string xml = System.Text.Encoding.UTF8.GetString(metadataBytes);
+        }
 
-        // Bind the PDF file to the facade
-        xmp.BindPdf(pdfPath);
-
-        // Retrieve the full XMP metadata as a byte array
-        byte[] metadataBytes = xmp.GetXmpMetadata();
-
-        // Stop timing
         sw.Stop();
 
-        // Output benchmark result
         Console.WriteLine($"XMP metadata extraction time: {sw.ElapsedMilliseconds} ms");
-
-        // Optionally display size of the metadata (in bytes)
-        Console.WriteLine($"Metadata size: {metadataBytes.Length} bytes");
-
-        // Clean up (PdfXmpMetadata does not implement IDisposable, so no explicit disposal needed)
     }
 }

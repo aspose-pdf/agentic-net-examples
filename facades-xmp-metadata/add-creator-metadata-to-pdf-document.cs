@@ -2,45 +2,45 @@ using System;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-public static class PdfDocumentExtensions
+namespace PdfExtensions
 {
     /// <summary>
-    /// Adds a Creator metadata value to any Aspose.Pdf.Document.
-    /// The change is applied to the in‑memory Document instance; you can later call <c>pdfDocument.Save(...)</c>.
+    /// Extension methods for Aspose.Pdf.Document.
     /// </summary>
-    /// <param name="pdfDocument">The PDF document to modify.</param>
-    /// <param name="creator">The creator string to set.</param>
-    public static void AddCreatorTool(this Document pdfDocument, string creator)
+    public static class PdfDocumentExtensions
     {
-        // Initialise the PdfFileInfo facade.
-        PdfFileInfo fileInfo = new PdfFileInfo();
+        /// <summary>
+        /// Adds or updates the Creator metadata of the PDF document.
+        /// </summary>
+        /// <param name="pdfDoc">The Aspose.Pdf.Document instance to modify.</param>
+        /// <param name="creator">The creator string to set.</param>
+        public static void AddCreator(this Document pdfDoc, string creator)
+        {
+            if (pdfDoc == null) throw new ArgumentNullException(nameof(pdfDoc));
+            if (creator == null) throw new ArgumentNullException(nameof(creator));
 
-        // Bind the facade to the existing Document instance.
-        fileInfo.BindPdf(pdfDocument);
+            // Bind the existing Document to the PdfFileInfo facade.
+            PdfFileInfo fileInfo = new PdfFileInfo();
+            fileInfo.BindPdf(pdfDoc);
 
-        // Set the Creator property; this updates the metadata of the bound document.
-        fileInfo.Creator = creator;
+            // Set the Creator property.
+            fileInfo.Creator = creator;
 
-        // No explicit Save is required here; the change is reflected in the Document object.
-        // The caller can later call pdfDocument.Save(...) as needed.
+            // No explicit Save is required; the change is reflected in the Document object.
+        }
     }
-}
 
-// ---------------------------------------------------------------------------
-// A minimal entry point is required because the project is built as an
-// executable (Console Application). Adding a static Main method satisfies the
-// compiler and allows the library to be compiled and, if desired, executed.
-// ---------------------------------------------------------------------------
-public class Program
-{
-    public static void Main(string[] args)
+    // ---------------------------------------------------------------------
+    // Dummy entry point – required because the project is currently built
+    // as a console application.  Adding a minimal Main method satisfies the
+    // compiler without affecting the reusable extension functionality.
+    // ---------------------------------------------------------------------
+    internal class Program
     {
-        // Example usage (optional – can be removed in production).
-        // Ensure you have a valid PDF file at the specified path.
-        // Document doc = new Document("input.pdf");
-        // doc.AddCreatorTool("My Awesome Tool");
-        // doc.Save("output.pdf");
-        
-        // The method is intentionally left empty to serve only as a valid entry point.
+        private static void Main(string[] args)
+        {
+            // Intentionally left blank. The library can be used by referencing
+            // this assembly and calling Document.AddCreator(...).
+        }
     }
 }

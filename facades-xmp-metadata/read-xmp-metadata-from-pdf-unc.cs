@@ -7,36 +7,36 @@ class Program
 {
     static void Main()
     {
-        // UNC path to the PDF file on the network share
-        const string pdfPath = @"\\server\share\documents\sample.pdf";
+        // UNC path to the PDF file on a network share
+        const string pdfPath = @"\\ServerName\ShareFolder\Documents\sample.pdf";
 
-        // Verify that the file exists before attempting to read it
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Use the PdfXmpMetadata facade to bind the PDF and retrieve XMP metadata
-        using (PdfXmpMetadata xmpMetadata = new PdfXmpMetadata())
+        try
         {
-            // Bind the PDF located at the UNC path
-            xmpMetadata.BindPdf(pdfPath);
+            // PdfXmpMetadata implements SaveableFacade (IDisposable), so use a using block
+            using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+            {
+                // Bind the PDF located at the UNC path
+                xmp.BindPdf(pdfPath);
 
-            // Retrieve the entire XMP metadata as a byte array (XML format)
-            byte[] fullMetadataBytes = xmpMetadata.GetXmpMetadata();
-            string fullMetadataXml = Encoding.UTF8.GetString(fullMetadataBytes);
+                // Retrieve the entire XMP metadata as a byte array
+                byte[] rawData = xmp.GetXmpMetadata();
 
-            Console.WriteLine("=== Full XMP Metadata ===");
-            Console.WriteLine(fullMetadataXml);
-            Console.WriteLine();
+                // Convert the byte array to a UTF‑8 string for display
+                string xml = Encoding.UTF8.GetString(rawData);
 
-            // Example: retrieve a specific XMP property (e.g., creator)
-            byte[] creatorBytes = xmpMetadata.GetXmpMetadata("dc:creator");
-            string creatorXml = Encoding.UTF8.GetString(creatorBytes);
-
-            Console.WriteLine("=== dc:creator Metadata ===");
-            Console.WriteLine(creatorXml);
+                Console.WriteLine("XMP Metadata (XML):");
+                Console.WriteLine(xml);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error reading XMP metadata: {ex.Message}");
         }
     }
 }

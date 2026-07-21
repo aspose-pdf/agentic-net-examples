@@ -1,55 +1,55 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Xml;
-using Aspose.Pdf.Facades; // PdfXmpMetadata resides here
+using Aspose.Pdf.Facades;   // PdfXmpMetadata resides here
 
-class XmpReader
+class Program
 {
     static void Main()
     {
-        // Path to the PDF file whose XMP metadata will be read
-        const string pdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
 
-        // Ensure the file exists before proceeding
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Bind the PDF to the PdfXmpMetadata facade
-        // PdfXmpMetadata implements IDisposable, so we use a using block
+        // Bind the PDF to the XMP metadata facade
         using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            xmp.BindPdf(pdfPath);
+            xmp.BindPdf(inputPdf);
 
-            // Retrieve the whole XMP metadata as a byte array (XML format)
-            byte[] rawData = xmp.GetXmpMetadata();
+            // Retrieve the whole XMP packet as XML bytes
+            byte[] xmlBytes = xmp.GetXmpMetadata();
 
-            // Convert the byte array to a UTF‑8 string
-            string xmlContent = Encoding.UTF8.GetString(rawData);
-
-            // Load the XML into an XmlDocument for parsing
+            // Load the XML into an XmlDocument for querying
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xmlContent);
+            using (MemoryStream ms = new MemoryStream(xmlBytes))
+            {
+                xmlDoc.Load(ms);
+            }
 
-            // Prepare a namespace manager because XMP uses several XML namespaces
-            XmlNamespaceManager nsMgr = new XmlNamespaceManager(xmlDoc.NameTable);
-            nsMgr.AddNamespace("dc", "http://purl.org/dc/elements/1.1/");
-            nsMgr.AddNamespace("xmp", "http://ns.adobe.com/xap/1.0/");
-            nsMgr.AddNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+            // Prepare namespace manager for common XMP prefixes
+            XmlNamespaceManager ns = new XmlNamespaceManager(xmlDoc.NameTable);
+            ns.AddNamespace("dc",  "http://purl.org/dc/elements/1.1/");
+            ns.AddNamespace("xmp", "http://ns.adobe.com/xap/1.0/");
+            ns.AddNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
 
-            // Example: read the creator (dc:creator) – the value is inside an rdf:Bag/rdf:li element
-            XmlNode creatorNode = xmlDoc.SelectSingleNode("//dc:creator/rdf:Bag/rdf:li", nsMgr);
-            string creator = creatorNode?.InnerText ?? "(not set)";
+            // Helper to fetch the inner text of the first node matching an XPath
+            string GetNodeValue(string xpath)
+            {
+                XmlNode node = xmlDoc.SelectSingleNode(xpath, ns);
+                return node?.InnerText ?? "(not found)";
+            }
 
-            // Example: read the creation date (xmp:CreateDate)
-            XmlNode createDateNode = xmlDoc.SelectSingleNode("//xmp:CreateDate", nsMgr);
-            string createDate = createDateNode?.InnerText ?? "(not set)";
+            // Example: read creator, title and creation date from the XMP packet
+            string creator    = GetNodeValue("//dc:creator/rdf:Seq/rdf:li");
+            string title      = GetNodeValue("//dc:title/rdf:Alt/rdf:li");
+            string createDate = GetNodeValue("//xmp:CreateDate");
 
-            // Output the extracted values
             Console.WriteLine($"Creator   : {creator}");
+            Console.WriteLine($"Title     : {title}");
             Console.WriteLine($"CreateDate: {createDate}");
         }
     }
