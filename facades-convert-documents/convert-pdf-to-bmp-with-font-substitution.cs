@@ -1,56 +1,62 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging; // ImageFormat for BMP
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // required for font substitution
+using System.Drawing.Imaging;               // ImageFormat for BMP
+using Aspose.Pdf;                           // Document, etc.
+using Aspose.Pdf.Facades;                  // PdfConverter (Facade)
+using Aspose.Pdf.Devices;                  // Resolution
+using Aspose.Pdf.Text;                     // FontRepository & SimpleFontSubstitution
 
-class Program
+class PdfToBmpConverter
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        // Input PDF file path
+        const string inputPdfPath = "input.pdf";
+
+        // Output directory for BMP images
         const string outputDir = "BmpImages";
 
-        if (!File.Exists(inputPdf))
+        // Ensure the input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure output directory exists
+        // Create output directory if it does not exist
         Directory.CreateDirectory(outputDir);
 
-        // Register a font substitution: replace Times New Roman with Calibri
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Times New Roman", "Calibri"));
-
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Initialize PdfConverter with the loaded document
-            using (PdfConverter converter = new PdfConverter(doc))
-            {
-                // Set conversion range (first to last page)
-                converter.StartPage = 1;
-                converter.EndPage = doc.Pages.Count;
+            // Apply custom font substitution: replace Times New Roman with Calibri
+            // Use FontRepository.Substitutions with SimpleFontSubstitution (requires Aspose.Pdf.Text namespace)
+            FontRepository.Substitutions.Add(new SimpleFontSubstitution("Times New Roman", "Calibri"));
 
-                // Prepare for conversion
+            // Initialize PdfConverter with the loaded document
+            using (PdfConverter converter = new PdfConverter(pdfDoc))
+            {
+                // Set desired resolution (e.g., 300 DPI) for higher quality BMPs
+                converter.Resolution = new Resolution(300);
+
+                // Prepare the converter for conversion
                 converter.DoConvert();
 
                 int pageNumber = 1;
-                // Iterate through pages and save each as BMP
+                // Iterate through all pages and save each as a BMP image
                 while (converter.HasNextImage())
                 {
-                    string outPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
-                    converter.GetNextImage(outPath, ImageFormat.Bmp);
+                    string bmpPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
+                    // GetNextImage saves the next page image to the specified file using the given format
+                    converter.GetNextImage(bmpPath, ImageFormat.Bmp);
                     pageNumber++;
                 }
 
-                // Release converter resources
+                // Release resources held by the converter
                 converter.Close();
             }
         }
 
-        Console.WriteLine("PDF to BMP conversion completed.");
+        Console.WriteLine("PDF conversion to BMP completed successfully.");
     }
 }

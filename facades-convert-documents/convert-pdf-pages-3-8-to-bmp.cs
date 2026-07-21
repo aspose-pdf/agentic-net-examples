@@ -1,45 +1,49 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
 using System.Drawing.Imaging;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputFolder = "BmpImages";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Use PdfConverter (Facade) to convert pages to BMP images
-        using (PdfConverter converter = new PdfConverter())
+        // Load the PDF document (wrapped in using for proper disposal)
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Bind the source PDF file
-            converter.BindPdf(inputPdfPath);
-
-            // Set the page range (3 to 8, inclusive)
-            converter.StartPage = 3;
-            converter.EndPage   = 8;
-
-            // Prepare the converter
-            converter.DoConvert();
-
-            int currentPage = converter.StartPage;
-            // Iterate through the generated images
-            while (converter.HasNextImage())
+            // Initialize the PdfConverter facade (also disposable)
+            using (PdfConverter converter = new PdfConverter())
             {
-                string outputPath = Path.Combine(outputFolder, $"page_{currentPage}.bmp");
-                // Save the current page as BMP
-                converter.GetNextImage(outputPath, ImageFormat.Bmp);
-                currentPage++;
+                // Bind the loaded document to the converter
+                converter.BindPdf(pdfDoc);
+
+                // Set the desired page range (pages are 1‑based)
+                converter.StartPage = 3;
+                converter.EndPage   = 8;
+
+                // Prepare the conversion process
+                converter.DoConvert();
+
+                // Export each page in the range as a BMP image
+                int pageNumber = converter.StartPage;
+                while (converter.HasNextImage())
+                {
+                    string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}_out.bmp");
+                    converter.GetNextImage(outputPath, ImageFormat.Bmp);
+                    pageNumber++;
+                }
             }
         }
 

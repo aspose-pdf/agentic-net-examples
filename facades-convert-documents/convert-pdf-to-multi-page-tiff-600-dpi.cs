@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Devices;
 
@@ -7,31 +8,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTiff = "output.tiff";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.tiff";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfConverter is a Facade that handles PDF‑to‑image conversion.
+        // Convert PDF to a multi‑page TIFF with 600 DPI resolution
         using (PdfConverter converter = new PdfConverter())
         {
-            // Bind the source PDF.
-            converter.BindPdf(inputPdf);
+            // Bind the source PDF file
+            converter.BindPdf(inputPath);
 
-            // Set the resolution to 600 DPI for high‑quality graphics.
-            converter.Resolution = new Resolution(600);
+            // Set the desired resolution (600 DPI)
+            converter.Resolution = new Aspose.Pdf.Devices.Resolution(600);
 
-            // Initialize the conversion process.
+            // Initialize conversion
             converter.DoConvert();
 
-            // Save all pages as a single multi‑page TIFF file.
-            converter.SaveAsTIFF(outputTiff);
+            // Save all pages as a single TIFF file
+            converter.SaveAsTIFF(outputPath);
         }
 
-        Console.WriteLine($"PDF successfully converted to TIFF: {outputTiff}");
+        Console.WriteLine($"TIFF image saved to '{outputPath}'.");
     }
 }

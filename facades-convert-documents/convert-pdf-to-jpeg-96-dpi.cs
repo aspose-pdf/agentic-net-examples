@@ -1,53 +1,48 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Devices;
 
-class PdfToJpegConverter
+class Program
 {
     static void Main()
     {
-        // Input PDF file
         const string inputPdf = "input.pdf";
-
-        // Directory where JPEG images will be saved
-        const string outputDir = "JpegPages";
+        const string outputDir = "output_images";
 
         // Verify input file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Use PdfConverter (facade) to convert each page to JPEG
-        using (PdfConverter converter = new PdfConverter())
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        using (Document pdfDocument = new Document(inputPdf))
         {
-            // Set desired resolution (96 DPI for web‑friendly images)
-            // PdfConverter.Resolution expects a Resolution object, not an int.
-            converter.Resolution = new Resolution(96);
+            // Create a Resolution object with 96 DPI (web‑friendly)
+            Resolution resolution = new Resolution(96);
 
-            // Bind the source PDF file
-            converter.BindPdf(inputPdf);
+            // Initialize the JPEG device with the specified resolution
+            JpegDevice jpegDevice = new JpegDevice(resolution);
 
-            // Prepare the converter for image extraction
-            converter.DoConvert();
-
-            int pageNumber = 1;
-            // Iterate through all pages and save each as a JPEG file
-            while (converter.HasNextImage())
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
                 string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
-                // GetNextImage overload infers format from file extension (".jpg")
-                converter.GetNextImage(outputPath);
-                pageNumber++;
+
+                // Create a file stream for the output image
+                using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
+                {
+                    // Convert the current page to JPEG and write to the stream
+                    jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
+                }
             }
         }
 
-        Console.WriteLine("PDF pages have been converted to JPEG images.");
+        Console.WriteLine("PDF pages have been successfully converted to JPEG images at 96 DPI.");
     }
 }

@@ -1,45 +1,44 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // for Resolution
+using Aspose.Pdf.Devices;
 
-class Program
+class PdfToPngConverter
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "output_images";
+        const string inputPdfPath = "input.pdf";
+        const string outputDir = "PngPages";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // PdfConverter implements IDisposable – wrap in using for deterministic cleanup
+        using (Document pdfDoc = new Document(inputPdfPath))
         using (PdfConverter converter = new PdfConverter())
         {
-            // Bind the source PDF file
-            converter.BindPdf(inputPdf);
+            // Bind the PDF document to the converter
+            converter.BindPdf(pdfDoc);
 
-            // Set low resolution (72 DPI) for quick preview images
+            // Set the desired resolution (72 DPI for quick preview)
             converter.Resolution = new Resolution(72);
 
-            // Prepare the converter (initial work before extracting images)
+            // Prepare the converter for image extraction
             converter.DoConvert();
 
-            int pageNumber = 1;
-            // Extract each page as a PNG image
+            int pageIndex = 1;
+            // Iterate over all pages and save each as a PNG image
             while (converter.HasNextImage())
             {
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
-                // GetNextImage infers the image format from the file extension, no ImageFormat needed
+                string outputPath = Path.Combine(outputDir, $"page_{pageIndex}.png");
+                // The overload infers the image format from the file extension, avoiding System.Drawing dependencies
                 converter.GetNextImage(outputPath);
-                pageNumber++;
+                pageIndex++;
             }
         }
 

@@ -1,16 +1,17 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;          // Facade API for conversion
-using Aspose.Pdf.Devices;          // Resolution enum
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";               // Source PDF file
-        const string outputDir = "output_images";           // Folder for JPEG files
+        const string inputPdf = "input.pdf";
+        const string outputDir = "output_images";
 
-        // Verify source file exists
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
@@ -20,28 +21,29 @@ class Program
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // PdfConverter implements IDisposable – use a using block for deterministic cleanup
+        // Convert PDF pages to JPEG images using PdfConverter (Facades API)
         using (PdfConverter converter = new PdfConverter())
         {
-            // Bind the PDF document to the converter
+            // Bind the source PDF file
             converter.BindPdf(inputPdf);
 
-            // Set conversion resolution to 300 DPI
+            // Set resolution to 300 DPI
             converter.Resolution = new Resolution(300);
 
-            // No need to set CoordinateType – CropBox is the default in recent Aspose.Pdf versions
-            // converter.CoordinateType = CoordinateType.CropBox; // removed
+            // NOTE: In recent Aspose.Pdf versions the CropBox is used by default.
+            // The CoordinateType property has been removed, so we simply omit it.
 
-            // Prepare the converter (required before retrieving images)
+            // Initialize conversion process
             converter.DoConvert();
 
-            int pageIndex = 1;
-            // Iterate over all pages; each call to GetNextImage writes a JPEG file
+            int pageNumber = 1;
+            // Iterate through all pages and save each as a JPEG image
             while (converter.HasNextImage())
             {
-                string outputPath = Path.Combine(outputDir, $"page_{pageIndex}.jpeg");
-                converter.GetNextImage(outputPath);   // Default format is JPEG
-                pageIndex++;
+                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
+                // GetNextImage saves the current page as JPEG by default
+                converter.GetNextImage(outputPath);
+                pageNumber++;
             }
         }
 

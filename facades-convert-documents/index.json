@@ -1,82 +1,34 @@
 {
   "category": "facades-convert-documents",
-  "nuget_version": "26.6.0",
-  "last_updated": "2026-07-05T08:32:59Z",
+  "nuget_version": "26.7.0",
+  "last_updated": "2026-07-18T00:39:36Z",
   "examples": {
-    "convert-pdf-to-png-300-dpi": {
-      "title": "Convert PDF to PNG Images at 300 DPI",
-      "filename": "convert-pdf-to-png-300-dpi.cs",
-      "description": "Shows how to use Aspose.Pdf's PdfConverter to convert each page of a PDF document into separate PNG files at 300 DPI.",
+    "convert-pdf-pages-to-bmp-helvetica-arial": {
+      "title": "Convert PDF Pages 5‑7 to BMP with Helvetica‑to‑Arial Substitution",
+      "filename": "convert-pdf-pages-to-bmp-helvetica-arial.cs",
+      "description": "Shows how to replace Helvetica with Arial using font substitution and convert pages 5 to 7 of a PDF into BMP images with the PdfConverter facade.",
       "tags": [
-        "pdf",
-        "png",
-        "conversion",
-        "300dpi",
-        "aspose"
+        "pdf conversion",
+        "bmp",
+        "font substitution",
+        "page range",
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Devices.Resolution",
-        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
-        "Aspose.Pdf.Facades.PdfConverter.GetNextImage"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
-      "status": "verified"
-    },
-    "convert-pdf-pages-to-jpeg-150-dpi": {
-      "title": "Convert PDF Pages 1‑10 to JPEG with 150 DPI",
-      "filename": "convert-pdf-pages-to-jpeg-150-dpi.cs",
-      "description": "Demonstrates how to convert the first ten pages of a PDF document to JPEG images at 150 DPI using the CropBox coordinate type with Aspose.Pdf.Facades.",
-      "tags": [
-        "pdf",
-        "jpeg",
-        "conversion",
-        "resolution",
-        "cropbox"
-      ],
-      "apis_used": [
-        "PdfConverter",
-        "PdfConverter.BindPdf",
-        "PdfConverter.DoConvert",
-        "PdfConverter.GetNextImage",
-        "PdfConverter.HasNextImage",
-        "Resolution"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
-      "status": "verified"
-    },
-    "convert-pdf-pages-5-7-to-bmp-helvetica-to-arial": {
-      "title": "Convert PDF Pages 5‑7 to BMP with Helvetica to Arial Substitution",
-      "filename": "convert-pdf-pages-5-7-to-bmp-helvetica-to-arial.cs",
-      "description": "Demonstrates converting specific PDF pages (5‑7) to BMP images while replacing the Helvetica font with Arial using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "bmp",
-        "font-substitution",
-        "page-conversion",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.FontRepository.Substitutions.Add",
         "Aspose.Pdf.Text.SimpleFontSubstitution",
-        "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
         "Aspose.Pdf.Facades.PdfConverter.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-pdf-pages-3-8-to-tiff": {
-      "title": "Convert PDF Pages 3‑8 to TIFF Images",
+      "title": "Convert PDF Pages 3-8 to TIFF",
       "filename": "convert-pdf-pages-3-8-to-tiff.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, iterate pages 3 through 8, and convert each page to a TIFF file using the TiffDevice with default resolution and CropBox.",
+      "description": "Shows how to load a PDF with Aspose.Pdf and use TiffDevice to convert pages 3 through 8 into a single multi‑page TIFF using the default resolution and CropBox.",
       "tags": [
         "pdf",
         "tiff",
@@ -87,86 +39,85 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Devices.TiffDevice",
-        "Aspose.Pdf.Devices.TiffDevice.Process",
-        "Aspose.Pdf.PageCollection",
-        "Aspose.Pdf.Page"
+        "Aspose.Pdf.Devices.TiffDevice.Process"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-pdf-pages-to-png": {
       "title": "Convert PDF Pages to PNG Images",
       "filename": "convert-pdf-pages-to-png.cs",
-      "description": "Demonstrates using Aspose.Pdf's PdfConverter facade to convert each page of a PDF into separate PNG files with sequential naming.",
+      "description": "Shows how to use Aspose.Pdf's PdfConverter facade to convert each page of a PDF document into separate PNG files with sequential naming.",
       "tags": [
         "pdf",
         "png",
         "conversion",
-        "facade",
-        "aspose"
+        "aspose",
+        "facade"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfConverter",
         "Aspose.Pdf.Facades.PdfConverter.BindPdf",
         "Aspose.Pdf.Facades.PdfConverter.DoConvert",
         "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
         "Aspose.Pdf.Facades.PdfConverter.GetNextImage"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
-    "convert-first-five-pdf-pages-to-jpeg": {
-      "title": "Convert First Five PDF Pages to JPEG at 200 DPI",
-      "filename": "convert-first-five-pdf-pages-to-jpeg.cs",
-      "description": "Demonstrates using Aspose.Pdf.Facades.PdfConverter to convert the first five pages of a PDF into JPEG images with a resolution of 200 DPI.",
+    "convert-pdf-to-jpeg-first-5-pages": {
+      "title": "Convert PDF to JPEG Images (First 5 Pages, 200 DPI)",
+      "filename": "convert-pdf-to-jpeg-first-5-pages.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, setting a 200 DPI resolution, and converting up to the first five pages to JPEG files.",
       "tags": [
         "pdf",
         "jpeg",
         "conversion",
-        "pages",
-        "resolution"
+        "aspose",
+        "dpi"
       ],
       "apis_used": [
-        "PdfConverter",
-        "PdfConverter.BindPdf",
-        "PdfConverter.DoConvert",
-        "PdfConverter.HasNextImage",
-        "PdfConverter.GetNextImage",
-        "Resolution"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.JpegDevice",
+        "Aspose.Pdf.Devices.JpegDevice.Process",
+        "Aspose.Pdf.Page"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-pdf-to-bmp-with-font-substitution": {
-      "title": "Convert PDF to BMP Images with Font Substitution",
+      "title": "Convert PDF to BMP Images with Times New Roman to Calibri Substitution",
       "filename": "convert-pdf-to-bmp-with-font-substitution.cs",
-      "description": "Demonstrates how to convert each page of a PDF document to BMP images while substituting Times New Roman with Calibri using Aspose.Pdf.",
+      "description": "Loads a PDF, replaces Times New Roman with Calibri via custom font substitution, and converts each page to a BMP image at 300 DPI using Aspose.Pdf's PdfConverter.",
       "tags": [
         "pdf",
         "bmp",
         "font-substitution",
         "conversion",
-        "Aspose.Pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.FontRepository.Substitutions",
-        "Aspose.Pdf.Text.SimpleFontSubstitution",
         "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.GetNextImage"
+        "Aspose.Pdf.Facades.PdfConverter.GetNextImage",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Text.SimpleFontSubstitution",
+        "Aspose.Pdf.Devices.Resolution"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
-    "convert-pdf-to-multi-page-tiff": {
-      "title": "Convert PDF to Multi‑Page TIFF with 300 DPI",
-      "filename": "convert-pdf-to-multi-page-tiff.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfConverter to bind a PDF, set a 300 dpi resolution, and save all pages as a single multi‑page TIFF file.",
+    "convert-pdf-to-multi-page-tiff-300-dpi": {
+      "title": "Convert PDF to Multi‑Page TIFF at 300 DPI",
+      "filename": "convert-pdf-to-multi-page-tiff-300-dpi.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfConverter facade to convert a PDF document into a single multi‑page TIFF image with a 300 DPI resolution.",
       "tags": [
         "pdf",
         "tiff",
@@ -175,45 +126,45 @@
         "facade"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.Resolution",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.SaveAsTIFF",
-        "Aspose.Pdf.Devices.Resolution"
+        "Aspose.Pdf.Devices.Resolution",
+        "PdfConverter.BindPdf",
+        "PdfConverter.DoConvert",
+        "PdfConverter.SaveAsTIFF"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
-    "convert-pdf-to-png-reverse-order": {
-      "title": "Convert PDF to PNG Images in Reverse Page Order",
-      "filename": "convert-pdf-to-png-reverse-order.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfConverter to convert each page of a PDF into PNG files while processing the pages from the last to the first.",
+    "convert-pdf-pages-to-png-reverse-order": {
+      "title": "Convert PDF Pages to PNG Images in Reverse Order",
+      "filename": "convert-pdf-pages-to-png-reverse-order.cs",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf, iterate its pages from last to first, and save each page as a PNG image using PdfConverter.",
       "tags": [
         "pdf",
         "png",
         "conversion",
         "reverse-order",
-        "facade"
+        "aspose-pdf"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfConverter",
         "PdfConverter.BindPdf",
         "PdfConverter.StartPage",
         "PdfConverter.EndPage",
         "PdfConverter.DoConvert",
-        "PdfConverter.GetNextImage",
-        "PdfConverter.Close"
+        "PdfConverter.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-pdf-to-jpeg-images": {
       "title": "Convert PDF to JPEG Images Using PdfConverter",
       "filename": "convert-pdf-to-jpeg-images.cs",
-      "description": "Shows how to convert each page of a PDF into separate JPEG files while preserving the original page dimensions and color depth using Aspose.Pdf's PdfConverter facade.",
+      "description": "Shows how to convert each page of a PDF into separate JPEG files while preserving the original page dimensions and color depth using Aspose.Pdf.Facades.PdfConverter.",
       "tags": [
         "pdf",
         "jpeg",
@@ -229,106 +180,13 @@
         "Aspose.Pdf.Facades.PdfConverter.GetNextImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-pdf-to-bmp-partial-range": {
       "title": "Convert PDF Pages to BMP Images (Partial Range)",
       "filename": "convert-pdf-to-bmp-partial-range.cs",
-      "description": "Demonstrates using Aspose.Pdf.Facades.PdfConverter to convert a specific page range of a PDF into BMP image files.",
-      "tags": [
-        "pdf",
-        "bmp",
-        "conversion",
-        "partial",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfConverter",
-        "PdfConverter.BindPdf",
-        "PdfConverter.StartPage",
-        "PdfConverter.EndPage",
-        "PdfConverter.DoConvert",
-        "PdfConverter.HasNextImage",
-        "PdfConverter.GetNextImage"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
-      "status": "verified"
-    },
-    "convert-pdf-to-multi-page-tiff-600-dpi": {
-      "title": "Convert PDF to Multi-Page TIFF at 600 DPI",
-      "filename": "convert-pdf-to-multi-page-tiff-600-dpi.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfConverter to convert a PDF file into a single multi-page TIFF image with a resolution of 600 DPI.",
-      "tags": [
-        "pdf",
-        "tiff",
-        "conversion",
-        "600dpi",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.Resolution",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.SaveAsTIFF"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
-      "status": "verified"
-    },
-    "convert-pdf-to-png-using-cropbox": {
-      "title": "Convert PDF to PNG Images Using CropBox",
-      "filename": "convert-pdf-to-png-using-cropbox.cs",
-      "description": "Shows how to convert each page of a PDF file to PNG images while using the CropBox coordinate type to include only the visible page area.",
-      "tags": [
-        "pdf",
-        "png",
-        "conversion",
-        "cropbox",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
-        "Aspose.Pdf.Facades.PdfConverter.GetNextImage",
-        "Aspose.Pdf.CoordinateType"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
-      "status": "verified"
-    },
-    "convert-pdf-to-jpeg-with-font-substitution": {
-      "title": "Convert PDF to JPEG with Font Substitution",
-      "filename": "convert-pdf-to-jpeg-with-font-substitution.cs",
-      "description": "Demonstrates how to convert each page of a PDF to JPEG images while providing a fallback font for any missing fonts using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "jpeg",
-        "font-substitution",
-        "conversion",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.FontRepository",
-        "Aspose.Pdf.Text.SimpleFontSubstitution",
-        "Aspose.Pdf.Devices.JpegDevice",
-        "Aspose.Pdf.Devices.Resolution"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
-      "status": "verified"
-    },
-    "convert-pdf-pages-3-8-to-bmp": {
-      "title": "Convert PDF Pages 3‑8 to BMP Images",
-      "filename": "convert-pdf-pages-3-8-to-bmp.cs",
-      "description": "Demonstrates using Aspose.Pdf.Facades.PdfConverter to convert a specific page range (pages 3 to 8) of a PDF document into BMP image files.",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfConverter to convert a specific page range (pages 2‑6) of a PDF into BMP image files.",
       "tags": [
         "pdf",
         "bmp",
@@ -346,13 +204,107 @@
         "PdfConverter.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
-    "convert-pdf-pages-to-tiff": {
-      "title": "Convert PDF Pages to Individual TIFF Images",
-      "filename": "convert-pdf-pages-to-tiff.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfConverter to split a PDF into separate TIFF files, one per page, using default settings.",
+    "convert-pdf-to-multi-page-tiff-600-dpi": {
+      "title": "Convert PDF to Multi‑Page TIFF at 600 DPI",
+      "filename": "convert-pdf-to-multi-page-tiff-600-dpi.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfConverter to bind a PDF, set a 600 DPI resolution, and save all pages as a single multi‑page TIFF image.",
+      "tags": [
+        "pdf",
+        "tiff",
+        "conversion",
+        "600dpi",
+        "aspose.pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfConverter",
+        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
+        "Aspose.Pdf.Facades.PdfConverter.Resolution",
+        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
+        "Aspose.Pdf.Facades.PdfConverter.SaveAsTIFF",
+        "Aspose.Pdf.Devices.Resolution"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:39:36Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-png-images": {
+      "title": "Convert PDF Pages to PNG Images Using PdfConverter",
+      "filename": "convert-pdf-to-png-images.cs",
+      "description": "Demonstrates converting each page of a PDF into separate PNG files with Aspose.Pdf's PdfConverter, using the default CropBox to capture only the visible page area.",
+      "tags": [
+        "pdf",
+        "png",
+        "conversion",
+        "cropbox",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "PdfConverter",
+        "PdfConverter.BindPdf",
+        "PdfConverter.DoConvert",
+        "PdfConverter.HasNextImage",
+        "PdfConverter.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T00:39:36Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-jpeg-with-font-substitution": {
+      "title": "Convert PDF to JPEG with Font Substitution",
+      "filename": "convert-pdf-to-jpeg-with-font-substitution.cs",
+      "description": "Shows how to load a PDF, apply a default font for missing fonts, and convert each page to JPEG images using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "jpeg",
+        "font-substitution",
+        "conversion",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PdfSaveOptions",
+        "Aspose.Pdf.Facades.PdfConverter",
+        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
+        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
+        "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
+        "Aspose.Pdf.Facades.PdfConverter.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:39:36Z",
+      "status": "verified"
+    },
+    "convert-pdf-pages-3-8-to-bmp": {
+      "title": "Convert PDF Pages 3‑8 to BMP Images",
+      "filename": "convert-pdf-pages-3-8-to-bmp.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfConverter facade to convert a specific page range (pages 3 to 8) of a PDF document into BMP image files.",
+      "tags": [
+        "pdf",
+        "bmp",
+        "conversion",
+        "page-range",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfConverter",
+        "PdfConverter.BindPdf",
+        "PdfConverter.StartPage",
+        "PdfConverter.EndPage",
+        "PdfConverter.DoConvert",
+        "PdfConverter.HasNextImage",
+        "PdfConverter.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:39:36Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-tiff-images": {
+      "title": "Convert PDF to TIFF Images Using PdfConverter",
+      "filename": "convert-pdf-to-tiff-images.cs",
+      "description": "Demonstrates how to convert each page of a PDF into separate TIFF files using Aspose.Pdf's PdfConverter with default settings.",
       "tags": [
         "pdf",
         "tiff",
@@ -361,144 +313,185 @@
         "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfConverter",
         "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.StartPage",
-        "Aspose.Pdf.Facades.PdfConverter.EndPage",
         "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.SaveAsTIFF",
+        "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
+        "Aspose.Pdf.Facades.PdfConverter.GetNextImage",
         "Aspose.Pdf.Facades.PdfConverter.Close"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-pdf-to-png-72-dpi": {
       "title": "Convert PDF to PNG Images with 72 DPI Preview",
       "filename": "convert-pdf-to-png-72-dpi.cs",
-      "description": "Shows how to convert each page of a PDF into PNG images at 72 DPI using Aspose.Pdf's PdfConverter for quick preview generation.",
+      "description": "Demonstrates how to convert each page of a PDF into separate PNG files using Aspose.Pdf's PdfConverter with a 72 DPI resolution for quick preview generation.",
       "tags": [
         "pdf",
         "png",
         "conversion",
         "preview",
-        "resolution"
+        "aspose"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfConverter",
         "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.Resolution",
         "Aspose.Pdf.Facades.PdfConverter.DoConvert",
         "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
         "Aspose.Pdf.Facades.PdfConverter.GetNextImage",
         "Aspose.Pdf.Devices.Resolution"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-pdf-to-jpeg-96-dpi": {
-      "title": "Convert PDF Pages to JPEG Images at 96 DPI",
+      "title": "Convert PDF to JPEG Images at 96 DPI",
       "filename": "convert-pdf-to-jpeg-96-dpi.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfConverter to convert each page of a PDF into separate JPEG files with a web‑friendly 96 DPI resolution.",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, setting a 96 DPI resolution, and converting each page to a JPEG image saved to a directory.",
       "tags": [
         "pdf",
         "jpeg",
         "conversion",
         "resolution",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
-        "Aspose.Pdf.Facades.PdfConverter.GetNextImage",
-        "Aspose.Pdf.Devices.Resolution"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
-      "status": "verified"
-    },
-    "convert-pdf-to-bmp-using-cropbox": {
-      "title": "Convert PDF to BMP Images Using CropBox Cropping",
-      "filename": "convert-pdf-to-bmp-using-cropbox.cs",
-      "description": "Demonstrates how to convert each page of a PDF to BMP images with automatic margin cropping using the PdfConverter facade's default CropBox coordinate type.",
-      "tags": [
-        "pdf",
-        "bmp",
-        "conversion",
-        "cropbox",
-        "aspose.pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
-        "Aspose.Pdf.Facades.PdfConverter.GetNextImage"
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.JpegDevice",
+        "Aspose.Pdf.Devices.JpegDevice.Process",
+        "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-pdf-to-multi-page-tiff-with-font-substitution": {
-      "title": "Convert PDF to Multi‑Page TIFF with Symbol to Arial Unicode Font Substitution",
+      "title": "Convert PDF to Multi‑Page TIFF with Symbol to Arial Font Substitution",
       "filename": "convert-pdf-to-multi-page-tiff-with-font-substitution.cs",
-      "description": "Demonstrates how to convert a PDF document to a single multi‑page TIFF file using Aspose.Pdf, while applying a custom font substitution that maps the Symbol font to Arial Unicode MS.",
+      "description": "Demonstrates loading a PDF, applying a fallback Arial font for missing Symbol characters, and converting the result to a single multi‑page TIFF image.",
       "tags": [
         "pdf",
         "tiff",
         "font-substitution",
         "conversion",
-        "facade"
+        "aspose-pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfConverter",
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.FontRepository",
-        "Aspose.Pdf.Text.SimpleFontSubstitution",
-        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.SaveAsTIFF"
+        "Aspose.Pdf.PdfSaveOptions",
+        "Aspose.Pdf.Facades.PdfConverter",
+        "Document.Save",
+        "PdfConverter.BindPdf",
+        "PdfConverter.DoConvert",
+        "PdfConverter.SaveAsTIFF"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-pdf-to-png-in-parallel": {
       "title": "Convert PDF to PNG Images in Parallel",
       "filename": "convert-pdf-to-png-in-parallel.cs",
-      "description": "Demonstrates how to convert each page of a PDF document to separate PNG files using Aspose.Pdf's PdfConverter while processing pages concurrently with Parallel.For to speed up the conversion.",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, setting a resolution, and converting each page to a PNG file using parallel processing to speed up conversion.",
       "tags": [
         "pdf",
         "png",
-        "parallel",
         "conversion",
-        "aspose-pdf"
+        "parallel",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.StartPage",
-        "Aspose.Pdf.Facades.PdfConverter.EndPage",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.GetNextImage"
+        "Aspose.Pdf.Resolution",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Devices.PngDevice.Process"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "batch-convert-pdfs-to-jpeg": {
       "title": "Batch Convert PDFs to JPEG Images",
       "filename": "batch-convert-pdfs-to-jpeg.cs",
-      "description": "Shows how to convert every PDF in a directory to JPEG images, creating a subfolder per document and saving each page as a separate JPEG using Aspose.Pdf.Facades.PdfConverter.",
+      "description": "Shows how to iterate over PDF files in a folder and convert each page to separate JPEG images using Aspose.Pdf.Facades.PdfConverter.",
       "tags": [
         "pdf",
         "jpeg",
         "batch",
+        "conversion",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfConverter",
+        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
+        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
+        "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
+        "Aspose.Pdf.Facades.PdfConverter.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:39:36Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-bmp-images": {
+      "title": "Convert PDF to BMP Images with Resolution Settings",
+      "filename": "convert-pdf-to-bmp-images.cs",
+      "description": "Demonstrates how to convert each page of a PDF document to BMP images using the PdfConverter facade, configuring the output resolution before conversion.",
+      "tags": [
+        "pdf",
+        "bmp",
+        "conversion",
+        "resolution",
+        "facade"
+      ],
+      "apis_used": [
+        "PdfConverter",
+        "PdfConverter.BindPdf",
+        "PdfConverter.Resolution",
+        "PdfConverter.DoConvert",
+        "PdfConverter.HasNextImage",
+        "PdfConverter.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:39:36Z",
+      "status": "verified"
+    },
+    "convert-pdf-pages-to-tiff": {
+      "title": "Convert PDF Pages to Separate TIFF Images",
+      "filename": "convert-pdf-pages-to-tiff.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfConverter facade to extract each page of a PDF as an individual TIFF file, saving them with sequential page indexes.",
+      "tags": [
+        "pdf",
+        "tiff",
+        "conversion",
+        "facade",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PpdfConverter",
+        "PdfConverter.BindPdf",
+        "PdfConverter.DoConvert",
+        "PdfConverter.HasNextImage",
+        "PdfConverter.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:39:36Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-png-with-font-substitution": {
+      "title": "Convert PDF to PNG with Font Substitution",
+      "filename": "convert-pdf-to-png-with-font-substitution.cs",
+      "description": "Shows how to convert each page of a PDF into PNG images while replacing missing Helvetica fonts with Times New Roman using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "png",
+        "font-substitution",
         "conversion",
         "aspose"
       ],
@@ -506,98 +499,29 @@
         "Aspose.Pdf.Facades.PdfConverter",
         "Aspose.Pdf.Facades.PdfConverter.BindPdf",
         "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
         "Aspose.Pdf.Facades.PdfConverter.GetNextImage",
-        "Aspose.Pdf.Facades.PdfConverter.Close"
+        "Aspose.Pdf.Text.FontRepository.Substitutions",
+        "Aspose.Pdf.Text.SimpleFontSubstitution",
+        "Aspose.Pdf.Devices.Resolution"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
-    "convert-pdf-to-bmp-images": {
-      "title": "Convert PDF to BMP Images with Resolution Settings",
-      "filename": "convert-pdf-to-bmp-images.cs",
-      "description": "Demonstrates using Aspose.Pdf's PdfConverter facade to convert each page of a PDF document into BMP images, configuring the output resolution before conversion.",
-      "tags": [
-        "pdf",
-        "bmp",
-        "conversion",
-        "resolution",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.Resolution",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
-        "Aspose.Pdf.Facades.PdfConverter.GetNextImage",
-        "Aspose.Pdf.Facades.PdfConverter.Close"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
-      "status": "verified"
-    },
-    "convert-pdf-pages-to-individual-tiff": {
-      "title": "Convert PDF Pages to Individual TIFF Images",
-      "filename": "convert-pdf-pages-to-individual-tiff.cs",
-      "description": "Shows how to use Aspose.Pdf's PdfConverter to extract each page of a PDF and save it as a separate TIFF file, with optional sample PDF creation.",
-      "tags": [
-        "pdf",
-        "tiff",
-        "conversion",
-        "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.SaveAsTIFF",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages.Add",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
-      "status": "verified"
-    },
-    "convert-pdf-to-png-with-font-substitution": {
-      "title": "Convert PDF to PNG with Font Substitution",
-      "filename": "convert-pdf-to-png-with-font-substitution.cs",
-      "description": "Shows how to convert each page of a PDF to PNG images while substituting missing Helvetica fonts with Times New Roman using Aspose.Pdf facades.",
-      "tags": [
-        "pdf",
-        "png",
-        "font-substitution",
-        "conversion",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Facades.RenderingOptions",
-        "Aspose.Pdf.FontRepository.Substitutions",
-        "Aspose.Pdf.Text.SimpleFontSubstitution"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
-      "status": "verified"
-    },
-    "convert-pdf-pages-to-jpeg-preview": {
-      "title": "Convert PDF Pages 1-3 to JPEG Preview Images",
-      "filename": "convert-pdf-pages-to-jpeg-preview.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfConverter to generate JPEG images for the first three pages of a PDF, creating a three‑page preview.",
+    "convert-pdf-to-jpeg-preview": {
+      "title": "Convert PDF Pages to JPEG Images (Preview)",
+      "filename": "convert-pdf-to-jpeg-preview.cs",
+      "description": "Shows how to convert the first three pages of a PDF document into separate JPEG files using Aspose.Pdf's PdfConverter facade.",
       "tags": [
         "pdf",
         "jpeg",
-        "preview",
         "conversion",
+        "preview",
         "facade"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
         "Aspose.Pdf.Facades.PdfConverter.StartPage",
         "Aspose.Pdf.Facades.PdfConverter.EndPage",
         "Aspose.Pdf.Facades.PdfConverter.DoConvert",
@@ -605,82 +529,82 @@
         "Aspose.Pdf.Facades.PdfConverter.GetNextImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
-    "convert-pdf-to-bmp-images-200-dpi": {
-      "title": "Convert PDF to BMP Images with 200 DPI",
-      "filename": "convert-pdf-to-bmp-images-200-dpi.cs",
-      "description": "Demonstrates converting each page of a PDF to BMP images at 200 DPI using Aspose.Pdf.Facades.PdfConverter with the default CropBox.",
+    "convert-pdf-to-bmp-images__v2": {
+      "title": "Convert PDF to BMP Images",
+      "filename": "convert-pdf-to-bmp-images__v2.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, rasterize each page to a BMP file at 200 DPI using BmpDevice, and save the images to an output folder.",
       "tags": [
         "pdf",
         "bmp",
         "conversion",
-        "resolution",
-        "facade"
+        "rasterization",
+        "aspose-pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.Resolution",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
-        "Aspose.Pdf.Facades.PdfConverter.GetNextImage"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.BmpDevice",
+        "Aspose.Pdf.Devices.BmpDevice.Process",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.Page"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-pdf-to-multi-page-tiff-400-dpi": {
-      "title": "Convert PDF to Multi-Page TIFF with 400 DPI",
+      "title": "Convert PDF to Multi-Page TIFF at 400 DPI",
       "filename": "convert-pdf-to-multi-page-tiff-400-dpi.cs",
-      "description": "Demonstrates using Aspose.Pdf.Facades.PdfConverter to convert a PDF into a single multi-page TIFF image at 400 DPI resolution.",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfConverter to convert a PDF into a single multi-page TIFF image with 400 DPI resolution for archival quality.",
       "tags": [
         "pdf",
         "tiff",
         "conversion",
-        "resolution",
+        "high-resolution",
         "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.SaveAsTIFF",
-        "Aspose.Pdf.Facades.PdfConverter.Resolution",
-        "Aspose.Pdf.Devices.Resolution"
+        "Aspose.Pdf.Devices.Resolution",
+        "PdfConverter.BindPdf",
+        "PdfConverter.DoConvert",
+        "PdfConverter.SaveAsTIFF"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-pdf-to-png-with-font-substitution__v2": {
       "title": "Convert PDF to PNG with Font Substitution",
       "filename": "convert-pdf-to-png-with-font-substitution__v2.cs",
-      "description": "Demonstrates how to substitute missing fonts with a fallback (Arial) and convert each page of a PDF document to PNG images using the PdfConverter facade.",
+      "description": "Shows how to convert each page of a PDF to PNG images while registering a generic font substitution (missing fonts replaced by Arial) using Aspose.Pdf.",
       "tags": [
         "pdf",
         "png",
-        "font-substitution",
         "conversion",
-        "facade"
+        "font-substitution",
+        "aspose-pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.FontRepository.Substitutions",
+        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
+        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
+        "Aspose.Pdf.Facades.PdfConverter.GetNextImage",
+        "Aspose.Pdf.Facades.PdfConverter.Close",
+        "Aspose.Pdf.Devices.Resolution",
         "Aspose.Pdf.Text.SimpleFontSubstitution",
-        "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
-        "Aspose.Pdf.Facades.PdfConverter.GetNextImage"
+        "Aspose.Pdf.FontRepository.Substitutions.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-pdf-to-jpeg-images__v2": {
-      "title": "Convert PDF to JPEG Images",
+      "title": "Convert PDF to JPEG Images using PdfConverter",
       "filename": "convert-pdf-to-jpeg-images__v2.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfConverter to convert each page of a PDF document into separate JPEG files saved in an output folder.",
+      "description": "Shows how to convert each page of a PDF into separate JPEG files using Aspose.Pdf's PdfConverter facade with default settings.",
       "tags": [
         "pdf",
         "jpeg",
@@ -696,13 +620,13 @@
         "Aspose.Pdf.Facades.PdfConverter.GetNextImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
-    "convert-first-10-pdf-pages-to-bmp": {
-      "title": "Convert First 10 PDF Pages to BMP Images",
-      "filename": "convert-first-10-pdf-pages-to-bmp.cs",
-      "description": "Demonstrates how to use Aspose.Pdf's PdfConverter facade to convert the first ten pages of a PDF into BMP image files.",
+    "convert-pdf-to-bmp-first-10-pages": {
+      "title": "Convert PDF to BMP Images (First 10 Pages)",
+      "filename": "convert-pdf-to-bmp-first-10-pages.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfConverter to convert the first ten pages of a PDF document into BMP image files.",
       "tags": [
         "pdf",
         "bmp",
@@ -717,60 +641,39 @@
         "PdfConverter.EndPage",
         "PdfConverter.DoConvert",
         "PdfConverter.HasNextImage",
-        "PdfConverter.GetNextImage"
+        "PdfConverter.GetNextImage",
+        "PdfConverter.Close"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
-      "status": "verified"
-    },
-    "convert-pdf-to-multi-page-tiff-with-font-substitution__v2": {
-      "title": "Convert PDF to Multi-Page TIFF with Font Substitution",
-      "filename": "convert-pdf-to-multi-page-tiff-with-font-substitution__v2.cs",
-      "description": "Demonstrates converting a PDF document to a multi-page TIFF image while substituting the Courier font with Liberation Mono for better rendering.",
-      "tags": [
-        "pdf",
-        "tiff",
-        "font-substitution",
-        "conversion",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Devices.Resolution",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Text.SimpleFontSubstitution"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-pdf-to-png-72-dpi__v2": {
-      "title": "Convert PDF Pages to PNG Images at 72 DPI",
+      "title": "Convert PDF to PNG Images at 72 DPI Using CropBox",
       "filename": "convert-pdf-to-png-72-dpi__v2.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, set a 72 DPI resolution, and convert each page to a PNG file while preserving the visible content defined by the page's CropBox.",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf, set a 72 DPI resolution, and convert each page to a PNG image while preserving the visible content via the CropBox.",
       "tags": [
         "pdf",
         "png",
         "conversion",
         "resolution",
-        "aspose-pdf"
+        "cropbox"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Devices.PngDevice",
         "Aspose.Pdf.Devices.Resolution",
-        "Aspose.Pdf.Devices.PngDevice.Process",
-        "Aspose.Pdf.Page"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Devices.PngDevice.Process"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-pdf-pages-to-jpeg": {
       "title": "Convert PDF Pages to JPEG Images",
       "filename": "convert-pdf-pages-to-jpeg.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfConverter to convert each page of a PDF into separate JPEG files with sequential page-number naming.",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfConverter to convert each page of a PDF into separate JPEG files, naming them with a page number suffix.",
       "tags": [
         "pdf",
         "jpeg",
@@ -783,21 +686,22 @@
         "PdfConverter.BindPdf",
         "PdfConverter.DoConvert",
         "PdfConverter.HasNextImage",
-        "PdfConverter.GetNextImage"
+        "PdfConverter.GetNextImage",
+        "PdfConverter.Close"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
-    "convert-pdf-to-bmp-pages-150-dpi": {
-      "title": "Convert PDF Pages to BMP Images (1‑20) at 150 DPI",
-      "filename": "convert-pdf-to-bmp-pages-150-dpi.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, iterate over the first 20 pages (or up to the document length), and render each page to a BMP file using a 150 DPI resolution.",
+    "convert-pdf-pages-to-bmp": {
+      "title": "Convert PDF Pages to BMP Images (150 DPI)",
+      "filename": "convert-pdf-pages-to-bmp.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, setting a 150 DPI resolution, and converting the first 20 pages to BMP files.",
       "tags": [
         "pdf",
         "bmp",
         "conversion",
-        "aspose.pdf",
+        "aspose",
         "resolution"
       ],
       "apis_used": [
@@ -805,40 +709,40 @@
         "Aspose.Pdf.Devices.Resolution",
         "Aspose.Pdf.Devices.BmpDevice",
         "Aspose.Pdf.Devices.BmpDevice.Process",
-        "Aspose.Pdf.PageCollection"
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.Page"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
-    "convert-pdf-to-multi-page-tiff__v2": {
-      "title": "Convert PDF to Multi-Page TIFF with Font Substitution",
-      "filename": "convert-pdf-to-multi-page-tiff__v2.cs",
-      "description": "Shows how to use Aspose.Pdf's PdfConverter to transform a PDF into a single multi-page TIFF image while substituting Symbol fonts with Arial Unicode MS for proper symbol rendering.",
+    "convert-pdf-to-multi-page-tiff-with-font-substitution__v2": {
+      "title": "Convert PDF to Multi‑Page TIFF with Font Substitution",
+      "filename": "convert-pdf-to-multi-page-tiff-with-font-substitution__v2.cs",
+      "description": "Demonstrates loading a PDF, substituting missing Symbol fonts with Arial Unicode MS, and converting the document to a single multi‑page TIFF image using Aspose.Pdf.",
       "tags": [
         "pdf",
         "tiff",
         "font-substitution",
         "conversion",
-        "Aspose.Pdf"
+        "aspose-pdf"
       ],
       "apis_used": [
-        "PdfConverter",
-        "PdfConverter.BindPdf",
-        "PdfConverter.DoConvert",
-        "PdfConverter.SaveAsTIFF",
-        "RenderingOptions",
-        "RenderingOptions.ConvertFontsToUnicodeTTF",
-        "Resolution"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PdfSaveOptions",
+        "Aspose.Pdf.Facades.PdfConverter",
+        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
+        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
+        "Aspose.Pdf.Facades.PdfConverter.SaveAsTIFF"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-odd-pdf-pages-to-png": {
       "title": "Convert Odd PDF Pages to PNG Images",
       "filename": "convert-odd-pdf-pages-to-png.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfConverter to extract only odd-numbered pages from a PDF and save each page as an individual PNG file.",
+      "description": "Demonstrates extracting only odd‑numbered pages from a PDF and saving each page as a separate PNG file using Aspose.Pdf and the Facade API.",
       "tags": [
         "pdf",
         "png",
@@ -847,28 +751,29 @@
         "facade"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfConverter",
-        "Aspose.Pdf.Facades.PdfConverter.BindPdf",
-        "Aspose.Pdf.Facades.PdfConverter.StartPage",
-        "Aspose.Pdf.Facades.PdfConverter.EndPage",
-        "Aspose.Pdf.Facades.PdfConverter.DoConvert",
-        "Aspose.Pdf.Facades.PdfConverter.GetNextImage",
-        "Aspose.Pdf.Facades.PdfConverter.Document.Pages.Count"
+        "Document.Pages.Count",
+        "PdfConverter.BindPdf",
+        "PdfConverter.StartPage",
+        "PdfConverter.EndPage",
+        "PdfConverter.DoConvert",
+        "PdfConverter.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
     "convert-pdf-to-jpeg-300-dpi": {
-      "title": "Convert PDF to JPEG Images at 300 DPI",
+      "title": "Convert PDF to JPEG Images at 300 DPI Using CropBox",
       "filename": "convert-pdf-to-jpeg-300-dpi.cs",
-      "description": "Shows how to convert each page of a PDF into separate JPEG files using Aspose.Pdf's PdfConverter facade with a 300 DPI resolution and the default CropBox coordinate type.",
+      "description": "Shows how to convert each page of a PDF into high‑resolution JPEG images (300 DPI) using Aspose.Pdf's PdfConverter, which utilizes the CropBox for precise cropping.",
       "tags": [
         "pdf",
         "jpeg",
         "conversion",
         "300dpi",
-        "facade"
+        "facades"
       ],
       "apis_used": [
         "PdfConverter",
@@ -878,36 +783,39 @@
         "PdfConverter.HasNextImage",
         "PdfConverter.GetNextImage"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
-    "convert-pdf-to-bmp-images__v2": {
+    "convert-pdf-to-bmp-with-font-substitution__v2": {
       "title": "Convert PDF to BMP Images with Font Substitution",
-      "filename": "convert-pdf-to-bmp-images__v2.cs",
-      "description": "Demonstrates how to convert each page of a PDF document to BMP images using Aspose.Pdf, with automatic font substitution for missing fonts and configurable resolution.",
+      "filename": "convert-pdf-to-bmp-with-font-substitution__v2.cs",
+      "description": "Demonstrates converting each page of a PDF to BMP images using PdfConverter and applying a global font substitution for missing fonts.",
       "tags": [
         "pdf",
         "bmp",
         "conversion",
         "font-substitution",
-        "aspose"
+        "facade"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfConverter",
         "Aspose.Pdf.Facades.PdfConverter.BindPdf",
         "Aspose.Pdf.Facades.PdfConverter.DoConvert",
+        "Aspose.Pdf.Facades.PdfConverter.HasNextImage",
         "Aspose.Pdf.Facades.PdfConverter.GetNextImage",
-        "Aspose.Pdf.Devices.Resolution"
+        "Aspose.Pdf.FontRepository.Substitutions.Add",
+        "Aspose.Pdf.Text.SimpleFontSubstitution"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     },
-    "convert-pdf-pages-to-multi-page-tiff": {
+    "convert-pdf-pages-4-9-to-multi-page-tiff": {
       "title": "Convert PDF Pages 4-9 to Multi-Page TIFF",
-      "filename": "convert-pdf-pages-to-multi-page-tiff.cs",
-      "description": "Demonstrates extracting a specific page range from a PDF and saving it as a single multi-page TIFF using Aspose.Pdf's PdfConverter facade.",
+      "filename": "convert-pdf-pages-4-9-to-multi-page-tiff.cs",
+      "description": "Shows how to extract pages 4 through 9 from a PDF and save them as a single multi-page TIFF using Aspose.Pdf's PdfConverter facade.",
       "tags": [
         "pdf",
         "tiff",
@@ -925,7 +833,7 @@
         "Aspose.Pdf.Facades.PdfConverter.SaveAsTIFF"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-05T08:32:59Z",
+      "generated_at": "2026-07-18T00:39:36Z",
       "status": "verified"
     }
   }
