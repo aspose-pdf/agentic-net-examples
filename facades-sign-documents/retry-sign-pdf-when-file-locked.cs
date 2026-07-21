@@ -2,92 +2,86 @@ using System;
 using System.IO;
 using System.Threading;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "signed_output.pdf";
-        const string certPath  = "certificate.pfx";
-        const string certPass  = "password";
+        const string inputPath      = "input.pdf";
+        const string outputPath     = "signed_output.pdf";
+        const string certificatePath = "certificate.pfx";
+        const string certificatePassword = "password";
 
-        if (!File.Exists(inputPdf))
+        // Signature parameters
+        const int    pageNumber    = 1;
+        const bool   visible       = true;
+        const string reason        = "Approved";
+        const string contact       = "john.doe@example.com";
+        const string location      = "New York";
+
+        // Rectangle for the visible signature (System.Drawing.Rectangle)
+        System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 200, 100);
+
+        // Retry configuration
+        const int maxAttempts = 5;
+        const int delayMilliseconds = 2000;
+
+        int attempt = 0;
+        bool signed = false;
+
+        while (attempt < maxAttempts && !signed)
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-
-        if (!File.Exists(certPath))
-        {
-            Console.Error.WriteLine($"Certificate file not found: {certPath}");
-            return;
-        }
-
-        const int maxRetries = 5;
-        const int delayMs    = 2000; // 2 seconds between attempts
-
-        for (int attempt = 1; attempt <= maxRetries; attempt++)
-        {
+            attempt++;
             try
             {
-                // Use PdfFileSignature facade to sign the PDF
-                using (PdfFileSignature signer = new PdfFileSignature())
+                // Bind the PDF, configure the signature and save
+                using (PdfFileSignature pdfSign = new PdfFileSignature())
                 {
-                    // Load the PDF file
-                    signer.BindPdf(inputPdf);
-
-                    // Set the certificate for signing
-                    signer.SetCertificate(certPath, certPass);
+                    // Bind the source PDF file
+                    pdfSign.BindPdf(inputPath);
 
                     // Optional: set a visual appearance for the signature
-                    // signer.SignatureAppearance = "signature_image.jpg";
+                    // pdfSign.SignatureAppearance = "signature_image.jpg";
 
-                    // Define the rectangle where the visible signature will appear
-                    System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 200, 100);
+                    // Load the certificate used for signing
+                    pdfSign.SetCertificate(certificatePath, certificatePassword);
 
-                    // Perform the signing on page 1
-                    signer.Sign(
-                        page: 1,
-                        SigReason: "Approved",
-                        SigContact: "john.doe@example.com",
-                        SigLocation: "New York",
-                        visible: true,
-                        annotRect: rect);
+                    // Perform the signing operation
+                    pdfSign.Sign(pageNumber, reason, contact, location, visible, rect);
 
-                    // Save the signed PDF
-                    signer.Save(outputPdf);
+                    // Save the signed PDF to the output file
+                    pdfSign.Save(outputPath);
                 }
 
-                Console.WriteLine($"PDF signed successfully and saved to '{outputPdf}'.");
-                break; // success, exit retry loop
+                signed = true;
+                Console.WriteLine($"PDF signed successfully on attempt {attempt}.");
             }
-            catch (IOException ioEx) when (IsFileLocked(ioEx))
+            catch (IOException ex) when (IsFileLockedException(ex))
             {
-                // The file is locked by another process
-                Console.Error.WriteLine($"Attempt {attempt} failed: file is locked. Retrying in {delayMs} ms...");
-                if (attempt == maxRetries)
-                {
-                    Console.Error.WriteLine("Maximum retry attempts reached. Signing aborted.");
-                    Console.Error.WriteLine(ioEx.Message);
-                    return;
-                }
-                Thread.Sleep(delayMs);
+                // The file is locked by another process – wait and retry
+                Console.WriteLine($"Attempt {attempt}: PDF file is locked. Retrying in {delayMilliseconds} ms...");
+                Thread.Sleep(delayMilliseconds);
             }
             catch (Exception ex)
             {
-                // Any other exception is considered fatal
+                // Any other exception is fatal
                 Console.Error.WriteLine($"Signing failed: {ex.Message}");
-                return;
+                break;
             }
+        }
+
+        if (!signed)
+        {
+            Console.Error.WriteLine("Failed to sign the PDF after multiple attempts.");
         }
     }
 
-    // Helper to detect file‑lock errors (Windows specific HRESULT 0x20)
-    private static bool IsFileLocked(IOException ex)
+    // Helper to detect file‑lock related IOException
+    private static bool IsFileLockedException(IOException ex)
     {
+        // HResult 0x20 (32) indicates sharing violation on Windows
         const int ERROR_SHARING_VIOLATION = 0x20;
-        return (ex.HResult & 0xFFFF) == ERROR_SHARING_VIOLATION;
+        return ex.HResult == unchecked((int)0x80070020) || ex.Message.Contains("being used by another process");
     }
 }

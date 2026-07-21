@@ -1,8 +1,9 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using System.Drawing;
-using System.Drawing.Imaging;
+using Aspose.Pdf.Facades;          // PdfFileSignature
+using Aspose.Pdf;                 // for any PDF related types (kept for completeness)
+using System.Drawing;            // Image handling (Windows only)
+using System.Drawing.Imaging;    // ImageFormat
 
 class Program
 {
@@ -17,13 +18,13 @@ class Program
             return;
         }
 
-        // Bind the PDF and extract the signature image
+        // Bind the PDF to the PdfFileSignature facade
         using (PdfFileSignature pdfSignature = new PdfFileSignature())
         {
             pdfSignature.BindPdf(inputPdf);
 
-            // Extract the image associated with the signature field "WitnessSignature"
-            // Use the overload that accepts a string name (SignatureName class has no public ctor).
+            // Extract the image stream for the signature field named "WitnessSignature"
+            // The ExtractImage method accepts the field name directly (string overload).
             Stream jpegStream = pdfSignature.ExtractImage("WitnessSignature");
             if (jpegStream == null)
             {
@@ -31,12 +32,11 @@ class Program
                 return;
             }
 
-            // Convert JPEG stream to PNG and save it
+            // Convert the JPEG stream to PNG and save it
             using (jpegStream)
-            using (var image = Image.FromStream(jpegStream))
-            using (var outStream = File.Create(outputPng))
+            using (System.Drawing.Image img = System.Drawing.Image.FromStream(jpegStream))
             {
-                image.Save(outStream, ImageFormat.Png);
+                img.Save(outputPng, ImageFormat.Png);
             }
         }
 

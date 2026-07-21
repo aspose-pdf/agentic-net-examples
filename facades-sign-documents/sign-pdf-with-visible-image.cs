@@ -1,64 +1,76 @@
 using System;
-using System.Drawing;
+using System.IO;
+using System.Drawing; // needed for System.Drawing.Rectangle
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main(string[] args)
     {
-        // Expect two arguments: input PDF path and signature image path
+        // Expect exactly two arguments: PDF file path and signature image path
         if (args.Length < 2)
         {
-            Console.Error.WriteLine("Usage: <app> <input-pdf> <signature-image>");
+            Console.Error.WriteLine("Usage: <app> <pdfPath> <signatureImagePath>");
             return;
         }
 
-        string inputPdf = args[0];
-        string signatureImage = args[1];
-        string outputPdf = System.IO.Path.Combine(
-            System.IO.Path.GetDirectoryName(inputPdf) ?? "",
-            System.IO.Path.GetFileNameWithoutExtension(inputPdf) + "_signed.pdf");
+        string pdfPath = args[0];
+        string imagePath = args[1];
 
-        // Verify input files exist
-        if (!System.IO.File.Exists(inputPdf))
+        // Validate input files
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        if (!System.IO.File.Exists(signatureImage))
+        if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Signature image not found: {signatureImage}");
+            Console.Error.WriteLine($"Signature image not found: {imagePath}");
             return;
         }
 
-        // Create the PdfFileSignature facade
+        // Prepare output file name
+        string outputPath = Path.Combine(
+            Path.GetDirectoryName(pdfPath) ?? string.Empty,
+            Path.GetFileNameWithoutExtension(pdfPath) + "_signed.pdf");
+
+        // Initialize the PdfFileSignature facade
         PdfFileSignature pdfSign = new PdfFileSignature();
 
         // Bind the source PDF
-        pdfSign.BindPdf(inputPdf);
+        pdfSign.BindPdf(pdfPath);
 
-        // Set the visual appearance of the signature (the image)
-        pdfSign.SignatureAppearance = signatureImage;
+        // Set the visual appearance of the signature (image)
+        pdfSign.SignatureAppearance = imagePath;
 
-        // Define the rectangle where the signature will be placed (in points)
-        // Here we place it at (100,100) with width=200 and height=100
-        Rectangle rect = new Rectangle(100, 100, 200, 100);
+        // Define the rectangle where the signature will be placed (page coordinates)
+        // Rectangle(x, y, width, height) – coordinates are in points (1/72 inch)
+        System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 200, 100);
 
-        // Sign the document.
-        // Note: No certificate is set; this will add a visible signature appearance only.
-        // If a digital certificate is required, call pdfSign.SetCertificate(pfxPath, password) before signing.
-        pdfSign.Sign(
-            page: 1,                 // first page (1‑based indexing)
-            SigReason: "Signed",     // reason for signing
-            SigContact: "contact@example.com",
-            SigLocation: "Location",
-            visible: true,           // make the signature visible
-            annotRect: rect);        // rectangle for the signature
+        // OPTIONAL: If you have a certificate, set it here.
+        // The example uses placeholder values; replace with actual certificate path and password.
+        try
+        {
+            pdfSign.SetCertificate("certificate.pfx", "password");
+            // Sign the first page with visible signature
+            pdfSign.Sign(
+                page: 1,
+                SigReason: "Document signed",
+                SigContact: "contact@example.com",
+                SigLocation: "Location",
+                visible: true,
+                annotRect: rect);
+        }
+        catch (Exception ex)
+        {
+            // If certificate is missing or signing fails, report but still save the PDF with appearance
+            Console.Error.WriteLine($"Signing failed (certificate may be missing): {ex.Message}");
+        }
 
         // Save the signed PDF
-        pdfSign.Save(outputPdf);
+        pdfSign.Save(outputPath);
 
-        Console.WriteLine($"Signed PDF saved to: {outputPdf}");
+        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
     }
 }

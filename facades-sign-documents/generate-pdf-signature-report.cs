@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "signed.pdf";
+        const string inputPdf = "signed_document.pdf";
         const string reportPdf = "signature_report.pdf";
 
         if (!File.Exists(inputPdf))
@@ -17,66 +17,76 @@ class Program
             return;
         }
 
-        // Load signatures using PdfFileSignature facade
+        // Load the signed PDF and extract signature information
         using (PdfFileSignature pdfSign = new PdfFileSignature())
         {
             pdfSign.BindPdf(inputPdf);
 
-            // Get all non‑empty signature names
-            var sigNames = pdfSign.GetSignatureNames();
+            // Retrieve all non‑empty signature names
+            var signatureNames = pdfSign.GetSignatureNames();
 
             // Create a new PDF document for the report
             using (Document reportDoc = new Document())
             {
-                // Add the first page
-                Page page = reportDoc.Pages.Add();
+                // Add a page to the report
+                Page reportPage = reportDoc.Pages.Add();
 
-                // Header
-                TextFragment header = new TextFragment("Signature Report");
-                header.TextState.FontSize = 18;
-                header.TextState.Font = FontRepository.FindFont("Helvetica");
-                header.Position = new Position(50, 800);
-                page.Paragraphs.Add(header);
+                // Title
+                TextFragment title = new TextFragment("Signature Report");
+                title.TextState.FontSize = 18;
+                title.TextState.FontStyle = FontStyles.Bold;
+                title.Position = new Position(50, 800);
+                reportPage.Paragraphs.Add(title);
 
-                double y = 760; // Starting Y position for entries
+                // Header line
+                TextFragment header = new TextFragment(
+                    "Name | Signer | Valid | Reason | Location | DateTime | Revision | Covers Whole Document");
+                header.TextState.FontSize = 12;
+                header.TextState.FontStyle = FontStyles.Bold;
+                header.Position = new Position(50, 770);
+                reportPage.Paragraphs.Add(header);
 
-                foreach (var sigName in sigNames)
+                // Iterate over each signature and add its details
+                float yPos = 750;
+                for (int i = 0; i < signatureNames.Count; i++)
                 {
-                    // Retrieve signature details
-                    string signer = pdfSign.GetSignerName(sigName);
-                    string reason = pdfSign.GetReason(sigName);
-                    string location = pdfSign.GetLocation(sigName);
-                    DateTime? dateTime = pdfSign.GetDateTime(sigName);
+                    var sigName = signatureNames[i];
+
+                    string signer = pdfSign.GetSignerName(sigName) ?? "N/A";
                     bool isValid = pdfSign.VerifySignature(sigName);
+                    string reason = pdfSign.GetReason(sigName) ?? "N/A";
+                    string location = pdfSign.GetLocation(sigName) ?? "N/A";
+                    DateTime dateTime = pdfSign.GetDateTime(sigName);
                     int revision = pdfSign.GetRevision(sigName);
                     bool coversWhole = pdfSign.CoversWholeDocument(sigName);
 
-                    // Build line text
-                    string line = $"Name: {sigName}, Signer: {signer}, Reason: {reason}, Location: {location}, " +
-                                  $"Date: {(dateTime.HasValue ? dateTime.Value.ToString() : "N/A")}, " +
-                                  $"Valid: {isValid}, Revision: {revision}, CoversWhole: {coversWhole}";
-
+                    string line = $"{sigName} | {signer} | {isValid} | {reason} | {location} | {dateTime:G} | {revision} | {coversWhole}";
                     TextFragment tf = new TextFragment(line);
-                    tf.TextState.FontSize = 12;
-                    tf.TextState.Font = FontRepository.FindFont("Helvetica");
-                    tf.Position = new Position(50, y);
-                    page.Paragraphs.Add(tf);
+                    tf.TextState.FontSize = 10;
+                    tf.Position = new Position(50, yPos);
+                    reportPage.Paragraphs.Add(tf);
 
-                    y -= 20; // Move down for next entry
-
-                    // Add a new page if needed
-                    if (y < 50)
+                    yPos -= 20; // Move down for next line
+                    if (yPos < 50) // Add a new page if needed
                     {
-                        page = reportDoc.Pages.Add();
-                        y = 800;
+                        reportPage = reportDoc.Pages.Add();
+                        yPos = 800;
                     }
                 }
+
+                // Add total revision information
+                int totalRevision = pdfSign.GetTotalRevision();
+                TextFragment total = new TextFragment($"Total Document Revisions: {totalRevision}");
+                total.TextState.FontSize = 12;
+                total.TextState.FontStyle = FontStyles.Bold;
+                total.Position = new Position(50, yPos - 30);
+                reportPage.Paragraphs.Add(total);
 
                 // Save the report PDF
                 reportDoc.Save(reportPdf);
             }
         }
 
-        Console.WriteLine($"Signature report saved to '{reportPdf}'.");
+        Console.WriteLine($"Signature report generated: {reportPdf}");
     }
 }
