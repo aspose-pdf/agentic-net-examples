@@ -6,27 +6,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "filled.pdf";
-        const string outputTemplate = "output/page%NUM%.pdf";
+        const string inputPath = "filled.pdf";
+        const string outputDir = "Pages";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         // Ensure the output directory exists
-        string outputDir = Path.GetDirectoryName(outputTemplate);
-        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
+        Directory.CreateDirectory(outputDir);
+
+        // Split the PDF into single‑page streams
+        PdfFileEditor editor = new PdfFileEditor();
+        MemoryStream[] pageStreams = editor.SplitToPages(inputPath);
+
+        // Save each stream as an individual PDF file
+        for (int i = 0; i < pageStreams.Length; i++)
         {
-            Directory.CreateDirectory(outputDir);
+            // Reset stream position before reading
+            pageStreams[i].Position = 0;
+
+            string outPath = Path.Combine(outputDir, $"page_{i + 1}.pdf");
+            using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+            {
+                pageStreams[i].CopyTo(fs);
+            }
+
+            // Release the memory stream
+            pageStreams[i].Dispose();
         }
 
-        // Split the PDF into single‑page files using the template
-        PdfFileEditor pdfEditor = new PdfFileEditor();
-        pdfEditor.SplitToPages(inputPdf, outputTemplate);
-
-        Console.WriteLine("PDF split into individual pages successfully.");
+        Console.WriteLine($"Successfully split into {pageStreams.Length} single‑page PDFs in '{outputDir}'.");
     }
 }

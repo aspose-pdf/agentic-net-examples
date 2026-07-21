@@ -1,60 +1,68 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core PDF classes (Document, Page, etc.)
-using Aspose.Pdf.Facades;            // Facade classes (PdfFileStamp, Stamp, FormattedText)
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // for EncodingType
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string filledPdfPath   = "filled_form.pdf";   // PDF after AutoFiller processing
-        const string watermarkedPath = "watermarked_output.pdf";
+        const string inputPdf  = "filled_form.pdf";   // PDF after AutoFiller has populated the form
+        const string outputPdf = "watermarked_output.pdf";
 
-        // Verify input file exists
-        if (!File.Exists(filledPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {filledPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // Add a text watermark to every page using PdfFileStamp (Facade API)
-        // -----------------------------------------------------------------
-        // 1. Create the stamp (text) – FormattedText constructor sets text,
-        //    color (System.Drawing.Color), font name, encoding, embed flag, size.
-        Aspose.Pdf.Facades.FormattedText ft = new Aspose.Pdf.Facades.FormattedText(
-            "CONFIDENTIAL",                     // watermark text
-            System.Drawing.Color.Red,           // text color (System.Drawing required)
-            "Helvetica",                        // font name
-            Aspose.Pdf.Facades.EncodingType.Winansi,
-            false,                              // embed font?
-            72);                                // font size
-
-        // 2. Create a Stamp object and bind the formatted text.
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        stamp.BindLogo(ft);                     // use the text as the stamp content
-        stamp.IsBackground = true;              // place behind page content
-        stamp.Opacity = 0.3f;                   // semi‑transparent
-        // Position the stamp (centered). Origin is the lower‑left corner of the stamp.
-        // Here we place it roughly at the center of a typical A4 page (595x842 points).
-        stamp.SetOrigin(200f, 400f);
-        // Optional: set size of the stamp (width, height). If not set, size is derived from text.
-        // stamp.SetImageSize(300f, 100f);
-
-        // 3. Use PdfFileStamp to apply the stamp to the whole document.
-        using (Aspose.Pdf.Facades.PdfFileStamp fileStamp = new Aspose.Pdf.Facades.PdfFileStamp())
+        // Load the PDF (Document implements IDisposable, so wrap in using)
+        using (Document doc = new Document(inputPdf))
         {
-            // Bind the source PDF (the one already filled by AutoFiller)
-            fileStamp.BindPdf(filledPdfPath);
+            // -----------------------------------------------------------------
+            // At this point the form fields are already filled by AutoFiller.
+            // Now add a text watermark to every page using PdfFileStamp.
+            // -----------------------------------------------------------------
 
-            // Add the prepared stamp – by default it applies to all pages.
+            // Initialize the PdfFileStamp facade on the existing Document.
+            // PdfFileStamp does NOT implement IDisposable; do NOT wrap it in a using block.
+            PdfFileStamp fileStamp = new PdfFileStamp(doc);
+
+            // Create a Stamp object. Fully qualify to avoid ambiguity with Aspose.Pdf.Stamp.
+            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+
+            // Prepare the watermark text. FormattedText uses System.Drawing.Color for color.
+            // Example: semi‑transparent gray text "CONFIDENTIAL".
+            FormattedText ft = new FormattedText(
+                "CONFIDENTIAL",                     // text
+                System.Drawing.Color.FromArgb(128, 128, 128, 128), // semi‑transparent gray (ARGB)
+                "Helvetica",                        // font name
+                EncodingType.Winansi,               // encoding
+                false,                              // embed font
+                48);                                // font size
+
+            // Bind the formatted text to the stamp.
+            stamp.BindLogo(ft);
+
+            // Place the stamp behind the page content (background).
+            stamp.IsBackground = true;
+
+            // Optionally set the position and size of the watermark.
+            // Here we center it and let Aspose calculate the size.
+            stamp.SetOrigin(100, 400);   // X, Y coordinates (adjust as needed)
+            stamp.SetImageSize(300, 100); // Width, Height (adjust as needed)
+
+            // Add the stamp to all pages.
             fileStamp.AddStamp(stamp);
 
-            // Save the result to a new file.
-            fileStamp.Save(watermarkedPath);
+            // Close the facade to finalize stamping.
+            fileStamp.Close();
+
+            // Save the final PDF with the watermark.
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Watermarked PDF saved to '{watermarkedPath}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
     }
 }
