@@ -2,10 +2,10 @@
   "product": "Aspose.PDF",
   "platform": "net",
   "framework": "net10.0",
-  "package_version": "26.6.0",
+  "package_version": "26.7.0",
   "total_examples": 2684,
   "total_categories": 34,
-  "last_updated": "2026-07-06",
+  "last_updated": "2026-07-19",
   "categories": [
     {
       "name": "accessibility-and-tagged-pdfs",

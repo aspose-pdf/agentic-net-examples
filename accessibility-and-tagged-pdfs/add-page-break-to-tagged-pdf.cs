@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
+using Aspose.Pdf.Tagged;               // ITaggedContent, DivElement, ParagraphElement
+using Aspose.Pdf.LogicalStructure;    // StructureElement, ParagraphElement
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "tagged_with_pagebreak.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,13 +17,13 @@ class Program
             return;
         }
 
-        // Load the PDF (no special load options needed for PDF)
+        // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
             // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Set language and title (optional)
+            // Optional: set language and title for the document
             tagged.SetLanguage("en-US");
             tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
@@ -31,26 +31,25 @@ class Program
             StructureElement root = tagged.RootElement;
 
             // ------------------------------------------------------------
-            // Section 1
+            // Section 1 – add some content (example paragraph)
             // ------------------------------------------------------------
             ParagraphElement section1 = tagged.CreateParagraphElement();
-            section1.SetText("Section 1: Introduction");
-            // Append the first section to the root
+            section1.SetText("First section content.");
             root.AppendChild(section1);
 
             // ------------------------------------------------------------
-            // Page break element
+            // Page break element – forces the next element to start on a new page
             // ------------------------------------------------------------
-            // Insert a page‑break by creating a DivElement with the "PageBreak" tag.
+            // In Aspose.PDF the page‑break is represented by a DivElement with the tag "PageBreak".
             DivElement pageBreak = tagged.CreateDivElement();
             pageBreak.SetTag("PageBreak");
             root.AppendChild(pageBreak);
 
             // ------------------------------------------------------------
-            // Section 2
+            // Section 2 – content that will appear on the next page
             // ------------------------------------------------------------
             ParagraphElement section2 = tagged.CreateParagraphElement();
-            section2.SetText("Section 2: Details");
+            section2.SetText("Second section content starts on a new page.");
             root.AppendChild(section2);
 
             // Save the modified PDF (no PreSave call required)
