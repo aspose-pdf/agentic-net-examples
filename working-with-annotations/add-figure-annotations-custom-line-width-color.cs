@@ -7,10 +7,12 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "annotated_output.pdf";
+        // Input PDF path
+        const string inputPath = "input.pdf";
+        // Output PDF path
+        const string outputPath = "output.pdf";
 
-        // Pages on which to add the figure annotation (1‑based indexing)
+        // Pages on which to add figure annotations (1‑based indexing)
         int[] targetPages = { 1, 3, 5 };
 
         if (!File.Exists(inputPath))
@@ -19,7 +21,7 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
             foreach (int pageNumber in targetPages)
@@ -30,24 +32,29 @@ class Program
 
                 Page page = doc.Pages[pageNumber];
 
-                // Define the annotation rectangle (llx, lly, urx, ury)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+                // Define the rectangle for the figure annotation
+                // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
 
-                // Create a concrete figure annotation – SquareAnnotation in this case
-                SquareAnnotation square = new SquareAnnotation(page, rect)
+                // Create a concrete figure annotation (SquareAnnotation in this example)
+                SquareAnnotation figure = new SquareAnnotation(page, rect)
                 {
-                    // Set the annotation border color
-                    Color = Aspose.Pdf.Color.Blue
+                    // Set the annotation color (stroke color)
+                    Color = Aspose.Pdf.Color.Blue,
+                    // Optional: set a title or contents
+                    Title = "Sample Figure",
+                    Contents = "Custom square annotation"
                 };
 
-                // Set line width via Border (requires the parent annotation in the constructor)
-                square.Border = new Border(square) { Width = 3 };
+                // Set custom line width via the Border object.
+                // Border constructor requires the parent annotation instance.
+                figure.Border = new Border(figure) { Width = 3 };
 
-                // Add the annotation to the page
-                page.Annotations.Add(square);
+                // Add the annotation to the page's annotation collection
+                page.Annotations.Add(figure);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: save inside using block)
             doc.Save(outputPath);
         }
 

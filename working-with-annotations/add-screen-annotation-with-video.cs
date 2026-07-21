@@ -7,54 +7,54 @@ class Program
 {
     static void Main()
     {
-        // Input PDF and video file paths
-        const string inputPdfPath  = "input.pdf";
-        const string videoFilePath = "sample.mp4";
-        const string outputPdfPath = "output_with_screen_annotation.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_screen_annotation.pdf";
+        const string videoPath  = "sample_video.mp4"; // path to the video file
 
-        // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(videoFilePath))
-        {
-            Console.Error.WriteLine($"Video file not found: {videoFilePath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        if (!File.Exists(videoPath))
         {
-            // Ensure the document has at least three pages (Aspose.Pdf uses 1‑based indexing)
+            Console.Error.WriteLine($"Video file not found: {videoPath}");
+            return;
+        }
+
+        // Load the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Ensure the document has at least three pages
             if (doc.Pages.Count < 3)
             {
                 Console.Error.WriteLine("The document does not contain a third page.");
                 return;
             }
 
-            // Get the third page
-            Page page = doc.Pages[3];
+            // Get page three (Aspose.Pdf uses 1‑based indexing)
+            Page pageThree = doc.Pages[3];
 
             // Define the rectangle where the screen annotation will appear
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
+            // (left, bottom, right, top) in points
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 400, 300, 600);
 
             // Create the ScreenAnnotation with the video file
-            ScreenAnnotation screenAnn = new ScreenAnnotation(page, rect, videoFilePath)
+            ScreenAnnotation screenAnn = new ScreenAnnotation(pageThree, rect, videoPath)
             {
-                Title    = "Embedded Video",
+                // Optional: set a title and contents for the annotation
+                Title    = "Video Annotation",
                 Contents = "Click to play the video."
             };
 
             // Add the annotation to the page's annotation collection
-            page.Annotations.Add(screenAnn);
+            pageThree.Annotations.Add(screenAnn);
 
-            // Save the modified PDF
-            doc.Save(outputPdfPath);
+            // Save the modified document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with screen annotation: {outputPdfPath}");
+        Console.WriteLine($"PDF saved with screen annotation: {outputPath}");
     }
 }

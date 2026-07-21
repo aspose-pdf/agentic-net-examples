@@ -16,39 +16,39 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Mapping: annotation identifier -> page number (1‑based)
+        var annotationMap = new Dictionary<string, int>();
+
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Dictionary to hold annotation identifier -> page number (1‑based)
-            var annotationMap = new Dictionary<string, int>();
-
-            // Iterate through all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                Page page = doc.Pages[i];
-                // Iterate through annotations on the current page
-                foreach (Annotation annot in page.Annotations)
-                {
-                    // Use the annotation Name as its identifier if set; otherwise fallback to FullName
-                    string id = !string.IsNullOrEmpty(annot.Name) ? annot.Name : annot.FullName;
+                Page page = doc.Pages[pageIndex];
 
-                    // Ensure we have a non‑empty identifier before adding to the map
+                // Iterate over all annotations on the current page
+                foreach (Annotation annotation in page.Annotations)
+                {
+                    // Prefer the Name property; fall back to FullName if Name is empty
+                    string id = !string.IsNullOrEmpty(annotation.Name) ? annotation.Name : annotation.FullName;
+
                     if (!string.IsNullOrEmpty(id))
                     {
-                        // Annotation.PageIndex returns the page index (1‑based)
-                        annotationMap[id] = annot.PageIndex;
+                        // Store the first occurrence of each ID; duplicates are ignored
+                        if (!annotationMap.ContainsKey(id))
+                        {
+                            annotationMap[id] = pageIndex;
+                        }
                     }
                 }
             }
+        }
 
-            // Example usage: print the mapping
-            Console.WriteLine("Annotation ID -> Page Number");
-            foreach (var kvp in annotationMap)
-            {
-                Console.WriteLine($"{kvp.Key} -> {kvp.Value}");
-            }
-
-            // The dictionary can now be used for quick lookup elsewhere
+        // Display the resulting mapping
+        foreach (KeyValuePair<string, int> entry in annotationMap)
+        {
+            Console.WriteLine($"Annotation ID: {entry.Key}, Page Number: {entry.Value}");
         }
     }
 }

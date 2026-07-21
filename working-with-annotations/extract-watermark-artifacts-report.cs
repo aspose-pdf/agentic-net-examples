@@ -6,50 +6,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string reportPath = "watermark_report.txt";
+        const string inputPdf = "input.pdf";
+        const string reportCsv = "watermark_report.csv";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Create a text report file
-            using (StreamWriter writer = new StreamWriter(reportPath))
+            // Prepare CSV report header
+            using (StreamWriter writer = new StreamWriter(reportCsv))
             {
-                writer.WriteLine("Watermark Artifacts Report");
-                writer.WriteLine($"Document: {Path.GetFileName(inputPath)}");
-                writer.WriteLine();
+                writer.WriteLine("Page,Left,Bottom,Right,Top,Opacity");
 
-                int pageNumber = 1;
-                // Iterate through all pages (1‑based indexing)
-                foreach (Page page in doc.Pages)
+                int totalWatermarks = 0;
+
+                // Pages are 1‑based in Aspose.Pdf
+                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
                 {
-                    // Iterate through artifacts on the current page
+                    Page page = doc.Pages[pageIndex];
+
+                    // Iterate over all artifacts on the page
                     foreach (Artifact artifact in page.Artifacts)
                     {
-                        // Identify WatermarkArtifact instances
+                        // Filter only WatermarkArtifact instances
                         if (artifact is WatermarkArtifact watermark)
                         {
-                            // Position can be a Rectangle or other struct; ToString provides readable output
-                            var position = watermark.Position;
+                            totalWatermarks++;
+
+                            // Position is an Aspose.Pdf.Point (X,Y)
+                            Aspose.Pdf.Point point = watermark.Position;
+
                             // Opacity is a double in the range 0..1
                             double opacity = watermark.Opacity;
 
-                            writer.WriteLine($"Page {pageNumber}:");
-                            writer.WriteLine($"  Position: {position}");
-                            writer.WriteLine($"  Opacity : {opacity}");
+                            // Write CSV line – using the point for both corners (left/bottom = right/top)
+                            writer.WriteLine($"{pageIndex},{point.X},{point.Y},{point.X},{point.Y},{opacity}");
                         }
                     }
-                    pageNumber++;
                 }
+
+                Console.WriteLine($"Watermark report generated: {reportCsv}");
+                Console.WriteLine($"Total watermarks found: {totalWatermarks}");
             }
         }
-
-        Console.WriteLine($"Watermark report generated at '{reportPath}'.");
     }
 }

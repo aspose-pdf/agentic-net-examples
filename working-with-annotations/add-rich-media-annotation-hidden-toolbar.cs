@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputPdf = "output.pdf";         // result PDF
-        const string videoFile = "sample.mp4";         // video to embed
+        const string inputPdf  = "input.pdf";   // source PDF
+        const string outputPdf = "output.pdf";  // result PDF
+        const string videoFile = "sample.mp4";  // video to embed
 
         if (!File.Exists(inputPdf))
         {
@@ -22,14 +22,13 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdf))
         {
-            // Choose the page where the annotation will be placed (first page in this example)
+            // Choose the page where the annotation will be placed (first page)
             Page page = doc.Pages[1];
 
-            // Define the rectangle for the RichMediaAnnotation (coordinates in points)
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            // Define the annotation rectangle (left, bottom, right, top)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
 
             // Create the RichMediaAnnotation
@@ -38,30 +37,25 @@ class Program
                 // Activate the media on click (you can also use PageOpen or PageVisible)
                 ActivateOn = RichMediaAnnotation.ActivationEvent.Click,
 
-                // Hide the default playback toolbar by supplying custom flash variables.
-                // The exact variable name depends on the player; "toolbar=false" is a common example.
+                // Hide the default playback toolbar by setting a custom Flash variable
+                // (the exact variable name depends on the player; "toolbar=false" is a common example)
                 CustomFlashVariables = "toolbar=false"
             };
 
-            // Embed the video content. The first argument is a name for the stream.
+            // Embed the video content stream
             using (FileStream videoStream = File.OpenRead(videoFile))
             {
+                // The first argument is the name of the stream inside the PDF
                 richMedia.SetContent(Path.GetFileName(videoFile), videoStream);
             }
 
-            // Optionally set a poster image (preview shown before playback)
-            // using (FileStream posterStream = File.OpenRead("poster.jpg"))
-            // {
-            //     richMedia.SetPoster(posterStream);
-            // }
-
-            // Add the annotation to the page's annotation collection
+            // Add the annotation to the page
             page.Annotations.Add(richMedia);
 
-            // Save the modified PDF (lifecycle rule: use using, then Save)
+            // Save the modified PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"RichMediaAnnotation added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Rich media annotation added and saved to '{outputPdf}'.");
     }
 }

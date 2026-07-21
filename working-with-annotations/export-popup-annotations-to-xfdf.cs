@@ -1,57 +1,69 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Xml.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
-class Program
+class ExportPopupAnnotations
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputXfdfPath = "popups.xfdf";
+        const string inputPdf  = "input.pdf";
+        const string outputXfdf = "popups.xfdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Load the source PDF
-        using (Document pdfDoc = new Document(inputPdfPath))
+        using (Document srcDoc = new Document(inputPdf))
         {
-            // Export all annotations to a memory stream in XFDF format
-            using (MemoryStream allXfdfStream = new MemoryStream())
+            // Create a new empty PDF that will hold only popup annotations
+            using (Document tempDoc = new Document())
             {
-                pdfDoc.ExportAnnotationsToXfdf(allXfdfStream);
-                allXfdfStream.Position = 0; // reset for reading
+                // Ensure the temporary document has the same number of pages as the source
+                for (int i = 1; i <= srcDoc.Pages.Count; i++)
+                {
+                    // Add a blank page (size will be taken from the source page)
+                    Page srcPage = srcDoc.Pages[i];
+                    Page newPage = tempDoc.Pages.Add();
+                    newPage.PageInfo = srcPage.PageInfo; // copy page size and rotation
+                }
 
-                // Load the XFDF XML
-                XDocument xfdfDoc = XDocument.Load(allXfdfStream);
+                // Iterate through each page and copy only PopupAnnotation objects
+                for (int i = 1; i <= srcDoc.Pages.Count; i++)
+                {
+                    Page srcPage = srcDoc.Pages[i];
+                    Page destPage = tempDoc.Pages[i];
 
-                // XFDF stores annotations as <annotation> elements.
-                // Keep only those where the @subtype attribute equals "Popup".
-                var popupAnnotations = xfdfDoc
-                    .Descendants("annotation")
-                    .Where(a => (string)a.Attribute("subtype") == "Popup")
-                    .ToList();
+                    for (int j = 1; j <= srcPage.Annotations.Count; j++)
+                    {
+                        Annotation ann = srcPage.Annotations[j];
+                        if (ann is PopupAnnotation popup)
+                        {
+                            // Create a new popup annotation on the corresponding page
+                            PopupAnnotation newPopup = new PopupAnnotation(destPage, popup.Rect)
+                            {
+                                Contents = popup.Contents,
+                                Color    = popup.Color,
+                                Open     = popup.Open,
+                                Name     = popup.Name,
+                                Modified = popup.Modified,
+                                // Copy any other needed properties here
+                            };
 
-                // Create a new XFDF document containing only the popup annotations
-                XDocument popupXfdf = new XDocument(
-                    new XDeclaration("1.0", "UTF-8", "yes"),
-                    new XElement("xfdf",
-                        new XAttribute("xml:space", "preserve"),
-                        // Preserve the <pdf> element if present (metadata about the PDF)
-                        xfdfDoc.Root.Element("pdf") ?? null,
-                        // Add the filtered popup annotations
-                        popupAnnotations
-                    )
-                );
+                            // Add the new popup annotation to the destination page
+                            destPage.Annotations.Add(newPopup);
+                        }
+                    }
+                }
 
-                // Save the filtered XFDF to the desired file
-                popupXfdf.Save(outputXfdfPath);
-                Console.WriteLine($"Popup annotations exported to '{outputXfdfPath}'.");
+                // Export only the popup annotations to XFDF
+                tempDoc.ExportAnnotationsToXfdf(outputXfdf);
             }
         }
+
+        Console.WriteLine($"Popup annotations exported to '{outputXfdf}'.");
     }
 }

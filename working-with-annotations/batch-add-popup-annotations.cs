@@ -19,39 +19,44 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            // Pages are 1‑based in Aspose.Pdf
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Rectangle for the TextAnnotation (sticky note)
+                // Text annotation (sticky note) rectangle
                 Aspose.Pdf.Rectangle textRect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
-                TextAnnotation txtAnn = new TextAnnotation(page, textRect)
+                TextAnnotation textAnn = new TextAnnotation(page, textRect)
                 {
                     Title = $"Note {i}",
-                    Contents = $"This is a text annotation on page {i}.",
-                    Icon = TextIcon.Note,
+                    Contents = $"This is a text annotation on page {i}",
+                    Icon = TextIcon.Comment,
+                    Color = Aspose.Pdf.Color.Yellow,
                     Open = false
                 };
 
-                // Rectangle for the PopupAnnotation (larger area)
-                Aspose.Pdf.Rectangle popupRect = new Aspose.Pdf.Rectangle(130, 700, 300, 800);
-                PopupAnnotation popup = new PopupAnnotation(page, popupRect)
+                // Popup annotation rectangle (larger window)
+                Aspose.Pdf.Rectangle popupRect = new Aspose.Pdf.Rectangle(130, 650, 400, 800);
+                PopupAnnotation popupAnn = new PopupAnnotation(page, popupRect)
                 {
-                    // Link the popup to its parent text annotation
-                    Parent = txtAnn,
-                    Open = false
+                    Contents = $"Popup for page {i}",
+                    Open = false,
+                    Color = Aspose.Pdf.Color.LightGray
                 };
 
-                // Add both annotations to the page's annotation collection
-                page.Annotations.Add(txtAnn);
-                page.Annotations.Add(popup);
+                // Link the popup to the text annotation
+                textAnn.Popup = popupAnn;
+                popupAnn.Parent = textAnn;
+
+                // Add both annotations to the page
+                page.Annotations.Add(textAnn);
+                page.Annotations.Add(popupAnn);
             }
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved PDF with pop‑up annotations to '{outputPath}'.");
+        Console.WriteLine($"Saved annotated PDF to '{outputPath}'.");
     }
 }

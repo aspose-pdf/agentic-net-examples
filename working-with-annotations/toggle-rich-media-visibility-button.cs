@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,41 +17,48 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
-            // Assume we work with the first page
+            // Work with the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define rectangle for the RichMedia annotation
-            Aspose.Pdf.Rectangle richMediaRect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
-            // Create a RichMedia annotation (placeholder – actual media not set)
-            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, richMediaRect)
+            // -----------------------------------------------------------------
+            // 1. Create a RichMediaAnnotation (placeholder – no actual media file)
+            // -----------------------------------------------------------------
+            Aspose.Pdf.Rectangle richRect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, richRect)
             {
-                // Optional: give it a name to reference later if needed
-                Name = "MyRichMedia"
+                Name = "myRichMedia",
+                // Ensure the annotation is initially visible (no Hidden flag)
+                Flags = AnnotationFlags.Print
             };
             page.Annotations.Add(richMedia);
 
-            // Define rectangle for the button annotation
-            Aspose.Pdf.Rectangle buttonRect = new Aspose.Pdf.Rectangle(350, 500, 450, 550);
-            // Create a push button field
-            ButtonField button = new ButtonField(page, buttonRect)
+            // -----------------------------------------------------------------
+            // 2. Create a push button that will toggle the visibility of the
+            //    RichMediaAnnotation when the user clicks it.
+            // -----------------------------------------------------------------
+            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(350, 500, 450, 540);
+            ButtonField toggleBtn = new ButtonField(doc, btnRect)
             {
-                // Visual appearance
-                Color = Aspose.Pdf.Color.LightGray,
-                Contents = "Toggle Media"
+                Name = "toggleButton",
+                AlternateCaption = "Toggle Media",
+                Highlighting = HighlightingMode.Push
             };
 
-            // When the button is pressed, hide the RichMedia annotation
-            button.Actions.OnPressMouseBtn = new HideAction(richMedia, true);
-            // When the button is released, show the RichMedia annotation
-            button.Actions.OnReleaseMouseBtn = new HideAction(richMedia, false);
+            // HideAction can hide or show an annotation. Setting the second
+            // parameter to true means the action will hide the target annotation.
+            // When the button is pressed, this action will be executed.
+            HideAction hideAction = new HideAction(richMedia, true);
 
-            // Add the button to the page
-            page.Annotations.Add(button);
+            // Assign the hide action to the button's mouse‑press event.
+            toggleBtn.Actions.OnPressMouseBtn = hideAction;
 
-            // Save the modified PDF
+            // Add the button to the page.
+            page.Annotations.Add(toggleBtn);
+
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 

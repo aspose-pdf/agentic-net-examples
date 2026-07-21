@@ -16,26 +16,34 @@ class Program
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
+
         if (!File.Exists(fdfPath))
         {
             Console.Error.WriteLine($"FDF not found: {fdfPath}");
             return;
         }
 
-        // Load the PDF document (disposable)
-        using (Document doc = new Document(pdfPath))
+        try
         {
-            // Open the FDF file stream
-            using (FileStream fdfStream = File.OpenRead(fdfPath))
+            // Load the source PDF
+            using (Document doc = new Document(pdfPath))
             {
-                // Import annotations; page numbers in the FDF are applied automatically
-                FdfReader.ReadAnnotations(fdfStream, doc);
+                // Open the FDF file stream
+                using (FileStream fdfStream = File.OpenRead(fdfPath))
+                {
+                    // Import annotations; page numbers in the FDF are applied automatically
+                    FdfReader.ReadAnnotations(fdfStream, doc);
+                }
+
+                // Save the PDF with the imported annotations
+                doc.Save(outputPath);
             }
 
-            // Save the PDF with imported annotations
-            doc.Save(outputPath);
+            Console.WriteLine($"Annotations imported and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Annotations imported and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

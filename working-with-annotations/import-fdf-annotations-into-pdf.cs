@@ -7,14 +7,14 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";          // Existing PDF
-        const string fdfPath       = "data.fdf";           // FDF file with annotations
-        const string outputPdfPath = "merged_output.pdf";  // Resulting PDF
+        const string pdfPath   = "input.pdf";      // existing PDF
+        const string fdfPath   = "data.fdf";       // FDF file with annotations
+        const string outputPath = "merged_output.pdf";
 
-        // Ensure source files exist
-        if (!File.Exists(inputPdfPath))
+        // Verify files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
         if (!File.Exists(fdfPath))
@@ -23,18 +23,21 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
-        // Open the FDF stream
-        using (FileStream fdfStream = File.OpenRead(fdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Import annotations from the FDF into the PDF
-            FdfReader.ReadAnnotations(fdfStream, pdfDoc);
+            // Open the FDF stream
+            using (FileStream fdfStream = File.OpenRead(fdfPath))
+            {
+                // Import annotations from the FDF into the PDF document
+                FdfReader.ReadAnnotations(fdfStream, pdfDoc);
+                // Stream will be closed automatically by the using block
+            }
 
-            // Save the merged document
-            pdfDoc.Save(outputPdfPath);
+            // Save the updated PDF (lifecycle rule: use Document.Save)
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"Merged PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"FDF annotations merged and saved to '{outputPath}'.");
     }
 }

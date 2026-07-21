@@ -6,28 +6,34 @@ class Program
 {
     static void Main()
     {
-        // Path to the source PDF file
-        const string pdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        // Ensure the PDF exists
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Build the XFDF file path in the same folder as the PDF
-        string directory = Path.GetDirectoryName(pdfPath);
-        string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-        string xfdfPath = Path.Combine(directory, $"{fileNameWithoutExt}.xfdf");
-
-        // Load the PDF document and export its annotations to XFDF
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        using (Document doc = new Document(inputPath))
         {
-            // Exports all annotations in the document to the XFDF file
-            doc.ExportAnnotationsToXfdf(xfdfPath);
-        }
+            // Create a memory stream that will receive the XFDF data
+            using (MemoryStream xfdfStream = new MemoryStream())
+            {
+                // Export all annotations from the document into the stream
+                doc.ExportAnnotationsToXfdf(xfdfStream);
 
-        Console.WriteLine($"Annotations exported to: {xfdfPath}");
+                // Reset the stream position so it can be read from the beginning
+                xfdfStream.Position = 0;
+
+                // Example: read the XFDF content and write it to the console
+                using (StreamReader reader = new StreamReader(xfdfStream))
+                {
+                    string xfdfContent = reader.ReadToEnd();
+                    Console.WriteLine("XFDF data:");
+                    Console.WriteLine(xfdfContent);
+                }
+            }
+        }
     }
 }

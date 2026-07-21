@@ -2,14 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Operators; // for Border class
+using Aspose.Pdf.Drawing;   // for Rectangle
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "underline_magenta.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,31 +17,26 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule for loading)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[1];
-
-            // Define the rectangle where the underline annotation will appear
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            // Define the rectangle where the underline will appear (llx, lly, urx, ury)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
 
-            // Create the underline annotation
-            UnderlineAnnotation underline = new UnderlineAnnotation(page, rect)
-            {
-                // Set the annotation color to magenta
-                Color = Aspose.Pdf.Color.Magenta
-            };
+            // Create the underline annotation on the first page
+            UnderlineAnnotation underline = new UnderlineAnnotation(doc.Pages[1], rect);
 
-            // Set the line thickness via the Border property.
-            // Border requires the parent annotation in its constructor.
+            // Set the annotation color to magenta
+            underline.Color = Aspose.Pdf.Color.Magenta;
+
+            // Set the line thickness to 2 points via the Border property
+            // Border requires the parent annotation in its constructor
             underline.Border = new Border(underline) { Width = 2 };
 
             // Add the annotation to the page
-            page.Annotations.Add(underline);
+            doc.Pages[1].Annotations.Add(underline);
 
-            // Save the modified PDF (using rule for saving)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

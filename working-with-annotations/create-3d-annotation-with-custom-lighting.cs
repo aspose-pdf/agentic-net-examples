@@ -8,8 +8,8 @@ class Program
     static void Main()
     {
         // Paths – adjust as needed
-        const string modelPath   = "model.u3d";      // 3‑D model file (U3D/PRC)
-        const string outputPath  = "3d_annotation.pdf";
+        const string outputPath = "3d_annotation.pdf";
+        const string modelPath   = "model.u3d"; // 3‑D model file (U3D/PRC)
 
         // Ensure the 3‑D model file exists
         if (!File.Exists(modelPath))
@@ -18,31 +18,34 @@ class Program
             return;
         }
 
-        // Create a new PDF document and add a blank page
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
+            // Add a blank page (1‑based indexing)
             Page page = doc.Pages.Add();
 
-            // Load the 3‑D content from the model file
+            // Load the 3‑D model into a PDF3DContent object (string overload)
             PDF3DContent content = new PDF3DContent(modelPath);
 
-            // Create a custom lighting scheme – using the predefined CAD scheme here
-            PDF3DLightingScheme lighting = PDF3DLightingScheme.CAD;
+            // Create a custom lighting scheme – using the built‑in CAD scheme as an example
+            // You can also instantiate a new scheme: new PDF3DLightingScheme(LightingSchemeType.CAD)
+            PDF3DLightingScheme lightingScheme = PDF3DLightingScheme.CAD;
 
-            // Choose a render mode that shows shaded illustration
+            // Choose a render mode – ShadedIllustration gives a realistic shaded view
             PDF3DRenderMode renderMode = PDF3DRenderMode.ShadedIllustration;
 
-            // Build the 3‑D artwork with the content, lighting scheme and render mode
-            PDF3DArtwork artwork = new PDF3DArtwork(doc, content, lighting, renderMode);
+            // Create the 3‑D artwork with the document, content, lighting scheme and render mode
+            PDF3DArtwork artwork = new PDF3DArtwork(doc, content, lightingScheme, renderMode);
 
-            // Define the rectangle where the annotation will appear (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
+            // Define the annotation rectangle (coordinates are in points; lower‑left origin)
+            // Here we place the annotation at (100,400) with width 400 and height 400
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 400, 500, 800);
 
             // Create the 3‑D annotation and attach it to the page
             PDF3DAnnotation annotation = new PDF3DAnnotation(page, rect, artwork);
             page.Annotations.Add(annotation);
 
-            // Save the PDF
+            // Save the PDF – no SaveOptions needed because we are saving to PDF format
             doc.Save(outputPath);
         }
 

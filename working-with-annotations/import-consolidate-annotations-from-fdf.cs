@@ -1,28 +1,25 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Annotations; // FdfReader is in this namespace
 
 class Program
 {
     static void Main()
     {
-        // Input PDF that will receive the annotations
-        const string pdfPath = "base.pdf";
+        // Input PDF and list of FDF files containing annotations
+        const string pdfPath = "input.pdf";
+        string[] fdfFiles = { "annotations1.fdf", "annotations2.fdf", "annotations3.fdf" };
+        const string outputPdf = "output_with_annotations.pdf";
 
-        // List of FDF files to import
-        string[] fdfFiles = { "notes1.fdf", "comments.fdf", "review.fdf" };
-
-        // Ensure the PDF exists
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Open the PDF document inside a using block (lifecycle rule)
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(pdfPath))
         {
             // Import annotations from each FDF file into the same document
@@ -34,7 +31,7 @@ class Program
                     continue;
                 }
 
-                // Open the FDF stream and import annotations (FdfReader rule)
+                // Open the FDF stream and read annotations (FdfReader.ReadAnnotations is the correct API)
                 using (FileStream fdfStream = File.OpenRead(fdfPath))
                 {
                     FdfReader.ReadAnnotations(fdfStream, doc);
@@ -42,27 +39,23 @@ class Program
             }
 
             // Consolidate all annotations from all pages into a single collection
-            List<Annotation> allAnnotations = new List<Annotation>();
-
-            // Pages are 1‑based (global rule)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            List<Annotation> consolidated = new List<Annotation>();
+            for (int i = 1; i <= doc.Pages.Count; i++) // Aspose.Pdf uses 1‑based page indexing
             {
-                AnnotationCollection pageAnnots = doc.Pages[i].Annotations;
-
-                // Add each annotation from the page to the list
-                foreach (Annotation annot in pageAnnots)
+                AnnotationCollection pageAnnotations = doc.Pages[i].Annotations;
+                foreach (Annotation ann in pageAnnotations)
                 {
-                    allAnnotations.Add(annot);
+                    consolidated.Add(ann);
                 }
             }
 
-            // Example usage: output total count
-            Console.WriteLine($"Total annotations imported: {allAnnotations.Count}");
+            // Example usage: display total number of merged annotations
+            Console.WriteLine($"Total merged annotations: {consolidated.Count}");
 
-            // Save the updated PDF (lifecycle rule – still inside using)
-            const string outputPath = "annotated_output.pdf";
-            doc.Save(outputPath);
-            Console.WriteLine($"Annotated PDF saved to '{outputPath}'.");
+            // Save the updated PDF (no extra SaveOptions needed for PDF output)
+            doc.Save(outputPdf);
         }
+
+        Console.WriteLine($"Merged PDF saved to '{outputPdf}'.");
     }
 }

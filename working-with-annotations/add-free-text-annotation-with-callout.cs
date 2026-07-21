@@ -2,15 +2,15 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;          // for DefaultAppearance
-using System.Drawing;          // required for DefaultAppearance color
+using Aspose.Pdf.Text;
+using System.Drawing; // for System.Drawing.Color used by DefaultAppearance
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "annotated.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "free_text_annotation.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,31 +18,30 @@ class Program
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page to annotate (1‑based indexing)
+            // Get the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the rectangle that will contain the free‑text annotation
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the annotation rectangle (left, bottom, right, top)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
 
-            // DefaultAppearance requires System.Drawing.Color for the text color
-            DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
+            // Create DefaultAppearance (font name, size, text color) – uses System.Drawing.Color
+            DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Blue);
 
-            // Create the FreeTextAnnotation with the appearance
+            // Create the FreeTextAnnotation with a callout (exactly three points)
             FreeTextAnnotation freeText = new FreeTextAnnotation(page, rect, appearance)
             {
-                Contents = "This is a free‑text annotation with a callout.",
-                Color    = Aspose.Pdf.Color.Yellow   // background color of the annotation box
-            };
-
-            // Callout requires exactly three points: start (inside), knee (bend), end (target)
-            freeText.Callout = new Aspose.Pdf.Point[]
-            {
-                new Aspose.Pdf.Point(150, 550), // start point inside the annotation
-                new Aspose.Pdf.Point(200, 620), // knee point (bend)
-                new Aspose.Pdf.Point(250, 650)  // end point (pointing to target location)
+                Contents = "Important note with callout",
+                Color = Aspose.Pdf.Color.Yellow, // border color
+                Opacity = 0.8,
+                Callout = new Aspose.Pdf.Point[]
+                {
+                    new Aspose.Pdf.Point(150, 550), // start point (inside annotation)
+                    new Aspose.Pdf.Point(200, 620), // knee point (bend)
+                    new Aspose.Pdf.Point(250, 650)  // end point (target location)
+                }
             };
 
             // Add the annotation to the page
@@ -52,6 +51,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Free‑text annotation with callout saved to '{outputPath}'.");
+        Console.WriteLine($"Free‑text annotation saved to '{outputPath}'.");
     }
 }

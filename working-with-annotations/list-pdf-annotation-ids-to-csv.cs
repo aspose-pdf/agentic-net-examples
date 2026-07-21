@@ -12,35 +12,37 @@ class Program
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPdfPath))
         {
-            // Prepare CSV writer
-            using (StreamWriter csvWriter = new StreamWriter(outputCsvPath, false))
+            // Prepare the CSV file (overwrite if it exists)
+            using (StreamWriter writer = new StreamWriter(outputCsvPath, false, System.Text.Encoding.UTF8))
             {
                 // Write CSV header
-                csvWriter.WriteLine("PageNumber,AnnotationName");
+                writer.WriteLine("PageNumber,AnnotationName");
 
-                // Pages are 1‑based in Aspose.Pdf
+                // Iterate pages (Aspose.Pdf uses 1‑based indexing)
                 for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
                 {
                     Page page = doc.Pages[pageIndex];
                     AnnotationCollection annotations = page.Annotations;
 
-                    // AnnotationCollection is also 1‑based
-                    for (int annIndex = 1; annIndex <= annotations.Count; annIndex++)
+                    // Iterate all annotations on the current page
+                    foreach (Annotation annotation in annotations)
                     {
-                        Annotation annotation = annotations[annIndex];
+                        // Use the Name property as the annotation identifier.
+                        // If Name is null or empty, fall back to FullName.
+                        string id = !string.IsNullOrEmpty(annotation.Name) ? annotation.Name : annotation.FullName ?? string.Empty;
 
-                        // Use the annotation's Name as its identifier (fallback to empty string if null)
-                        string annName = annotation.Name ?? string.Empty;
+                        // Escape commas in the identifier if necessary
+                        if (id.Contains(","))
+                            id = $"\"{id}\"";
 
-                        // Write a CSV line for this annotation
-                        csvWriter.WriteLine($"{pageIndex},\"{annName}\"");
+                        writer.WriteLine($"{pageIndex},{id}");
                     }
                 }
             }
