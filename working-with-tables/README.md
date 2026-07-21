@@ -1,36 +1,5 @@
 # Working with tables
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareSourceCode",
-  "name": "Working with tables -- Aspose.PDF for .NET Examples",
-  "description": "96 verified, compile-tested C# examples demonstrating working with tables operations in Aspose.PDF for .NET 26.7.0.",
-  "programmingLanguage": "C#",
-  "runtimePlatform": ".NET",
-  "targetProduct": {
-    "@type": "SoftwareApplication",
-    "name": "Aspose.PDF for .NET",
-    "softwareVersion": "26.7.0"
-  },
-  "codeRepository": "https://github.com/aspose-pdf/agentic-net-examples.git/tree/main/working-with-tables",
-  "license": "https://opensource.org/licenses/MIT",
-  "keywords": [
-    "Working with tables",
-    "PDF",
-    "C#",
-    "Aspose.PDF",
-    ".NET",
-    "Aspose.PDF 26.7.0"
-  ],
-  "isPartOf": {
-    "@type": "SoftwareSourceCode",
-    "name": "Aspose.PDF for .NET -- Agentic Examples",
-    "codeRepository": "https://github.com/aspose-pdf/agentic-net-examples.git"
-  }
-}
-</script>
-
 > **Working with tables** in PDF using C# / .NET -- **96** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `working-with-tables`

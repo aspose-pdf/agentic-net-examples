@@ -1,36 +1,5 @@
 # Facades texts and images
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareSourceCode",
-  "name": "Facades texts and images -- Aspose.PDF for .NET Examples",
-  "description": "28 verified, compile-tested C# examples demonstrating facades texts and images operations in Aspose.PDF for .NET 26.7.0.",
-  "programmingLanguage": "C#",
-  "runtimePlatform": ".NET",
-  "targetProduct": {
-    "@type": "SoftwareApplication",
-    "name": "Aspose.PDF for .NET",
-    "softwareVersion": "26.7.0"
-  },
-  "codeRepository": "https://github.com/aspose-pdf/agentic-net-examples.git/tree/main/facades-texts-and-images",
-  "license": "https://opensource.org/licenses/MIT",
-  "keywords": [
-    "Facades texts and images",
-    "PDF",
-    "C#",
-    "Aspose.PDF",
-    ".NET",
-    "Aspose.PDF 26.7.0"
-  ],
-  "isPartOf": {
-    "@type": "SoftwareSourceCode",
-    "name": "Aspose.PDF for .NET -- Agentic Examples",
-    "codeRepository": "https://github.com/aspose-pdf/agentic-net-examples.git"
-  }
-}
-</script>
-
 > **Facades texts and images** in PDF using C# / .NET -- **28** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-texts-and-images`

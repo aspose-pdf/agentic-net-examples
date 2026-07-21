@@ -1,36 +1,5 @@
 # Stamping
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareSourceCode",
-  "name": "Stamping -- Aspose.PDF for .NET Examples",
-  "description": "50 verified, compile-tested C# examples demonstrating stamping operations in Aspose.PDF for .NET 26.7.0.",
-  "programmingLanguage": "C#",
-  "runtimePlatform": ".NET",
-  "targetProduct": {
-    "@type": "SoftwareApplication",
-    "name": "Aspose.PDF for .NET",
-    "softwareVersion": "26.7.0"
-  },
-  "codeRepository": "https://github.com/aspose-pdf/agentic-net-examples.git/tree/main/stamping",
-  "license": "https://opensource.org/licenses/MIT",
-  "keywords": [
-    "Stamping",
-    "PDF",
-    "C#",
-    "Aspose.PDF",
-    ".NET",
-    "Aspose.PDF 26.7.0"
-  ],
-  "isPartOf": {
-    "@type": "SoftwareSourceCode",
-    "name": "Aspose.PDF for .NET -- Agentic Examples",
-    "codeRepository": "https://github.com/aspose-pdf/agentic-net-examples.git"
-  }
-}
-</script>
-
 > **Stamping** in PDF using C# / .NET -- **50** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `stamping`

@@ -1,36 +1,5 @@
 # Working with graphs
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareSourceCode",
-  "name": "Working with graphs -- Aspose.PDF for .NET Examples",
-  "description": "77 verified, compile-tested C# examples demonstrating working with graphs operations in Aspose.PDF for .NET 26.7.0.",
-  "programmingLanguage": "C#",
-  "runtimePlatform": ".NET",
-  "targetProduct": {
-    "@type": "SoftwareApplication",
-    "name": "Aspose.PDF for .NET",
-    "softwareVersion": "26.7.0"
-  },
-  "codeRepository": "https://github.com/aspose-pdf/agentic-net-examples.git/tree/main/working-with-graphs",
-  "license": "https://opensource.org/licenses/MIT",
-  "keywords": [
-    "Working with graphs",
-    "PDF",
-    "C#",
-    "Aspose.PDF",
-    ".NET",
-    "Aspose.PDF 26.7.0"
-  ],
-  "isPartOf": {
-    "@type": "SoftwareSourceCode",
-    "name": "Aspose.PDF for .NET -- Agentic Examples",
-    "codeRepository": "https://github.com/aspose-pdf/agentic-net-examples.git"
-  }
-}
-</script>
-
 > **Working with graphs** in PDF using C# / .NET -- **77** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `working-with-graphs`
