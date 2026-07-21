@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -16,49 +15,57 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber and enable the FlowEngine to detect merged cells
-            TableAbsorber absorber = new TableAbsorber
-            {
-                UseFlowEngine = true
-            };
+            // Create a TableAbsorber instance
+            TableAbsorber absorber = new TableAbsorber();
 
-            // Extract tables from the entire document
+            // Enable the FlowEngine to get accurate RowSpan/ColSpan information
+            absorber.UseFlowEngine = true;
+
+            // Extract tables from the whole document
             absorber.Visit(doc);
 
-            int tableIndex = 0;
-            foreach (var table in absorber.TableList)
+            // Iterate over all detected tables
+            for (int t = 0; t < absorber.TableList.Count; t++)
             {
-                tableIndex++;
-                int rowIndex = 0;
-                foreach (var row in table.RowList)
+                var table = absorber.TableList[t];
+                bool tableHasMergedCell = false;
+
+                // Iterate rows
+                for (int r = 0; r < table.RowList.Count; r++)
                 {
-                    rowIndex++;
-                    int colIndex = 0;
-                    foreach (var cell in row.CellList)
+                    var row = table.RowList[r];
+
+                    // Iterate cells in the row
+                    for (int c = 0; c < row.CellList.Count; c++)
                     {
-                        colIndex++;
+                        var cell = row.CellList[c];
 
-                        // Default span values
-                        int rowSpan = 1;
-                        int colSpan = cell.ColSpan; // ColSpan is always available
-
-                        // RowSpan may not exist on AbsorbedCell; retrieve via reflection if present
-                        PropertyInfo rowSpanProp = cell.GetType().GetProperty("RowSpan");
-                        if (rowSpanProp != null && rowSpanProp.PropertyType == typeof(int))
+                        // Check for merged cells (RowSpan > 1 or ColSpan > 1)
+                        // AbsorbedCell provides ColSpan; RowSpan is also available when FlowEngine is used
+                        int colSpan = cell.ColSpan;
+                        int rowSpan = 0;
+                        // RowSpan property may not exist on AbsorbedCell in older versions;
+                        // use reflection as a safe fallback
+                        var rowSpanProp = cell.GetType().GetProperty("RowSpan");
+                        if (rowSpanProp != null)
                         {
                             rowSpan = (int)rowSpanProp.GetValue(cell);
                         }
 
-                        // Report cells that span more than one row or column
-                        if (rowSpan > 1 || colSpan > 1)
+                        if (colSpan > 1 || rowSpan > 1)
                         {
-                            Console.WriteLine(
-                                $"Merged cell detected: Table {tableIndex}, Page {table.PageNum}, Row {rowIndex}, Column {colIndex}, RowSpan={rowSpan}, ColSpan={colSpan}");
+                            tableHasMergedCell = true;
+                            Console.WriteLine($"Table {t + 1}, Row {r + 1}, Cell {c + 1} is merged (RowSpan={rowSpan}, ColSpan={colSpan})");
                         }
                     }
+                }
+
+                if (!tableHasMergedCell)
+                {
+                    Console.WriteLine($"Table {t + 1} contains no merged cells.");
                 }
             }
         }

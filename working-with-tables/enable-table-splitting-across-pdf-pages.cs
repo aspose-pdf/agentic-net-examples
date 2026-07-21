@@ -9,45 +9,42 @@ class Program
     {
         const string outputPath = "table_split.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a page to the document (first page)
+            // Add a single page to host the table
             Page page = doc.Pages.Add();
 
-            // Create a table that will be added to the page
+            // Create a table, enable splitting across pages, and define column widths
             Table table = new Table
             {
-                // Enable splitting of the table across pages
-                IsBroken = true,
-
-                // Optional: set column widths (percentage of page width)
-                ColumnWidths = "20 30 20 30"
+                IsBroken = true,                         // Allow the table to break across pages
+                ColumnWidths = "100 100 100",            // Three equal columns
+                DefaultCellBorder = new BorderInfo(     // Simple border for all cells
+                    BorderSide.All,
+                    0.5f,                               // float literal as required
+                    Color.Black)
             };
 
             // Add a header row
             Row header = table.Rows.Add();
-            header.DefaultCellTextState = new TextState { FontSize = 12, FontStyle = FontStyles.Bold };
-            header.Cells.Add("ID");
-            header.Cells.Add("Name");
-            header.Cells.Add("Quantity");
-            header.Cells.Add("Description");
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
+            header.Cells.Add("Header 3");
 
-            // Add many data rows to force the table to span multiple pages
-            for (int i = 1; i <= 200; i++)
+            // Populate many rows to force the table to span multiple pages
+            for (int i = 1; i <= 100; i++)
             {
                 Row row = table.Rows.Add();
-                row.DefaultCellTextState = new TextState { FontSize = 10 };
-                row.Cells.Add(i.ToString());
-                row.Cells.Add($"Item {i}");
-                row.Cells.Add((i * 5).ToString());
-                row.Cells.Add($"This is a description for item {i}. It may be long enough to wrap onto multiple lines.");
+                row.Cells.Add($"Item {i}A");
+                row.Cells.Add($"Item {i}B");
+                row.Cells.Add($"Item {i}C");
             }
 
-            // Add the table to the page's paragraphs collection
+            // Insert the table into the page's content
             page.Paragraphs.Add(table);
 
-            // Save the document as PDF
+            // Save the resulting PDF
             doc.Save(outputPath);
         }
 

@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,71 +6,58 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and add a blank page
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the existing PDF (document disposal handled by using)
-        using (Document doc = new Document(inputPath))
-        {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[1];
+            Page page = doc.Pages.Add();
 
             // -------------------------------------------------
-            // 1. Create a text fragment that will precede the table
+            // 1. Create a text fragment (BaseParagraph) and add it to the page
             // -------------------------------------------------
-            TextFragment txtFragment = new TextFragment("Below is a sample table:")
+            TextFragment fragment = new TextFragment("This paragraph precedes a table:")
             {
-                // Position the fragment (X, Y) – coordinates are measured from the bottom‑left corner
-                Position = new Position(50, 700)
+                // Position the fragment on the page (X = 50, Y = 750)
+                Position = new Position(50, 750)
             };
-            // Optional: set formatting (font, size, etc.)
-            txtFragment.TextState.FontSize = 12;
-            txtFragment.TextState.Font = FontRepository.FindFont("Helvetica");
-
-            // Add the fragment to the page
-            page.Paragraphs.Add(txtFragment);
-
-            // Store the index of the fragment we just added (Count‑1 after the Add)
-            int txtIndex = page.Paragraphs.Count - 1;
+            page.Paragraphs.Add(fragment);
 
             // -------------------------------------------------
-            // 2. Create a table (Table derives from BaseParagraph)
+            // 2. Create a table (BaseParagraph) and populate it
             // -------------------------------------------------
             Table table = new Table
             {
-                // Define column widths (three columns in this example)
-                ColumnWidths = "100 200 100"
+                // Optional: set column widths (comma‑separated or space‑separated string)
+                ColumnWidths = "200 200"
             };
 
-            // First row – header cells
-            Row headerRow = table.Rows.Add();
-            headerRow.Cells.Add("Header 1");
-            headerRow.Cells.Add("Header 2");
-            headerRow.Cells.Add("Header 3");
+            // Add first row
+            Row row1 = table.Rows.Add();
+            row1.Cells.Add("Header 1");
+            row1.Cells.Add("Header 2");
 
-            // Second row – data cells
-            Row dataRow = table.Rows.Add();
-            dataRow.Cells.Add("Cell 1");
-            dataRow.Cells.Add("Cell 2");
-            dataRow.Cells.Add("Cell 3");
+            // Add second row
+            Row row2 = table.Rows.Add();
+            row2.Cells.Add("Cell A1");
+            row2.Cells.Add("Cell A2");
 
-            // -------------------------------------------------
-            // 3. Insert the table after the previously added fragment
-            // -------------------------------------------------
-            page.Paragraphs.Insert(txtIndex + 1, table);
+            // Add third row
+            Row row3 = table.Rows.Add();
+            row3.Cells.Add("Cell B1");
+            row3.Cells.Add("Cell B2");
 
             // -------------------------------------------------
-            // 4. Save the modified PDF
+            // 3. Insert the table after the fragment
+            //    Paragraphs.Insert uses zero‑based indexing.
             // -------------------------------------------------
-            doc.Save(outputPath);
+            // Index 1 inserts the table after the first paragraph (index 0)
+            page.Paragraphs.Insert(1, table);
+
+            // -------------------------------------------------
+            // 4. Save the document
+            // -------------------------------------------------
+            doc.Save("TableInsideParagraph.pdf");
         }
 
-        Console.WriteLine($"Document saved to '{outputPath}'.");
+        Console.WriteLine("PDF with table inside paragraph created successfully.");
     }
 }

@@ -8,19 +8,27 @@ class Program
     static void Main()
     {
         // Input and output paths (adjust as needed)
-        const string outputPath = "table_width_output.pdf";
+        const string outputPath = "table_width_demo.pdf";
 
-        // Create a new PDF document inside a using block for proper disposal
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
             // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table and define its column widths (optional)
+            // Create a table and set its position on the page
             Table table = new Table
             {
-                // Example: three columns with relative widths
-                ColumnWidths = "100 150 200"
+                // Position the table (left, top) – values are in points (1/72 inch)
+                // Here we place it 50 points from the left and 700 points from the bottom
+                // (Aspose.Pdf uses bottom‑left origin for page coordinates)
+                // The Width is not set explicitly; it will be calculated after layout
+                // based on column definitions and cell contents.
+                // The Table will be added to the page's Paragraphs collection.
+                // No need to set Width property directly.
+                // The GetWidth() method will return the calculated width after layout.
+                // Example column widths: three columns with relative widths
+                ColumnWidths = "33 33 34"
             };
 
             // Add a header row
@@ -38,28 +46,19 @@ class Program
                 row.Cells.Add($"Row {i} - Col 3");
             }
 
-            // Add the table to the page's paragraphs collection
+            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // At this point the table has been laid out.
-            // Get the calculated width of the rendered table.
+            // Force layout by saving the document (or by calling doc.Save with a stream)
+            // The layout engine runs during Save, after which GetWidth() returns the
+            // actual rendered width.
+            doc.Save(outputPath);
+
+            // After layout, retrieve the calculated width of the table
             double renderedWidth = table.GetWidth();
 
             // Output the width to the console
-            Console.WriteLine($"Rendered table width: {renderedWidth}");
-
-            // Optionally, add a text fragment showing the width on the page
-            TextFragment tf = new TextFragment($"Table width = {renderedWidth:F2} points")
-            {
-                // Position the fragment below the table
-                Position = new Position(50, page.PageInfo.Height - 50)
-            };
-            page.Paragraphs.Add(tf);
-
-            // Save the PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Rendered table width: {renderedWidth} points");
         }
-
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

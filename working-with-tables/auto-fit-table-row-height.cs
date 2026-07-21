@@ -1,45 +1,66 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document
-        using (Document doc = new Document())
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_autofit_row.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
-
-            // Create a table and add it to the page
-            Table table = new Table
-            {
-                // Define column widths (two columns in this example)
-                ColumnWidths = "150 300"
-            };
-            page.Paragraphs.Add(table);
-
-            // Add a row with content that may require height adjustment
-            Row row = table.Rows.Add();
-            // First cell – short text
-            row.Cells.Add("ID");
-            // Second cell – long text that should wrap and cause the row to grow
-            row.Cells.Add("This is a very long description that should automatically increase the row height to fit all the wrapped text without truncation.");
-
-            // -----------------------------------------------------------------
-            // Enable automatic height adjustment for the row.
-            // In Aspose.Pdf the Row class does not expose a Height property.
-            // Leaving FixedRowHeight unset (or explicitly setting it to 0) tells the renderer
-            // to calculate the height from the intrinsic content, which results in an
-            // auto‑fitting row.
-            // -----------------------------------------------------------------
-            row.FixedRowHeight = 0; // 0 = AutoFit
-
-            // Save the PDF
-            doc.Save("AutoFitRow.pdf");
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        Console.WriteLine("PDF with auto‑fitting row saved as 'AutoFitRow.pdf'.");
+        // Load the existing PDF
+        using (Document doc = new Document(inputPath))
+        {
+            // Access the tagged content API
+            ITaggedContent tagged = doc.TaggedContent;
+
+            // Set language and title (optional)
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+
+            // Get the root element of the logical structure tree
+            StructureElement root = tagged.RootElement;
+
+            // Create a table element and attach it to the root
+            TableElement table = tagged.CreateTableElement();
+            table.AlternativeText = "Sample table with auto‑fit rows";
+            root.AppendChild(table);
+
+            // Create a table row (TableTRElement) via the factory
+            TableTRElement row = tagged.CreateTableTRElement();
+
+            // Attach the row to the table
+            table.AppendChild(row);
+
+            // IMPORTANT: Enable automatic height adjustment for the row.
+            // Setting FixedRowHeight to 0 and MinRowHeight to 0 lets the row
+            // height be determined by its intrinsic content (auto‑fit).
+            row.FixedRowHeight = 0;   // No fixed height
+            row.MinRowHeight   = 0;   // No minimum height constraint
+
+            // Add a header cell
+            TableTHElement th = tagged.CreateTableTHElement();
+            th.SetText("Header");
+            row.AppendChild(th);
+
+            // Add a data cell with multi‑line content to demonstrate auto‑fit
+            TableTDElement td = tagged.CreateTableTDElement();
+            td.SetText("Line 1\nLine 2\nLine 3");
+            row.AppendChild(td);
+
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"PDF saved with auto‑fit row height: '{outputPath}'");
     }
 }

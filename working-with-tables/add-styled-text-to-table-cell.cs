@@ -1,23 +1,22 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // required for TextFragment, FontRepository, TextState
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "output.pdf";
-
-        // Create a new PDF document and ensure proper disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page to the document
+            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Create a table with a single column (width can be adjusted as needed)
-            Table table = new Table();
-            table.ColumnWidths = "200"; // 200 points width for the column
+            // Create a table with a single column (width 200 points)
+            Table table = new Table
+            {
+                ColumnWidths = "200"
+            };
 
             // Add a row to the table
             Row row = table.Rows.Add();
@@ -25,29 +24,26 @@ class Program
             // Add a cell to the row
             Cell cell = row.Cells.Add();
 
-            // Allow the cell to use the TextFragment's TextState for styling
+            // Create a TextFragment with the desired text
+            TextFragment tf = new TextFragment("Sample Text");
+
+            // Set the font and size for the fragment
+            tf.TextState.Font = FontRepository.FindFont("TimesNewRoman");
+            tf.TextState.FontSize = 12;
+
+            // Ensure the cell respects the TextFragment's TextState
             cell.IsOverrideByFragment = true;
 
-            // Create a TextFragment with the desired text
-            TextFragment tf = new TextFragment("Hello Aspose PDF");
-
-            // Set the font and size via the TextState of the fragment
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf.TextState.FontSize = 14; // specific font size
-
-            // Optional: set text color
-            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
-
-            // Add the TextFragment to the cell's paragraph collection
+            // Add the TextFragment to the cell's paragraphs collection
             cell.Paragraphs.Add(tf);
 
-            // Add the table to the page's paragraph collection
+            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF document (PDF format by default)
-            doc.Save(outputPath);
+            // Save the PDF document
+            doc.Save("output.pdf");
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine("PDF with styled cell text created successfully.");
     }
 }

@@ -15,41 +15,39 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber to find tables in the document
-            TableAbsorber tableAbsorber = new TableAbsorber();
+            // Initialize the TableAbsorber
+            TableAbsorber absorber = new TableAbsorber();
 
-            // Extract tables from the whole document
-            tableAbsorber.Visit(doc);
+            // Extract tables from the entire document
+            absorber.Visit(doc);
 
-            // Iterate over each absorbed table
-            for (int t = 0; t < tableAbsorber.TableList.Count; t++)
+            // Iterate through each absorbed table
+            for (int t = 0; t < absorber.TableList.Count; t++)
             {
-                var absorbedTable = tableAbsorber.TableList[t];
-                Console.WriteLine($"Table {t + 1} (Page {absorbedTable.PageNum}):");
+                var table = absorber.TableList[t];
+                Console.WriteLine($"Table {t + 1} on page {table.PageNum}:");
 
-                // Iterate over rows in the current table
-                for (int r = 0; r < absorbedTable.RowList.Count; r++)
+                // Iterate through rows of the table
+                for (int r = 0; r < table.RowList.Count; r++)
                 {
-                    var row = absorbedTable.RowList[r];
-                    Console.WriteLine($"  Row {r + 1}:");
+                    var row = table.RowList[r];
 
-                    // Iterate over cells in the current row
+                    // Iterate through cells of the row
                     for (int c = 0; c < row.CellList.Count; c++)
                     {
                         var cell = row.CellList[c];
-                        Console.Write($"    Cell {c + 1} text: ");
 
-                        // Concatenate all text fragments inside the cell
+                        // Concatenate text from all fragments within the cell
                         string cellText = string.Empty;
                         foreach (TextFragment fragment in cell.TextFragments)
                         {
                             cellText += fragment.Text;
                         }
 
-                        Console.WriteLine(cellText);
+                        Console.WriteLine($"  Row {r + 1}, Cell {c + 1}: \"{cellText}\"");
                     }
                 }
             }

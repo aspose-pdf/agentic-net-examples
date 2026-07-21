@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,75 +6,49 @@ class Program
 {
     static void Main()
     {
-        // Output PDF path
-        const string outputPath = "TableAutoFit.pdf";
+        const string outputPath = "table_autofit.pdf";
 
-        // Create a new PDF document inside a using block for proper disposal
         using (Document doc = new Document())
         {
-            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table and set ColumnAdjustment to AutoFitToContent
+            // Create a table and enable column auto‑fit behavior
             Table table = new Table
             {
-                // This makes the table automatically adjust column widths to fit the cell contents
-                ColumnAdjustment = ColumnAdjustment.AutoFitToContent,
-
-                // Optional: set table position and width
-                Left = 50,
-                Top = 700,
-                // Width can be set; AutoFitToContent will still adjust columns within this width
-                // If Width is not set, the table will expand as needed
-                // Width = 500
+                ColumnAdjustment = ColumnAdjustment.AutoFitToContent
             };
 
-            // Add the table to the page's paragraph collection
-            page.Paragraphs.Add(table);
+            // Optionally set a border around the whole table
+            table.Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black);
 
-            // ----- Build table rows and cells -----
             // Header row
-            Row headerRow = new Row();
-            table.Rows.Add(headerRow);
-
-            // Header cells
+            Row headerRow = table.Rows.Add();
             Cell headerCell1 = new Cell();
             headerCell1.Paragraphs.Add(new TextFragment("Product"));
+            headerCell1.DefaultCellTextState = new TextState { FontSize = 12, Font = FontRepository.FindFont("Helvetica-Bold") };
             headerRow.Cells.Add(headerCell1);
 
             Cell headerCell2 = new Cell();
             headerCell2.Paragraphs.Add(new TextFragment("Description"));
+            headerCell2.DefaultCellTextState = new TextState { FontSize = 12, Font = FontRepository.FindFont("Helvetica-Bold") };
             headerRow.Cells.Add(headerCell2);
 
-            Cell headerCell3 = new Cell();
-            headerCell3.Paragraphs.Add(new TextFragment("Price"));
-            headerRow.Cells.Add(headerCell3);
+            // Data row with long content to demonstrate auto‑fit
+            Row dataRow = table.Rows.Add();
+            Cell dataCell1 = new Cell();
+            dataCell1.Paragraphs.Add(new TextFragment("Widget A"));
+            dataRow.Cells.Add(dataCell1);
 
-            // Data rows (example data)
-            string[,] data = {
-                { "Widget A", "A high‑quality widget with many features", "$19.99" },
-                { "Gadget B", "Compact gadget, ideal for travel", "$9.50" },
-                { "Tool C", "Durable tool for heavy‑duty tasks", "$29.75" }
-            };
+            Cell dataCell2 = new Cell();
+            dataCell2.Paragraphs.Add(new TextFragment(
+                "This is a very long description that should cause the column to adjust its width automatically to fit the content without truncation."));
+            dataRow.Cells.Add(dataCell2);
 
-            for (int i = 0; i < data.GetLength(0); i++)
-            {
-                Row dataRow = new Row();
-                table.Rows.Add(dataRow);
-
-                for (int j = 0; j < data.GetLength(1); j++)
-                {
-                    Cell cell = new Cell();
-                    // Use TextFragment to add text to the cell
-                    cell.Paragraphs.Add(new TextFragment(data[i, j]));
-                    dataRow.Cells.Add(cell);
-                }
-            }
-
-            // Save the PDF document
+            // Add the table to the page and save the document
+            page.Paragraphs.Add(table);
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with AutoFitToContent table saved to '{outputPath}'.");
     }
 }

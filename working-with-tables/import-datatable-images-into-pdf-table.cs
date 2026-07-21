@@ -2,77 +2,86 @@ using System;
 using System.Data;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Prepare a DataTable with a text column and an image column (byte[]).
+        // Prepare a DataTable where the second column holds image data as byte arrays.
         DataTable dt = new DataTable();
         dt.Columns.Add("Name", typeof(string));
         dt.Columns.Add("Photo", typeof(byte[]));
 
-        // Load an example image from disk into a byte array.
-        const string imagePath = "sample.jpg";
-        if (!File.Exists(imagePath))
+        // Load sample images from disk into the DataTable.
+        // Adjust the file paths as needed for your environment.
+        string[] imageFiles = { "photo1.png", "photo2.png" };
+        string[] names = { "Alice", "Bob" };
+
+        for (int i = 0; i < imageFiles.Length; i++)
         {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
-            return;
+            if (File.Exists(imageFiles[i]))
+            {
+                byte[] imgBytes = File.ReadAllBytes(imageFiles[i]);
+                dt.Rows.Add(names[i], imgBytes);
+            }
         }
 
-        byte[] imageBytes = File.ReadAllBytes(imagePath);
-        dt.Rows.Add("Sample Item", imageBytes);
-        // Add more rows as needed...
-
-        // Create a new PDF document and add a page.
+        // Create a new PDF document.
         using (Document doc = new Document())
         {
+            // Add a page to host the table.
             Page page = doc.Pages.Add();
 
             // Create a table with two columns.
-            Table table = new Table();
-            // Set column widths (example: 150 points for text, 200 points for image).
-            table.ColumnWidths = "150 200";
+            Table table = new Table
+            {
+                // Define column widths (in points). Adjust as needed.
+                ColumnWidths = "150 150",
+                // Optional: set a border for all cells.
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
+            };
 
-            // Optional: set table border for visibility using the correct BorderInfo class.
-            table.Border = new BorderInfo(BorderSide.All, 1);
+            // Add a header row.
+            var headerRow = table.Rows.Add();
+            headerRow.Cells.Add("Name");
+            headerRow.Cells.Add("Photo");
 
-            // Iterate through the DataTable rows and populate the table.
+            // Populate the table rows from the DataTable.
             foreach (DataRow dr in dt.Rows)
             {
-                // Add a new row to the table.
-                Aspose.Pdf.Row row = table.Rows.Add();
+                var row = table.Rows.Add();
 
-                // First cell: text.
-                Aspose.Pdf.Cell textCell = row.Cells.Add();
-                string name = dr["Name"]?.ToString() ?? string.Empty;
-                TextFragment tf = new TextFragment(name);
-                textCell.Paragraphs.Add(tf);
+                // Text cell for the name.
+                row.Cells.Add(dr["Name"].ToString());
 
-                // Second cell: image.
-                Aspose.Pdf.Cell imageCell = row.Cells.Add();
-                byte[] imgData = dr["Photo"] as byte[];
-                if (imgData != null && imgData.Length > 0)
+                // Image cell.
+                var imgCell = row.Cells.Add();
+
+                // Create an Image object from the byte array.
+                using (MemoryStream ms = new MemoryStream((byte[])dr["Photo"]))
                 {
-                    // Aspose.Pdf.Image must be created with the parameter‑less constructor
-                    // and the image data supplied via the ImageStream property.
-                    using (MemoryStream ms = new MemoryStream(imgData))
+                    Image img = new Image
                     {
-                        Image img = new Image { ImageStream = ms };
-                        // Optionally set scaling, margins, etc.
-                        imageCell.Paragraphs.Add(img);
-                    }
+                        // Assign the stream containing the image data.
+                        ImageStream = ms,
+                        // Optionally fix the displayed size.
+                        FixWidth = 100,
+                        FixHeight = 100
+                    };
+
+                    // Add the image to the cell's paragraph collection.
+                    imgCell.Paragraphs.Add(img);
                 }
             }
 
-            // Add the populated table to the page.
+            // Add the table to the page.
             page.Paragraphs.Add(table);
 
             // Save the PDF.
-            const string outputPath = "output.pdf";
-            doc.Save(outputPath);
-            Console.WriteLine($"PDF saved to '{outputPath}'.");
+            doc.Save("output.pdf");
         }
+
+        Console.WriteLine("PDF with table and images created successfully.");
     }
 }

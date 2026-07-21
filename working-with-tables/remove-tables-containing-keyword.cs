@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
@@ -11,7 +10,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string keyword    = "CONFIDENTIAL"; // keyword to search for in any cell
+        const string keyword    = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
@@ -19,52 +18,59 @@ class Program
             return;
         }
 
-        // Load the PDF document (wrapped in using for proper disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a TableAbsorber to find all tables in the document
-            TableAbsorber absorber = new TableAbsorber();
-
-            // Extract tables from the whole document
-            absorber.Visit(doc);
-
-            // Make a copy of the TableList because Remove() modifies the collection
-            List<AbsorbedTable> tables = absorber.TableList.ToList();
-
-            // Iterate over each table and check all cells for the keyword
-            foreach (AbsorbedTable table in tables)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                bool containsKeyword = false;
+                // Create a TableAbsorber to find all tables in the document
+                TableAbsorber absorber = new TableAbsorber();
 
-                foreach (var row in table.RowList)
+                // Extract tables from the whole document
+                absorber.Visit(doc);
+
+                // Work on a copy of the TableList because Remove() modifies the collection
+                var tables = absorber.TableList.ToList();
+
+                foreach (AbsorbedTable table in tables)
                 {
-                    foreach (var cell in row.CellList)
+                    bool containsKeyword = false;
+
+                    // Iterate over rows and cells to search for the keyword
+                    foreach (var row in table.RowList)
                     {
-                        foreach (TextFragment fragment in cell.TextFragments)
+                        foreach (var cell in row.CellList)
                         {
-                            if (!string.IsNullOrEmpty(fragment.Text) &&
-                                fragment.Text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+                            foreach (TextFragment fragment in cell.TextFragments)
                             {
-                                containsKeyword = true;
-                                break;
+                                if (fragment.Text != null &&
+                                    fragment.Text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+                                {
+                                    containsKeyword = true;
+                                    break;
+                                }
                             }
+                            if (containsKeyword) break;
                         }
                         if (containsKeyword) break;
                     }
-                    if (containsKeyword) break;
+
+                    // If the keyword is found in any cell, remove the table from the page
+                    if (containsKeyword)
+                    {
+                        absorber.Remove(table);
+                    }
                 }
 
-                // If the keyword was found, remove the entire table from the page
-                if (containsKeyword)
-                {
-                    absorber.Remove(table);
-                }
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Tables containing \"{keyword}\" have been removed. Output saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Processing complete. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
