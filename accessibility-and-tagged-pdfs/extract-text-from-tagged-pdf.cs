@@ -17,40 +17,47 @@ class Program
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content (throws if PDF is not tagged)
+            // Access tagged content interface
             ITaggedContent tagged = doc.TaggedContent;
+            if (tagged == null)
+            {
+                Console.WriteLine("The document does not contain tagged content.");
+                return;
+            }
 
-            // Root of the logical structure tree
+            // Root of the structure tree
             StructureElement root = tagged.RootElement;
 
-            // Collect all textual content
-            StringBuilder allText = new StringBuilder();
-            TraverseStructure(root, allText);
+            StringBuilder sb = new StringBuilder();
+            TraverseStructure(root, sb, 0);
 
-            // Output the extracted text
-            Console.WriteLine("Extracted Text:");
-            Console.WriteLine(allText.ToString());
+            Console.WriteLine("Extracted textual content from the tagged PDF:");
+            Console.WriteLine(sb.ToString());
         }
     }
 
-    // Recursively walk the structure tree and append ActualText of each element
-    static void TraverseStructure(StructureElement element, StringBuilder sb)
+    // Recursively walk the structure tree and collect text
+    static void TraverseStructure(StructureElement element, StringBuilder sb, int depth)
     {
-        // ActualText holds the visible text for most structure elements
-        if (!string.IsNullOrWhiteSpace(element.ActualText))
+        // Indentation for readability (optional)
+        string indent = new string(' ', depth * 2);
+
+        // ActualText holds the visible text of the element
+        string text = element.ActualText ?? string.Empty;
+        if (!string.IsNullOrWhiteSpace(text))
         {
-            sb.AppendLine(element.ActualText);
+            sb.AppendLine($"{indent}{text}");
         }
 
-        // Iterate over child elements (ElementList) – use ChildElements property
+        // Iterate over child elements
         foreach (Element child in element.ChildElements)
         {
             if (child is StructureElement childStruct)
             {
-                TraverseStructure(childStruct, sb);
+                TraverseStructure(childStruct, sb, depth + 1);
             }
         }
     }
