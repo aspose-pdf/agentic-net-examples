@@ -230,3 +230,66 @@ jobs:
       - name: No .cs files changed
         if: steps.changed.outputs.has_cs == 'false'
         run: echo "No .cs files in this PR — skipping validation."
+
+  # ── URL stability guard ────────────────────────────────────────────────
+  # Every .cs path on main is a URL that may be indexed by Google or linked
+  # externally. Deleting a .cs file breaks any such link. This job fails the
+  # PR when .cs files are deleted without an `allow-delete` label -- forcing
+  # the operator to keep a stub at the old path (see git_ops/url_stubs.py
+  # in aspose-pdf-api-v2) so the URL keeps returning 200 forever.
+  #
+  # Bypass: add the `allow-delete` label to the PR (audit-visible; use only
+  # when the URL was never indexed or the API is truly gone).
+  no-cs-deletes:
+    name: URL stability (no .cs deletes)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect deleted .cs files
+        id: deletes
+        run: |
+          BASE="origin/${{ github.base_ref }}"
+          DELETED=$(git diff --name-only --diff-filter=D "$BASE"...HEAD -- '*.cs' || true)
+          if [ -z "$DELETED" ]; then
+            echo "count=0" >> "$GITHUB_OUTPUT"
+            echo "No .cs files deleted."
+            exit 0
+          fi
+          COUNT=$(printf '%s\n' "$DELETED" | wc -l | tr -d ' ')
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          {
+            echo "### .cs files deleted in this PR"
+            echo ""
+            echo '```'
+            printf '%s\n' "$DELETED"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Enforce no-delete rule
+        if: steps.deletes.outputs.count != '0'
+        env:
+          LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+        run: |
+          if printf '%s' "$LABELS" | grep -q '"allow-delete"'; then
+            echo "PR carries 'allow-delete' label -- deletions permitted."
+            echo "**Bypass applied**: PR has \`allow-delete\` label." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          {
+            echo ""
+            echo "### FAILED: .cs deletions block the merge"
+            echo ""
+            echo "Every .cs path on \`main\` is a URL that may be indexed by search"
+            echo "engines or linked externally. Deleting a file breaks those links."
+            echo ""
+            echo "**Fix**: keep the old path as a stub pointing at the new location"
+            echo "(see \`git_ops/url_stubs.py\` in the generator repo)."
+            echo ""
+            echo "**Bypass** (only when the URL was never indexed / API is gone):"
+            echo "add the \`allow-delete\` label to this PR and re-run."
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 1
