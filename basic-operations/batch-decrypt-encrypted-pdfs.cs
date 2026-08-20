@@ -8,10 +8,10 @@ class Program
     {
         // Folder containing encrypted PDFs
         const string inputFolder = "EncryptedPdfs";
-        // Folder where decrypted PDFs will be saved
+        // Folder where decrypted copies will be saved
         const string outputFolder = "DecryptedPdfs";
         // Shared owner password for all PDFs in the batch
-        const string ownerPassword = "ownerPassword123";
+        const string ownerPassword = "owner123";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -19,35 +19,38 @@ class Program
             return;
         }
 
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
         // Process each PDF file in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string encryptedPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = Path.GetFileName(inputPath);
-            string outputPath = Path.Combine(outputFolder, fileName);
+            string fileName = Path.GetFileNameWithoutExtension(encryptedPath);
+            string decryptedPath = Path.Combine(outputFolder, $"{fileName}_decrypted.pdf");
 
             try
             {
                 // Open the encrypted document using the owner password
-                using (Document doc = new Document(inputPath, ownerPassword))
+                using (Document doc = new Document(encryptedPath, ownerPassword))
                 {
                     // Remove encryption
                     doc.Decrypt();
 
-                    // Save an unprotected copy
-                    doc.Save(outputPath);
+                    // Save the unprotected copy
+                    doc.Save(decryptedPath);
                 }
 
-                Console.WriteLine($"Decrypted: {fileName} → {outputPath}");
+                Console.WriteLine($"Decrypted: {encryptedPath} → {decryptedPath}");
             }
             catch (InvalidPasswordException ex)
             {
-                Console.Error.WriteLine($"Invalid password for file '{fileName}': {ex.Message}");
+                // Owner password was incorrect or the file is not encrypted
+                Console.Error.WriteLine($"Invalid password for '{encryptedPath}': {ex.Message}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing file '{fileName}': {ex.Message}");
+                // Any other error (e.g., file access issues)
+                Console.Error.WriteLine($"Error processing '{encryptedPath}': {ex.Message}");
             }
         }
     }

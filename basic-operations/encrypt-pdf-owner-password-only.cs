@@ -8,8 +8,8 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "encrypted.pdf";
-        const string userPassword  = "user123";   // password required to open the PDF
-        const string ownerPassword = "";          // no owner password needed
+        const string ownerPassword = "owner123";
+        const string userPassword  = ""; // no user password, owner only
 
         if (!File.Exists(inputPath))
         {
@@ -19,16 +19,16 @@ class Program
 
         try
         {
-            // Load the PDF and ensure deterministic disposal
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Allow only printing; editing (ModifyContent) and copying (ExtractContent) are omitted
-                Permissions perms = Permissions.PrintDocument;
+                // Restrict all user permissions (owner has full access)
+                Permissions perms = (Permissions)0; // no permissions for user
 
-                // Encrypt with user password, no owner password, and strong AES‑256 algorithm
+                // Encrypt with owner password only, using strong AES-256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                // Save the encrypted document
+                // Save the encrypted PDF
                 doc.Save(outputPath);
             }
 

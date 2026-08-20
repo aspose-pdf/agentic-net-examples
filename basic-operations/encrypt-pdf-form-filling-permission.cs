@@ -19,12 +19,15 @@ class Program
 
         try
         {
-            // Load the existing PDF
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Set permissions to allow only form filling (no content extraction)
+                // Allow only form filling; do not include ExtractContent permission
                 Permissions perms = Permissions.FillForm;
+
+                // Encrypt with AES-256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
                 // Save the encrypted PDF
                 doc.Save(outputPath);
             }

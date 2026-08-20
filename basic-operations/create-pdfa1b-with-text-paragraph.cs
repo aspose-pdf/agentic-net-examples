@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,39 +7,36 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "output_pdfa1b.pdf";
-        const string logPath = "conversion_log.xml";
+        const string outputPath = "output_pdfa.pdf";
+        const string logPath    = "conversion.log";
 
-        // Create a new PDF document and ensure proper disposal
+        // Create a new PDF document. Add a page before accessing it (evaluation mode may start with zero pages).
         using (Document doc = new Document())
         {
-            // Add a blank page (Aspose.Pdf uses 1‑based page indexing)
-            doc.Pages.Add();
+            // Add a page explicitly to avoid IndexOutOfRangeException.
+            Page page = doc.Pages.Add();
 
-            // Get the first page
-            Page page = doc.Pages[1];
-
-            // Create a text paragraph
+            // Create a text paragraph.
             TextParagraph paragraph = new TextParagraph();
 
-            // Define the rectangle where the paragraph will be placed
-            paragraph.Rectangle = new Rectangle(100, 600, 500, 700);
+            // Define the rectangle where the paragraph will be placed (fully qualified to avoid ambiguity).
+            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 600, 500, 700);
 
-            // Enable word wrapping by words
+            // Enable word wrapping by words.
             paragraph.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
 
-            // Add lines of text to the paragraph
-            paragraph.AppendLine("The quick brown fox jumps over the lazy dog.");
-            paragraph.AppendLine("Second line of the paragraph.");
+            // Add lines of text to the paragraph.
+            paragraph.AppendLine("Hello, Aspose.Pdf!");
+            paragraph.AppendLine("This PDF is saved as PDF/A‑1b.");
 
-            // Append the paragraph to the page using TextBuilder
+            // Append the paragraph to the page using TextBuilder.
             TextBuilder builder = new TextBuilder(page);
             builder.AppendParagraph(paragraph);
 
-            // Convert the document to PDF/A‑1b (PDF/A‑1b compliance)
+            // Convert the document to PDF/A‑1b compliance. The log file records any conversion issues.
             doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
 
-            // Save the PDF/A‑1b document
+            // Save the PDF/A‑1b document.
             doc.Save(outputPath);
         }
 

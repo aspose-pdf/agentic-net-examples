@@ -6,46 +6,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_pdfx3.pdf";
-        const string iccProfilePath = "CMYK.icc"; // Path to a CMYK ICC profile
+        const string inputPath = "input.pdf";          // source PDF
+        const string outputPath = "output_pdfx3.pdf"; // PDF/X‑3 result
+        const string logPath = "conversion_log.txt";   // conversion log (optional)
+        const string iccPath = "CMYK.icc";            // path to a CMYK ICC profile
 
+        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(iccProfilePath))
+        // Verify ICC profile exists
+        if (!File.Exists(iccPath))
         {
-            Console.Error.WriteLine($"ICC profile not found: {iccProfilePath}");
+            Console.Error.WriteLine($"ICC profile not found: {iccPath}");
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the source PDF inside a using block for deterministic disposal.
-            using (Document doc = new Document(inputPath))
-            {
-                // Prepare conversion options for PDF/X‑3 compliance.
-                PdfFormatConversionOptions convOptions = new PdfFormatConversionOptions(PdfFormat.PDF_X_3);
+            // Attach an OutputIntent that forces CMYK colour space.
+            // The OutputIntent is added to the document before conversion.
+            doc.OutputIntents.Add(new OutputIntent(iccPath));
 
-                // Force all colors to CMYK by specifying an ICC profile.
-                convOptions.IccProfileFileName = iccProfilePath;
-                convOptions.OutputIntent = new OutputIntent(iccProfilePath); // Embed the profile.
+            // Convert the document to PDF/X‑3. Use the overload that accepts
+            // a log file path, the target format and an error‑handling action.
+            doc.Convert(logPath, PdfFormat.PDF_X_3, ConvertErrorAction.Delete);
 
-                // Convert the document to PDF/X‑3 using the options above.
-                doc.Convert(convOptions);
-
-                // Save the converted document as a regular PDF file (it now conforms to PDF/X‑3).
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"PDF/X‑3 compliant file saved to '{outputPath}'.");
+            // Save the converted document.
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF/X‑3 compliant file saved to '{outputPath}'.");
     }
 }
