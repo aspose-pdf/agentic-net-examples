@@ -15,27 +15,19 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document (required for proper resource handling)
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document (lifecycle: create & load)
-            using (Document doc = new Document(inputPath))
+            // Initialize the PdfFileSignature facade and bind the PDF file
+            using (PdfFileSignature signature = new PdfFileSignature())
             {
-                // Initialize the PdfFileSignature facade
-                using (PdfFileSignature signature = new PdfFileSignature())
-                {
-                    // Bind the loaded document to the facade
-                    signature.BindPdf(doc);
+                signature.BindPdf(inputPath); // alternatively: signature.BindPdf(doc);
 
-                    // Detect extended usage rights
-                    bool hasUsageRights = signature.ContainsUsageRights();
+                // Check for extended usage rights
+                bool hasUsageRights = signature.ContainsUsageRights();
 
-                    Console.WriteLine($"Contains usage rights: {hasUsageRights}");
-                }
+                Console.WriteLine($"Contains usage rights: {hasUsageRights}");
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

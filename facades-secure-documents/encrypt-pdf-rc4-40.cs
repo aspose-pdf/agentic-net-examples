@@ -1,44 +1,38 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;               // DocumentPrivilege enum
+using Aspose.Pdf.Facades;      // PdfFileSecurity, KeySize, Algorithm
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "encrypted.pdf";
-        const string userPassword = "user123";
-        const string ownerPassword = ""; // optional owner password
+        const string inputPath  = "input.pdf";
+        const string outputPath = "encrypted_rc4_40.pdf";
+        const string userPassword  = "user123";
+        const string ownerPassword = "owner123";
 
+        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
-        {
-            // Initialize the security facade with source and destination files
-            using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
-            {
-                // Encrypt using RC4‑40 (KeySize.x40). DocumentPrivilege can be set as needed.
-                bool encrypted = security.EncryptFile(userPassword, ownerPassword,
-                    DocumentPrivilege.Print, KeySize.x40);
+        // Initialize the PdfFileSecurity facade with source and destination files
+        PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
 
-                if (encrypted)
-                {
-                    Console.WriteLine($"PDF encrypted successfully: {outputPath}");
-                }
-                else
-                {
-                    Console.Error.WriteLine("Encryption failed.");
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        // Encrypt using RC4 with a 40‑bit key, allowing printing as a privilege
+        bool encrypted = fileSecurity.EncryptFile(
+            userPassword,
+            ownerPassword,
+            DocumentPrivilege.Print,
+            KeySize.x40,
+            Algorithm.RC4);
+
+        if (encrypted)
+            Console.WriteLine($"Encryption succeeded. Encrypted file saved as '{outputPath}'.");
+        else
+            Console.Error.WriteLine("Encryption failed.");
     }
 }

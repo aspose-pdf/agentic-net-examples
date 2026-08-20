@@ -8,9 +8,8 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "encrypted_output.pdf";
+        const string outputPath = "encrypted.pdf";
         const string userPassword = "user123";
-        const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
         {
@@ -18,24 +17,16 @@ class Program
             return;
         }
 
-        // Define custom privileges: allow printing and copying, forbid modifications
-        DocumentPrivilege privilege = DocumentPrivilege.AllowAll;
-        privilege.AllowModifyContents = false;
-        privilege.AllowModifyAnnotations = false;
-
         // Initialize the facade with source and destination files
         PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
 
-        // Encrypt using AES‑256 (KeySize.x256) and the custom privilege
-        bool encrypted = fileSecurity.EncryptFile(userPassword, ownerPassword, privilege, KeySize.x256, Algorithm.AES);
+        // Encrypt using only a user password; owner password is left undefined (null)
+        // Example privilege: allow printing; use 256‑bit AES encryption
+        bool result = fileSecurity.EncryptFile(userPassword, null, DocumentPrivilege.Print, KeySize.x256);
 
-        if (encrypted)
-        {
+        if (result)
             Console.WriteLine($"Encryption succeeded. Output saved to '{outputPath}'.");
-        }
         else
-        {
             Console.Error.WriteLine("Encryption failed.");
-        }
     }
 }

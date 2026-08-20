@@ -1,110 +1,73 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Expected CSV columns: InputPath,OutputPath,OldOwnerPassword,NewUserPassword,NewOwnerPassword
-    static void Main(string[] args)
+    static void Main()
     {
-        if (args.Length == 0)
-        {
-            Console.Error.WriteLine("Usage: Program <csvFilePath>");
-            return;
-        }
+        const string csvPath = "files.csv";
 
-        string csvPath = args[0];
         if (!File.Exists(csvPath))
         {
             Console.Error.WriteLine($"CSV file not found: {csvPath}");
             return;
         }
 
-        var entries = new List<CsvEntry>();
-        try
+        // Expected CSV columns: InputPdf,OutputPdf,OldOwnerPassword,NewUserPassword,NewOwnerPassword
+        foreach (var line in File.ReadLines(csvPath))
         {
-            using (StreamReader reader = new StreamReader(csvPath))
+            // Skip empty lines and header (assumes header starts with "InputPdf")
+            if (string.IsNullOrWhiteSpace(line) || line.StartsWith("InputPdf", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var parts = line.Split(',');
+
+            if (parts.Length < 5)
             {
-                bool firstLine = true;
-                while (!reader.EndOfStream)
-                {
-                    string line = reader.ReadLine();
-                    if (string.IsNullOrWhiteSpace(line))
-                        continue;
-
-                    // Skip header
-                    if (firstLine)
-                    {
-                        firstLine = false;
-                        if (line.StartsWith("InputPath", StringComparison.OrdinalIgnoreCase))
-                            continue;
-                    }
-
-                    var parts = line.Split(',');
-                    if (parts.Length < 5)
-                    {
-                        Console.Error.WriteLine($"Invalid line (expected 5 columns): {line}");
-                        continue;
-                    }
-
-                    entries.Add(new CsvEntry
-                    {
-                        InputPath = parts[0].Trim(),
-                        OutputPath = parts[1].Trim(),
-                        OldOwnerPassword = parts[2].Trim(),
-                        NewUserPassword = parts[3].Trim(),
-                        NewOwnerPassword = parts[4].Trim()
-                    });
-                }
+                Console.Error.WriteLine($"Invalid CSV line (expected 5 columns): {line}");
+                continue;
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error reading CSV: {ex.Message}");
-            return;
-        }
 
-        foreach (var entry in entries)
-        {
-            if (!File.Exists(entry.InputPath))
+            string inputPdf   = parts[0].Trim();
+            string outputPdf  = parts[1].Trim();
+            string oldOwnerPw = parts[2].Trim();
+            string newUserPw  = parts[3].Trim();
+            string newOwnerPw = parts[4].Trim();
+
+            if (!File.Exists(inputPdf))
             {
-                Console.Error.WriteLine($"Input PDF not found: {entry.InputPath}");
+                Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
                 continue;
             }
 
             try
             {
-                // Ensure output directory exists
-                string outDir = Path.GetDirectoryName(entry.OutputPath);
-                if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))
-                    Directory.CreateDirectory(outDir);
-
-                using (PdfFileSecurity security = new PdfFileSecurity(entry.InputPath, entry.OutputPath))
+                // Create the PdfFileSecurity facade
+                using (PdfFileSecurity security = new PdfFileSecurity())
                 {
-                    bool success = security.ChangePassword(
-                        entry.OldOwnerPassword,
-                        entry.NewUserPassword,
-                        entry.NewOwnerPassword);
+                    // Load the source PDF
+                    security.BindPdf(inputPdf);
 
-                    Console.WriteLine(success
-                        ? $"Password changed: {entry.InputPath} -> {entry.OutputPath}"
-                        : $"Failed to change password for: {entry.InputPath}");
+                    // Change passwords (keeps original security settings)
+                    bool changed = security.ChangePassword(oldOwnerPw, newUserPw, newOwnerPw);
+
+                    if (!changed)
+                    {
+                        Console.Error.WriteLine($"Password change failed for: {inputPdf}");
+                        continue;
+                    }
+
+                    // Save the result to the output path
+                    security.Save(outputPdf);
                 }
+
+                Console.WriteLine($"Processed: {inputPdf} -> {outputPdf}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{entry.InputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{inputPdf}': {ex.Message}");
             }
         }
-    }
-
-    private class CsvEntry
-    {
-        public string InputPath { get; set; }
-        public string OutputPath { get; set; }
-        public string OldOwnerPassword { get; set; }
-        public string NewUserPassword { get; set; }
-        public string NewOwnerPassword { get; set; }
     }
 }
