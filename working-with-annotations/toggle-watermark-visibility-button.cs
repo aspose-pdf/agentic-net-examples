@@ -3,13 +3,13 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -18,61 +18,62 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF, modify, and save – wrapped in using for proper disposal.
         using (Document doc = new Document(inputPath))
         {
-            // Work with the first page (1‑based indexing)
+            // Work with the first page (1‑based indexing).
             Page page = doc.Pages[1];
 
             // ------------------------------------------------------------
-            // 1. Create a WatermarkArtifact and add it to the page
+            // 1. Create a WatermarkArtifact and add it to the page.
             // ------------------------------------------------------------
-            WatermarkArtifact watermark = new WatermarkArtifact
+            WatermarkArtifact watermark = new WatermarkArtifact();
+
+            // Set the watermark text and its visual style.
+            TextState ts = new TextState
             {
-                Text = "CONFIDENTIAL",
-                // Position the watermark (center of the page)
-                Position = new Point(page.PageInfo.Width / 2, page.PageInfo.Height / 2),
-                ArtifactHorizontalAlignment = HorizontalAlignment.Center,
-                ArtifactVerticalAlignment = VerticalAlignment.Center,
-                Opacity = 1.0
+                Font = FontRepository.FindFont("Helvetica"),
+                FontSize = 72,
+                ForegroundColor = Color.Red
             };
+            watermark.SetTextAndState("CONFIDENTIAL", ts);
+
+            // Position the watermark (coordinates are in points).
+            // WatermarkArtifact.Position expects a Point, not a Position.
+            watermark.Position = new Point(100, 400);
+
+            // Make the watermark semi‑transparent and place it behind page content.
+            watermark.Opacity = 0.5;
+            watermark.IsBackground = true;
+
+            // Add the artifact to the page.
             page.Artifacts.Add(watermark);
 
             // ------------------------------------------------------------
-            // 2. Create a push button that will toggle the watermark visibility
+            // 2. Add a push button that toggles the watermark visibility.
             // ------------------------------------------------------------
-            // Define button rectangle (lower‑left corner at (50,50), size 100x30)
-            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(50, 50, 150, 80);
-            ButtonField toggleButton = new ButtonField(page, btnRect);
-            toggleButton.NormalCaption = "Toggle Watermark";
-            // Set a partial name (optional but recommended)
-            toggleButton.PartialName = "toggleWatermarkBtn";
-            // Configure a simple border (no color property on Border class)
-            toggleButton.Border = new Border(toggleButton) { Width = 1 };
-            // Optional: set border color via the annotation's own Color property
-            toggleButton.Color = Color.Black;
+            // Define the button rectangle (llx, lly, urx, ury).
+            Rectangle buttonRect = new Rectangle(50, 50, 150, 80);
+            ButtonField toggleButton = new ButtonField(page, buttonRect)
+            {
+                // Text shown on the button.
+                Contents = "Toggle Watermark"
+            };
 
-            // ------------------------------------------------------------
-            // 3. Attach a JavaScript action that toggles the artifact's opacity
-            // ------------------------------------------------------------
+            // JavaScript to toggle the artifact's IsBackground flag.
+            // Use a valid action property from AnnotationActionCollection.
             string js = @"
-var pageNum = this.getPageNum();
-var art = this.getPageNthArtifact(pageNum - 1, 0);
-if (art.opacity == 1) {
-    art.opacity = 0;
-} else {
-    art.opacity = 1;
-}
-this.dirty = true;
-";
-            // Use a valid action property for button clicks
+                var art = this.getPage(0).Artifacts[0];
+                art.IsBackground = !art.IsBackground;
+                this.getPage(0).update();
+            ";
             toggleButton.Actions.OnPressMouseBtn = new JavascriptAction(js);
 
-            // Add the button to the page annotations collection
+            // Add the button to the page's annotation collection.
             page.Annotations.Add(toggleButton);
 
             // ------------------------------------------------------------
-            // 4. Save the modified PDF
+            // Save the modified PDF.
             // ------------------------------------------------------------
             doc.Save(outputPath);
         }

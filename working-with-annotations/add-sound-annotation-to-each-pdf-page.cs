@@ -9,53 +9,50 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output_with_sound.pdf";
-        const string soundFile  = "notification.wav"; // path to the sound to be played
+        const string soundFile  = "notification.wav"; // path to the sound file
 
-        // Verify required files exist
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
+
         if (!File.Exists(soundFile))
         {
             Console.Error.WriteLine($"Sound file not found: {soundFile}");
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF (using statement ensures deterministic disposal)
-            using (Document doc = new Document(inputPath))
+            // Iterate through all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Pages are 1‑based in Aspose.Pdf
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                Page page = doc.Pages[i];
+
+                // Define a small rectangle where the annotation will be placed
+                // (left, bottom, right, top)
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 50, 70, 70);
+
+                // Create a SoundAnnotation that plays the specified sound file
+                SoundAnnotation soundAnn = new SoundAnnotation(page, rect, soundFile)
                 {
-                    Page page = doc.Pages[i];
+                    // Optional: set the icon to a speaker
+                    Icon = SoundIcon.Speaker,
+                    // Activate the sound when the page becomes visible
+                    // (requires Aspose.Pdf 20.10+; if not available, the default activation is click)
+                    // ActivationEvent = RichMediaAnnotation.ActivationEvent.PageVisible
+                };
 
-                    // Define a tiny rectangle (in points) where the annotation will be placed.
-                    // The rectangle can be invisible; its size does not affect playback.
-                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 1, 1);
-
-                    // Create a SoundAnnotation that references the sound file.
-                    SoundAnnotation sound = new SoundAnnotation(page, rect, soundFile);
-
-                    // Optional: set the icon that appears if the annotation is visible.
-                    sound.Icon = SoundIcon.Speaker;
-
-                    // Add the annotation to the page. The bool parameter handles page rotation.
-                    page.Annotations.Add(sound, true);
-                }
-
-                // Save the modified PDF.
-                doc.Save(outputPath);
+                // Add the annotation to the page
+                page.Annotations.Add(soundAnn);
             }
 
-            Console.WriteLine($"PDF with sound annotations saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF with sound annotations saved to '{outputPath}'.");
     }
 }

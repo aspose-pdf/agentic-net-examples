@@ -8,43 +8,48 @@ class Program
     {
         const string inputPdfPath   = "input.pdf";
         const string outputPdfPath  = "output.pdf";
-        const string highResImgPath = "highres.jpg";
+        const string highResImgPath = "highres.png";
 
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
+
         if (!File.Exists(highResImgPath))
         {
             Console.Error.WriteLine($"High‑resolution image not found: {highResImgPath}");
             return;
         }
 
-        // Load the PDF document (using the required lifecycle rule)
+        // Load the PDF document (using the standard load constructor)
         using (Document doc = new Document(inputPdfPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing internally,
-            // but foreach abstracts that detail)
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
             foreach (Page page in doc.Pages)
             {
-                // Examine each artifact on the page
-                foreach (Artifact artifact in page.Artifacts)
+                // Iterate through artifacts on the page (also 1‑based)
+                for (int i = 1; i <= page.Artifacts.Count; i++)
                 {
+                    Artifact artifact = page.Artifacts[i];
+
                     // Identify BackgroundArtifact instances
                     if (artifact is BackgroundArtifact bgArtifact)
                     {
-                        // Replace the background image with a higher‑resolution version.
-                        // SetImage(string) loads the image from the file path and keeps the layout unchanged.
-                        bgArtifact.SetImage(highResImgPath);
+                        // Replace the background image with the higher‑resolution version.
+                        // SetImage copies the image data, so the source stream can be closed safely.
+                        using (FileStream imgStream = File.OpenRead(highResImgPath))
+                        {
+                            bgArtifact.SetImage(imgStream);
+                        }
                     }
                 }
             }
 
-            // Save the modified PDF (using the required lifecycle rule)
+            // Save the modified PDF (standard Save overload)
             doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF saved with updated background image: '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved with updated background image: {outputPdfPath}");
     }
 }

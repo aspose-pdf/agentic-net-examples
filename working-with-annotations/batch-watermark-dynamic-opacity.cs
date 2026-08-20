@@ -1,28 +1,15 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
-class BatchWatermark
+class Program
 {
-    // Adjust opacity based on page count.
-    // Example: more pages → lower opacity, but keep within 0.1‑0.9 range.
-    static double ComputeOpacity(int pageCount)
-    {
-        // Simple linear scaling: 0.9 for 1 page, down to 0.1 for 1000+ pages.
-        double opacity = 0.9 - (pageCount - 1) * 0.0008;
-        if (opacity < 0.1) opacity = 0.1;
-        if (opacity > 0.9) opacity = 0.9;
-        return opacity;
-    }
-
     static void Main()
     {
-        // Input folder containing PDFs.
-        const string inputFolder = @"C:\InputPdfs";
-        // Output folder for watermarked PDFs.
-        const string outputFolder = @"C:\OutputPdfs";
+        // Folder containing source PDFs
+        const string inputFolder = "input_pdfs";
+        // Folder where watermarked PDFs will be saved
+        const string outputFolder = "output_pdfs";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -32,63 +19,42 @@ class BatchWatermark
 
         Directory.CreateDirectory(outputFolder);
 
-        // Gather all PDF files in the input folder.
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found to process.");
-            return;
-        }
-
-        foreach (string inputPath in pdfFiles)
+        // Process each PDF file in the input folder
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
             string fileName = Path.GetFileName(inputPath);
             string outputPath = Path.Combine(outputFolder, fileName);
 
-            try
+            // Load the PDF document (using block ensures proper disposal)
+            using (Document doc = new Document(inputPath))
             {
-                // Load the PDF document (using statement ensures proper disposal).
-                using (Document doc = new Document(inputPath))
+                // Page count uses 1‑based indexing (Pages[1] is the first page)
+                int pageCount = doc.Pages.Count;
+
+                // Example opacity calculation: 0.1 per page, capped at 0.9, minimum 0.1
+                double opacity = Math.Min(0.9, Math.Max(0.1, pageCount * 0.1));
+
+                // Create a watermark artifact
+                WatermarkArtifact watermark = new WatermarkArtifact
                 {
-                    int pageCount = doc.Pages.Count;
-                    double opacity = ComputeOpacity(pageCount);
+                    Text = "CONFIDENTIAL",
+                    Opacity = opacity,
+                    IsBackground = true, // place behind page content
+                    ArtifactHorizontalAlignment = HorizontalAlignment.Center,
+                    ArtifactVerticalAlignment = VerticalAlignment.Center
+                };
 
-                    // Create a watermark artifact once and reuse it for each page.
-                    WatermarkArtifact watermark = new WatermarkArtifact
-                    {
-                        IsBackground = true,
-                        Opacity = opacity,
-                        Text = "CONFIDENTIAL",
-                        // Center the watermark using alignment properties.
-                        ArtifactHorizontalAlignment = HorizontalAlignment.Center,
-                        ArtifactVerticalAlignment = VerticalAlignment.Center,
-                        // Define visual style of the text.
-                        TextState = new TextState
-                        {
-                            Font = FontRepository.FindFont("Helvetica"),
-                            FontSize = 48,
-                            ForegroundColor = Aspose.Pdf.Color.Gray
-                        }
-                    };
-
-                    // Add the watermark to every page.
-                    foreach (Page page in doc.Pages)
-                    {
-                        page.Artifacts.Add(watermark);
-                    }
-
-                    // Save the modified document.
-                    doc.Save(outputPath);
+                // Add the watermark to every page in the document
+                foreach (Page page in doc.Pages)
+                {
+                    page.Artifacts.Add(watermark);
                 }
 
-                Console.WriteLine($"Watermarked: {fileName} → {outputPath}");
+                // Save the modified PDF (standard PDF output)
+                doc.Save(outputPath);
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
-            }
-        }
 
-        Console.WriteLine("Batch watermarking completed.");
+            Console.WriteLine($"Processed '{fileName}' with opacity {Math.Min(0.9, Math.Max(0.1, new Document(inputPath).Pages.Count * 0.1)):F2}");
+        }
     }
 }

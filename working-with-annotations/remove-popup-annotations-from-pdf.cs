@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -17,16 +16,16 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document; using ensures proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            // Pages are 1‑based in Aspose.Pdf
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Collect PopupAnnotation instances first (cannot modify collection during enumeration)
-                List<PopupAnnotation> popups = new List<PopupAnnotation>();
+                // Gather all PopupAnnotation objects on the current page
+                var popups = new System.Collections.Generic.List<PopupAnnotation>();
                 foreach (Annotation ann in page.Annotations)
                 {
                     if (ann is PopupAnnotation popup)
@@ -35,8 +34,8 @@ class Program
                     }
                 }
 
-                // Delete each popup annotation while preserving its parent markup annotation
-                foreach (PopupAnnotation popup in popups)
+                // Remove each popup annotation; its parent markup annotation stays intact
+                foreach (var popup in popups)
                 {
                     page.Annotations.Delete(popup);
                 }
@@ -46,6 +45,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All popup annotations removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"All popup annotations removed. Output saved to '{outputPath}'.");
     }
 }

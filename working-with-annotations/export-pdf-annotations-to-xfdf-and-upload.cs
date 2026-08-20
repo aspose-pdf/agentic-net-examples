@@ -8,69 +8,50 @@ using Aspose.Pdf;
 class Program
 {
     // Entry point
-    static async Task Main(string[] args)
+    static async Task Main()
     {
-        // Validate arguments: input PDF path and REST endpoint URL
-        if (args.Length < 2)
+        const string inputPdfPath = "input.pdf";          // PDF with annotations
+        const string apiEndpoint   = "https://example.com/api/upload"; // REST API URL
+
+        // Ensure the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("Usage: Program <input-pdf-path> <rest-endpoint-url>");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        string pdfPath = args[0];
-        string endpointUrl = args[1];
-
-        if (!File.Exists(pdfPath))
+        // Load the PDF document (lifecycle rule: use Document constructor)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found at '{pdfPath}'.");
-            return;
-        }
-
-        // Export annotations to XFDF in memory and upload
-        try
-        {
-            // Load the PDF document (using block ensures proper disposal)
-            using (Document doc = new Document(pdfPath))
+            // Export annotations to an in‑memory XFDF stream
+            using (MemoryStream xfdfStream = new MemoryStream())
             {
-                // Export annotations to a MemoryStream
-                using (MemoryStream xfdfStream = new MemoryStream())
+                pdfDoc.ExportAnnotationsToXfdf(xfdfStream);
+                xfdfStream.Position = 0; // Reset for reading
+
+                // Prepare HTTP client and multipart content
+                using (HttpClient httpClient = new HttpClient())
+                using (MultipartFormDataContent multipart = new MultipartFormDataContent())
+                using (StreamContent fileContent = new StreamContent(xfdfStream))
                 {
-                    // ExportAnnotationsToXfdf writes XFDF data into the provided stream
-                    doc.ExportAnnotationsToXfdf(xfdfStream);
+                    // Set the correct MIME type for XFDF
+                    fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.adobe.xfdf");
+                    // Add the file content; the third parameter is the filename sent to the server
+                    multipart.Add(fileContent, "file", "annotations.xfdf");
 
-                    // Reset stream position before reading
-                    xfdfStream.Position = 0;
+                    // POST the XFDF to the REST endpoint
+                    HttpResponseMessage response = await httpClient.PostAsync(apiEndpoint, multipart);
 
-                    // Upload the XFDF content to the REST API
-                    await UploadXfdfAsync(xfdfStream, endpointUrl);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine("XFDF uploaded successfully.");
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine($"Upload failed: {(int)response.StatusCode} {response.ReasonPhrase}");
+                    }
                 }
             }
-
-            Console.WriteLine("Annotations exported and uploaded successfully.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
-
-    // Sends the XFDF stream to the specified REST endpoint using HTTP POST
-    private static async Task UploadXfdfAsync(Stream xfdfStream, string url)
-    {
-        // Prepare HttpClient (should be reused in real applications)
-        using (HttpClient client = new HttpClient())
-        {
-            // Create content for the request
-            StreamContent content = new StreamContent(xfdfStream);
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.adobe.xfdf");
-
-            // Optionally, use multipart/form-data if the API expects a file field
-            MultipartFormDataContent multipart = new MultipartFormDataContent();
-            multipart.Add(content, "file", "annotations.xfdf");
-
-            // Perform POST request
-            HttpResponseMessage response = await client.PostAsync(url, multipart);
-            response.EnsureSuccessStatusCode(); // Throw if not successful
         }
     }
 }

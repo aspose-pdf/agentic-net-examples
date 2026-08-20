@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "highlighted.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,32 +16,28 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document (lifecycle rule: using block for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page to annotate (first page in this example)
-            Page page = doc.Pages[1];
-
-            // Define the rectangle area for the highlight annotation
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            // Define the rectangle area to be highlighted (fully qualified to avoid ambiguity)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
 
-            // Create the highlight annotation
-            HighlightAnnotation highlight = new HighlightAnnotation(page, rect)
-            {
-                // Set opacity to 70% (value range 0..1)
-                Opacity = 0.7,
-                // Optional: set the highlight color
-                Color = Color.Yellow
-            };
+            // Create a highlight annotation on the first page
+            HighlightAnnotation highlight = new HighlightAnnotation(doc.Pages[1], rect);
 
-            // Add the annotation to the page
-            page.Annotations.Add(highlight);
+            // Set opacity to 70% (0.7) for subtle emphasis
+            highlight.Opacity = 0.7;
 
-            // Save the modified PDF (lifecycle rule: use Save)
+            // Optional: set a visible color for the highlight
+            highlight.Color = Aspose.Pdf.Color.Yellow;
+
+            // Add the annotation to the page's annotation collection
+            doc.Pages[1].Annotations.Add(highlight);
+
+            // Save the modified PDF (lifecycle rule: Document.Save)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Highlight annotation with 70% opacity saved to '{outputPath}'.");
+        Console.WriteLine($"Highlighted PDF saved to '{outputPath}'.");
     }
 }

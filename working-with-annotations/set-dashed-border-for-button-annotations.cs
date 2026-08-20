@@ -17,13 +17,13 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document (using the required lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
             // Iterate through all pages (1‑based indexing)
             foreach (Page page in doc.Pages)
             {
-                // Iterate through all annotations on the page (1‑based indexing)
+                // Iterate through all annotations on the page (also 1‑based)
                 for (int idx = 1; idx <= page.Annotations.Count; idx++)
                 {
                     Annotation ann = page.Annotations[idx];
@@ -33,24 +33,22 @@ class Program
                     {
                         // Ensure a Border object exists; create one if necessary
                         if (button.Border == null)
-                        {
                             button.Border = new Border(button);
-                        }
 
                         // Set the border style to dashed and thickness to 2 points
-                        button.Border.Style = Aspose.Pdf.Annotations.BorderStyle.Dashed;
+                        button.Border.Style = BorderStyle.Dashed;
                         button.Border.Width = 2;
 
-                        // Optional: define a dash pattern (on length, off length)
+                        // Optional: define a dash pattern (on 3 points, off 3 points)
                         button.Border.Dash = new Dash(3, 3);
                     }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (using the required lifecycle rule)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Button annotation borders updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Button annotations updated and saved to '{outputPath}'.");
     }
 }

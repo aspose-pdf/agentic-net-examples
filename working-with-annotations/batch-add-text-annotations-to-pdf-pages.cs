@@ -16,42 +16,35 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Iterate over all pages (1‑based indexing)
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                Page page = doc.Pages[i];
+
+                // Define the annotation rectangle (left, bottom, right, top)
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+                // Create a text annotation for the current page
+                TextAnnotation annotation = new TextAnnotation(page, rect)
                 {
-                    Page page = doc.Pages[i];
+                    Title = $"Note {i}",
+                    Contents = $"This is page {i}",
+                    Color = Aspose.Pdf.Color.Yellow,
+                    Open = true,
+                    Icon = TextIcon.Note
+                };
 
-                    // Define the annotation rectangle (left, bottom, right, top)
-                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-                    // Create a text annotation for the current page
-                    TextAnnotation annotation = new TextAnnotation(page, rect)
-                    {
-                        Title = $"Note {i}",
-                        Contents = $"This is a text annotation on page {i}.",
-                        Open = true,
-                        Icon = TextIcon.Note,
-                        Color = Aspose.Pdf.Color.Yellow
-                    };
-
-                    // Add the annotation to the page's annotation collection
-                    page.Annotations.Add(annotation);
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
+                // Add the annotation to the page's annotation collection
+                page.Annotations.Add(annotation);
             }
 
-            Console.WriteLine($"Annotations added and saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Annotations added and saved to '{outputPath}'.");
     }
 }

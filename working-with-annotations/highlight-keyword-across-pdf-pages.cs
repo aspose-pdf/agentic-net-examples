@@ -8,9 +8,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        // Input PDF, output PDF and the keyword to highlight
+        const string inputPath  = "input.pdf";
         const string outputPath = "highlighted_output.pdf";
-        const string keyword = "yourKeyword"; // replace with the word to highlight
+        const string keyword    = "sample"; // change to the desired word
 
         if (!File.Exists(inputPath))
         {
@@ -21,36 +22,37 @@ class Program
         // Open the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Search for all occurrences of the keyword in the entire document
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber(keyword);
-            doc.Pages.Accept(absorber); // apply absorber to all pages
-
-            // Iterate over each found text fragment
-            foreach (TextFragment fragment in absorber.TextFragments)
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // Directly obtain the page that contains the fragment
-                Page page = fragment.Page;
-                if (page == null)
-                    continue; // safety check
+                // Create a TextFragmentAbsorber that searches for the keyword
+                TextFragmentAbsorber absorber = new TextFragmentAbsorber(keyword);
 
-                // Get the rectangle that bounds the fragment
-                Aspose.Pdf.Rectangle rect = fragment.Rectangle;
+                // Search the current page
+                doc.Pages[pageIndex].Accept(absorber);
 
-                // Create a highlight annotation on that page and rectangle
-                HighlightAnnotation highlight = new HighlightAnnotation(page, rect)
+                // For each found text fragment, create a highlight annotation
+                foreach (TextFragment fragment in absorber.TextFragments)
                 {
-                    // Set the highlight color (yellow is common)
-                    Color = Aspose.Pdf.Color.Yellow
-                };
+                    // The rectangle that bounds the text fragment
+                    Aspose.Pdf.Rectangle rect = fragment.Rectangle;
 
-                // Add the annotation to the page's annotation collection
-                page.Annotations.Add(highlight);
+                    // Create the highlight annotation on the current page
+                    HighlightAnnotation highlight = new HighlightAnnotation(doc.Pages[pageIndex], rect);
+
+                    // Set visual appearance (yellow highlight, 50% opacity)
+                    highlight.Color   = Aspose.Pdf.Color.Yellow;
+                    highlight.Opacity = 0.5;
+
+                    // Add the annotation to the page
+                    doc.Pages[pageIndex].Annotations.Add(highlight);
+                }
             }
 
-            // Save the modified PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All occurrences of \"{keyword}\" have been highlighted and saved to '{outputPath}'.");
+        Console.WriteLine($"Keyword highlights saved to '{outputPath}'.");
     }
 }
