@@ -1,48 +1,45 @@
 using System;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "table_with_custom_row_height.pdf";
-
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page to the document
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table with three columns (widths in points)
-            Table table = new Table
-            {
-                ColumnWidths = "100 200 100"
-            };
+            // Create a table with three columns
+            Table table = new Table();
+            table.ColumnWidths = "150 150 150";
+
+            // First row (default height)
+            Row row1 = table.Rows.Add();
+            row1.Cells.Add("R1C1");
+            row1.Cells.Add("R1C2");
+            row1.Cells.Add("R1C3");
+
+            // Second row – set a custom fixed height (e.g., 80 points)
+            Row row2 = table.Rows.Add();
+            row2.Cells.Add("R2C1");
+            row2.Cells.Add("R2C2");
+            row2.Cells.Add("R2C3");
+            row2.FixedRowHeight = 80; // Assign fixed height in points
+
+            // Third row (default height)
+            Row row3 = table.Rows.Add();
+            row3.Cells.Add("R3C1");
+            row3.Cells.Add("R3C2");
+            row3.Cells.Add("R3C3");
+
+            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // ----- Row 1: default height -----
-            Row row1 = table.Rows.Add();
-            row1.Cells.Add("Cell 1");
-            row1.Cells.Add("Cell 2");
-            row1.Cells.Add("Cell 3");
-
-            // ----- Row 2: custom fixed height (e.g., 50 points) -----
-            Row row2 = table.Rows.Add();
-            row2.FixedRowHeight = 50; // sets a fixed row height in points
-            row2.Cells.Add("Tall Cell 1");
-            row2.Cells.Add("Tall Cell 2");
-            row2.Cells.Add("Tall Cell 3");
-
-            // ----- Row 3: default height -----
-            Row row3 = table.Rows.Add();
-            row3.Cells.Add("Cell 4");
-            row3.Cells.Add("Cell 5");
-            row3.Cells.Add("Cell 6");
-
-            // Save the PDF to the specified path
-            doc.Save(outputPath);
+            // Save the PDF to a file
+            doc.Save("TableWithCustomRowHeight.pdf");
         }
-
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

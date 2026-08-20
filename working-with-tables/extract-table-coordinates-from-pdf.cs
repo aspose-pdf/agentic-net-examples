@@ -15,29 +15,28 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Open the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
             // Create a TableAbsorber to find tables in the document
             TableAbsorber absorber = new TableAbsorber();
 
-            // Extract tables from all pages
+            // Extract tables from the whole document
             absorber.Visit(doc);
 
-            if (absorber.TableList.Count == 0)
-            {
-                Console.WriteLine("No tables were detected in the document.");
-                return;
-            }
-
-            // Iterate over each detected table and output its rectangle coordinates
+            // Iterate over all found tables
             for (int i = 0; i < absorber.TableList.Count; i++)
             {
                 AbsorbedTable table = absorber.TableList[i];
+                // The Rectangle property describes the table position on the page
                 Aspose.Pdf.Rectangle rect = table.Rectangle;
 
-                Console.WriteLine($"Table {i + 1} (Page {table.PageNum}):");
-                Console.WriteLine($"  LLX = {rect.LLX}, LLY = {rect.LLY}, URX = {rect.URX}, URY = {rect.URY}");
+                Console.WriteLine($"Table {i + 1} on page {table.PageNum}:");
+                Console.WriteLine($"  Lower‑Left X: {rect.LLX}");
+                Console.WriteLine($"  Lower‑Left Y: {rect.LLY}");
+                Console.WriteLine($"  Upper‑Right X: {rect.URX}");
+                Console.WriteLine($"  Upper‑Right Y: {rect.URY}");
+                Console.WriteLine();
             }
         }
     }

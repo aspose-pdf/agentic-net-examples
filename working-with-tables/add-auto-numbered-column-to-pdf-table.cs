@@ -8,59 +8,62 @@ class Program
     {
         const string outputPath = "table_with_numbers.pdf";
 
-        // Create a new PDF document
+        // Document lifecycle must be wrapped in a using block
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a page to host the table
             Page page = doc.Pages.Add();
 
-            // Create a table and configure basic appearance
+            // Create a table with three columns (first column will hold numbers)
             Table table = new Table
             {
-                // Define column widths (first column for numbers)
+                // Column widths: 50 units for the number column, 150 for each data column
                 ColumnWidths = "50 150 150",
-                // Optional: add borders and padding for readability
+                // Optional styling for cells – use BorderInfo constructor (no Width property)
                 DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f),
                 DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
             };
 
-            // Helper local function to create a cell containing plain text
-            Cell CreateTextCell(string text)
-            {
-                Cell cell = new Cell();
-                cell.Paragraphs.Add(new TextFragment(text));
-                return cell;
-            }
-
-            // Add a header row
+            // Header row (no number in the first cell)
             Row header = table.Rows.Add();
-            header.Cells.Add(CreateTextCell("No"));
-            header.Cells.Add(CreateTextCell("Name"));
-            header.Cells.Add(CreateTextCell("Value"));
+            header.Cells.Add("");               // placeholder for number column
+            header.Cells.Add("Name");
+            header.Cells.Add("Value");
+            // Header text style
+            header.DefaultCellTextState = new TextState
+            {
+                FontSize = 12,
+                FontStyle = FontStyles.Bold
+            };
 
-            // Number of data rows to generate
-            int dataRows = 10;
+            // Sample data rows (placeholders for numbers)
+            string[] names  = { "Alpha", "Beta", "Gamma" };
+            string[] values = { "10", "20", "30" };
 
-            // Add data rows with an auto‑numbered first column
-            for (int i = 1; i <= dataRows; i++)
+            for (int i = 0; i < names.Length; i++)
             {
                 Row row = table.Rows.Add();
-
-                // First cell: sequential number
-                row.Cells.Add(CreateTextCell(i.ToString()));
-
-                // Additional cells (example content)
-                row.Cells.Add(CreateTextCell($"Item {i}"));
-                row.Cells.Add(CreateTextCell($"Value {i * 100}"));
+                row.Cells.Add("");               // placeholder for auto‑number
+                row.Cells.Add(names[i]);
+                row.Cells.Add(values[i]);
             }
 
-            // Add the table to the page
-            page.Paragraphs.Add(table);
+            // Build an array with sequential numbers (skip header row)
+            object[] numbers = new object[table.Rows.Count];
+            for (int i = 0; i < numbers.Length; i++)
+            {
+                numbers[i] = (i == 0) ? "" : i.ToString(); // header stays empty, rows start at 1
+            }
 
-            // Save the PDF
+            // Import the numbers into the first column of the table
+            // firstFilledRow = 0, firstFilledColumn = 0, isLeftColumnsFilled = false
+            table.ImportArray(numbers, 0, 0, false);
+
+            // Add the table to the page and save the document
+            page.Paragraphs.Add(table);
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Table with auto‑numbered column saved to '{outputPath}'.");
     }
 }

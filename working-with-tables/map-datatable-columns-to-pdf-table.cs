@@ -3,68 +3,73 @@ using System.Data;
 using System.Collections.Generic;
 using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Prepare a sample DataTable
-        DataTable dt = new DataTable();
-        dt.Columns.Add("Id", typeof(int));
-        dt.Columns.Add("Name", typeof(string));
-        dt.Columns.Add("Quantity", typeof(int));
-        dt.Columns.Add("Price", typeof(decimal));
+        // Prepare sample DataTable
+        DataTable dataTable = new DataTable();
+        dataTable.Columns.Add("Id", typeof(int));
+        dataTable.Columns.Add("Name", typeof(string));
+        dataTable.Columns.Add("Age", typeof(int));
+        dataTable.Columns.Add("Country", typeof(string));
 
-        dt.Rows.Add(1, "Apple", 10, 0.5m);
-        dt.Rows.Add(2, "Banana", 20, 0.3m);
-        dt.Rows.Add(3, "Cherry", 15, 0.8m);
+        dataTable.Rows.Add(1, "Alice", 30, "USA");
+        dataTable.Rows.Add(2, "Bob",   25, "UK");
+        dataTable.Rows.Add(3, "Carol", 28, "Canada");
 
-        // Mapping: DataTable column name -> target Table column index (zero‑based)
-        // Example: place "Name" in column 0, "Quantity" in column 2, "Price" in column 4
+        // Mapping: DataTable column name -> target Table column index
+        // Example: map "Name" to column 0, "Age" to column 1, "Country" to column 2
         var columnMapping = new Dictionary<string, int>
         {
-            { "Name", 0 },
-            { "Quantity", 2 },
-            { "Price", 4 }
+            { "Name",    0 },
+            { "Age",     1 },
+            { "Country", 2 }
         };
 
-        // Create a new PDF document
+        // Determine the number of target columns (max index + 1)
+        int targetColumnCount = columnMapping.Values.Max() + 1;
+
+        // Build source column list ordered by target column index
+        int[] sourceColumnList = columnMapping
+                                    .OrderBy(kv => kv.Value)                     // sort by target index
+                                    .Select(kv => dataTable.Columns[kv.Key]!.Ordinal) // get DataTable column ordinal (null‑forgiving)
+                                    .ToArray();
+
+        // Build source row list (all rows)
+        int[] sourceRowList = Enumerable.Range(0, dataTable.Rows.Count).ToArray();
+
+        // Create PDF document
         using (Document doc = new Document())
         {
-            // Create a table with enough columns (max target index + 1)
-            int totalColumns = columnMapping.Values.Max() + 1;
-            Table table = new Table
-            {
-                // Optional: set column widths (equal width for simplicity)
-                ColumnWidths = string.Join(" ", Enumerable.Repeat("50", totalColumns))
-            };
+            // Add a page
+            Page page = doc.Pages.Add();
 
-            // Build source column list based on the mapping keys
-            int[] sourceColumnList = columnMapping.Keys
-                .Select(colName => dt.Columns[colName].Ordinal)
-                .ToArray();
+            // Create a table and define column widths (optional)
+            Table table = new Table();
+            // Table.ColumnWidths expects a string like "100 100 100" – create a simple equal‑width definition
+            table.ColumnWidths = string.Join(" ", Enumerable.Repeat("100", targetColumnCount));
 
-            // Build source row list (all rows)
-            int[] sourceRowList = Enumerable.Range(0, dt.Rows.Count).ToArray();
-
-            // Determine the first column where import will start
-            int firstFilledColumn = columnMapping.Values.Min();
-
-            // Import the selected columns into the table.
-            // showColumnNamesAsFirstRow = true (adds column headers)
-            // isHtmlSupported = false (plain text)
+            // Import data using the mapping
+            // Parameters:
+            //   dataTable          - source DataTable
+            //   sourceRowList      - rows to import
+            //   sourceColumnList   - columns to import in the order defined by mapping
+            //   firstFilledRow     - start at first row of the table (0‑based)
+            //   firstFilledColumn  - start at first column of the table (0‑based)
+            //   showColumnNamesAsFirstRow - import column names as header row
+            //   isHtmlSupported    - false (plain text)
             table.ImportDataTable(
-                dt,
+                dataTable,
                 sourceRowList,
                 sourceColumnList,
                 firstFilledRow: 0,
-                firstFilledColumn: firstFilledColumn,
+                firstFilledColumn: 0,
                 showColumnNamesAsFirstRow: true,
                 isHtmlSupported: false);
 
-            // Add the table to the first page
-            Page page = doc.Pages.Add();
+            // Add the table to the page
             page.Paragraphs.Add(table);
 
             // Save the PDF

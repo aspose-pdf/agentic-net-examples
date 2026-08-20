@@ -6,29 +6,25 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "table_with_padding.pdf";
+        const string outputPath = "table_padding.pdf";
 
-        // Ensure the Document is disposed properly
+        // Document must be disposed via using (rule: document-disposal-with-using)
         using (Document doc = new Document())
         {
             // Add a new page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table and set the default cell padding for all cells
-            Table table = new Table
-            {
-                // MarginInfo defines padding for Top, Bottom, Left, Right (in points)
-                DefaultCellPadding = new MarginInfo
-                {
-                    Top = 5,
-                    Bottom = 5,
-                    Left = 5,
-                    Right = 5
-                }
-            };
-
-            // Optional: define column widths (in points or percentages)
+            // Create a table with three equal-width columns
+            Table table = new Table();
             table.ColumnWidths = "100 100 100";
+
+            // Define default cell padding for the entire table
+            MarginInfo padding = new MarginInfo();
+            padding.Left   = 5;   // left padding
+            padding.Right  = 5;   // right padding
+            padding.Top    = 3;   // top padding
+            padding.Bottom = 3;   // bottom padding
+            table.DefaultCellPadding = padding; // apply to all cells
 
             // Add a header row
             Row header = table.Rows.Add();
@@ -36,19 +32,22 @@ class Program
             header.Cells.Add("Header 2");
             header.Cells.Add("Header 3");
 
-            // Add a data row
-            Row data = table.Rows.Add();
-            data.Cells.Add("Cell A1");
-            data.Cells.Add("Cell A2");
-            data.Cells.Add("Cell A3");
+            // Add some data rows
+            for (int i = 1; i <= 5; i++)
+            {
+                Row row = table.Rows.Add();
+                row.Cells.Add($"Row {i} - Col 1");
+                row.Cells.Add($"Row {i} - Col 2");
+                row.Cells.Add($"Row {i} - Col 3");
+            }
 
             // Place the table on the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF document
+            // Save the PDF (rule: save-to-non-pdf-always-use-save-options not needed for PDF)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with table padding saved to '{outputPath}'.");
     }
 }

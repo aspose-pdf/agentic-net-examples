@@ -1,92 +1,81 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;   // for Color
 
-class ConditionalFormattingExample
+class Program
 {
     static void Main()
     {
-        const string outputPath = "ConditionalFormatting.pdf";
-
-        // Create a new PDF document
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a page to host the table
             Page page = doc.Pages.Add();
 
-            // Create a table with 5 columns
+            // Create a table with three columns of equal width
             Table table = new Table
             {
-                ColumnWidths = "100 100 100 100 100", // equal column widths
-                Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
+                ColumnWidths = "100 100 100"
             };
 
-            // Add header row
-            Row header = table.Rows.Add();
-            header.BackgroundColor = Aspose.Pdf.Color.LightGoldenrodYellow;
+            // ----- Header row -----
+            var header = table.Rows.Add();
             header.Cells.Add("Item");
-            header.Cells.Add("Q1");
-            header.Cells.Add("Q2");
-            header.Cells.Add("Q3");
-            header.Cells.Add("Q4");
+            header.Cells.Add("Quantity");
+            header.Cells.Add("Price");
 
-            // Sample data rows
-            string[,] data = new string[,] {
-                { "Product A", "120", "85",  "95",  "110" },
-                { "Product B", "60",  "70",  "55",  "65"  },
-                { "Product C", "200", "190", "210", "205" }
+            // ----- Sample data rows -----
+            var data = new object[,] {
+                { "Apple",  10, 0.5 },
+                { "Banana", 25, 0.3 },
+                { "Cherry", 5,  1.2 }
             };
 
-            // Populate the table with data
-            for (int i = 0; i < data.GetLength(0); i++)
+            // Add data rows to the table
+            for (int r = 0; r < data.GetLength(0); r++)
             {
-                Row row = table.Rows.Add();
-                for (int j = 0; j < data.GetLength(1); j++)
-                {
-                    row.Cells.Add(data[i, j]);
-                }
+                var row = table.Rows.Add();
+                row.Cells.Add(data[r, 0].ToString());               // Item
+                row.Cells.Add(data[r, 1].ToString());               // Quantity
+                row.Cells.Add(data[r, 2].ToString());               // Price
             }
 
-            // Define a numeric threshold
-            double threshold = 100.0;
+            // ----- Conditional formatting -----
+            // Define thresholds
+            double quantityThreshold = 20;   // Highlight quantities > 20
+            double priceThreshold    = 1.0; // Highlight prices > 1.0
 
-            // Apply conditional formatting: cells with numeric value > threshold get a red background
-            // Skip the first column (item names) and the header row
-            // NOTE: Aspose.Pdf collections are zero‑based, not one‑based.
-            for (int r = 1; r < table.Rows.Count; r++) // start after header (index 0)
+            // Table.Rows and TableCell collections are 0‑based. Header row is at index 0.
+            // Data rows therefore start at index 1.
+            for (int r = 0; r < data.GetLength(0); r++)
             {
-                Row row = table.Rows[r];
-                for (int c = 1; c < row.Cells.Count; c++) // skip first column (index 0)
+                // Row in the table that corresponds to the current data record
+                var row = table.Rows[r + 1]; // +1 skips the header row (index 0)
+
+                // Quantity is the second column (cell index 1)
+                var qtyCell = row.Cells[1];
+                double qty = Convert.ToDouble(data[r, 1]);
+                if (qty > quantityThreshold)
                 {
-                    var cell = row.Cells[c];
-                    // The cell's text is stored inside its first paragraph as a TextFragment
-                    if (cell.Paragraphs.Count > 0 && cell.Paragraphs[0] is TextFragment tf)
-                    {
-                        if (double.TryParse(tf.Text, out double value))
-                        {
-                            if (value > threshold)
-                            {
-                                // Set background color to light red
-                                cell.BackgroundColor = Aspose.Pdf.Color.LightCoral;
-                            }
-                            else
-                            {
-                                // Optional: set a different background for values below the threshold
-                                cell.BackgroundColor = Aspose.Pdf.Color.LightGreen;
-                            }
-                        }
-                    }
+                    // LightGoldenrodYellow background for high quantities
+                    qtyCell.BackgroundColor = Color.LightGoldenrodYellow;
+                }
+
+                // Price is the third column (cell index 2)
+                var priceCell = row.Cells[2];
+                double price = Convert.ToDouble(data[r, 2]);
+                if (price > priceThreshold)
+                {
+                    // LemonChiffon background for high prices
+                    priceCell.BackgroundColor = Color.LemonChiffon;
                 }
             }
 
             // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF
-            doc.Save(outputPath);
+            // Save the PDF (no SaveOptions needed for PDF output)
+            doc.Save("ConditionalFormatting.pdf");
         }
-
-        Console.WriteLine($"PDF with conditional formatting saved to '{outputPath}'.");
     }
 }

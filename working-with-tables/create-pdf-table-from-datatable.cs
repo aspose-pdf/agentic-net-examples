@@ -1,56 +1,55 @@
 using System;
 using System.Data;
+using System.Collections.Generic;
+using System.Globalization;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // ---------- 1. Create an in‑memory DataTable with sample data ----------
+        // Create an in‑memory DataTable with sample data (no SqlClient required)
         DataTable dataTable = new DataTable();
         dataTable.Columns.Add("Id", typeof(int));
         dataTable.Columns.Add("Name", typeof(string));
         dataTable.Columns.Add("Quantity", typeof(int));
-        dataTable.Columns.Add("Price", typeof(decimal));
 
-        dataTable.Rows.Add(1, "Apple", 10, 0.5m);
-        dataTable.Rows.Add(2, "Banana", 20, 0.3m);
-        dataTable.Rows.Add(3, "Orange", 15, 0.4m);
+        dataTable.Rows.Add(1, "Apple", 10);
+        dataTable.Rows.Add(2, "Banana", 20);
+        dataTable.Rows.Add(3, "Cherry", 30);
 
-        // ---------- 2. Create a new PDF document (lifecycle managed by using) ----------
-        using (Document pdfDoc = new Document())
+        const string outputPdfPath = "output.pdf";
+
+        // Create a new PDF document and add a page
+        using (Document pdfDocument = new Document())
         {
-            // Add a blank page (pages are 1‑based).
-            Page page = pdfDoc.Pages.Add();
+            Page page = pdfDocument.Pages.Add();
 
-            // ---------- 3. Build a table and import the DataTable ----------
-            Table table = new Table
+            // Create a table and set equal column widths (integer percentages to avoid culture‑specific parsing issues)
+            Table table = new Table();
+            int columnCount = dataTable.Columns.Count;
+            if (columnCount > 0)
             {
-                Border = new BorderInfo(BorderSide.All, 0.5f),
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f),
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
-            };
+                // Use integer percentages – Aspose.Pdf parses the widths with the current culture, so we avoid decimal points.
+                int baseWidth = 100 / columnCount;               // integer division
+                int remainder = 100 % columnCount;               // distribute the leftover percentage
+                List<string> widths = new List<string>();
+                for (int i = 0; i < columnCount; i++)
+                {
+                    int width = baseWidth + (i == columnCount - 1 ? remainder : 0);
+                    widths.Add(width.ToString(CultureInfo.InvariantCulture));
+                }
+                table.ColumnWidths = string.Join(",", widths);
+            }
 
-            // Define column widths before importing the DataTable.
-            // Aspose.Pdf requires column widths to be set; otherwise ImportDataTable throws a NullReferenceException.
-            float[] columnWidths = new float[dataTable.Columns.Count];
-            for (int i = 0; i < columnWidths.Length; i++)
-                columnWidths[i] = 100; // equal width for each column (adjust as needed)
-
-            // Table.ColumnWidths is a string property – provide a comma‑separated list.
-            table.ColumnWidths = string.Join(",", columnWidths);
-
-            // Import the DataTable. Parameters: (DataTable, import column names, first row, first column)
+            // Import the DataTable into the PDF table (first row = column names)
             table.ImportDataTable(dataTable, true, 0, 0);
 
-            // Add the table to the page.
+            // Add the table to the page and save the document
             page.Paragraphs.Add(table);
-
-            // ---------- 4. Save the PDF ----------
-            pdfDoc.Save("ProductsReport.pdf");
+            pdfDocument.Save(outputPdfPath);
         }
 
-        Console.WriteLine("PDF generated successfully: ProductsReport.pdf");
+        Console.WriteLine($"PDF table generated and saved to '{outputPdfPath}'.");
     }
 }
