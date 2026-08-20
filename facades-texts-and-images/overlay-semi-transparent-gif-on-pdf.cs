@@ -7,43 +7,51 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // PDF that already contains a PNG image
-        const string outputPdf = "output.pdf";  // Resulting PDF with GIF overlay
-        const string gifPath   = "overlay.gif"; // Semi‑transparent GIF to overlay
+        // Input PDF that already contains the PNG image.
+        const string inputPdfPath = "input.pdf";
+        // GIF image to overlay (semi‑transparent).
+        const string overlayGifPath = "overlay.gif";
+        // Output PDF with the overlay applied.
+        const string outputPdfPath = "output.pdf";
 
-        // Validate input files
-        if (!File.Exists(inputPdf))
+        // Verify required files exist.
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(gifPath))
+        if (!File.Exists(overlayGifPath))
         {
-            Console.Error.WriteLine($"Overlay GIF not found: {gifPath}");
+            Console.Error.WriteLine($"Overlay GIF not found: {overlayGifPath}");
             return;
         }
 
-        // Create the PdfFileMend facade (no obsolete constructor)
-        PdfFileMend mend = new PdfFileMend();
+        // Use PdfFileMend facade to modify the PDF.
+        using (PdfFileMend mend = new PdfFileMend())
+        {
+            // Load the existing PDF.
+            mend.BindPdf(inputPdfPath);
 
-        // Bind the source PDF document
-        mend.BindPdf(inputPdf);
+            // Define the rectangle where the GIF will be placed.
+            // Coordinates are in default user space units (points).
+            float lowerLeftX = 50f;   // X of lower‑left corner
+            float lowerLeftY = 500f;  // Y of lower‑left corner
+            float upperRightX = 250f; // X of upper‑right corner
+            float upperRightY = 700f; // Y of upper‑right corner
 
-        // Prepare compositing parameters.
-        // BlendMode.Normal respects the GIF's own alpha channel (semi‑transparent).
-        CompositingParameters compParams = new CompositingParameters(BlendMode.Normal);
+            // Create compositing parameters to achieve a semi‑transparent effect.
+            // BlendMode.Multiply blends the overlay with the underlying PNG.
+            CompositingParameters compParams = new CompositingParameters(BlendMode.Multiply);
 
-        // Add the GIF image to page 1.
-        // Coordinates are in points (1/72 inch). Adjust as needed to match the PNG area.
-        // lowerLeftX, lowerLeftY, upperRightX, upperRightY
-        mend.AddImage(gifPath, 1, 50f, 500f, 250f, 700f, compParams);
+            // Add the GIF image on page 1 using the compositing parameters.
+            // This overlays the GIF onto the existing PNG at the same coordinates.
+            mend.AddImage(overlayGifPath, 1, lowerLeftX, lowerLeftY, upperRightX, upperRightY, compParams);
 
-        // Save the modified PDF
-        mend.Save(outputPdf);
+            // Save the modified PDF.
+            mend.Save(outputPdfPath);
+            mend.Close();
+        }
 
-        // Release resources
-        mend.Close();
-
-        Console.WriteLine($"Overlay applied and saved to '{outputPdf}'.");
+        Console.WriteLine($"Overlay completed. Output saved to '{outputPdfPath}'.");
     }
 }

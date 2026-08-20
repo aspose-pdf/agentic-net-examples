@@ -6,10 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const int    pageNumber = 4;   // target page (1‑based indexing)
-        const int    imageId    = 1;   // index of the image to remove on that page
+        const int pageNumber = 4;      // target page (1‑based)
+        const int imageObjectId = 2;   // replace with the actual image index to remove
 
         if (!File.Exists(inputPath))
         {
@@ -17,12 +17,16 @@ class Program
             return;
         }
 
-        // Load the PDF, delete the specified image, and save the result.
+        // PdfContentEditor does not implement IDisposable, so we manage it manually
         PdfContentEditor editor = new PdfContentEditor();
         editor.BindPdf(inputPath);
-        editor.DeleteImage(pageNumber, new int[] { imageId });
+
+        // Remove the specified image from page four
+        editor.DeleteImage(pageNumber, new int[] { imageObjectId });
+
+        // Save the modified PDF
         editor.Save(outputPath);
 
-        Console.WriteLine($"Removed image {imageId} from page {pageNumber} and saved to '{outputPath}'.");
+        Console.WriteLine($"Removed image ID {imageObjectId} from page {pageNumber} and saved to '{outputPath}'.");
     }
 }

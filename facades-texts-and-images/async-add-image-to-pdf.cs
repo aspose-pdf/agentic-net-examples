@@ -2,96 +2,92 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Aspose.Pdf.Facades;   // Facade API for PDF modifications
+using Aspose.Pdf.Facades; // PdfFileMend resides here
 
-namespace PdfAsyncModification
+class PdfModifier
 {
-    public static class PdfMendExtensions
+    /// <summary>
+    /// Asynchronously adds an image to the first page of a PDF and saves the result.
+    /// All PdfFileMend operations are executed on a background thread via Task.Run
+    /// to avoid blocking the calling thread.
+    /// </summary>
+    /// <param name="inputPdfPath">Path to the source PDF file.</param>
+    /// <param name="outputPdfPath">Path where the modified PDF will be saved.</param>
+    /// <param name="imagePath">Path to the image file to be added.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public static Task ModifyPdfAsync(
+        string inputPdfPath,
+        string outputPdfPath,
+        string imagePath,
+        CancellationToken cancellationToken = default)
     {
-        /// <summary>
-        /// Asynchronously adds an image to a PDF file using PdfFileMend.
-        /// The operation is executed on a background thread via Task.Run to avoid blocking the caller.
-        /// </summary>
-        /// <param name="inputPdfPath">Path to the source PDF file.</param>
-        /// <param name="outputPdfPath">Path where the modified PDF will be saved.</param>
-        /// <param name="imagePath">Path to the image file to be added.</param>
-        /// <param name="pageNumber">1‑based page number where the image will be placed.</param>
-        /// <param name="x">X coordinate (lower‑left) of the image rectangle.</param>
-        /// <param name="y">Y coordinate (lower‑left) of the image rectangle.</param>
-        /// <param name="width">Width of the image rectangle.</param>
-        /// <param name="height">Height of the image rectangle.</param>
-        /// <param name="cancellationToken">Optional cancellation token.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public static Task AddImageAsync(
-            string inputPdfPath,
-            string outputPdfPath,
-            string imagePath,
-            int pageNumber,
-            float x,
-            float y,
-            float width,
-            float height,
-            CancellationToken cancellationToken = default)
+        // Validate arguments early
+        if (string.IsNullOrWhiteSpace(inputPdfPath))
+            throw new ArgumentException("Input PDF path is required.", nameof(inputPdfPath));
+        if (string.IsNullOrWhiteSpace(outputPdfPath))
+            throw new ArgumentException("Output PDF path is required.", nameof(outputPdfPath));
+        if (string.IsNullOrWhiteSpace(imagePath))
+            throw new ArgumentException("Image path is required.", nameof(imagePath));
+
+        // Run the blocking PdfFileMend work on a thread‑pool thread
+        return Task.Run(() =>
         {
-            // Validate arguments early to fail fast.
-            if (string.IsNullOrWhiteSpace(inputPdfPath))
-                throw new ArgumentException("Input PDF path is required.", nameof(inputPdfPath));
-            if (string.IsNullOrWhiteSpace(outputPdfPath))
-                throw new ArgumentException("Output PDF path is required.", nameof(outputPdfPath));
-            if (string.IsNullOrWhiteSpace(imagePath))
-                throw new ArgumentException("Image path is required.", nameof(imagePath));
+            // Throw if cancellation was requested before we start
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // Ensure the PDF file exists
             if (!File.Exists(inputPdfPath))
                 throw new FileNotFoundException("Input PDF not found.", inputPdfPath);
             if (!File.Exists(imagePath))
                 throw new FileNotFoundException("Image file not found.", imagePath);
-            if (pageNumber < 1)
-                throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number must be 1 or greater.");
 
-            // Wrap the synchronous PdfFileMend work in Task.Run.
-            return Task.Run(() =>
+            // Use a using block for deterministic disposal of the facade (lifecycle rule)
+            using (PdfFileMend mend = new PdfFileMend())
             {
-                // Respect cancellation request before starting heavy work.
-                cancellationToken.ThrowIfCancellationRequested();
+                // Bind the source PDF file
+                mend.BindPdf(inputPdfPath);
 
-                // PdfFileMend does not require a Document instance; it works directly on files.
-                // Use a using block to ensure resources are released promptly.
-                using (PdfFileMend pdfMend = new PdfFileMend())
+                // Open the image stream (will be disposed automatically by the using below)
+                using (FileStream imgStream = File.OpenRead(imagePath))
                 {
-                    // Bind the source PDF.
-                    pdfMend.BindPdf(inputPdfPath);
-
-                    // Add the image to the specified page and rectangle.
-                    // AddImage(string imagePath, int pageNumber, float x, float y, float width, float height)
-                    pdfMend.AddImage(imagePath, pageNumber, x, y, width, height);
-
-                    // Save the modified PDF to the output location.
-                    pdfMend.Save(outputPdfPath);
+                    // Add the image to page 1 at the desired rectangle.
+                    // Coordinates are in points (1/72 inch). Adjust as needed.
+                    // The method returns a bool indicating success; we can ignore it or handle it.
+                    bool added = mend.AddImage(imgStream, 1, 10f, 10f, 100f, 100f);
+                    if (!added)
+                        throw new InvalidOperationException("Failed to add image to PDF.");
                 }
 
-                // Throw if cancellation was requested during the operation.
-                cancellationToken.ThrowIfCancellationRequested();
-            }, cancellationToken);
-        }
+                // Save the modified PDF to the output path
+                mend.Save(outputPdfPath);
+
+                // Close releases any internal resources (optional because of using)
+                mend.Close();
+            }
+        }, cancellationToken);
     }
 
-    // Simple entry point to satisfy the compiler for a console‑style project.
-    // The method is async so callers can await asynchronous PDF work if they wish.
-    public class Program
+    // Example usage
+    static async Task Main(string[] args)
     {
-        public static async Task Main(string[] args)
+        // Example file paths – replace with real paths as needed
+        const string inputPdf = "sample_input.pdf";
+        const string outputPdf = "sample_output.pdf";
+        const string imageFile = "logo.png";
+
+        try
         {
-            // No mandatory execution logic – the library can be used via the
-            // PdfMendExtensions.AddImageAsync method from other code.
-            // Example (commented out) of how to call the async method:
-            // await PdfMendExtensions.AddImageAsync(
-            //     "source.pdf",
-            //     "modified.pdf",
-            //     "logo.png",
-            //     pageNumber: 1,
-            //     x: 100,
-            //     y: 500,
-            //     width: 200,
-            //     height: 100);
+            await ModifyPdfAsync(inputPdf, outputPdf, imageFile);
+            Console.WriteLine($"PDF modified and saved to '{outputPdf}'.");
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine("Operation was cancelled.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

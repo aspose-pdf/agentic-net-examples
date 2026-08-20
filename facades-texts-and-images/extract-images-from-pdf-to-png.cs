@@ -1,51 +1,47 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;          // PdfExtractor resides here
-using System.Drawing.Imaging;      // ImageFormat for PNG
+using System.Drawing.Imaging;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputDir = "ExtractedImages";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "ExtractedImages";
 
-        // Verify source PDF exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure output folder exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // PdfExtractor implements IDisposable – use using for deterministic cleanup
+        // Use PdfExtractor (which implements IDisposable) inside a using block
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF file to the extractor
-            extractor.BindPdf(inputPdf);
+            // Bind the source PDF file
+            extractor.BindPdf(inputPdfPath);
 
-            // Prepare extractor to retrieve images
+            // Extract images from the PDF
             extractor.ExtractImage();
 
             int imageIndex = 1;
-            // Iterate over all extracted images
+            // Iterate through all extracted images
             while (extractor.HasNextImage())
             {
-                string outPath = Path.Combine(outputDir, $"image-{imageIndex}.png");
+                // Build the output file name (PNG format)
+                string outputFile = Path.Combine(outputFolder, $"image-{imageIndex}.png");
 
-                // Save the current image as PNG; GetNextImage returns true on success
-                bool saved = extractor.GetNextImage(outPath, ImageFormat.Png);
-                if (!saved)
-                {
-                    Console.Error.WriteLine($"Failed to extract image #{imageIndex}");
-                }
+                // Save the current image as PNG
+                extractor.GetNextImage(outputFile, ImageFormat.Png);
 
                 imageIndex++;
             }
         }
 
-        Console.WriteLine("All images have been extracted.");
+        Console.WriteLine("Image extraction completed.");
     }
 }
