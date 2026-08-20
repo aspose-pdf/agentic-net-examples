@@ -9,8 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string rootTitle  = "Accessible Document Title";
+        const string outputPath = "output_with_language.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -21,17 +20,20 @@ class Program
         // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content (no casting needed)
-            ITaggedContent tagged = doc.TaggedContent;
+            // Access the tagged content interface
+            ITaggedContent taggedContent = doc.TaggedContent;
 
-            // Get the root structure element and set its Title property
-            StructureElement root = tagged.RootElement;
-            root.Title = rootTitle;
+            // Set the primary language for the whole document
+            taggedContent.SetLanguage("en-US");
+
+            // Optionally, also set the language on the root structure element
+            StructureElement root = taggedContent.RootElement;
+            root.Language = "en-US";
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with root title to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with language attribute: {outputPath}");
     }
 }

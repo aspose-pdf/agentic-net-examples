@@ -8,61 +8,69 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";   // source PDF
-        const string outputCsvPath = "links.csv";  // CSV file to write URLs
+        const string inputPdf  = "input.pdf";
+        const string outputCsv = "links.csv";
 
-        // Ensure the input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // List to collect extracted URLs
-        List<string> extractedUrls = new List<string>();
-
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
+            // Load the PDF document
+            using (Document doc = new Document(inputPdf))
             {
-                Page page = pdfDoc.Pages[pageIndex];
+                var records = new List<(int PageNumber, string Url)>();
 
-                // Iterate through all annotations on the page
-                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
+                // Pages are 1‑based
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    Annotation annotation = page.Annotations[annIndex];
+                    Page page = doc.Pages[i];
 
-                    // We're interested only in link annotations
-                    if (annotation is LinkAnnotation linkAnnotation)
+                    // Annotations collection is also 1‑based
+                    for (int j = 1; j <= page.Annotations.Count; j++)
                     {
-                        // Extract the URL from a GoToURIAction if present
-                        if (linkAnnotation.Action is GoToURIAction uriAction && !string.IsNullOrEmpty(uriAction.URI))
+                        Annotation ann = page.Annotations[j];
+
+                        // We are interested only in link annotations
+                        if (ann is LinkAnnotation link)
                         {
-                            extractedUrls.Add(uriAction.URI);
+                            string url = null;
+
+                            // Extract URL from GoToURIAction if present
+                            if (link.Action is GoToURIAction uriAction && !string.IsNullOrEmpty(uriAction.URI))
+                            {
+                                url = uriAction.URI;
+                            }
+
+                            if (!string.IsNullOrEmpty(url))
+                            {
+                                records.Add((i, url));
+                            }
                         }
-                        // In older PDFs the Hyperlink property may hold a URI, but the property
-                        // no longer exposes a URI member in recent Aspose.Pdf versions. If needed,
-                        // you could inspect other properties of Hyperlink, but for this task we
-                        // rely solely on GoToURIAction.
                     }
                 }
+
+                // Write results to CSV
+                using (StreamWriter writer = new StreamWriter(outputCsv, false))
+                {
+                    writer.WriteLine("Page,URL");
+                    foreach (var rec in records)
+                    {
+                        // Escape commas in URL if any
+                        string escapedUrl = rec.Url.Contains(",") ? $"\"{rec.Url}\"" : rec.Url;
+                        writer.WriteLine($"{rec.PageNumber},{escapedUrl}");
+                    }
+                }
+
+                Console.WriteLine($"Extracted {records.Count} link(s) to '{outputCsv}'.");
             }
         }
-
-        // Write the URLs to a CSV file (simple one‑column CSV)
-        using (StreamWriter writer = new StreamWriter(outputCsvPath, false))
+        catch (Exception ex)
         {
-            writer.WriteLine("URL"); // header
-            foreach (string url in extractedUrls)
-            {
-                // Escape double quotes by doubling them (CSV rule)
-                string escaped = url.Replace("\"", "\"\"");
-                writer.WriteLine($"\"{escaped}\"");
-            }
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        Console.WriteLine($"Extracted {extractedUrls.Count} link(s) to '{outputCsvPath}'.");
     }
 }

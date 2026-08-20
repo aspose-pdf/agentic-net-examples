@@ -17,32 +17,29 @@ class Program
             return;
         }
 
-        // Open the PDF document (lifecycle managed by using)
+        // Load the PDF inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
             // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Optional: set the document language
-            tagged.SetLanguage("en-US");
+            // Create a figure element in the logical structure
+            FigureElement figure = tagged.CreateFigureElement();
 
-            // Create a Span element (inline text structure)
-            SpanElement span = tagged.CreateSpanElement();
+            // Set a concise description using the Title property
+            figure.Title = "Sample Figure: Revenue Chart";
 
-            // Set the visible text of the span (if needed)
-            span.SetText("example");
+            // Optional: provide alternative text for accessibility
+            figure.AlternativeText = "Bar chart showing quarterly revenue";
 
-            // Supply hidden pronunciation text via ActualText
-            span.ActualText = "ɪɡˈzæmpəl";
-
-            // Attach the span to the root of the structure tree
+            // Append the figure element to the root of the structure tree
             StructureElement root = tagged.RootElement;
-            root.AppendChild(span); // AppendChild with one argument (default bool)
+            root.AppendChild(figure);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with figure title to '{outputPath}'.");
     }
 }

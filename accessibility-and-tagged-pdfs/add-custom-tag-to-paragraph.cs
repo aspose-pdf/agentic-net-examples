@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                         // Document, Color, etc.
-using Aspose.Pdf.Tagged;                 // ITaggedContent
-using Aspose.Pdf.LogicalStructure;       // StructureElement, ParagraphElement
+using Aspose.Pdf;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
@@ -10,32 +10,32 @@ class Program
     {
         const string outputPath = "custom_tag_paragraph.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Access the tagged‑content API
-            ITaggedContent tagged = doc.TaggedContent;
+            // Access the tagged content API
+            ITaggedContent taggedContent = doc.TaggedContent;
 
             // Set document language and title (optional)
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle("Document with Custom Tagged Paragraph");
+            taggedContent.SetLanguage("en-US");
+            taggedContent.SetTitle("Document with Custom Tag Paragraph");
 
-            // Get the root element of the logical structure tree
-            StructureElement root = tagged.RootElement;
+            // Get the root element of the structure tree
+            StructureElement root = taggedContent.RootElement;
 
-            // Create a paragraph element via the factory
-            ParagraphElement para = tagged.CreateParagraphElement();
+            // Create a paragraph element
+            ParagraphElement paragraph = taggedContent.CreateParagraphElement();
 
-            // Assign a custom tag name to represent a specialized content type
-            para.SetTag("MySpecialParagraph");
+            // Set a custom tag name to represent specialized content
+            paragraph.SetTag("MyCustomTag");
 
             // Set the visible text of the paragraph
-            para.SetText("This paragraph carries a custom tag for specialized processing.");
+            paragraph.SetText("This paragraph uses a custom tag for specialized content.");
 
             // Append the paragraph to the root of the structure tree
-            root.AppendChild(para);   // AppendChild with a single argument (bool defaults)
+            root.AppendChild(paragraph);
 
-            // Save the PDF (no SaveOptions needed for PDF output)
+            // Save the PDF
             doc.Save(outputPath);
         }
 

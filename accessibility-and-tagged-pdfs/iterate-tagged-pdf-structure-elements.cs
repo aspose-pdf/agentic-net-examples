@@ -22,43 +22,41 @@ class Program
             // Access the tagged content interface
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Get the root structure element (no cast required)
-            StructureElement root = tagged.RootElement;
+            // If the document is not tagged, there will be no structure tree to traverse
+            if (tagged == null || tagged.RootElement == null)
+            {
+                Console.WriteLine("The PDF does not contain tagged content.");
+                return;
+            }
 
-            Console.WriteLine("Structure elements:");
+            // Start recursive traversal from the root element
+            StructureElement root = tagged.RootElement;
+            Console.WriteLine("Structure Elements:");
             WalkStructure(root, 0);
         }
     }
 
-    // Recursive traversal of the structure tree
+    // Recursively walk the structure tree and log Title, Language, and (if needed) custom tag info
     static void WalkStructure(StructureElement element, int depth)
     {
         string indent = new string(' ', depth * 2);
+        string title = element.Title ?? "(no title)";
+        string language = element.Language ?? "(no language)";
 
-        // Retrieve properties; Title, Language, and custom tag (if available)
-        string title = element.Title ?? string.Empty;
-        string language = element.Language ?? string.Empty;
-        string customTag = string.Empty;
-
-        // Attempt to get the custom tag name; SetTag exists, GetTag is not documented
-        // but many versions expose a GetTag() method. Use it if available.
-        try
-        {
-            // This call will compile only if GetTag() exists; otherwise it will be ignored.
-            customTag = (element as dynamic).GetTag() ?? string.Empty;
-        }
-        catch { /* ignore if method not present */ }
-
+        // Custom tags can be set via SetTag(string) but there is no getter.
+        // Therefore we log that a custom tag may exist but cannot be retrieved directly.
         Console.WriteLine($"{indent}Element: {element.GetType().Name}");
         Console.WriteLine($"{indent}  Title   : {title}");
         Console.WriteLine($"{indent}  Language: {language}");
-        Console.WriteLine($"{indent}  Tag     : {customTag}");
+        Console.WriteLine($"{indent}  (Custom tag not directly readable via API)");
 
-        // Recurse into child elements
+        // Iterate over child elements using the ChildElements collection
         foreach (Element child in element.ChildElements)
         {
-            if (child is StructureElement se)
-                WalkStructure(se, depth + 1);
+            if (child is StructureElement childStruct)
+            {
+                WalkStructure(childStruct, depth + 1);
+            }
         }
     }
 }

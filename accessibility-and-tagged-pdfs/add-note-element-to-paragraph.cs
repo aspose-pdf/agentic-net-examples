@@ -17,36 +17,33 @@ class Program
             return;
         }
 
-        // Load the PDF and obtain the tagged‑content helper
+        // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
+            // Access tagged content API
             ITaggedContent tagged = doc.TaggedContent;
-
-            // Optional: set language and title for the tagged PDF
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
             // Get the root structure element (no cast needed)
             StructureElement root = tagged.RootElement;
 
-            // Create a paragraph element and set its main text
+            // Create a paragraph element and set its visible text
             ParagraphElement paragraph = tagged.CreateParagraphElement();
-            paragraph.SetText("This is the main paragraph text.");
+            paragraph.SetText("This is the main paragraph content.");
 
-            // Create a note element (footnote/endnote) and set its supplemental text
+            // Create a note element (footnote/endnote) and set its text
             NoteElement note = tagged.CreateNoteElement();
             note.SetText("Supplemental information provided as a note.");
 
             // Attach the note as a child of the paragraph
-            paragraph.AppendChild(note);   // bool parameter omitted – default is true
+            paragraph.AppendChild(note); // bool parameter omitted (default)
 
-            // Add the paragraph (with its note) to the document structure
+            // Attach the paragraph (with its note) to the document root
             root.AppendChild(paragraph);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with note element: '{outputPath}'");
+        Console.WriteLine($"PDF saved with note element: {outputPath}");
     }
 }
