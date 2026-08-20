@@ -1,14 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "resized_letter.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_letter.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,22 +15,18 @@ class Program
             return;
         }
 
-        // PdfPageEditor is a facade that allows page size manipulation.
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            // Bind the source PDF file (file‑path overload).
-            editor.BindPdf(inputPath);
+        // Letter size in points (1 inch = 72 points)
+        double letterWidth = 8.5 * 72; // 612 points
+        double letterHeight = 11 * 72; // 792 points
 
-            // Set the desired page size. PageSize is in Aspose.Pdf namespace.
-            editor.PageSize = PageSize.PageLetter;
+        PdfFileEditor editor = new PdfFileEditor();
 
-            // Apply the changes to all pages.
-            editor.ApplyChanges();
+        // Resize all pages to Letter size and save to outputPath
+        bool success = editor.ResizeContents(inputPath, outputPath, null, letterWidth, letterHeight);
 
-            // Save the modified PDF to a new file.
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
+        if (success)
+            Console.WriteLine($"PDF resized to Letter size and saved as '{outputPath}'.");
+        else
+            Console.Error.WriteLine("Failed to resize PDF.");
     }
 }

@@ -1,105 +1,74 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Holds information about a source PDF and the page range to insert.
-    class SourceInfo
-    {
-        public string FilePath;      // Path to the source PDF.
-        public int StartPage;        // First page of the range (1‑based).
-        public int EndPage;          // Last page of the range (1‑based).
-        public int InsertLocation;   // Position in the destination where pages will be inserted (1‑based).
-    }
-
     static void Main()
     {
-        // Destination PDF that will receive the inserted pages.
-        const string destinationPdf = "base.pdf";
+        // Paths – adjust as needed
+        const string basePdfPath   = "base.pdf";      // Existing destination PDF
+        const string resultPdfPath = "result.pdf";    // Final output PDF
 
-        // Final output PDF after all insertions.
-        const string finalOutputPdf = "merged_result.pdf";
-
-        // Define the source PDFs and the ranges to insert.
-        var sources = new List<SourceInfo>
+        // Ensure the result file starts as a copy of the base PDF
+        if (!File.Exists(basePdfPath))
         {
-            new SourceInfo { FilePath = "source1.pdf", StartPage = 2, EndPage = 5, InsertLocation = 1 },
-            new SourceInfo { FilePath = "source2.pdf", StartPage = 1, EndPage = 3, InsertLocation = 4 },
-            new SourceInfo { FilePath = "source3.pdf", StartPage = 7, EndPage = 9, InsertLocation = 10 }
-        };
-
-        // Validate that the destination file exists.
-        if (!File.Exists(destinationPdf))
-        {
-            Console.Error.WriteLine($"Destination file not found: {destinationPdf}");
+            Console.Error.WriteLine($"Base PDF not found: {basePdfPath}");
             return;
         }
+        File.Copy(basePdfPath, resultPdfPath, true);
 
-        // The file that will be used as input for the next iteration.
-        string currentInput = destinationPdf;
-
-        // Temporary file used for the output of each insertion step.
-        string tempOutput = Path.GetTempFileName();
-
-        try
+        // Define source PDFs and the page numbers to insert from each
+        // Example data – replace with real file names and page arrays
+        var sources = new (string filePath, int[] pages)[]
         {
-            foreach (var src in sources)
-            {
-                // Ensure the source file exists.
-                if (!File.Exists(src.FilePath))
-                {
-                    Console.Error.WriteLine($"Source file not found: {src.FilePath}");
-                    break;
-                }
+            ("source1.pdf", new int[] { 2, 4, 5 }),   // insert pages 2,4,5 from source1.pdf
+            ("source2.pdf", new int[] { 1, 3 }),      // insert pages 1,3 from source2.pdf
+            ("source3.pdf", new int[] { 6 })          // insert page 6 from source3.pdf
+        };
 
-                // Perform the insertion using PdfFileEditor.
-                PdfFileEditor editor = new PdfFileEditor();
-                bool success = editor.Insert(
-                    currentInput,               // Input PDF (current state)
-                    src.InsertLocation,        // Insert position (1‑based)
-                    src.FilePath,              // PDF to take pages from
-                    src.StartPage,             // Start page in source
-                    src.EndPage,               // End page in source
-                    tempOutput);               // Output PDF for this step
+        // PdfFileEditor does NOT implement IDisposable – do NOT wrap in using
+        PdfFileEditor editor = new PdfFileEditor();
 
-                if (!success)
-                {
-                    Console.Error.WriteLine($"Failed to insert pages from {src.FilePath}");
-                    break;
-                }
+        // Insert position is 1‑based. Start after the first page of the current result PDF.
+        int insertPosition = 2; // insert after page 1
 
-                // Delete the previous intermediate file if it was a temp file.
-                if (currentInput != destinationPdf && File.Exists(currentInput))
-                {
-                    File.Delete(currentInput);
-                }
-
-                // Prepare for the next iteration.
-                currentInput = tempOutput;
-                tempOutput = Path.GetTempFileName();
-            }
-
-            // After processing all sources, move the final intermediate file to the desired output.
-            if (File.Exists(currentInput))
-            {
-                // Overwrite if the final output already exists.
-                if (File.Exists(finalOutputPdf))
-                {
-                    File.Delete(finalOutputPdf);
-                }
-                File.Move(currentInput, finalOutputPdf);
-                Console.WriteLine($"All insertions completed. Result saved to '{finalOutputPdf}'.");
-            }
-        }
-        finally
+        foreach (var src in sources)
         {
-            // Clean up any leftover temporary file.
-            if (File.Exists(tempOutput))
+            if (!File.Exists(src.filePath))
             {
-                File.Delete(tempOutput);
+                Console.Error.WriteLine($"Source PDF not found: {src.filePath}");
+                continue;
             }
+
+            // Temporary file to hold the intermediate result
+            string tempPath = Path.GetTempFileName();
+
+            // TryInsert returns false instead of throwing if the operation fails
+            bool success = editor.TryInsert(
+                resultPdfPath,          // current destination PDF
+                insertPosition,         // where to insert pages (1‑based)
+                src.filePath,           // source PDF
+                src.pages,              // page numbers to insert
+                tempPath);              // output PDF
+
+            if (!success)
+            {
+                Console.Error.WriteLine($"Failed to insert pages from {src.filePath}");
+                // Clean up temporary file and abort the batch
+                File.Delete(tempPath);
+                break;
+            }
+
+            // Replace the previous result with the new intermediate file
+            File.Delete(resultPdfPath);
+            File.Move(tempPath, resultPdfPath);
+
+            // Update the insert position for the next iteration:
+            // inserted pages occupy the range we just added
+            insertPosition += src.pages.Length;
         }
+
+        Console.WriteLine($"Batch insertion completed. Output saved to '{resultPdfPath}'.");
     }
 }

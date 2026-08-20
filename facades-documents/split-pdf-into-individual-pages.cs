@@ -6,32 +6,36 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file to be split
-        const string inputPdf = "input.pdf";
+        // Input PDF file path
+        const string inputPdfPath = "input.pdf";
 
-        // Directory where individual page PDFs will be saved
-        const string outputDir = "SplitPages";
+        // Output folder where each page PDF will be saved
+        const string outputFolder = "output_pages";
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
-
-        // Template for the output files.
-        // %NUM% will be replaced with the page number (1‑based) by PdfFileEditor.
-        string fileNameTemplate = Path.Combine(outputDir, "page%NUM%.pdf");
-
-        // Verify the source file exists
-        if (!File.Exists(inputPdf))
+        // Verify input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Use PdfFileEditor from Aspose.Pdf.Facades to split the PDF.
-        // SplitToPages(string, string) writes each page to a separate file
-        // according to the provided template.
-        PdfFileEditor pdfEditor = new PdfFileEditor();
-        pdfEditor.SplitToPages(inputPdf, fileNameTemplate);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        Console.WriteLine($"PDF split into individual pages under '{outputDir}'.");
+        // Template for output files – %NUM% will be replaced by the page number (1‑based)
+        string fileNameTemplate = Path.Combine(outputFolder, "page%NUM%.pdf");
+
+        try
+        {
+            // PdfFileEditor provides the SplitToPages method that creates one PDF per page
+            PdfFileEditor pdfEditor = new PdfFileEditor();
+            pdfEditor.SplitToPages(inputPdfPath, fileNameTemplate);
+
+            Console.WriteLine($"PDF split into individual pages successfully. Files are located in '{outputFolder}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during split operation: {ex.Message}");
+        }
     }
 }

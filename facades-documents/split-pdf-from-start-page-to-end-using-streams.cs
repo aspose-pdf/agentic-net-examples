@@ -6,44 +6,35 @@ class Program
 {
     static void Main()
     {
+        // Path to the source PDF file
         const string inputPath = "input.pdf";
-        const int startPage = 5; // page from which to split to the end
+        // Page number from which to start the split (1‑based indexing)
+        const int startPage = 5;
+        // Path for the resulting PDF containing pages from startPage to the end
+        const string outputPath = "split_end.pdf";
 
+        // Validate input file existence
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
-        // Open the source PDF as a read‑only stream
+        // Open the source and destination streams inside using blocks for deterministic disposal
         using (FileStream inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
+        using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
         {
-            // Destination will be kept in memory
-            using (MemoryStream outputStream = new MemoryStream())
-            {
-                PdfFileEditor editor = new PdfFileEditor();
+            // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly
+            PdfFileEditor editor = new PdfFileEditor();
 
-                // Split from startPage to the end of the document
-                bool result = editor.SplitToEnd(inputStream, startPage, outputStream);
+            // Split from the specified start page to the end of the document.
+            // The method returns true on success; we can optionally check the result.
+            bool success = editor.SplitToEnd(inputStream, startPage, outputStream);
 
-                if (!result)
-                {
-                    Console.Error.WriteLine("Split operation failed.");
-                    return;
-                }
-
-                // Reset the output stream position before reading from it
-                outputStream.Position = 0;
-
-                // Example: write the split part to a physical file
-                const string outputPath = "split_part.pdf";
-                using (FileStream fileOut = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-                {
-                    outputStream.CopyTo(fileOut);
-                }
-
-                Console.WriteLine($"Pages {startPage}‑{int.MaxValue} saved to '{outputPath}'.");
-            }
+            if (success)
+                Console.WriteLine($"Successfully split PDF from page {startPage} to the end. Output saved to '{outputPath}'.");
+            else
+                Console.Error.WriteLine("Split operation failed.");
         }
     }
 }
