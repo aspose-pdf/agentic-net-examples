@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "sorted_desc.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "reordered_descending.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -21,15 +21,14 @@ class Program
             // Create a new empty PDF to hold pages in the desired order
             using (Document destDoc = new Document())
             {
-                // Add pages from the source document in descending order
-                // Page numbers are 1‑based, so start from Count and go down to 1
+                // Pages are 1‑based; iterate from the last page down to the first
                 for (int i = srcDoc.Pages.Count; i >= 1; i--)
                 {
-                    // Add the page object to the destination document
+                    // Add a copy of the page to the destination document
                     destDoc.Pages.Add(srcDoc.Pages[i]);
                 }
 
-                // Optional: reorganize the internal page tree for better performance
+                // Optional: balance the page tree for better performance
                 destDoc.PageNodesToBalancedTree();
 
                 // Save the reordered PDF
@@ -37,6 +36,6 @@ class Program
             }
         }
 
-        Console.WriteLine($"Pages reordered descending and saved to '{outputPath}'.");
+        Console.WriteLine($"Reordered PDF saved to '{outputPath}'.");
     }
 }

@@ -15,20 +15,20 @@ class Program
             return;
         }
 
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages collection is 1‑based; iterate accordingly
+            // Pages are 1‑based in Aspose.Pdf
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Apply a 90° rotation to pages whose number is divisible by 3
+                // Apply a 90° rotation when the page number is divisible by 3
                 if (i % 3 == 0)
                 {
-                    Page page = doc.Pages[i];
-                    page.Rotate = Rotation.on90; // 90 degrees clockwise (use 'on' prefix)
+                    doc.Pages[i].Rotate = Rotation.on90; // correct enum value
                 }
             }
 
-            // Save the modified document (PDF format)
+            // Save the modified document
             doc.Save(outputPath);
         }
 

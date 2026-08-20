@@ -7,53 +7,56 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string ttfPath = "custom.ttf";
+        // Input PDF and custom TrueType font file paths
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output_with_page_numbers.pdf";
+        const string customFontPath = "custom_font.ttf";
 
-        if (!File.Exists(inputPdf))
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(customFontPath))
+        {
+            Console.Error.WriteLine($"Custom font not found: {customFontPath}");
             return;
         }
 
-        if (!File.Exists(ttfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"TrueType font not found: {ttfPath}");
-            return;
-        }
-
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
-        {
-            // Load the external TTF font and ensure it is embedded
-            Font customFont = FontRepository.FindFont(ttfPath);
+            // Load the external TrueType font and mark it for embedding
+            Font customFont = FontRepository.FindFont(customFontPath);
             customFont.IsEmbedded = true;
 
-            // Embed any standard Type1 fonts that might be used
+            // Ensure standard Type1 fonts are also embedded when required
             doc.EmbedStandardFonts = true;
 
-            // Create a page number stamp (default format "#")
-            PageNumberStamp stamp = new PageNumberStamp();
-            stamp.TextState.Font = customFont;
-            stamp.TextState.FontSize = 12; // desired font size
-            stamp.TextState.ForegroundColor = Color.Black;
+            // Create a PageNumberStamp with default format ("#")
+            PageNumberStamp pageNumberStamp = new PageNumberStamp();
 
-            // Position the stamp at the bottom center of each page
-            stamp.HorizontalAlignment = HorizontalAlignment.Center;
-            stamp.VerticalAlignment = VerticalAlignment.Bottom;
-            stamp.BottomMargin = 20; // distance from the bottom edge
+            // Assign the custom font to the stamp's TextState
+            pageNumberStamp.TextState.Font = customFont;
 
-            // Apply the stamp to every page in the document
+            // Optional styling
+            pageNumberStamp.TextState.FontSize = 12;               // Font size
+            pageNumberStamp.TextState.ForegroundColor = Color.Black; // Text color
+            pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
+            pageNumberStamp.BottomMargin = 20; // Distance from bottom edge
+
+            // Add the stamp to every page in the document
             foreach (Page page in doc.Pages)
             {
-                page.AddStamp(stamp);
+                page.AddStamp(pageNumberStamp);
             }
 
             // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Page numbers added with custom font to '{outputPdf}'.");
+        Console.WriteLine($"Page numbers added with custom font. Output saved to '{outputPdfPath}'.");
     }
 }

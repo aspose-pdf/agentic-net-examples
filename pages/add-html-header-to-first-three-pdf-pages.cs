@@ -7,40 +7,59 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_header.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputHtml = "output.html";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // Define the HTML header (embedded CSS styling)
-            const string htmlHeader = @"
-                <div style='font-family:Helvetica; font-size:14pt; color:#0066CC; text-align:center; margin-bottom:10pt;'>
-                    <span style='font-weight:bold;'>Sample HTML Header</span>
-                </div>";
+            // Define the HTML header with embedded CSS
+            string headerHtml = @"
+                <style>
+                    .myHeader { 
+                        font-family: Arial, sans-serif; 
+                        font-size: 14pt; 
+                        color: #003366; 
+                        text-align: center; 
+                        margin-bottom: 5pt;
+                    }
+                </style>
+                <div class='myHeader'>Confidential Report – Page {page}</div>";
 
-            // Apply the header to the first three pages only
+            // Apply the header to the first three pages
             for (int i = 1; i <= Math.Min(3, doc.Pages.Count); i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create an HtmlFragment containing the styled header
-                HtmlFragment headerFragment = new HtmlFragment(htmlHeader);
+                // Create an HtmlFragment (HTML rendering is supported via HtmlFragment)
+                HtmlFragment headerFragment = new HtmlFragment(headerHtml);
 
-                // Insert the fragment at the beginning of the page content so it appears as a header
-                page.Paragraphs.Insert(0, headerFragment);
+                // Create a HeaderFooter object and add the fragment to its Paragraphs collection
+                HeaderFooter header = new HeaderFooter();
+                header.Paragraphs.Add(headerFragment);
+
+                // Assign the header to the page
+                page.Header = header;
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Prepare HTML save options with CSS embedded into the HTML file
+            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+            {
+                PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                // Ensure the header/footer is rendered
+                HtmlMarkupGenerationMode = HtmlSaveOptions.HtmlMarkupGenerationModes.WriteAllHtml
+            };
+
+            // Save the document as HTML
+            doc.Save(outputHtml, htmlOpts);
         }
 
-        Console.WriteLine($"PDF saved with HTML header to '{outputPath}'.");
+        Console.WriteLine($"HTML with embedded CSS header saved to '{outputHtml}'.");
     }
 }

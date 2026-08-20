@@ -18,19 +18,22 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based; iterate through all pages
+            // Iterate through all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Set background: even pages LightGray, odd pages White
-                page.Background = (i % 2 == 0) ? Aspose.Pdf.Color.LightGray : Aspose.Pdf.Color.White;
+                // Alternate background: odd pages LightGray, even pages White
+                if (i % 2 == 1)
+                    page.Background = Color.LightGray;
+                else
+                    page.Background = Color.White;
             }
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with alternating page backgrounds to '{outputPath}'.");
+        Console.WriteLine($"Saved PDF with alternating page backgrounds to '{outputPath}'.");
     }
 }

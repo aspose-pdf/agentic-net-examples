@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -22,17 +22,13 @@ class Program
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
+                double pageWidth = page.PageInfo.Width;
 
-                // Get the current page width (points)
-                double currentWidth = page.PageInfo.Width;
-
-                // If the page is wider than 600 points, resize it to A4
-                if (currentWidth > 600)
+                // Resize only pages wider than 600 points to A4 size
+                if (pageWidth > 600)
                 {
-                    // PageSize.A4 provides the standard A4 dimensions
-                    page.SetPageSize(
-                        Aspose.Pdf.PageSize.A4.Width,
-                        Aspose.Pdf.PageSize.A4.Height);
+                    // Set page size to A4 (width and height in points)
+                    page.SetPageSize(Aspose.Pdf.PageSize.A4.Width, Aspose.Pdf.PageSize.A4.Height);
                 }
             }
 

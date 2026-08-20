@@ -1,41 +1,47 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputCsv = "pages_dimensions.csv";
+        const string inputPdfPath = "input.pdf";
+        const string outputCsvPath = "pages_dimensions.csv";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Create the CSV file and write header
-            using (StreamWriter writer = new StreamWriter(outputCsv, false, Encoding.UTF8))
+            // Load the PDF document (using the recommended lifecycle pattern)
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                writer.WriteLine("PageNumber,Width,Height");
-
-                // Pages are 1‑based in Aspose.Pdf
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                // Create a CSV file and write header
+                using (StreamWriter csvWriter = new StreamWriter(outputCsvPath, false))
                 {
-                    Page page = doc.Pages[i];
-                    double width = page.PageInfo.Width;
-                    double height = page.PageInfo.Height;
+                    csvWriter.WriteLine("PageNumber,Width,Height");
 
-                    writer.WriteLine($"{i},{width},{height}");
+                    // Pages are 1‑based in Aspose.Pdf
+                    for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
+                    {
+                        Page page = pdfDoc.Pages[pageIndex];
+                        double width = page.PageInfo.Width;   // page width in points
+                        double height = page.PageInfo.Height; // page height in points
+
+                        csvWriter.WriteLine($"{pageIndex},{width},{height}");
+                    }
                 }
             }
-        }
 
-        Console.WriteLine($"Page dimensions exported to '{outputCsv}'.");
+            Console.WriteLine($"Page dimensions exported to '{outputCsvPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

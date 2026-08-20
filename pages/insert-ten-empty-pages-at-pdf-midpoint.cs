@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_pages.pdf";
+        const string outputPath = "output_with_inserted_pages.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,17 +15,20 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Calculate the middle position (1‑based indexing)
-            // For an even number of pages, the new pages will be inserted after the first half
-            int middlePosition = (doc.Pages.Count / 2) + 1;
+            // Get the original page count (1‑based indexing)
+            int originalCount = doc.Pages.Count;
 
-            // Insert ten empty pages at the calculated midpoint
+            // Calculate the insertion start index (middle of the document)
+            // For even counts we insert after the first half; for odd counts after the middle page.
+            int startIndex = (originalCount / 2) + 1; // 1‑based index
+
+            // Insert ten empty pages sequentially so they appear together
             for (int i = 0; i < 10; i++)
             {
-                doc.Pages.Insert(middlePosition);
+                doc.Pages.Insert(startIndex + i);
             }
 
             // Save the modified document

@@ -8,7 +8,8 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "watermarked.pdf";
+        const string outputPath = "watermarked_output.pdf";
+        const string watermarkText = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
@@ -16,31 +17,33 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a textual stamp that will serve as the watermark
-            TextStamp watermark = new TextStamp("CONFIDENTIAL");
-
-            // Configure the visual appearance of the stamp
-            watermark.TextState.Font = FontRepository.FindFont("Helvetica");
-            watermark.TextState.FontSize = 72;
-            watermark.TextState.ForegroundColor = Aspose.Pdf.Color.Gray; // fill color
-
-            // Semi‑transparent fill
-            watermark.Opacity = 0.5f;
-
-            // Outline (stroke) settings
-            watermark.OutlineOpacity = 0.5f;   // semi‑transparent outline
-            watermark.OutlineWidth   = 1.0f;   // outline thickness
-
-            // Place the stamp behind the page content (typical for watermarks)
-            watermark.Background = true;
-
-            // Apply the watermark to every page in the document
+            // Iterate over all pages (1‑based indexing)
             foreach (Page page in doc.Pages)
             {
-                page.AddStamp(watermark);
+                // Create a textual stamp with the desired watermark text
+                TextStamp stamp = new TextStamp(watermarkText);
+
+                // Configure text appearance
+                stamp.TextState.Font = FontRepository.FindFont("Helvetica");
+                stamp.TextState.FontSize = 48;
+                stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red;   // Fill color
+
+                // Semi‑transparent fill
+                stamp.Opacity = 0.5;               // 0.0 (fully transparent) to 1.0 (opaque)
+
+                // Outline (stroke) settings
+                stamp.OutlineOpacity = 0.5;        // Semi‑transparent outline
+                stamp.OutlineWidth = 1.0;          // Outline thickness
+
+                // Position the watermark at the center of the page
+                stamp.HorizontalAlignment = HorizontalAlignment.Center;
+                stamp.VerticalAlignment   = VerticalAlignment.Center;
+
+                // Add the stamp to the current page
+                page.AddStamp(stamp);
             }
 
             // Save the modified PDF

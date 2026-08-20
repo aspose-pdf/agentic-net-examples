@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPdf  = "input.pdf";          // source PDF
-        const string watermarkImage = "watermark.png"; // image to repeat
-        const string outputPdf = "output_watermarked.pdf";
+        const string outputPdf = "watermarked.pdf";    // result PDF
+        const string watermarkImage = "logo.png";      // image to repeat
 
         if (!File.Exists(inputPdf))
         {
@@ -23,48 +22,43 @@ class Program
             return;
         }
 
-        // Load the PDF (using statement ensures proper disposal)
+        // Load the PDF document (lifecycle rule: use Document constructor)
         using (Document doc = new Document(inputPdf))
         {
             // Iterate over all pages
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[pageIndex];
-
                 // Page dimensions (points)
                 double pageWidth  = page.PageInfo.Width;
                 double pageHeight = page.PageInfo.Height;
 
-                // Create a prototype stamp to obtain its natural size
-                ImageStamp prototype = new ImageStamp(watermarkImage);
-                // Optional: scale the watermark (e.g., 50% of original)
-                prototype.Width  = prototype.Width * 0.5;
-                prototype.Height = prototype.Height * 0.5;
-                prototype.Opacity = 0.3;          // semi‑transparent
-                prototype.Background = true;      // place behind page content
+                // Desired size of each watermark image (adjust as needed)
+                const double stampWidth  = 100;   // points
+                const double stampHeight = 50;    // points
 
-                double stampWidth  = prototype.Width;
-                double stampHeight = prototype.Height;
+                // Spacing between repeated images (adjust as needed)
+                const double stepX = 150; // horizontal step
+                const double stepY = 120; // vertical step
 
-                // Define spacing between repeated watermarks
-                double hSpacing = 50; // horizontal gap
-                double vSpacing = 50; // vertical gap
-
-                // Grid placement: start from bottom‑left corner
-                for (double y = 0; y < pageHeight; y += stampHeight + vSpacing)
+                // Loop to place stamps in a grid
+                for (double y = 0; y < pageHeight; y += stepY)
                 {
-                    for (double x = 0; x < pageWidth; x += stampWidth + hSpacing)
+                    for (double x = 0; x < pageWidth; x += stepX)
                     {
-                        // Create a fresh stamp for each position
-                        ImageStamp stamp = new ImageStamp(watermarkImage)
-                        {
-                            Width      = stampWidth,
-                            Height     = stampHeight,
-                            Opacity    = 0.3,
-                            Background = true,
-                            XIndent    = x,
-                            YIndent    = y
-                        };
+                        // Create a new ImageStamp for each position
+                        ImageStamp stamp = new ImageStamp(watermarkImage);
+
+                        // Set size of the stamp
+                        stamp.Width  = stampWidth;
+                        stamp.Height = stampHeight;
+
+                        // Position of the stamp (origin is bottom‑left)
+                        stamp.XIndent = x;
+                        stamp.YIndent = y;
+
+                        // Make the watermark semi‑transparent and place it on top
+                        stamp.Opacity   = 0.2f;   // 0 = fully transparent, 1 = opaque
+                        stamp.Background = false;
 
                         // Add the stamp to the current page
                         page.AddStamp(stamp);
@@ -72,7 +66,7 @@ class Program
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPdf);
         }
 

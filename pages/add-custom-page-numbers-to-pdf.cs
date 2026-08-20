@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // for PageNumberStamp (inherits from TextStamp)
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "paged_output.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,30 +15,29 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle: load)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Determine total page count (required for the "of Y" part)
-            int totalPages = doc.Pages.Count;
-
-            // Create a PageNumberStamp with custom format.
-            // The placeholder '#' will be replaced by the current page number.
-            // The total page count is inserted as a constant.
-            string format = $"Page # of {totalPages}";
-            PageNumberStamp pageNumberStamp = new PageNumberStamp(format);
-
-            // Position the stamp at the bottom center of each page.
-            pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
-            pageNumberStamp.BottomMargin        = 20; // distance from bottom edge
+            // Create a page number stamp with the desired format.
+            // The character '#' is replaced with the current page number,
+            // and a second '#' is replaced with the total page count.
+            PageNumberStamp pageNumberStamp = new PageNumberStamp("Page # of #")
+            {
+                // Center the stamp horizontally at the bottom of each page.
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                BottomMargin        = 20, // distance from the bottom edge
+                // Adjust font size automatically to fit the stamp rectangle.
+                AutoAdjustFontSizeToFitStampRectangle = true
+            };
 
             // Apply the stamp to every page in the document.
-            foreach (Page page in doc.Pages)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                page.AddStamp(pageNumberStamp);
+                doc.Pages[i].AddStamp(pageNumberStamp);
             }
 
-            // Save the modified PDF (lifecycle: save)
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 

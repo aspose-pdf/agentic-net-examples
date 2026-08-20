@@ -1,43 +1,45 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPath  = "input.pdf";
-        // Output PDF file path (reordered pages)
+        // Input PDF path
+        const string inputPath = "input.pdf";
+        // Output PDF path
         const string outputPath = "reordered.pdf";
 
         // Define the new page order (1‑based indexes)
-        // Example: {3, 1, 2} will place page 3 first, then page 1, then page 2
-        int[] newOrder = new int[] { 3, 1, 2 };
+        // Example: {3,1,2} will place page 3 first, then page 1, then page 2
+        int[] newOrder = { 3, 1, 2 };
 
-        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source document and create an empty target document
+        // Load source document and create target document inside using blocks
         using (Document srcDoc = new Document(inputPath))
         using (Document dstDoc = new Document())
         {
-            // Ensure the requested order is within the source page count
-            foreach (int pageNumber in newOrder)
+            // Validate that the requested indexes are within the source page count
+            foreach (int idx in newOrder)
             {
-                if (pageNumber < 1 || pageNumber > srcDoc.Pages.Count)
+                if (idx < 1 || idx > srcDoc.Pages.Count)
                 {
-                    Console.Error.WriteLine($"Invalid page number {pageNumber} for source document with {srcDoc.Pages.Count} pages.");
+                    Console.Error.WriteLine($"Invalid page index {idx}. Document has {srcDoc.Pages.Count} pages.");
                     return;
                 }
+            }
 
-                // Add the page from the source document to the target document.
-                // The Add method copies the page; the original document remains unchanged.
-                dstDoc.Pages.Add(srcDoc.Pages[pageNumber]);
+            // Copy pages to the target document in the specified order
+            foreach (int idx in newOrder)
+            {
+                // Pages collection is 1‑based, so we can use the index directly
+                dstDoc.Pages.Add(srcDoc.Pages[idx]);
             }
 
             // Save the reordered PDF
