@@ -6,10 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "flattened_output.pdf";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
@@ -19,26 +18,29 @@ class Program
         // Record original file size
         long originalSize = new FileInfo(inputPath).Length;
 
-        // Flatten all annotations using PdfAnnotationEditor (Facades API)
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        // Flatten all annotations using PdfAnnotationEditor
+        PdfAnnotationEditor editor = new PdfAnnotationEditor();
+        try
         {
-            editor.BindPdf(inputPath);               // Load the PDF
-            editor.FlatteningAnnotations();          // Flatten all annotations
-            editor.Save(outputPath);                  // Save the flattened PDF
+            editor.BindPdf(inputPath);                 // Load the PDF
+            editor.FlatteningAnnotations();            // Flatten all annotations
+            editor.Save(outputPath);                    // Save the flattened PDF
+        }
+        finally
+        {
+            // Ensure resources are released
+            editor.Close();
         }
 
-        // Record size after flattening
-        long flattenedSize = new FileInfo(outputPath).Length;
+        // Record new file size
+        long newSize = new FileInfo(outputPath).Length;
 
-        // Calculate reduction
-        long sizeReduction = originalSize - flattenedSize;
-        double reductionPercent = originalSize > 0
-            ? (double)sizeReduction / originalSize * 100
-            : 0;
+        // Calculate and log size reduction
+        long reduction = originalSize - newSize;
+        double percent = originalSize > 0 ? (reduction * 100.0 / originalSize) : 0;
 
-        // Log results
-        Console.WriteLine($"Original size:   {originalSize} bytes");
-        Console.WriteLine($"Flattened size:  {flattenedSize} bytes");
-        Console.WriteLine($"Size reduction:  {sizeReduction} bytes ({reductionPercent:F2}%)");
+        Console.WriteLine($"Original size: {originalSize} bytes");
+        Console.WriteLine($"Flattened size: {newSize} bytes");
+        Console.WriteLine($"Size reduction: {reduction} bytes ({percent:F2}%)");
     }
 }

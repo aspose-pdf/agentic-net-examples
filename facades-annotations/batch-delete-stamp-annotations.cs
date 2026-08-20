@@ -6,15 +6,20 @@ class Program
 {
     static void Main()
     {
-        // Folder containing PDFs to process
-        const string inputFolder  = @"C:\Pdf\Input";
-        // Folder where cleaned PDFs will be saved
-        const string outputFolder = @"C:\Pdf\Output";
+        // Directory containing PDF files
+        const string inputFolder = @"C:\PdfFolder";
+        // Optional: output folder (can be same as input to overwrite)
+        const string outputFolder = @"C:\PdfFolder\Processed";
 
-        // Ensure output directory exists
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
+
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
+        // Process each PDF file in the folder
         foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
             try
@@ -25,20 +30,18 @@ class Program
                     // Load the PDF document
                     editor.BindPdf(pdfPath);
 
-                    // Delete all annotations of type "Stamp"
+                    // Delete all stamp annotations in the document
                     editor.DeleteAnnotations("Stamp");
 
-                    // Build output file path (overwrite original name in output folder)
-                    string outPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
+                    // Determine output path (overwrite or separate folder)
+                    string fileName = Path.GetFileName(pdfPath);
+                    string outputPath = Path.Combine(outputFolder, fileName);
 
                     // Save the modified PDF
-                    editor.Save(outPath);
-
-                    // Close the facade (releases any resources)
-                    editor.Close();
+                    editor.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
+                Console.WriteLine($"Processed: {pdfPath}");
             }
             catch (Exception ex)
             {

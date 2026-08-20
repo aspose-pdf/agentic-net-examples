@@ -1,92 +1,71 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
+using System.Linq;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations; // <-- added namespace for Annotation types
+using Aspose.Pdf.Annotations;
 
-class AnnotationSummaryUtility
+class AnnotationReportUtility
 {
     static void Main(string[] args)
     {
-        // Expect one or more PDF file paths as command‑line arguments.
-        if (args.Length == 0)
-        {
-            Console.Error.WriteLine("Usage: AnnotationSummaryUtility <pdf1> [<pdf2> ...]");
-            return;
-        }
+        // Determine the folder containing PDFs.
+        string inputFolder = args.Length > 0 ? args[0] : Directory.GetCurrentDirectory();
 
-        // Prepare a summary report file.
-        string reportPath = "AnnotationSummaryReport.txt";
-        using (StreamWriter reportWriter = new StreamWriter(reportPath, false))
+        // Get all PDF files in the folder.
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+
+        var reportLines = new List<string>();
+
+        foreach (string pdfPath in pdfFiles)
         {
-            foreach (string inputPath in args)
+            // Use PdfAnnotationEditor to work with annotations.
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                if (!File.Exists(inputPath))
+                // Load the PDF document.
+                editor.BindPdf(pdfPath);
+
+                // Total pages in the document (1‑based indexing).
+                int pageCount = editor.Document.Pages.Count;
+
+                // Retrieve all possible annotation types.
+                AnnotationType[] allTypes = (AnnotationType[])Enum.GetValues(typeof(AnnotationType));
+
+                // Extract annotations of all types from the whole document.
+                IList<Annotation> annotations = editor.ExtractAnnotations(1, pageCount, allTypes);
+
+                // Count annotations by their type.
+                var typeCounts = new Dictionary<AnnotationType, int>();
+                foreach (Annotation ann in annotations)
                 {
-                    Console.Error.WriteLine($"File not found: {inputPath}");
-                    continue;
+                    AnnotationType type = ann.AnnotationType;
+                    if (typeCounts.ContainsKey(type))
+                        typeCounts[type]++;
+                    else
+                        typeCounts[type] = 1;
                 }
 
-                try
+                // Build report entries for this PDF.
+                reportLines.Add($"File: {Path.GetFileName(pdfPath)}");
+                if (typeCounts.Count == 0)
                 {
-                    // ---------- Lifecycle: create, load, save ----------
-                    // Create the PdfAnnotationEditor facade.
-                    using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                    reportLines.Add("  No annotations found.");
+                }
+                else
+                {
+                    foreach (var kvp in typeCounts.OrderBy(k => k.Key.ToString()))
                     {
-                        // Load (bind) the PDF document.
-                        editor.BindPdf(inputPath);
-
-                        // Access the underlying Document to enumerate pages.
-                        Document doc = editor.Document;
-
-                        // Dictionary to hold annotation type name -> count.
-                        Dictionary<string, int> typeCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-                        // Iterate all pages (Aspose.Pdf uses 1‑based indexing).
-                        for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
-                        {
-                            Page page = doc.Pages[pageNum];
-                            // Each page has an Annotations collection.
-                            foreach (Annotation annot in page.Annotations)
-                            {
-                                string typeName = annot.GetType().Name; // e.g., TextAnnotation, HighlightAnnotation, etc.
-                                if (typeCounts.ContainsKey(typeName))
-                                    typeCounts[typeName]++;
-                                else
-                                    typeCounts[typeName] = 1;
-                            }
-                        }
-
-                        // Write per‑file summary to the report.
-                        reportWriter.WriteLine($"File: {Path.GetFileName(inputPath)}");
-                        if (typeCounts.Count == 0)
-                        {
-                            reportWriter.WriteLine("  No annotations found.");
-                        }
-                        else
-                        {
-                            foreach (var kvp in typeCounts)
-                            {
-                                reportWriter.WriteLine($"  {kvp.Key}: {kvp.Value}");
-                            }
-                        }
-                        reportWriter.WriteLine(); // blank line between files
-
-                        // Optional: save a copy of the PDF (unchanged) to satisfy the save rule.
-                        string outputCopyPath = Path.Combine(
-                            Path.GetDirectoryName(inputPath) ?? "",
-                            Path.GetFileNameWithoutExtension(inputPath) + "_processed.pdf");
-                        editor.Save(outputCopyPath);
+                        reportLines.Add($"  {kvp.Key}: {kvp.Value}");
                     }
                 }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
-                }
+                reportLines.Add(string.Empty);
             }
         }
 
-        Console.WriteLine($"Annotation summary written to '{reportPath}'.");
+        // Write the summary report to a text file in the same folder.
+        string reportPath = Path.Combine(inputFolder, "AnnotationReport.txt");
+        File.WriteAllLines(reportPath, reportLines);
+
+        Console.WriteLine($"Annotation summary saved to '{reportPath}'.");
     }
 }

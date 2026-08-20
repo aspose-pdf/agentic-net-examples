@@ -8,51 +8,56 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";      // source PDF
-        const string xfdfPath  = "annotations.xfdf"; // XFDF file containing annotations
-        const string outputPath = "output.pdf";    // result PDF
+        const string inputPdfPath   = "input.pdf";      // PDF to receive annotations
+        const string xfdfPath       = "annotations.xfdf"; // XFDF file with annotations
+        const string outputPdfPath  = "output.pdf";     // Resulting PDF
+        const int  startPage        = 2;                // First page to keep annotations
+        const int  endPage          = 4;                // Last page to keep annotations
 
-        // Define the page range where the XFDF annotations should be applied (inclusive)
-        int startPage = 2; // first page to receive annotations (1‑based)
-        int endPage   = 4; // last page to receive annotations
-
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
+
         if (!File.Exists(xfdfPath))
         {
-            Console.Error.WriteLine($"XFDF not found: {xfdfPath}");
+            Console.Error.WriteLine($"XFDF file not found: {xfdfPath}");
             return;
         }
 
-        // Bind the PDF to the annotation editor facade
-        PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        editor.BindPdf(pdfPath);
-
-        // Import all annotations from the XFDF file into the document
-        // (this brings the annotations onto all pages)
-        editor.ImportAnnotationsFromXfdf(xfdfPath);
-
-        // Remove annotations that fall outside the desired page range.
-        // The facade does not provide a direct page‑range import, so we delete
-        // the unwanted ones after the import.
-        // Iterate through pages before the start page and after the end page.
-        for (int i = 1; i < startPage; i++)
+        // Load the target PDF
+        using (Document targetDoc = new Document(inputPdfPath))
         {
-            // Delete all annotations on page i
-            editor.ModifyAnnotations(i, i, null); // passing null removes all annotations on that page
-        }
-        for (int i = endPage + 1; i <= editor.Document.Pages.Count; i++)
-        {
-            editor.ModifyAnnotations(i, i, null);
+            // Bind the PDF to the annotation editor facade
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            {
+                editor.BindPdf(targetDoc);
+
+                // Import all annotations from the XFDF file
+                editor.ImportAnnotationsFromXfdf(xfdfPath);
+
+                // Remove annotations from pages outside the desired range
+                // Pages are 1‑based in Aspose.Pdf
+                for (int i = 1; i <= targetDoc.Pages.Count; i++)
+                {
+                    if (i < startPage || i > endPage)
+                    {
+                        Page page = targetDoc.Pages[i];
+                        // Delete all annotations on this page
+                        while (page.Annotations.Count > 0)
+                        {
+                            // Annotations collection is also 1‑based
+                            page.Annotations.Delete(page.Annotations.Count);
+                        }
+                    }
+                }
+
+                // Save the modified PDF
+                editor.Save(outputPdfPath);
+            }
         }
 
-        // Save the modified PDF
-        editor.Save(outputPath);
-        editor.Close();
-
-        Console.WriteLine($"XFDF annotations applied to pages {startPage}-{endPage} and saved to '{outputPath}'.");
+        Console.WriteLine($"Annotations imported to pages {startPage}-{endPage} and saved as '{outputPdfPath}'.");
     }
 }

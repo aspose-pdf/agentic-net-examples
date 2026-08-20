@@ -11,30 +11,29 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
+        // Create the annotation editor facade
+        PdfAnnotationEditor editor = new PdfAnnotationEditor();
         try
         {
-            // Initialize the annotation editor facade
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-            {
-                // Load the PDF document
-                editor.BindPdf(inputPath);
+            // Load the PDF document
+            editor.BindPdf(inputPath);
 
-                // Flatten all annotations (make them non‑editable visual elements)
-                editor.FlatteningAnnotations();
+            // Flatten all annotations (convert them to non‑editable visual elements)
+            editor.FlatteningAnnotations();
 
-                // Save the flattened PDF
-                editor.Save(outputPath);
-            }
-
-            Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
+            // Save the flattened PDF
+            editor.Save(outputPath);
         }
-        catch (Exception ex)
+        finally
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Release resources held by the facade
+            editor.Close();
         }
+
+        Console.WriteLine($"Annotations flattened and saved to '{outputPath}'.");
     }
 }
