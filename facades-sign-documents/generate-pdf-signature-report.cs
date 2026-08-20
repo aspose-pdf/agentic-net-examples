@@ -4,89 +4,81 @@ using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
 
-class Program
+class SignatureReportGenerator
 {
     static void Main()
     {
-        const string inputPdf = "signed_document.pdf";
-        const string reportPdf = "signature_report.pdf";
+        const string inputPdfPath  = "signed_document.pdf";      // source PDF with signatures
+        const string outputPdfPath = "signature_report.pdf";     // generated report
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the signed PDF and extract signature information
+        // Bind the source PDF to the PdfFileSignature facade
         using (PdfFileSignature pdfSign = new PdfFileSignature())
         {
-            pdfSign.BindPdf(inputPdf);
+            pdfSign.BindPdf(inputPdfPath);
 
             // Retrieve all non‑empty signature names
             var signatureNames = pdfSign.GetSignatureNames();
 
             // Create a new PDF document for the report
-            using (Document reportDoc = new Document())
+            using (Document report = new Document())
             {
-                // Add a page to the report
-                Page reportPage = reportDoc.Pages.Add();
+                // Add the first page
+                Page page = report.Pages.Add();
 
-                // Title
+                // Starting vertical position (top of the page)
+                double yPos = 800;
+
+                // Title of the report
                 TextFragment title = new TextFragment("Signature Report");
                 title.TextState.FontSize = 18;
-                title.TextState.FontStyle = FontStyles.Bold;
-                title.Position = new Position(50, 800);
-                reportPage.Paragraphs.Add(title);
+                title.TextState.Font = FontRepository.FindFont("Helvetica");
+                title.Position = new Position(50, yPos);
+                page.Paragraphs.Add(title);
+                yPos -= 30; // move down after the title
 
-                // Header line
-                TextFragment header = new TextFragment(
-                    "Name | Signer | Valid | Reason | Location | DateTime | Revision | Covers Whole Document");
-                header.TextState.FontSize = 12;
-                header.TextState.FontStyle = FontStyles.Bold;
-                header.Position = new Position(50, 770);
-                reportPage.Paragraphs.Add(header);
-
-                // Iterate over each signature and add its details
-                float yPos = 750;
-                for (int i = 0; i < signatureNames.Count; i++)
+                // Iterate over each signature and collect details
+                foreach (SignatureName sigName in signatureNames)
                 {
-                    var sigName = signatureNames[i];
+                    // Signature identifier (string representation)
+                    string sigId = sigName.Name;
 
-                    string signer = pdfSign.GetSignerName(sigName) ?? "N/A";
-                    bool isValid = pdfSign.VerifySignature(sigName);
-                    string reason = pdfSign.GetReason(sigName) ?? "N/A";
+                    // Gather signature details
+                    string signer   = pdfSign.GetSignerName(sigName) ?? "N/A";
+                    DateTime? dt    = pdfSign.GetDateTime(sigName);
+                    string dateStr  = dt?.ToString("g") ?? "N/A";
+                    string reason   = pdfSign.GetReason(sigName) ?? "N/A";
                     string location = pdfSign.GetLocation(sigName) ?? "N/A";
-                    DateTime dateTime = pdfSign.GetDateTime(sigName);
-                    int revision = pdfSign.GetRevision(sigName);
-                    bool coversWhole = pdfSign.CoversWholeDocument(sigName);
+                    bool   isValid  = pdfSign.VerifySignature(sigName);
 
-                    string line = $"{sigName} | {signer} | {isValid} | {reason} | {location} | {dateTime:G} | {revision} | {coversWhole}";
+                    // Compose a line with the collected information
+                    string line = $"Signature: {sigId} | Signer: {signer} | Date: {dateStr} | Reason: {reason} | Location: {location} | Valid: {isValid}";
+
+                    // Add the line to the report
                     TextFragment tf = new TextFragment(line);
-                    tf.TextState.FontSize = 10;
+                    tf.TextState.FontSize = 12;
+                    tf.TextState.Font = FontRepository.FindFont("Helvetica");
                     tf.Position = new Position(50, yPos);
-                    reportPage.Paragraphs.Add(tf);
+                    page.Paragraphs.Add(tf);
+                    yPos -= 20; // move down for the next entry
 
-                    yPos -= 20; // Move down for next line
-                    if (yPos < 50) // Add a new page if needed
+                    // If we reach the bottom margin, start a new page
+                    if (yPos < 50)
                     {
-                        reportPage = reportDoc.Pages.Add();
+                        page = report.Pages.Add();
                         yPos = 800;
                     }
                 }
 
-                // Add total revision information
-                int totalRevision = pdfSign.GetTotalRevision();
-                TextFragment total = new TextFragment($"Total Document Revisions: {totalRevision}");
-                total.TextState.FontSize = 12;
-                total.TextState.FontStyle = FontStyles.Bold;
-                total.Position = new Position(50, yPos - 30);
-                reportPage.Paragraphs.Add(total);
-
-                // Save the report PDF
-                reportDoc.Save(reportPdf);
+                // Save the report as a PDF file
+                report.Save(outputPdfPath);
+                Console.WriteLine($"Signature report saved to '{outputPdfPath}'.");
             }
         }
-
-        Console.WriteLine($"Signature report generated: {reportPdf}");
     }
 }
