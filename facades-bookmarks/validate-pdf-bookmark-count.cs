@@ -7,58 +7,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF
-        const string outputPdf  = "output_with_bookmarks.pdf"; // file after processing
-        const int    expectedCount = 5;                 // expected number of bookmarks
+        const string inputPath      = "input.pdf";          // source PDF
+        const string outputPath     = "output_with_bm.pdf"; // PDF after adding bookmarks
+        const int    expectedCount  = 5;                    // expected number of bookmarks
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the source PDF and add bookmarks for all pages
+        using (Document doc = new Document(inputPath))
         {
-            // -----------------------------------------------------------------
-            // Bind the source PDF, optionally modify bookmarks, then save it.
-            // -----------------------------------------------------------------
+            // PdfBookmarkEditor works on the Document instance
             using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
             {
-                editor.BindPdf(inputPdf);
-
-                // Example: create bookmarks for all pages (remove if not needed)
-                // editor.CreateBookmarks();
-
-                // Save the PDF after any bookmark operations.
-                editor.Save(outputPdf);
-            }
-
-            // -----------------------------------------------------------------
-            // Verify the number of bookmarks in the saved PDF.
-            // -----------------------------------------------------------------
-            using (PdfBookmarkEditor verifier = new PdfBookmarkEditor())
-            {
-                verifier.BindPdf(outputPdf);
-
-                // Extract all bookmarks (recursive).
-                Bookmarks bookmarks = verifier.ExtractBookmarks();
-
-                int actualCount = bookmarks?.Count ?? 0;
-                Console.WriteLine($"Bookmarks found: {actualCount}");
-
-                if (actualCount == expectedCount)
-                {
-                    Console.WriteLine("Bookmark count matches the expected value.");
-                }
-                else
-                {
-                    Console.WriteLine($"Bookmark count mismatch. Expected: {expectedCount}, Actual: {actualCount}");
-                }
+                editor.BindPdf(doc);          // initialize the facade with the document
+                editor.CreateBookmarks();     // create a bookmark for each page
+                editor.Save(outputPath);      // persist changes to a new file
             }
         }
-        catch (Exception ex)
+
+        // Re-open the saved PDF and extract its bookmarks
+        using (PdfBookmarkEditor extractor = new PdfBookmarkEditor())
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            extractor.BindPdf(outputPath);               // load the saved PDF
+            Bookmarks bookmarks = extractor.ExtractBookmarks(); // get all bookmarks
+            int actualCount = bookmarks.Count;
+
+            Console.WriteLine($"Expected bookmarks: {expectedCount}");
+            Console.WriteLine($"Actual bookmarks  : {actualCount}");
+
+            if (actualCount == expectedCount)
+                Console.WriteLine("Bookmark count validation succeeded.");
+            else
+                Console.WriteLine("Bookmark count validation failed.");
         }
     }
 }

@@ -1,31 +1,27 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputXml = "bookmarks.xml";
+        const string pdfPath = "input.pdf";
+        const string xmlPath = "bookmarks.xml";
 
-        if (!File.Exists(inputPdf))
+        // Verify that the source PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Initialize the bookmark editor and bind the PDF document
+        // Initialize the bookmark editor, bind the PDF and export its bookmarks to XML
         PdfBookmarkEditor editor = new PdfBookmarkEditor();
-        editor.BindPdf(inputPdf);
+        editor.BindPdf(pdfPath);                 // Load the PDF into the facade
+        editor.ExportBookmarksToXML(xmlPath);    // Export the complete bookmark list
+        editor.Close();                          // Release resources held by the editor
 
-        // Export the complete bookmark list to an XML file
-        editor.ExportBookmarksToXML(outputXml);
-
-        // Release resources held by the editor
-        editor.Close();
-
-        Console.WriteLine($"Bookmarks have been exported to '{outputXml}'.");
+        Console.WriteLine($"Bookmarks successfully exported to '{xmlPath}'.");
     }
 }

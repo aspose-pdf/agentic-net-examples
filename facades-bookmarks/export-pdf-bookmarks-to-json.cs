@@ -1,69 +1,70 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 using Aspose.Pdf.Facades;
 
-class Program
+namespace BookmarkExportExample
 {
-    static void Main()
-    {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "bookmarks.json";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
-
-        // Bind the PDF and extract bookmarks
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
-        {
-            editor.BindPdf(inputPdf);
-            Bookmarks bookmarks = editor.ExtractBookmarks(); // recursive extraction
-
-            // Convert to a serializable hierarchy
-            List<BookmarkNode> hierarchy = new List<BookmarkNode>();
-            foreach (Bookmark bm in bookmarks)
-            {
-                hierarchy.Add(ConvertBookmark(bm));
-            }
-
-            // Serialize hierarchy to JSON
-            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(hierarchy, jsonOptions);
-            File.WriteAllText(outputJson, json);
-        }
-
-        Console.WriteLine($"Bookmarks exported to '{outputJson}'.");
-    }
-
-    // Recursively transforms Aspose.Pdf.Facades.Bookmark into a plain DTO
-    static BookmarkNode ConvertBookmark(Bookmark bm)
-    {
-        BookmarkNode node = new BookmarkNode {
-            Title = bm.Title,
-            PageNumber = bm.PageNumber,
-            Children = new List<BookmarkNode>()
-        };
-
-        if (bm.ChildItems != null)
-        {
-            foreach (Bookmark child in bm.ChildItems)
-            {
-                node.Children.Add(ConvertBookmark(child));
-            }
-        }
-
-        return node;
-    }
-
-    // DTO used for JSON serialization
-    class BookmarkNode
+    // Simple DTO for JSON serialization
+    public class BookmarkInfo
     {
         public string Title { get; set; }
+        public int Level { get; set; }
         public int PageNumber { get; set; }
-        public List<BookmarkNode> Children { get; set; }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            const string inputPdfPath = "input.pdf";
+            const string outputJsonPath = "bookmarks.json";
+
+            if (!File.Exists(inputPdfPath))
+            {
+                Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+                return;
+            }
+
+            // Extract bookmarks using PdfBookmarkEditor (facade API)
+            using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+            {
+                editor.BindPdf(inputPdfPath);
+
+                // Get all bookmarks (recursive hierarchy)
+                var allBookmarks = editor.ExtractBookmarks();
+
+                var flatList = new List<BookmarkInfo>();
+                TraverseBookmarks(allBookmarks, 1, flatList);
+
+                // Serialize to JSON with indentation for readability
+                JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+                string json = JsonSerializer.Serialize(flatList, jsonOptions);
+
+                File.WriteAllText(outputJsonPath, json);
+                Console.WriteLine($"Bookmarks exported to '{outputJsonPath}'.");
+            }
+        }
+
+        // Recursively walk the bookmark tree, recording title, level and page number
+        private static void TraverseBookmarks(Aspose.Pdf.Facades.Bookmarks bookmarks, int level, List<BookmarkInfo> result)
+        {
+            foreach (Aspose.Pdf.Facades.Bookmark bm in bookmarks)
+            {
+                result.Add(new BookmarkInfo
+                {
+                    Title = bm.Title,
+                    Level = level,
+                    PageNumber = bm.PageNumber
+                });
+
+                // If the bookmark has children, recurse with increased level
+                if (bm.ChildItem != null && bm.ChildItem.Count > 0)
+                {
+                    TraverseBookmarks(bm.ChildItem, level + 1, result);
+                }
+            }
+        }
     }
 }
