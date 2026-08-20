@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - document
 
-> **Document** in PDF using C# / .NET -- **117** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Document** in PDF using C# / .NET -- **120** verified, compile-tested examples for **Aspose.PDF for .NET** 26.8.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,32 +23,30 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (117/117 files) ← category-specific
-- `using Aspose.Pdf.Text;` (30/117 files)
-- `using Aspose.Pdf.Annotations;` (25/117 files)
-- `using Aspose.Pdf.Forms;` (13/117 files)
-- `using Aspose.Pdf.Devices;` (6/117 files)
-- `using Aspose.Pdf.Drawing;` (5/117 files)
-- `using Aspose.Pdf.LogicalStructure;` (5/117 files)
-- `using Aspose.Pdf.Optimization;` (5/117 files)
-- `using Aspose.Pdf.Tagged;` (5/117 files)
-- `using Aspose.Pdf.Facades;` (2/117 files)
-- `using Aspose.Pdf.Comparison;` (1/117 files)
-- `using Aspose.Pdf.Multithreading;` (1/117 files)
-- `using Aspose.Pdf.Security.HiddenDataSanitization;` (1/117 files)
-- `using System;` (117/117 files)
-- `using System.IO;` (105/117 files)
-- `using System.Collections.Generic;` (3/117 files)
-- `using System.Drawing;` (3/117 files)
-- `using System.Data;` (2/117 files)
-- `using System.Diagnostics;` (2/117 files)
-- `using System.Text;` (2/117 files)
-- `using NUnit.Framework;` (1/117 files)
-- `using System.Drawing.Imaging;` (1/117 files)
-- `using System.Linq;` (1/117 files)
-- `using System.Threading;` (1/117 files)
-- `using System.Threading.Tasks;` (1/117 files)
-- `using System.Xml;` (1/117 files)
+- `using Aspose.Pdf;` (120/120 files) ← category-specific
+- `using Aspose.Pdf.Text;` (33/120 files)
+- `using Aspose.Pdf.Annotations;` (23/120 files)
+- `using Aspose.Pdf.Forms;` (12/120 files)
+- `using Aspose.Pdf.Optimization;` (7/120 files)
+- `using Aspose.Pdf.Tagged;` (7/120 files)
+- `using Aspose.Pdf.LogicalStructure;` (6/120 files)
+- `using Aspose.Pdf.Devices;` (5/120 files)
+- `using Aspose.Pdf.Drawing;` (3/120 files)
+- `using Aspose.Pdf.Facades;` (2/120 files)
+- `using Aspose.Pdf.Multithreading;` (1/120 files)
+- `using Aspose.Pdf.Security.HiddenDataSanitization;` (1/120 files)
+- `using System;` (120/120 files)
+- `using System.IO;` (101/120 files)
+- `using System.Collections.Generic;` (3/120 files)
+- `using System.Data;` (2/120 files)
+- `using System.Diagnostics;` (2/120 files)
+- `using System.Drawing;` (2/120 files)
+- `using System.Text;` (2/120 files)
+- `using NUnit.Framework;` (1/120 files)
+- `using System.Linq;` (1/120 files)
+- `using System.Reflection;` (1/120 files)
+- `using System.Threading;` (1/120 files)
+- `using System.Threading.Tasks;` (1/120 files)
 
 ## Common Code Pattern
 
@@ -66,40 +64,40 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-background-color-to-pdf-page](./add-background-color-to-pdf-page.cs) | Add Background Color to PDF Page Using Rectangle with Opacit... | `Document`, `Page`, `Graph` | Demonstrates how to apply a semi‑transparent background color to a PDF page by drawing a full‑pag... |
-| [add-captions-below-images-in-pdf](./add-captions-below-images-in-pdf.cs) | Add Captions Below Images in PDF | `Document`, `Page`, `XImage` | Shows how to iterate through PDF pages, locate each image, and insert a styled text caption benea... |
-| [add-checked-checkbox-form-field](./add-checked-checkbox-form-field.cs) | Add Checked Checkbox Form Field to PDF | `Document`, `Page`, `Rectangle` | Demonstrates creating a PDF document, adding a checkbox form field, setting its default state to ... |
-| [add-company-logo-header-to-pdf-pages](./add-company-logo-header-to-pdf-pages.cs) | Add Company Logo Header to PDF Pages | `Document`, `Page`, `ImageStamp` | Shows how to load an existing PDF with Aspose.Pdf, iterate over all pages, and place an ImageStam... |
-| [add-custom-signature-appearance-last-page](./add-custom-signature-appearance-last-page.cs) | Add Custom Signature Appearance to Last PDF Page | `Document`, `Page`, `Rectangle` | Shows how to create a signature field on the last page of a PDF and apply a custom signature imag... |
-| [add-custom-xml-xmp-metadata-to-pdf](./add-custom-xml-xmp-metadata-to-pdf.cs) | Add Custom XML XMP Metadata to PDF | `Document`, `DocumentInfo`, `Add` | The example loads an existing PDF, adds custom key‑value pairs to the document information dictio... |
-| [add-diagonal-text-stamp-to-pdf-pages](./add-diagonal-text-stamp-to-pdf-pages.cs) | Add Diagonal Text Stamp to PDF Pages | `Document`, `TextStamp`, `FontRepository` | Demonstrates loading a PDF with Aspose.Pdf, creating a TextStamp with a custom message, configuri... |
-| [add-digital-signature-to-pdf](./add-digital-signature-to-pdf.cs) | Add Digital Signature Field and Sign PDF with Self‑Signed Ce... | `Document`, `Page`, `SignatureField` | Demonstrates how to create a signature field on a PDF page, configure a PKCS#7 self‑signed certif... |
-| [add-dynamic-heading-to-pdf](./add-dynamic-heading-to-pdf.cs) | Add Dynamic Heading to PDF Document | `Document`, `Page`, `Heading` | Demonstrates loading an existing PDF, creating a heading with dynamic content (date and user name... |
-| [add-heading-to-pdf-outline](./add-heading-to-pdf-outline.cs) | Add Heading to PDF Outline (Bookmark) | `Document`, `OutlineItemCollection`, `FitExplicitDestination` | Demonstrates how to insert a new outline (bookmark) into an existing PDF and set its destination ... |
-| [add-hyperlink-annotation-to-pdf](./add-hyperlink-annotation-to-pdf.cs) | Add Hyperlink Annotation to PDF | `Document`, `Page`, `Rectangle` | Shows how to insert a clickable link annotation that opens an external website when clicked, usin... |
-| [add-indented-paragraph-with-line-spacing](./add-indented-paragraph-with-line-spacing.cs) | Add Indented Paragraph with Custom Line Spacing to PDF | `Document`, `Page`, `TextParagraph` | Shows how to load an existing PDF, create a TextParagraph with first‑line and subsequent‑line ind... |
-| [add-javascript-calculation-to-pdf-form-fields](./add-javascript-calculation-to-pdf-form-fields.cs) | Add JavaScript Calculation to PDF Form Fields | `Document`, `Page`, `NumberField` | Demonstrates creating a PDF with two numeric fields and a read‑only sum field, then attaching a J... |
-| [add-javascript-open-action-to-pdf](./add-javascript-open-action-to-pdf.cs) | Add JavaScript Open Action to PDF | `Document`, `JavascriptAction`, `OpenAction` | Demonstrates how to embed a JavaScript action that shows an alert dialog when the PDF document is... |
-| [add-javascript-total-calculation-to-pdf-form](./add-javascript-total-calculation-to-pdf-form.cs) | Add JavaScript Total Calculation to PDF Form Fields | `Document`, `Form`, `TextBoxField` | Demonstrates how to programmatically attach a JavaScript calculate action to PDF form fields usin... |
-| [add-line-annotation-custom-color-thickness](./add-line-annotation-custom-color-thickness.cs) | Add Line Annotation with Custom Color and Thickness to PDF | `Document`, `Page`, `Rectangle` | Demonstrates loading a PDF, creating a line annotation with a custom blue color and thickness, ad... |
-| [add-line-separator-annotation-to-pdf-page](./add-line-separator-annotation-to-pdf-page.cs) | Add Line Separator Annotation to PDF Page | `Document`, `Page`, `Rectangle` | Demonstrates how to insert a horizontal line annotation as a visual separator on a PDF page using... |
-| [add-link-annotation-open-pdf-attachment](./add-link-annotation-open-pdf-attachment.cs) | Create Link Annotation to Open PDF Attachment | `Document`, `Page`, `Rectangle` | Demonstrates how to add a link annotation to a PDF page that opens an external PDF attachment whe... |
-| [add-page-number-footer-to-pdf](./add-page-number-footer-to-pdf.cs) | Add Page Number Footer to PDF | `Document`, `Page`, `TextStamp` | Shows how to add a custom footer that displays "Page X of Y" on every page of an existing PDF usi... |
-| [add-page-numbers-to-pdf-footer](./add-page-numbers-to-pdf-footer.cs) | Add Page Numbers to PDF Footer | `Document`, `Page`, `PageNumberStamp` | Shows how to insert dynamic page numbers in the footer of each PDF page using Aspose.Pdf's PageNu... |
-| [add-popup-note-annotation](./add-popup-note-annotation.cs) | Add Pop‑up Note Annotation to PDF | `Document`, `Page`, `Rectangle` | Shows how to create a TextAnnotation (sticky‑note) with an associated PopupAnnotation that displa... |
-| [add-reusable-background-image-to-all-pdf-pages](./add-reusable-background-image-to-all-pdf-pages.cs) | Add Reusable Background Image to All PDF Pages | `Document`, `PdfPageStamp`, `AddStamp` | Shows how to use a single‑page PDF as a reusable background stamp and apply it to every page of a... |
-| [add-signature-field-to-pdf](./add-signature-field-to-pdf.cs) | Add Signature Field to PDF with Default Appearance | `Document`, `Form`, `DefaultAppearance` | Demonstrates how to load a PDF, set a default appearance for form fields, create a signature fiel... |
-| [add-structured-headings-to-pdf](./add-structured-headings-to-pdf.cs) | Add Structured Headings to PDF | `Document`, `Page`, `Heading` | Demonstrates how to create a PDF, add Heading objects with different levels and automatic numberi... |
-| [add-styled-table-with-borders-to-pdf](./add-styled-table-with-borders-to-pdf.cs) | Add Styled Table with Borders and Alternating Row Colors to ... | `Document`, `Page`, `Table` | Demonstrates creating a table with a full border, header styling, and alternating row background ... |
-| [add-visible-signature-field-and-lock-pdf](./add-visible-signature-field-and-lock-pdf.cs) | Add Visible Signature Field and Lock PDF after Signing | `Document`, `SignatureField`, `PKCS7` | Demonstrates how to create a visible signature field in a PDF, sign it with a PKCS#7 certificate,... |
-| [apply-semi-transparent-image-watermark-to-pdf](./apply-semi-transparent-image-watermark-to-pdf.cs) | Apply Semi-Transparent Image Watermark to PDF Pages | `Document`, `Page`, `WatermarkArtifact` | Demonstrates adding a semi‑transparent image overlay as a watermark to each page of a PDF using A... |
-| [attach-pdf-portfolio-with-metadata](./attach-pdf-portfolio-with-metadata.cs) | Attach PDF Portfolio and Set Custom Metadata | `Document`, `FileSpecification`, `FileAttachmentAnnotation` | Demonstrates embedding a PDF as a portfolio (embedded file) into an existing PDF, adding an optio... |
-| [auto-tagging-and-headings-pdf](./auto-tagging-and-headings-pdf.cs) | Create Clean Navigable PDF with Auto‑Tagging and Headings | `Document`, `AutoTaggingSettings`, `ITaggedContent` | Demonstrates how to enable Aspose.Pdf auto‑tagging for PDF sanitization, set document metadata, a... |
-| [batch-sanitize-pdfs](./batch-sanitize-pdfs.cs) | Batch Sanitize PDFs and Save Cleaned Copies | `Document`, `RemoveMetadata`, `RemovePdfaCompliance` | Demonstrates how to iterate over a folder of PDF files, remove metadata and compliance flags, opt... |
-| ... | | | *and 87 more files* |
+| [add-accessibility-tags-to-pdf](./add-accessibility-tags-to-pdf.cs) | Add Accessibility Tags to PDF (Headings, Paragraphs, Tables) | `Document`, `ITaggedContent`, `StructureElement` | Loads an existing PDF, enables auto‑tagging, sets language and title metadata, and creates tagged... |
+| [add-background-color-to-pdf-page](./add-background-color-to-pdf-page.cs) | Add Background Color to PDF Page with Opacity | `Document`, `Page`, `Graph` | Demonstrates how to fill an entire PDF page with a semi‑transparent color by adding a rectangle s... |
+| [add-background-template-to-pdf-pages](./add-background-template-to-pdf-pages.cs) | Add Background Template to All PDF Pages | `Document`, `Page`, `PdfPageStamp` | Shows how to load a PDF and a single‑page background template, then stamp each page of the target... |
+| [add-captions-below-images-in-pdf](./add-captions-below-images-in-pdf.cs) | Add Captions Below Images in PDF | `Document`, `Page`, `XImage` | Shows how to iterate over image resources in a PDF and insert a styled caption paragraph beneath ... |
+| [add-checked-checkbox-form-field](./add-checked-checkbox-form-field.cs) | Add Checked Checkbox Form Field to PDF | `Document`, `Page`, `Rectangle` | Shows how to create a PDF document, add a checkbox form field, set its default state to checked, ... |
+| [add-company-logo-header-to-pdf-pages](./add-company-logo-header-to-pdf-pages.cs) | Add Company Logo Header to PDF Pages | `Document`, `Page`, `ImageStamp` | Shows how to load an existing PDF, create an ImageStamp for a logo, position it as a top‑center h... |
+| [add-custom-document-info-and-xmp-metadata](./add-custom-document-info-and-xmp-metadata.cs) | Add Custom Document Info and XMP Metadata to PDF | `Document`, `DocumentInfo`, `Add` | Demonstrates how to add custom key/value pairs to a PDF's DocumentInfo dictionary and embed XMP m... |
+| [add-diagonal-text-stamp-to-pdf](./add-diagonal-text-stamp-to-pdf.cs) | Add Diagonal Text Stamp Watermark to PDF | `Document`, `TextStamp`, `FontRepository` | Shows how to load a PDF with Aspose.Pdf, create a TextStamp with a custom message, configure its ... |
+| [add-digital-signature-to-pdf](./add-digital-signature-to-pdf.cs) | Add Digital Signature Field and Sign PDF with Self‑Signed Ce... | `Document`, `Rectangle`, `SignatureField` | Demonstrates how to create a signature field in a PDF, configure a PKCS#1 signature using a self‑... |
+| [add-dynamic-heading-to-pdf](./add-dynamic-heading-to-pdf.cs) | Add Dynamic Heading to PDF | `Document`, `Page`, `Heading` | Shows how to load a PDF template, create a heading with dynamic date and user information, positi... |
+| [add-hierarchical-numbered-headings](./add-hierarchical-numbered-headings.cs) | Add Hierarchical Numbered Headings to PDF | `Document`, `Page`, `Heading` | Shows how to apply decimal numbering to headings and create hierarchical numbering (chapters and ... |
+| [add-hyperlink-annotation-to-pdf](./add-hyperlink-annotation-to-pdf.cs) | Add Hyperlink Annotation to PDF | `Document`, `Page`, `Rectangle` | Shows how to insert a clickable hyperlink annotation that opens an external website in a PDF docu... |
+| [add-indented-paragraph-with-line-spacing](./add-indented-paragraph-with-line-spacing.cs) | Add Indented Paragraph with Line Spacing to PDF | `Document`, `Page`, `TextParagraph` | Shows how to load a PDF, create a TextParagraph with first‑line and subsequent line indentation, ... |
+| [add-javascript-open-action-to-pdf](./add-javascript-open-action-to-pdf.cs) | Add JavaScript Open Action to PDF | `Document`, `Save`, `JavascriptAction` | Demonstrates embedding JavaScript in a PDF with Aspose.Pdf so an alert dialog appears when the do... |
+| [add-javascript-sum-calculation-to-pdf-form](./add-javascript-sum-calculation-to-pdf-form.cs) | Calculate Sum of Two PDF Form Fields with JavaScript | `Document`, `Page`, `NumberField` | Demonstrates creating a PDF with two numeric input fields and a read‑only sum field, then attachi... |
+| [add-javascript-sum-numeric-pdf-form-fields](./add-javascript-sum-numeric-pdf-form-fields.cs) | Add JavaScript to Sum Numeric PDF Form Fields | `Document`, `Form`, `TextBoxField` | Demonstrates embedding Acrobat JavaScript in a PDF with Aspose.Pdf to calculate the total of two ... |
+| [add-level-1-heading-to-pdf](./add-level-1-heading-to-pdf.cs) | Add Level 1 Heading to PDF using Tagged Content | `Document`, `ITaggedContent`, `HeaderElement` | Demonstrates how to create a PDF document, use the tagged content API to insert a Level 1 heading... |
+| [add-line-annotation-with-custom-color-thickness](./add-line-annotation-with-custom-color-thickness.cs) | Add Line Annotation with Custom Color and Thickness to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to create a line annotation on a PDF page, set its color, and adjust its thickne... |
+| [add-line-separator-annotation-to-pdf-page](./add-line-separator-annotation-to-pdf-page.cs) | Add Line Separator Annotation to PDF Page | `Document`, `Page`, `Point` | Demonstrates how to insert a horizontal line annotation as a visual separator on a specific PDF p... |
+| [add-link-annotation-open-pdf-attachment](./add-link-annotation-open-pdf-attachment.cs) | Add Link Annotation to Open PDF Attachment | `Document`, `Page`, `Rectangle` | Shows how to create a link annotation on a PDF page that opens an external PDF attachment using A... |
+| [add-multi-level-toc-to-pdf](./add-multi-level-toc-to-pdf.cs) | Add Multi‑Level Table of Contents to PDF | `Document`, `AutoTaggingSettings`, `ProcessParagraphs` | Demonstrates how to enable auto‑tagging, detect headings, create a TOC element, insert a dedicate... |
+| [add-new-bookmark-to-pdf-outline](./add-new-bookmark-to-pdf-outline.cs) | Add New Bookmark to PDF Outline | `Document`, `OutlineItemCollection`, `XYZExplicitDestination` | Demonstrates how to create an outline (bookmark) in an existing PDF, set its title, style, and de... |
+| [add-page-count-footer-to-pdf](./add-page-count-footer-to-pdf.cs) | Add Page Count Footer to PDF Pages | `Document`, `Page`, `TextFragment` | Demonstrates how to add a custom footer that shows "Page X of Y" on each page of a PDF using Aspo... |
+| [add-page-numbers-to-pdf-footer](./add-page-numbers-to-pdf-footer.cs) | Add Page Numbers to PDF Footer | `Document`, `Page`, `PageNumberStamp` | Demonstrates how to insert sequential page numbers into the footer of each page in a PDF using As... |
+| [add-popup-note-annotation](./add-popup-note-annotation.cs) | Add Pop‑up Note Annotation to PDF | `Document`, `Page`, `Rectangle` | Shows how to create a TextAnnotation with a linked PopupAnnotation in a PDF using Aspose.Pdf and ... |
+| [add-signature-field-to-pdf](./add-signature-field-to-pdf.cs) | Add Signature Field to PDF with Matching Appearance | `Document`, `SignatureField`, `DefaultAppearance` | Shows how to insert a user signature form field into an existing PDF and configure its default ap... |
+| [add-signature-image-stamp-to-last-page](./add-signature-image-stamp-to-last-page.cs) | Add Signature Image Stamp to Last PDF Page | `Document`, `Page`, `ImageStamp` | Shows how to load a PDF with Aspose.Pdf, create an ImageStamp from a signature image, position it... |
+| [add-styled-table-alternating-row-colors](./add-styled-table-alternating-row-colors.cs) | Add Styled Table with Alternating Row Colors to PDF | `Document`, `Page`, `Table` | Demonstrates creating a table with borders, header styling, and alternating row background colors... |
+| [add-visible-digital-signature-and-lock-pdf](./add-visible-digital-signature-and-lock-pdf.cs) | Add Visible Digital Signature Field and Lock PDF | `Document`, `SignatureField`, `PKCS1` | The example loads an existing PDF, creates a visible signature field on the first page, signs it ... |
+| [add-watermark-layer-merge-layers](./add-watermark-layer-merge-layers.cs) | Add Watermark Layer and Merge Layers in PDF | `Document`, `Layer`, `ImageStamp` | Demonstrates how to create a watermark as an optional content group (layer), add it to each page ... |
+| ... | | | *and 90 more files* |
 
 ## Category Statistics
-- Total examples: 117
+- Total examples: 120
 
 ## Category-Specific Tips
 
@@ -140,5 +138,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for document patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-07-17 | Run: `20260717_171638_da3b3e`
+Updated: 2026-08-20 | Run: `20260820_001147_12d7b3`
 <!-- AUTOGENERATED:END -->

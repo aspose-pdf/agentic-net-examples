@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "encrypted.pdf";
-        const string userPassword = "user123";
+        const string userPassword  = "user123";
         const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
@@ -17,15 +17,18 @@ class Program
             return;
         }
 
-        // Allow only content modification; printing and copying are not permitted
-        Permissions perms = Permissions.ModifyContent;
-
         try
         {
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Encrypt using AES‑256 algorithm
+                // No permissions granted (printing and copying are disabled)
+                Permissions perms = (Permissions)0;
+
+                // Encrypt with AES‑256
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
+                // Save the encrypted PDF
                 doc.Save(outputPath);
             }
 

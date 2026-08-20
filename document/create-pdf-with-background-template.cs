@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string templatePath = "template.pdf";   // PDF page to be used as background
-        const string outputPath   = "output.pdf";    // Resulting PDF
-        const int    pageCount    = 5;               // Number of pages to create
+        const string templatePath = "template.pdf";
+        const string outputPath   = "output.pdf";
+        const int  pageCount     = 5; // number of pages to generate
 
         if (!File.Exists(templatePath))
         {
@@ -16,37 +16,33 @@ class Program
             return;
         }
 
-        // Load the template PDF (contains the background page)
+        // Load the PDF page that will be used as background template
         using (Document templateDoc = new Document(templatePath))
         {
-            // Create a new empty PDF document
+            // Create the target document
             using (Document outputDoc = new Document())
             {
-                // Use the first page of the template as the background source
-                Page backgroundPage = templateDoc.Pages[1];
-
+                // Add blank pages to the target document
                 for (int i = 1; i <= pageCount; i++)
                 {
-                    // Add a new blank page to the output document
-                    Page newPage = outputDoc.Pages.Add();
+                    outputDoc.Pages.Add();
+                }
 
-                    // Ensure the new page has the same size and margins as the background page
-                    newPage.PageInfo = backgroundPage.PageInfo;
+                // Create a stamp from the first page of the template
+                PdfPageStamp backgroundStamp = new PdfPageStamp(templateDoc.Pages[1]);
+                backgroundStamp.Background = true; // place stamp behind page content
 
-                    // Create a stamp that uses the background page
-                    PdfPageStamp stamp = new PdfPageStamp(backgroundPage)
-                    {
-                        Background = true   // place stamp behind any future content
-                    };
-
-                    // Apply the stamp to the newly created page
-                    newPage.AddStamp(stamp);
+                // Apply the background stamp to every page of the target document
+                for (int i = 1; i <= outputDoc.Pages.Count; i++)
+                {
+                    outputDoc.Pages[i].AddStamp(backgroundStamp);
                 }
 
                 // Save the resulting PDF
                 outputDoc.Save(outputPath);
-                Console.WriteLine($"PDF created with background template: {outputPath}");
             }
         }
+
+        Console.WriteLine($"PDF with background template saved to '{outputPath}'.");
     }
 }

@@ -8,31 +8,34 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputTxtPath = "output.txt";
+        const string inputPdf = "input.pdf";
+        const string outputTxt = "output.txt";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Create a TextAbsorber to extract text from the document
-            TextAbsorber absorber = new TextAbsorber();
+            // Load the PDF document
+            using (Document doc = new Document(inputPdf))
+            {
+                // Extract text from all pages
+                TextAbsorber absorber = new TextAbsorber();
+                doc.Pages.Accept(absorber);
+                string extractedText = absorber.Text ?? string.Empty;
 
-            // Extract text from all pages
-            pdfDoc.Pages.Accept(absorber);
+                // Write the extracted text to a UTF‑8 encoded file
+                File.WriteAllText(outputTxt, extractedText, Encoding.UTF8);
+            }
 
-            // Retrieve the extracted text
-            string extractedText = absorber.Text ?? string.Empty;
-
-            // Write the text to a UTF-8 encoded file
-            File.WriteAllText(outputTxtPath, extractedText, Encoding.UTF8);
+            Console.WriteLine($"Text successfully extracted to '{outputTxt}'.");
         }
-
-        Console.WriteLine($"Text extracted to '{outputTxtPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

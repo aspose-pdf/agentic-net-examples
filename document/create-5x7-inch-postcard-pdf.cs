@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text; // needed for TextFragment, Position, FontRepository
 
 class Program
 {
@@ -13,26 +15,25 @@ class Program
             // Add a blank page to the document
             Page page = doc.Pages.Add();
 
-            // Set the page size to 5 inches × 7 inches.
-            // Aspose.Pdf uses points (1 inch = 72 points).
+            // Set custom page size: 5 inches (width) x 7 inches (height)
+            // 1 inch = 72 points, so 5*72 = 360, 7*72 = 504
             double width  = 5 * 72; // 360 points
             double height = 7 * 72; // 504 points
             page.SetPageSize(width, height);
 
-            // -------------------------------------------------
-            // Optional: add sample content (e.g., a text fragment)
-            // -------------------------------------------------
-            // Uncomment the following lines if you want to place text on the postcard.
-            // using Aspose.Pdf.Text;
-            // TextFragment tf = new TextFragment("Postcard");
-            // tf.Position = new Position(100, 400);
-            // page.Paragraphs.Add(tf);
-            // -------------------------------------------------
+            // OPTIONAL: add a sample text fragment to demonstrate the page
+            TextFragment tf = new TextFragment("Hello, Postcard!");
+            tf.TextState.FontSize = 24;
+            tf.TextState.Font = FontRepository.FindFont("Helvetica");
+            tf.TextState.ForegroundColor = Color.Blue;
+            // Position the text somewhere on the page
+            tf.Position = new Position(100, 400);
+            page.Paragraphs.Add(tf);
 
-            // Save the PDF with the custom page size
+            // Save the PDF to the specified path
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Postcard PDF saved to '{outputPath}'.");
     }
 }

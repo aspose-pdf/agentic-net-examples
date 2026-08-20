@@ -1,16 +1,16 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // Path to the source PDF
-        const string outputPath = "output.pdf";  // Path for the resulting PDF
-        const int    pageToDelete = 3;           // Page number to remove (1‑based)
+        const string inputPath  = "input.pdf";   // source PDF
+        const string outputPath = "output.pdf";  // result PDF
+        const int pageToDelete  = 3;             // page number to remove (1‑based)
 
-        // Verify the input file exists
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
@@ -20,20 +20,20 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the requested page exists
+            // Ensure the requested page number is within the document range
             if (pageToDelete < 1 || pageToDelete > doc.Pages.Count)
             {
-                Console.Error.WriteLine($"Invalid page number: {pageToDelete}. Document has {doc.Pages.Count} pages.");
+                Console.Error.WriteLine($"Invalid page number {pageToDelete}. Document contains {doc.Pages.Count} pages.");
                 return;
             }
 
-            // Delete the specified page; Aspose.Pdf automatically renumbers remaining pages
+            // Delete the specified page; Aspose.Pdf automatically renumbers the remaining pages
             doc.Pages.Delete(pageToDelete);
 
-            // Save the modified document as PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page {pageToDelete} removed. Result saved to '{outputPath}'.");
+        Console.WriteLine($"Page {pageToDelete} removed. Saved to '{outputPath}'.");
     }
 }

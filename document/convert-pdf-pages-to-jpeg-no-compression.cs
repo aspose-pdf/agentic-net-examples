@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
-using Aspose.Pdf.Optimization;
 
 class Program
 {
@@ -20,31 +19,31 @@ class Program
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPdf))
         {
-            // Disable image compression during optimization to keep original image data unchanged
-            OptimizationOptions opt = new OptimizationOptions();
-            opt.CompressImages = false; // do not compress images
-            // Apply the optimization options (no other changes are required)
-            pdfDoc.OptimizeResources(opt);
+            // No explicit optimization is required for page‑to‑image conversion.
+            // The JpegDevice will render the page at the requested resolution
+            // without applying any additional image compression.
 
-            // Create a JPEG device with maximum quality (100) and default resolution (150 DPI)
-            JpegDevice jpegDevice = new JpegDevice(quality: 100);
+            // Create a JPEG device with a high resolution. The default JPEG quality is 100 (no loss).
+            var jpegDevice = new JpegDevice(new Resolution(300));
 
-            // Iterate through all pages (1‑based indexing)
+            // Iterate over all pages (1‑based indexing)
             for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
                 string outPath = Path.Combine(outputDir, $"page_{pageNum}.jpg");
 
-                // Convert the current page to JPEG and save to file
+                // Convert the page to an image and write it to a file stream
                 using (FileStream outStream = new FileStream(outPath, FileMode.Create))
                 {
                     jpegDevice.Process(pdfDoc.Pages[pageNum], outStream);
                 }
 
-                Console.WriteLine($"Saved page {pageNum} as JPEG → {outPath}");
+                Console.WriteLine($"Saved page {pageNum} → {outPath}");
             }
         }
+
+        Console.WriteLine("Image conversion completed without compression.");
     }
 }

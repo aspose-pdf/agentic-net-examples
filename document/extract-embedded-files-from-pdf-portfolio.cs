@@ -9,51 +9,49 @@ class Program
         const string inputPdf = "portfolio.pdf";
         const string outputDir = "ExtractedFiles";
 
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
         try
         {
+            // Load the PDF document (lifecycle rule: use using for disposal)
             using (Document doc = new Document(inputPdf))
             {
-                // Iterate over embedded files using reflection to avoid direct dependency on the EmbeddedFile type
-                foreach (var embedded in doc.EmbeddedFiles)
+                // Access the collection of embedded files
+                var embeddedFiles = doc.EmbeddedFiles;
+
+                // If there are no embedded files, inform the user
+                if (embeddedFiles == null || embeddedFiles.Count == 0)
                 {
-                    // Get the file name
-                    var nameProp = embedded.GetType().GetProperty("Name");
-                    string fileName = nameProp?.GetValue(embedded) as string;
-                    if (string.IsNullOrEmpty(fileName))
-                        continue;
+                    Console.WriteLine("No embedded files found in the PDF portfolio.");
+                    return;
+                }
 
-                    // Build the output path
-                    string filePath = Path.Combine(outputDir, fileName);
+                // Iterate over each embedded file and save it to the output directory
+                foreach (var embeddedFile in embeddedFiles)
+                {
+                    // Use reflection to avoid a direct dependency on the EmbeddedFile type
+                    var nameProp = embeddedFile.GetType().GetProperty("Name");
+                    var getStreamMethod = embeddedFile.GetType().GetMethod("GetFileStream");
 
-                    // Invoke the Save(string) method via reflection
-                    var saveMethod = embedded.GetType().GetMethod("Save", new[] { typeof(string) });
-                    if (saveMethod != null)
+                    string fileName = nameProp?.GetValue(embeddedFile) as string ?? "unknown";
+                    string outputPath = Path.Combine(outputDir, fileName);
+
+                    // Retrieve the file stream from the embedded file and write it to disk
+                    using (Stream sourceStream = getStreamMethod?.Invoke(embeddedFile, null) as Stream)
+                    using (FileStream destStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                     {
-                        saveMethod.Invoke(embedded, new object[] { filePath });
-                        Console.WriteLine($"Saved embedded file: {filePath}");
+                        sourceStream?.CopyTo(destStream);
                     }
-                    else
-                    {
-                        // Fallback: try to extract the raw stream if Save method is unavailable
-                        var fileSpecProp = embedded.GetType().GetProperty("FileSpecification");
-                        var fileSpec = fileSpecProp?.GetValue(embedded);
-                        var contentsProp = fileSpec?.GetType().GetProperty("Contents");
-                        var contents = contentsProp?.GetValue(fileSpec) as Stream;
-                        if (contents != null)
-                        {
-                            using (var outStream = File.Create(filePath))
-                                contents.CopyTo(outStream);
-                            Console.WriteLine($"Saved embedded file (stream fallback): {filePath}");
-                        }
-                    }
+
+                    Console.WriteLine($"Extracted: {fileName}");
                 }
             }
         }

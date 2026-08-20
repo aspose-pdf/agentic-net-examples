@@ -2,47 +2,58 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class CrashReportDemo
 {
     static void Main()
     {
-        // Simulate an exception that will be used to generate the crash report
+        // Simulate an exception that we want to generate a crash report for
         Exception simulatedException = new InvalidOperationException("Simulated exception for crash report.");
 
         // Create CrashReportOptions with the exception
-        CrashReportOptions crashOptions = new CrashReportOptions(simulatedException);
+        CrashReportOptions options = new CrashReportOptions(simulatedException);
 
-        // Define a network share path (ensure it ends without a trailing backslash)
-        string networkSharePath = @"\\Server\Share\CrashReports";
-        string targetDirectory = networkSharePath;
+        // ---------------------------------------------------------------------
+        // Define the network share (UNC) path. In a real scenario this could be
+        // read from a configuration file or environment variable.
+        // ---------------------------------------------------------------------
+        string networkSharePath = @"\\MyServer\Shared\CrashReports";
 
-        // Try to create the network directory; if it fails, fall back to a local temp folder
+        // Try to create the directory on the network share. If the share is not
+        // reachable (IOException) fall back to a local temporary folder so the
+        // demo can still run without throwing an unhandled exception.
+        string targetPath = networkSharePath;
         try
         {
-            DirectoryInfo di = Directory.CreateDirectory(networkSharePath);
-            if (!di.Exists)
-                throw new IOException("Directory creation reported success but the directory does not exist.");
+            if (!Directory.Exists(targetPath))
+            {
+                Directory.CreateDirectory(targetPath);
+            }
         }
-        catch (Exception ex)
+        catch (IOException)
         {
-            Console.WriteLine($"Unable to access network share: {ex.Message}");
-            targetDirectory = Path.Combine(Path.GetTempPath(), "CrashReports");
-            Directory.CreateDirectory(targetDirectory);
-            Console.WriteLine($"Falling back to local directory: {targetDirectory}");
+            // Network path not found – use a local fallback directory.
+            targetPath = Path.Combine(Path.GetTempPath(), "CrashReports");
+            Directory.CreateDirectory(targetPath);
         }
 
-        // Set the output directory and a deterministic filename for the crash report
-        crashOptions.CrashReportDirectory = targetDirectory; // directory where the report will be written
-        crashOptions.CrashReportFilename = $"CrashReport_{DateTime.Now:yyyyMMdd_HHmmss}.html"; // optional – makes the path predictable
+        // Set the output directory for the crash report.
+        options.CrashReportDirectory = targetPath;
+
+        // Optionally set a custom filename (otherwise it is auto‑generated)
+        options.CrashReportFilename = "MyCrashReport.html";
 
         // Generate the crash report
-        PdfException.GenerateCrashReport(crashOptions);
+        PdfException.GenerateCrashReport(options);
 
         // Verify that the report file was created at the expected location
-        string reportPath = crashOptions.CrashReportPath; // full path returned by the API after generation
-        bool reportExists = File.Exists(reportPath);
-
-        Console.WriteLine($"Crash report generated at: {reportPath}");
-        Console.WriteLine($"Report exists: {reportExists}");
+        string reportPath = options.CrashReportPath; // Full path including filename
+        if (File.Exists(reportPath))
+        {
+            Console.WriteLine($"Crash report successfully written to: {reportPath}");
+        }
+        else
+        {
+            Console.WriteLine($"Failed to write crash report to: {reportPath}");
+        }
     }
 }

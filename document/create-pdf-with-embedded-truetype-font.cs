@@ -7,47 +7,45 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string outputPdf = "EmbeddedFontOutput.pdf";
-        const string ttfPath   = @"C:\Windows\Fonts\arial.ttf"; // TrueType font file
+        const string outputPath = "embedded_font.pdf";
+        const string ttfPath = @"C:\Windows\Fonts\arial.ttf"; // adjust if needed
 
-        // Ensure the TrueType font file exists
         if (!File.Exists(ttfPath))
         {
-            Console.Error.WriteLine($"Font file not found: {ttfPath}");
+            Console.Error.WriteLine($"TrueType font not found: {ttfPath}");
             return;
         }
 
-        // Create a new PDF document and embed the TrueType font
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Load the TrueType font from file
-            Font ttfFont = FontRepository.OpenFont(ttfPath);
-            // Mark the font to be embedded into the PDF
-            ttfFont.IsEmbedded = true;
-
-            // Optional: embed standard Type1 fonts if they are used elsewhere
-            doc.EmbedStandardFonts = true;
-
-            // Add a page
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a text fragment using the embedded font
+            // Load the TrueType font from a stream and mark it for embedding
+            Font trueTypeFont;
+            using (FileStream fontStream = File.OpenRead(ttfPath))
+            {
+                trueTypeFont = FontRepository.OpenFont(fontStream, FontTypes.TTF);
+            }
+            trueTypeFont.IsEmbedded = true;
+
+            // Create a text fragment that uses the embedded font
             TextFragment fragment = new TextFragment("Sample text with embedded TrueType font.");
-            fragment.TextState.Font = ttfFont;
+            fragment.TextState.Font = trueTypeFont;
             fragment.TextState.FontSize = 14;
             fragment.TextState.ForegroundColor = Color.Black;
 
-            // Position the text on the page (optional)
-            fragment.Position = new Position(100, 700);
-
-            // Add the fragment to the page
+            // Add the text fragment to the page
             page.Paragraphs.Add(fragment);
 
-            // Save the PDF – fonts are embedded as part of the document
-            doc.Save(outputPdf);
+            // Ensure any standard Type1 fonts are also embedded if used
+            doc.EmbedStandardFonts = true;
+
+            // Save the PDF with the embedded TrueType font
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF created with embedded TrueType font: {outputPdf}");
+        Console.WriteLine($"PDF created at '{outputPath}' with embedded TrueType font.");
     }
 }

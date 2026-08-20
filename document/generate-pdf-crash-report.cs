@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 
 class Program
@@ -8,39 +7,33 @@ class Program
     {
         try
         {
-            // Simulate an exception (divide by zero)
-            int zero = 0;
-            int _ = 1 / zero;
+            // Example operation that may throw a PdfException.
+            // Replace with actual PDF processing logic as needed.
+            using (Document doc = new Document("nonexistent.pdf"))
+            {
+                Console.WriteLine($"Pages: {doc.Pages.Count}");
+            }
+        }
+        catch (PdfException ex)
+        {
+            // Create crash report options based on the caught exception.
+            CrashReportOptions options = new CrashReportOptions(ex)
+            {
+                // Optional customizations:
+                CustomMessage = "An error occurred while processing the PDF document."
+                // CrashReportDirectory = "C:\\CrashReports";
+                // CrashReportFilename = "MyCrashReport.html";
+            };
+
+            // Generate the crash report HTML file.
+            PdfException.GenerateCrashReport(options);
+
+            Console.WriteLine($"Crash report generated at: {options.CrashReportPath}");
         }
         catch (Exception ex)
         {
-            // Prepare crash report options
-            CrashReportOptions options = new CrashReportOptions(ex)
-            {
-                // Optional: add a custom message
-                CustomMessage = "An unexpected error occurred while processing the PDF.",
-                // Optional: specify output directory (defaults to current directory)
-                CrashReportDirectory = Directory.GetCurrentDirectory(),
-                // Optional: set a specific filename for the intermediate HTML report
-                CrashReportFilename = "MyCrashReport.html"
-            };
-
-            // Generate the crash report in HTML format
-            PdfException.GenerateCrashReport(options);
-
-            // Path to the generated HTML report
-            string htmlPath = options.CrashReportPath;
-
-            // Desired final PDF path
-            string pdfPath = Path.Combine(Directory.GetCurrentDirectory(), "CrashReport.pdf");
-
-            // Load the HTML report and save it as PDF
-            using (Document doc = new Document(htmlPath, new HtmlLoadOptions()))
-            {
-                doc.Save(pdfPath);
-            }
-
-            Console.WriteLine($"Crash report PDF saved to '{pdfPath}'.");
+            // Handle any other unexpected exceptions.
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
         }
     }
 }
