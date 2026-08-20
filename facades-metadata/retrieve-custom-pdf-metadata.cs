@@ -14,14 +14,14 @@ class Program
             return;
         }
 
-        // Initialize PdfFileInfo facade for the PDF file
+        // Initialize the PdfFileInfo facade for the PDF document
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Retrieve the Keywords metadata (empty string if not set)
-            string keywords = pdfInfo.Keywords;
+            // Retrieve the custom metadata value for "ProjectCode"
+            string projectCode = pdfInfo.GetMetaInfo("ProjectCode");
 
-            // Display the retrieved value
-            Console.WriteLine($"Keywords: {keywords}");
+            // Display the retrieved value (empty string if the key does not exist)
+            Console.WriteLine($"ProjectCode: {projectCode}");
         }
     }
 }

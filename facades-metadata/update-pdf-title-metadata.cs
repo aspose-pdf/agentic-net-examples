@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -9,33 +7,25 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string newTitle = "Updated PDF Title";
+        const string newTitle = "My Updated PDF Title";
 
-        // Ensure the source PDF exists; create a minimal one if it does not.
-        if (!File.Exists(inputPath))
+        if (!System.IO.File.Exists(inputPath))
         {
-            var doc = new Document();
-            doc.Pages.Add(); // add a blank page so the file is a valid PDF
-            doc.Save(inputPath);
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Initialize PdfFileInfo with the source PDF. Wrap in a using block to guarantee disposal.
-        using (var pdfInfo = new PdfFileInfo(inputPath))
+        // Load the PDF metadata facade
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Set the Title metadata.
+            // Update the Title property
             pdfInfo.Title = newTitle;
 
-            // Save the updated PDF to a new file.
-            bool success = pdfInfo.SaveNewInfo(outputPath);
-            if (!success)
-            {
-                Console.Error.WriteLine("Failed to save updated PDF.");
-            }
-            else
-            {
-                Console.WriteLine($"Title updated and saved to '{outputPath}'.");
-            }
-            // No explicit Close() call is required; the using statement disposes the object.
+            // Save the PDF with the updated metadata
+            bool saved = pdfInfo.SaveNewInfo(outputPath);
+            Console.WriteLine(saved
+                ? $"Title updated and saved to '{outputPath}'."
+                : $"Failed to save updated PDF to '{outputPath}'.");
         }
     }
 }

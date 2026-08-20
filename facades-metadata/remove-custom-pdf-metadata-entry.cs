@@ -15,16 +15,19 @@ class Program
             return;
         }
 
-        // Open the PDF with the PdfFileInfo facade
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
-        {
-            // Set the custom metadata entry "ObsoleteField" to an empty value
-            pdfInfo.SetMetaInfo("ObsoleteField", string.Empty);
+        // Initialize the PdfFileInfo facade and bind the PDF
+        PdfFileInfo pdfInfo = new PdfFileInfo();
+        pdfInfo.BindPdf(inputPath);
 
-            // Save the updated PDF to a new file
-            pdfInfo.SaveNewInfo(outputPath);
-        }
+        // Remove the custom metadata entry by setting its value to empty
+        pdfInfo.SetMetaInfo("ObsoleteField", string.Empty);
 
-        Console.WriteLine($"Custom metadata cleared. Saved to '{outputPath}'.");
+        // Save the PDF with the updated metadata
+        pdfInfo.SaveNewInfo(outputPath);
+
+        // Clean up the facade
+        pdfInfo.Close();
+
+        Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
     }
 }
