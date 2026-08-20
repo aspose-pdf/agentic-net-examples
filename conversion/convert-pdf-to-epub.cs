@@ -1,32 +1,31 @@
 using System;
 using System.IO;
-using Aspose.Pdf;   // Core Aspose.Pdf namespace contains Document and EpubSaveOptions
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the target EPUB file
-        const string pdfPath  = "input.pdf";
-        const string epubPath = "output.epub";
+        const string inputPdf = "input.pdf";
+        const string outputEpub = "output.epub";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(pdfPath))
+        // Verify the source PDF exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source file not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (lifecycle: create & load)
-        using (Document pdfDocument = new Document(pdfPath))
+        // Load the PDF document (lifecycle: create and load)
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Initialize default EPUB save options (no custom settings required)
-            EpubSaveOptions saveOptions = new EpubSaveOptions();
+            // Initialize default EPUB save options (default conversion settings)
+            EpubSaveOptions epubOptions = new EpubSaveOptions();
 
             // Save the document as EPUB using the options (lifecycle: save)
-            pdfDocument.Save(epubPath, saveOptions);
+            pdfDoc.Save(outputEpub, epubOptions);
         }
 
-        Console.WriteLine($"Conversion completed: '{epubPath}'");
+        Console.WriteLine($"PDF successfully converted to EPUB: {outputEpub}");
     }
 }

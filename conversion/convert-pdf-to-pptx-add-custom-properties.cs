@@ -6,38 +6,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPptx = "output.pptx";
+        const string inputPdfPath = "input.pdf";
+        const string outputPptxPath = "output.pptx";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF, set standard and custom properties, then save as PPTX
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document (wrapped in using for proper disposal)
-            using (Document pdfDoc = new Document(inputPdf))
-            {
-                // Set standard document property
-                pdfDoc.Info.Subject = "Presentation generated from PDF";
+            // Standard property
+            pdfDoc.Info.Subject = "Presentation Subject";
 
-                // Set a custom property using the DocumentInfo indexer
-                pdfDoc.Info["Company"] = "Acme Corporation";
+            // Custom property – use the DocumentInfo indexer (CustomProperties collection does not exist)
+            pdfDoc.Info["Company"] = "Acme Corporation";
 
-                // Initialize PPTX save options (required for non‑PDF output)
-                PptxSaveOptions pptxOptions = new PptxSaveOptions();
+            // PPTX save options (available directly under Aspose.Pdf namespace)
+            var pptxOptions = new PptxSaveOptions();
 
-                // Save the document as PPTX using the explicit save options
-                pdfDoc.Save(outputPptx, pptxOptions);
-            }
-
-            Console.WriteLine($"PDF successfully converted to PPTX: {outputPptx}");
+            // Convert and save as PPTX
+            pdfDoc.Save(outputPptxPath, pptxOptions);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF successfully converted to PPTX: {outputPptxPath}");
     }
 }

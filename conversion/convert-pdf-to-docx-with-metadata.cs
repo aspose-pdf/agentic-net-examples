@@ -6,44 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputDocxPath = "output.docx";
+        const string inputPdf = "input.pdf";
+        const string outputDocx = "output.docx";
+        const string author = "John Doe";
+        const string title = "Sample Document";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF, set metadata, and save as DOCX using DocSaveOptions
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Load the source PDF
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Set custom metadata properties
+            pdfDoc.Info.Author = author;
+            pdfDoc.Info.Title = title;
+
+            // Configure DOCX conversion options
+            DocSaveOptions saveOptions = new DocSaveOptions
             {
-                // Set custom metadata
-                pdfDoc.Info.Author = "John Doe";
-                pdfDoc.Info.Title  = "Converted Document";
+                Format = DocSaveOptions.DocFormat.DocX,          // Output as DOCX
+                Mode = DocSaveOptions.RecognitionMode.Flow,     // Full recognition for editability
+                RecognizeBullets = true                         // Enable bullet recognition
+            };
 
-                // Prepare DOCX save options
-                DocSaveOptions saveOptions = new DocSaveOptions
-                {
-                    // Choose DOCX format
-                    Format = DocSaveOptions.DocFormat.DocX,
-                    // Use full flow recognition for better editability
-                    Mode   = DocSaveOptions.RecognitionMode.Flow,
-                    // Optional: enable bullet recognition
-                    RecognizeBullets = true
-                };
-
-                // Save as DOCX using explicit save options
-                pdfDoc.Save(outputDocxPath, saveOptions);
-            }
-
-            Console.WriteLine($"PDF successfully converted to DOCX: {outputDocxPath}");
+            // Save the document as DOCX with the specified options
+            pdfDoc.Save(outputDocx, saveOptions);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF '{inputPdf}' converted to DOCX '{outputDocx}' with author and title metadata.");
     }
 }

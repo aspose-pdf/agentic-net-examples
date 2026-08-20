@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_pdfa.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,25 +15,28 @@ class Program
             return;
         }
 
-        // Create conversion options for PDF/A (PDF/A‑1B) with error handling.
-        PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
-
-        // Enable automatic tagging during conversion.
-        options.AutoTaggingSettings = new AutoTaggingSettings
-        {
-            EnableAutoTagging = true
-            // Additional AutoTaggingSettings can be configured here if needed.
-        };
-
-        // Load the source PDF, convert it using the options, and save the PDF/A output.
+        // Load the source PDF, configure conversion options with auto‑tagging enabled,
+        // convert to PDF/A, and save the result.
         using (Document doc = new Document(inputPath))
         {
-            bool converted = doc.Convert(options);
-            if (!converted)
+            // Create conversion options for PDF/A‑1B format.
+            PdfFormatConversionOptions convOptions = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B);
+
+            // Enable automatic tagging during conversion.
+            convOptions.AutoTaggingSettings = new AutoTaggingSettings
             {
-                Console.Error.WriteLine("Conversion failed. Check the log for details.");
+                EnableAutoTagging = true
+            };
+
+            // Perform the conversion. Returns true on success.
+            bool success = doc.Convert(convOptions);
+            if (!success)
+            {
+                Console.Error.WriteLine("Conversion failed.");
+                return;
             }
 
+            // Save the converted PDF/A document.
             doc.Save(outputPath);
         }
 

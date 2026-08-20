@@ -6,26 +6,25 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.xps";
+        const string inputPdf = "input.pdf";
+        const string outputXps = "output.xps";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPath))
+        // Load the PDF document within a using block for proper disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
             // Create XpsSaveOptions with default settings
-            XpsSaveOptions saveOptions = new XpsSaveOptions();
+            XpsSaveOptions xpsOptions = new XpsSaveOptions();
 
-            // Save the document as XPS using the specified save options
-            pdfDoc.Save(outputPath, saveOptions);
+            // Save the document as XPS, passing the SaveOptions explicitly
+            pdfDoc.Save(outputXps, xpsOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to XPS: {outputPath}");
+        Console.WriteLine($"PDF successfully converted to XPS: {outputXps}");
     }
 }

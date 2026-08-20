@@ -7,40 +7,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "PngOutput";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "output_images";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the PDF document (using statement ensures proper disposal)
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Create a PNG device with a high resolution (e.g., 300 DPI)
+            // Create a PNG device with a desired resolution (e.g., 300 DPI)
             Resolution resolution = new Resolution(300);
             PngDevice pngDevice = new PngDevice(resolution)
             {
-                // Enable transparent background for pages that contain an alpha channel
+                // Enable transparent background for pages that contain alpha channel
                 TransparentBackground = true
             };
 
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            // Iterate over all pages (1‑based indexing)
+            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                string outPath = Path.Combine(outputDir, $"page_{pageNum}.png");
-                using (FileStream outStream = new FileStream(outPath, FileMode.Create))
+                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
+
+                // Save each page as a PNG file
+                using (FileStream pngStream = new FileStream(outputPath, FileMode.Create))
                 {
-                    // Convert the current page to PNG and write to the stream
-                    pngDevice.Process(pdfDoc.Pages[pageNum], outStream);
+                    pngDevice.Process(pdfDocument.Pages[pageNumber], pngStream);
                 }
             }
         }
 
-        Console.WriteLine("PDF pages have been converted to PNG with transparent background.");
+        Console.WriteLine("PDF to PNG conversion with transparent background completed.");
     }
 }

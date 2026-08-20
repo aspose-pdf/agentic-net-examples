@@ -7,55 +7,55 @@ class Program
 {
     static void Main()
     {
-        // Paths
-        const string inputPdfPath = "input.pdf";
-        const string outputPptxPath = "output.pptx";
-        const string imagesOutputDir = "ExtractedImages";
+        // Input PDF file
+        const string pdfPath = "input.pdf";
+        // Output PPTX file
+        const string pptxPath = "output.pptx";
+        // Directory to store extracted images
+        const string imagesDir = "ExtractedImages";
 
-        // Verify input PDF exists
-        if (!File.Exists(inputPdfPath))
+        // Validate input file
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Ensure the directory for extracted images exists
-        Directory.CreateDirectory(imagesOutputDir);
+        // Ensure the images directory exists
+        Directory.CreateDirectory(imagesDir);
 
-        // ---------- Convert PDF to PPTX using Aspose.Pdf only ----------
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // ---------- Convert PDF to PPTX ----------
+        // Use Aspose.Pdf Document to load the PDF and save as PPTX.
+        // SaveFormat.Pptx is defined in the Aspose.Pdf namespace; no extra SaveOptions class is required.
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Directly save as PPTX – no Aspose.Slides required
-            pdfDoc.Save(outputPptxPath, SaveFormat.Pptx);
+            pdfDoc.Save(pptxPath, SaveFormat.Pptx);
         }
 
         // ---------- Extract images from the generated PPTX ----------
-        // A PPTX file is a ZIP archive; images are stored under "ppt/media"
-        using (ZipArchive archive = ZipFile.OpenRead(outputPptxPath))
+        // A PPTX file is a ZIP archive. All slide images are stored under the "ppt/media" folder.
+        // We can extract them without needing Aspose.Slides.
+        using (ZipArchive archive = ZipFile.OpenRead(pptxPath))
         {
             int imageCounter = 1;
             foreach (ZipArchiveEntry entry in archive.Entries)
             {
-                // Look for image files inside the PPTX package
+                // Look for entries like "ppt/media/image1.png", "ppt/media/image2.jpeg", etc.
                 if (entry.FullName.StartsWith("ppt/media/", StringComparison.OrdinalIgnoreCase) &&
-                    IsImageFile(entry.Name))
+                    (entry.Name.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
+                     entry.Name.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                     entry.Name.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
+                     entry.Name.EndsWith(".gif", StringComparison.OrdinalIgnoreCase) ||
+                     entry.Name.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase)))
                 {
-                    string extension = Path.GetExtension(entry.Name);
-                    string destPath = Path.Combine(imagesOutputDir, $"image_{imageCounter}{extension}");
+                    string destPath = Path.Combine(imagesDir, $"image_{imageCounter}{Path.GetExtension(entry.Name)}");
                     entry.ExtractToFile(destPath, overwrite: true);
+                    Console.WriteLine($"Extracted image saved to: {destPath}");
                     imageCounter++;
                 }
             }
         }
 
-        Console.WriteLine("PDF successfully converted to PPTX and images extracted.");
-    }
-
-    // Helper to determine if a file name represents a common image format
-    static bool IsImageFile(string fileName)
-    {
-        string ext = Path.GetExtension(fileName).ToLowerInvariant();
-        return ext == ".png" || ext == ".jpg" || ext == ".jpeg" ||
-               ext == ".bmp" || ext == ".gif" || ext == ".tif" || ext == ".tiff";
+        Console.WriteLine("PDF to PPTX conversion and image extraction completed.");
     }
 }

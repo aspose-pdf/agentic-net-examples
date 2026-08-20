@@ -6,31 +6,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputDocxPath = "output.docx";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.docx";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for proper disposal
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Configure DOCX save options
+            // Configure save options for DOCX conversion
             DocSaveOptions saveOptions = new DocSaveOptions
             {
                 // Specify DOCX output format
                 Format = DocSaveOptions.DocFormat.DocX,
-                // Set recognition mode to Flow (automatic content detection)
+                // Use automatic content detection (Flow mode)
                 Mode = DocSaveOptions.RecognitionMode.Flow
             };
 
-            // Save the PDF as DOCX using the configured options
-            pdfDocument.Save(outputDocxPath, saveOptions);
+            // Save the document as DOCX using the specified options
+            pdfDoc.Save(outputPath, saveOptions);
         }
 
-        Console.WriteLine($"Conversion completed: '{outputDocxPath}'");
+        Console.WriteLine($"PDF successfully converted to DOCX: {outputPath}");
     }
 }

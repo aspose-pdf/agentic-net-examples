@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa4.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,28 +15,32 @@ class Program
             return;
         }
 
-        // Load the source PDF, convert to PDF/A‑4 with auto‑tagging, and save the result.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create conversion options for PDF/A‑4.
-            PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_4);
-
-            // Enable auto‑tagging during conversion.
-            options.AutoTaggingSettings = AutoTaggingSettings.Default;
-            options.AutoTaggingSettings.EnableAutoTagging = true;
-
-            // Perform the conversion.
-            bool success = doc.Convert(options);
-            if (!success)
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine("Conversion failed.");
-                return;
+                // Set up conversion options for PDF/A‑4
+                PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_4);
+
+                // Enable auto‑tagging using the default settings
+                options.AutoTaggingSettings = AutoTaggingSettings.Default;
+                options.AutoTaggingSettings.EnableAutoTagging = true;
+
+                // Perform the conversion
+                bool converted = doc.Convert(options);
+                if (!converted)
+                {
+                    Console.Error.WriteLine("Conversion reported failure.");
+                }
+
+                // Save the converted PDF/A‑4 document
+                doc.Save(outputPath);
+                Console.WriteLine($"PDF/A‑4 saved to '{outputPath}'.");
             }
-
-            // Save the converted PDF/A‑4 document.
-            doc.Save(outputPath);
         }
-
-        Console.WriteLine($"PDF/A‑4 file saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
