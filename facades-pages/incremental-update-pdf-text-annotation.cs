@@ -2,13 +2,12 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_incremental.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,36 +16,31 @@ class Program
             return;
         }
 
-        // Open the source PDF with read/write access – required for incremental saving
-        using (FileStream stream = new FileStream(inputPath, FileMode.Open, FileAccess.ReadWrite))
-        using (Document doc = new Document(stream))
+        // Open the PDF with read/write access so that incremental updates can be written.
+        using (FileStream pdfStream = new FileStream(inputPath, FileMode.Open, FileAccess.ReadWrite))
         {
-            // ---- Example modification: add a text annotation on the first page ----
+            // Load the document from the writable stream.
+            Document doc = new Document(pdfStream);
+
+            // Example modification: add a text annotation to the first page.
             Page page = doc.Pages[1];
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
             TextAnnotation annotation = new TextAnnotation(page, rect)
             {
-                Title    = "Incremental Update",
-                Contents = "Added via incremental save",
-                Color    = Aspose.Pdf.Color.Yellow,
+                Title    = "Note",
+                Contents = "Incremental update example",
                 Open     = true,
-                Icon     = TextIcon.Note
+                Icon     = TextIcon.Note,
+                Color    = Aspose.Pdf.Color.Yellow
             };
             page.Annotations.Add(annotation);
 
-            // ---- Use a Facade class (PdfFileInfo) to demonstrate Facades usage ----
-            // PdfFileInfo can retrieve information about the PDF; here we just instantiate it.
-            PdfFileInfo info = new PdfFileInfo();
-            // (No explicit binding is needed for PdfFileInfo; it works with the file on disk.)
-
-            // Save the document incrementally – this preserves the original file structure
-            // and writes only the changes as an incremental update.
-            doc.Save(); // Incremental save because the document was opened with a writable stream
+            // Save the changes incrementally (writes only the delta to the same stream).
+            doc.Save();
         }
 
-        // After the incremental save, the original file has been updated.
-        // If you need a separate copy, simply copy the file.
-        File.Copy(inputPath, outputPath, overwrite: true);
+        // Copy the updated file to a new location if a separate output file is desired.
+        File.Copy(inputPath, outputPath, true);
         Console.WriteLine($"Incrementally updated PDF saved to '{outputPath}'.");
     }
 }

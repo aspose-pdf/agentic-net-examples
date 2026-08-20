@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_with_transitions.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,51 +16,51 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create a PdfPageEditor facade bound to the loaded document
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            // Initialize the PdfPageEditor facade with the loaded document
+            PdfPageEditor editor = new PdfPageEditor(doc);
+
+            // Iterate through all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                // Iterate through all pages (1‑based indexing)
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                Page page = doc.Pages[pageNum];
+
+                // Simple content‑type detection:
+                // If the page contains any images, treat it as an "image" page,
+                // otherwise treat it as a "text" page.
+                bool hasImages = page.Resources.Images.Count > 0;
+
+                // Configure the editor to edit only the current page
+                editor.ProcessPages = new int[] { pageNum };
+
+                // Assign a distinct transition type based on the content
+                if (hasImages)
                 {
-                    // Retrieve the current page
-                    Page page = doc.Pages[pageNum];
-
-                    // Determine a simple content type:
-                    // If the page contains at least one image, treat it as "image" content,
-                    // otherwise treat it as "text" content.
-                    bool hasImages = page.Resources.Images.Count > 0;
-
-                    // Configure the editor to work on the current page only
-                    editor.ProcessPages = new int[] { pageNum };
-
-                    // Assign a distinct transition type based on the content type
-                    if (hasImages)
-                    {
-                        // Use a vertical blinds transition for image pages
-                        editor.TransitionType = PdfPageEditor.BLINDV;
-                    }
-                    else
-                    {
-                        // Use a dissolve transition for text‑only pages
-                        editor.TransitionType = PdfPageEditor.DISSOLVE;
-                    }
-
-                    // Optional: set the duration of the transition (in seconds)
-                    // TransitionDuration expects an integer value (seconds), not a float.
-                    editor.TransitionDuration = 2; // 2 seconds
-
-                    // Apply the changes for the current page
-                    editor.ApplyChanges();
+                    // Vertical blinds for image pages
+                    editor.TransitionType = PdfPageEditor.BLINDV;
                 }
+                else
+                {
+                    // Dissolve effect for text pages
+                    editor.TransitionType = PdfPageEditor.DISSOLVE;
+                }
+
+                // Optional: set transition duration (in seconds)
+                editor.TransitionDuration = 2;
+
+                // Apply the changes to the current page
+                editor.ApplyChanges();
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            // Save the modified PDF using the facade's Save method
+            editor.Save(outputPath);
+
+            // Release resources held by the facade
+            editor.Close();
         }
 
-        Console.WriteLine($"PDF saved with page transitions to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with page transitions: {outputPath}");
     }
 }

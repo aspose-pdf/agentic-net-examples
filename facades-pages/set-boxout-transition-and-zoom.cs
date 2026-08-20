@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,30 +16,28 @@ class Program
             return;
         }
 
-        // Bind the PDF to the PdfPageEditor facade
+        // Edit page properties using PdfPageEditor facade
         using (PdfPageEditor editor = new PdfPageEditor())
         {
+            // Load the source PDF
             editor.BindPdf(inputPath);
 
-            // Apply changes only to page 2 (1‑based indexing)
+            // Target only page 2 (Aspose.Pdf uses 1‑based indexing)
             editor.ProcessPages = new int[] { 2 };
 
-            // Set transition type to BoxOut (outward box)
+            // Set transition effect to BoxOut (outward box)
             editor.TransitionType = PdfPageEditor.OUTBOX;
 
-            // Set zoom factor to 1.3 (130%) – float literal required
+            // Set zoom factor to 1.3 (130%) – note the 'f' suffix for a float literal
             editor.Zoom = 1.3f;
 
-            // Optional: set transition duration (in seconds)
-            editor.TransitionDuration = 2;
-
-            // Apply the configured changes
+            // Apply the changes to the document
             editor.ApplyChanges();
 
             // Save the modified PDF
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
     }
 }

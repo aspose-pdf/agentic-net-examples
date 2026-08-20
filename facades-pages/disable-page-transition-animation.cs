@@ -16,22 +16,24 @@ class Program
             return;
         }
 
-        // Load the PDF into the page editor
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            editor.BindPdf(inputPath);
+            // Initialize PdfPageEditor with the loaded document
+            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            {
+                // Edit only page 6 (1‑based indexing)
+                editor.ProcessPages = new int[] { 6 };
+                // Disable transition animation by setting duration to zero seconds
+                editor.TransitionDuration = 0;
+                // Apply the changes to the document
+                editor.ApplyChanges();
+            }
 
-            // Edit only page 6 (1‑based indexing)
-            editor.ProcessPages = new int[] { 6 };
-
-            // Disable transition animation by setting duration to zero seconds
-            editor.TransitionDuration = 0;
-
-            // Apply the changes and save the result
-            editor.ApplyChanges();
-            editor.Save(outputPath);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

@@ -8,7 +8,6 @@ class Program
     static void Main()
     {
         const string inputPath = "sample.pdf";
-        const string outputPath = "rotated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,28 +15,26 @@ class Program
             return;
         }
 
-        // Bind the PDF to the editor and work within a using block for proper disposal
+        // Bind the PDF to the PdfPageEditor facade
         using (PdfPageEditor editor = new PdfPageEditor())
         {
             editor.BindPdf(inputPath);
 
-            // Retrieve original page size (page numbers are 1‑based)
-            PageSize originalSize = editor.GetPageSize(1);
-            Console.WriteLine($"Original size: {originalSize.Width} x {originalSize.Height}");
+            // Rotate the first page by 90 degrees (optional – demonstrates the change)
+            editor.Rotation = 90;          // sets rotation for all pages; can also use PageRotations dictionary
+            editor.ApplyChanges();         // apply the rotation to the document
 
-            // Rotate page 1 by 90 degrees
-            editor.Rotation = 90;                 // set rotation angle (0, 90, 180, 270)
-            editor.ProcessPages = new int[] { 1 }; // apply rotation only to page 1
-            editor.ApplyChanges();                // commit the rotation
+            // Get the rotation of page 1 after applying changes
+            int rotation = editor.GetPageRotation(1);
+            Console.WriteLine($"Rotation of page 1: {rotation} degrees");
 
-            // Retrieve page size after rotation
-            PageSize rotatedSize = editor.GetPageSize(1);
-            Console.WriteLine($"Rotated size: {rotatedSize.Width} x {rotatedSize.Height}");
+            // Get the page size of page 1 after rotation
+            PageSize size = editor.GetPageSize(1);
+            Console.WriteLine($"Page 1 size after rotation: {size.Width} x {size.Height}");
 
-            // Save the modified PDF
+            // Save the modified PDF (optional)
+            const string outputPath = "rotated.pdf";
             editor.Save(outputPath);
         }
-
-        Console.WriteLine("Operation completed.");
     }
 }

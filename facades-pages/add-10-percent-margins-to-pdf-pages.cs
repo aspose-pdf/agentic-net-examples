@@ -6,39 +6,35 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF (100‑page document) and the output PDF
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_resized.pdf";
 
-        // Verify that the source file exists
+        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
-        // Create the PdfFileEditor facade (no IDisposable implementation)
-        PdfFileEditor fileEditor = new PdfFileEditor();
+        // Create the facade that provides page‑editing operations
+        PdfFileEditor editor = new PdfFileEditor();
 
-        // Add a 10 % margin on all four sides of every page.
-        // Passing null for the pages array processes all pages in the document.
-        const double marginPercent = 10.0; // 10 % margin
-        bool success = fileEditor.AddMarginsPct(
-            inputPath,          // source PDF
-            outputPath,         // destination PDF
-            null,               // null = all pages
-            marginPercent,      // left margin (% of page width)
-            marginPercent,      // right margin (% of page width)
-            marginPercent,      // top margin (% of page height)
-            marginPercent);     // bottom margin (% of page height)
+        // Add a 10 % margin on all four sides for every page.
+        // Passing null for the pages array tells the method to process all pages.
+        bool result = editor.AddMarginsPct(
+            inputPath,      // source document path
+            outputPath,     // destination document path
+            null,           // process all pages
+            10,             // left margin (percent of page width)
+            10,             // right margin (percent of page width)
+            10,             // top margin (percent of page height)
+            10              // bottom margin (percent of page height)
+        );
 
-        if (success)
-        {
-            Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
-        }
+        // Report the outcome
+        if (result)
+            Console.WriteLine($"Successfully resized PDF. Output saved to '{outputPath}'.");
         else
-        {
-            Console.Error.WriteLine("Failed to resize PDF contents.");
-        }
+            Console.Error.WriteLine("Failed to resize PDF.");
     }
 }

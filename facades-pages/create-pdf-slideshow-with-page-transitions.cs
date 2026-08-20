@@ -3,12 +3,12 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+class PdfSlideshowCreator
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "slideshow.pdf";
+        const string inputPath  = "input.pdf";   // source PDF
+        const string outputPath = "slideshow.pdf"; // result PDF with transitions
 
         if (!File.Exists(inputPath))
         {
@@ -16,29 +16,44 @@ class Program
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
+        // Load the source PDF inside a using block for deterministic disposal.
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the PdfPageEditor facade with the loaded document
-            PdfPageEditor editor = new PdfPageEditor(doc);
+            // PdfPageEditor is a facade that allows editing page properties
+            // such as transition effects and display durations.
+            using (PdfPageEditor editor = new PdfPageEditor())
+            {
+                // Bind the loaded document to the editor.
+                editor.BindPdf(doc);
 
-            // Set a transition effect (e.g., vertical blinds) for page changes
-            editor.TransitionType = PdfPageEditor.BLINDV; // constant defined in PdfPageEditor
-            editor.TransitionDuration = 2; // transition lasts 2 seconds
+                int pageCount = doc.Pages.Count; // Aspose.Pdf uses 1‑based indexing
 
-            // Set how long each page is displayed during the slideshow
-            editor.DisplayDuration = 5; // each page shown for 5 seconds
+                // Apply a transition and duration to each page.
+                for (int i = 1; i <= pageCount; i++)
+                {
+                    // Restrict the editor to the current page.
+                    editor.ProcessPages = new int[] { i };
 
-            // Process all pages (null or empty array means all pages)
-            editor.ProcessPages = null;
+                    // Choose a transition style based on the page number.
+                    // The constants (e.g., BLINDH, DISSOLVE) are defined in PdfPageEditor.
+                    if (i % 2 == 1)
+                        editor.TransitionType = PdfPageEditor.BLINDH;   // vertical blinds
+                    else
+                        editor.TransitionType = PdfPageEditor.DISSOLVE; // dissolve effect
 
-            // Apply the configured changes to the document
-            editor.ApplyChanges();
+                    // Duration of the transition effect (in seconds).
+                    editor.TransitionDuration = 2;
 
-            // Release resources held by the editor
-            editor.Close();
+                    // How long the page stays visible before moving to the next page (in seconds).
+                    editor.DisplayDuration = 5;
 
-            // Save the modified PDF (output format is PDF, so no SaveOptions needed)
+                    // Commit the changes for the current page.
+                    editor.ApplyChanges();
+                }
+            }
+
+            // Save the modified document. No SaveOptions are needed because the output
+            // format is PDF, which is the default.
             doc.Save(outputPath);
         }
 

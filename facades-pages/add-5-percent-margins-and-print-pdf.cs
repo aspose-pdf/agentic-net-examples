@@ -7,24 +7,29 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string tempPath = "temp_with_margins.pdf";
+        const string tempPath  = "temp_with_margins.pdf";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Apply a 5% margin on all sides of every page
+        // -----------------------------------------------------------------
+        // Step 1: Add a 5 % margin on all four sides of every page.
+        // The AddMarginsPct overload that accepts file paths processes all
+        // pages when the pages array is null.
+        // -----------------------------------------------------------------
         PdfFileEditor editor = new PdfFileEditor();
         bool added = editor.AddMarginsPct(
-            inputPath,          // source PDF
-            tempPath,           // destination PDF with margins
-            null,               // null = all pages
-            5,                  // left margin percent
-            5,                  // right margin percent
-            5,                  // top margin percent
-            5);                 // bottom margin percent
+            source:      inputPath,
+            destination: tempPath,
+            pages:       null,   // null → all pages
+            leftMargin:  5,      // 5 % of page width
+            rightMargin: 5,      // 5 % of page width
+            topMargin:   5,      // 5 % of page height
+            bottomMargin:5);     // 5 % of page height
 
         if (!added)
         {
@@ -32,16 +37,25 @@ class Program
             return;
         }
 
-        // Print the resized PDF; AutoResize ensures it fits the printable area
-        using (PdfViewer viewer = new PdfViewer())
+        // -----------------------------------------------------------------
+        // Step 2: Print the modified PDF.
+        // AutoResize = true scales the document to fit the printable area,
+        // ensuring the added white space is respected.
+        // -----------------------------------------------------------------
+        PdfViewer viewer = new PdfViewer();
+        try
         {
             viewer.BindPdf(tempPath);
-            viewer.AutoResize = true;
-            viewer.PrintDocument();
-            viewer.Close();
+            viewer.AutoResize = true;   // fit to printable area
+            viewer.AutoRotate = true;   // rotate if needed
+            viewer.PrintDocument();     // print using the default printer
+        }
+        finally
+        {
+            viewer.Close(); // release resources
         }
 
-        // Clean up temporary file (optional)
-        try { File.Delete(tempPath); } catch { }
+        // Optional: clean up the temporary file
+        try { File.Delete(tempPath); } catch { /* ignore cleanup errors */ }
     }
 }

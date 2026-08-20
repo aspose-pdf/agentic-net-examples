@@ -7,34 +7,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_letter.pdf";
 
-        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create a PdfPageEditor facade and bind it to the loaded document
-            PdfPageEditor editor = new PdfPageEditor();
-            editor.BindPdf(doc);
+            // Initialize the facade for page editing
+            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            {
+                // Letter size in points (1 inch = 72 points)
+                double width  = 8.5 * 72; // 612 points
+                double height = 11  * 72; // 792 points
 
-            // Define Letter portrait dimensions (8.5" x 11") in points (1 inch = 72 points)
-            double widthPoints  = 8.5 * 72; // 612 points
-            double heightPoints = 11  * 72; // 792 points
+                // Set the new page size for all pages
+                editor.PageSize = new PageSize((float)width, (float)height);
+                editor.ApplyChanges(); // Apply changes to the document
+            }
 
-            // Set the new page size for all pages
-            editor.PageSize = new PageSize((float)widthPoints, (float)heightPoints);
-
-            // Apply the changes to the document
-            editor.ApplyChanges();
-
-            // Save the modified PDF
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 

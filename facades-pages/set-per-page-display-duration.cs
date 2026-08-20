@@ -12,36 +12,32 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Use PdfPageEditor (Facade) to edit page properties.
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF file.
-            editor.BindPdf(inputPath);
-
-            // Get total number of pages (1‑based indexing).
-            int pageCount = editor.Document.Pages.Count;
-
-            // Set a different display duration for each page.
-            for (int i = 1; i <= pageCount; i++)
+            // PdfPageEditor works on a Document instance
+            using (PdfPageEditor editor = new PdfPageEditor(doc))
             {
-                // Restrict editing to the current page.
-                editor.ProcessPages = new int[] { i };
-
-                // Set duration equal to the page index (seconds).
-                editor.DisplayDuration = i;
-
-                // Apply the change to the selected page.
-                editor.ApplyChanges();
+                // Iterate over pages (1‑based indexing)
+                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                {
+                    // Edit only the current page
+                    editor.ProcessPages = new int[] { pageIndex };
+                    // Set display duration: increase by 1 second per page
+                    editor.DisplayDuration = pageIndex; // seconds
+                    // Apply the change to the document
+                    editor.ApplyChanges();
+                }
             }
 
-            // Save the modified PDF.
-            editor.Save(outputPath);
+            // Save the modified document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with per‑page display durations to '{outputPath}'.");
+        Console.WriteLine($"Document saved with per‑page display durations to '{outputPath}'.");
     }
 }
