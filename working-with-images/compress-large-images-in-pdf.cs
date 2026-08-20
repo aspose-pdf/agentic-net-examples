@@ -7,35 +7,35 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_compressed.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_compressed.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdf))
+        using (Document doc = new Document(inputPath))
         {
-            // Configure optimization options
-            OptimizationOptions optOptions = new OptimizationOptions();
+            // Create an optimization strategy with all options enabled
+            OptimizationOptions opt = OptimizationOptions.All();
 
-            // Enable image compression
-            optOptions.ImageCompressionOptions.CompressImages = true;
-            // Set JPEG quality (0‑100). Lower value = higher compression.
-            optOptions.ImageCompressionOptions.ImageQuality = 70;
-            // Optionally limit the maximum resolution of images (in DPI)
-            optOptions.ImageCompressionOptions.MaxResolution = 1500;
+            // Configure image compression: enable compression and set quality (e.g., 75%)
+            opt.ImageCompressionOptions.CompressImages = true;
+            opt.ImageCompressionOptions.ImageQuality = 75; // 0‑100, higher = better quality
+
+            // Optionally limit the maximum resolution to avoid oversized images
+            // opt.ImageCompressionOptions.MaxResolution = 1500; // uncomment if needed
 
             // Apply the optimization to the document
-            pdfDoc.OptimizeResources(optOptions);
+            doc.OptimizeResources(opt);
 
             // Save the optimized PDF
-            pdfDoc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Optimized PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Optimized PDF saved to '{outputPath}'.");
     }
 }
