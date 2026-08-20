@@ -6,46 +6,33 @@ class Program
 {
     static void Main()
     {
-        // Folder containing the source PDF files
-        const string inputFolder = "InputPdfs";
+        const string pdfPath = "input.pdf";
+        const string jsonPath = "formdata.json";
 
-        // Folder where the JSON files will be written
-        const string outputFolder = "FormJson";
-
-        if (!Directory.Exists(inputFolder))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Get all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
+        try
         {
-            try
+            // Load the PDF document
+            using (Document doc = new Document(pdfPath))
             {
-                // Build the JSON file name and full path **before** opening the document
-                string jsonFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".json";
-                string jsonPath = Path.Combine(outputFolder, jsonFileName);
-
-                // Load the PDF document (wrapped in using for deterministic disposal)
-                using (Document doc = new Document(pdfPath))
+                // Export all form fields to a UTF‑8 encoded JSON file
+                using (FileStream fs = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
                 {
-                    // Export the entire form to a JSON file
-                    doc.Form.ExportToJson(jsonPath);
+                    // Correct API: ExportToJson writes the form data as UTF‑8 JSON
+                    doc.Form.ExportToJson(fs);
                 }
+            }
 
-                Console.WriteLine($"Exported: {Path.GetFileName(pdfPath)} → {Path.GetFileName(jsonPath)}");
-            }
-            catch (Exception ex)
-            {
-                // Log any errors but continue processing remaining files
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+            Console.WriteLine($"Form data exported to '{jsonPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,38 +8,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTxt = "output.txt";
+        const string inputPdfPath = "input.pdf";
+        const string outputTxtPath = "output.txt";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
-            {
-                // Create a TextAbsorber to extract text from all pages
-                TextAbsorber absorber = new TextAbsorber();
+            // Create a TextAbsorber to extract text from all pages
+            TextAbsorber absorber = new TextAbsorber();
 
-                // Accept the absorber for the entire page collection
-                doc.Pages.Accept(absorber);
+            // Accept the absorber for the entire page collection (1‑based indexing is handled internally)
+            pdfDoc.Pages.Accept(absorber);
 
-                // Retrieve the concatenated text
-                string extractedText = absorber.Text ?? string.Empty;
+            // Retrieve the concatenated text from all pages
+            string extractedText = absorber.Text ?? string.Empty;
 
-                // Write the text to a .txt file
-                File.WriteAllText(outputTxt, extractedText);
-            }
+            // Write the extracted text directly to a .txt file using UTF‑8 encoding
+            File.WriteAllText(outputTxtPath, extractedText, Encoding.UTF8);
 
-            Console.WriteLine($"Text extracted and saved to '{outputTxt}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine($"Text extracted and saved to '{outputTxtPath}'.");
         }
     }
 }

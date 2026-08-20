@@ -8,67 +8,67 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdfPath = "input.pdf";
         const string outputFolder = "TablesCsv";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Load PDF document (using rule for disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document (lifecycle rule: use using)
+        using (Document doc = new Document(inputPdfPath))
         {
             // Find all tables in the document
             TableAbsorber absorber = new TableAbsorber();
-            absorber.Visit(doc); // extracts tables from the whole document
+            absorber.Visit(doc); // extracts tables from all pages
 
-            // Iterate over each discovered table
-            for (int t = 0; t < absorber.TableList.Count; t++)
+            // Iterate over each detected table
+            for (int tableIndex = 0; tableIndex < absorber.TableList.Count; tableIndex++)
             {
-                var table = absorber.TableList[t];
-                StringBuilder sb = new StringBuilder();
+                var absorbedTable = absorber.TableList[tableIndex];
+                StringBuilder csvBuilder = new StringBuilder();
 
-                // Iterate rows
-                for (int r = 0; r < table.RowList.Count; r++)
+                // Process rows
+                foreach (var row in absorbedTable.RowList)
                 {
-                    var row = table.RowList[r];
-                    var cellTexts = new string[row.CellList.Count];
+                    var cellTexts = new List<string>();
 
-                    // Iterate cells
-                    for (int c = 0; c < row.CellList.Count; c++)
+                    // Process cells in the current row
+                    foreach (var cell in row.CellList)
                     {
-                        var cell = row.CellList[c];
                         StringBuilder cellBuilder = new StringBuilder();
 
                         // Concatenate all text fragments inside the cell
-                        foreach (TextFragment fragment in cell.TextFragments)
+                        foreach (var fragment in cell.TextFragments)
                         {
                             cellBuilder.Append(fragment.Text);
                         }
 
                         // Escape CSV special characters
-                        string cellText = cellBuilder.ToString();
-                        if (cellText.Contains("\""))
-                            cellText = cellText.Replace("\"", "\"\""); // escape quotes
-                        if (cellText.Contains(",") || cellText.Contains("\n") || cellText.Contains("\r") || cellText.Contains("\""))
-                            cellText = $"\"{cellText}\"";
+                        string cellText = cellBuilder.ToString()
+                            .Replace("\"", "\"\""); // escape double quotes
 
-                        cellTexts[c] = cellText;
+                        if (cellText.Contains(",") || cellText.Contains("\"") || cellText.Contains("\n"))
+                        {
+                            cellText = $"\"{cellText}\"";
+                        }
+
+                        cellTexts.Add(cellText);
                     }
 
-                    // Join cells with commas and add line
-                    sb.AppendLine(string.Join(",", cellTexts));
+                    // Join cells with commas to form a CSV line
+                    csvBuilder.AppendLine(string.Join(",", cellTexts));
                 }
 
-                // Write CSV file for this table
-                string csvPath = Path.Combine(outputFolder, $"table_{t + 1}.csv");
-                File.WriteAllText(csvPath, sb.ToString(), Encoding.UTF8);
-                Console.WriteLine($"Table {t + 1} exported to: {csvPath}");
+                // Write the CSV file for the current table
+                string csvPath = Path.Combine(outputFolder, $"table_{tableIndex + 1}.csv");
+                File.WriteAllText(csvPath, csvBuilder.ToString(), Encoding.UTF8);
+                Console.WriteLine($"Exported table {tableIndex + 1} to '{csvPath}'.");
             }
         }
     }

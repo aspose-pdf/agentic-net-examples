@@ -1,80 +1,75 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class PdfTextExtractor
+public static class PdfTextParallelExtractor
 {
-    // Asynchronously extracts text from multiple PDF files in parallel.
-    // Returns a dictionary where the key is the input file path and the value is the extracted text.
-    public static async Task<Dictionary<string, string>> ExtractTextsAsync(string[] pdfFilePaths)
+    /// <summary>
+    /// Extracts text from multiple PDF files in parallel.
+    /// </summary>
+    /// <param name="pdfFilePaths">Array of PDF file paths to process.</param>
+    /// <param name="cancellationToken">Optional token to cancel the operation.</param>
+    /// <returns>
+    /// A task that resolves to a dictionary where the key is the PDF file path
+    /// and the value is the extracted text for that document.
+    /// </returns>
+    public static async Task<Dictionary<string, string>> ExtractTextsAsync(
+        string[] pdfFilePaths,
+        CancellationToken cancellationToken = default)
     {
-        // Guard clause.
         if (pdfFilePaths == null) throw new ArgumentNullException(nameof(pdfFilePaths));
 
-        // Prepare a thread‑safe collection for the results.
         var results = new Dictionary<string, string>();
-        object lockObj = new object();
-
-        // Create a task for each PDF file.
+        var lockObj = new object();
         var extractionTasks = new List<Task>();
+
         foreach (var path in pdfFilePaths)
         {
-            // Skip missing files early.
-            if (!File.Exists(path))
-            {
-                Console.Error.WriteLine($"File not found: {path}");
+            string pdfPath = path;
+            if (!File.Exists(pdfPath))
                 continue;
-            }
 
-            // Launch the extraction on a thread‑pool thread.
             extractionTasks.Add(Task.Run(() =>
             {
-                // Load the document inside a using block for deterministic disposal.
-                using (Document doc = new Document(path))
+                cancellationToken.ThrowIfCancellationRequested();
+
+                using (var doc = new Document(pdfPath))
                 {
-                    // Create a TextAbsorber to collect all text.
-                    TextAbsorber absorber = new TextAbsorber();
-
-                    // Accept the absorber for all pages of the document.
+                    var absorber = new TextAbsorber();
                     doc.Pages.Accept(absorber);
+                    string extractedText = absorber.Text ?? string.Empty;
 
-                    // Store the result in the shared dictionary (protected by a lock).
                     lock (lockObj)
                     {
-                        results[path] = absorber.Text;
+                        results[pdfPath] = extractedText;
                     }
                 }
-            }));
+            }, cancellationToken));
         }
 
-        // Await completion of all extraction tasks.
-        await Task.WhenAll(extractionTasks);
+        await Task.WhenAll(extractionTasks).ConfigureAwait(false);
         return results;
     }
+}
 
-    // Example usage.
-    static async Task Main()
+public static class Program
+{
+    public static async Task Main(string[] args)
     {
-        // Define the PDF files to process.
-        string[] pdfFiles = new[]
-        {
-            "sample1.pdf",
-            "sample2.pdf",
-            "sample3.pdf"
-        };
+        // Determine the folder to scan – first argument or current directory.
+        string folder = args.Length > 0 ? args[0] : Directory.GetCurrentDirectory();
+        string[] pdfFiles = Directory.GetFiles(folder, "*.pdf", SearchOption.TopDirectoryOnly);
 
-        // Extract texts in parallel.
-        Dictionary<string, string> extractedTexts = await ExtractTextsAsync(pdfFiles);
+        var texts = await PdfTextParallelExtractor.ExtractTextsAsync(pdfFiles);
 
-        // Output the results.
-        foreach (var kvp in extractedTexts)
+        foreach (var kvp in texts)
         {
-            Console.WriteLine($"--- Text from: {kvp.Key} ---");
-            Console.WriteLine(kvp.Value);
-            Console.WriteLine();
+            Console.WriteLine($"File: {kvp.Key}");
+            Console.WriteLine($"Extracted characters: {kvp.Value.Length}");
         }
     }
 }
