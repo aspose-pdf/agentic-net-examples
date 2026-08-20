@@ -1,64 +1,45 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf; // Document class provides XMP metadata handling
 
 class Program
 {
-    // Entry point: expects at least three arguments:
-    // 1. Input PDF file path
-    // 2. XMP property name (e.g., "dc:creator")
-    // 3. New value for the property
-    // 4. Optional output PDF file path (if omitted, a default name is generated)
+    // Entry point: args[0]=input PDF, args[1]=output PDF, args[2]=XMP property name, args[3]=new value
     static void Main(string[] args)
     {
-        if (args.Length < 3)
+        if (args.Length != 4)
         {
-            Console.Error.WriteLine("Usage: <input.pdf> <propertyName> <propertyValue> [output.pdf]");
+            Console.Error.WriteLine("Usage: <input.pdf> <output.pdf> <xmpPropertyName> <newValue>");
             return;
         }
 
         string inputPath  = args[0];
-        string propName   = args[1];
-        string propValue  = args[2];
-        string outputPath = args.Length >= 4 ? args[3] : GetDefaultOutputPath(inputPath);
+        string outputPath = args[1];
+        string propName   = args[2];
+        string propValue  = args[3];
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Error: Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Use PdfXmpMetadata facade to bind the PDF, modify XMP, and save.
-            using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-            {
-                // Load the PDF document.
-                xmp.BindPdf(inputPath);
+            // Load the PDF document
+            Document pdfDoc = new Document(inputPath);
 
-                // Add or update the specified XMP property.
-                // The Add(string, object) overload accepts a plain string value.
-                xmp.Add(propName, propValue);
+            // Update (or add) the specified XMP property using the Metadata dictionary
+            pdfDoc.Metadata[propName] = propValue;
 
-                // Persist the changes to a new PDF file.
-                xmp.Save(outputPath);
-            }
+            // Save the modified PDF
+            pdfDoc.Save(outputPath);
 
-            Console.WriteLine($"XMP property '{propName}' updated successfully.");
-            Console.WriteLine($"Output saved to: {outputPath}");
+            Console.WriteLine($"XMP property '{propName}' updated and saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error updating XMP metadata: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-    }
-
-    // Generates a default output file name by appending "_updated" before the extension.
-    private static string GetDefaultOutputPath(string inputPath)
-    {
-        string directory = Path.GetDirectoryName(inputPath);
-        string filename  = Path.GetFileNameWithoutExtension(inputPath);
-        string extension = Path.GetExtension(inputPath);
-        return Path.Combine(directory, $"{filename}_updated{extension}");
     }
 }

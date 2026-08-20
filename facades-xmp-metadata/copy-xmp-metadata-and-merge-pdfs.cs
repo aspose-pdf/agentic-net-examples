@@ -7,45 +7,42 @@ class Program
 {
     static void Main()
     {
-        const string sourcePath = "source.pdf";   // PDF with desired XMP metadata
-        const string targetPath = "target.pdf";   // PDF that will receive the metadata
-        const string outputPath = "merged.pdf";   // Resulting PDF after merge
+        const string sourcePdfPath = "source.pdf";   // PDF to copy XMP metadata from
+        const string targetPdfPath = "target.pdf";   // PDF that will receive the metadata
+        const string outputPdfPath = "merged.pdf";   // Resulting PDF after merging pages
 
-        if (!File.Exists(sourcePath) || !File.Exists(targetPath))
+        // Ensure source and target files exist
+        if (!File.Exists(sourcePdfPath) || !File.Exists(targetPdfPath))
         {
             Console.Error.WriteLine("Source or target PDF not found.");
             return;
         }
 
-        try
+        // Load source PDF and extract its XMP metadata using the Facade class
+        using (Document sourceDoc = new Document(sourcePdfPath))
         {
-            // Load source and target documents
-            using (Document sourceDoc = new Document(sourcePath))
-            using (Document targetDoc = new Document(targetPath))
-            {
-                // Extract XMP metadata from source PDF
-                PdfXmpMetadata xmpFacade = new PdfXmpMetadata();
-                xmpFacade.BindPdf(sourcePath);
-                byte[] xmpBytes = xmpFacade.GetXmpMetadata();
+            PdfXmpMetadata xmpFacade = new PdfXmpMetadata();
+            xmpFacade.BindPdf(sourceDoc);
+            byte[] xmpBytes = xmpFacade.GetXmpMetadata(); // XMP as XML bytes
 
-                // Apply extracted XMP metadata to target PDF
+            // Load target PDF, apply the extracted XMP metadata, then merge pages
+            using (Document targetDoc = new Document(targetPdfPath))
+            {
+                // Apply XMP metadata to the target document
                 using (MemoryStream xmpStream = new MemoryStream(xmpBytes))
                 {
                     targetDoc.SetXmpMetadata(xmpStream);
                 }
 
-                // Append all pages from source PDF to target PDF
+                // Append all pages from the source PDF to the target PDF
+                // Aspose.Pdf uses 1‑based page indexing; adding the whole collection is safe
                 targetDoc.Pages.Add(sourceDoc.Pages);
 
-                // Save the merged document with the transferred metadata
-                targetDoc.Save(outputPath);
+                // Save the merged document with the new metadata
+                targetDoc.Save(outputPdfPath);
             }
+        }
 
-            Console.WriteLine($"Merged PDF saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Merged PDF saved to '{outputPdfPath}'.");
     }
 }

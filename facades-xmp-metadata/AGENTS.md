@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - facades-xmp-metadata
 
-> **Facades XMP metadata** in PDF using C# / .NET -- **44** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades XMP metadata** in PDF using C# / .NET -- **44** verified, compile-tested examples for **Aspose.PDF for .NET** 26.8.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -24,22 +24,21 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 ## Required Namespaces
 
 - `using Aspose.Pdf.Facades;` (42/44 files) ← category-specific
-- `using Aspose.Pdf;` (28/44 files) ← category-specific
+- `using Aspose.Pdf;` (23/44 files) ← category-specific
 - `using Aspose.Pdf.Text;` (2/44 files)
 - `using Aspose.Pdf.Optimization;` (1/44 files)
 - `using Aspose.Pdf.XfaConverter;` (1/44 files)
 - `using System;` (44/44 files)
-- `using System.IO;` (33/44 files)
-- `using System.Text;` (6/44 files)
-- `using System.Xml;` (3/44 files)
-- `using System.Collections.Generic;` (2/44 files)
+- `using System.IO;` (37/44 files)
+- `using System.Text;` (7/44 files)
+- `using System.Xml;` (5/44 files)
+- `using NUnit.Framework;` (3/44 files)
 - `using System.Xml.Linq;` (2/44 files)
+- `using Newtonsoft.Json;` (1/44 files)
+- `using System.Collections.Generic;` (1/44 files)
 - `using System.Diagnostics;` (1/44 files)
 - `using System.Drawing;` (1/44 files)
-- `using System.Linq;` (1/44 files)
-- `using System.Reflection;` (1/44 files)
-- `using System.Text.Json;` (1/44 files)
-- `using System.Threading;` (1/44 files)
+- `using System.Threading.Tasks;` (1/44 files)
 - `using System.Xml.Schema;` (1/44 files)
 
 ## Common Code Pattern
@@ -58,36 +57,36 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-creator-metadata-to-pdf-document](./add-creator-metadata-to-pdf-document.cs) | Add Creator Metadata to PDF Document | `Document`, `PdfFileInfo`, `BindPdf` | Shows how to add or update the Creator XMP metadata of an Aspose.Pdf.Document by using the PdfFil... |
-| [add-minimal-xmp-metadata-fallback](./add-minimal-xmp-metadata-fallback.cs) | Add Minimal XMP Metadata Fallback to PDF | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Demonstrates binding a PDF to the PdfXmpMetadata facade, checking for existing XMP metadata, and ... |
-| [add-timestamp-to-pdf-xmp-metadata](./add-timestamp-to-pdf-xmp-metadata.cs) | Add Timestamp to PDF XMP Metadata | `Document`, `PdfXmpMetadata`, `Add` | Shows how to embed a custom ISO‑8601 timestamp into the XMP metadata of a PDF using Aspose.Pdf. |
-| [benchmark-xmp-metadata-extraction](./benchmark-xmp-metadata-extraction.cs) | Benchmark XMP Metadata Extraction from Large PDF | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Shows how to measure the time required to read XMP metadata from a large PDF using Aspose.Pdf.Fac... |
-| [clear-all-xmp-metadata](./clear-all-xmp-metadata.cs) | Clear All XMP Metadata from PDF | `Document`, `PdfXmpMetadata`, `BindPdf` | Shows how to remove every XMP metadata entry from a PDF while keeping the mandatory PDF schema he... |
-| [compress-pdf-read-xmp-metadata](./compress-pdf-read-xmp-metadata.cs) | Compress PDF with High Compression and Read XMP Metadata | `Document`, `All`, `ImageCompressionOptions` | The example compresses a PDF using high‑compression settings via OptimizationOptions and then ext... |
-| [copy-xmp-metadata-and-merge-pdfs](./copy-xmp-metadata-and-merge-pdfs.cs) | Copy XMP Metadata and Merge PDFs | `Document`, `PdfXmpMetadata`, `BindPdf` | Shows how to extract XMP metadata from a source PDF with PdfXmpMetadata, apply it to a target PDF... |
-| [create-xmp-metadata-pdf](./create-xmp-metadata-pdf.cs) | Create XMP Metadata and Embed in PDF | `Document`, `Page`, `TextFragment` | Shows how to generate a PDF, register XMP namespaces, add custom XMP metadata entries, and save t... |
-| [decrypt-encrypted-pdf-with-pdffilesecurity](./decrypt-encrypted-pdf-with-pdffilesecurity.cs) | Decrypt Encrypted PDF with PdfFileSecurity Facade | `PdfFileSecurity`, `BindPdf`, `DecryptFile` | Shows how to bind an encrypted PDF using PdfFileSecurity, handle InvalidPasswordException by load... |
-| [decrypt-update-creator-reencrypt-pdf](./decrypt-update-creator-reencrypt-pdf.cs) | Decrypt PDF, Update Creator Metadata, and Re‑Encrypt | `Document`, `DocumentInfo`, `Decrypt` | Demonstrates opening a password‑protected PDF using the owner password, changing the Creator meta... |
-| [detect-xmp-metadata-in-pdf](./detect-xmp-metadata-in-pdf.cs) | Detect XMP Metadata in a PDF | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Shows how to check whether a PDF file contains XMP metadata using the Aspose.Pdf.Facades.PdfXmpMe... |
-| [disable-baseurl-injection-for-pdf-generation](./disable-baseurl-injection-for-pdf-generation.cs) | Disable BaseUrl Injection for PDF Generation in Test Environ... | `Document`, `HtmlLoadOptions`, `Save` | Demonstrates using a configuration switch to control HtmlLoadOptions, disabling BaseUrl injection... |
-| [export-xmp-metadata-to-json](./export-xmp-metadata-to-json.cs) | Export XMP Metadata from PDF to JSON | `Document`, `PdfXmpMetadata`, `BindPdf` | Demonstrates how to extract XMP metadata from a PDF using Aspose.Pdf, convert the XML into a dict... |
-| [export-xmp-metadata-to-sidecar](./export-xmp-metadata-to-sidecar.cs) | Export XMP Metadata from PDF to Side‑car File | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Demonstrates how to extract XMP metadata from a PDF using Aspose.Pdf.Facades and save it as a sep... |
-| [extract-audit-original-xmp-metadata](./extract-audit-original-xmp-metadata.cs) | Extract and Audit Original XMP Metadata from PDF | `Document`, `PdfXmpMetadata`, `BindPdf` | Demonstrates how to load a PDF, retrieve its XMP metadata using the PdfXmpMetadata facade, and sa... |
-| [extract-xmp-metadata-from-pdf-byte-array](./extract-xmp-metadata-from-pdf-byte-array.cs) | Extract XMP Metadata from PDF Byte Array | `Document`, `Page`, `TextFragment` | Demonstrates how to create a PDF in memory, bind its byte array to the PdfXmpMetadata facade, and... |
-| [extract-xmp-metadata-to-dictionary](./extract-xmp-metadata-to-dictionary.cs) | Extract XMP Metadata from PDF to Dictionary | `PdfXmpMetadata`, `BindPdf`, `Keys` | Shows how to read XMP metadata from a PDF using Aspose.Pdf.Facades.PdfXmpMetadata and convert it ... |
-| [insert-pdf-pages-update-xmp-metadata](./insert-pdf-pages-update-xmp-metadata.cs) | Insert PDF Pages and Update XMP Metadata | `PdfFileEditor`, `TryInsert`, `PdfXmpMetadata` | Demonstrates inserting pages from one PDF into another using PdfFileEditor and then updating the ... |
-| [list-xmp-namespaces-in-pdf](./list-xmp-namespaces-in-pdf.cs) | List XMP Namespaces in a PDF | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Shows how to extract the XMP metadata from a PDF with Aspose.Pdf and enumerate the namespace decl... |
-| [load-pdf-retrieve-xmp-metadata](./load-pdf-retrieve-xmp-metadata.cs) | Load PDF and Retrieve XMP Metadata | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Shows how to bind an existing PDF file to a PdfXmpMetadata facade and extract its XMP metadata as... |
-| [log-xmp-metadata-size-before-after-modification](./log-xmp-metadata-size-before-after-modification.cs) | Log XMP Metadata Size Before and After Modification | `Document`, `PdfXmpMetadata`, `GetXmpMetadata` | Loads a PDF, reads its XMP metadata using PdfXmpMetadata, logs the original size, adds a custom f... |
-| [modify-xmp-creator-property](./modify-xmp-creator-property.cs) | Modify XMP Creator Property in a PDF | `Document`, `BindPdf`, `GetXmpMetadata` | Shows how to read the XMP metadata from a PDF, edit the dc:creator node, and write the updated me... |
-| [nightly-creator-metadata-refresh](./nightly-creator-metadata-refresh.cs) | Nightly Creator Metadata Refresh for PDFs | `PdfFileInfo`, `Creator`, `SaveNewInfo` | Shows how to schedule a daily job that scans a folder of PDFs and updates the Creator XMP metadat... |
-| [preserve-xmp-metadata-when-splitting-pdf](./preserve-xmp-metadata-when-splitting-pdf.cs) | Preserve XMP Metadata When Splitting PDF Pages | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Shows how to extract XMP metadata from a multi‑page PDF and attach it to each single‑page PDF gen... |
-| [read-xmp-metadata-from-pdf-unc](./read-xmp-metadata-from-pdf-unc.cs) | Read XMP Metadata from PDF via UNC Path | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Demonstrates loading a PDF located on a network share using a UNC path and extracting its XMP met... |
-| [read-xmp-metadata-from-pdf](./read-xmp-metadata-from-pdf.cs) | Read XMP Metadata from a PDF | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Demonstrates how to bind a PDF file, extract its XMP packet as XML, and query common metadata fie... |
-| [remove-nickname-from-pdf-xmp-metadata](./remove-nickname-from-pdf-xmp-metadata.cs) | Remove Nickname Element from PDF XMP Metadata | `PdfXmpMetadata`, `BindPdf`, `Remove` | Demonstrates how to delete the Nickname element from a PDF's XMP metadata using the Aspose.Pdf.Fa... |
-| [remove-xmp-metadata-from-pdf](./remove-xmp-metadata-from-pdf.cs) | Remove XMP Metadata from PDF | `Document`, `PdfXmpMetadata`, `Clear` | Shows how to delete the entire XMP metadata block from a PDF file using Aspose.Pdf's PdfXmpMetada... |
-| [replace-pdf-xmp-metadata](./replace-pdf-xmp-metadata.cs) | Replace PDF XMP Metadata from External File | `Document`, `SetXmpMetadata`, `Save` | Shows how to load a PDF, read an external .xmp file, and replace the PDF's existing XMP metadata ... |
-| [retrieve-xmp-metadata-from-pdf](./retrieve-xmp-metadata-from-pdf.cs) | Retrieve XMP Metadata from PDF | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Shows how to bind a PDF using PdfXmpMetadata and extract its raw XMP XML as a UTF‑8 string. |
+| [add-minimal-xmp-metadata-fallback](./add-minimal-xmp-metadata-fallback.cs) | Add Minimal XMP Metadata Fallback to PDF | `Document`, `PdfXmpMetadata`, `BindPdf` | Shows how to detect missing XMP metadata in a PDF and inject a minimal set of metadata entries us... |
+| [add-xmp-timestamp-to-pdf](./add-xmp-timestamp-to-pdf.cs) | Add XMP Timestamp to PDF during Generation | `Document`, `Page`, `TextFragment` | Shows how to create a PDF with Aspose.Pdf, add a page with sample text, and automatically embed a... |
+| [bind-pdf-byte-array-to-pdfxmpmetadata](./bind-pdf-byte-array-to-pdfxmpmetadata.cs) | Bind PDF Byte Array to PdfXmpMetadata and Extract XMP | `Document`, `Add`, `Save` | Demonstrates how to create a PDF in memory, bind it from a byte array to the PdfXmpMetadata facad... |
+| [clear-xmp-metadata-pdf](./clear-xmp-metadata-pdf.cs) | Clear All XMP Metadata from PDF while Preserving Header | `PdfXmpMetadata`, `BindPdf`, `Clear` | Demonstrates how to remove all XMP metadata from a PDF using Aspose.Pdf.Facades, keeping only the... |
+| [compress-pdf-read-xmp-metadata](./compress-pdf-read-xmp-metadata.cs) | Compress PDF with High Settings and Read XMP Metadata | `Document`, `OptimizationOptions`, `OptimizeResources` | Demonstrates compressing a PDF using high‑compression optimization options and then extracting it... |
+| [copy-xmp-metadata-and-merge-pdfs](./copy-xmp-metadata-and-merge-pdfs.cs) | Copy XMP Metadata and Merge PDFs | `Document`, `PdfXmpMetadata`, `BindPdf` | Shows how to extract XMP metadata from a source PDF with the PdfXmpMetadata facade, apply it to a... |
+| [create-pdf-with-xmp-metadata](./create-pdf-with-xmp-metadata.cs) | Create PDF with XMP Metadata | `Document`, `Add`, `RegisterNamespaceUri` | Shows how to generate a new PDF, register XMP namespaces, add custom XMP metadata entries, and sa... |
+| [decrypt-update-creatortool-reencrypt-pdf](./decrypt-update-creatortool-reencrypt-pdf.cs) | Decrypt PDF, Update CreatorTool, and Re‑encrypt | `Document`, `PdfFileSecurity`, `PdfFileInfo` | Demonstrates how to open a password‑protected PDF, decrypt it, modify the Creator metadata (Creat... |
+| [detect-and-modify-xmp-metadata](./detect-and-modify-xmp-metadata.cs) | Detect and Modify XMP Metadata in PDF | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Demonstrates how to bind a PDF with Aspose.Pdf.Facades.PdfXmpMetadata, check for existing XMP met... |
+| [disable-baseurl-injection-html-to-pdf](./disable-baseurl-injection-html-to-pdf.cs) | Disable BaseUrl Injection When Converting HTML to PDF | `Document`, `HtmlLoadOptions`, `PdfViewer` | Shows how to use a configuration switch to optionally omit the BaseUrl in HtmlLoadOptions while c... |
+| [export-pdf-xmp-metadata-to-json](./export-pdf-xmp-metadata-to-json.cs) | Export PDF XMP Metadata to JSON | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Shows how to extract XMP metadata from a PDF using Aspose.Pdf.Facades and convert it into JSON fo... |
+| [export-xmp-metadata-from-pdf](./export-xmp-metadata-from-pdf.cs) | Export XMP Metadata from PDF to a Side‑car File | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Demonstrates how to bind a PDF document, retrieve its XMP metadata using Aspose.Pdf.Facades, and ... |
+| [extract-xmp-metadata-from-pdf](./extract-xmp-metadata-from-pdf.cs) | Extract XMP Metadata from PDF | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Demonstrates how to bind a PDF with the PdfXmpMetadata facade, retrieve the raw XMP XML bytes, co... |
+| [extract-xmp-metadata-to-dictionary](./extract-xmp-metadata-to-dictionary.cs) | Extract XMP Metadata from PDF to Dictionary | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Shows how to read the XMP packet from a PDF using Aspose.Pdf.Facades and convert the XML into a c... |
+| [insert-pages-update-xmp-metadata](./insert-pages-update-xmp-metadata.cs) | Insert Pages and Update XMP Metadata in PDF | `PdfFileEditor`, `TryInsert`, `PdfXmpMetadata` | Demonstrates how to insert selected pages from one PDF into another and then add or overwrite XMP... |
+| [list-xmp-namespaces-in-pdf](./list-xmp-namespaces-in-pdf.cs) | List XMP Namespaces in a PDF | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Shows how to extract the XMP metadata packet from a PDF using Aspose.Pdf and enumerate the namesp... |
+| [load-encrypted-pdf-decrypt-save](./load-encrypted-pdf-decrypt-save.cs) | Load Encrypted PDF, Decrypt with Password, and Save Unprotec... | `Document`, `ctor(string)`, `ctor(string, string)` | Demonstrates how to detect an encrypted PDF, handle the InvalidPasswordException, load the docume... |
+| [log-original-xmp-metadata](./log-original-xmp-metadata.cs) | Log Original XMP Metadata from PDF | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Shows how to bind a PDF using the PdfXmpMetadata facade, extract the XMP metadata as XML, and sav... |
+| [log-xmp-metadata-size-before-after-modification](./log-xmp-metadata-size-before-after-modification.cs) | Log XMP Metadata Size Before and After Modification | `Document`, `PdfXmpMetadata`, `GetXmpMetadata` | Demonstrates how to retrieve, log, and modify the XMP metadata block of a PDF using Aspose.Pdf, s... |
+| [modify-xmp-creator-property](./modify-xmp-creator-property.cs) | Modify XMP Creator Property in PDF | `Document`, `PdfXmpMetadata`, `BindPdf` | Demonstrates reading XMP metadata from a PDF, updating the dc:creator element, and writing the mo... |
+| [persist-custom-xmp-metadata-pdf](./persist-custom-xmp-metadata-pdf.cs) | Persist Custom XMP Metadata in PDF | `Document`, `PdfFileInfo`, `Creator` | The example creates a PDF, sets the Creator property and custom XMP metadata entries (BaseUrl and... |
+| [read-xmp-metadata-from-large-pdf](./read-xmp-metadata-from-large-pdf.cs) | Read XMP Metadata from Large PDF and Measure Performance | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Demonstrates how to bind a large PDF file, extract its XMP metadata using Aspose.Pdf.Facades, and... |
+| [read-xmp-metadata-from-pdf-unc](./read-xmp-metadata-from-pdf-unc.cs) | Read XMP Metadata from PDF via UNC Path | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Shows how to bind a PDF located on a network share using a UNC path and extract its XMP metadata ... |
+| [read-xmp-metadata-from-pdf](./read-xmp-metadata-from-pdf.cs) | Read XMP Metadata from PDF | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Demonstrates how to bind a PDF file to a PdfXmpMetadata facade and retrieve its XMP metadata as a... |
+| [read-xmp-metadata-from-pdf__v2](./read-xmp-metadata-from-pdf__v2.cs) | Read and Parse XMP Metadata from a PDF | `PdfXmpMetadata`, `BindPdf`, `GetXmpMetadata` | Demonstrates how to bind a PDF, extract its XMP metadata as XML, and read specific schema propert... |
+| [refresh-creatortool-metadata-for-pdfs](./refresh-creatortool-metadata-for-pdfs.cs) | Refresh CreatorTool Metadata for PDFs | `PdfFileInfo`, `SaveNewInfo`, `Creator` | Shows how to scan a repository of PDF files and update the CreatorTool‑related XMP metadata (Crea... |
+| [remove-nickname-from-xmp-metadata](./remove-nickname-from-xmp-metadata.cs) | Remove Nickname Element from PDF XMP Metadata | `PdfXmpMetadata`, `BindPdf`, `Remove` | Shows how to bind a PDF, remove the Nickname property from its XMP metadata using the PdfXmpMetad... |
+| [remove-xmp-metadata-from-pdf](./remove-xmp-metadata-from-pdf.cs) | Remove XMP Metadata from PDF | `PdfXmpMetadata`, `BindPdf`, `Clear` | Shows how to delete the entire XMP metadata block from a PDF using Aspose.Pdf.Facades and save a ... |
+| [replace-pdf-xmp-metadata](./replace-pdf-xmp-metadata.cs) | Replace PDF XMP Metadata from External File | `Document`, `SetXmpMetadata`, `Save` | Demonstrates loading a PDF, reading an external XMP file and replacing the document's XMP metadat... |
+| [set-baseurl-in-pdf-xmp-metadata](./set-baseurl-in-pdf-xmp-metadata.cs) | Set BaseURL in PDF XMP Metadata | `PdfXmpMetadata`, `BindPdf`, `Add` | Demonstrates how to add or replace the BaseURL property in a PDF's XMP metadata using the PdfXmpM... |
 | ... | | | *and 14 more files* |
 
 ## Category Statistics
@@ -102,5 +101,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for facades-xmp-metadata patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-07-17 | Run: `20260717_171638_da3b3e`
+Updated: 2026-08-20 | Run: `20260820_001147_12d7b3`
 <!-- AUTOGENERATED:END -->

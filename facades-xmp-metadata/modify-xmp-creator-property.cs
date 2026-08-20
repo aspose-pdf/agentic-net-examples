@@ -9,60 +9,68 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
-        const string newCreator = "New Creator Name";
+        const string newCreator = "New Author";
 
+        // Ensure input PDF exists (self‑contained example)
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
+            using var seed = new Document();
+            seed.Pages.Add();
+            seed.Save(inputPdf);
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Bind the PDF to the XMP metadata facade
-            PdfXmpMetadata xmp = new PdfXmpMetadata();
+            // Bind XMP metadata facade to the document
+            var xmp = new PdfXmpMetadata();
             xmp.BindPdf(doc);
 
-            // Retrieve the existing XMP metadata as a byte array
-            byte[] rawXmp = xmp.GetXmpMetadata();
+            // Retrieve existing XMP metadata as XML string
+            byte[] rawMetadata = xmp.GetXmpMetadata();
+            string xml = Encoding.UTF8.GetString(rawMetadata);
 
-            // Convert the byte array to a string (UTF‑8) and load it into an XmlDocument
-            string xmpXml = Encoding.UTF8.GetString(rawXmp);
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xmpXml);
+            // Load XML into XmlDocument for manipulation
+            var xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(xml);
 
-            // Prepare a namespace manager because XMP uses XML namespaces
-            XmlNamespaceManager ns = new XmlNamespaceManager(xmlDoc.NameTable);
-            ns.AddNamespace("dc", "http://purl.org/dc/elements/1.1/"); // Dublin Core namespace
+            // Prepare namespace manager (XMP uses Dublin Core namespace for creator)
+            var nsMgr = new XmlNamespaceManager(xmlDoc.NameTable);
+            nsMgr.AddNamespace("dc", "http://purl.org/dc/elements/1.1/");
+            nsMgr.AddNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
 
-            // Locate the existing node (e.g., dc:creator) and modify its value
-            XmlNode creatorNode = xmlDoc.SelectSingleNode("//dc:creator", ns);
+            // Locate the dc:creator node and modify its value
+            XmlNode? creatorNode = xmlDoc.SelectSingleNode("//dc:creator", nsMgr);
             if (creatorNode != null)
             {
                 creatorNode.InnerText = newCreator;
             }
             else
             {
-                Console.WriteLine("Creator node not found; no changes applied.");
+                // If the node does not exist, create it under the first rdf:Description element
+                XmlNode? descriptionNode = xmlDoc.SelectSingleNode("//rdf:Description", nsMgr);
+                if (descriptionNode != null)
+                {
+                    string? dcNs = nsMgr.LookupNamespace("dc");
+                    // dcNs is guaranteed because we added it above
+                    var newCreatorElem = xmlDoc.CreateElement("dc", "creator", dcNs!);
+                    newCreatorElem.InnerText = newCreator;
+                    descriptionNode.AppendChild(newCreatorElem);
+                }
             }
 
-            // Write the modified XML back into a memory stream
-            using (MemoryStream updatedStream = new MemoryStream())
-            {
-                xmlDoc.Save(updatedStream);
-                updatedStream.Position = 0; // reset stream position for reading
+            // Save the modified XML back into a memory stream
+            using var ms = new MemoryStream();
+            xmlDoc.Save(ms);
+            ms.Position = 0;
 
-                // Set the updated XMP metadata on the document
-                doc.SetXmpMetadata(updatedStream);
-
-                // Save the PDF with the new XMP metadata
-                doc.Save(outputPdf);
-            }
+            // Write the updated XMP metadata back to the PDF
+            doc.SetXmpMetadata(ms);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"XMP metadata updated and saved to '{outputPdf}'.");
     }
 }

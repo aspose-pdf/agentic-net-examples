@@ -1,66 +1,71 @@
 using System;
 using System.IO;
+using System.Xml;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class PdfPublicationValidator
 {
-    /// <summary>
-    /// Validates that the specified PDF contains all mandatory XMP metadata fields.
-    /// If validation succeeds, the PDF is saved to the output path.
-    /// </summary>
-    /// <param name="inputPdfPath">Path to the source PDF.</param>
-    /// <param name="outputPdfPath">Path where the validated PDF will be saved.</param>
-    /// <param name="mandatoryFields">Array of XMP field names that must be present (e.g., "dc:title", "dc:creator").</param>
-    /// <returns>True if all mandatory fields are present and the PDF was saved; otherwise false.</returns>
-    public static bool ValidateAndPublish(string inputPdfPath, string outputPdfPath, string[] mandatoryFields)
+    // Validates that all mandatory XMP fields are present in the PDF.
+    // If validation succeeds, the PDF is saved to the specified output path.
+    // Otherwise, an exception is thrown.
+    public static void ValidateAndPublish(string inputPdfPath, string[] mandatoryXmpFields, string outputPdfPath)
     {
-        // Verify input file exists
         if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return false;
-        }
+            throw new FileNotFoundException($"Input PDF not found: {inputPdfPath}");
 
-        try
+        // Load the PDF document (lifecycle: create & load)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document (lifecycle rule: use Document constructor)
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Bind the PDF to the XMP metadata facade
+            using (PdfXmpMetadata xmpFacade = new PdfXmpMetadata())
             {
-                // Bind the PDF to the XMP metadata facade (facade rule)
-                PdfXmpMetadata xmp = new PdfXmpMetadata(pdfDoc);
-                xmp.BindPdf(pdfDoc);
+                xmpFacade.BindPdf(pdfDoc);
 
-                // Check each mandatory XMP field
-                foreach (string fieldName in mandatoryFields)
+                // Retrieve the full XMP metadata as XML bytes
+                byte[] xmpBytes = xmpFacade.GetXmpMetadata();
+                if (xmpBytes == null || xmpBytes.Length == 0)
+                    throw new InvalidOperationException("The PDF does not contain any XMP metadata.");
+
+                // Load the XML into an XmlDocument for querying
+                XmlDocument xmlDoc = new XmlDocument();
+                using (MemoryStream ms = new MemoryStream(xmpBytes))
                 {
-                    if (!xmp.ContainsKey(fieldName))
-                    {
-                        Console.Error.WriteLine($"Missing mandatory XMP field: {fieldName}");
-                        return false; // Validation failed
-                    }
+                    xmlDoc.Load(ms);
                 }
 
-                // Optional: perform PDF structural validation (uses Document.Validate)
-                // The validation log is written to a temporary file; it can be inspected if needed.
-                string validationLog = Path.Combine(Path.GetDirectoryName(outputPdfPath) ?? ".", "validation.log");
-                bool isValid = pdfDoc.Validate(validationLog, PdfFormat.PDF_A_1B);
-                if (!isValid)
-                {
-                    Console.Error.WriteLine($"PDF validation failed. See log: {validationLog}");
-                    return false;
-                }
+                // Namespace manager to handle common XMP namespaces (dc, xmp, etc.)
+                XmlNamespaceManager nsMgr = new XmlNamespaceManager(xmlDoc.NameTable);
+                nsMgr.AddNamespace("dc", "http://purl.org/dc/elements/1.1/");
+                nsMgr.AddNamespace("xmp", "http://ns.adobe.com/xap/1.0/");
+                nsMgr.AddNamespace("pdf", "http://ns.adobe.com/pdf/1.3/");
+                nsMgr.AddNamespace("pdfa", "http://www.aiim.org/pdfa/ns/schema#");
+                nsMgr.AddNamespace("pdfaid", "http://www.aiim.org/pdfa/ns/id/");
 
-                // Save the validated PDF (lifecycle rule: use Document.Save)
-                pdfDoc.Save(outputPdfPath);
-                Console.WriteLine($"PDF validated and saved to: {outputPdfPath}");
-                return true;
+                // Verify each mandatory field exists and has a non‑empty value
+                foreach (string field in mandatoryXmpFields)
+                {
+                    // The field name may include a prefix (e.g., "dc:creator").
+                    // Split prefix and local name to build an XPath expression.
+                    string[] parts = field.Split(':');
+                    if (parts.Length != 2)
+                        throw new ArgumentException($"Invalid XMP field format: {field}. Expected prefix:localName.");
+
+                    string prefix = parts[0];
+                    string localName = parts[1];
+
+                    // Build XPath: //prefix:localName
+                    string xpath = $"//{prefix}:{localName}";
+                    XmlNode node = xmlDoc.SelectSingleNode(xpath, nsMgr);
+
+                    if (node == null || string.IsNullOrWhiteSpace(node.InnerText))
+                        throw new InvalidOperationException($"Mandatory XMP field '{field}' is missing or empty.");
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during validation/publication: {ex.Message}");
-            return false;
+
+            // All mandatory fields are present – save (publish) the PDF.
+            // Save operation follows the lifecycle rule (using block ensures disposal).
+            pdfDoc.Save(outputPdfPath);
         }
     }
 
@@ -70,15 +75,24 @@ class PdfPublicationValidator
         string inputPath = "source.pdf";
         string outputPath = "published.pdf";
 
-        // Define the XMP fields that must be present
-        string[] requiredXmpFields = new[]
+        // Define the XMP fields that must be present.
+        // Adjust the list according to your publication requirements.
+        string[] requiredFields = new string[]
         {
             "dc:title",
             "dc:creator",
-            "dc:description"
+            "dc:description",
+            "pdf:Producer"
         };
 
-        bool result = ValidateAndPublish(inputPath, outputPath, requiredXmpFields);
-        Console.WriteLine(result ? "Publication succeeded." : "Publication aborted due to missing XMP metadata.");
+        try
+        {
+            ValidateAndPublish(inputPath, requiredFields, outputPath);
+            Console.WriteLine($"PDF validated and published to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Validation failed: {ex.Message}");
+        }
     }
 }
