@@ -1,58 +1,41 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;               // Facade APIs for stamping
-using Aspose.Pdf;                       // Core PDF types (Document, Page, etc.)
-using Aspose.Pdf.Text;                  // For FormattedText (requires System.Drawing.Color)
+using System.Drawing; // System.Drawing.Color for FormattedText
+using Aspose.Pdf.Facades; // PdfFileMend, FormattedText, EncodingType
 
-// Apply a text stamp only on pages 1, 5 and 10 of an existing PDF.
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "stamped_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "stamped_output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Initialize the PdfFileStamp facade.
-        using (PdfFileStamp fileStamp = new PdfFileStamp())
-        {
-            // Bind the source PDF file.
-            fileStamp.BindPdf(inputPdf);
+        // Prepare the formatted text (watermark) – use System.Drawing.Color and a float font size.
+        FormattedText formattedText = new FormattedText(
+            "CONFIDENTIAL",          // text
+            Color.Red,                // System.Drawing.Color
+            "Helvetica",             // font name
+            EncodingType.Winansi,     // encoding
+            false,                    // embed font?
+            36f);                     // font size (float)
 
-            // Create a text stamp using FormattedText.
-            // Note: FormattedText constructor requires System.Drawing.Color.
-            FormattedText ft = new FormattedText(
-                "CONFIDENTIAL",                     // Text to display
-                System.Drawing.Color.Red,           // Text color
-                "Helvetica",                        // Font name
-                EncodingType.Winansi,               // Encoding
-                false,                              // Embedded flag
-                36);                                // Font size
+        // Pages that should receive the stamp.
+        int[] targetPages = { 1, 5, 10 };
 
-            // Create the stamp object (fully qualified to avoid ambiguity).
-            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-            stamp.BindLogo(ft);                    // Attach the formatted text.
-            stamp.IsBackground = true;            // Render behind page content.
-            stamp.Opacity = 0.5f;                  // Semi‑transparent.
+        // Use PdfFileMend (not PdfFileStamp) to add the text to the selected pages.
+        PdfFileMend mend = new PdfFileMend();
+        mend.BindPdf(inputPath);
+        // AddText overload: (FormattedText, int[] pages, float llx, float lly, float urx, float ury)
+        mend.AddText(formattedText, targetPages, 100f, 500f, 300f, 550f);
+        mend.Save(outputPath);
+        mend.Close();
 
-            // Restrict the stamp to pages 1, 5 and 10.
-            stamp.Pages = new int[] { 1, 5, 10 };
-
-            // Add the configured stamp to the PDF.
-            fileStamp.AddStamp(stamp);
-
-            // Save the result. The Save method writes the output file.
-            fileStamp.Save(outputPdf);
-
-            // Close releases resources (optional because of using).
-            fileStamp.Close();
-        }
-
-        Console.WriteLine($"Stamp applied to pages 1, 5, 10. Output saved as '{outputPdf}'.");
+        Console.WriteLine($"Text stamp applied to pages 1,5,10. Output saved to '{outputPath}'.");
     }
 }

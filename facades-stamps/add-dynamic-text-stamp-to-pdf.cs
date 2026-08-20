@@ -1,51 +1,56 @@
 using System;
 using System.IO;
-using System.Drawing;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Text;   // for TextStamp
+using Aspose.Pdf.Annotations; // not needed but harmless
 
 class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "stamped_output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "stamped_output.pdf";
+
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
         // Dynamic values to embed in the stamp
         string author = "John Doe";
         string date   = DateTime.Now.ToString("yyyy-MM-dd");
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        // Create the stamp text using string interpolation
+        string stampText = $"Author: {author} | Date: {date}";
+
+        // Process the PDF
+        using (Document doc = new Document(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
+            // Create a TextStamp with the interpolated text
+            TextStamp textStamp = new TextStamp(stampText)
+            {
+                // Example visual settings (optional)
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                Opacity             = 0.5f,
+                // Adjust the stamp to fit the page width if needed
+                AutoAdjustFontSizeToFitStampRectangle = true,
+                // Position can be fine‑tuned via margins
+                RightMargin = 20,
+                BottomMargin = 20
+            };
+
+            // Apply the stamp to each page (or a specific page)
+            foreach (Page page in doc.Pages)
+            {
+                page.AddStamp(textStamp);
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        // Create formatted text with interpolation (all styling via constructor)
-        FormattedText formattedText = new FormattedText(
-            $"Author: {author}, Date: {date}",
-            Color.Black,               // text color
-            "Helvetica",              // font name
-            EncodingType.Winansi,
-            false,                     // embed font?
-            12);                       // font size
-
-        // Build a Stamp and bind the formatted text
-        Stamp stamp = new Stamp();
-        stamp.BindLogo(formattedText);
-        stamp.SetOrigin(0, 20);                 // X,Y from bottom‑left corner
-        stamp.IsBackground = false;            // place on top of page content
-        stamp.Opacity = 0.8f;                   // semi‑transparent
-        // Alignment and indent properties are not available on Stamp; positioning is handled via SetOrigin.
-
-        // Apply the stamp to all pages of the document
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(inputPdf);
-        fileStamp.AddStamp(stamp);
-        fileStamp.Save(outputPdf);
-        fileStamp.Close();
-
-        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }
