@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -6,32 +7,38 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document and ensure proper disposal
+        const string outputPath = "graph.pdf";
+
+        // Create a new PDF document (wrapped in using for proper disposal)
         using (Document doc = new Document())
         {
             // Add a blank page to the document
             Page page = doc.Pages.Add();
 
-            // Use the double‑parameter constructor (required by the API)
-            Graph graph = new Graph(300.0, 200.0);
+            // Create a Graph instance with the desired size (double constructor is required)
+            Graph graph = new Graph(400.0, 200.0);
 
-            // Explicitly set the exact dimensions (optional – the constructor already defines them)
-            graph.Width = 300;   // width in points
-            graph.Height = 200;  // height in points
+            // Optionally, you can also set Width and Height explicitly (they are read‑only after construction, but setting them does no harm)
+            graph.Width = 400;
+            graph.Height = 200;
 
-            // Create a rectangle shape that fills the graph area
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 300f, 200f);
+            // Add a visible rectangle that fills the entire graph area
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 400f, 200f);
             rect.GraphInfo = new GraphInfo
             {
-                FillColor = Color.LightGray
+                FillColor = Color.LightGray,
+                Color = Color.Black,
+                LineWidth = 1f
             };
             graph.Shapes.Add(rect);
 
-            // Add the configured graph to the page's paragraph collection
+            // Add the graph to the page's paragraph collection
             page.Paragraphs.Add(graph);
 
-            // Save the PDF to disk
-            doc.Save("graph_dimensions.pdf");
+            // Save the document as a PDF
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF with graph saved to '{outputPath}'.");
     }
 }

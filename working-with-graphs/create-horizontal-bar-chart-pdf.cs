@@ -6,43 +6,46 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "barchart.pdf";
+        const string outputPath = "bar_chart.pdf";
 
-        // Document lifecycle must be wrapped in a using block
+        // Document lifecycle must be wrapped in a using block for proper disposal
         using (Document doc = new Document())
         {
-            // Add a single page to the document
+            // Add a single page (Pages are 1‑based)
             Page page = doc.Pages.Add();
 
             // Create a Graph container that will hold the rectangle shapes
-            // Width and height define the drawing area for the graph
-            Graph graph = new Graph(600, 200);
+            // Width and height are in points; adjust as needed for the page size
+            Graph graph = new Graph(500, 200);
+            graph.Left = 50;   // position from the left edge of the page
+            graph.Top  = 600;  // position from the bottom edge of the page
 
-            // Parameters for the bar chart
-            double barWidth = 30;               // Width of each bar
-            double barHeight = 20;              // Height of each bar
-            double startX = 50;                 // X coordinate of the first bar
-            double startY = 100;                // Y coordinate (bottom) for all bars
-            double xIncrement = 40;             // Horizontal distance between bars
+            // Bar chart parameters
+            double barWidth   = 30;   // width of each bar
+            double spacing    = 10;   // space between bars
+            double maxHeight  = 150;  // maximum bar height (for scaling)
 
-            // Loop to add ten rectangles (bars) with incremental X positions
+            // Loop to create ten bars with incremental X positions
             for (int i = 0; i < 10; i++)
             {
-                // Calculate the X position for the current bar
-                double x = startX + i * xIncrement;
+                // X coordinate for the current bar
+                double left = i * (barWidth + spacing);
 
-                // Create a rectangle shape (left, bottom, width, height)
+                // Example height: increase with index (you could use real data here)
+                double height = (i + 1) * (maxHeight / 10);
+
+                // Create a rectangle shape (Aspose.Pdf.Drawing.Rectangle, not Aspose.Pdf.Rectangle)
                 Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(
-                    (float)x,               // left (X)
-                    (float)startY,          // bottom (Y)
-                    (float)barWidth,        // width
-                    (float)barHeight);      // height
+                    (float)left,          // left position within the graph
+                    0,                    // bottom position (baseline)
+                    (float)barWidth,      // width of the bar
+                    (float)height);       // height of the bar
 
-                // Set visual properties via GraphInfo (FillColor, Border Color, LineWidth)
+                // Set visual styling via GraphInfo (FillColor, border Color, LineWidth)
                 rect.GraphInfo = new GraphInfo
                 {
-                    FillColor = Aspose.Pdf.Color.LightGray,
-                    Color = Aspose.Pdf.Color.Black,
+                    FillColor = Aspose.Pdf.Color.FromRgb(0.2 + i * 0.08, 0.4, 0.6), // varying fill color
+                    Color     = Aspose.Pdf.Color.Black,                           // border color
                     LineWidth = 1
                 };
 
@@ -50,13 +53,13 @@ class Program
                 graph.Shapes.Add(rect);
             }
 
-            // Add the graph (containing all rectangles) to the page
+            // Add the completed graph to the page's paragraph collection
             page.Paragraphs.Add(graph);
 
-            // Save the PDF document
+            // Save the PDF (Document.Save without SaveOptions writes PDF)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Bar chart PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Bar chart saved to '{outputPath}'.");
     }
 }

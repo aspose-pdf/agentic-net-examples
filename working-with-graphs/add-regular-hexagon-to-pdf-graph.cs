@@ -6,67 +6,62 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document
+        // Create a new PDF document inside a using block for proper disposal.
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a blank page to the document.
             Page page = doc.Pages.Add();
 
-            // Create a Graph container (width, height) – use double overload as the float overload is obsolete
-            Graph graph = new Graph(400.0, 400.0);
+            // Define a graph (container for vector shapes) with desired size.
+            // Width and height are in points (1/72 inch).
+            Graph graph = new Graph(400, 300);
 
-            // Parameters for a regular hexagon
-            float radius = 100f;          // distance from center to vertices
-            float centerX = 200f;         // X coordinate of the center
-            float centerY = 200f;         // Y coordinate of the center
+            // Parameters for a regular hexagon.
+            double centerX = 200;   // X coordinate of the center.
+            double centerY = 150;   // Y coordinate of the center.
+            double radius  = 100;   // Distance from center to any vertex.
+            int sides = 6;          // Number of sides for a regular polygon.
 
-            // Compute the six vertices of the hexagon
-            float[] vertices = new float[12]; // 6 points * (x,y)
-            for (int i = 0; i < 6; i++)
+            // Pre‑compute the vertices of the hexagon.
+            var vertices = new System.Drawing.PointF[sides];
+            for (int i = 0; i < sides; i++)
             {
-                double angle = Math.PI / 3 * i - Math.PI / 2; // start at top
-                vertices[2 * i]     = (float)(centerX + radius * Math.Cos(angle));
-                vertices[2 * i + 1] = (float)(centerY + radius * Math.Sin(angle));
+                double angle = Math.PI / 3 * i; // 60° increments.
+                float x = (float)(centerX + radius * Math.Cos(angle));
+                float y = (float)(centerY + radius * Math.Sin(angle));
+                vertices[i] = new System.Drawing.PointF(x, y);
             }
 
-            // Create line shapes connecting consecutive vertices and close the polygon
-            Shape[] lines = new Shape[6];
-            for (int i = 0; i < 6; i++)
+            // Create line shapes for each edge of the polygon.
+            for (int i = 0; i < sides; i++)
             {
-                int next = (i + 1) % 6;
-                float[] linePos = {
-                    vertices[2 * i], vertices[2 * i + 1],
-                    vertices[2 * next], vertices[2 * next + 1]
-                };
+                // Current vertex.
+                var p1 = vertices[i];
+                // Next vertex (wrap around to the first vertex).
+                var p2 = vertices[(i + 1) % sides];
+
+                // Line constructor expects a float array: { x1, y1, x2, y2 }.
+                float[] linePos = { p1.X, p1.Y, p2.X, p2.Y };
                 Line line = new Line(linePos);
-                // Set border color and thickness via GraphInfo
+
+                // Set border (stroke) color and thickness via GraphInfo.
                 line.GraphInfo = new GraphInfo
                 {
-                    Color = Aspose.Pdf.Color.Blue, // border color
-                    LineWidth = 2f                 // border thickness
+                    Color = Aspose.Pdf.Color.Blue,   // Border color.
+                    LineWidth = 2                     // Border thickness.
                 };
-                lines[i] = line;
+
+                // Add the line to the graph.
+                graph.Shapes.Add(line);
             }
 
-            // Combine the lines into a single Path shape (fully qualified to avoid ambiguity with System.IO.Path)
-            Aspose.Pdf.Drawing.Path hexagon = new Aspose.Pdf.Drawing.Path(lines);
-            // Ensure the overall path also has the desired border styling
-            hexagon.GraphInfo = new GraphInfo
-            {
-                Color = Aspose.Pdf.Color.Blue,
-                LineWidth = 2f
-            };
-
-            // Add the hexagon shape to the graph
-            graph.Shapes.Add(hexagon);
-
-            // Add the graph to the page
+            // Add the completed graph to the page's paragraph collection.
             page.Paragraphs.Add(graph);
 
-            // Save the PDF
-            doc.Save("regular_hexagon.pdf");
+            // Save the PDF document.
+            doc.Save("RegularHexagon.pdf");
         }
 
-        Console.WriteLine("PDF with a regular hexagon saved as 'regular_hexagon.pdf'.");
+        Console.WriteLine("PDF with a regular hexagon saved as 'RegularHexagon.pdf'.");
     }
 }
