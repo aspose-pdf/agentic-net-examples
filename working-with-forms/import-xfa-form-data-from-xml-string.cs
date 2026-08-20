@@ -7,50 +7,38 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the output PDF
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        // XML string containing the form data to be imported
-        const string formDataXml = @"
-            <xfa:datasets xmlns:xfa='http://www.xfa.org/schema/xfa-data/1.0/'>
-                <xfa:data>
-                    <form>
-                        <FirstName>John</FirstName>
-                        <LastName>Doe</LastName>
-                        <Email>john.doe@example.com</Email>
-                    </form>
-                </xfa:data>
-            </xfa:datasets>";
+        // XML string containing form field values (XFA format)
+        string xmlData = @"<?xml version='1.0' encoding='UTF-8'?>
+<xfa:datasets xmlns:xfa='http://www.xfa.org/schema/xfa-data/1.0/'>
+    <data>
+        <field1>Value1</field1>
+        <field2>Value2</field2>
+    </data>
+</xfa:datasets>";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
-            {
-                // Load the XML string into an XmlDocument
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.LoadXml(formDataXml);
+            // Parse the XML string into an XmlDocument
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(xmlData);
 
-                // Assign the XFA data to the form (core API, no Facades)
-                pdfDoc.Form.AssignXfa(xmlDoc);
+            // Import the XML data into the PDF form (XFA)
+            doc.Form.AssignXfa(xmlDoc);
 
-                // Save the updated PDF
-                pdfDoc.Save(outputPdfPath);
-            }
-
-            Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
+            // Save the updated PDF
+            doc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form data imported and saved to '{outputPdf}'.");
     }
 }

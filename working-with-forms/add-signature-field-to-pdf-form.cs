@@ -8,34 +8,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "signed_form.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block for proper disposal
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access the form object (creates one if it doesn't exist)
-            Form form = doc.Form;
-
-            // Define the rectangle where the signature field will appear
-            // (lower‑left‑x, lower‑left‑y, upper‑right‑x, upper‑right‑y)
+            // Define the position and size of the signature field (llx, lly, urx, ury)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
 
-            // Create a signature field on the document (first page by default)
-            SignatureField signatureField = new SignatureField(doc, rect)
+            // Create a signature field on the first page (page index is 1‑based)
+            SignatureField sigField = new SignatureField(doc, rect)
             {
-                PartialName = "Signature1",      // field name used in scripts or later signing
-                AlternateName = "Sign Here"      // tooltip shown in PDF viewers
+                Name = "Signature1",               // internal field name
+                AlternateName = "Sign Here",       // tooltip shown in PDF viewers
+                Required = true,                  // make the field required
+                ReadOnly = false                  // allow user input
             };
 
-            // Add the field to the form on page 1 (pages are 1‑based)
-            form.Add(signatureField, 1);
+            // Add the signature field to the document's form
+            doc.Form.Add(sigField);
 
             // Save the modified PDF
             doc.Save(outputPath);

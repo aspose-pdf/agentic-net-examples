@@ -1,65 +1,72 @@
 using System;
 using System.IO;
+using System.Drawing; // for System.Drawing.Color
+using System.Text.Json; // for JSON serialization
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text; // needed for DefaultAppearance
 
 class Program
 {
     static void Main()
     {
-        // File paths
-        const string templatePath = "template.pdf";
+        const string templatePath = "form_template.pdf";
         const string jsonPath     = "data.json";
-        const string filledPath   = "filled.pdf";
+        const string outputPath   = "filled_form.pdf";
 
-        // -------------------------------------------------
-        // 1. Create a PDF form template with placeholder fields
-        // -------------------------------------------------
+        // ---------- Create a PDF form template ----------
         using (Document doc = new Document())
         {
-            // Add a new page (1‑based indexing)
+            // Add a single page (1‑based indexing)
             Page page = doc.Pages.Add();
 
-            // ----- Text box field (Name) -----
-            // Rectangle(left, bottom, width, height)
-            Aspose.Pdf.Rectangle nameRect = new Aspose.Pdf.Rectangle(100, 700, 300, 720);
-            TextBoxField nameField = new TextBoxField(page, nameRect)
+            // ----- Text box field (placeholder) -----
+            Aspose.Pdf.Rectangle txtRect = new Aspose.Pdf.Rectangle(100, 600, 300, 620);
+            TextBoxField txtField = new TextBoxField(page, txtRect)
             {
-                PartialName = "Name",          // field identifier
-                Value       = "Enter name"    // placeholder text
+                PartialName = "NameField",          // field identifier
+                Value       = "Enter name"          // placeholder text
             };
-            doc.Form.Add(nameField);           // attach to the form (adds annotation)
+            // Set default appearance using the constructor (font name, size, color)
+            txtField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
+            // Add the field to the document's form (not the page)
+            doc.Form.Add(txtField);
 
-            // ----- Check box field (Subscribe) -----
-            Aspose.Pdf.Rectangle subscribeRect = new Aspose.Pdf.Rectangle(100, 650, 120, 670);
-            CheckboxField subscribeField = new CheckboxField(page, subscribeRect)
+            // ----- Checkbox field (placeholder) -----
+            Aspose.Pdf.Rectangle chkRect = new Aspose.Pdf.Rectangle(100, 560, 115, 575);
+            CheckboxField chkField = new CheckboxField(page, chkRect)
             {
-                PartialName = "Subscribe",
-                Value       = "Off"           // default unchecked
+                PartialName = "SubscribeField",
+                Value       = "Off"                 // default unchecked
             };
-            doc.Form.Add(subscribeField);
+            // Add the checkbox to the document's form
+            doc.Form.Add(chkField);
 
-            // Save the empty template
+            // Save the blank form template
             doc.Save(templatePath);
         }
 
-        // -------------------------------------------------
-        // 2. Prepare JSON data matching the field names
-        // -------------------------------------------------
-        // Example JSON: { "Name":"John Doe", "Subscribe":true }
-        string jsonContent = @"{ ""Name"": ""John Doe"", ""Subscribe"": true }";
-        File.WriteAllText(jsonPath, jsonContent);
+        // ---------- Create a JSON data source matching the field names ----------
+        var formData = new
+        {
+            NameField = "John Doe",
+            SubscribeField = "On" // "On" checks the box, "Off" leaves it unchecked
+        };
+        string jsonString = JsonSerializer.Serialize(formData, new JsonSerializerOptions { WriteIndented = true });
+        File.WriteAllText(jsonPath, jsonString);
 
-        // -------------------------------------------------
-        // 3. Load the template and populate fields from JSON
-        // -------------------------------------------------
+        // ---------- Populate the form from the JSON data source ----------
         using (Document doc = new Document(templatePath))
         {
-            // Import field values from the JSON file
+            // Import field values from the JSON file (matches field names)
             doc.Form.ImportFromJson(jsonPath);
 
+            // Optional: flatten the form if you want a non‑editable result
+            // doc.Form.Flatten();
+
             // Save the filled PDF
-            doc.Save(filledPath);
+            doc.Save(outputPath);
         }
     }
 }

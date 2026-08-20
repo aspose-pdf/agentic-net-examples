@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "myField";
+        const string fieldName = "myTextField";
 
         if (!File.Exists(inputPath))
         {
@@ -17,36 +17,35 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the form object
-            Form form = doc.Form;
-
-            // Verify that the field exists
-            if (form.HasField(fieldName))
+            // The Form indexer returns a WidgetAnnotation; cast it to Field to access field‑specific members
+            Field field = doc.Form[fieldName] as Field;
+            if (field != null)
             {
-                // The Form indexer returns a WidgetAnnotation; cast it to Field
-                Field? field = form[fieldName] as Field;
-                if (field != null)
-                {
-                    // Mark the field as required
-                    field.Required = true;
-                }
-                else
-                {
-                    Console.WriteLine($"Field '{fieldName}' exists but is not a supported form field type.");
-                }
+                // Mark the existing field as required; validation will fail if left empty
+                field.Required = true;
             }
             else
             {
-                Console.WriteLine($"Field '{fieldName}' not found in the document.");
+                // Field not found – create a new TextBoxField as an example
+                // Rectangle coordinates: lower‑left x, lower‑left y, upper‑right x, upper‑right y
+                var rect = new Aspose.Pdf.Rectangle(100, 500, 300, 530);
+                var txt = new TextBoxField(doc, rect)
+                {
+                    PartialName = fieldName,
+                    Required = true
+                };
+                // Add the new field to the form (and to the first page annotations)
+                doc.Form.Add(txt);
+                doc.Pages[1].Annotations.Add(txt);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved with required field: '{outputPath}'.");
+        Console.WriteLine($"PDF with required field saved to '{outputPath}'.");
     }
 }

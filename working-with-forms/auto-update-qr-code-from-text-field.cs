@@ -3,12 +3,13 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath = "input.pdf";   // PDF containing a text field "txtField" and a barcode field "qrField"
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,48 +18,37 @@ class Program
             return;
         }
 
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Enable automatic recalculation of form fields.
+            // Ensure form recalculation is enabled (default is true)
             doc.Form.AutoRecalculate = true;
 
-            // Guard against missing form collection.
-            if (doc.Form == null || doc.Form.Fields == null)
+            // Retrieve the text box field that the user will edit
+            TextBoxField txtField = doc.Form["txtField"] as TextBoxField;
+            // Retrieve the barcode field that will display the QR code
+            BarcodeField qrField = doc.Form["qrField"] as BarcodeField;
+
+            if (txtField == null || qrField == null)
             {
-                Console.Error.WriteLine("The document does not contain a form.");
+                Console.Error.WriteLine("Required fields not found in the PDF.");
                 return;
             }
 
-            // Retrieve the text field that drives the QR code.
-            TextBoxField txtField = doc.Form["TextField"] as TextBoxField;
-            // Retrieve the QR code field (a BarcodeField).
-            BarcodeField qrField = doc.Form["QRField"] as BarcodeField;
+            // NOTE: Symbology and ECC are read‑only properties of an existing BarcodeField.
+            // The PDF template should already define the field as a QR Code with the desired error correction level.
+            // Therefore we do NOT assign to qrField.Symbology or qrField.ECC here.
 
-            if (txtField == null)
-            {
-                Console.Error.WriteLine("Text field 'TextField' not found.");
-                return;
-            }
-
-            if (qrField == null)
-            {
-                Console.Error.WriteLine("Barcode field 'QRField' not found.");
-                return;
-            }
-
-            // The QR symbology must already be defined in the PDF template.
-            // BarcodeField.Symbology is read‑only, so we only update the value.
-            string js = @"
-                var txt = event.value;
-                var qr  = this.getField('QRField');
-                qr.value = txt;
-            ";
+            // Attach JavaScript to the text field so that when its value changes,
+            // the QR code field is updated automatically.
+            // The JavaScript runs in the PDF viewer context.
+            string js = "this.getField('qrField').value = event.value;";
             txtField.Actions.OnModifyCharacter = new JavascriptAction(js);
 
-            // Save the updated PDF.
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with dynamic QR code: {outputPath}");
+        Console.WriteLine($"PDF with auto‑updating QR code saved to '{outputPath}'.");
     }
 }

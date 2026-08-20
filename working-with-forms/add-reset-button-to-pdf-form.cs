@@ -1,8 +1,9 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // JavascriptAction
-using Aspose.Pdf.Forms;      // ButtonField
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -20,25 +21,29 @@ class Program
         // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access the AcroForm object
-            Form form = doc.Form;
+            // Define the rectangle where the reset button will be placed (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 540);
 
-            // Define the rectangle for the reset button
-            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
-
-            // Create a push‑button field
-            ButtonField resetButton = new ButtonField(doc, btnRect)
+            // Create a push‑button field (ButtonField) on the first page
+            ButtonField resetButton = new ButtonField(doc.Pages[1], btnRect)
             {
-                PartialName = "ResetButton",
-                AlternateCaption = "Reset Form"
+                // The name used to reference the field programmatically
+                Name = "ResetButton",
+                // The label shown on the button
+                NormalCaption = "Reset Form",
+                // Optional: set a background color
+                Color = Color.LightGray
             };
 
-            // Attach a JavaScript action that resets the form when the button is clicked
-            // Use the correct action property for a button click: OnReleaseMouseBtn
-            resetButton.Actions.OnReleaseMouseBtn = new JavascriptAction("this.resetForm();");
+            // Set a thin border – this must be done after the object is constructed
+            resetButton.Border = new Border(resetButton) { Width = 1 };
 
-            // Add the button to the form
-            form.Add(resetButton);
+            // Attach a JavaScript action that resets the form when the button is pressed
+            // Aspose.PDF does not have a dedicated ResetFormAction; use JavaScript instead.
+            resetButton.Actions.OnPressMouseBtn = new JavascriptAction("this.resetForm();");
+
+            // Add the button to the form (it will appear on the first page)
+            doc.Form.Add(resetButton);
 
             // Save the modified PDF
             doc.Save(outputPath);

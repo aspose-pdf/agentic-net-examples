@@ -22,7 +22,7 @@ class Program
             // Access the form fields collection
             Form form = doc.Form;
 
-            // Find the radio button field named "PaymentMethod"
+            // Retrieve the radio button field by its full name
             RadioButtonField paymentMethod = form["PaymentMethod"] as RadioButtonField;
             if (paymentMethod == null)
             {
@@ -31,14 +31,16 @@ class Program
             }
 
             // Set the default selected value to "Credit"
-            // You can set either the Value (export value) or the Selected index.
-            // Here we use the export value, which matches the option name.
+            // The Value property accepts the export value of the option.
             paymentMethod.Value = "Credit";
+
+            // Alternatively, you could set the Selected index if you know it:
+            // paymentMethod.Selected = 2; // example index (1‑based)
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with default selection to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with default payment method set to 'Credit' at '{outputPath}'.");
     }
 }

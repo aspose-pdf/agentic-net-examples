@@ -7,48 +7,50 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // PDF with form fields
-        const string outputPdf  = "filled_encrypted.pdf";
+        const string inputPdf   = "form_template.pdf";   // PDF with fillable form fields
+        const string outputPdf  = "form_filled_encrypted.pdf";
         const string userPwd    = "user123";
         const string ownerPwd   = "owner123";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         try
         {
-            // Load the PDF document (lifecycle: load)
+            // Load the PDF document (using the standard Document constructor)
             using (Document doc = new Document(inputPdf))
             {
-                // Fill form fields (example field names)
-                // TextBoxField
-                if (doc.Form["Name"] is TextBoxField nameField)
-                    nameField.Value = "John Doe";
-
-                // CheckboxField
-                if (doc.Form["Subscribe"] is CheckboxField checkField)
-                    checkField.Checked = true;
-
-                // ComboBoxField – select the third option (index 2) using Options collection
-                if (doc.Form["Country"] is ComboBoxField comboField)
+                // ----- Fill form fields -----
+                // Access the Form collection and set values by field name.
+                // Adjust field names to match those in your PDF.
+                if (doc.Form != null && doc.Form.Count > 0)
                 {
-                    if (comboField.Options != null && comboField.Options.Count > 2)
-                    {
-                        // Set the value of the field to the value of the third option
-                        comboField.Value = comboField.Options[2].Value;
-                    }
+                    // Example: set a text field named "Name"
+                    if (doc.Form["Name"] is TextBoxField nameField)
+                        nameField.Value = "John Doe";
+
+                    // Example: set a text field named "Email"
+                    if (doc.Form["Email"] is TextBoxField emailField)
+                        emailField.Value = "john.doe@example.com";
+
+                    // Example: set a checkbox named "Subscribe"
+                    if (doc.Form["Subscribe"] is CheckboxField subscribeField)
+                        subscribeField.Checked = true; // or subscribeField.Value = "Yes" depending on PDF definition
+
+                    // Add more field assignments as needed, casting to the appropriate field type.
                 }
 
-                // Set permissions (allow printing and content extraction)
+                // ----- Encrypt the document -----
+                // Define permissions (allow printing and content extraction)
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                // Encrypt the document using AES-256 (encryption rule)
+                // Use CryptoAlgorithm.AESx256 as recommended
                 doc.Encrypt(userPwd, ownerPwd, perms, CryptoAlgorithm.AESx256);
 
-                // Save the encrypted PDF (lifecycle: save)
+                // Save the encrypted PDF
                 doc.Save(outputPdf);
             }
 

@@ -2,60 +2,59 @@ using System;
 using System.IO;
 using System.Xml;
 using System.Xml.Xsl;
-using Aspose.Pdf; // XmlSaveOptions resides in this namespace
+using Aspose.Pdf;
 
-class Program
+class ExportFormDataAndTransform
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string pdfPath = "input.pdf";          // PDF with form fields
-        const string xmlPath = "formData.xml";       // Exported XML
-        const string xsltPath = "report.xslt";      // XSLT to create custom report
-        const string reportPath = "customReport.html"; // Result of transformation
+        // Paths for the source PDF, intermediate XML, XSLT stylesheet, and final report.
+        const string pdfPath      = "input.pdf";
+        const string xmlPath      = "formData.xml";
+        const string xsltPath     = "reportTemplate.xslt";
+        const string reportPath   = "customReport.html";
 
-        // Verify input files exist
+        // Ensure the source PDF exists.
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
+
+        // Ensure the XSLT stylesheet exists.
         if (!File.Exists(xsltPath))
         {
-            Console.Error.WriteLine($"XSLT not found: {xsltPath}");
+            Console.Error.WriteLine($"XSLT file not found: {xsltPath}");
             return;
         }
 
-        try
+        // STEP 1: Load the PDF document.
+        using (Document pdfDocument = new Document(pdfPath))
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(pdfPath))
-            {
-                // Export the PDF (including form data) to XML
-                XmlSaveOptions xmlSaveOpts = new XmlSaveOptions();
-                pdfDoc.Save(xmlPath, xmlSaveOpts);
-            }
-
-            // Perform XSLT transformation: XML -> custom report (e.g., HTML)
-            XslCompiledTransform xslt = new XslCompiledTransform();
-            xslt.Load(xsltPath); // Load the XSLT stylesheet
-
-            // Prepare XML reader for the exported XML
-            using (XmlReader xmlReader = XmlReader.Create(xmlPath))
-            {
-                // Create writer for the output report
-                using (XmlWriter resultWriter = XmlWriter.Create(reportPath, xslt.OutputSettings))
-                {
-                    xslt.Transform(xmlReader, resultWriter);
-                }
-            }
-
-            Console.WriteLine($"Form data exported to XML: {xmlPath}");
-            Console.WriteLine($"Custom report generated: {reportPath}");
+            // STEP 2: Export the PDF (including form data) to XML.
+            // XmlSaveOptions exports the entire PDF structure; form fields are represented in the XML.
+            XmlSaveOptions xmlSaveOptions = new XmlSaveOptions();
+            pdfDocument.Save(xmlPath, xmlSaveOptions);
         }
-        catch (Exception ex)
+
+        // STEP 3: Transform the exported XML using the provided XSLT to generate the custom report.
+        // XslCompiledTransform performs the XSLT transformation.
+        XslCompiledTransform transformer = new XslCompiledTransform();
+
+        // Load the XSLT stylesheet.
+        using (XmlReader xsltReader = XmlReader.Create(xsltPath))
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            transformer.Load(xsltReader);
         }
+
+        // Perform the transformation: XML input -> transformed output (e.g., HTML).
+        using (XmlReader xmlReader = XmlReader.Create(xmlPath))
+        using (XmlWriter resultWriter = XmlWriter.Create(reportPath, transformer.OutputSettings))
+        {
+            transformer.Transform(xmlReader, resultWriter);
+        }
+
+        Console.WriteLine($"Form data exported to XML: {xmlPath}");
+        Console.WriteLine($"Custom report generated: {reportPath}");
     }
 }

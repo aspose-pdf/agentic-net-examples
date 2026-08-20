@@ -2,8 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Annotations; // for JavascriptAction
 
 class Program
 {
@@ -18,29 +17,34 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Open the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the form object (creates one if it doesn't exist)
-            Form form = doc.Form;
-
             // Define the rectangle where the date field will appear (llx, lly, urx, ury)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 250, 630);
 
             // Create a DateField on the first page
-            DateField dateField = new DateField(doc.Pages[1], rect);
-            dateField.Name = "DateField1";               // field name
-            dateField.PartialName = "DateField1";        // partial name (used in JavaScript)
-            dateField.AlternateName = "Select a date";   // tooltip shown in Acrobat
-            dateField.DateFormat = "mm/dd/yyyy";        // display format
+            DateField dateField = new DateField(doc.Pages[1], rect)
+            {
+                // Set a default date format (e.g., MM/dd/yyyy)
+                DateFormat = "MM/dd/yyyy",
+                // Set a tooltip (alternate name) for the field
+                AlternateName = "Select a date",
+                // Background color of the field
+                Color = Color.LightGray
+            };
 
-            // JavaScript that runs when the field is activated.
-            // It sets the field value to the current date using the specified format.
-            dateField.OnActivated = new JavascriptAction(
-                "event.target.value = util.printd('mm/dd/yyyy', new Date());");
+            // Configure the border after the DateField instance has been created
+            dateField.Border = new Border(dateField) { Width = 1 };
 
-            // Add the field to the document's form
-            form.Add(dateField);
+            // Add the field to the document's form collection
+            doc.Form.Add(dateField);
+
+            // Initialize the field (required for JavaScript actions to work)
+            dateField.Init(doc.Pages[1]);
+
+            // Attach JavaScript that opens the built‑in date picker when the field is activated
+            dateField.OnActivated = new JavascriptAction("app.execMenuItem('ShowDatePicker');");
 
             // Save the modified PDF
             doc.Save(outputPath);
