@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 using Aspose.Pdf.Facades;
 
@@ -8,49 +8,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "sample.pdf";
+        const string inputPdfPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Collect Base64 strings of extracted images
+        // List to hold Base64 strings of extracted images
         List<string> base64Images = new List<string>();
 
-        // PdfExtractor implements IDisposable; wrap in using for proper disposal
+        // Use PdfExtractor (implements IDisposable) to extract images
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the source PDF file
-            extractor.BindPdf(inputPath);
+            // Bind the PDF file
+            extractor.BindPdf(inputPdfPath);
 
-            // Prepare the extractor to work with images
+            // Prepare for image extraction
             extractor.ExtractImage();
 
-            // Iterate through all images in the document
+            // Iterate through all images in the PDF
             while (extractor.HasNextImage())
             {
-                // Store each image in a memory stream
-                using (MemoryStream ms = new MemoryStream())
+                // Retrieve the next image into a memory stream
+                using (MemoryStream imageStream = new MemoryStream())
                 {
-                    // Retrieve the next image (default format is JPEG)
-                    bool success = extractor.GetNextImage(ms);
-                    if (success)
-                    {
-                        // Reset stream position before reading
-                        ms.Position = 0;
+                    extractor.GetNextImage(imageStream);
 
-                        // Convert the image bytes to a Base64 string
-                        string base64 = Convert.ToBase64String(ms.ToArray());
-                        base64Images.Add(base64);
-                    }
+                    // Convert the stream content to a Base64 string
+                    string base64 = Convert.ToBase64String(imageStream.ToArray());
+                    base64Images.Add(base64);
                 }
             }
+
+            // Release resources held by the extractor
+            extractor.Close();
         }
 
         // Serialize the list of Base64 strings to JSON for transmission
-        string json = JsonSerializer.Serialize(base64Images);
-        Console.WriteLine(json);
+        string jsonPayload = JsonSerializer.Serialize(base64Images);
+        Console.WriteLine(jsonPayload);
     }
 }

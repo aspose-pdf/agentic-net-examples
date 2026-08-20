@@ -2,71 +2,77 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfApi
+public static class PdfContentChecker
 {
-    public static class PdfContentChecker
+    /// <summary>
+    /// Returns true if the specified PDF file contains both text and images.
+    /// </summary>
+    /// <param name="pdfPath">Full path to the PDF file.</param>
+    /// <returns>True when at least one text fragment and one image are present.</returns>
+    public static bool ContainsTextAndImages(string pdfPath)
     {
-        /// <summary>
-        /// Returns true if the specified PDF file contains at least one piece of text
-        /// and at least one image.
-        /// </summary>
-        /// <param name="pdfPath">Full path to the PDF file.</param>
-        /// <returns>True when both text and images are present; otherwise false.</returns>
-        public static bool ContainsTextAndImages(string pdfPath)
+        if (string.IsNullOrEmpty(pdfPath) || !File.Exists(pdfPath))
+            throw new FileNotFoundException("PDF file not found.", pdfPath);
+
+        // Use PdfExtractor (Facade) inside a using block for deterministic disposal.
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            if (string.IsNullOrEmpty(pdfPath))
-                throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
+            // Bind the PDF file.
+            extractor.BindPdf(pdfPath);
 
-            if (!File.Exists(pdfPath))
-                throw new FileNotFoundException("PDF file not found.", pdfPath);
+            // ----- Check for text -----
+            // Extract all text from the document.
+            extractor.ExtractText();
 
-            // PdfExtractor implements IDisposable, so use a using block for deterministic cleanup.
-            using (PdfExtractor extractor = new PdfExtractor())
+            // Capture extracted text into a memory stream.
+            bool hasText;
+            using (MemoryStream textStream = new MemoryStream())
             {
-                // Bind the PDF file to the extractor.
-                extractor.BindPdf(pdfPath);
-
-                // Extract text and check if any text pages are available.
-                extractor.ExtractText();
-                bool hasText = extractor.HasNextPageText();
-
-                // Extract images and check if any images are available.
-                extractor.ExtractImage();
-                bool hasImage = extractor.HasNextImage();
-
-                // Return true only when both text and images exist.
-                return hasText && hasImage;
+                extractor.GetText(textStream);
+                hasText = textStream.Length > 0;
             }
+
+            // If there is no text, we can return false early.
+            if (!hasText)
+                return false;
+
+            // ----- Check for images -----
+            // Extract images from the document.
+            extractor.ExtractImage();
+
+            // HasNextImage indicates whether at least one image is available.
+            bool hasImage = extractor.HasNextImage();
+
+            // Return true only when both text and image are present.
+            return hasImage;
         }
     }
+}
 
-    // ---------------------------------------------------------------------
-    // Minimal entry point required for a console‑application project.
-    // The method simply demonstrates usage; it can be removed or replaced
-    // when the project is turned into a class‑library.
-    // ---------------------------------------------------------------------
-    internal class Program
+// ---------------------------------------------------------------------------
+// Minimal console entry point – required for a project that compiles to an
+// executable.  If the project is intended to be a class library, change the
+// output type instead of adding this class.
+// ---------------------------------------------------------------------------
+public class Program
+{
+    public static void Main(string[] args)
     {
-        private static void Main(string[] args)
+        if (args.Length == 0)
         {
-            // If a PDF path is supplied as the first argument, run the check and write the result.
-            if (args.Length > 0)
-            {
-                string pdfPath = args[0];
-                try
-                {
-                    bool result = PdfContentChecker.ContainsTextAndImages(pdfPath);
-                    Console.WriteLine($"PDF contains both text and images: {result}");
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Usage: AsposePdfApi <pdf-file-path>");
-            }
+            Console.WriteLine("Usage: PdfContentChecker <pdfPath>");
+            return;
+        }
+
+        string pdfPath = args[0];
+        try
+        {
+            bool containsBoth = PdfContentChecker.ContainsTextAndImages(pdfPath);
+            Console.WriteLine($"PDF contains both text and images: {containsBoth}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
         }
     }
 }

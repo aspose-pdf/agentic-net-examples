@@ -8,9 +8,9 @@ class Program
     static void Main(string[] args)
     {
         // Expect a single argument: path to the PDF file
-        if (args.Length != 1)
+        if (args.Length == 0)
         {
-            Console.Error.WriteLine("Usage: ExtractText <pdf-path>");
+            Console.Error.WriteLine("Usage: <executable> <pdfPath>");
             return;
         }
 
@@ -28,15 +28,13 @@ class Program
             // Bind the PDF file to the extractor
             extractor.BindPdf(pdfPath);
 
-            // Perform text extraction (Unicode encoding by default)
+            // Perform text extraction (Unicode encoding is default)
             extractor.ExtractText();
 
-            // Retrieve extracted text into a memory stream
+            // Retrieve the extracted text into a memory stream
             using (MemoryStream ms = new MemoryStream())
             {
                 extractor.GetText(ms);
-
-                // Convert the stream bytes to a string (Unicode)
                 string extractedText = Encoding.Unicode.GetString(ms.ToArray());
 
                 // Output the extracted text to the console

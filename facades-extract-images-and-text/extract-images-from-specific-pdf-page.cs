@@ -1,45 +1,49 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging; // <-- required for ImageFormat
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "ExtractedImages";
-        const int pageNumber = 3; // page to extract images from
+        const string inputPdf = "input.pdf";          // source PDF
+        const string outputDir = "ExtractedImages";   // folder for extracted images
+        const int pageNumber = 2;                     // page to extract from (1‑based)
 
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Use PdfExtractor to extract images from a single page
+        // Use PdfExtractor to pull images from a single page
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the source PDF
+            // Bind the PDF document
             extractor.BindPdf(inputPdf);
 
-            // Limit extraction to the desired page
-            extractor.StartPage = pageNumber;
-            extractor.EndPage   = pageNumber;
+            // Limit extraction range to the desired page
+            extractor.StartPage = pageNumber;   // start page (inclusive)
+            extractor.EndPage   = pageNumber;   // end page (inclusive)
 
-            // Extract images from the bound page range
+            // Perform image extraction for the specified range
             extractor.ExtractImage();
 
             int imageIndex = 1;
+            // Iterate through all images found on that page
             while (extractor.HasNextImage())
             {
-                // Save each extracted image as JPEG
-                string outputPath = Path.Combine(outputDir,
+                string outPath = Path.Combine(
+                    outputDir,
                     $"page{pageNumber}_image{imageIndex}.jpg");
-                extractor.GetNextImage(outputPath, ImageFormat.Jpeg);
+
+                // Save each image as JPEG (default format)
+                extractor.GetNextImage(outPath, ImageFormat.Jpeg);
                 imageIndex++;
             }
         }

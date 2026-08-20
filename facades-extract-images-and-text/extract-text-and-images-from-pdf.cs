@@ -2,52 +2,52 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class PdfExtractionDemo
+class Program
 {
     static void Main()
     {
         const string pdfPath = "input.pdf";
         const string textOutputPath = "extracted_text.txt";
-        const string imagesOutputFolder = "ExtractedImages";
+        const string imagesOutputDir = "ExtractedImages";
 
+        // Verify the source PDF exists
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Ensure the images folder exists
-        Directory.CreateDirectory(imagesOutputFolder);
+        // Ensure the images output directory exists
+        Directory.CreateDirectory(imagesOutputDir);
 
-        // Create and configure the extractor
+        // PdfExtractor implements IDisposable, so use a using block for deterministic cleanup
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF file
+            // Bind the PDF file to the extractor
             extractor.BindPdf(pdfPath);
 
-            // Enable text extraction (pure text mode = 0)
+            // Optional: set extraction modes (defaults are suitable for most scenarios)
+            // 0 = pure text mode, 1 = raw ordering mode
             extractor.ExtractTextMode = 0;
+            // extractor.ExtractImageMode = ExtractImageMode.DefinedInResources; // default
 
-            // Image extraction mode property does not exist in recent Aspose.Pdf versions.
-            // The default behavior extracts all images, so no explicit setting is required.
+            // ----------- Text Extraction -----------
+            extractor.ExtractText();                     // Perform text extraction
+            extractor.GetText(textOutputPath);           // Save all extracted text to a file
 
-            // Perform extraction
-            extractor.ExtractText();
-            extractor.ExtractImage();
+            // ----------- Image Extraction -----------
+            extractor.ExtractImage();                    // Perform image extraction
 
-            // Save extracted text to a file
-            extractor.GetText(textOutputPath);
-            Console.WriteLine($"Text extracted to: {textOutputPath}");
-
-            // Save each extracted image to a separate file
             int imageIndex = 1;
             while (extractor.HasNextImage())
             {
-                string imagePath = Path.Combine(imagesOutputFolder, $"image-{imageIndex}.png");
+                // Save each image as a separate file (PNG format by default)
+                string imagePath = Path.Combine(imagesOutputDir, $"image-{imageIndex}.png");
                 extractor.GetNextImage(imagePath);
-                Console.WriteLine($"Image {imageIndex} saved to: {imagePath}");
                 imageIndex++;
             }
         }
+
+        Console.WriteLine("Text and image extraction completed successfully.");
     }
 }
