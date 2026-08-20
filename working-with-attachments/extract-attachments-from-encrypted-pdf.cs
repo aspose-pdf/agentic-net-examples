@@ -6,50 +6,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "encrypted.pdf";   // Encrypted PDF path
-        const string password   = "userPassword";   // Decryption password
-        const string outputDir  = "ExtractedAttachments";
+        const string encryptedPdfPath = "encrypted.pdf";
+        const string password = "user123";
+        const string outputFolder = "Attachments";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(encryptedPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {encryptedPdfPath}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
         try
         {
-            // Open the encrypted PDF using the password
-            using (Document doc = new Document(inputPdf, password))
+            // Open the encrypted PDF using the supplied password
+            using (Document doc = new Document(encryptedPdfPath, password))
             {
-                // Decrypt the document (required before accessing embedded files)
+                // Decrypt the document in memory (optional – Document constructor already opens it for reading)
                 doc.Decrypt();
 
-                // Iterate over embedded files (attachments) using reflection to avoid a direct
-                // dependency on the EmbeddedFile type, which may vary between Aspose.Pdf versions.
-                foreach (var embedded in doc.EmbeddedFiles)
+                // Iterate through all embedded files (attachments) using reflection to avoid compile‑time dependency on a specific class name
+                foreach (var attachment in doc.EmbeddedFiles)
                 {
-                    // Retrieve the file name via the "Name" property.
-                    var nameProp = embedded.GetType().GetProperty("Name");
-                    var saveMethod = embedded.GetType().GetMethod("Save", new[] { typeof(string) });
-
-                    if (nameProp == null || saveMethod == null)
-                        continue; // Skip if the expected members are not present.
-
-                    string attachmentName = nameProp.GetValue(embedded) as string;
-                    if (string.IsNullOrEmpty(attachmentName))
+                    // Get the attachment name
+                    var nameProp = attachment.GetType().GetProperty("Name");
+                    var name = nameProp?.GetValue(attachment) as string;
+                    if (string.IsNullOrEmpty(name))
                         continue;
 
-                    string attachmentPath = Path.Combine(outputDir, attachmentName);
-                    // Invoke the Save(string) method to write the attachment to disk.
-                    saveMethod.Invoke(embedded, new object[] { attachmentPath });
-                    Console.WriteLine($"Extracted: {attachmentName}");
+                    // Build the full path for the extracted attachment
+                    string outputPath = Path.Combine(outputFolder, name);
+
+                    // Invoke the Save(string) method via reflection
+                    var saveMethod = attachment.GetType().GetMethod("Save", new[] { typeof(string) });
+                    saveMethod?.Invoke(attachment, new object[] { outputPath });
+
+                    Console.WriteLine($"Extracted: {outputPath}");
                 }
             }
-
-            Console.WriteLine("Attachment extraction completed.");
         }
         catch (Exception ex)
         {

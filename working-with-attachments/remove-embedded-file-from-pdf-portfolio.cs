@@ -8,8 +8,8 @@ class Program
     {
         const string inputPath = "portfolio.pdf";
         const string outputPath = "portfolio_updated.pdf";
-        // Index of the embedded file to remove (0‑based)
-        int indexToRemove = 2;
+        // Index of the embedded file to delete (1‑based for user convenience)
+        int fileIndex = 2;
 
         if (!File.Exists(inputPath))
         {
@@ -17,42 +17,32 @@ class Program
             return;
         }
 
-        // Load the PDF portfolio
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the collection of embedded files
-            EmbeddedFileCollection embeddedFiles = doc.EmbeddedFiles;
+            // Access the collection of embedded files in the portfolio
+            var embeddedFiles = doc.EmbeddedFiles;
 
-            // Aspose uses 1‑based indexing for EmbeddedFileCollection
-            int aspIndex = indexToRemove + 1;
-
-            // Validate the requested index
-            if (aspIndex < 1 || aspIndex > embeddedFiles.Count)
+            // Validate the requested index (user supplied is 1‑based)
+            if (fileIndex < 1 || fileIndex > embeddedFiles.Count)
             {
-                Console.Error.WriteLine("Invalid index for embedded file collection.");
+                Console.Error.WriteLine($"Invalid index {fileIndex}. Collection contains {embeddedFiles.Count} items.");
                 return;
             }
 
-            // Retrieve the FileSpecification at the requested position
-            FileSpecification spec = embeddedFiles[aspIndex];
-            string fileName = spec?.Name;
+            // Convert to zero‑based index for the collection
+            int zeroBasedIndex = fileIndex - 1;
 
-            if (!string.IsNullOrEmpty(fileName))
-            {
-                // Delete the embedded file by its name
-                embeddedFiles.Delete(fileName);
-                Console.WriteLine($"Deleted embedded file '{fileName}' at index {indexToRemove}.");
-            }
-            else
-            {
-                Console.Error.WriteLine("Failed to obtain the file name of the embedded file.");
-                return;
-            }
+            // Get the name of the file at the specified index
+            string fileName = embeddedFiles[zeroBasedIndex].Name;
+
+            // Delete the embedded file by its name
+            embeddedFiles.Delete(fileName);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Embedded file at index {fileIndex} removed. Saved to '{outputPath}'.");
     }
 }

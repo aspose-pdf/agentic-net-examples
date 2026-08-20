@@ -2,76 +2,71 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class ExtractAttachments
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputRootFolder = "Attachments";
+        // Path to the source PDF file
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        // Base directory where subfolders for each attachment will be created
+        const string outputBaseDir = "Attachments";
+
+        // Validate input PDF existence
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Ensure the root output folder exists
-        Directory.CreateDirectory(outputRootFolder);
+        // Ensure the base output directory exists
+        Directory.CreateDirectory(outputBaseDir);
 
-        // Load the PDF document (wrapped in using for proper disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(pdfPath))
         {
-            // If there are no embedded files, inform the user and exit
-            if (pdfDoc.EmbeddedFiles == null || pdfDoc.EmbeddedFiles.Count == 0)
+            // Iterate over all embedded files (attachments) in the PDF
+            foreach (var embeddedFile in doc.EmbeddedFiles)
             {
-                Console.WriteLine("No attachments found in the PDF.");
-                return;
-            }
+                // Use reflection/dynamic to access the Name property and Save method without
+                // depending on the concrete EmbeddedFile type (avoids CS0246).
+                string attachmentFileName = (string)embeddedFile.GetType().GetProperty("Name")?.GetValue(embeddedFile) ?? "UnnamedAttachment";
 
-            int attachmentIndex = 1;
+                // Create a subfolder named after the attachment (without extension) to hold the file
+                string subFolderName = Path.GetFileNameWithoutExtension(attachmentFileName);
+                if (string.IsNullOrWhiteSpace(subFolderName))
+                    subFolderName = Guid.NewGuid().ToString(); // fallback for empty names
 
-            // Iterate over each embedded file using reflection to avoid a direct reference to the EmbeddedFile type
-            foreach (object embeddedObj in pdfDoc.EmbeddedFiles)
-            {
-                var embeddedType = embeddedObj.GetType();
-                var nameProp = embeddedType.GetProperty("Name");
-                var contentProp = embeddedType.GetProperty("Content");
+                string subFolderPath = Path.Combine(outputBaseDir, subFolderName);
+                Directory.CreateDirectory(subFolderPath);
 
-                string embeddedName = nameProp?.GetValue(embeddedObj) as string ?? string.Empty;
-                byte[] embeddedContent = contentProp?.GetValue(embeddedObj) as byte[];
+                // Full path for the extracted file
+                string outputFilePath = Path.Combine(subFolderPath, attachmentFileName);
 
-                // If we cannot retrieve the content, skip this entry
-                if (embeddedContent == null)
+                // Invoke the Save method via reflection
+                var saveMethod = embeddedFile.GetType().GetMethod("Save", new[] { typeof(string) });
+                if (saveMethod != null)
                 {
-                    Console.WriteLine($"Skipping attachment #{attachmentIndex} because its content could not be read.");
-                    attachmentIndex++;
-                    continue;
+                    saveMethod.Invoke(embeddedFile, new object[] { outputFilePath });
+                }
+                else
+                {
+                    // Fallback: try to get the file stream from the FileSpecification and copy it manually
+                    var fileSpec = embeddedFile.GetType().GetProperty("FileSpecification")?.GetValue(embeddedFile);
+                    var contents = fileSpec?.GetType().GetProperty("Contents")?.GetValue(fileSpec) as Stream;
+                    if (contents != null)
+                    {
+                        using (var outStream = File.Create(outputFilePath))
+                        {
+                            contents.CopyTo(outStream);
+                        }
+                    }
                 }
 
-                // Determine a safe folder name for the attachment
-                string baseFolderName = Path.GetFileNameWithoutExtension(embeddedName);
-                if (string.IsNullOrWhiteSpace(baseFolderName))
-                {
-                    baseFolderName = $"Attachment_{attachmentIndex}";
-                }
-
-                // Create a subfolder for this attachment
-                string attachmentFolder = Path.Combine(outputRootFolder, baseFolderName);
-                Directory.CreateDirectory(attachmentFolder);
-
-                // Determine the file name to write (fallback if Name is empty)
-                string fileName = string.IsNullOrWhiteSpace(embeddedName)
-                    ? $"attachment_{attachmentIndex}"
-                    : embeddedName;
-
-                string outputFilePath = Path.Combine(attachmentFolder, fileName);
-
-                // Write the attachment's binary content to the file
-                File.WriteAllBytes(outputFilePath, embeddedContent);
-
-                Console.WriteLine($"Saved attachment '{embeddedName}' to '{outputFilePath}'");
-                attachmentIndex++;
+                Console.WriteLine($"Extracted '{attachmentFileName}' to '{subFolderPath}'");
             }
         }
+
+        Console.WriteLine("All attachments have been extracted.");
     }
 }

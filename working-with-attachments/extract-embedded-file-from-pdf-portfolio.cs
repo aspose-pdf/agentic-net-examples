@@ -1,53 +1,53 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core API namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF containing embedded files (portfolio items)
-        const string inputPdfPath = "portfolio.pdf";
+        // Path to the PDF that contains a portfolio (embedded files)
+        const string pdfPath = "portfolio.pdf";
 
         // Index of the embedded file to extract (1‑based as per Aspose.Pdf docs)
-        const int embeddedFileIndex = 2; // change as needed
+        const int embeddedIndex = 2;
 
-        if (!File.Exists(inputPdfPath))
+        // Ensure the source PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(pdfPath))
         {
-            // Ensure the requested index exists
-            if (pdfDoc.EmbeddedFiles == null || pdfDoc.EmbeddedFiles.Count < embeddedFileIndex)
+            // Access the collection of embedded files (portfolio items)
+            EmbeddedFileCollection embeddedFiles = doc.EmbeddedFiles;
+
+            // Validate the requested index
+            if (embeddedIndex < 1 || embeddedIndex > embeddedFiles.Count)
             {
-                Console.Error.WriteLine($"Embedded file index {embeddedFileIndex} is out of range.");
+                Console.Error.WriteLine($"Invalid index {embeddedIndex}. " +
+                                        $"Document contains {embeddedFiles.Count} embedded file(s).");
                 return;
             }
 
-            // Retrieve the embedded file specification (1‑based index)
-            FileSpecification embeddedFileSpec = pdfDoc.EmbeddedFiles[embeddedFileIndex];
+            // Retrieve the specific embedded file (FileSpecification)
+            FileSpecification fileSpec = embeddedFiles[embeddedIndex];
 
-            // The original file name (including extension) is stored in the specification
-            string originalFileName = embeddedFileSpec.Name;
+            // Determine the original file name (includes its extension)
+            // Use the Name property – the correct way to get the embedded file's name
+            string originalFileName = fileSpec.Name ?? $"embedded_{embeddedIndex}";
 
-            // Ensure the embedded file stream (Contents) is present
-            if (embeddedFileSpec.Contents == null)
+            // Save the embedded file using its original name
+            using (Stream source = fileSpec.Contents)
+            using (FileStream destination = new FileStream(originalFileName, FileMode.Create, FileAccess.Write))
             {
-                Console.Error.WriteLine($"Embedded file at index {embeddedFileIndex} has no data.");
-                return;
+                source.CopyTo(destination);
             }
 
-            // Save the embedded file to the current directory using its original name
-            using (FileStream outStream = File.Create(originalFileName))
-            {
-                embeddedFileSpec.Contents.CopyTo(outStream);
-            }
-
-            Console.WriteLine($"Extracted embedded file saved as: {originalFileName}");
+            Console.WriteLine($"Embedded file extracted and saved as: {originalFileName}");
         }
     }
 }

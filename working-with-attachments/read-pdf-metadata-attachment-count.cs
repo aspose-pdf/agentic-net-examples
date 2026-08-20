@@ -6,43 +6,45 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "sample.pdf";
+        const string inputPdf  = "sample.pdf";      // input PDF path
+        const string reportTxt = "metadata_report.txt"; // output report path
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block (ensures proper disposal)
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document (lifecycle rule: use using for disposal)
+        using (Document doc = new Document(inputPdf))
         {
-            // ----- Read standard metadata -----
-            string title       = doc.Info.Title       ?? "(none)";
-            string author      = doc.Info.Author      ?? "(none)";
-            string subject     = doc.Info.Subject     ?? "(none)";
-            string keywords    = doc.Info.Keywords    ?? "(none)";
-            string creator     = doc.Info.Creator     ?? "(none)";
-            string producer    = doc.Info.Producer    ?? "(none)";
-            string creationDt  = doc.Info.CreationDate != DateTime.MinValue ? doc.Info.CreationDate.ToString() : "(none)";
-            string modDt       = doc.Info.ModDate != DateTime.MinValue ? doc.Info.ModDate.ToString() : "(none)";
+            // Access standard metadata via DocumentInfo
+            DocumentInfo info = doc.Info;
 
-            // ----- Count embedded file attachments -----
-            // In Aspose.Pdf the collection is called EmbeddedFiles, not Attachments.
+            // Get the number of embedded file attachments (may be zero)
             int attachmentCount = doc.EmbeddedFiles?.Count ?? 0;
 
-            // ----- Output the report -----
-            Console.WriteLine("PDF Metadata Report");
-            Console.WriteLine("-------------------");
-            Console.WriteLine($"Title            : {title}");
-            Console.WriteLine($"Author           : {author}");
-            Console.WriteLine($"Subject          : {subject}");
-            Console.WriteLine($"Keywords         : {keywords}");
-            Console.WriteLine($"Creator          : {creator}");
-            Console.WriteLine($"Producer         : {producer}");
-            Console.WriteLine($"Creation Date    : {creationDt}");
-            Console.WriteLine($"Modification Date: {modDt}");
-            Console.WriteLine($"Attachment Count : {attachmentCount}");
+            // Build a simple text report
+            string report = $"Title: {info.Title}\n" +
+                            $"Author: {info.Author}\n" +
+                            $"Subject: {info.Subject}\n" +
+                            $"Keywords: {info.Keywords}\n" +
+                            $"Creator: {info.Creator}\n" +
+                            $"Producer: {info.Producer}\n" +
+                            $"Creation Date: {info.CreationDate}\n" +
+                            $"Modification Date: {info.ModDate}\n" +
+                            $"Attachment Count: {attachmentCount}\n";
+
+            // Output to console
+            Console.WriteLine(report);
+
+            // Write the report to a text file
+            File.WriteAllText(reportTxt, report);
+
+            // Demonstrate a save operation (no modifications made)
+            doc.Save("output_copy.pdf");
         }
+
+        Console.WriteLine($"Metadata report saved to '{reportTxt}'.");
     }
 }

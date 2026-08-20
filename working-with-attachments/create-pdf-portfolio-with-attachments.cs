@@ -1,51 +1,40 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Output PDF Portfolio file path
         const string outputPath = "portfolio.pdf";
 
-        // Create an empty PDF document
+        // Create a new PDF document. The Portfolio collection is created automatically.
         using (Document doc = new Document())
         {
-            // Add a blank page (required for a valid PDF)
-            Page page = doc.Pages.Add();
+            // Ensure the Collection object exists – it represents the PDF portfolio.
+            if (doc.Collection == null)
+                doc.Collection = new Collection();
 
-            // Add a simple text fragment to the page (optional)
-            TextFragment tf = new TextFragment("PDF Portfolio")
-            {
-                Position = new Position(100, 700)
-            };
-            tf.TextState.FontSize = 24;
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
-            page.Paragraphs.Add(tf);
+            // Files that will be embedded in the portfolio
+            string[] filesToAttach = { "file1.txt", "image.png" };
 
-            // Add file attachments (portfolio items)
-            // Each attachment is represented by a FileSpecification object
-            // Adjust the file paths as needed; they must exist on disk
-            string[] filesToAttach = { "file1.pdf", "image1.png", "document1.docx" };
             foreach (string filePath in filesToAttach)
             {
                 if (!File.Exists(filePath))
-                {
-                    Console.Error.WriteLine($"Attachment not found: {filePath}");
-                    continue;
-                }
+                    continue; // Skip missing files
 
-                // Create a FileSpecification that embeds the file.
-                // The first argument is the physical file path, the second argument is a description (optional).
-                FileSpecification attachment = new FileSpecification(filePath, Path.GetFileName(filePath));
+                // Create a FileSpecification for the attachment.
+                // The first argument is the file name that will appear in the portfolio,
+                // the second argument is a description (using the same name here).
+                var fileSpec = new FileSpecification(Path.GetFileName(filePath), Path.GetFileName(filePath));
+                // Set the file contents via a memory stream.
+                fileSpec.Contents = new MemoryStream(File.ReadAllBytes(filePath));
 
-                // Add the attachment to the document's EmbeddedFiles collection.
-                doc.EmbeddedFiles.Add(attachment);
+                // Add the file specification to the document's collection (portfolio).
+                doc.Collection.Add(fileSpec);
             }
 
-            // Save the PDF Portfolio
+            // Save the PDF portfolio
             doc.Save(outputPath);
         }
 

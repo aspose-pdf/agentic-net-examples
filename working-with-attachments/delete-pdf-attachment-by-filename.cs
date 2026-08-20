@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // PDF containing attachments
-        const string outputPath = "output.pdf";         // PDF after deletion
-        const string attachmentName = "example.txt";    // Name of the embedded file to remove
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string attachmentName = "myfile.txt";
 
         if (!File.Exists(inputPath))
         {
@@ -16,17 +16,26 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Delete the embedded file by its filename (case‑sensitive)
-            // EmbeddedFiles is an EmbeddedFileCollection; Delete(string) removes by name.
-            doc.EmbeddedFiles.Delete(attachmentName);
+            // Verify the attachment exists
+            var fileSpec = doc.EmbeddedFiles.FindByName(attachmentName);
+            if (fileSpec != null)
+            {
+                // Delete the attachment by its filename
+                doc.EmbeddedFiles.Delete(attachmentName);
+                Console.WriteLine($"Attachment '{attachmentName}' deleted.");
+            }
+            else
+            {
+                Console.WriteLine($"Attachment '{attachmentName}' not found.");
+            }
 
-            // Save the modified document
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Attachment \"{attachmentName}\" removed. Saved to \"{outputPath}\".");
+        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
     }
 }

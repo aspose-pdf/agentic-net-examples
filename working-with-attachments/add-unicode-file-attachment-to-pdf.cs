@@ -7,55 +7,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
         const string outputPath = "output_with_attachment.pdf";
-        const string attachmentPath = "sample.txt";
-        const string unicodeFileName = "文件附件.txt"; // Unicode filename to display in PDF viewers
+        const string fileToAttach = "sample.txt";
 
-        // Ensure a source PDF exists; create a simple one if missing.
-        if (!File.Exists(inputPath))
+        // Ensure the file to attach exists; create a simple one if missing.
+        if (!File.Exists(fileToAttach))
         {
-            using (Document doc = new Document())
-            {
-                doc.Pages.Add(); // add a blank page
-                doc.Save(inputPath);
-            }
+            File.WriteAllText(fileToAttach, "Sample attachment content.");
         }
 
-        // Ensure the file to be attached exists.
-        if (!File.Exists(attachmentPath))
+        // Create a new PDF document.
+        using (Document doc = new Document())
         {
-            File.WriteAllText(attachmentPath, "Sample attachment content.");
-        }
+            // Add a blank page (first page, 1‑based indexing).
+            Page page = doc.Pages.Add();
 
-        // Load the PDF, add a file attachment annotation with a Unicode name, and save.
-        using (Document doc = new Document(inputPath))
-        {
-            // Create a FileSpecification for the attachment.
-            FileSpecification fileSpec = new FileSpecification(attachmentPath);
-            // Set the Unicode name that PDF viewers will show.
-            fileSpec.UnicodeName = unicodeFileName;
-
-            // Define the rectangle where the attachment icon will appear.
+            // Define the annotation rectangle (position and size).
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
 
-            // Create the attachment annotation on the first page.
-            Page page = doc.Pages[1];
+            // Create a FileSpecification for the attachment using the file path.
+            FileSpecification fileSpec = new FileSpecification(fileToAttach)
+            {
+                // Set a Unicode filename (e.g., Chinese characters).
+                UnicodeName = "示例文件.txt"
+            };
+
+            // Create the file attachment annotation.
             FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec)
             {
-                // Optional visual settings.
-                Icon = FileIcon.Paperclip, // Correct enum for attachment icons
-                Contents = "Embedded file with Unicode name",
-                Color = Aspose.Pdf.Color.Blue
+                // Icon assignment is optional; omitted to avoid version‑specific enum issues.
+                Contents = "Attached file with Unicode name", // tooltip text
+                Title = "Unicode Attachment"                 // title shown in popup
             };
 
             // Add the annotation to the page.
             page.Annotations.Add(attachment);
 
-            // Save the modified PDF.
+            // Save the PDF document.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Attachment added with Unicode filename. Saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'. Open it in a viewer to verify the attachment.");
     }
 }

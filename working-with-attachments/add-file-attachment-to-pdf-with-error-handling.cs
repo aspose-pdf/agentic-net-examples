@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";          // PDF to which the attachment will be added
-        const string attachmentPath = "document.txt"; // File to attach
+        const string pdfPath = "input.pdf";            // PDF to which the attachment will be added
+        const string attachmentPath = "attachment.docx"; // File to attach
         const string outputPath = "output_with_attachment.pdf";
 
         // Verify that the source PDF exists
@@ -27,47 +27,44 @@ class Program
 
         try
         {
-            // Load the PDF document (lifecycle rule: use using for disposal)
+            // Load the PDF document (lifecycle: load)
             using (Document doc = new Document(pdfPath))
             {
-                // Choose the page where the annotation will be placed (first page in this example)
-                Page page = doc.Pages[1];
+                // Create a file specification for the attachment (description is optional)
+                FileSpecification fileSpec = new FileSpecification(attachmentPath, "Attached document");
 
-                // Define the rectangle for the attachment annotation
+                // Define the rectangle for the annotation (position on the page)
                 // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 150, 550);
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 600);
 
-                // Create a FileSpecification for the attachment
-                // The stream is opened in a using block to ensure it is closed promptly
-                using (FileStream fs = new FileStream(attachmentPath, FileMode.Open, FileAccess.Read))
+                // Create the file attachment annotation on the first page
+                Page page = doc.Pages[1]; // 1‑based indexing
+                FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec)
                 {
-                    FileSpecification fileSpec = new FileSpecification(fs, Path.GetFileName(attachmentPath));
+                    // Optional visual properties
+                    Icon = FileIcon.Paperclip, // Correct enum for attachment icons
+                    Color = Aspose.Pdf.Color.Blue,
+                    Contents = "Attached document"
+                };
 
-                    // Create the FileAttachment annotation
-                    FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec)
-                    {
-                        // Optional properties
-                        Title = "Attached Document",
-                        Contents = "See attached file.",
-                        // Set a visual cue for the annotation (border color)
-                        Color = Aspose.Pdf.Color.Blue
-                        // Icon property omitted because the enum may not be available in all SDK versions
-                    };
+                // Add the annotation to the page
+                page.Annotations.Add(attachment);
 
-                    // Add the annotation to the page
-                    page.Annotations.Add(attachment);
-                }
-
-                // Save the modified PDF (lifecycle rule: use Save without extra options for PDF output)
+                // Save the modified PDF (lifecycle: save)
                 doc.Save(outputPath);
             }
 
             Console.WriteLine($"Attachment added successfully. Saved as '{outputPath}'.");
         }
-        catch (PdfException ex)
+        catch (FileNotFoundException fnfEx)
         {
-            // Handles errors thrown by Aspose.Pdf (e.g., corrupted PDF)
-            Console.Error.WriteLine($"PDF processing error: {ex.Message}");
+            // Handles cases where the PDF or attachment disappears after the existence check
+            Console.Error.WriteLine($"File not found: {fnfEx.Message}");
+        }
+        catch (PdfException pdfEx)
+        {
+            // Handles Aspose.Pdf specific errors (e.g., corrupted PDF)
+            Console.Error.WriteLine($"PDF processing error: {pdfEx.Message}");
         }
         catch (Exception ex)
         {

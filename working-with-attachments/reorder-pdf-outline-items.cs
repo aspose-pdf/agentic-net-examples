@@ -1,81 +1,76 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core PDF API
 
-class Program
+class ReorderPortfolioOutlines
 {
     static void Main()
     {
-        const string inputPdf  = "portfolio.pdf";
-        const string outputPdf = "portfolio_reordered.pdf";
+        const string inputPath = "portfolio.pdf";
+        const string outputPath = "portfolio_reordered.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document (using the standard load constructor)
+        using (Document doc = new Document(inputPath))
         {
-            // Access the document outline (bookmarks/portfolio items)
-            OutlineCollection outlines = doc.Outlines;
-
-            // Ensure there are at least two items to reorder
-            if (outlines.Count < 2)
+            // ---------------------------------------------------------------
+            // 1. Extract current top‑level outline items into a list for manipulation
+            // ---------------------------------------------------------------
+            List<OutlineItemCollection> originalItems = new List<OutlineItemCollection>();
+            foreach (OutlineItemCollection item in doc.Outlines)
             {
-                Console.WriteLine("Not enough outline items to reorder.");
-                doc.Save(outputPdf);
-                return;
+                originalItems.Add(item);
             }
 
-            // Retrieve the first two items (1‑based indexing)
-            OutlineItemCollection firstItem  = outlines[1];
-            OutlineItemCollection secondItem = outlines[2];
+            // ---------------------------------------------------------------
+            // 2. Define the desired order.
+            //    Example: reverse the sequence – replace with any custom logic.
+            // ---------------------------------------------------------------
+            originalItems.Reverse();
 
-            // Preserve the properties of each item
-            OutlineItemCollection newFirst = new OutlineItemCollection(outlines)
+            // ---------------------------------------------------------------
+            // 3. Remove all existing outline items from the document.
+            // ---------------------------------------------------------------
+            doc.Outlines.Clear();
+
+            // ---------------------------------------------------------------
+            // 4. Re‑add the items in the new sequence.
+            //    We create a fresh OutlineItemCollection for each entry and copy the
+            //    relevant properties (Title, Action, Destination, visual style, etc.).
+            // ---------------------------------------------------------------
+            foreach (OutlineItemCollection original in originalItems)
             {
-                Title       = secondItem.Title,
-                Destination = secondItem.Destination,
-                Color       = secondItem.Color,
-                Bold        = secondItem.Bold,
-                Italic      = secondItem.Italic,
-                Open        = secondItem.Open
-            };
+                // Create a new outline entry based on the original one.
+                OutlineItemCollection newItem = new OutlineItemCollection(doc.Outlines)
+                {
+                    Title = original.Title,
+                    Action = original.Action,
+                    Destination = original.Destination,
+                    Color = original.Color,
+                    Open = original.Open,
+                    Bold = original.Bold,
+                    Italic = original.Italic
+                };
 
-            OutlineItemCollection newSecond = new OutlineItemCollection(outlines)
-            {
-                Title       = firstItem.Title,
-                Destination = firstItem.Destination,
-                Color       = firstItem.Color,
-                Bold        = firstItem.Bold,
-                Italic      = firstItem.Italic,
-                Open        = firstItem.Open
-            };
+                // Add the newly created outline to the document's root outline collection.
+                doc.Outlines.Add(newItem);
 
-            // Remove all existing items
-            outlines.Clear();
-
-            // Re‑add items in the desired order (swap first and second)
-            outlines.Add(newFirst);
-            outlines.Add(newSecond);
-
-            // If there were more items beyond the first two, re‑add them unchanged
-            for (int i = 3; i <= outlines.VisibleCount; i++)
-            {
-                // The original collection has been cleared, so we need to fetch from the saved copy
-                // Re‑use the original items stored before clearing
-                // Since we only swapped the first two, we can simply re‑add the remaining originals
-                // by creating new OutlineItemCollection instances.
-                // For brevity, this example assumes only two items need reordering.
-                break;
+                // NOTE: If the original outline had child items, they would need to be
+                // copied recursively. This example focuses on top‑level items only.
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // ---------------------------------------------------------------
+            // 5. Save the modified PDF.
+            // ---------------------------------------------------------------
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Reordered PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Reordered PDF saved to '{outputPath}'.");
     }
 }

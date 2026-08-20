@@ -6,44 +6,48 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for proper disposal)
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Get the collection of embedded file attachments
-            var embeddedFiles = doc.EmbeddedFiles;
-
-            if (embeddedFiles == null || embeddedFiles.Count == 0)
+            // Iterate over each embedded file (attachment)
+            foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
             {
-                Console.WriteLine("No attachments found in the document.");
-                return;
-            }
+                if (fileSpec == null)
+                    continue;
 
-            // Iterate over each FileSpecification in the collection
-            foreach (FileSpecification fileSpec in embeddedFiles)
-            {
-                // Attachment name (fallback to a placeholder if null)
-                string name = fileSpec.Name ?? "Unnamed";
+                // Get the attachment name (original file name)
+                string fileName = fileSpec.Name;
 
-                // Determine size – use Params.Size when available, otherwise fall back to the stream length
+                // Determine the size of the attachment (in bytes)
                 long size = 0;
-                if (fileSpec.Params != null)
+                Stream contentStream = fileSpec.Contents;
+                if (contentStream != null)
                 {
-                    size = fileSpec.Params.Size; // Size is an int, implicitly convertible to long
-                }
-                else if (fileSpec.Contents != null && fileSpec.Contents.CanSeek)
-                {
-                    size = fileSpec.Contents.Length;
+                    if (contentStream.CanSeek)
+                    {
+                        size = contentStream.Length;
+                    }
+                    else
+                    {
+                        // Fallback: copy to a MemoryStream to obtain length
+                        using (var ms = new MemoryStream())
+                        {
+                            contentStream.CopyTo(ms);
+                            size = ms.Length;
+                        }
+                    }
                 }
 
-                Console.WriteLine($"Attachment: {name}, Size: {size} bytes");
+                // Output the attachment details
+                Console.WriteLine($"Attachment: {fileName}, Size: {size} bytes");
             }
         }
     }

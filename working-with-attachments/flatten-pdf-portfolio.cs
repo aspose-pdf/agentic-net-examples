@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "portfolio.pdf";   // PDF Portfolio file
+        const string inputPath  = "portfolio.pdf";   // PDF Portfolio input
         const string outputPath = "flattened.pdf";   // Standard PDF output
 
         if (!File.Exists(inputPath))
@@ -15,16 +15,16 @@ class Program
             return;
         }
 
-        // Load the PDF Portfolio, flatten it, and save as a regular PDF
+        // Load the PDF Portfolio, then flatten it to remove interactive collection features
         using (Document doc = new Document(inputPath))
         {
-            // Remove interactive elements (forms, annotations, etc.)
+            // Flatten removes form fields and interactive elements; for a portfolio this also strips the collection UI
             doc.Flatten();
 
-            // Save the flattened document
+            // Save as a regular PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Portfolio flattened and saved to '{outputPath}'.");
     }
 }
