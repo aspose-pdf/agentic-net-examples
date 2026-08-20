@@ -9,12 +9,9 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string srcText    = "TextToReplace";   // text to find
+        const string destText   = "NewText";         // replacement text
 
-        // Text to find and its replacement
-        const string sourceText = "TextToReplace";
-        const string newText    = "NewReplacement";
-
-        // Ensure the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
@@ -24,17 +21,17 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a PdfContentEditor and bind it to the loaded document
+            // Initialize the PdfContentEditor facade and bind the document
             PdfContentEditor editor = new PdfContentEditor();
             editor.BindPdf(doc);
 
             // Replace text only on page 3 (Aspose.Pdf uses 1‑based page indexing)
-            editor.ReplaceText(sourceText, 3, newText);
+            editor.ReplaceText(srcText, 3, destText);
 
-            // Save the modified document (saving without explicit options writes PDF)
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Text replacement completed. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Replacement completed. Output saved to '{outputPath}'.");
     }
 }

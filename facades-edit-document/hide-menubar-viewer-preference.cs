@@ -16,18 +16,25 @@ class Program
             return;
         }
 
-        // PdfContentEditor is a Facades class used to modify PDF viewer preferences.
-        PdfContentEditor editor = new PdfContentEditor();
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Initialize the facade for editing PDF content
+            PdfContentEditor editor = new PdfContentEditor();
 
-        // Load the source PDF.
-        editor.BindPdf(inputPath);
+            // Bind the loaded document to the editor
+            editor.BindPdf(doc);
 
-        // Set the viewer preference to hide the menu bar when the document is opened.
-        editor.ChangeViewerPreference(ViewerPreference.HideMenubar);
+            // Set the viewer preference to hide the menu bar
+            editor.ChangeViewerPreference(ViewerPreference.HideMenubar);
 
-        // Save the modified PDF.
-        editor.Save(outputPath);
+            // Save the modified PDF
+            editor.Save(outputPath);
 
-        Console.WriteLine($"PDF saved with HideMenubar preference: {outputPath}");
+            // Release resources held by the editor
+            editor.Close();
+        }
+
+        Console.WriteLine($"PDF saved with HideMenubar preference: '{outputPath}'");
     }
 }

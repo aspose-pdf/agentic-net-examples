@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Printing;
 
@@ -16,34 +15,30 @@ class Program
             return;
         }
 
-        // Configure printer settings for the network printer.
-        // Adjust the printer name/URI according to how the printer is installed on the system.
-        PrinterSettings printerSettings = new PrinterSettings
+        // Initialize the PdfViewer facade
+        using (PdfViewer viewer = new PdfViewer())
         {
-            // Example using a UNC share; replace \"Printer\" with the actual share name if needed.
-            PrinterName = @"\\192.168.1.100\Printer",
-            Copies = 1
-        };
+            // Load the PDF document
+            viewer.BindPdf(pdfPath);
 
-        // Load the PDF document (lifecycle rule: use Document constructor and using block).
-        using (Document doc = new Document(pdfPath))
-        {
-            // Initialize PdfViewer with the loaded document.
-            using (PdfViewer viewer = new PdfViewer(doc))
-            {
-                // Suppress any UI dialogs for silent printing.
-                viewer.AutoResize = true;      // Fit content to printable area.
-                viewer.AutoRotate = true;      // Auto‑rotate pages if needed.
-                viewer.PrintPageDialog = false; // No page‑range dialog.
+            // Configure viewer for silent printing (no dialogs)
+            viewer.AutoResize = true;      // fit to printable area
+            viewer.AutoRotate = true;      // auto‑rotate pages if needed
+            viewer.PrintPageDialog = false; // suppress the page‑range dialog
 
-                // Print the document using the specified printer settings.
-                viewer.PrintDocumentWithSettings(printerSettings);
+            // Set up printer settings for the network printer
+            PrinterSettings printerSettings = new PrinterSettings();
+            // Use the UNC path to the network printer; replace "printer" with the actual share name
+            printerSettings.PrinterName = @"\\192.168.1.100\printer";
+            printerSettings.Copies = 1;    // number of copies
 
-                // Close the viewer to release resources.
-                viewer.Close();
-            }
+            // Send the print job silently
+            viewer.PrintDocumentWithSettings(printerSettings);
+
+            // Release resources
+            viewer.Close();
         }
 
-        Console.WriteLine("Print job dispatched to the network printer.");
+        Console.WriteLine("Print job sent to the network printer.");
     }
 }

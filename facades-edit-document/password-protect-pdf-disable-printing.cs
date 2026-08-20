@@ -20,18 +20,15 @@ class Program
         // Load the PDF document
         Document doc = new Document(inputPath);
 
-        // Define permissions – allow everything except printing
-        Permissions perms = Permissions.ModifyContent |
-                             Permissions.ExtractContent |
-                             Permissions.FillForm |
-                             Permissions.AssembleDocument;
+        // Disable all privileged actions (including printing) by using no permission flags
+        Permissions perms = (Permissions)0; // equivalent to "no permissions"
 
-        // Encrypt the document with user and owner passwords, 256‑bit AES, and the defined permissions
+        // Encrypt with 256‑bit AES algorithm
         doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
         // Save the protected PDF
         doc.Save(outputPath);
 
-        Console.WriteLine($"PDF encrypted successfully: {outputPath}");
+        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
     }
 }

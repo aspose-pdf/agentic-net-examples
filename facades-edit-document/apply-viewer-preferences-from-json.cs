@@ -1,113 +1,105 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Text.Json;
-using System.Reflection;
 using Aspose.Pdf.Facades;
 
 namespace PdfViewerPreferenceApplier
 {
-    // Represents the overall configuration file structure.
-    public class Config
+    // Represents the JSON configuration for viewer preferences.
+    public class ViewerSettings
     {
-        public List<FileConfig> Files { get; set; }
-    }
-
-    // Represents a single PDF processing entry.
-    public class FileConfig
-    {
-        public string InputPath { get; set; }      // Path to the source PDF.
-        public string OutputPath { get; set; }     // Desired output PDF path.
-        public List<string> Preferences { get; set; } // List of ViewerPreference flag names.
+        public bool HideMenubar { get; set; }
+        public bool HideToolbar { get; set; }
+        public bool HideWindowUI { get; set; }
+        public bool FitWindow { get; set; }
+        public bool CenterWindow { get; set; }
+        public bool DisplayDocTitle { get; set; }
+        public bool PageModeUseNone { get; set; }
+        public bool PageModeUseOutlines { get; set; }
+        public bool PageModeUseThumbs { get; set; }
+        public bool PageModeFullScreen { get; set; }
+        public bool PageLayoutSinglePage { get; set; }
+        public bool PageLayoutOneColumn { get; set; }
+        public bool PageLayoutTwoColumnLeft { get; set; }
+        public bool PageLayoutTwoColumnRight { get; set; }
+        // Add other flags as needed.
     }
 
     class Program
     {
         static void Main()
         {
-            const string jsonConfigPath = "viewerPreferences.json";
+            const string configPath = "viewerPreferences.json";   // JSON config file path
+            const string inputFolder = "InputPdfs";              // Folder containing source PDFs
+            const string outputFolder = "OutputPdfs";            // Folder for processed PDFs
 
-            if (!File.Exists(jsonConfigPath))
+            if (!File.Exists(configPath))
             {
-                Console.Error.WriteLine($"Configuration file not found: {jsonConfigPath}");
+                Console.Error.WriteLine($"Configuration file not found: {configPath}");
                 return;
             }
 
-            // Deserialize the JSON configuration.
-            Config config;
+            // Load and deserialize the JSON configuration.
+            ViewerSettings settings;
             try
             {
-                string json = File.ReadAllText(jsonConfigPath);
-                config = JsonSerializer.Deserialize<Config>(json, new JsonSerializerOptions
+                string json = File.ReadAllText(configPath);
+                settings = JsonSerializer.Deserialize<ViewerSettings>(json);
+                if (settings == null)
                 {
-                    PropertyNameCaseInsensitive = true
-                });
+                    Console.Error.WriteLine("Failed to deserialize configuration.");
+                    return;
+                }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
+                Console.Error.WriteLine($"Error reading configuration: {ex.Message}");
                 return;
             }
 
-            if (config?.Files == null || config.Files.Count == 0)
-            {
-                Console.WriteLine("No files to process.");
-                return;
-            }
+            // Build the combined viewer preference flags.
+            int viewerPreference = 0;
+            if (settings.HideMenubar)          viewerPreference |= ViewerPreference.HideMenubar;
+            if (settings.HideToolbar)          viewerPreference |= ViewerPreference.HideToolbar;
+            if (settings.HideWindowUI)         viewerPreference |= ViewerPreference.HideWindowUI;
+            if (settings.FitWindow)            viewerPreference |= ViewerPreference.FitWindow;
+            if (settings.CenterWindow)         viewerPreference |= ViewerPreference.CenterWindow;
+            if (settings.DisplayDocTitle)      viewerPreference |= ViewerPreference.DisplayDocTitle;
+            if (settings.PageModeUseNone)      viewerPreference |= ViewerPreference.PageModeUseNone;
+            if (settings.PageModeUseOutlines)  viewerPreference |= ViewerPreference.PageModeUseOutlines;
+            if (settings.PageModeUseThumbs)    viewerPreference |= ViewerPreference.PageModeUseThumbs;
+            if (settings.PageModeFullScreen)   viewerPreference |= ViewerPreference.PageModeFullScreen;
+            if (settings.PageLayoutSinglePage) viewerPreference |= ViewerPreference.PageLayoutSinglePage;
+            if (settings.PageLayoutOneColumn)  viewerPreference |= ViewerPreference.PageLayoutOneColumn;
+            if (settings.PageLayoutTwoColumnLeft) viewerPreference |= ViewerPreference.PageLayoutTwoColumnLeft;
+            if (settings.PageLayoutTwoColumnRight) viewerPreference |= ViewerPreference.PageLayoutTwoColumnRight;
+            // Extend with additional flags as required.
 
-            // Process each PDF according to its specified viewer preferences.
-            foreach (var file in config.Files)
+            // Ensure output directory exists.
+            Directory.CreateDirectory(outputFolder);
+
+            // Process each PDF file in the input folder.
+            foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
             {
-                if (!File.Exists(file.InputPath))
-                {
-                    Console.Error.WriteLine($"Input PDF not found: {file.InputPath}");
-                    continue;
-                }
+                string fileName = Path.GetFileName(inputPath);
+                string outputPath = Path.Combine(outputFolder, fileName);
 
                 try
                 {
-                    // Create the PdfContentEditor facade.
+                    // Use PdfContentEditor to modify viewer preferences.
                     PdfContentEditor editor = new PdfContentEditor();
-
-                    // Bind the source PDF.
-                    editor.BindPdf(file.InputPath);
-
-                    // Combine the requested ViewerPreference flags.
-                    int combinedPref = 0;
-                    if (file.Preferences != null)
-                    {
-                        foreach (string prefName in file.Preferences)
-                        {
-                            // Use reflection to obtain the constant value from ViewerPreference.
-                            FieldInfo field = typeof(ViewerPreference).GetField(prefName,
-                                BindingFlags.Public | BindingFlags.Static);
-                            if (field != null && field.FieldType == typeof(int))
-                            {
-                                combinedPref |= (int)field.GetValue(null);
-                            }
-                            else
-                            {
-                                Console.Error.WriteLine($"Unknown ViewerPreference: {prefName}");
-                            }
-                        }
-                    }
-
-                    // Apply the combined viewer preference.
-                    editor.ChangeViewerPreference(combinedPref);
-
-                    // Save the modified PDF.
-                    editor.Save(file.OutputPath);
-
-                    // Close the facade (PdfContentEditor does not implement IDisposable).
-                    editor.Close();
-
-                    Console.WriteLine($"Processed '{file.InputPath}' -> '{file.OutputPath}'");
+                    editor.BindPdf(inputPath);
+                    editor.ChangeViewerPreference(viewerPreference);
+                    editor.Save(outputPath);
+                    Console.WriteLine($"Processed: {fileName}");
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine($"Error processing '{file.InputPath}': {ex.Message}");
+                    Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
                 }
             }
+
+            Console.WriteLine("All files processed.");
         }
     }
 }

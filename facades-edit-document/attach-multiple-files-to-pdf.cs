@@ -8,17 +8,17 @@ class Program
     static void Main()
     {
         // Path to the PDF that will receive the attachments
-        const string targetPdfPath = "base.pdf";
+        const string targetPdfPath = "target.pdf";
 
         // Output PDF with all attachments added
-        const string outputPdfPath = "base_with_attachments.pdf";
+        const string outputPdfPath = "target_with_attachments.pdf";
 
         // Collection of files to attach
         string[] filesToAttach = new string[]
         {
-            "attachment1.docx",
-            "attachment2.xlsx",
-            "attachment3.txt"
+            "attachment1.pdf",
+            "image.png",
+            "document.docx"
         };
 
         // Verify that the target PDF exists
@@ -28,37 +28,33 @@ class Program
             return;
         }
 
-        // Verify that each attachment file exists
-        foreach (string attachPath in filesToAttach)
+        // Verify that each attachment file exists before processing
+        foreach (string file in filesToAttach)
         {
-            if (!File.Exists(attachPath))
+            if (!File.Exists(file))
             {
-                Console.Error.WriteLine($"Attachment file not found: {attachPath}");
+                Console.Error.WriteLine($"Attachment file not found: {file}");
                 return;
             }
         }
 
-        try
+        // Create the PdfContentEditor facade (does NOT implement IDisposable)
+        PdfContentEditor editor = new PdfContentEditor();
+
+        // Bind the target PDF document
+        editor.BindPdf(targetPdfPath);
+
+        // Attach each file to the PDF
+        foreach (string attachmentPath in filesToAttach)
         {
-            // Initialize the PdfContentEditor facade and bind the target PDF
-            PdfContentEditor editor = new PdfContentEditor();
-            editor.BindPdf(targetPdfPath);
-
-            // Attach each file to the PDF without creating a visual annotation
-            foreach (string attachPath in filesToAttach)
-            {
-                // The second parameter is a description for the attachment
-                editor.AddDocumentAttachment(attachPath, $"Attached file: {Path.GetFileName(attachPath)}");
-            }
-
-            // Save the resulting PDF with all attachments
-            editor.Save(outputPdfPath);
-
-            Console.WriteLine($"Attachments added successfully. Output saved to '{outputPdfPath}'.");
+            // Use the file name as the description (you can customize as needed)
+            string description = Path.GetFileName(attachmentPath);
+            editor.AddDocumentAttachment(attachmentPath, description);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        // Save the resulting PDF with all attachments
+        editor.Save(outputPdfPath);
+
+        Console.WriteLine($"Attachments added. Output saved to '{outputPdfPath}'.");
     }
 }

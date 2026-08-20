@@ -1,59 +1,78 @@
 using System;
-using System.IO;
 using System.Xml;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;          // needed for the Form facade
+using Aspose.Pdf.Forms;            // needed for TextBoxField and other field types
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "template.pdf";   // PDF with AcroForm fields
-        const string inputXmlPath  = "data.xml";       // XML source data
-        const string outputPdfPath = "filled.pdf";     // Resulting PDF
+        // Paths for the temporary files used in this self‑contained example.
+        const string pdfTemplatePath = "template.pdf";
+        const string outputPdfPath    = "filled.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        // ---------------------------------------------------------------------
+        // 1. Create a sample PDF that contains the required AcroForm fields.
+        // ---------------------------------------------------------------------
+        using (Document seedDoc = new Document())
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
-            return;
-        }
+            // Add a page.
+            Page page = seedDoc.Pages.Add();
 
-        if (!File.Exists(inputXmlPath))
-        {
-            Console.Error.WriteLine($"XML not found: {inputXmlPath}");
-            return;
-        }
-
-        // Load XML document once
-        XmlDocument xmlDoc = new XmlDocument();
-        xmlDoc.Load(inputXmlPath);
-
-        // Initialize the Form facade on the source PDF
-        using (Form form = new Form(inputPdfPath))
-        {
-            // Iterate over all AcroForm field names
-            foreach (string fieldName in form.FieldNames)
+            // Create a text box for "FirstName".
+            TextBoxField firstNameField = new TextBoxField(page, new Rectangle(100, 700, 200, 720))
             {
-                // Build an XPath that selects an element whose name matches the field name
-                // Adjust the XPath as needed for your XML structure
-                string xpath = $"//*[local-name() = '{fieldName}']";
+                PartialName = "FirstName",
+                Value = string.Empty
+            };
+            seedDoc.Form.Add(firstNameField, 1);
 
-                XmlNode node = xmlDoc.SelectSingleNode(xpath);
-                if (node != null)
-                {
-                    string value = node.InnerText ?? string.Empty;
-                    // Fill the field with the extracted value
-                    form.FillField(fieldName, value);
-                }
-                else
-                {
-                    Console.WriteLine($"No XML value found for field '{fieldName}'.");
-                }
-            }
+            // Create a text box for "LastName".
+            TextBoxField lastNameField = new TextBoxField(page, new Rectangle(100, 650, 200, 670))
+            {
+                PartialName = "LastName",
+                Value = string.Empty
+            };
+            seedDoc.Form.Add(lastNameField, 1);
 
-            // Save the filled PDF to the desired output file
+            // Save the template PDF that will later be filled.
+            seedDoc.Save(pdfTemplatePath);
+        }
+
+        // ---------------------------------------------------------------------
+        // 2. Prepare the XML data (in‑memory – no external file required).
+        // ---------------------------------------------------------------------
+        string xmlContent = @"<Root><FirstName>John</FirstName><LastName>Doe</LastName></Root>";
+        XmlDocument xmlDoc = new XmlDocument();
+        xmlDoc.LoadXml(xmlContent);
+
+        // Helper function to extract a value using an XPath expression.
+        string GetValue(string xpath)
+        {
+            XmlNode node = xmlDoc.SelectSingleNode(xpath);
+            return node?.InnerText ?? string.Empty;
+        }
+
+        // Extract the values for the form fields.
+        string firstName = GetValue("//FirstName");
+        string lastName  = GetValue("//LastName");
+
+        // ---------------------------------------------------------------------
+        // 3. Fill the AcroForm fields using the Form facade (new API).
+        // ---------------------------------------------------------------------
+        // NOTE: Both Aspose.Pdf.Facades and Aspose.Pdf.Forms contain a type named "Form".
+        // To avoid the CS0104 ambiguous‑reference error we fully qualify the facade class.
+        using (Aspose.Pdf.Facades.Form form = new Aspose.Pdf.Facades.Form(pdfTemplatePath))
+        {
+            // Populate the fields.
+            form.FillField("FirstName", firstName);
+            form.FillField("LastName",  lastName);
+
+            // Save the filled PDF to the desired output path.
             form.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Form fields populated and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Form fields have been populated and saved to '{outputPdfPath}'.");
     }
 }

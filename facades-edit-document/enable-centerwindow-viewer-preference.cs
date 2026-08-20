@@ -1,30 +1,30 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades;   // PdfContentEditor, ViewerPreference
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_centered.pdf";
+        const string outputPath = "centered_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Use PdfContentEditor facade to modify viewer preferences
+        // PdfContentEditor implements IDisposable, so wrap it in a using block.
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Load the source PDF
+            // Load the source PDF.
             editor.BindPdf(inputPath);
 
-            // Set the CenterWindow flag (true) using the ViewerPreference constant
+            // Set the CenterWindow viewer preference (true) by applying the corresponding flag.
             editor.ChangeViewerPreference(ViewerPreference.CenterWindow);
 
-            // Save the modified PDF
+            // Save the modified PDF.
             editor.Save(outputPath);
         }
 

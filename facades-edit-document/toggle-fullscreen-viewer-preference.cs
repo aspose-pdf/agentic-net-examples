@@ -1,77 +1,67 @@
 using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades; // PdfContentEditor, ViewerPreference
+using Aspose.Pdf.Facades;
 
-class PdfFullScreenToggler
+class PdfFullScreenToggle
 {
     /// <summary>
-    /// Toggles the FullScreen viewer preference of a PDF.
+    /// Toggles the FullScreen viewer preference of a PDF file.
+    /// If the PDF is currently set to FullScreen, the flag is removed;
+    /// otherwise the FullScreen flag is added.
     /// </summary>
-    /// <param name="inputPdf">Path to the source PDF.</param>
-    /// <param name="outputPdf">Path where the modified PDF will be saved.</param>
-    /// <param name="enableFullScreen">If true, enable FullScreen mode; otherwise disable it.</param>
-    public static void ToggleFullScreen(string inputPdf, string outputPdf, bool enableFullScreen)
+    /// <param name="inputPath">Path to the source PDF.</param>
+    /// <param name="outputPath">Path where the modified PDF will be saved.</param>
+    public static void ToggleFullScreen(string inputPath, string outputPath)
     {
-        // Ensure the source file exists
-        if (!File.Exists(inputPdf))
-            throw new FileNotFoundException($"Input file not found: {inputPdf}");
-
-        // PdfContentEditor implements IDisposable, so use a using block for deterministic disposal
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Ensure the source file exists.
+        if (!System.IO.File.Exists(inputPath))
         {
-            // Bind the existing PDF document
-            editor.BindPdf(inputPdf);
-
-            // Retrieve the current viewer preference flags
-            int currentPref = editor.GetViewerPreference();
-
-            // Compute the new preference value by setting or clearing the FullScreen flag
-            int newPref;
-            if (enableFullScreen)
-            {
-                // Turn on FullScreen by adding the flag (bitwise OR)
-                newPref = currentPref | ViewerPreference.PageModeFullScreen;
-            }
-            else
-            {
-                // Turn off FullScreen by removing the flag (bitwise AND with complement)
-                newPref = currentPref & ~ViewerPreference.PageModeFullScreen;
-            }
-
-            // Apply the updated viewer preference
-            editor.ChangeViewerPreference(newPref);
-
-            // Save the modified PDF to the specified output path
-            editor.Save(outputPdf);
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
         }
+
+        // Create the PdfContentEditor facade.
+        PdfContentEditor editor = new PdfContentEditor();
+
+        // Bind the PDF document to the editor.
+        editor.BindPdf(inputPath);
+
+        // Retrieve the current viewer preference flags.
+        int currentPref = editor.GetViewerPreference();
+
+        // Determine whether FullScreen mode is currently set.
+        bool isFullScreen = (currentPref & ViewerPreference.PageModeFullScreen) != 0;
+
+        // Toggle the FullScreen flag.
+        int newPref;
+        if (isFullScreen)
+        {
+            // Remove the FullScreen flag.
+            newPref = currentPref & ~ViewerPreference.PageModeFullScreen;
+        }
+        else
+        {
+            // Add the FullScreen flag.
+            newPref = currentPref | ViewerPreference.PageModeFullScreen;
+        }
+
+        // Apply the updated viewer preference.
+        editor.ChangeViewerPreference(newPref);
+
+        // Save the modified PDF to the specified output path.
+        editor.Save(outputPath);
+
+        // Optional: release resources (PdfContentEditor inherits from SaveableFacade which implements IDisposable).
+        editor.Close();
     }
 
-    // Example usage
+    // Example usage.
     static void Main()
     {
-        const string inputPath = "sample.pdf";
-        const string outputPathOn = "sample_fullscreen_on.pdf";
-        const string outputPathOff = "sample_fullscreen_off.pdf";
+        const string inputPdf = "sample.pdf";
+        const string outputPdf = "sample_toggled.pdf";
 
-        // -------------------------------------------------------------------
-        // Create a minimal PDF inline so the sandbox has a file to work with.
-        // -------------------------------------------------------------------
-        if (!File.Exists(inputPath))
-        {
-            using (Document seed = new Document())
-            {
-                seed.Pages.Add(); // add a blank page
-                seed.Save(inputPath);
-            }
-        }
+        ToggleFullScreen(inputPdf, outputPdf);
 
-        // Enable FullScreen mode
-        ToggleFullScreen(inputPath, outputPathOn, true);
-        Console.WriteLine($"FullScreen enabled: {outputPathOn}");
-
-        // Disable FullScreen mode
-        ToggleFullScreen(inputPath, outputPathOff, false);
-        Console.WriteLine($"FullScreen disabled: {outputPathOff}");
+        Console.WriteLine($"FullScreen preference toggled. Output saved to '{outputPdf}'.");
     }
 }

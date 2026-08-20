@@ -6,14 +6,14 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";          // Existing PDF
-        const string attachmentPath = "attachment_file.pdf"; // File to attach
-        const string outputPdfPath = "output.pdf";         // Resulting PDF
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string attachmentPath = "attachment_file.pdf";
+        const string description = "Sample attachment";
 
-        // Verify that both files exist before proceeding
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
@@ -23,20 +23,14 @@ class Program
             return;
         }
 
-        // Use PdfContentEditor (a facade) to add the attachment.
-        // The facade implements IDisposable, so wrap it in a using block.
+        // Add the file attachment using PdfContentEditor (no annotation)
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Bind the existing PDF document.
-            editor.BindPdf(inputPdfPath);
-
-            // Add the file attachment without any visual annotation.
-            editor.AddDocumentAttachment(attachmentPath, "Description of attachment_file");
-
-            // Save the modified PDF to a new file.
-            editor.Save(outputPdfPath);
+            editor.BindPdf(inputPdf);
+            editor.AddDocumentAttachment(attachmentPath, description);
+            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Attachment added. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
     }
 }

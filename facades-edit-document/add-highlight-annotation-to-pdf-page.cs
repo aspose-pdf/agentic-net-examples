@@ -1,21 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using System.Drawing; // Required for System.Drawing.Rectangle and System.Drawing.Color used by PdfContentEditor
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        // Example rectangle coordinates for the highlight (adjust as needed)
-        int x      = 100;   // lower‑left X (System.Drawing.Rectangle uses X as left)
-        int y      = 500;   // lower‑left Y (System.Drawing.Rectangle uses Y as top, but PdfContentEditor expects lower‑left; values are passed directly)
-        int width  = 200;   // rectangle width
-        int height = 20;    // rectangle height
+        const string inputPath = "input.pdf";
+        const string outputPath = "highlighted.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -23,21 +16,39 @@ class Program
             return;
         }
 
-        // Load the PDF, add a highlight annotation on page 3, and save.
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
-        using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Bind the document to the facade.
-            editor.BindPdf(doc);
+            // Verify that page 3 exists (Aspose.Pdf uses 1‑based indexing)
+            if (doc.Pages.Count < 3)
+            {
+                Console.Error.WriteLine("The document has fewer than 3 pages.");
+                return;
+            }
 
-            // Create a highlight markup (type = 0) on page 3.
-            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(x, y, width, height);
-            editor.CreateMarkup(rect, "Highlighted text", 0, 3, System.Drawing.Color.Yellow);
+            // Get page 3
+            Page page = doc.Pages[3];
 
-            // Persist the changes.
-            editor.Save(outputPath);
+            // Define the rectangle that covers the text to be highlighted.
+            // Coordinates are (llx, lly, urx, ury) in points.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
+
+            // Create a highlight annotation on the specified page and rectangle.
+            HighlightAnnotation highlight = new HighlightAnnotation(page, rect)
+            {
+                // Use Aspose.Pdf.Color (cross‑platform) for the highlight color.
+                Color = Aspose.Pdf.Color.Yellow,
+                // Optional: add a comment that appears in the annotation popup.
+                Contents = "Highlighted text"
+            };
+
+            // Attach the annotation to the page.
+            page.Annotations.Add(highlight);
+
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Highlight annotation added to page 3 and saved as '{outputPath}'.");
+        Console.WriteLine($"Highlight annotation added and saved to '{outputPath}'.");
     }
 }

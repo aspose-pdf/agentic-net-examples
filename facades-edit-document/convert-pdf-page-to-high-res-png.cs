@@ -1,29 +1,28 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;          // PdfConverter, ImageFormat (if needed)
-using Aspose.Pdf.Devices;          // Resolution
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Devices; // for Resolution
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF file
-        const string outputPng = "page7.png";   // output PNG file for page 7
+        const string inputPdf = "input.pdf";          // source PDF
+        const string outputPng = "page7_300dpi.png";   // output PNG file
 
-        // Ensure the input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Use PdfConverter (Facade) to convert the specific page to PNG
+        // PdfConverter is a Facade class; wrap it in a using block for proper disposal
         using (PdfConverter converter = new PdfConverter())
         {
-            // Bind the PDF document
+            // Bind the PDF file to the converter
             converter.BindPdf(inputPdf);
 
-            // Set the page range to only page 7 (1‑based indexing)
+            // Set the page range to only page 7 (Aspose.Pdf uses 1‑based indexing)
             converter.StartPage = 7;
             converter.EndPage   = 7;
 
@@ -33,16 +32,11 @@ class Program
             // Prepare the converter for image extraction
             converter.DoConvert();
 
-            // Extract the image if available. Use the overload that infers the format from the file extension.
-            if (converter.HasNextImage())
-            {
-                converter.GetNextImage(outputPng); // format inferred from ".png"
-                Console.WriteLine($"Page 7 saved as PNG to '{outputPng}'.");
-            }
-            else
-            {
-                Console.Error.WriteLine("No image was extracted from the PDF.");
-            }
+            // Save the extracted page as a PNG image.
+            // The overload without ImageFormat infers the format from the file extension.
+            converter.GetNextImage(outputPng);
         }
+
+        Console.WriteLine($"Page 7 saved as high‑resolution PNG: {outputPng}");
     }
 }

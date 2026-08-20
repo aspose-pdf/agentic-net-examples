@@ -15,17 +15,18 @@ class Program
             return;
         }
 
-        // Initialize the PdfContentEditor facade
+        // Initialize the facade and bind the source PDF
         PdfContentEditor editor = new PdfContentEditor();
         editor.BindPdf(inputPath);
 
-        // Combine viewer preferences using bitwise OR
+        // Combine desired viewer preferences using bitwise OR
         int combinedPreferences = ViewerPreference.CenterWindow | ViewerPreference.HideToolbar;
         editor.ChangeViewerPreference(combinedPreferences);
 
         // Save the modified PDF
         editor.Save(outputPath);
-        editor.Close(); // optional cleanup
+        // Release resources held by the facade
+        editor.Close();
 
         Console.WriteLine($"PDF saved with updated viewer preferences to '{outputPath}'.");
     }

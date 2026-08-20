@@ -1,12 +1,13 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,16 +16,16 @@ class Program
             return;
         }
 
-        // PdfContentEditor implements IDisposable, so using ensures proper disposal
+        // PdfContentEditor implements IDisposable, so a using block ensures it is closed automatically.
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Load the PDF file into the editor
+            // Load the PDF file into the editor.
             editor.BindPdf(inputPath);
 
-            // Example edit: replace all occurrences of "Hello" with "Hi"
+            // Example edit: replace all occurrences of "Hello" with "Hi".
             editor.ReplaceText("Hello", "Hi");
 
-            // Save the modified PDF to a new file
+            // Persist the changes to a new file.
             editor.Save(outputPath);
         }
 

@@ -9,23 +9,22 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify the source PDF exists
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // PdfFileEditor does NOT implement IDisposable, so do NOT wrap it in a using block.
-        // The Delete method removes the specified pages (1‑based indexing) and writes the result.
+        // PdfFileEditor does NOT implement IDisposable, so no using block is required
         PdfFileEditor editor = new PdfFileEditor();
 
-        // Delete page 5 from the document.
-        bool deleted = editor.Delete(inputPath, new int[] { 5 }, outputPath);
+        // Delete page 5 (Aspose.Pdf uses 1‑based page numbers)
+        bool result = editor.Delete(inputPath, new int[] { 5 }, outputPath);
 
-        if (deleted)
+        if (result)
         {
-            Console.WriteLine($"Page 5 successfully removed. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Page 5 removed successfully. Output saved to '{outputPath}'.");
         }
         else
         {

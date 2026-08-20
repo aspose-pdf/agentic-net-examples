@@ -7,47 +7,45 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath      = "input.pdf";          // Existing PDF to which the attachment will be added
-        const string outputPdfPath     = "output_with_attachment.pdf";
-        const string largeAttachmentPath = "largefile.bin";    // File larger than 10 MB
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_with_attachment.pdf";
+        const string largeFile = "large_attachment.bin"; // file >10 MB
 
-        // Verify that the large attachment exists
-        if (!File.Exists(largeAttachmentPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Attachment not found: {largeAttachmentPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(largeFile))
+        {
+            Console.Error.WriteLine($"Attachment file not found: {largeFile}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // Add the large attachment using the PdfContentEditor facade
-        // -----------------------------------------------------------------
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPdfPath); // Load the source PDF
-        // Add the attachment without a visible annotation
-        editor.AddDocumentAttachment(largeAttachmentPath, "Large attachment exceeding 10 MB");
-        // Save the modified PDF
-        editor.Save(outputPdfPath);
-        // No explicit Dispose needed for PdfContentEditor (it does not implement IDisposable)
+        // Increase the limit for loading whole files into memory if needed (default 210 MB)
+        Document.FileSizeLimitToMemoryLoading = 500; // MB
 
-        // -----------------------------------------------------------------
-        // Load the resulting PDF to ensure memory usage stays within limits
-        // -----------------------------------------------------------------
-        using (Document resultDoc = new Document(outputPdfPath))
+        using (Document doc = new Document(inputPdf))
         {
-            // The static property defines the maximum file size that can be fully loaded into memory (default 210 MB)
-            // It can be inspected or adjusted if required.
-            int currentLimitMb = Document.FileSizeLimitToMemoryLoading;
-            Console.WriteLine($"Current file‑size‑to‑memory limit: {currentLimitMb} MB");
+            // Bind the document to the content editor facade
+            PdfContentEditor editor = new PdfContentEditor();
+            editor.BindPdf(doc);
 
-            // Explicitly free any cached resources to keep memory usage low
-            resultDoc.FreeMemory();
+            // Add the large attachment using a stream to avoid loading it entirely into memory
+            using (FileStream attStream = File.OpenRead(largeFile))
+            {
+                editor.AddDocumentAttachment(attStream, Path.GetFileName(largeFile), "Large attachment >10 MB");
+            }
 
-            // Optionally, report the final file size (should be >10 MB due to the attachment)
-            long fileSizeBytes = new FileInfo(outputPdfPath).Length;
-            Console.WriteLine($"Resulting PDF size: {fileSizeBytes / (1024 * 1024)} MB");
+            // Save the modified PDF
+            editor.Save(outputPdf);
+
+            // Release cached resources and check memory usage
+            doc.FreeMemory();
+            long memoryUsed = GC.GetTotalMemory(forceFullCollection: true);
+            Console.WriteLine($"Memory used after operation: {memoryUsed / (1024 * 1024)} MB");
         }
 
-        Console.WriteLine("Attachment added and memory usage verified.");
+        Console.WriteLine($"PDF with attachment saved to '{outputPdf}'.");
     }
 }

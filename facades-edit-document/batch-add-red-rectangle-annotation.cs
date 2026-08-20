@@ -3,64 +3,67 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-class BatchAddRedRectangle
+class Program
 {
     static void Main()
     {
-        const string inputFolder = "Input";
-        const string outputFolder = "Output";
+        // Base directory of the executable (works on any platform)
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-        // Ensure the output directory exists
+        // Resolve input and output folders relative to the base directory
+        string inputFolder = Path.Combine(baseDir, "Input");
+        string outputFolder = Path.Combine(baseDir, "Output");
+
+        // Ensure both folders exist – create them if they are missing
+        Directory.CreateDirectory(inputFolder);
         Directory.CreateDirectory(outputFolder);
 
-        // Verify the input directory exists; if not, create it and exit gracefully
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder '{inputFolder}' does not exist. Creating it now. Place PDF files there and re‑run the program.");
-            Directory.CreateDirectory(inputFolder);
-            return;
-        }
-
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-
+        // Get all PDF files in the input folder (if any)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
         if (pdfFiles.Length == 0)
         {
-            Console.WriteLine($"No PDF files found in '{inputFolder}'. Nothing to process.");
+            Console.WriteLine($"No PDF files found in '{inputFolder}'. Place PDFs there and rerun the program.");
             return;
         }
 
-        foreach (string pdfPath in pdfFiles)
+        foreach (string inputPath in pdfFiles)
         {
+            string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
+
             try
             {
-                // Load the PDF document
-                Document pdfDocument = new Document(pdfPath);
-
-                // Define the rectangle (lower‑left X,Y and upper‑right X,Y)
-                // Example: rectangle from (100,100) to (300,200)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
-
-                // Create a square (rectangle) annotation on the first page
-                SquareAnnotation square = new SquareAnnotation(pdfDocument.Pages[1], rect)
+                // Open the PDF document
+                using (Document doc = new Document(inputPath))
                 {
-                    Color = Aspose.Pdf.Color.Red,   // Border color
-                    Opacity = 0.5                    // Semi‑transparent
-                };
+                    // Ensure the document has at least one page
+                    if (doc.Pages.Count > 0)
+                    {
+                        // Get the first page (1‑based indexing)
+                        Page page = doc.Pages[1];
 
-                // Add the annotation to the page
-                pdfDocument.Pages[1].Annotations.Add(square);
+                        // Define the rectangle area (llx, lly, urx, ury)
+                        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-                // Save the annotated PDF to the output folder, preserving the original name
-                string fileName = System.IO.Path.GetFileName(pdfPath);
-                string outPath = System.IO.Path.Combine(outputFolder, fileName);
-                pdfDocument.Save(outPath);
+                        // Create a square (rectangle) annotation with a red border
+                        SquareAnnotation square = new SquareAnnotation(page, rect)
+                        {
+                            Color = Aspose.Pdf.Color.Red // Border color
+                            // FillColor = Aspose.Pdf.Color.Transparent // optional transparent fill
+                        };
 
-                Console.WriteLine($"Annotated '{fileName}' saved to '{outputFolder}'.");
+                        // Add the annotation to the page
+                        page.Annotations.Add(square);
+                    }
+
+                    // Save the modified PDF to the output location
+                    doc.Save(outputPath);
+                }
+
+                Console.WriteLine($"Annotated PDF saved: {outputPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
     }

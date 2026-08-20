@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -12,7 +11,7 @@ class Program
         const string attachmentPath = "Terms.pdf";
         const string description = "Contract Terms";
 
-        // Verify that the source PDF and attachment exist.
+        // Verify that the source PDF and the attachment exist.
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
@@ -24,18 +23,13 @@ class Program
             return;
         }
 
-        // PdfContentEditor does not implement IDisposable, so we instantiate it directly.
+        // Bind the PDF, add the attachment (no visual annotation), and save.
         PdfContentEditor editor = new PdfContentEditor();
-
-        // Load the existing PDF document.
         editor.BindPdf(inputPdf);
-
-        // Add the file attachment without creating an annotation.
         editor.AddDocumentAttachment(attachmentPath, description);
-
-        // Save the updated PDF.
         editor.Save(outputPdf);
 
-        Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Attachment '{attachmentPath}' added with description '{description}'.");
+        Console.WriteLine($"Result saved to '{outputPdf}'.");
     }
 }

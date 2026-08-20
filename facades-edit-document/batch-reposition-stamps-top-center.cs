@@ -1,19 +1,14 @@
 using System;
 using System.IO;
-using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class BatchStampReposition
+class Program
 {
     static void Main()
     {
-        // Input PDF files (can be populated as needed)
-        string[] inputFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
-        // Output directory for the processed PDFs
-        string outputDir = "RepositionedStamps";
-
-        Directory.CreateDirectory(outputDir);
+        // List of PDF files to process
+        string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
 
         foreach (string inputPath in inputFiles)
         {
@@ -23,57 +18,48 @@ class BatchStampReposition
                 continue;
             }
 
-            // Derive output file name
-            string outputPath = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(inputPath) + "_repositioned.pdf");
+            // Output file name (original name with suffix)
+            string outputPath = Path.Combine(
+                Path.GetDirectoryName(inputPath) ?? string.Empty,
+                Path.GetFileNameWithoutExtension(inputPath) + "_repositioned.pdf");
 
-            // Load the PDF document (lifecycle: using block ensures disposal)
+            // Load the document to obtain page dimensions (using rule for disposal)
             using (Document doc = new Document(inputPath))
             {
-                // Bind the document to PdfContentEditor to manipulate stamps
+                // Initialize the content editor and bind the same PDF file
                 PdfContentEditor editor = new PdfContentEditor();
-                editor.BindPdf(doc);
+                editor.BindPdf(inputPath);
 
-                // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+                // Iterate through all pages (1‑based indexing)
                 for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
                 {
-                    // Retrieve all stamps on the current page
+                    // Retrieve page size
+                    var pageInfo = doc.Pages[pageNum].PageInfo;
+                    double pageWidth = pageInfo.Width;
+                    double pageHeight = pageInfo.Height;
+
+                    // Get all stamps on the current page
                     StampInfo[] stamps = editor.GetStamps(pageNum);
-                    if (stamps == null || stamps.Length == 0)
-                        continue; // No stamps on this page
+                    if (stamps == null) continue;
 
-                    // Page dimensions
-                    double pageWidth = doc.Pages[pageNum].PageInfo.Width;
-                    double pageHeight = doc.Pages[pageNum].PageInfo.Height;
-
+                    // Reposition each stamp to top‑center
                     for (int i = 0; i < stamps.Length; i++)
                     {
-                        StampInfo stampInfo = stamps[i];
+                        // Horizontal center, 10 points below the top edge
+                        double newX = pageWidth / 2.0;
+                        double newY = pageHeight - 10.0;
 
-                        // ----- Retrieve stamp width & height via reflection (properties may not exist in older versions) -----
-                        double stampWidth = 0;
-                        double stampHeight = 0;
-                        Type siType = stampInfo.GetType();
-                        PropertyInfo widthProp = siType.GetProperty("Width");
-                        PropertyInfo heightProp = siType.GetProperty("Height");
-                        if (widthProp != null && widthProp.CanRead)
-                            stampWidth = Convert.ToDouble(widthProp.GetValue(stampInfo));
-                        if (heightProp != null && heightProp.CanRead)
-                            stampHeight = Convert.ToDouble(heightProp.GetValue(stampInfo));
-
-                        // Calculate new X coordinate (centered horizontally). If width is unknown, fall back to page centre.
-                        double newX = (stampWidth > 0) ? (pageWidth - stampWidth) / 2.0 : pageWidth / 2.0;
-                        // Calculate new Y coordinate (top of the page). If height is unknown, place at page top.
-                        double newY = (stampHeight > 0) ? pageHeight - stampHeight : pageHeight;
-
-                        // Move the stamp to the new position. The stamp index is the array position (i).
-                        editor.MoveStamp(pageNum, i, newX, newY);
+                        // MoveStamp uses 1‑based stamp index
+                        editor.MoveStamp(pageNum, i + 1, newX, newY);
                     }
                 }
 
-                // Save the modified document (lifecycle: save inside using block)
-                doc.Save(outputPath);
-                Console.WriteLine($"Processed '{inputPath}' → '{outputPath}'");
+                // Save the modified PDF
+                editor.Save(outputPath);
+                editor.Close();
             }
+
+            Console.WriteLine($"Repositioned PDF saved to '{outputPath}'.");
         }
     }
 }

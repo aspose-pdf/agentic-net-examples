@@ -7,37 +7,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf      = "secured.pdf";          // Encrypted PDF file
-        const string userPassword  = "userpass";             // Password to open the PDF
-        const string attachment    = "attachment.txt";       // File to attach
-        const string description   = "Sample attachment";    // Description for the attachment
-        const string outputPdf     = "secured_with_attachment.pdf";
+        const string inputPdfPath = "secured.pdf";
+        const string outputPdfPath = "secured_with_attachment.pdf";
+        const string userPassword = "userpass";
+        const string attachmentFilePath = "attachment.txt";
+        const string attachmentDescription = "Sample attachment";
 
-        // Verify that required files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(attachment))
-        {
-            Console.Error.WriteLine($"Attachment file not found: {attachment}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the encrypted PDF using the password
-        using (Document doc = new Document(inputPdf, userPassword))
+        if (!File.Exists(attachmentFilePath))
         {
-            // Initialize the content editor with the loaded document
+            Console.Error.WriteLine($"Attachment file not found: {attachmentFilePath}");
+            return;
+        }
+
+        // Open the encrypted PDF using the password
+        using (Document doc = new Document(inputPdfPath, userPassword))
+        {
+            // Initialize the content editor with the opened document
             PdfContentEditor editor = new PdfContentEditor(doc);
 
-            // Add the file attachment (no visual annotation)
-            editor.AddDocumentAttachment(attachment, description);
+            // Add the file attachment (no annotation)
+            editor.AddDocumentAttachment(attachmentFilePath, attachmentDescription);
 
             // Save the modified PDF
-            editor.Save(outputPdf);
+            editor.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Attachment added and saved to '{outputPdfPath}'.");
     }
 }

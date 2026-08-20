@@ -4,77 +4,80 @@ using System.Threading;
 using System.Threading.Tasks;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfApi
+public static class PdfAttachmentHelper
 {
-    class PdfAttachmentHelper
+    /// <summary>
+    /// Asynchronously adds a file attachment to a PDF document and saves the result.
+    /// </summary>
+    /// <param name="inputPdfPath">Path to the source PDF file.</param>
+    /// <param name="attachmentFilePath">Path to the file that will be attached.</param>
+    /// <param name="description">Description of the attachment.</param>
+    /// <param name="outputPdfPath">Path where the updated PDF will be saved.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public static async Task AddAttachmentAsync(
+        string inputPdfPath,
+        string attachmentFilePath,
+        string description,
+        string outputPdfPath,
+        CancellationToken cancellationToken = default)
     {
-        /// <summary>
-        /// Asynchronously adds a file attachment to a PDF and saves the result.
-        /// The operation runs on a background thread so the UI thread remains responsive.
-        /// </summary>
-        /// <param name="sourcePdfPath">Path to the source PDF file.</param>
-        /// <param name="attachmentPath">Path to the file to attach.</param>
-        /// <param name="attachmentDescription">Description for the attachment.</param>
-        /// <param name="outputPdfPath">Path where the updated PDF will be saved.</param>
-        /// <param name="cancellationToken">Optional token to cancel the operation.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public static async Task AddAttachmentAndSaveAsync(
-            string sourcePdfPath,
-            string attachmentPath,
-            string attachmentDescription,
-            string outputPdfPath,
-            CancellationToken cancellationToken = default)
+        // Validate input parameters early to avoid runtime errors.
+        if (string.IsNullOrWhiteSpace(inputPdfPath))
+            throw new ArgumentException("Input PDF path must be provided.", nameof(inputPdfPath));
+        if (string.IsNullOrWhiteSpace(attachmentFilePath))
+            throw new ArgumentException("Attachment file path must be provided.", nameof(attachmentFilePath));
+        if (!File.Exists(inputPdfPath))
+            throw new FileNotFoundException("Input PDF not found.", inputPdfPath);
+        if (!File.Exists(attachmentFilePath))
+            throw new FileNotFoundException("Attachment file not found.", attachmentFilePath);
+
+        // Run the blocking Facade operations on a background thread.
+        await Task.Run(() =>
         {
-            // Validate input files early to avoid unnecessary work.
-            if (!File.Exists(sourcePdfPath))
-                throw new FileNotFoundException($"Source PDF not found: {sourcePdfPath}");
+            // Ensure the operation respects cancellation.
+            cancellationToken.ThrowIfCancellationRequested();
 
-            if (!File.Exists(attachmentPath))
-                throw new FileNotFoundException($"Attachment file not found: {attachmentPath}");
-
-            // Run the Facade operations on a thread‑pool thread.
-            await Task.Run(() =>
+            // Use the PdfContentEditor facade to bind, attach, and save.
+            using (PdfContentEditor editor = new PdfContentEditor())
             {
-                var editor = new PdfContentEditor();
-                editor.BindPdf(sourcePdfPath);
-                editor.AddDocumentAttachment(attachmentPath, attachmentDescription);
+                // Load the existing PDF.
+                editor.BindPdf(inputPdfPath);
+
+                // Add the attachment without any visual annotation.
+                editor.AddDocumentAttachment(attachmentFilePath, description);
+
+                // Save the modified PDF to the specified output path.
                 editor.Save(outputPdfPath);
-            }, cancellationToken).ConfigureAwait(false);
-        }
+            }
+        }, cancellationToken).ConfigureAwait(false);
     }
+}
 
-    class Program
+public class Program
+{
+    // Entry point required for a console application. Using async Main (C# 7.1+).
+    public static async Task Main(string[] args)
     {
-        // C# 7.1+ async entry point.
-        static async Task Main(string[] args)
+        if (args.Length < 4)
         {
-            // Expected arguments: sourcePdf attachmentFile description outputPdf
-            if (args.Length < 4)
-            {
-                Console.WriteLine("Usage: <sourcePdf> <attachmentFile> <description> <outputPdf>");
-                return;
-            }
+            Console.WriteLine("Usage: <inputPdfPath> <attachmentFilePath> <description> <outputPdfPath>");
+            return;
+        }
 
-            string sourcePdf = args[0];
-            string attachment = args[1];
-            string description = args[2];
-            string outputPdf = args[3];
+        string inputPdfPath = args[0];
+        string attachmentFilePath = args[1];
+        string description = args[2];
+        string outputPdfPath = args[3];
 
-            try
-            {
-                await PdfAttachmentHelper.AddAttachmentAndSaveAsync(
-                    sourcePdf,
-                    attachment,
-                    description,
-                    outputPdf,
-                    CancellationToken.None);
-
-                Console.WriteLine("Attachment added and PDF saved successfully.");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error: {ex.Message}");
-            }
+        try
+        {
+            await PdfAttachmentHelper.AddAttachmentAsync(inputPdfPath, attachmentFilePath, description, outputPdfPath);
+            Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdfPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }
