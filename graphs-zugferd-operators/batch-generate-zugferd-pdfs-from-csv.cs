@@ -1,15 +1,24 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
+    // Simple DTO for CSV rows
+    private class InvoiceRecord
+    {
+        public string InvoiceNumber { get; set; }
+        public string CustomerName { get; set; }
+        public string Amount { get; set; }
+        public string XmlPath { get; set; }
+    }
+
     static void Main()
     {
-        // Paths configuration
         const string csvPath = "invoices.csv";          // CSV with invoice data
-        const string xmlFolder = "XmlData";             // Folder containing ZUGFeRD XML files
-        const string outputFolder = "InvoicesPdf";      // Destination for generated PDFs
+        const string outputFolder = "GeneratedInvoices"; // Folder for PDFs
 
         if (!File.Exists(csvPath))
         {
@@ -19,79 +28,67 @@ class Program
 
         Directory.CreateDirectory(outputFolder);
 
-        // Simple CSV parsing (header + comma‑separated values)
-        using (StreamReader reader = new StreamReader(csvPath))
+        List<InvoiceRecord> records = ParseCsv(csvPath);
+        foreach (var rec in records)
         {
-            // Skip header line
-            string header = reader.ReadLine();
-
-            while (!reader.EndOfStream)
+            // Validate XML file existence
+            if (!File.Exists(rec.XmlPath))
             {
-                string line = reader.ReadLine();
-                if (string.IsNullOrWhiteSpace(line))
-                    continue;
+                Console.Error.WriteLine($"XML file not found for invoice {rec.InvoiceNumber}: {rec.XmlPath}");
+                continue;
+            }
 
-                // Expected columns: InvoiceNumber,CustomerName,Amount,XmlFileName
-                var fields = line.Split(',');
+            // Create a new PDF document
+            using (Document pdfDoc = new Document())
+            {
+                // Add a page
+                Page page = pdfDoc.Pages.Add();
 
-                if (fields.Length < 4)
-                {
-                    Console.Error.WriteLine($"Invalid CSV line: {line}");
-                    continue;
-                }
+                // Prepare invoice text
+                string invoiceText = $"Invoice #: {rec.InvoiceNumber}\n" +
+                                     $"Customer: {rec.CustomerName}\n" +
+                                     $"Amount: {rec.Amount}";
 
-                string invoiceNumber = fields[0].Trim();
-                string customerName = fields[1].Trim();
-                string amount = fields[2].Trim();
-                string xmlFileName = fields[3].Trim();
+                // Add text to the page
+                TextFragment tf = new TextFragment(invoiceText);
+                tf.Position = new Position(100, 700); // Position near top-left
+                page.Paragraphs.Add(tf);
 
-                string xmlPath = Path.Combine(xmlFolder, xmlFileName);
-                if (!File.Exists(xmlPath))
-                {
-                    Console.Error.WriteLine($"XML file not found for invoice {invoiceNumber}: {xmlPath}");
-                    continue;
-                }
+                // Attach ZUGFeRD XML data to the PDF
+                pdfDoc.BindXml(rec.XmlPath);
 
-                string pdfPath = Path.Combine(outputFolder, $"{invoiceNumber}.pdf");
-
-                // Create a new PDF document and add invoice details
-                using (Document pdfDoc = new Document())
-                {
-                    var page = pdfDoc.Pages.Add();
-
-                    // Invoice number
-                    Aspose.Pdf.Text.TextFragment tfInvoice = new Aspose.Pdf.Text.TextFragment($"Invoice #: {invoiceNumber}")
-                    {
-                        Position = new Aspose.Pdf.Text.Position(50, 750),
-                        TextState = { FontSize = 14, Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica") }
-                    };
-                    page.Paragraphs.Add(tfInvoice);
-
-                    // Customer name
-                    Aspose.Pdf.Text.TextFragment tfCustomer = new Aspose.Pdf.Text.TextFragment($"Customer: {customerName}")
-                    {
-                        Position = new Aspose.Pdf.Text.Position(50, 720),
-                        TextState = { FontSize = 12 }
-                    };
-                    page.Paragraphs.Add(tfCustomer);
-
-                    // Amount
-                    Aspose.Pdf.Text.TextFragment tfAmount = new Aspose.Pdf.Text.TextFragment($"Amount: {amount}")
-                    {
-                        Position = new Aspose.Pdf.Text.Position(50, 690),
-                        TextState = { FontSize = 12 }
-                    };
-                    page.Paragraphs.Add(tfAmount);
-
-                    // Attach ZUGFeRD XML data to the PDF
-                    pdfDoc.BindXml(xmlPath);
-
-                    // Save the PDF (ZUGFeRD‑compliant)
-                    pdfDoc.Save(pdfPath);
-                }
-
-                Console.WriteLine($"Generated PDF: {pdfPath}");
+                // Save the PDF with a name based on the invoice number
+                string outputPdfPath = Path.Combine(outputFolder, $"{rec.InvoiceNumber}.pdf");
+                pdfDoc.Save(outputPdfPath);
+                Console.WriteLine($"Generated PDF: {outputPdfPath}");
             }
         }
+    }
+
+    // Parses a CSV file where each line is:
+    // InvoiceNumber,CustomerName,Amount,XmlFilePath
+    private static List<InvoiceRecord> ParseCsv(string csvFilePath)
+    {
+        var list = new List<InvoiceRecord>();
+        foreach (var line in File.ReadLines(csvFilePath))
+        {
+            // Skip empty lines
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            // Simple split by comma; assumes no commas inside fields
+            var parts = line.Split(',');
+            if (parts.Length < 4)
+                continue; // malformed line
+
+            InvoiceRecord record = new InvoiceRecord {
+                InvoiceNumber = parts[0].Trim(),
+                CustomerName = parts[1].Trim(),
+                Amount = parts[2].Trim(),
+                XmlPath = parts[3].Trim()
+            };
+            list.Add(record);
+        }
+        return list;
     }
 }

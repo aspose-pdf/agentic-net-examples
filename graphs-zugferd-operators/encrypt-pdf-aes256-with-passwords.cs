@@ -22,7 +22,7 @@ class Program
             // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Define the permissions to allow after encryption
+                // Set desired permissions (e.g., allow printing and content extraction)
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
                 // Apply AES‑256 encryption with user and owner passwords
@@ -32,7 +32,7 @@ class Program
                 doc.Save(encryptedPath);
             }
 
-            Console.WriteLine($"PDF encrypted successfully: {encryptedPath}");
+            Console.WriteLine($"Encrypted PDF saved to '{encryptedPath}'.");
         }
         catch (Exception ex)
         {

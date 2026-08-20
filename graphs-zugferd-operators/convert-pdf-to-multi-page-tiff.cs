@@ -7,26 +7,22 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.tif";
 
-        // Output multi‑page TIFF file path
-        const string outputTiffPath = "output.tif";
-
-        // Verify input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF document
+        using (Document pdfDocument = new Document(inputPath))
         {
-            // Define the resolution (DPI) for the resulting TIFF images
+            // Define resolution for the TIFF images (e.g., 300 DPI)
             Resolution resolution = new Resolution(300);
 
-            // Configure TIFF settings (no compression, default color depth, landscape orientation)
+            // Configure TIFF conversion settings
             TiffSettings tiffSettings = new TiffSettings
             {
                 Compression = CompressionType.None,
@@ -35,13 +31,13 @@ class Program
                 SkipBlankPages = false
             };
 
-            // Create the TIFF device with the specified resolution and settings
+            // Create a TIFF device with the specified resolution and settings
             TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
 
             // Convert the entire PDF to a multi‑page TIFF file
-            tiffDevice.Process(pdfDocument, outputTiffPath);
+            tiffDevice.Process(pdfDocument, outputPath);
         }
 
-        Console.WriteLine($"PDF successfully converted to multi‑page TIFF: {outputTiffPath}");
+        Console.WriteLine($"PDF successfully converted to multi‑page TIFF: {outputPath}");
     }
 }

@@ -7,10 +7,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string searchText = "Hello";
-        const string replaceText = "Hi";
+        const string oldText    = "Hello";
+        const string newText    = "Hi";
 
         if (!File.Exists(inputPath))
         {
@@ -21,32 +21,30 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[pageIndex];
-                // In recent Aspose.Pdf versions the low‑level operators are accessed via the Contents collection
-                OperatorCollection contents = page.Contents;
+                // OperatorCollection holds all content operators for the page
+                var operators = page.Contents;
 
-                // Iterate over the low‑level operators on the page (1‑based indexing)
-                for (int opIndex = 1; opIndex <= contents.Count; opIndex++)
+                // Scan the operator list and replace matching ShowText operators
+                for (int i = 0; i < operators.Count; i++)
                 {
-                    // Identify ShowText (Tj) operators
-                    if (contents[opIndex] is ShowText showText)
+                    if (operators[i] is ShowText show && show.Text != null && show.Text.Contains(oldText))
                     {
-                        // Replace occurrences of the target string
-                        if (!string.IsNullOrEmpty(showText.Text) && showText.Text.Contains(searchText))
-                        {
-                            // Create a new ShowText operator with the replaced text
-                            ShowText newOp = new ShowText(showText.Text.Replace(searchText, replaceText));
-                            // Substitute the old operator with the new one
-                            contents[opIndex] = newOp;
-                        }
+                        // Create a new ShowText operator with the replaced string
+                        ShowText replacement = new ShowText(show.Text.Replace(oldText, newText));
+
+                        // Preserve the original operator index (required by the PDF content stream)
+                        replacement.Index = show.Index;
+
+                        // Substitute the operator in the collection
+                        operators[i] = replacement;
                     }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 

@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -19,16 +19,16 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // JavaScript that jumps to page 5 (pageNum is zero‑based, so 4)
-            JavascriptAction openAction = new JavascriptAction("this.pageNum = 4;");
+            // JavaScript that jumps to page 5 when the document opens
+            JavascriptAction openJs = new JavascriptAction("this.pageNum = 5;");
 
-            // Assign the JavaScript action to be executed when the document opens
-            doc.OpenAction = openAction;
+            // Set the JavaScript as the document's open action
+            doc.OpenAction = openJs;
 
-            // Save the modified PDF
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved PDF with open‑action to page 5: {outputPath}");
+        Console.WriteLine($"Saved PDF with open action to '{outputPath}'.");
     }
 }

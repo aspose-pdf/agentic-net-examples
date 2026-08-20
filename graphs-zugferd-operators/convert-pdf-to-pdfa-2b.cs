@@ -8,7 +8,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output_pdfa2b.pdf";
-        const string logPath    = "conversion_log.txt";
+        const string logPath    = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -16,24 +16,16 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF, convert to PDF/A‑2b, then save.
+        using (Document doc = new Document(inputPath))
         {
-            // Load the source PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // Convert the document to PDF/A‑2b compliance.
-                // ConvertErrorAction.Delete removes objects that cannot be converted.
-                doc.Convert(logPath, PdfFormat.PDF_A_2B, ConvertErrorAction.Delete);
+            // Convert to PDF/A‑2b; errors are logged to the specified file.
+            doc.Convert(logPath, PdfFormat.PDF_A_2B, ConvertErrorAction.Delete);
 
-                // After conversion, save the compliant PDF.
-                doc.Save(outputPath);
-            }
+            // Save the converted document.
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"PDF/A‑2b compliant file saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"PDF/A‑2b compliant file saved to '{outputPath}'.");
     }
 }

@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string attachmentName = "myfile.txt"; // name of the attachment to remove
+        const string attachmentName = "example.txt"; // name of the attachment to remove
 
         if (!File.Exists(inputPath))
         {
@@ -16,23 +16,17 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document (lifecycle rule: use Document constructor)
-            using (Document doc = new Document(inputPath))
-            {
-                // Remove the specific embedded file by its filename (EmbeddedFileCollection.Delete)
-                doc.EmbeddedFiles.Delete(attachmentName);
+            // Remove the specific embedded file by its filename
+            // EmbeddedFiles is an EmbeddedFileCollection which provides Delete(string)
+            doc.EmbeddedFiles.Delete(attachmentName);
 
-                // Save the modified PDF (lifecycle rule: use Document.Save)
-                doc.Save(outputPath);
-            }
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"Attachment '{attachmentName}' removed. Saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Attachment '{attachmentName}' removed. Saved to '{outputPath}'.");
     }
 }

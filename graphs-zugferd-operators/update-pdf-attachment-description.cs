@@ -7,43 +7,76 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // Existing PDF with attachment(s)
-        const string outputPdf = "output.pdf";         // PDF after updating description
-        const string newDescription = "Latest version of the attached file";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string updatedDescription = "Latest version of the attached file";
 
-        if (!File.Exists(inputPdf))
+        // ------------------------------------------------------------
+        // 1. Ensure a source PDF exists – create a minimal PDF with a
+        //    file‑attachment annotation so the example is self‑contained.
+        // ------------------------------------------------------------
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
+            // Create a dummy file that will be attached.
+            byte[] dummyContent = System.Text.Encoding.UTF8.GetBytes("Dummy file content");
+            using var dummyStream = new MemoryStream(dummyContent);
+
+            // Build the PDF.
+            using (var doc = new Document())
+            {
+                // Add a single page.
+                Page page = doc.Pages.Add();
+
+                // Create a FileSpecification for the dummy file.
+                var fileSpec = new FileSpecification(dummyStream, "dummy.txt")
+                {
+                    Description = "Initial description",
+                    // MIMEType property does not exist in Aspose.Pdf.FileSpecification –
+                    // it is optional for this example and therefore omitted.
+                    // AFRelationship is optional; keep it if needed.
+                    AFRelationship = AFRelationship.Data
+                };
+
+                // Define the rectangle where the annotation will appear.
+                var rect = new Aspose.Pdf.Rectangle(100, 600, 120, 620);
+
+                // Create the file‑attachment annotation. NOTE: the constructor requires the
+                // owning Page as the first argument, then the rectangle, then the FileSpecification.
+                var fileAttachment = new FileAttachmentAnnotation(page, rect, fileSpec);
+
+                // Add the annotation to the page.
+                page.Annotations.Add(fileAttachment);
+
+                // Save the placeholder PDF.
+                doc.Save(inputPdfPath);
+            }
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // ------------------------------------------------------------
+        // 2. Load the PDF and update the description of any file‑attachment
+        //    annotations.
+        // ------------------------------------------------------------
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            foreach (Page page in pdfDoc.Pages)
             {
-                // Iterate over all annotations on the page (1‑based indexing)
+                // Annotations collection is 1‑based.
                 for (int idx = 1; idx <= page.Annotations.Count; idx++)
                 {
-                    Annotation ann = page.Annotations[idx];
-
-                    // Check if the annotation is a file attachment
-                    if (ann is FileAttachmentAnnotation fileAnn)
+                    Annotation annotation = page.Annotations[idx];
+                    if (annotation is FileAttachmentAnnotation fileAttachment)
                     {
-                        // Update the description of the attached file
-                        if (fileAnn.File != null)
+                        if (fileAttachment.File != null)
                         {
-                            fileAnn.File.Description = newDescription;
+                            fileAttachment.File.Description = updatedDescription;
                         }
                     }
                 }
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Attachment description updated and saved to '{outputPdf}'.");
+        Console.WriteLine($"Attachment description updated and saved to '{outputPdfPath}'.");
     }
 }

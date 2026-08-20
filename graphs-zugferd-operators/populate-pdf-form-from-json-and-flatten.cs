@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string jsonPath  = "data.json";
+        const string inputPdf = "input.pdf";
+        const string jsonPath = "data.json";
         const string outputPdf = "filled_flattened.pdf";
 
         if (!File.Exists(inputPdf))
@@ -16,7 +16,6 @@ class Program
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
         if (!File.Exists(jsonPath))
         {
             Console.Error.WriteLine($"JSON data file not found: {jsonPath}");
@@ -25,16 +24,16 @@ class Program
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
+            // Load the PDF document
             using (Document doc = new Document(inputPdf))
             {
                 // Populate form fields from the JSON file
                 doc.Form.ImportFromJson(jsonPath);
 
-                // Flatten the form so that field values become part of the page content
+                // Flatten the form to make fields non‑editable
                 doc.Form.Flatten();
 
-                // Save the resulting PDF
+                // Save the updated PDF
                 doc.Save(outputPdf);
             }
 
