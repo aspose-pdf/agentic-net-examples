@@ -1,51 +1,54 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing; // for alignment enums
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string imageFile = "watermark.png";
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "watermarked.pdf";
+        const string imagePath  = "logo.png"; // image to use as watermark
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(imageFile))
-        {
-            Console.Error.WriteLine($"Image file not found: {imageFile}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using)
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(imagePath))
         {
-            // Create an image stamp from the image file
-            ImageStamp stamp = new ImageStamp(imageFile);
+            Console.Error.WriteLine($"Watermark image not found: {imagePath}");
+            return;
+        }
 
-            // Rotate 90 degrees to make the watermark diagonal
-            stamp.Rotate = Rotation.on90; // correct enum value
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Create an ImageStamp from the image file
+            ImageStamp imgStamp = new ImageStamp(imagePath);
 
-            // Optional visual settings
-            stamp.Opacity = 0.3;                     // semi‑transparent
-            stamp.Background = false;                // draw on top of page content
-            stamp.HorizontalAlignment = HorizontalAlignment.Center;
-            stamp.VerticalAlignment   = VerticalAlignment.Center;
+            // Rotate the stamp 90 degrees to achieve a diagonal appearance
+            imgStamp.RotateAngle = 90; // arbitrary angle in degrees
 
-            // Apply the stamp to every page
+            // Optional: place the stamp at the center of each page
+            imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            imgStamp.VerticalAlignment   = VerticalAlignment.Center;
+
+            // Optional: make the stamp semi‑transparent
+            imgStamp.Opacity = 0.3;
+
+            // Apply the stamp to every page in the document
             foreach (Page page in doc.Pages)
             {
-                page.AddStamp(stamp);
+                page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF (lifecycle rule: use Save inside using)
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Diagonal watermark saved to '{outputPdf}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

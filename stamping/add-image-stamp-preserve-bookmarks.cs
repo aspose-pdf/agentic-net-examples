@@ -1,51 +1,46 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // for alignment enums
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";      // source PDF with bookmarks/outlines
-        const string stampImage = "logo.png";       // image to use as stamp
-        const string outputPdf  = "output.pdf";     // result PDF (bookmarks preserved)
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string stampImagePath = "logo.png";
 
-        // Validate input files
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
-        if (!File.Exists(stampImage))
+        if (!File.Exists(stampImagePath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImage}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        // Load the existing PDF (bookmarks and outline are loaded automatically)
-        using (Document doc = new Document(inputPdf))
+        // Load the existing PDF (bookmarks and outline are preserved)
+        using (Document doc = new Document(inputPath))
         {
-            // Create an image stamp – the same instance can be reused for all pages
-            ImageStamp imgStamp = new ImageStamp(stampImage)
-            {
-                // Example visual settings – adjust as needed
-                Background          = false,                     // stamp on top of page content
-                Opacity             = 0.7f,                      // semi‑transparent
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center
-            };
+            // Create an image stamp
+            ImageStamp imgStamp = new ImageStamp(stampImagePath);
+            imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            imgStamp.VerticalAlignment   = VerticalAlignment.Center;
+            imgStamp.Opacity = 0.5;          // semi‑transparent
+            imgStamp.Background = false;    // stamp on top of page content
 
-            // Apply the stamp to every page; bookmarks/outlines remain untouched
+            // Apply the stamp to every page
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF; existing bookmarks and outline are preserved
-            doc.Save(outputPdf);
+            // Save the modified PDF (bookmarks/outlines remain intact)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Image stamp added. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

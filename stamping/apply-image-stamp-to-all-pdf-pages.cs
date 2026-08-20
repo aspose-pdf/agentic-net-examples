@@ -6,32 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdf  = "input.pdf";
         const string outputPdf = "output.pdf";
-        const string stampImage = "stamp.png";
+        const string stampImg  = "stamp.png";
 
-        // Verify input files exist
+        // Verify required files exist
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(stampImage))
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImage}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        // Load the PDF document (disposed automatically)
+        // Load the PDF document (lifecycle rule: using block for disposal)
         using (Document doc = new Document(inputPdf))
         {
-            // Create an ImageStamp and configure its appearance
-            ImageStamp imgStamp = new ImageStamp(stampImage)
+            // Create an image stamp (core API)
+            ImageStamp imgStamp = new ImageStamp(stampImg)
             {
-                Background = false,                     // Stamp on top of page content
-                Opacity = 0.5,                          // 50% transparent
+                // Optional visual settings
+                Background = false,
+                Opacity   = 0.5,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment   = VerticalAlignment.Center
             };
 
             // Apply the stamp to every page using a foreach loop
@@ -40,7 +41,7 @@ class Program
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF (writes PDF regardless of extension)
+            // Save the modified PDF (lifecycle rule)
             doc.Save(outputPdf);
         }
 

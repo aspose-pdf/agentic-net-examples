@@ -6,52 +6,52 @@ class Program
 {
     static void Main()
     {
-        const string targetPath = "target.pdf";          // PDF to be stamped
-        const string backgroundPath = "background.pdf"; // PDF containing the background page
-        const string outputPath = "stamped_output.pdf";
+        // Input PDFs
+        const string sourcePdf = "source.pdf";   // PDF that provides the background page
+        const string targetPdf = "target.pdf";   // PDF that will receive the background stamp
+        const string outputPdf = "output.pdf";   // Resulting PDF
 
-        if (!File.Exists(targetPath))
+        // Verify files exist
+        if (!File.Exists(sourcePdf) || !File.Exists(targetPdf))
         {
-            Console.Error.WriteLine($"Target PDF not found: {targetPath}");
-            return;
-        }
-        if (!File.Exists(backgroundPath))
-        {
-            Console.Error.WriteLine($"Background PDF not found: {backgroundPath}");
+            Console.Error.WriteLine("One or more input files are missing.");
             return;
         }
 
-        // Load the document that will receive the stamp
-        using (Document targetDoc = new Document(targetPath))
-        // Load the document that provides the stamp page
-        using (Document bgDoc = new Document(backgroundPath))
+        // Load the document that will be stamped (target)
+        using (Document targetDoc = new Document(targetPdf))
         {
-            // Select the page from the background document to use as stamp (first page here)
-            Page bgPage = bgDoc.Pages[1];
-
-            // Apply the background stamp to each page of the target document
-            for (int i = 1; i <= targetDoc.Pages.Count; i++) // 1‑based indexing
+            // Load the document that contains the background page (source)
+            using (Document sourceDoc = new Document(sourcePdf))
             {
-                Page targetPage = targetDoc.Pages[i];
+                // Choose the page from the source document to use as background.
+                // Here we use the first page; change the index as needed (1‑based).
+                Page backgroundPage = sourceDoc.Pages[1];
 
-                // Create a PdfPageStamp using the selected background page
-                PdfPageStamp stamp = new PdfPageStamp(bgPage)
+                // Apply the background stamp to each page of the target document.
+                for (int i = 1; i <= targetDoc.Pages.Count; i++)
                 {
-                    Background = true,                         // place behind existing content
-                    Width = targetPage.Rect.Width,              // scale to target page width
-                    Height = targetPage.Rect.Height,            // scale to target page height
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                    Page targetPage = targetDoc.Pages[i];
 
-                // Add the stamp to the current page
-                targetPage.AddStamp(stamp);
+                    // Create a PdfPageStamp from the selected source page.
+                    PdfPageStamp stamp = new PdfPageStamp(backgroundPage)
+                    {
+                        Background = true,               // Place stamp behind existing content
+                        Width = targetPage.Rect.Width,    // Scale to match target page size
+                        Height = targetPage.Rect.Height,
+                        XIndent = 0,
+                        YIndent = 0
+                    };
+
+                    // Add the stamp to the current target page.
+                    targetPage.AddStamp(stamp);
+                }
             }
 
-            // Save the stamped document
-            targetDoc.Save(outputPath);
+            // Save the modified document.
+            targetDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Background stamp applied successfully. Output saved to '{outputPdf}'.");
     }
 }

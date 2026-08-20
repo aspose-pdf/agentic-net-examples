@@ -1,58 +1,42 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // for ImageStamp (inherits from Stamp)
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Paths
-        const string inputPdfPath   = "encrypted_input.pdf";
-        const string outputPdfPath  = "stamped_output.pdf";
-        const string imagePath      = "stamp_image.png";
-        const string userPassword   = "user123"; // password to open the encrypted PDF
+        const string inputPath  = "encrypted.pdf";   // Encrypted source PDF
+        const string password   = "user123";        // Password to open the PDF
+        const string outputPath = "stamped.pdf";    // Resulting PDF with stamp
+        const string stampImage = "logo.png";       // Image to use as stamp
 
-        // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath) || !File.Exists(stampImage))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(imagePath))
-        {
-            Console.Error.WriteLine($"Stamp image not found: {imagePath}");
+            Console.Error.WriteLine("Input PDF or stamp image not found.");
             return;
         }
 
-        try
+        // Open the encrypted PDF using the password
+        using (Document doc = new Document(inputPath, password))
         {
-            // Open the encrypted PDF using the user password
-            using (Document doc = new Document(inputPdfPath, userPassword))
-            {
-                // Create an image stamp from the specified image file
-                ImageStamp imgStamp = new ImageStamp(imagePath)
-                {
-                    // Position and appearance settings (optional)
-                    Background = false,                     // stamp on top of page content
-                    Opacity    = 0.7f,                      // semi‑transparent
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Center
-                };
+            // Decrypt the document so it can be modified
+            doc.Decrypt();
 
-                // Add the stamp to the first page (page indexing is 1‑based)
-                doc.Pages[1].AddStamp(imgStamp);
+            // Create an image stamp
+            ImageStamp imgStamp = new ImageStamp(stampImage);
+            imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            imgStamp.VerticalAlignment   = VerticalAlignment.Center;
+            imgStamp.Opacity = 0.5f; // optional transparency
 
-                // Save the modified PDF (encryption is preserved)
-                doc.Save(outputPdfPath);
-            }
+            // Add the stamp to the first page (pages are 1‑based)
+            Page page = doc.Pages[1];
+            page.AddStamp(imgStamp);
 
-            Console.WriteLine($"Image stamp added and saved to '{outputPdfPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }
