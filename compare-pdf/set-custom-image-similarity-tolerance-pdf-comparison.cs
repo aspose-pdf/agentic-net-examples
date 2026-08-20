@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Comparison;
+using System.Drawing.Imaging;
 
 class Program
 {
@@ -9,27 +10,33 @@ class Program
     {
         const string pdf1Path = "doc1.pdf";
         const string pdf2Path = "doc2.pdf";
-        const string resultPath = "comparison_result.pdf";
+        const string outputDir = "ComparisonResults";
+        const double customTolerance = 5.0; // percentage tolerance for image differences
 
-        // Verify input files exist
         if (!File.Exists(pdf1Path) || !File.Exists(pdf2Path))
         {
             Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
-        // Load the two PDF documents inside using blocks for deterministic disposal
+        Directory.CreateDirectory(outputDir);
+
         using (Document doc1 = new Document(pdf1Path))
         using (Document doc2 = new Document(pdf2Path))
         {
-            // Create a graphical comparer and set a custom tolerance (percentage)
+            // Set up the graphical comparer with a custom threshold
             GraphicalPdfComparer comparer = new GraphicalPdfComparer();
-            comparer.Threshold = 5.0; // Ignore differences smaller than 5%
+            comparer.Threshold = customTolerance; // ignore changes below this percentage
 
-            // Perform the comparison and save the result as a PDF
-            comparer.CompareDocumentsToPdf(doc1, doc2, resultPath);
+            // Perform the comparison and save result images
+            comparer.CompareDocumentsToImages(
+                doc1,
+                doc2,
+                outputDir,
+                "diff",
+                ImageFormat.Png);
         }
 
-        Console.WriteLine($"Comparison completed. Result saved to '{resultPath}'.");
+        Console.WriteLine("PDF comparison completed.");
     }
 }

@@ -7,14 +7,9 @@ class Program
 {
     static void Main()
     {
-        // Paths to the two PDFs to compare
-        const string firstPdfPath  = "doc1.pdf";
-        const string secondPdfPath = "doc2.pdf";
-
-        // Folder where the diff PDF will be saved
-        const string outputFolder = "DiffResults";
-        // Full path of the resulting diff PDF
-        string resultPdfPath = Path.Combine(outputFolder, "diff.pdf");
+        const string firstPdfPath  = "first.pdf";
+        const string secondPdfPath = "second.pdf";
+        const string diffPdfPath   = "diff_output.pdf";
 
         // Verify that both source files exist
         if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
@@ -23,21 +18,20 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
         try
         {
             // Load the two documents inside using blocks for deterministic disposal
             using (Document doc1 = new Document(firstPdfPath))
             using (Document doc2 = new Document(secondPdfPath))
             {
-                // Create the comparer and generate the diff PDF
-                GraphicalPdfComparer comparer = new GraphicalPdfComparer();
-                comparer.CompareDocumentsToPdf(doc1, doc2, resultPdfPath);
+                // Default comparison options
+                ComparisonOptions options = new ComparisonOptions();
+
+                // Perform page‑by‑page comparison and save the diff PDF
+                TextPdfComparer.CompareDocumentsPageByPage(doc1, doc2, options, diffPdfPath);
             }
 
-            Console.WriteLine($"Diff PDF created at: {resultPdfPath}");
+            Console.WriteLine($"Comparison diff PDF saved to '{diffPdfPath}'.");
         }
         catch (Exception ex)
         {

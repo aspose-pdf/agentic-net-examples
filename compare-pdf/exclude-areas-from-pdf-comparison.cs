@@ -7,47 +7,43 @@ class Program
 {
     static void Main()
     {
-        const string docPath1 = "doc1.pdf";
-        const string docPath2 = "doc2.pdf";
-        const string resultPath = "comparison_result.pdf";
+        const string firstPdfPath = "first.pdf";
+        const string secondPdfPath = "second.pdf";
+        const string resultPdfPath = "comparison_result.pdf";
 
-        if (!File.Exists(docPath1) || !File.Exists(docPath2))
+        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
         {
             Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
-        // Define rectangular areas to exclude from the first document.
-        // Example: exclude a header and a footer region.
-        Aspose.Pdf.Rectangle[] excludeFromFirst = new Aspose.Pdf.Rectangle[]
+        // Define the rectangular areas to exclude from each document.
+        // Rectangle constructor: (llx, lly, urx, ury)
+        Aspose.Pdf.Rectangle[] excludeAreasFirst = new Aspose.Pdf.Rectangle[]
         {
-            new Aspose.Pdf.Rectangle(0, 750, 595, 842), // top area
-            new Aspose.Pdf.Rectangle(0, 0, 595, 50)    // bottom area
+            new Aspose.Pdf.Rectangle(100, 500, 300, 600) // example area on first PDF
         };
 
-        // Define rectangular areas to exclude from the second document.
-        Aspose.Pdf.Rectangle[] excludeFromSecond = new Aspose.Pdf.Rectangle[]
+        Aspose.Pdf.Rectangle[] excludeAreasSecond = new Aspose.Pdf.Rectangle[]
         {
-            new Aspose.Pdf.Rectangle(0, 750, 595, 842),
-            new Aspose.Pdf.Rectangle(0, 0, 595, 50)
+            new Aspose.Pdf.Rectangle(50, 400, 250, 500) // example area on second PDF
         };
 
-        // Set up comparison options with the excluded areas.
-        SideBySideComparisonOptions options = new SideBySideComparisonOptions
+        // Configure comparison options with the exclusion areas.
+        var compareOptions = new SideBySideComparisonOptions
         {
-            ExcludeAreas1 = excludeFromFirst,
-            ExcludeAreas2 = excludeFromSecond
-            // ExcludeTables = true; // optional, if tables should be ignored
+            ExcludeAreas1 = excludeAreasFirst,
+            ExcludeAreas2 = excludeAreasSecond
+            // Additional options can be set here, e.g., ExcludeTables = true;
         };
 
-        // Load both PDFs inside using blocks for deterministic disposal.
-        using (Document doc1 = new Document(docPath1))
-        using (Document doc2 = new Document(docPath2))
+        // Load the PDFs and perform side‑by‑side comparison.
+        using (Document doc1 = new Document(firstPdfPath))
+        using (Document doc2 = new Document(secondPdfPath))
         {
-            // Perform side‑by‑side comparison and save the result.
-            SideBySidePdfComparer.Compare(doc1, doc2, resultPath, options);
+            SideBySidePdfComparer.Compare(doc1, doc2, resultPdfPath, compareOptions);
         }
 
-        Console.WriteLine($"Comparison completed. Result saved to '{resultPath}'.");
+        Console.WriteLine($"Comparison completed. Result saved to '{resultPdfPath}'.");
     }
 }

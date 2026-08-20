@@ -8,11 +8,12 @@ class Program
 {
     static void Main()
     {
-        const string pdf1Path = "doc1.pdf";
-        const string pdf2Path = "doc2.pdf";
-        const string resultPath = "comparison_result.pdf";
+        const string pdfPath1 = "document1.pdf";
+        const string pdfPath2 = "document2.pdf";
+        const string resultPdfPath = "comparison_result.pdf";
 
-        if (!File.Exists(pdf1Path) || !File.Exists(pdf2Path))
+        // Verify that both source PDFs exist
+        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
         {
             Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
@@ -20,27 +21,25 @@ class Program
 
         try
         {
-            // Load the two PDF documents inside using blocks for deterministic disposal
-            using (Document doc1 = new Document(pdf1Path))
-            using (Document doc2 = new Document(pdf2Path))
+            // Load the two PDFs inside using blocks for deterministic disposal
+            using (Document doc1 = new Document(pdfPath1))
+            using (Document doc2 = new Document(pdfPath2))
             {
-                // Initialize default comparison options
+                // Create default comparison options (can be customized as needed)
                 ComparisonOptions options = new ComparisonOptions();
 
-                // Perform a flat document comparison and save the visual diff PDF
-                List<DiffOperation> diffs = TextPdfComparer.CompareFlatDocuments(doc1, doc2, options, resultPath);
+                // Perform a flat document comparison.
+                // The method returns a list of differences and also writes a PDF with visual diff.
+                List<DiffOperation> differences = TextPdfComparer.CompareFlatDocuments(
+                    doc1, doc2, options, resultPdfPath);
 
-                // Output a simple summary of the differences
-                Console.WriteLine($"Comparison completed. Total differences: {diffs.Count}");
-                foreach (DiffOperation diff in diffs)
-                {
-                    Console.WriteLine(diff);
-                }
+                Console.WriteLine($"Comparison finished. Total differences: {differences.Count}");
+                Console.WriteLine($"Result PDF saved to: {resultPdfPath}");
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during PDF comparison: {ex.Message}");
+            Console.Error.WriteLine($"An error occurred during comparison: {ex.Message}");
         }
     }
 }
