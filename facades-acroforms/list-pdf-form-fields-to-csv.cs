@@ -7,49 +7,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string csvReportPath = "fields_report.csv";
+        const string inputPdfPath = "input.pdf";      // source PDF with form fields
+        const string outputCsvPath = "form_fields.csv"; // CSV report file
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // FormEditor implements IDisposable, so use a using block for deterministic disposal
-        using (FormEditor formEditor = new FormEditor())
+        // Load the PDF document and bind it to FormEditor (required by the task)
+        using (Document doc = new Document(inputPdfPath))
+        using (FormEditor formEditor = new FormEditor(doc))
         {
-            // Bind the PDF document to the editor
-            formEditor.BindPdf(inputPdfPath);
-
-            // Access the underlying Document object
-            Document doc = formEditor.Document;
-
-            // Create a Form facade based on the same Document to query field information
+            // FormEditor works on the same Document instance; we can use Form facade to query fields
             Form formFacade = new Form(doc);
 
             // Retrieve all field names
             string[] fieldNames = formFacade.FieldNames;
 
             // Write the report to a CSV file
-            using (StreamWriter writer = new StreamWriter(csvReportPath))
+            using (StreamWriter writer = new StreamWriter(outputCsvPath, false))
             {
-                // Header row
+                // CSV header
                 writer.WriteLine("FieldName,FieldType");
 
-                // Iterate over each field, get its type, and write to CSV
+                // Iterate over each field, obtain its type, and write a line to the CSV
                 foreach (string fieldName in fieldNames)
                 {
-                    // GetFieldType returns a FieldType enum value
-                    var fieldType = formFacade.GetFieldType(fieldName);
+                    // Get the field type using the Form facade
+                    FieldType fieldType = formFacade.GetFieldType(fieldName);
+
+                    // Write CSV line (field name and its type as string)
                     writer.WriteLine($"{fieldName},{fieldType}");
                 }
             }
 
-            // No modifications are made, so just close the editor
-            formEditor.Close();
+            // Save the (unchanged) PDF if needed; here we just ensure proper disposal
+            // (FormEditor inherits SaveableFacade, but no modifications were made)
+            // formEditor.Save(); // not required for this read‑only operation
         }
 
-        Console.WriteLine($"Form fields report saved to '{csvReportPath}'.");
+        Console.WriteLine($"Form field report generated: {outputCsvPath}");
     }
 }

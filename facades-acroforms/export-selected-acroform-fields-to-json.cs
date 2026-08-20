@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+class ExportSelectedFormFields
 {
     static void Main()
     {
@@ -15,75 +16,65 @@ class Program
         // Output JSON file that will contain only the selected fields
         const string outputJsonPath = "selected_fields.json";
 
-        // List of fully‑qualified field names that should be exported
-        string[] fieldsToExport = new[]
+        // List of fully‑qualified field names to export
+        var fieldsToExport = new List<string>
         {
-            "Form1.TextBox1",
-            "Form1.CheckBox1",
-            "Form1.ComboBox1"
+            "CustomerName",
+            "OrderDate",
+            "TotalAmount"
         };
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
         try
         {
-            // Initialize the Facades Form object on the PDF
-            using (Form form = new Form(inputPdfPath))
+            // Load the PDF document
+            using (var document = new Document(inputPdfPath))
             {
-                // Export all form fields to a memory stream as JSON
-                using (MemoryStream allJsonStream = new MemoryStream())
+                // Initialise the Facades Form object on the loaded document
+                using (var form = new Form(document))
                 {
-                    // ExportJson writes the JSON representation of all fields
-                    form.ExportJson(allJsonStream, indented: true);
-
-                    // Read the JSON text from the memory stream
-                    allJsonStream.Position = 0;
-                    using (StreamReader reader = new StreamReader(allJsonStream))
+                    // Export all form data to a memory stream first
+                    using (var allJsonStream = new MemoryStream())
                     {
-                        string allJson = reader.ReadToEnd();
+                        // ExportJson writes the whole form (all fields) to the stream
+                        form.ExportJson(allJsonStream, indented: true);
+                        allJsonStream.Position = 0; // rewind for reading
 
-                        // Parse the JSON; Aspose exports an array of objects,
-                        // each object contains at least a "FullName" property.
-                        JsonDocument doc = JsonDocument.Parse(allJson);
-                        JsonElement root = doc.RootElement;
+                        // Parse the exported JSON
+                        var rootNode = JsonNode.Parse(allJsonStream);
 
-                        // Prepare a list to hold the filtered field objects
-                        var filteredFields = new List<Dictionary<string, JsonElement>>();
+                        // The JSON structure produced by Aspose.Pdf is an object where each
+                        // property name corresponds to a form field name.
+                        // Build a new JSON object that contains only the requested fields.
+                        var filteredObject = new JsonObject();
 
-                        foreach (JsonElement fieldElement in root.EnumerateArray())
+                        if (rootNode is JsonObject rootObj)
                         {
-                            if (fieldElement.TryGetProperty("FullName", out JsonElement nameProp))
+                            foreach (string fieldName in fieldsToExport)
                             {
-                                string fullName = nameProp.GetString();
-                                if (fieldsToExport.Contains(fullName))
+                                if (rootObj.TryGetPropertyValue(fieldName, out JsonNode? fieldValue))
                                 {
-                                    // Copy all properties of the matching field into a dictionary
-                                    var fieldDict = new Dictionary<string, JsonElement>();
-                                    foreach (JsonProperty prop in fieldElement.EnumerateObject())
-                                    {
-                                        // Clone the JsonElement to avoid disposal issues
-                                        fieldDict[prop.Name] = prop.Value.Clone();
-                                    }
-                                    filteredFields.Add(fieldDict);
+                                    filteredObject.Add(fieldName, fieldValue);
                                 }
                             }
                         }
 
-                        // Serialize the filtered collection back to JSON
-                        var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-                        string filteredJson = JsonSerializer.Serialize(filteredFields, jsonOptions);
+                        // Write the filtered JSON to the final output file
+                        using (var outputFile = new FileStream(outputJsonPath, FileMode.Create, FileAccess.Write))
+                        using (var writer = new Utf8JsonWriter(outputFile, new JsonWriterOptions { Indented = true }))
+                        {
+                            filteredObject.WriteTo(writer);
+                        }
 
-                        // Write the filtered JSON to the output file
-                        File.WriteAllText(outputJsonPath, filteredJson);
+                        Console.WriteLine($"Selected fields exported to '{outputJsonPath}'.");
                     }
                 }
             }
-
-            Console.WriteLine($"Selected fields exported to '{outputJsonPath}'.");
         }
         catch (Exception ex)
         {

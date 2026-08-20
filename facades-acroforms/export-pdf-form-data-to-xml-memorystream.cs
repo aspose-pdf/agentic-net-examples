@@ -6,29 +6,30 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "form.pdf";
+        // Path to the PDF form (must exist on disk)
+        const string pdfPath = "input_form.pdf";
 
-        // Verify that the source PDF exists
+        // Ensure the PDF file exists before proceeding
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // MemoryStream will receive the exported XML data
+        // Create the Form facade for the PDF document
+        // Using the constructor that accepts a file path
+        Form pdfForm = new Form(pdfPath);
+
+        // Prepare a memory stream to receive the exported XML
         using (MemoryStream xmlStream = new MemoryStream())
         {
-            // Initialize the Form facade with the PDF file
-            using (Form form = new Form(pdfPath))
-            {
-                // Export the form fields to the memory stream as XML
-                form.ExportXml(xmlStream);
-            }
+            // Export form field data to the memory stream (no intermediate file)
+            pdfForm.ExportXml(xmlStream);
 
-            // Reset the stream position to read the XML content
+            // Reset the stream position to the beginning for reading
             xmlStream.Position = 0;
 
-            // Example: read the XML into a string and display it
+            // Optionally, read the XML content as a string (e.g., for further processing)
             using (StreamReader reader = new StreamReader(xmlStream))
             {
                 string xmlContent = reader.ReadToEnd();
@@ -36,5 +37,8 @@ class Program
                 Console.WriteLine(xmlContent);
             }
         }
+
+        // Clean up the Form facade
+        pdfForm.Close();
     }
 }

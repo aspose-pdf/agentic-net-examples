@@ -8,7 +8,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "myTextBox"; // replace with the actual field name
+        const string fieldName = "TextBox1"; // replace with the actual field name
 
         if (!File.Exists(inputPath))
         {
@@ -16,23 +16,22 @@ class Program
             return;
         }
 
-        // Open the PDF, set justification, and save
-        using (FormEditor editor = new FormEditor())
+        // Initialize FormEditor with input and output PDF files
+        Aspose.Pdf.Facades.FormEditor formEditor = new Aspose.Pdf.Facades.FormEditor(inputPath, outputPath);
+
+        // Configure the facade to use justified alignment
+        Aspose.Pdf.Facades.FormFieldFacade facade = new Aspose.Pdf.Facades.FormFieldFacade
         {
-            // Load the PDF document into the editor
-            editor.BindPdf(inputPath);
+            Alignment = Aspose.Pdf.Facades.FormFieldFacade.AlignJustified
+        };
+        formEditor.Facade = facade;
 
-            // Configure visual attributes: set alignment to justified
-            editor.Facade = new FormFieldFacade();
-            editor.Facade.Alignment = FormFieldFacade.AlignJustified;
+        // Apply the visual changes to the specified textbox field
+        formEditor.DecorateField(fieldName);
 
-            // Apply the alignment to the specified textbox field
-            editor.DecorateField(fieldName);
+        // Persist the changes to the output PDF
+        formEditor.Save();
 
-            // Save the modified PDF
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Justified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Justified text field saved to '{outputPath}'.");
     }
 }
