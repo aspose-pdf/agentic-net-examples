@@ -8,45 +8,51 @@ class Program
     static void Main()
     {
         // Input and output PDF paths
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";   // existing PDF or blank file
+        const string outputPdf = "output.pdf";
 
-        // Verify input file exists
-        if (!File.Exists(inputPath))
+        // Ensure the input file exists; if not, create a new empty PDF
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            using (Document doc = new Document())
+            {
+                doc.Pages.Add(); // add a blank page
+                doc.Save(inputPdf);
+            }
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document (lifecycle: load)
+        using (Document doc = new Document(inputPdf))
         {
-            // Get the first page (pages are 1‑based)
+            // Get the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Create a TextFragment that will hold the clickable segment
-            TextFragment fragment = new TextFragment("Click here");
-            fragment.Position = new Position(100, 600); // place on page
-            fragment.TextState.FontSize = 12;
-            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+            // Create a TextFragment that will hold the segment
+            TextFragment tf = new TextFragment();
+            tf.Position = new Position(100, 600); // place the text on the page
 
-            // Create a TextSegment (optional, can also use the default segment)
-            TextSegment segment = new TextSegment("Click here");
-            // Assign a web hyperlink to the segment
-            segment.Hyperlink = new WebHyperlink("https://www.example.com");
-            // Replace the default segment with our customized one
-            fragment.Segments.Clear();
-            fragment.Segments.Add(segment);
+            // Create a TextSegment with the visible text
+            TextSegment segment = new TextSegment("Click here to visit Aspose");
+            // Assign a web hyperlink to the segment (URI action)
+            segment.Hyperlink = new WebHyperlink("https://www.aspose.com");
 
-            // Append the fragment to the page
+            // Optionally set visual style for the segment
+            segment.TextState.Font = FontRepository.FindFont("Helvetica");
+            segment.TextState.FontSize = 12;
+            segment.TextState.ForegroundColor = Color.Blue;
+            segment.TextState.Underline = true;
+
+            // Add the segment to the fragment's segment collection
+            tf.Segments.Add(segment);
+
+            // Append the fragment (with the clickable segment) to the page
             TextBuilder builder = new TextBuilder(page);
-            builder.AppendText(fragment);
+            builder.AppendText(tf);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the modified PDF (lifecycle: save)
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Clickable text added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with clickable text saved to '{outputPdf}'.");
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,29 +7,34 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "lineheight_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Ensure there is at least one page to work with
+            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
 
             // Create a TextFragment with multiple lines
-            TextFragment fragment = new TextFragment("First line\nSecond line\nThird line");
+            TextFragment tf = new TextFragment("First line\nSecond line\nThird line");
 
-            // Configure the existing TextState (read‑only property) with custom line spacing
-            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            fragment.TextState.FontSize = 12;
-            fragment.TextState.LineSpacing = 20; // line height in points
+            // Set a custom line height (line spacing) via TextState
+            tf.TextState.LineSpacing = 20f; // line height in points
 
-            // Add the fragment to the page
-            page.Paragraphs.Add(fragment);
+            // Add the text fragment to the page
+            page.Paragraphs.Add(tf);
 
-            // Save the PDF document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to {outputPath}");
+        Console.WriteLine($"PDF saved with custom line height to '{outputPath}'.");
     }
 }

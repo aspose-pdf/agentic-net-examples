@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,36 +7,48 @@ class Program
 {
     static void Main()
     {
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Create a new PDF document and ensure proper disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a TextParagraph that will hold multiple lines
+        // Load the source PDF inside a using block (lifecycle rule)
+        using (Document doc = new Document(inputPath))
+        {
+            // Get the first page (1‑based indexing)
+            Page page = doc.Pages[1];
+
+            // Create a TextParagraph that will hold the new lines
             TextParagraph paragraph = new TextParagraph();
 
-            // Define the rectangle area where the paragraph will be placed
-            paragraph.Rectangle = new Aspose.Pdf.Rectangle(50, 700, 550, 100);
+            // Define the rectangle where the paragraph will be placed
+            paragraph.Rectangle = new Rectangle(100, 600, 400, 800);
 
-            // Configure a TextState with desired font, size, and line spacing (leading)
+            // Optional: enable word wrapping
+            paragraph.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
+
+            // Create a TextState and set the desired line spacing (Leading)
+            // In Aspose.Pdf the property controlling line spacing is LineSpacing.
+            // Setting it influences the leading used when the TextState is applied.
             TextState textState = new TextState();
             textState.Font = FontRepository.FindFont("Helvetica");
             textState.FontSize = 12;
-            textState.LineSpacing = 20; // leading of 20 points
+            textState.LineSpacing = 20f; // Desired leading (extra space between lines)
 
-            // Append lines using the same TextState to apply the custom leading
+            // Append lines using the TextState with custom spacing
             paragraph.AppendLine("First line with custom leading.", textState);
-            paragraph.AppendLine("Second line with the same leading.", textState);
+            paragraph.AppendLine("Second line follows the same leading.", textState);
             paragraph.AppendLine("Third line continues the spacing.", textState);
 
-            // Render the paragraph onto the page
+            // Add the paragraph to the page using TextBuilder
             TextBuilder builder = new TextBuilder(page);
             builder.AppendParagraph(paragraph);
 
-            // Save the PDF
+            // Save the modified PDF (lifecycle rule)
             doc.Save(outputPath);
         }
 

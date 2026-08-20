@@ -7,9 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string disclaimer = "Disclaimer: This document is confidential.";
 
         if (!File.Exists(inputPath))
         {
@@ -23,23 +22,21 @@ class Program
             // Get the first page (Aspose.Pdf uses 1‑based indexing)
             Page firstPage = doc.Pages[1];
 
-            // Ensure new paragraphs are added after the existing content
-            firstPage.IsAddParagraphsAfterLast = true;
-
             // Create a TextFragment with the disclaimer text
-            TextFragment disclaimerFragment = new TextFragment(disclaimer);
-            // Optional styling
-            disclaimerFragment.TextState.FontSize = 9;
-            disclaimerFragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            disclaimerFragment.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
+            TextFragment disclaimer = new TextFragment("Disclaimer: This document is confidential.");
+
+            // Optional: set visual formatting for the disclaimer
+            disclaimer.TextState.FontSize = 10;
+            disclaimer.TextState.Font = FontRepository.FindFont("Helvetica");
+            disclaimer.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
 
             // Append the TextFragment to the end of the page's paragraph collection
-            firstPage.Paragraphs.Add(disclaimerFragment);
+            firstPage.Paragraphs.Add(disclaimer);
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved PDF with disclaimer to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with disclaimer: {outputPath}");
     }
 }

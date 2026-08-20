@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "rotated_output.pdf";
-        const string searchText = "Sample Text"; // text to rotate
+        const string searchPhrase = "Exact text to rotate"; // replace with the target text
 
         if (!File.Exists(inputPath))
         {
@@ -17,37 +17,28 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document (lifecycle rule: use constructor inside using)
-            using (Document doc = new Document(inputPath))
+            // Locate the specific text fragment
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchPhrase);
+            // Search on the first page (adjust page index if needed)
+            doc.Pages[1].Accept(absorber);
+
+            if (absorber.TextFragments.Count > 0)
             {
-                // Find the text fragment containing the target phrase
-                TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
-                // Apply absorber to the first page (adjust page index as needed)
-                doc.Pages[1].Accept(absorber);
-
-                // Ensure at least one fragment was found
-                if (absorber.TextFragments.Count > 0)
-                {
-                    // Rotate the first found fragment by 45 degrees
-                    TextFragment fragment = absorber.TextFragments[1];
-                    fragment.TextState.Rotation = 45; // rotation in degrees
-                }
-                else
-                {
-                    Console.WriteLine($"Text \"{searchText}\" not found on page 1.");
-                }
-
-                // Save the modified document (lifecycle rule: use Save inside using)
-                doc.Save(outputPath);
+                // Rotate the first found fragment by 45 degrees
+                absorber.TextFragments[1].TextState.Rotation = 45;
+            }
+            else
+            {
+                Console.WriteLine("Specified text not found in the document.");
             }
 
-            Console.WriteLine($"Document saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
     }
 }

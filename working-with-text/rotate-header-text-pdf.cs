@@ -7,49 +7,59 @@ class Program
 {
     static void Main()
     {
-        // Folder containing source PDF files
-        const string inputFolder = @"C:\PdfInput";
+        // Folder containing input PDFs
+        const string inputFolder = @"C:\InputPdfs";
         // Folder where processed PDFs will be saved
-        const string outputFolder = @"C:\PdfOutput";
+        const string outputFolder = @"C:\OutputPdfs";
 
-        // Ensure output directory exists
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
+            return;
+        }
+
         Directory.CreateDirectory(outputFolder);
+
+        // Define a font size threshold that distinguishes headers.
+        // Adjust this value based on the PDFs you process.
+        const float headerFontSizeThreshold = 14f;
 
         // Process each PDF file in the input folder
         foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Build output file name (original name with "_rotated" suffix)
-            string outputPath = Path.Combine(
-                outputFolder,
-                Path.GetFileNameWithoutExtension(pdfPath) + "_rotated.pdf");
-
-            // Load the PDF document inside a using block for proper disposal
-            using (Document doc = new Document(pdfPath))
+            try
             {
-                // Absorb all text fragments from the whole document
-                TextFragmentAbsorber absorber = new TextFragmentAbsorber();
-                // Corrected: use the absorber to visit the document (Document.Accept is not available)
-                absorber.Visit(doc);
-
-                // Iterate over each extracted text fragment
-                foreach (TextFragment fragment in absorber.TextFragments)
+                // Load the PDF document
+                using (Document doc = new Document(pdfPath))
                 {
-                    // Simple heuristic: treat fragments with a relatively large font size as headers
-                    // Adjust the threshold (e.g., 12) as needed for your documents
-                    if (fragment.TextState.FontSize > 12)
+                    // Absorb all text fragments from the whole document
+                    TextFragmentAbsorber absorber = new TextFragmentAbsorber();
+                    doc.Pages.Accept(absorber);
+
+                    // Rotate fragments that are likely headers
+                    foreach (TextFragment fragment in absorber.TextFragments)
                     {
-                        // Rotate the header text by 90 degrees
-                        fragment.TextState.Rotation = 90;
+                        // Simple heuristic: treat larger font size as a header
+                        if (fragment.TextState.FontSize >= headerFontSizeThreshold)
+                        {
+                            // Rotate the text fragment by 90 degrees
+                            fragment.TextState.Rotation = 90;
+                        }
                     }
+
+                    // Save the modified document to the output folder
+                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
+                    doc.Save(outputPath);
                 }
 
-                // Save the modified document to the output path
-                doc.Save(outputPath);
+                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
             }
-
-            Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)} → {Path.GetFileName(outputPath)}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+            }
         }
 
-        Console.WriteLine("All PDFs have been processed.");
+        Console.WriteLine("All files processed.");
     }
 }

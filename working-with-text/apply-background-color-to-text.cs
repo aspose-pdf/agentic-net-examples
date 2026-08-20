@@ -16,25 +16,26 @@ class Program
             return;
         }
 
-        // Load the existing PDF inside a using block for deterministic disposal
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Create a TextFragment with the desired text
-            TextFragment fragment = new TextFragment("Highlighted text");
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
 
-            // Set the background color on the fragment's TextState BEFORE adding it to the page
-            fragment.TextState.BackgroundColor = Aspose.Pdf.Color.Yellow;
+            // Create a text fragment and set its background color via TextState
+            TextFragment fragment = new TextFragment("Hello, world with background!");
+            fragment.TextState.BackgroundColor = Aspose.Pdf.Color.Yellow; // apply background
 
-            // Position the fragment on the page (coordinates are in points)
+            // Position the fragment (optional – here we place it at coordinates 100, 700)
             fragment.Position = new Position(100, 700);
 
-            // Add the fragment to the first page (pages are 1‑based)
-            doc.Pages[1].Paragraphs.Add(fragment);
+            // Add the fragment to the page
+            page.Paragraphs.Add(fragment);
 
-            // Save the modified document (PDF format)
+            // Save the modified document (lifecycle rule: use Document.Save)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved to '{outputPath}'.");
+        Console.WriteLine($"Document saved with background-colored text to '{outputPath}'.");
     }
 }
