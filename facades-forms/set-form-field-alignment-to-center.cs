@@ -1,39 +1,40 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;   // FormEditor, FormFieldFacade
-using Aspose.Pdf;          // Document (if needed for other operations)
+using Aspose.Pdf;           // FormFieldFacade constants
 
-// Set the alignment of the "Address" field to center in an existing PDF form.
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input_form.pdf";   // source PDF containing the form
-        const string outputPdf = "output_form.pdf";  // PDF after alignment change
+        // Input PDF containing the form and the field named "Address"
+        const string inputPdf  = "input.pdf";
+        // Output PDF where the alignment change will be saved
+        const string outputPdf = "output.pdf";
 
-        // Ensure the source file exists.
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // FormEditor works as a disposable facade; wrap it in a using block.
+        // FormEditor implements IDisposable, so wrap it in a using block.
+        // Constructor takes the source PDF and the destination PDF.
         using (FormEditor editor = new FormEditor(inputPdf, outputPdf))
         {
-            // Set horizontal alignment to center for the field named "Address".
-            // FormFieldFacade.AlignCenter is the constant defining center alignment.
+            // Set the horizontal alignment of the field "Address" to center.
+            // FormFieldFacade.AlignCenter is the constant for center alignment.
             bool result = editor.SetFieldAlignment("Address", FormFieldFacade.AlignCenter);
 
             if (!result)
             {
-                Console.Error.WriteLine("Field \"Address\" not found or alignment could not be set.");
+                Console.Error.WriteLine("Failed to set alignment for field 'Address'.");
             }
 
-            // Persist changes to the output file.
+            // Save the changes to the output PDF.
             editor.Save();
         }
 
-        Console.WriteLine($"Alignment updated and saved to '{outputPdf}'.");
+        Console.WriteLine($"Alignment of field 'Address' set to center. Output saved to '{outputPdf}'.");
     }
 }

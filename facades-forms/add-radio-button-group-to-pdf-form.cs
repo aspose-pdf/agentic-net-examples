@@ -7,36 +7,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF
-        const string outputPath = "output.pdf";  // result PDF
+        // Paths – adjust as needed
+        const string inputPdf  = "input.pdf";   // existing PDF with at least 3 pages
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF with the FormEditor facade
-        using (FormEditor formEditor = new FormEditor())
+        // FormEditor is a Facades class that works with AcroForm fields.
+        // It implements IDisposable, so wrap it in a using block (document‑disposal‑with‑using rule).
+        using (FormEditor formEditor = new FormEditor(inputPdf, outputPdf))
         {
-            formEditor.BindPdf(inputPath);
+            // Define the radio button options.
+            formEditor.Items = new string[] { "Credit", "PayPal" };
 
-            // Define the radio button options
-            formEditor.Items = new[] { "Credit", "PayPal" };
-
-            // Optional visual settings
-            formEditor.RadioGap  = 10;   // gap between options (pixels)
+            // Optional visual settings.
+            formEditor.RadioGap  = 8;   // gap between the two radio buttons (pixels)
             formEditor.RadioHoriz = true; // arrange horizontally (default)
 
             // Add the radio button group on page 3.
-            // Rectangle defines the position of the first option.
-            // Adjust coordinates as needed.
+            // Parameters: field type, field name, page number (1‑based), lower‑left x, lower‑left y,
+            // upper‑right x, upper‑right y.
+            // Choose a rectangle that fits the desired layout.
             formEditor.AddField(FieldType.Radio, "PaymentMethod", 3, 100, 500, 200, 520);
 
-            // Save the modified document
-            formEditor.Save(outputPath);
+            // Persist the changes (save‑to‑non‑pdf‑always‑use‑save‑options rule does not apply here
+            // because we are saving a PDF; the Save() method writes PDF by default).
+            formEditor.Save();
         }
 
-        Console.WriteLine($"Radio button group 'PaymentMethod' added and saved to '{outputPath}'.");
+        Console.WriteLine($"Radio button group 'PaymentMethod' added to page 3 and saved as '{outputPdf}'.");
     }
 }

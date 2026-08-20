@@ -1,18 +1,18 @@
 {
   "category": "facades-forms",
-  "nuget_version": "26.7.0",
-  "last_updated": "2026-07-18T00:58:56Z",
+  "nuget_version": "26.8.0",
+  "last_updated": "2026-08-20T07:51:01Z",
   "examples": {
     "add-text-field-to-pdf-page": {
       "title": "Add Text Field to PDF Page",
       "filename": "add-text-field-to-pdf-page.cs",
-      "description": "Shows how to insert a text form field named 'CustomerName' on page 1 of a PDF using the Aspose.Pdf Facades API.",
+      "description": "Shows how to insert a text form field named \"CustomerName\" on page 1 of an existing PDF using Aspose.Pdf.Facades.FormEditor.",
       "tags": [
         "pdf",
         "form",
         "textfield",
-        "facades",
-        "aspnet"
+        "aspose",
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
@@ -22,270 +22,283 @@
         "Aspose.Pdf.Facades.FieldType"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "add-unchecked-checkbox-field-to-pdf-page": {
+    "add-unchecked-checkbox-field-to-pdf": {
       "title": "Add Unchecked Checkbox Field to PDF Page",
-      "filename": "add-unchecked-checkbox-field-to-pdf-page.cs",
-      "description": "Shows how to insert a checkbox form field on a specific PDF page and set its default state to unchecked using Aspose.Pdf.",
+      "filename": "add-unchecked-checkbox-field-to-pdf.cs",
+      "description": "Demonstrates how to insert a checkbox form field on a specific PDF page and set its default state to unchecked using Aspose.Pdf.",
       "tags": [
         "checkbox",
         "form",
         "pdf",
-        "Aspose.Pdf",
-        "page"
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormEditor.AddField",
-        "Aspose.Pdf.Forms.FieldType",
-        "Aspose.Pdf.Forms.CheckboxField"
+        "Aspose.Pdf.Forms.CheckboxField",
+        "Aspose.Pdf.Document.Form",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "add-radio-button-group-to-pdf-form": {
       "title": "Add Radio Button Group to PDF Form",
       "filename": "add-radio-button-group-to-pdf-form.cs",
-      "description": "Shows how to create a radio button group named \"PaymentMethod\" with options \"Credit\" and \"PayPal\" on page 3 of a PDF using Aspose.Pdf.Facades.FormEditor.",
+      "description": "Shows how to create a radio button group named \"PaymentMethod\" with options \"Credit\" and \"PayPal\" on page 3 of an existing PDF using Aspose.Pdf Facades.",
       "tags": [
         "radio-button",
         "pdf-form",
         "aspose-pdf",
-        "facade",
+        "facades",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.BindPdf",
         "Aspose.Pdf.Facades.FormEditor.AddField",
         "Aspose.Pdf.Facades.FormEditor.Save",
-        "Aspose.Pdf.Facades.FieldType"
+        "Aspose.Pdf.Facades.FormEditor.Items",
+        "Aspose.Pdf.Facades.FormEditor.RadioGap",
+        "Aspose.Pdf.Facades.FormEditor.RadioHoriz",
+        "Aspose.Pdf.FieldType"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "add-submit-button-to-pdf-form": {
       "title": "Add Submit Button to PDF Form",
       "filename": "add-submit-button-to-pdf-form.cs",
-      "description": "Shows how to insert a submit button into a PDF form on page 1 using Aspose.Pdf.Facades.FormEditor and save the updated PDF.",
+      "description": "Shows how to insert a submit button on page 1 of a PDF form that posts the form data to a specified URL using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
         "form",
         "submit-button",
-        "aspose",
-        "csharp"
+        "facades",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormEditor.AddSubmitBtn",
-        "Aspose.Pdf.Facades.FormEditor.Save"
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.Facades.FormEditor.Close"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "attach-javascript-alert-to-pdf-push-button": {
-      "title": "Attach JavaScript Alert to PDF Push Button",
-      "filename": "attach-javascript-alert-to-pdf-push-button.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.FormEditor to set a JavaScript action on a push‑button field so that an alert is displayed when the button is clicked.",
+    "add-javascript-alert-to-push-button": {
+      "title": "Add JavaScript Alert to Push Button in PDF",
+      "filename": "add-javascript-alert-to-push-button.cs",
+      "description": "Shows how to create a PDF with a push‑button field and attach a JavaScript alert that displays when the button is clicked using Aspose.Pdf.",
       "tags": [
+        "pdf",
         "javascript",
-        "pdf-form",
-        "push-button",
-        "aspose.pdf",
-        "form-editor"
+        "form",
+        "button",
+        "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.ButtonField",
+        "Aspose.Pdf.Forms.Form.Add",
         "Aspose.Pdf.Facades.FormEditor.BindPdf",
-        "Aspose.Pdf.Facades.FormEditor.SetFieldScript",
+        "Aspose.Pdf.Facades.FormEditor.AddFieldScript",
         "Aspose.Pdf.Facades.FormEditor.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "decorate-pdf-form-field-appearance": {
       "title": "Decorate PDF Form Field with Custom Appearance",
       "filename": "decorate-pdf-form-field-appearance.cs",
-      "description": "Demonstrates how to set a custom border color, background shade, and font style for a specific PDF form field using Aspose.Pdf Facades.",
+      "description": "Demonstrates how to set a custom border color, background shade, and font style for a specific PDF form field using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
-        "form",
-        "field",
+        "form-field",
         "appearance",
-        "facade"
+        "border-color",
+        "font-style"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormFieldFacade",
-        "Aspose.Pdf.Facades.FormEditor.BindPdf",
+        "Aspose.Pdf.Facades.FontStyle",
         "Aspose.Pdf.Facades.FormEditor.DecorateField",
         "Aspose.Pdf.Facades.FormEditor.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "apply-default-decoration-to-text-fields": {
       "title": "Apply Default Decoration to All Text Form Fields",
       "filename": "apply-default-decoration-to-text-fields.cs",
-      "description": "Shows how to configure a FormFieldFacade with visual attributes and use FormEditor to decorate every text form field in a PDF document.",
+      "description": "Shows how to set default visual attributes via FormFieldFacade and apply them to every text field in a PDF using FormEditor.",
       "tags": [
         "form-fields",
         "decoration",
-        "facade",
-        "pdf",
-        "Aspose.Pdf"
+        "Aspose.Pdf",
+        "FormEditor",
+        "Facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormFieldFacade",
+        "Aspose.Pdf.Facades.FieldType",
         "Aspose.Pdf.Facades.FormEditor.DecorateField",
-        "Aspose.Pdf.Facades.FormEditor.Save",
-        "Aspose.Pdf.Facades.FieldType"
+        "Aspose.Pdf.Facades.FormEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "set-form-field-alignment-to-center": {
       "title": "Set Form Field Alignment to Center",
       "filename": "set-form-field-alignment-to-center.cs",
-      "description": "Demonstrates how to open an existing PDF form, set the horizontal alignment of the \"Address\" field to center using FormEditor and FormFieldFacade, and save the updated PDF.",
+      "description": "Shows how to center‑align a PDF form field named \"Address\" using Aspose.Pdf.Facades FormEditor.",
       "tags": [
-        "pdf-form",
-        "field-alignment",
-        "center",
-        "Aspose.Pdf",
-        "C#"
+        "pdf",
+        "form",
+        "alignment",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormEditor.SetFieldAlignment",
+        "Aspose.Pdf.Facades.FormEditor.Save",
         "Aspose.Pdf.Facades.FormFieldFacade",
-        "Aspose.Pdf.Facades.FormFieldFacade.AlignCenter",
-        "Aspose.Pdf.Facades.FormEditor.Save"
+        "Aspose.Pdf.Facades.FormFieldFacade.AlignCenter"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "set-custom-image-background-for-signature-field": {
       "title": "Set Custom Image Background for Signature Field",
       "filename": "set-custom-image-background-for-signature-field.cs",
-      "description": "Shows how to apply a custom appearance with an image background to a PDF signature field named \"Signature\" using Aspose.Pdf.",
+      "description": "Shows how to modify an existing signature field's appearance by assigning a custom background image and visual properties using Aspose.Pdf's PdfFileSignature facade.",
       "tags": [
         "signature",
         "custom-appearance",
         "image-background",
         "pdf",
-        "forms"
+        "facade"
       ],
       "apis_used": [
-        "PdfFileSignature",
         "PdfFileSignature.BindPdf",
-        "PdfFileSignature.Save",
-        "SignatureField",
+        "PdfFileSignature.SignatureAppearance",
+        "PKCS1",
         "SignatureCustomAppearance",
-        "Color"
+        "PdfFileSignature.Sign",
+        "PdfFileSignature.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "set-pdf-form-field-attribute": {
-      "title": "Set PDF Form Field Attribute Using FormEditor",
-      "filename": "set-pdf-form-field-attribute.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.FormEditor to set a predefined attribute (Required flag) on a PDF form field and highlights that custom attributes are not supported by this API.",
+    "set-custom-attribute-on-pdf-form-field": {
+      "title": "Attempt to Set Custom Attribute on PDF Form Field",
+      "filename": "set-custom-attribute-on-pdf-form-field.cs",
+      "description": "Demonstrates using FormEditor.SetFieldAttribute to set a predefined flag on a PDF form field and explains that arbitrary custom attributes like \"data-id\" cannot be set with the current API.",
       "tags": [
         "pdf",
         "form",
-        "field-attribute",
-        "aspose",
-        "csharp"
+        "setfieldattribute",
+        "custom-attribute",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.BindPdf",
         "Aspose.Pdf.Facades.FormEditor.SetFieldAttribute",
         "Aspose.Pdf.Facades.FormEditor.Save",
-        "Aspose.Pdf.Facades.PropertyFlag"
+        "Aspose.Pdf.Forms.PropertyFlag"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "set-numeric-limit-for-pdf-form-field": {
       "title": "Set Numeric Limit for PDF Form Field",
       "filename": "set-numeric-limit-for-pdf-form-field.cs",
-      "description": "Shows how to restrict the \"Quantity\" AcroForm field to values between 1 and 100 by applying a character limit using Aspose.Pdf.Facades.FormEditor.",
+      "description": "Demonstrates how to open a PDF form, restrict the \"Quantity\" field to a maximum of three characters, add JavaScript validation for a numeric range of 1‑100, and save the updated document.",
       "tags": [
         "pdf",
         "form",
         "field-limit",
-        "aspose",
-        "csharp"
+        "validation",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormEditor.BindPdf",
         "Aspose.Pdf.Facades.FormEditor.SetFieldLimit",
+        "Aspose.Pdf.Facades.FormEditor.SetFieldScript",
         "Aspose.Pdf.Facades.FormEditor.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "add-list-item-to-dropdown-field": {
-      "title": "Add List Item to Dropdown Field in PDF",
-      "filename": "add-list-item-to-dropdown-field.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.FormEditor to add a new option to an existing dropdown (combo box) form field on a specific page of a PDF and save the result.",
+    "add-list-item-to-pdf-dropdown": {
+      "title": "Add List Item to PDF Dropdown Field",
+      "filename": "add-list-item-to-pdf-dropdown.cs",
+      "description": "Shows how to add a new option to a combo box (dropdown) form field in a PDF using Aspose.Pdf.Facades.FormEditor.",
       "tags": [
         "pdf",
         "form",
         "dropdown",
-        "aspose",
-        "facades"
+        "list-item",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
         "FormEditor.AddListItem",
-        "FormEditor.Save"
+        "FormEditor.Save",
+        "FormEditor.Dispose",
+        "FormEditor(string sourcePdfPath, string destinationPdfPath)"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "remove-list-item-from-pdf-form-field": {
+    "remove-list-item-from-pdf-form": {
       "title": "Remove List Item from PDF Form Field",
-      "filename": "remove-list-item-from-pdf-form-field.cs",
-      "description": "Demonstrates how to delete a specific list item (\"Option B\") from a list box field named \"Choices\" on a PDF form using Aspose.Pdf.Facades.FormEditor.",
+      "filename": "remove-list-item-from-pdf-form.cs",
+      "description": "Shows how to delete a specific list item (Option B) from a list field (Choices) in an AcroForm PDF using Aspose.Pdf.Facades.FormEditor.",
       "tags": [
         "pdf",
         "form",
         "list-item",
-        "aspose",
-        "csharp"
+        "delete",
+        "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.BindPdf",
         "Aspose.Pdf.Facades.FormEditor.DelListItem",
         "Aspose.Pdf.Facades.FormEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "copy-pdf-form-field-content": {
-      "title": "Copy PDF Form Field Content to Another Field",
-      "filename": "copy-pdf-form-field-content.cs",
-      "description": "Shows how to read the value of a form field and write it to a different field in the same PDF using Aspose.Pdf.Facades.",
+    "copy-field-content-between-pdf-form-fields": {
+      "title": "Copy Field Content Between PDF Form Fields",
+      "filename": "copy-field-content-between-pdf-form-fields.cs",
+      "description": "Demonstrates how to read the value of one form field and write it to another field in the same PDF using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
         "form-fields",
@@ -300,56 +313,57 @@
         "Aspose.Pdf.Facades.Form.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "copy-form-field-to-another-page": {
-      "title": "Copy and Rename PDF Form Field on a Specific Page",
-      "filename": "copy-form-field-to-another-page.cs",
-      "description": "Shows how to copy the outer definition of an existing PDF form field to a given page and rename it using Aspose.Pdf.Facades.FormEditor.",
+    "clone-form-field-to-page-5": {
+      "title": "Clone PDF Form Field to Page 5 and Rename",
+      "filename": "clone-form-field-to-page-5.cs",
+      "description": "Demonstrates how to copy the outer definition of an existing form field to a specific page using FormEditor, then rename the cloned field with the Form class.",
       "tags": [
         "form",
-        "copy",
-        "rename",
-        "Aspose.Pdf",
-        "facade"
+        "field-cloning",
+        "aspose-pdf",
+        "copy-outer-field",
+        "rename-field"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormEditor.CopyOuterField",
-        "Aspose.Pdf.Facades.FormEditor.RenameField",
-        "Aspose.Pdf.Facades.FormEditor.Save"
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.RenameField",
+        "Aspose.Pdf.Facades.Form.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "move-pdf-form-field": {
       "title": "Move PDF Form Field to New Position",
       "filename": "move-pdf-form-field.cs",
-      "description": "Shows how to relocate a form field to specific coordinates on a target page of a PDF using Aspose.Pdf's FormEditor.",
+      "description": "Shows how to relocate an existing form field to specific coordinates on a chosen page of a PDF using Aspose.Pdf.Facades.FormEditor.",
       "tags": [
         "pdf",
         "form",
         "move-field",
-        "coordinates",
-        "Aspose.Pdf"
+        "aspose",
+        "facade"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
+        "FormEditor.BindPdf",
         "FormEditor.MoveField",
-        "FormEditor.Save",
-        "Document(string)"
+        "FormEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "remove-form-field-from-pdf": {
-      "title": "Remove Form Field from PDF",
-      "filename": "remove-form-field-from-pdf.cs",
-      "description": "Shows how to delete a specific form field from a PDF document using Aspose.Pdf.Facades.FormEditor.",
+    "remove-pdf-form-field": {
+      "title": "Remove PDF Form Field",
+      "filename": "remove-pdf-form-field.cs",
+      "description": "Shows how to delete an existing form field from a PDF document using Aspose.Pdf.Facades.FormEditor.",
       "tags": [
         "pdf",
         "form",
@@ -364,56 +378,61 @@
         "FormEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "rename-pdf-form-field": {
       "title": "Rename PDF Form Field Using FormEditor",
       "filename": "rename-pdf-form-field.cs",
-      "description": "Demonstrates how to rename a form field throughout a PDF document using Aspose.Pdf's FormEditor facade.",
+      "description": "Shows how to create a PDF with a form field and rename that field from \"OldName\" to \"NewName\" using Aspose.Pdf.Facades.FormEditor.",
       "tags": [
         "pdf",
         "form",
         "rename",
         "aspose",
-        "csharp"
+        "facade"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Forms.TextBoxField",
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormEditor.BindPdf",
         "Aspose.Pdf.Facades.FormEditor.RenameField",
         "Aspose.Pdf.Facades.FormEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "add-email-validation-javascript-to-pdf-form-field": {
       "title": "Add Email Validation JavaScript to PDF Form Field",
       "filename": "add-email-validation-javascript-to-pdf-form-field.cs",
-      "description": "Demonstrates how to load a PDF, locate a text box field named \"Email\", and attach JavaScript that validates the email format on the blur (lost focus) event.",
+      "description": "Demonstrates how to attach a JavaScript action to the \"Email\" form field that validates the email format on the blur (lost focus) event using Aspose.Pdf.",
       "tags": [
         "pdf",
         "javascript",
-        "form",
+        "form-field",
         "validation",
-        "email"
+        "aspose-pdf"
       ],
       "apis_used": [
+        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.BindPdf",
+        "Aspose.Pdf.Facades.FormEditor.Save",
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Forms.TextBoxField",
-        "Aspose.Pdf.Annotations.JavascriptAction",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Forms.Field",
+        "Aspose.Pdf.Forms.JavascriptAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "export-pdf-form-fields-to-fdf": {
       "title": "Export PDF Form Fields to FDF",
       "filename": "export-pdf-form-fields-to-fdf.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.Form to export all form fields from a PDF document into an FDF file for external processing.",
+      "description": "Demonstrates loading a PDF form with the Form facade and exporting all its form fields to an FDF file for external processing.",
       "tags": [
         "pdf",
         "form",
@@ -426,145 +445,152 @@
         "Aspose.Pdf.Facades.Form.ExportFdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "import-xfdf-data-into-pdf-form-fields": {
-      "title": "Import XFDF Data into PDF Form Fields",
-      "filename": "import-xfdf-data-into-pdf-form-fields.cs",
-      "description": "Demonstrates how to import field values from an XFDF file into an existing PDF form and save the updated document using Aspose.Pdf.Facades.",
+    "import-xfdf-data-into-pdf-form": {
+      "title": "Import XFDF Data into PDF Form",
+      "filename": "import-xfdf-data-into-pdf-form.cs",
+      "description": "Shows how to import form field values from an XFDF file into an existing PDF using Aspose.Pdf.Facades.Form and save the updated document.",
       "tags": [
         "xfdf",
-        "pdf-forms",
-        "import",
+        "form",
+        "pdf",
         "aspose-pdf",
-        "csharp"
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.Form",
         "Aspose.Pdf.Facades.Form.ImportXfdf",
-        "Aspose.Pdf.Facades.Form.Save"
+        "Aspose.Pdf.Facades.Form.Save",
+        "Aspose.Pdf.Facades.Form(string, string)",
+        "Aspose.Pdf.Facades.Form.Dispose"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "batch-add-hidden-processeddate-field": {
-      "title": "Batch Add Hidden ProcessedDate Field to PDFs",
-      "filename": "batch-add-hidden-processeddate-field.cs",
-      "description": "Shows how to loop through all PDF files in a folder and add a hidden text field named \"ProcessedDate\" with a generated GUID using Aspose.Pdf.Facades.FormEditor.",
+    "decorate-checkbox-fields-in-pdfs": {
+      "title": "Decorate All Checkbox Fields in PDFs",
+      "filename": "decorate-checkbox-fields-in-pdfs.cs",
+      "description": "Demonstrates how to apply a visual decoration to every checkbox form field in multiple PDF documents within a folder using Aspose.Pdf.Facades.",
       "tags": [
-        "pdf",
-        "form",
-        "hidden-field",
-        "batch-processing",
-        "guid"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.BindPdf",
-        "Aspose.Pdf.Facades.FormEditor.AddField",
-        "Aspose.Pdf.Facades.FormEditor.Save",
-        "Aspose.Pdf.Facades.FieldType"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
-      "status": "verified"
-    },
-    "apply-consistent-decoration-to-checkbox-fields": {
-      "title": "Apply Consistent Decoration to All Checkbox Fields in PDFs",
-      "filename": "apply-consistent-decoration-to-checkbox-fields.cs",
-      "description": "Shows how to batch‑process PDFs in a directory, configure visual attributes with FormFieldFacade, and apply those attributes to every checkbox field using FormEditor.",
-      "tags": [
-        "pdf",
-        "form",
         "checkbox",
+        "form",
+        "pdf",
         "decoration",
         "batch"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.DecorateField",
         "Aspose.Pdf.Facades.FormFieldFacade",
-        "Aspose.Pdf.Facades.FieldType"
+        "Aspose.Pdf.Facades.FormEditor.BindPdf",
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.Facades.FormEditor.DecorateField",
+        "Aspose.Pdf.Facades.FormEditor.Facade",
+        "Aspose.Pdf.Facades.FieldType.CheckBox"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "batch-update-submit-button-urls": {
       "title": "Batch Update Submit Button URLs in PDFs",
       "filename": "batch-update-submit-button-urls.cs",
-      "description": "Shows how to process a folder of PDF files, locate submit buttons, and change their submission URL to a new address using Aspose.Pdf.Facades.",
+      "description": "Demonstrates how to iterate through a folder of PDF files, detect submit buttons in each form, and replace their URLs with a new address using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
+        "form",
         "submit-button",
         "batch",
-        "url-update",
         "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.Form",
         "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.Form.FormSubmitButtonNames",
-        "Aspose.Pdf.Facades.FormEditor.BindPdf",
-        "Aspose.Pdf.Facades.FormEditor.SetSubmitUrl",
-        "Aspose.Pdf.Facades.FormEditor.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
-      "status": "verified"
-    },
-    "clear-and-populate-dropdown-list": {
-      "title": "Clear and Populate Dropdown List in PDF Form",
-      "filename": "clear-and-populate-dropdown-list.cs",
-      "description": "Shows how to remove all existing items from a combo box (dropdown) field and add new items using Aspose.Pdf Facades FormEditor.",
-      "tags": [
-        "dropdown",
-        "form",
-        "pdf",
-        "facades",
-        "combo-box"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Forms.ComboBoxField",
+        "Form.FormSubmitButtonNames",
         "FormEditor.BindPdf",
-        "FormEditor.DelListItem",
-        "FormEditor.AddListItem",
+        "FormEditor.SetSubmitUrl",
         "FormEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "populate-pdf-listbox-with-country-names": {
-      "title": "Populate PDF ListBox with Country Names",
-      "filename": "populate-pdf-listbox-with-country-names.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.FormEditor to add 195 country items to a ListBox field in a PDF form.",
+    "clear-and-populate-list-box-field": {
+      "title": "Clear and Populate List Box Field in PDF",
+      "filename": "clear-and-populate-list-box-field.cs",
+      "description": "Demonstrates how to remove all existing options from a PDF list box (combo) field and then add new items using Aspose.Pdf.",
       "tags": [
-        "pdf",
-        "form",
         "listbox",
+        "form-fields",
+        "pdf",
         "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.FormEditor",
-        "FormEditor.AddListItem",
-        "FormEditor.Save",
-        "FormEditor..ctor",
-        "FormEditor.Dispose"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.ListBoxField",
+        "Aspose.Pdf.Forms.ListBoxField.Options",
+        "Aspose.Pdf.Forms.ListBoxField.DeleteOption",
+        "Aspose.Pdf.Forms.ListBoxField.AddOption",
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "clear-pdf-form-field-on-focus": {
+    "populate-country-list-box-pdf": {
+      "title": "Populate PDF List Box with Country Names",
+      "filename": "populate-country-list-box-pdf.cs",
+      "description": "Demonstrates creating a PDF with a ListBox form field and programmatically adding 195 country items to it using Aspose.Pdf's FormEditor.",
+      "tags": [
+        "pdf",
+        "listbox",
+        "form-fields",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.ListBoxField",
+        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.BindPdf",
+        "Aspose.Pdf.Facades.FormEditor.AddListItem",
+        "Aspose.Pdf.Facades.FormEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
+      "status": "verified"
+    },
+    "set-form-field-readonly-currency-appearance": {
+      "title": "Set Form Field to Read‑Only and Apply Currency Appearance",
+      "filename": "set-form-field-readonly-currency-appearance.cs",
+      "description": "Shows how to make a PDF form field read‑only and set its printable appearance (including currency formatting) using Aspose.Pdf Facades.",
+      "tags": [
+        "pdf",
+        "form",
+        "readonly",
+        "appearance",
+        "currency"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.BindPdf",
+        "Aspose.Pdf.Facades.FormEditor.SetFieldAttribute",
+        "Aspose.Pdf.Facades.FormEditor.SetFieldAppearance",
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.PropertyFlag.ReadOnly",
+        "Aspose.Pdf.Annotations.AnnotationFlags.Print"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:51:01Z",
+      "status": "verified"
+    },
+    "attach-javascript-clear-discountcode-field": {
       "title": "Clear PDF Form Field on Focus with JavaScript",
-      "filename": "clear-pdf-form-field-on-focus.cs",
-      "description": "Shows how to load a PDF, locate a text box form field named 'DiscountCode', attach a JavaScript action that clears the field when it receives focus, and save the updated document.",
+      "filename": "attach-javascript-clear-discountcode-field.cs",
+      "description": "Demonstrates how to attach a JavaScript action to a PDF form field using Aspose.Pdf so that the field is cleared when it receives focus.",
       "tags": [
         "pdf",
         "javascript",
@@ -574,92 +600,93 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Forms.Field",
         "Aspose.Pdf.Annotations.JavascriptAction",
-        "Aspose.Pdf.Forms.FieldActions",
+        "Aspose.Pdf.Forms.Field.Actions",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "copy-form-field-definitions-to-pdf": {
-      "title": "Copy Form Field Definitions from Template to PDF",
-      "filename": "copy-form-field-definitions-to-pdf.cs",
-      "description": "Shows how to enumerate form fields in a template PDF and copy their definitions to another PDF using Aspose.Pdf.Facades.",
+    "copy-form-fields-from-template-to-pdf": {
+      "title": "Copy Form Fields from Template PDF to Target PDF",
+      "filename": "copy-form-fields-from-template-to-pdf.cs",
+      "description": "Shows how to create a template PDF with a form field, create a target PDF, and copy the field definitions from the template to the target using Aspose.Pdf's FormEditor.",
       "tags": [
-        "pdf",
         "form-fields",
-        "copy",
+        "pdf-copy",
         "aspose-pdf",
-        "facade"
+        "form-editor",
+        "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.TextBoxField",
         "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.Form.FieldNames",
         "Aspose.Pdf.Facades.FormEditor.CopyOuterField",
+        "Aspose.Pdf.Facades.FormEditor.BindPdf",
         "Aspose.Pdf.Facades.FormEditor.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "move-pdf-form-fields-by-offset": {
       "title": "Move PDF Form Fields by Offset",
       "filename": "move-pdf-form-fields-by-offset.cs",
-      "description": "Shows how to shift all form fields in a PDF by a fixed (10,15) offset using Aspose.Pdf core API together with the FormEditor facade.",
+      "description": "Shows how to shift every form field in a PDF document by a specified X/Y offset using Aspose.Pdf's FormEditor.",
       "tags": [
-        "form-fields",
+        "pdf",
+        "form",
+        "field",
         "offset",
-        "layout",
-        "Aspose.Pdf",
-        "facades"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Forms.Field",
-        "FormEditor.BindPdf",
-        "FormEditor.MoveField",
-        "FormEditor.Save"
+        "Aspose.Pdf.Facades.FormEditor.BindPdf",
+        "Aspose.Pdf.Facades.FormEditor.MoveField",
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "batch-rename-pdf-form-fields": {
-      "title": "Batch Rename PDF Form Fields with Aspose.Pdf",
+      "title": "Batch Rename PDF Form Fields",
       "filename": "batch-rename-pdf-form-fields.cs",
-      "description": "Shows how to iterate over PDF form fields and rename any field whose name starts with a given prefix using the Aspose.Pdf.Facades.Form class.",
+      "description": "Demonstrates how to rename all form fields in a PDF that start with a specific prefix using Aspose.Pdf's Form and FormEditor classes.",
       "tags": [
         "pdf",
         "form",
-        "rename-field",
-        "batch",
-        "facade"
+        "rename",
+        "fields",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.FieldNames",
-        "Aspose.Pdf.Facades.Form.RenameField",
-        "Aspose.Pdf.Facades.Form.Save",
-        "Aspose.Pdf.Facades.Form..ctor"
+        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.RenameField",
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.Facades.Form.FieldNames"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "set-text-field-multiline": {
-      "title": "Set Text Field to Multiline in PDF",
-      "filename": "set-text-field-multiline.cs",
-      "description": "Shows how to convert a single‑line text field named \"Comments\" into a multiline field in a PDF using Aspose.Pdf.Facades.FormEditor.",
+    "set-text-field-to-multiline": {
+      "title": "Set Text Field to Multiline in PDF Form",
+      "filename": "set-text-field-to-multiline.cs",
+      "description": "Demonstrates how to convert the single‑line text field \"Comments\" into a multiline field using Aspose.Pdf.Facades.FormEditor.",
       "tags": [
         "pdf",
         "form",
         "multiline",
         "aspose",
-        "csharp"
+        "facades"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
@@ -667,87 +694,62 @@
         "Aspose.Pdf.Facades.FormEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "set-signature-field-border-width": {
       "title": "Set Signature Field Border Width in PDF",
       "filename": "set-signature-field-border-width.cs",
-      "description": "Demonstrates loading a PDF with the Form facade, locating the \"Signature\" form field, setting its border thickness to 2 points, and saving the updated document.",
+      "description": "Demonstrates how to load a PDF, retrieve a form field named \"Signature\", and set its border thickness to 2 points using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
         "form",
         "border",
         "signature",
-        "aspose"
+        "aspose-pdf"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.Form",
         "Aspose.Pdf.Facades.Form.GetFieldFacade",
-        "Aspose.Pdf.Facades.FormFieldFacade",
         "Aspose.Pdf.Facades.FormFieldFacade.BorderWidth",
         "Aspose.Pdf.Facades.Form.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "set-form-field-background-color": {
       "title": "Set Form Field Background Color to Light Green",
       "filename": "set-form-field-background-color.cs",
-      "description": "Demonstrates how to change the background color of a PDF form field named \"Status\" to light green using FormFieldFacade.",
+      "description": "Demonstrates using FormEditor and FormFieldFacade to change the background color of the \"Status\" form field to light green and save the updated PDF.",
       "tags": [
-        "pdf",
         "form",
-        "background",
+        "field",
+        "background-color",
         "facade",
-        "aspose"
+        "pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormFieldFacade",
         "Aspose.Pdf.Facades.FormEditor.DecorateField",
-        "Aspose.Pdf.Facades.FormEditor.Save",
-        "Aspose.Pdf.Facades.FormEditor.Facade"
+        "Aspose.Pdf.Facades.FormEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
-      "status": "verified"
-    },
-    "add-hidden-sessionid-field-to-pdfs": {
-      "title": "Add Hidden SessionId Field to PDFs in Batch",
-      "filename": "add-hidden-sessionid-field-to-pdfs.cs",
-      "description": "Shows how to loop through PDF files in a folder, bind each with Aspose.Pdf.Facades.Form, create a zero‑size hidden TextBoxField named SessionId containing a generated GUID, add it to the document's AcroForm, and save the modified PDF.",
-      "tags": [
-        "pdf",
-        "hidden-field",
-        "batch-processing",
-        "guid",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.BindPdf",
-        "Aspose.Pdf.Facades.Form.Save",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.TextBoxField",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Document.Form.Add"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "attach-js-validation-to-pdf-submit-button": {
       "title": "Attach JavaScript Validation to PDF Submit Button",
       "filename": "attach-js-validation-to-pdf-submit-button.cs",
-      "description": "Shows how to use Aspose.Pdf's FormEditor facade to bind an existing PDF, add a JavaScript script to a submit button that validates required fields, and save the modified document.",
+      "description": "Shows how to use Aspose.Pdf.Facades.FormEditor to add a JavaScript script to a PDF submit button that checks required fields before submitting the form.",
       "tags": [
-        "pdf",
         "javascript",
-        "form-validation",
-        "submit-button",
-        "aspose-pdf"
+        "pdf-form",
+        "validation",
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
@@ -756,13 +758,13 @@
         "Aspose.Pdf.Facades.FormEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "export-pdf-form-fields-to-json": {
       "title": "Export PDF Form Fields to JSON",
       "filename": "export-pdf-form-fields-to-json.cs",
-      "description": "Shows how to load a PDF containing AcroForm fields with the Form facade and export the field definitions to a pretty‑printed JSON file.",
+      "description": "Shows how to use Aspose.Pdf.Facades.Form to export all form field definitions from a PDF document into a pretty‑printed JSON file.",
       "tags": [
         "pdf",
         "form",
@@ -775,13 +777,13 @@
         "Aspose.Pdf.Facades.Form.ExportJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "create-pdf-form-fields-from-json": {
-      "title": "Create PDF Form Fields from JSON Definition",
+      "title": "Create PDF Form Fields from JSON Definitions",
       "filename": "create-pdf-form-fields-from-json.cs",
-      "description": "Shows how to read field specifications from a JSON file and add matching form fields to a newly created PDF using Aspose.Pdf's FormEditor.",
+      "description": "Demonstrates reading a JSON file with field specifications and adding matching form fields to a newly created PDF using Aspose.Pdf.",
       "tags": [
         "pdf",
         "form",
@@ -793,38 +795,37 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormEditor.AddField",
-        "Aspose.Pdf.Document.Pages.Add",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Facades.FieldType"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "set-phone-number-field-limit": {
-      "title": "Set Maximum Length for PDF Form Field",
+      "title": "Set Maximum Character Length for PDF Form Field",
       "filename": "set-phone-number-field-limit.cs",
-      "description": "Shows how to limit the number of characters a user can enter in a PDF form field using Aspose.Pdf.Facades.FormEditor.",
+      "description": "Shows how to load a PDF with Aspose.Pdf.Facades.FormEditor, set a maximum character count for the \"PhoneNumber\" form field, and save the updated document.",
       "tags": [
         "pdf",
         "form",
         "field-limit",
-        "aspose",
+        "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.BindPdf",
         "Aspose.Pdf.Facades.FormEditor.SetFieldLimit",
         "Aspose.Pdf.Facades.FormEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "set-date-field-format-in-pdf": {
+    "set-date-field-format": {
       "title": "Set Date Field Format in PDF Form",
-      "filename": "set-date-field-format-in-pdf.cs",
-      "description": "Demonstrates how to locate a DateField named \"Date\" in a PDF form and change its display format to MM/dd/yyyy using Aspose.Pdf.",
+      "filename": "set-date-field-format.cs",
+      "description": "Demonstrates how to locate a DateField in a PDF form and change its display format to \"MM/dd/yyyy\" using Aspose.Pdf.",
       "tags": [
         "pdf",
         "form",
@@ -834,85 +835,84 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.Annotation",
         "Aspose.Pdf.Forms.DateField",
+        "Aspose.Pdf.Document.Form",
+        "Aspose.Pdf.Forms.Field",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "add-reset-form-button-to-pdf": {
       "title": "Add Reset Form Button to PDF",
       "filename": "add-reset-form-button-to-pdf.cs",
-      "description": "Shows how to insert a push‑button field that resets all form fields in a PDF using Aspose.Pdf Facades.",
+      "description": "Demonstrates how to insert a push button into a PDF that clears all form fields when clicked, using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
         "form",
-        "reset",
-        "push-button",
-        "javascript"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.BindPdf",
-        "Aspose.Pdf.Facades.FormEditor.AddField",
-        "Aspose.Pdf.Facades.FormEditor.AddFieldScript",
-        "Aspose.Pdf.Facades.FormEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
-      "status": "verified"
-    },
-    "restrict-pdf-form-field-to-integer-range": {
-      "title": "Restrict PDF Form Field to Integer Range 0-100",
-      "filename": "restrict-pdf-form-field-to-integer-range.cs",
-      "description": "Shows how to limit a PDF form field's character length and attach JavaScript to enforce that the 'Score' field accepts only integer values between 0 and 100 using Aspose.Pdf.Facades.",
-      "tags": [
-        "pdf",
-        "form",
-        "validation",
+        "reset-button",
         "javascript",
         "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.AddField",
+        "Aspose.Pdf.Facades.FormEditor.AddFieldScript",
+        "Aspose.Pdf.Facades.FieldType"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:51:01Z",
+      "status": "verified"
+    },
+    "restrict-pdf-form-field-to-integer-0-100": {
+      "title": "Restrict PDF Form Field to Integer 0‑100",
+      "filename": "restrict-pdf-form-field-to-integer-0-100.cs",
+      "description": "Shows how to limit a PDF form text field named \"Score\" to accept only integer values between 0 and 100 using Aspose.Pdf.Facades FormEditor with field limits and JavaScript validation.",
+      "tags": [
+        "pdf",
+        "form",
+        "validation",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.FormEditor",
         "FormEditor.SetFieldLimit",
-        "FormEditor.AddFieldScript",
-        "Document.Save"
+        "FormEditor.SetFieldScript",
+        "FormEditor.Save",
+        "FormEditor constructor"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "attach-javascript-validation-to-pdf-form-field": {
       "title": "Attach JavaScript Validation to PDF Form Field",
       "filename": "attach-javascript-validation-to-pdf-form-field.cs",
-      "description": "Shows how to load a PDF, use the FormEditor facade to attach a JavaScript script to the \"Age\" form field that alerts the user when the entered value is less than 18, and then save the modified document.",
+      "description": "Shows how to bind a PDF, add a JavaScript script to the \"Age\" form field that displays a warning when the entered value is less than 18, and save the modified PDF.",
       "tags": [
-        "pdf",
         "javascript",
-        "form",
+        "pdf-form",
         "validation",
-        "aspose"
+        "aspose-pdf",
+        "facade"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.BindPdf",
         "Aspose.Pdf.Facades.FormEditor.SetFieldScript",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Facades.FormEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "copy-image-form-field-to-another": {
-      "title": "Copy Image Form Field to Another PDF Field",
-      "filename": "copy-image-form-field-to-another.cs",
-      "description": "Demonstrates how to copy the content of an image form field (e.g., a logo) to a new image field within the same PDF using Aspose.Pdf.Facades.FormEditor.",
+    "copy-image-field-to-another-field": {
+      "title": "Copy Image Field Content to Another Field in PDF",
+      "filename": "copy-image-field-to-another-field.cs",
+      "description": "Demonstrates how to copy the inner content of an existing image form field to a new image field in the same PDF using Aspose.Pdf.Facades.FormEditor.",
       "tags": [
         "pdf",
         "form",
@@ -923,126 +923,131 @@
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormEditor.CopyInnerField",
-        "Aspose.Pdf.Facades.FormEditor.Save"
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.Facades.FormEditor.Close"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "remove-empty-pdf-form-field": {
       "title": "Remove Empty PDF Form Field",
       "filename": "remove-empty-pdf-form-field.cs",
-      "description": "Shows how to read a PDF form field value and delete the field when it contains no user input, using Aspose.Pdf Facades.",
+      "description": "Shows how to read a PDF form field value and delete the field with Aspose.Pdf when it is empty or missing.",
       "tags": [
         "pdf",
-        "form-field",
-        "remove",
+        "form",
+        "field-removal",
         "aspose-pdf",
-        "facades"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.GetField",
         "Aspose.Pdf.Facades.FormEditor",
-        "Form.GetField",
-        "FormEditor.RemoveField",
-        "FormEditor.Save"
+        "Aspose.Pdf.Facades.FormEditor.BindPdf",
+        "Aspose.Pdf.Facades.FormEditor.RemoveField",
+        "Aspose.Pdf.Facades.FormEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "rename-pdf-form-fields-from-csv": {
-      "title": "Rename PDF Form Fields Using a CSV Mapping",
-      "filename": "rename-pdf-form-fields-from-csv.cs",
-      "description": "Shows how to read old‑new field name pairs from a CSV file and rename PDF form fields using Aspose.Pdf's FormEditor.",
+    "rename-pdf-form-fields-csv-mapping": {
+      "title": "Rename PDF Form Fields Using CSV Mapping",
+      "filename": "rename-pdf-form-fields-csv-mapping.cs",
+      "description": "Demonstrates creating a PDF with a form field, loading a CSV file of old‑new field name pairs, and renaming the fields in the PDF using Aspose.Pdf's FormEditor facade.",
       "tags": [
         "pdf",
         "form",
         "rename",
         "csv",
-        "aspose"
+        "facade"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormEditor.RenameField",
         "Aspose.Pdf.Facades.FormEditor.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "add-digital-signature-field-and-sign-pdf": {
-      "title": "Add Digital Signature Field and Sign PDF with Appearance",
+      "title": "Add Digital Signature Field and Sign PDF",
       "filename": "add-digital-signature-field-and-sign-pdf.cs",
-      "description": "Demonstrates how to add a signature form field named \"DigitalSignature\" to a PDF using FormEditor, set a graphic appearance, and digitally sign the field with a certificate via PdfFileSignature and PKCS1.",
+      "description": "Shows how to add a visible signature field to a PDF page and apply a digital signature using Aspose.Pdf facades.",
       "tags": [
         "digital-signature",
-        "pdf-form",
-        "signature-appearance",
-        "aspose-pdf",
-        "facades"
+        "pdf",
+        "form-editor",
+        "pdffilesignature",
+        "csharp"
       ],
       "apis_used": [
-        "FormEditor",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.PdfFileSignature",
+        "Aspose.Pdf.Forms.PKCS1",
         "FormEditor.AddField",
-        "PdfFileSignature",
-        "PdfFileSignature.SignatureAppearance",
-        "PdfFileSignature.SetCertificate",
-        "PdfFileSignature.Sign",
-        "PKCS1"
+        "PdfFileSignature.BindPdf",
+        "PdfFileSignature.Sign"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "set-pdf-form-field-required": {
-      "title": "Set PDF Form Field as Required",
-      "filename": "set-pdf-form-field-required.cs",
-      "description": "Demonstrates how to mark a PDF form field as required using Aspose.Pdf.Facades.FormEditor and persist the change to a new file.",
+    "mark-pdf-form-field-required": {
+      "title": "Mark PDF Form Field as Required with Asterisk",
+      "filename": "mark-pdf-form-field-required.cs",
+      "description": "Demonstrates how to set a form field to required using Aspose.Pdf.Facades.FormEditor, which automatically shows the asterisk indicator in PDF viewers.",
       "tags": [
         "pdf",
         "form",
         "required",
         "aspose",
-        "facades"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormEditor.SetFieldAttribute",
         "Aspose.Pdf.Facades.FormEditor.Save",
-        "Aspose.Pdf.Facades.PropertyFlag.Required",
-        "Aspose.Pdf.Facades.FormEditor.Dispose"
+        "Aspose.Pdf.Facades.PropertyFlag"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "apply-custom-font-to-pdf-form-text-fields": {
       "title": "Apply Custom Font to All PDF Form Text Fields",
       "filename": "apply-custom-font-to-pdf-form-text-fields.cs",
-      "description": "Demonstrates how to set a custom font (Arial Bold) for every text form field in a PDF using Aspose.Pdf Facades.",
+      "description": "Demonstrates how to set a custom font (e.g., Arial Bold) for every text field in a PDF form using Aspose.Pdf's FormEditor and FormFieldFacade.",
       "tags": [
         "pdf",
-        "form-fields",
+        "form",
         "custom-font",
         "facade",
         "aspnet"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormFieldFacade",
+        "Aspose.Pdf.Facades.FieldType",
         "Aspose.Pdf.Facades.FormEditor.DecorateField",
-        "Aspose.Pdf.Facades.FieldType"
+        "Aspose.Pdf.Facades.FormEditor.Facade"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "batch-add-selectall-checkbox-to-pdf": {
       "title": "Batch Add SelectAll Checkbox to First Page of PDFs",
       "filename": "batch-add-selectall-checkbox-to-pdf.cs",
-      "description": "Shows how to iterate over PDF files in a folder and add a checkbox form field named \"SelectAll\" to the first page of each document using Aspose.Pdf.",
+      "description": "Shows how to process multiple PDF files in a directory and use Aspose.Pdf.Facades.FormEditor to add a 'SelectAll' checkbox field on the first page of each PDF, saving the modified files to an output folder.",
       "tags": [
         "pdf",
         "checkbox",
@@ -1051,7 +1056,6 @@
         "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormEditor.BindPdf",
         "Aspose.Pdf.Facades.FormEditor.AddField",
@@ -1059,57 +1063,78 @@
         "Aspose.Pdf.Facades.FieldType"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "move-form-field-to-bottom-margin": {
-      "title": "Move Form Field to Bottom Margin on All PDF Pages",
-      "filename": "move-form-field-to-bottom-margin.cs",
-      "description": "Demonstrates how to reposition a specific form field (FooterNote) to the bottom margin of each page in a PDF using Aspose.Pdf, calculating coordinates per page and updating the field appearance.",
+    "move-footernote-to-bottom-margin": {
+      "title": "Move FooterNote Field to Bottom Margin on Each PDF Page",
+      "filename": "move-footernote-to-bottom-margin.cs",
+      "description": "Shows how to copy an existing form field to every page of a PDF and place it at the bottom margin using calculated coordinates.",
       "tags": [
-        "form-field",
-        "positioning",
-        "footer",
+        "form-fields",
         "pdf",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfFileStamp",
-        "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Document.Form.AddFieldAppearance"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
-      "status": "verified"
-    },
-    "add-javascript-to-quantity-field-total-price": {
-      "title": "Add JavaScript to Quantity Field for Total Price Calculation",
-      "filename": "add-javascript-to-quantity-field-total-price.cs",
-      "description": "Shows how to attach a JavaScript action to a PDF form field using Aspose.Pdf so that when the Quantity field changes, the TotalPrice field is automatically recalculated from a hidden UnitPrice field.",
-      "tags": [
-        "javascript",
-        "pdf-form",
-        "aspose-pdf",
-        "field-script",
-        "calculation"
+        "footer",
+        "margin",
+        "copy-field"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.AddFieldScript",
+        "Aspose.Pdf.Facades.FormEditor.CopyInnerField",
         "Aspose.Pdf.Facades.FormEditor.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "export-import-pdf-form-fields-xml": {
-      "title": "Export and Import PDF Form Fields using XML",
-      "filename": "export-import-pdf-form-fields-xml.cs",
-      "description": "Shows how to export form field data from a PDF to an XML file and later re‑import that XML back into a PDF using Aspose.Pdf.",
+    "set-field-appearance-format-price": {
+      "title": "Set Form Field Appearance and Format Price to Two Decimals",
+      "filename": "set-field-appearance-format-price.cs",
+      "description": "Demonstrates how to set the appearance flags of a PDF form field and fill the \"Price\" field with a value formatted to two decimal places using Aspose.Pdf.",
+      "tags": [
+        "form",
+        "field-appearance",
+        "price-format",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Annotations.AnnotationFlags",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:51:01Z",
+      "status": "verified"
+    },
+    "attach-javascript-to-pdf-form-field": {
+      "title": "Attach JavaScript to PDF Form Field for Auto-Calculating Total Price",
+      "filename": "attach-javascript-to-pdf-form-field.cs",
+      "description": "Shows how to load a PDF, retrieve the Quantity and TotalPrice form fields, attach a JavaScript OnCalculate action that computes TotalPrice from Quantity and UnitPrice, and save the modified document.",
+      "tags": [
+        "pdf",
+        "javascript",
+        "form",
+        "calculation",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.FormField",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
+      "status": "verified"
+    },
+    "export-import-pdf-form-xml": {
+      "title": "Export and Import PDF Form Data as XML",
+      "filename": "export-import-pdf-form-xml.cs",
+      "description": "Shows how to export form field values from a PDF to an XML file and later re‑import the XML back into a PDF using Aspose.Pdf.",
       "tags": [
         "pdf",
         "form",
@@ -1118,21 +1143,21 @@
         "import"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.Form",
         "Aspose.Pdf.Facades.Form.ExportXml",
         "Aspose.Pdf.Facades.Form.ImportXml",
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.TextBoxField",
-        "Aspose.Pdf.Forms.Form"
+        "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "import-pdf-form-fields-from-xml": {
-      "title": "Import PDF Form Fields from XML While Preserving Order",
-      "filename": "import-pdf-form-fields-from-xml.cs",
-      "description": "Demonstrates how to bind a PDF, import form field values from an XML file using Aspose.Pdf.Facades, and save the updated document while keeping the original field order.",
+    "import-pdf-form-fields-from-xml-preserve-order": {
+      "title": "Import PDF Form Fields from XML Preserving Order",
+      "filename": "import-pdf-form-fields-from-xml-preserve-order.cs",
+      "description": "Demonstrates how to import form field values from an XML file into a PDF while keeping the original field order and layout unchanged using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
         "form",
@@ -1142,41 +1167,40 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.BindPdf",
         "Aspose.Pdf.Facades.Form.ImportXml",
         "Aspose.Pdf.Facades.Form.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "add-list-box-field-to-pdf-form": {
       "title": "Add List Box Field to PDF Form",
       "filename": "add-list-box-field-to-pdf-form.cs",
-      "description": "Shows how to insert a ListBox form field named \"Priority\" with items Low, Medium, High and a default value Medium into an existing PDF using Aspose.Pdf.Facades.",
+      "description": "Demonstrates how to create a ListBox form field in a PDF, populate it with items, set a default value, and save the updated document using Aspose.Pdf.",
       "tags": [
+        "pdf",
+        "form",
         "listbox",
-        "pdf-form",
         "aspose",
-        "csharp",
-        "formeditor"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormEditor.BindPdf",
-        "Aspose.Pdf.Facades.FormEditor.Items",
         "Aspose.Pdf.Facades.FormEditor.AddField",
-        "Aspose.Pdf.Facades.FormEditor.Save",
-        "Aspose.Pdf.Facades.FieldType"
+        "Aspose.Pdf.Facades.FormEditor.Items",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "remove-button-fields-from-pdf-form": {
       "title": "Remove Button Fields from PDF Form",
       "filename": "remove-button-fields-from-pdf-form.cs",
-      "description": "Demonstrates how to load a PDF, identify all button form fields, delete them, and save the cleaned document using Aspose.Pdf.",
+      "description": "Demonstrates how to load a PDF, identify all button form fields, and delete them using Aspose.Pdf to simplify the form.",
       "tags": [
         "pdf",
         "form",
@@ -1186,25 +1210,25 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.Field",
         "Aspose.Pdf.Forms.ButtonField",
-        "Aspose.Pdf.Form",
-        "Aspose.Pdf.Form.Delete",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Forms.Form.Delete"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "merge-pdfs-unique-form-fields": {
-      "title": "Merge PDFs and Ensure Unique Form Field Names",
-      "filename": "merge-pdfs-unique-form-fields.cs",
-      "description": "Demonstrates concatenating multiple PDF form files while automatically renaming duplicate field names by enabling KeepFieldsUnique and setting a UniqueSuffix on PdfFileEditor.",
+    "merge-pdf-forms-unique-field-names": {
+      "title": "Merge PDF Forms with Unique Field Names",
+      "filename": "merge-pdf-forms-unique-field-names.cs",
+      "description": "Demonstrates how to concatenate multiple PDF form files while automatically renaming duplicate field names using Aspose.Pdf.Facades.PdfFileEditor.",
       "tags": [
         "pdf",
-        "form-fields",
+        "form",
         "merge",
-        "unique-names",
-        "batch-processing"
+        "unique-fields",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
@@ -1213,13 +1237,13 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "add-email-validation-script-to-pdf-form-field": {
-      "title": "Add Email Validation Script to PDF Form Field",
-      "filename": "add-email-validation-script-to-pdf-form-field.cs",
-      "description": "Demonstrates how to attach a JavaScript regular‑expression validation script to an \"Email\" form field in a PDF using Aspose.Pdf.Facades.FormEditor.",
+    "add-email-validation-to-pdf-form-field": {
+      "title": "Add Email Validation to PDF Form Field",
+      "filename": "add-email-validation-to-pdf-form-field.cs",
+      "description": "Demonstrates how to attach JavaScript to a PDF form field using Aspose.Pdf to validate email addresses with a regular expression.",
       "tags": [
         "pdf",
         "form",
@@ -1228,135 +1252,137 @@
         "email"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.FormEditor",
-        "FormEditor.BindPdf",
-        "FormEditor.SetFieldScript",
-        "FormEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
-      "status": "verified"
-    },
-    "decorate-pdf-form-field-background-image": {
-      "title": "Decorate PDF Form Field with Background Image and Centered Text",
-      "filename": "decorate-pdf-form-field-background-image.cs",
-      "description": "Shows how to set alignment and background color for a PDF form field and then add a background image that appears behind the field content using Aspose.Pdf facades.",
-      "tags": [
-        "pdf",
-        "form-field",
-        "background-image",
-        "aspose-pdf",
-        "facade"
-      ],
-      "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormFieldFacade",
-        "Aspose.Pdf.Facades.Stamp",
-        "Aspose.Pdf.Facades.PdfFileStamp"
+        "Aspose.Pdf.Facades.FormEditor.SetFieldScript",
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.Facades.FormEditor.SetFieldAttribute"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "add-hidden-numeric-version-field": {
-      "title": "Add Hidden Numeric Version Field to PDF",
-      "filename": "add-hidden-numeric-version-field.cs",
-      "description": "Shows how to create a hidden numeric text field named \"Version\" in a PDF using Aspose.Pdf and save the modified document.",
+    "decorate-pdf-form-field-with-header-image": {
+      "title": "Decorate PDF Form Field with Centered Text and Header Image",
+      "filename": "decorate-pdf-form-field-with-header-image.cs",
+      "description": "Shows how to set centered text alignment for a PDF form field using FormFieldFacade and then add a background image as a page header with PdfFileStamp.",
+      "tags": [
+        "form-field",
+        "background-image",
+        "text-alignment",
+        "Aspose.Pdf",
+        "PdfFileStamp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormFieldFacade",
+        "Aspose.Pdf.Facades.FormEditor.DecorateField",
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddHeader",
+        "Aspose.Pdf.Facades.PdfFileStamp.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
+      "status": "verified"
+    },
+    "add-hidden-version-field-to-pdf": {
+      "title": "Add Hidden Version Field to PDF",
+      "filename": "add-hidden-version-field-to-pdf.cs",
+      "description": "Shows how to insert a hidden numeric field named \"Version\" with a value of 2 into a PDF using Aspose.Pdf's FormEditor facade.",
       "tags": [
         "pdf",
         "form",
         "hidden-field",
         "version",
-        "aspose-pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.TextBoxField",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Annotations.AnnotationFlags",
-        "Aspose.Pdf.Document.Form.Add",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.BindPdf",
+        "Aspose.Pdf.Facades.FormEditor.AddField",
+        "Aspose.Pdf.Facades.FormEditor.SetFieldAttribute",
+        "Aspose.Pdf.Facades.FormEditor.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "copy-form-field-to-new-field-on-page": {
-      "title": "Copy Form Field Definition to New Field on Specific Page",
-      "filename": "copy-form-field-to-new-field-on-page.cs",
-      "description": "Shows how to copy the outer definition of an existing PDF form field to a new field on a given page using Aspose.Pdf Facades.",
+    "copy-rename-pdf-form-field": {
+      "title": "Copy and Rename PDF Form Field on a Specific Page",
+      "filename": "copy-rename-pdf-form-field.cs",
+      "description": "Demonstrates how to copy the outer definition of an existing PDF form field to a different page and then rename it using Aspose.Pdf.Facades.FormEditor.",
       "tags": [
+        "pdf",
         "form",
         "copy-field",
-        "pdf",
-        "facades",
-        "csharp"
+        "rename-field",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.BindPdf",
-        "Aspose.Pdf.Facades.FormEditor.CopyInnerField",
-        "Aspose.Pdf.Facades.FormEditor.Save"
+        "Aspose.Pdf.Facades.FormEditor.CopyOuterField",
+        "Aspose.Pdf.Facades.FormEditor.RenameField",
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.Facades.FormEditor.Dispose"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "move-signature-field-to-lower-right-corner-page-5": {
-      "title": "Move Signature Field to Lower Right Corner on Page 5",
-      "filename": "move-signature-field-to-lower-right-corner-page-5.cs",
-      "description": "Shows how to reposition an existing signature form field to a specific lower‑right location on page 5 using Aspose.Pdf's FormEditor.",
+    "move-signature-field-to-lower-right-corner": {
+      "title": "Move Signature Form Field to Lower Right Corner on Page 5",
+      "filename": "move-signature-field-to-lower-right-corner.cs",
+      "description": "Demonstrates how to reposition an existing PDF form field named \"Signature\" to the lower‑right corner of page 5 using Aspose.Pdf.Facades.FormEditor.",
       "tags": [
         "form-field",
-        "signature",
         "move",
         "pdf",
+        "aspose-pdf",
         "facades"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormEditor.MoveField",
         "Aspose.Pdf.Facades.FormEditor.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "enable-rich-text-formatting-for-pdf-form-field": {
-      "title": "Enable Rich Text Formatting for PDF Form Field",
-      "filename": "enable-rich-text-formatting-for-pdf-form-field.cs",
-      "description": "Shows how to retrieve a 'Comments' field, cast it to RichTextBoxField, enable multiline input, set a default appearance, and assign an RTF value using Aspose.Pdf.",
+    "set-rich-text-appearance-for-pdf-form-field": {
+      "title": "Set Rich Text Appearance for PDF Form Field",
+      "filename": "set-rich-text-appearance-for-pdf-form-field.cs",
+      "description": "Shows how to locate a RichTextBoxField in a PDF, configure its default appearance, enable multiline, spell‑check and scrolling, and then save the updated document.",
       "tags": [
         "rich-text",
         "pdf-form",
-        "aspose.pdf",
-        "csharp",
-        "field-appearance"
+        "default-appearance",
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.RichTextBoxField",
         "Aspose.Pdf.Text.DefaultAppearance",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Forms.Form"
+        "Aspose.Pdf.Document.Form",
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "add-javascript-populate-date-field": {
-      "title": "Add JavaScript to Populate Date Field on PDF Open",
-      "filename": "add-javascript-populate-date-field.cs",
-      "description": "Demonstrates how to attach a JavaScript action to a PDF that sets the \"Date\" form field to the current date when the document is opened, using Aspose.Pdf.Facades.",
+    "add-form-load-javascript-to-pdf": {
+      "title": "Add Form Load JavaScript to PDF",
+      "filename": "add-form-load-javascript-to-pdf.cs",
+      "description": "Demonstrates how to attach a document‑level JavaScript action that populates a form field named \"Date\" with the current date when the PDF is opened, using Aspose.Pdf.Facades.",
       "tags": [
         "javascript",
         "pdf",
-        "form-field",
-        "aspose-pdf",
-        "facades"
+        "form",
+        "document-open",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfContentEditor",
@@ -1366,214 +1392,235 @@
         "PdfContentEditor.DocumentOpen"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "export-checkboxes-to-fdf": {
-      "title": "Export Checkbox Fields to FDF",
-      "filename": "export-checkboxes-to-fdf.cs",
-      "description": "Demonstrates how to export only checkbox form field definitions from a PDF to an FDF file by marking non‑checkbox fields as non‑exportable and using the Form facade's ExportFdf method.",
+    "export-checkbox-fields-to-fdf": {
+      "title": "Export Checkbox Form Fields to FDF",
+      "filename": "export-checkbox-fields-to-fdf.cs",
+      "description": "Shows how to load a PDF document and use the Form facade to export its form fields to an FDF file, which can then be filtered to keep only checkbox definitions.",
       "tags": [
-        "checkbox",
+        "pdf",
+        "form",
         "fdf",
-        "form-export",
-        "aspose-pdf",
-        "facades"
+        "checkbox",
+        "export"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Forms.CheckboxField",
         "Aspose.Pdf.Facades.Form.ExportFdf"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "import-checkboxes-from-fdf": {
-      "title": "Import Checkbox Definitions from FDF into PDF",
+      "title": "Import Checkboxes from FDF and Merge into PDF",
       "filename": "import-checkboxes-from-fdf.cs",
-      "description": "Demonstrates how to load a PDF, import checkbox definitions from an FDF file using the Form facade, merge them with existing fields, and save the resulting document.",
+      "description": "Shows how to import checkbox definitions and values from an FDF file into an existing PDF form and merge them without creating duplicate fields using Aspose.Pdf.Facades.",
       "tags": [
-        "FDF",
+        "fdf",
         "checkbox",
-        "form-fields",
+        "form",
         "merge",
-        "Aspose.Pdf"
+        "aspose-pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.BindPdf",
         "Aspose.Pdf.Facades.Form.ImportFdf",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Facades.Form.Save",
+        "Aspose.Pdf.Facades.Form.Close"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "add-state-combo-box-to-pdf-form": {
+    "add-state-combobox-to-pdf": {
       "title": "Add State Combo Box to PDF Form",
-      "filename": "add-state-combo-box-to-pdf-form.cs",
-      "description": "Shows how to insert a combo box field named \"State\" into an existing PDF form and fill it with US state abbreviations using Aspose.Pdf.Facades.",
+      "filename": "add-state-combobox-to-pdf.cs",
+      "description": "Shows how to insert a combo box field named \"State\" into an existing PDF and fill it with US state abbreviations using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
         "form",
         "combobox",
         "aspose",
-        "csharp"
+        "us-states"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.AddField",
-        "Aspose.Pdf.Facades.FormEditor.AddListItem",
-        "Aspose.Pdf.Facades.FormEditor.Save",
-        "Aspose.Pdf.Facades.FieldType"
+        "Aspose.Pdf.Facades.FieldType",
+        "FormEditor.AddField",
+        "FormEditor.AddListItem",
+        "FormEditor.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "set-taxrate-readonly-calc-js": {
-      "title": "Make PDF Form Field Read‑Only and Add JavaScript Calculation",
-      "filename": "set-taxrate-readonly-calc-js.cs",
-      "description": "Shows how to set a PDF form field to read‑only and attach a JavaScript calculate action that computes TaxRate as 10% of the Subtotal field using Aspose.Pdf facades.",
+    "remove-non-whitelisted-items-from-pdf-combo-box": {
+      "title": "Remove Non-Whitelisted Items from a PDF Combo Box",
+      "filename": "remove-non-whitelisted-items-from-pdf-combo-box.cs",
+      "description": "Demonstrates how to create a PDF with a combo box field, populate it with items, and then delete any items that are not present in a predefined whitelist using Aspose.Pdf.",
       "tags": [
         "pdf",
         "form",
-        "javascript",
+        "combobox",
+        "whitelist",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.ComboBoxField",
+        "Aspose.Pdf.Facades.FormEditor",
+        "FormEditor.BindPdf",
+        "FormEditor.DelListItem",
+        "FormEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
+      "status": "verified"
+    },
+    "make-taxrate-readonly-add-js": {
+      "title": "Make TaxRate Read‑Only and Add JavaScript Calculation",
+      "filename": "make-taxrate-readonly-add-js.cs",
+      "description": "Shows how to set a PDF form field to read‑only and attach JavaScript that computes its value from the Subtotal field using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "form",
         "readonly",
+        "javascript",
         "calculation"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.SetFieldAttribute",
-        "Aspose.Pdf.Forms.NumberField",
-        "Aspose.Pdf.Forms.JavascriptAction",
-        "Aspose.Pdf.Facades.FormEditor.Save"
+        "Aspose.Pdf.Forms.PropertyFlag",
+        "FormEditor.SetFieldAttribute",
+        "FormEditor.SetFieldScript",
+        "Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "decorate-list-box-fields": {
-      "title": "Decorate List Box Fields with Uniform Border and Background",
-      "filename": "decorate-list-box-fields.cs",
-      "description": "Shows how to apply a consistent border style, width, color, and background color to all list box form fields in a PDF using Aspose.Pdf.Facades.",
+    "decorate-list-fields-uniform-border": {
+      "title": "Decorate List Fields with Uniform Border and Background",
+      "filename": "decorate-list-fields-uniform-border.cs",
+      "description": "Demonstrates applying a consistent background color and border style to all list-type form fields in a PDF using Aspose.Pdf Facades.",
       "tags": [
         "pdf",
         "form-fields",
         "border",
         "background",
-        "aspose-pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormFieldFacade",
-        "Aspose.Pdf.Facades.FieldType",
-        "FormEditor.DecorateField",
-        "FormEditor.Save"
+        "Aspose.Pdf.Facades.FormEditor.DecorateField",
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.Facades.FieldType"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "rename-pdf-form-fields-to-camelcase": {
       "title": "Rename PDF Form Fields to camelCase",
       "filename": "rename-pdf-form-fields-to-camelcase.cs",
-      "description": "Loads a PDF, enumerates its form fields, converts each field name to camelCase, and batch renames the fields using FormEditor.",
+      "description": "Demonstrates creating a PDF with form fields, iterating over them, and renaming each field to camelCase using Aspose.Pdf's FormEditor.RenameField method.",
       "tags": [
         "pdf",
         "form",
         "rename",
         "camelcase",
-        "batch"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Forms.TextBoxField",
-        "Aspose.Pdf.Forms.Field.PartialName",
-        "Aspose.Pdf.Facades.FormEditor.RenameField",
-        "Aspose.Pdf.Facades.FormEditor.Save"
+        "Aspose.Pdf.Forms.Field",
+        "Aspose.Pdf.Facades.FormEditor.RenameField"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "add-print-dialog-button-to-pdf": {
-      "title": "Add Print Dialog Button to PDF",
-      "filename": "add-print-dialog-button-to-pdf.cs",
-      "description": "Shows how to insert a push button into a PDF that triggers the browser's print dialog via JavaScript using Aspose.Pdf.",
+    "add-print-button-to-pdf": {
+      "title": "Add Print Button to PDF Using Aspose.Pdf",
+      "filename": "add-print-button-to-pdf.cs",
+      "description": "Shows how to insert a push‑button form field that triggers the PDF print dialog via JavaScript in an existing PDF document.",
       "tags": [
         "pdf",
         "form",
-        "push-button",
+        "print",
         "javascript",
-        "print"
+        "button"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.BindPdf",
         "Aspose.Pdf.Facades.FormEditor.AddField",
         "Aspose.Pdf.Facades.FormEditor.AddFieldScript",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.Facades.FieldType"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "hide-form-field-exportable": {
-      "title": "Hide Form Field While Keeping It Exportable",
-      "filename": "hide-form-field-exportable.cs",
-      "description": "Shows how to set a PDF form field to hidden using the NoView flag with Aspose.Pdf.Facades.FormEditor, so the field is not visible but still exported in form submissions.",
+    "set-pdf-form-field-hidden-exportable": {
+      "title": "Set PDF Form Field to Hidden but Exportable",
+      "filename": "set-pdf-form-field-hidden-exportable.cs",
+      "description": "Shows how to hide a PDF form field while keeping it exportable using Aspose.Pdf's FormEditor and AnnotationFlags.",
       "tags": [
+        "pdf",
         "form",
-        "hidden",
+        "hidden-field",
         "exportable",
-        "Aspose.Pdf",
-        "FormEditor"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormEditor.SetFieldAppearance",
         "Aspose.Pdf.Annotations.AnnotationFlags",
-        "Aspose.Pdf.Facades.FormEditor.Save"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "copy-notes-to-summary": {
-      "title": "Copy Notes Field to Summary Field in PDF Form",
+      "title": "Copy Notes Field to Summary in PDF Form",
       "filename": "copy-notes-to-summary.cs",
-      "description": "Shows how to read the value of a PDF form field and write it to another field using Aspose.Pdf.",
+      "description": "Shows how to read the value of a PDF form field and write it to another field using Aspose.Pdf.Facades.Form.",
       "tags": [
         "pdf",
         "form",
         "field",
-        "aspose",
+        "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.GetField",
-        "Aspose.Pdf.Facades.Form.FillField",
-        "Aspose.Pdf.Facades.Form.Save"
+        "Form(string)",
+        "Form.GetField",
+        "Form.FillField",
+        "Form.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "move-pdf-form-fields-page-2": {
-      "title": "Move PDF Form Fields on a Specific Page",
+      "title": "Move PDF Form Fields on Page 2 by 5 Points",
       "filename": "move-pdf-form-fields-page-2.cs",
-      "description": "Shows how to shift the position of form fields on page 2 of a PDF by 5 points using Aspose.Pdf.Facades.PdfPageEditor.",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfPageEditor to shift the content and form fields on a specific PDF page by a given offset, adjusting the margin.",
       "tags": [
         "pdf",
         "form-fields",
@@ -1583,19 +1630,19 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfPageEditor",
-        "PdfPageEditor.BindPdf",
-        "PdfPageEditor.ProcessPages",
-        "PdfPageEditor.MovePosition",
-        "PdfPageEditor.Save"
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfPageEditor.ProcessPages",
+        "Aspose.Pdf.Facades.PdfPageEditor.MovePosition",
+        "Aspose.Pdf.Facades.PdfPageEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "set-numeric-two-decimal-validation": {
-      "title": "Set Numeric Two-Decimal Validation for PDF Form Field",
-      "filename": "set-numeric-two-decimal-validation.cs",
-      "description": "Shows how to locate a TextBoxField named 'Discount' in a PDF, limit its length, configure combs, and attach JavaScript to enforce numeric input with two‑decimal precision using Aspose.Pdf.",
+    "set-numeric-validation-two-decimal-discount": {
+      "title": "Set Numeric Validation with Two Decimal Precision for PDF Form Field",
+      "filename": "set-numeric-validation-two-decimal-discount.cs",
+      "description": "Demonstrates how to add a text box field to a PDF and apply a JavaScript validation script that restricts input to numeric values with up to two decimal places, using Aspose.Pdf.",
       "tags": [
         "pdf",
         "form",
@@ -1604,206 +1651,219 @@
         "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.BindPdf",
-        "Aspose.Pdf.Facades.FormEditor.SetFieldCombNumber",
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.TextBoxField",
-        "Aspose.Pdf.Forms.JavascriptAction"
+        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.SetFieldScript",
+        "Aspose.Pdf.Facades.FormEditor.SetFieldLimit",
+        "Aspose.Pdf.Facades.FormEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "attach-confirmation-js-to-pdf-submit-button": {
-      "title": "Attach Confirmation JavaScript to PDF Submit Button",
-      "filename": "attach-confirmation-js-to-pdf-submit-button.cs",
-      "description": "Demonstrates using Aspose.Pdf.Facades.FormEditor to set a submit URL, configure the submit flag, and attach JavaScript that shows a confirmation dialog before submitting the PDF form.",
+    "add-confirmation-dialog-to-pdf-submit-button": {
+      "title": "Add Confirmation Dialog to PDF Submit Button",
+      "filename": "add-confirmation-dialog-to-pdf-submit-button.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.FormEditor to attach JavaScript that displays a confirmation dialog before submitting a PDF form.",
       "tags": [
         "pdf",
         "javascript",
         "form",
-        "submit",
-        "confirmation"
+        "confirmation",
+        "facade"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.BindPdf",
-        "Aspose.Pdf.Facades.FormEditor.SetSubmitUrl",
-        "Aspose.Pdf.Facades.FormEditor.SetSubmitFlag",
-        "Aspose.Pdf.Facades.FormEditor.AddFieldScript",
-        "Aspose.Pdf.Facades.FormEditor.Save"
+        "FormEditor",
+        "FormEditor.BindPdf",
+        "FormEditor.AddFieldScript",
+        "FormEditor.Save",
+        "FormEditor.Dispose"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "add-gender-radio-button-group-to-pdf": {
-      "title": "Add Gender Radio Button Group to PDF",
-      "filename": "add-gender-radio-button-group-to-pdf.cs",
-      "description": "Shows how to insert a radio button group named \"Gender\" with options Male, Female, and Other into an existing PDF using Aspose.Pdf.Facades.FormEditor.",
+    "add-gender-radio-button-group": {
+      "title": "Add Gender Radio Button Group to PDF Form",
+      "filename": "add-gender-radio-button-group.cs",
+      "description": "Shows how to insert a radio button group named \"Gender\" with options Male, Female, and Other, and set a default selection in an existing PDF using Aspose.Pdf.",
       "tags": [
         "pdf",
         "form",
-        "radio",
+        "radio-button",
         "aspose",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.AddField",
-        "Aspose.Pdf.Facades.FormEditor.Save",
-        "Aspose.Pdf.Facades.FormEditor.Items",
-        "Aspose.Pdf.Facades.FormEditor.RadioHoriz"
+        "FormEditor.BindPdf",
+        "FormEditor.AddField",
+        "FormEditor.Save",
+        "Aspose.Pdf.Facades.FieldType"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "remove-temporary-form-fields-from-pdf": {
       "title": "Remove Temporary Form Fields from PDF",
       "filename": "remove-temporary-form-fields-from-pdf.cs",
-      "description": "Demonstrates how to locate and delete form fields whose names start with \"Temp_\" in a PDF using Aspose.Pdf, then save the cleaned document.",
+      "description": "Shows how to locate and delete PDF form fields whose names start with \"Temp_\" using Aspose.Pdf's Form and FormEditor classes.",
       "tags": [
         "pdf",
-        "form-fields",
-        "cleanup",
+        "form",
+        "remove-fields",
         "aspose",
         "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Forms.Form.Delete",
-        "Aspose.Pdf.Forms.Form.Fields",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.FieldNames",
+        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.RemoveField",
+        "Aspose.Pdf.Document"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "convert-single-line-to-multi-line-address-field": {
-      "title": "Convert Single-Line PDF Form Field to Multi-Line with Auto-Wrap",
-      "filename": "convert-single-line-to-multi-line-address-field.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.FormEditor to change a PDF AcroForm text field from single-line to multi-line, enabling word-wrap and dynamic height.",
+    "convert-single-line-to-multiline-word-wrap": {
+      "title": "Convert Single‑Line Form Field to Multiline with Word Wrap",
+      "filename": "convert-single-line-to-multiline-word-wrap.cs",
+      "description": "Demonstrates how to change an existing single‑line PDF form field to a multiline field, enable automatic word wrapping, and save the updated document using Aspose.Pdf.",
       "tags": [
-        "pdf",
         "form",
         "multiline",
-        "aspose",
-        "facades"
+        "wordwrap",
+        "pdf",
+        "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.BindPdf",
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor.Single2Multiple",
         "Aspose.Pdf.Facades.FormEditor.Save",
-        "Aspose.Pdf.Facades.FormEditor.SetFieldLimit"
+        "Aspose.Pdf.Facades.PdfFileMend",
+        "Aspose.Pdf.Facades.PdfFileMend.IsWordWrap",
+        "Aspose.Pdf.Facades.PdfFileMend.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "add-hidden-authtoken-field-to-pdf": {
       "title": "Add Hidden AuthToken Field to PDF",
       "filename": "add-hidden-authtoken-field-to-pdf.cs",
-      "description": "Shows how to generate a cryptographically secure token and embed it as a hidden text box form field in a PDF using Aspose.Pdf.",
+      "description": "Generates a secure random token, creates a zero‑size hidden TextBoxField named AuthToken, adds it to the PDF form, and saves the modified document.",
       "tags": [
         "pdf",
-        "form-field",
-        "hidden",
-        "authtoken",
+        "hidden-field",
+        "auth-token",
+        "aspose-pdf",
         "security"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.TextBoxField",
         "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Document.Form",
+        "Aspose.Pdf.Forms.Form.Add",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "duplicate-pdf-form-field": {
       "title": "Duplicate PDF Form Field Using FormEditor",
       "filename": "duplicate-pdf-form-field.cs",
-      "description": "Demonstrates copying an existing form field named 'Signature' to a new field 'SignatureCopy' on the same page with Aspose.Pdf.Facades.FormEditor.",
+      "description": "Demonstrates how to copy an existing form field named \"Signature\" to a new field \"SignatureCopy\" on the same page using Aspose.Pdf.Facades.FormEditor.",
       "tags": [
         "pdf",
         "form",
         "duplicate",
-        "aspose-pdf",
+        "aspose",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.FormEditor",
         "Aspose.Pdf.Facades.FormEditor.CopyInnerField",
-        "Aspose.Pdf.Facades.FormEditor.Save"
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.Facades.FormEditor.Dispose",
+        "Aspose.Pdf.Facades.FormEditor.FormEditor(string, string)"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "move-pdf-form-field-to-top-left": {
       "title": "Move PDF Form Field to Top‑Left Corner",
       "filename": "move-pdf-form-field-to-top-left.cs",
-      "description": "Demonstrates how to reposition an existing form field named \"Logo\" to the top‑left corner of the first page using Aspose.Pdf Facades, with a specific width and height.",
+      "description": "Demonstrates how to reposition a form field named \"Logo\" to the top‑left corner of the first page with a specific width and height, then save the updated PDF.",
       "tags": [
-        "pdf",
         "form-field",
-        "move",
-        "facades",
-        "Aspose.Pdf"
+        "position",
+        "pdf",
+        "aspose",
+        "facades"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Facades.FormEditor",
-        "FormEditor.MoveField",
-        "FormEditor.Save"
+        "Aspose.Pdf.Facades.FormEditor.MoveField",
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.PageInfo.Height"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "add-input-mask-to-pdf-form-field": {
-      "title": "Add Input Mask to PDF Form Field",
-      "filename": "add-input-mask-to-pdf-form-field.cs",
-      "description": "Shows how to bind a PDF to the FormEditor facade and attach JavaScript that enforces a phone number mask (###) ###‑#### on a form field.",
+    "apply-phone-number-input-mask": {
+      "title": "Apply Phone Number Input Mask to PDF Form Field",
+      "filename": "apply-phone-number-input-mask.cs",
+      "description": "Demonstrates how to attach JavaScript to a PDF form field using Aspose.Pdf to enforce a phone number input mask \"(###) ###‑####\".",
       "tags": [
         "pdf",
         "form",
-        "input-mask",
         "javascript",
+        "input-mask",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.FormEditor",
+        "Aspose.Pdf.Facades.FormEditor.SetFieldScript",
+        "Aspose.Pdf.Facades.FormEditor.Save",
+        "Aspose.Pdf.Facades.FormEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:51:01Z",
+      "status": "verified"
+    },
+    "attach-js-resetform-clear-hidden-fields": {
+      "title": "Attach JavaScript to ResetForm Button to Clear Hidden Fields",
+      "filename": "attach-js-resetform-clear-hidden-fields.cs",
+      "description": "Shows how to bind a PDF with Aspose.Pdf.Facades.FormEditor, add JavaScript to a ResetForm button that resets the form and clears specified hidden fields, and then save the modified PDF.",
+      "tags": [
+        "pdf",
+        "javascript",
+        "form",
+        "reset",
         "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.BindPdf",
-        "Aspose.Pdf.Facades.FormEditor.AddFieldScript",
-        "Aspose.Pdf.Facades.FormEditor.Save"
+        "FormEditor",
+        "FormEditor.BindPdf",
+        "FormEditor.AddFieldScript",
+        "FormEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
-      "status": "verified"
-    },
-    "attach-javascript-to-resetform-that-also-clears-hidden-fields-during-reset": {
-      "title": "Attach Javascript To Resetform That Also Clears Hidden Fields During Reset",
-      "filename": "attach-javascript-to-resetform-that-also-clears-hidden-fields-during-reset.cs",
-      "description": "",
-      "tags": [],
-      "apis_used": [],
-      "difficulty": "",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
     "export-pdf-form-field-layout-to-json": {
       "title": "Export PDF Form Field Layout to JSON",
       "filename": "export-pdf-form-field-layout-to-json.cs",
-      "description": "Extracts the position and page information of each form field in a PDF and writes it to an indented JSON file for UI reconstruction.",
+      "description": "Demonstrates how to read the coordinates of each form field in a PDF using Aspose.Pdf.Facades and serialize the layout information to a JSON file for UI reconstruction.",
       "tags": [
         "pdf",
         "form",
@@ -1813,36 +1873,34 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Field.GetRectangle",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Forms.Field.FullName",
-        "Aspose.Pdf.Forms.Field.PageIndex"
+        "Aspose.Pdf.Facades.FormFieldFacade",
+        "Aspose.Pdf.Facades.Form.FieldNames",
+        "Aspose.Pdf.Facades.Form.GetFieldFacade",
+        "Aspose.Pdf.Facades.FormFieldFacade.Position"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     },
-    "import-form-field-layout-from-json": {
-      "title": "Import Form Field Layout from JSON into PDF",
-      "filename": "import-form-field-layout-from-json.cs",
-      "description": "Shows how to read field definitions from a JSON file and add them to a newly created PDF using Aspose.Pdf's FormEditor.",
+    "import-pdf-form-layout-from-json": {
+      "title": "Import PDF Form Layout from JSON",
+      "filename": "import-pdf-form-layout-from-json.cs",
+      "description": "Creates a JSON layout file, deserializes it, and adds the defined form fields to a new PDF document using Aspose.Pdf.",
       "tags": [
-        "json",
-        "form-fields",
         "pdf",
-        "aspose",
-        "csharp"
+        "form",
+        "json",
+        "layout",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.FormEditor",
-        "Aspose.Pdf.Facades.FormEditor.BindPdf",
         "Aspose.Pdf.Facades.FormEditor.AddField",
-        "Aspose.Pdf.Facades.FormEditor.Save"
+        "Aspose.Pdf.Facades.FieldType"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-07-18T00:58:56Z",
+      "generated_at": "2026-08-20T07:51:01Z",
       "status": "verified"
     }
   }

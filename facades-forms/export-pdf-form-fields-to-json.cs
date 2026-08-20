@@ -2,36 +2,35 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class ExportFormFieldsToJson
+class Program
 {
     static void Main()
     {
-        // Input PDF containing the form
+        // Path to the source PDF containing the form
         const string pdfPath = "input.pdf";
 
-        // Output JSON file that will receive the exported form field definitions
-        const string jsonPath = "formFields.json";
+        // Path where the exported JSON will be saved
+        const string jsonPath = "form_fields.json";
 
-        // Verify that the source PDF exists
+        // Ensure the PDF file exists before proceeding
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – {pdfPath}");
+            Console.Error.WriteLine($"Error: PDF file not found at '{pdfPath}'.");
             return;
         }
 
-        // Use the Facade Form class to work with AcroForm data.
-        // The constructor loads the PDF document internally.
+        // Initialize the Form facade with the PDF document
         using (Form form = new Form(pdfPath))
         {
-            // Create a writable file stream for the JSON output.
+            // Create a file stream for the JSON output (overwrite if exists)
             using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
             {
-                // Export all form fields to JSON.
-                // The second parameter (true) requests indented (pretty‑printed) JSON.
-                form.ExportJson(jsonStream, indented: true);
+                // Export all form field definitions to JSON.
+                // The second parameter 'true' enables indented (pretty‑printed) output.
+                form.ExportJson(jsonStream, true);
             }
         }
 
-        Console.WriteLine($"Form fields exported to JSON file: {jsonPath}");
+        Console.WriteLine($"Form fields exported to JSON at '{jsonPath}'.");
     }
 }

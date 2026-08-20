@@ -8,48 +8,55 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_moved_fields.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_moved.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF with the core API to read existing field rectangles
-        using (Document doc = new Document(inputPdf))
-        // Use FormEditor (Facades) to modify field positions and save the result
-        using (FormEditor formEditor = new FormEditor())
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Bind the same PDF file to the FormEditor
-            formEditor.BindPdf(inputPdf);
-
-            // Iterate over all form fields using the Fields collection
-            foreach (Field field in doc.Form.Fields)
+            // Bind a FormEditor to the loaded document
+            using (FormEditor editor = new FormEditor())
             {
-                if (field == null) continue;
+                editor.BindPdf(doc);
 
-                // The field name is stored in PartialName
-                string fieldName = field.PartialName;
+                // Offset to apply to each field (10 points right, 15 points up)
+                const float offsetX = 10f;
+                const float offsetY = 15f;
 
-                // Current rectangle coordinates
-                var rect = field.Rect;
-                if (rect == null) continue;
+                // Iterate over all form fields in the document
+                foreach (Field field in doc.Form.Fields)
+                {
+                    // Full name of the field (required by MoveField)
+                    string fieldName = field.FullName;
 
-                float newLlx = (float)rect.LLX + 10f;
-                float newLly = (float)rect.LLY + 15f;
-                float newUrx = (float)rect.URX + 10f;
-                float newUry = (float)rect.URY + 15f;
+                    // Current rectangle of the field (LLX, LLY, URX, URY are doubles)
+                    Aspose.Pdf.Rectangle rect = field.Rect;
 
-                // Move the field to the new position
-                formEditor.MoveField(fieldName, newLlx, newLly, newUrx, newUry);
+                    // Compute new rectangle coordinates with the offset, casting doubles to float
+                    float newLlx = (float)rect.LLX + offsetX;
+                    float newLly = (float)rect.LLY + offsetY;
+                    float newUrx = (float)rect.URX + offsetX;
+                    float newUry = (float)rect.URY + offsetY;
+
+                    // Move the field to the new position
+                    editor.MoveField(fieldName, newLlx, newLly, newUrx, newUry);
+                }
+
+                // Save changes made by the FormEditor back to the document
+                // The parameter‑less Save() is obsolete; using the overload that saves to the bound document.
+                editor.Save();
             }
 
             // Save the updated PDF
-            formEditor.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Form fields moved and saved to '{outputPdf}'.");
+        Console.WriteLine($"Form fields moved and saved to '{outputPath}'.");
     }
 }

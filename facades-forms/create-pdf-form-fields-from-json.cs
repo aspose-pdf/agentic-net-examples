@@ -7,24 +7,24 @@ using Aspose.Pdf.Facades;
 
 namespace PdfFormFromJson
 {
-    // Represents a field definition read from the JSON file
+    // Represents a single field definition as described in the JSON input.
     public class FieldDefinition
     {
-        public string Name { get; set; }          // Full field name
-        public string Type { get; set; }          // e.g., "Text", "CheckBox", "Radio", "ListBox", "ComboBox"
-        public int Page { get; set; }             // 1‑based page number
-        public float Llx { get; set; }            // Lower‑left X
-        public float Lly { get; set; }            // Lower‑left Y
-        public float Urx { get; set; }            // Upper‑right X
-        public float Ury { get; set; }            // Upper‑right Y
+        public string FieldType { get; set; }   // e.g., "Text", "CheckBox", "Radio", etc.
+        public string Name { get; set; }        // Full field name.
+        public int Page { get; set; }           // 1‑based page number.
+        public float Llx { get; set; }          // Lower‑left X coordinate.
+        public float Lly { get; set; }          // Lower‑left Y coordinate.
+        public float Urx { get; set; }          // Upper‑right X coordinate.
+        public float Ury { get; set; }          // Upper‑right Y coordinate.
     }
 
     class Program
     {
         static void Main()
         {
-            const string jsonPath   = "fields.json";          // Input JSON with field definitions
-            const string outputPath = "output.pdf";           // Resulting PDF file
+            const string jsonPath   = "fields.json";      // Input JSON file with field definitions.
+            const string outputPath = "output.pdf";       // Resulting PDF file.
 
             if (!File.Exists(jsonPath))
             {
@@ -32,7 +32,7 @@ namespace PdfFormFromJson
                 return;
             }
 
-            // Deserialize JSON into a list of field definitions
+            // Deserialize the JSON array into a list of FieldDefinition objects.
             List<FieldDefinition> fields;
             try
             {
@@ -46,54 +46,45 @@ namespace PdfFormFromJson
                 return;
             }
 
-            // Create a new PDF document and add a blank page for each distinct page number used
+            // Create a new blank PDF document and add a single page (more pages will be added on demand).
             using (Document doc = new Document())
             {
-                // Determine the highest page number required
-                int maxPage = 0;
-                foreach (var f in fields)
-                    if (f.Page > maxPage) maxPage = f.Page;
+                // Ensure at least one page exists; additional pages will be created as needed.
+                doc.Pages.Add();
 
-                // Ensure the document has enough pages (Aspose.Pdf uses 1‑based indexing)
-                for (int i = 1; i <= maxPage; i++)
-                    doc.Pages.Add();
+                // FormEditor works on the Document instance.
+                FormEditor formEditor = new FormEditor(doc);
 
-                // Use FormEditor (Facades API) to add fields to the document
-                using (FormEditor formEditor = new FormEditor(doc))
+                foreach (var def in fields)
                 {
-                    foreach (var f in fields)
+                    // Convert the string representation of the field type to the Aspose enum.
+                    if (!Enum.TryParse(typeof(FieldType), def.FieldType, true, out var enumValue))
                     {
-                        // Map string type to FieldType enum; default to Text if unknown
-                        FieldType fieldType = f.Type?.ToLowerInvariant() switch
-                        {
-                            "textbox"   => FieldType.Text,
-                            "text"      => FieldType.Text,
-                            "checkbox"  => FieldType.CheckBox,
-                            "check"     => FieldType.CheckBox,
-                            "radio"     => FieldType.Radio,
-                            "listbox"   => FieldType.ListBox,
-                            "combobox"  => FieldType.ComboBox,
-                            _ => FieldType.Text
-                        };
-
-                        // Add the field; AddField returns bool indicating success
-                        bool added = formEditor.AddField(fieldType,
-                                                         f.Name,
-                                                         f.Page,
-                                                         f.Llx,
-                                                         f.Lly,
-                                                         f.Urx,
-                                                         f.Ury);
-                        if (!added)
-                        {
-                            Console.Error.WriteLine($"Failed to add field '{f.Name}' on page {f.Page}");
-                        }
+                        Console.Error.WriteLine($"Unsupported field type: {def.FieldType}");
+                        continue;
                     }
 
-                    // No explicit Save on FormEditor; saving the underlying Document persists changes
+                    // Ensure the target page exists; add blank pages if necessary.
+                    while (doc.Pages.Count < def.Page)
+                    {
+                        doc.Pages.Add();
+                    }
+
+                    // Add the field to the document.
+                    bool added = formEditor.AddField((FieldType)enumValue,
+                                                     def.Name,
+                                                     def.Page,
+                                                     def.Llx,
+                                                     def.Lly,
+                                                     def.Urx,
+                                                     def.Ury);
+                    if (!added)
+                    {
+                        Console.Error.WriteLine($"Failed to add field: {def.Name}");
+                    }
                 }
 
-                // Save the resulting PDF
+                // Save the resulting PDF.
                 doc.Save(outputPath);
             }
 

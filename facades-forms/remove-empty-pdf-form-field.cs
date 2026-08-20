@@ -17,26 +17,33 @@ class Program
         }
 
         // Read the current value of the field using the Form facade
-        Form form = new Form(inputPath);
-        string fieldValue = form.GetField(fieldName);
-        form.Close(); // release resources
+        string fieldValue;
+        using (Form form = new Form(inputPath))
+        {
+            // GetField returns null if the field does not exist
+            fieldValue = form.GetField(fieldName);
+        }
 
-        // If the field is empty (no user input), remove it with FormEditor
+        // Remove the field only when it is empty or missing
         if (string.IsNullOrEmpty(fieldValue))
         {
-            // FormEditor is initialized with source and destination files
-            FormEditor editor = new FormEditor(inputPath, outputPath);
-            editor.RemoveField(fieldName); // delete the empty field
-            editor.Save();                 // persist changes to outputPath
-            editor.Close();                // clean up
+            using (FormEditor editor = new FormEditor())
+            {
+                // Bind the source PDF
+                editor.BindPdf(inputPath);
 
-            Console.WriteLine($"Field '{fieldName}' was empty and has been removed. Saved to '{outputPath}'.");
+                // Remove the specified field
+                editor.RemoveField(fieldName);
+
+                // Save the modified PDF
+                editor.Save(outputPath);
+            }
+
+            Console.WriteLine($"Field \"{fieldName}\" removed. Output saved to \"{outputPath}\".");
         }
         else
         {
-            // Field contains data; simply copy the original PDF to the output location
-            File.Copy(inputPath, outputPath, true);
-            Console.WriteLine($"Field '{fieldName}' contains data; no removal performed.");
+            Console.WriteLine($"Field \"{fieldName}\" contains data. No removal performed.");
         }
     }
 }

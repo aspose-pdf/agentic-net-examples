@@ -1,78 +1,102 @@
 using System;
-using System.Linq;
+using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_renamed.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
 
         // ------------------------------------------------------------
-        // Create a minimal PDF with a form field so the example can run
-        // in the sandbox where no external files exist.
+        // Create a self‑contained PDF with a few sample form fields.
         // ------------------------------------------------------------
-        using (Document seed = new Document())
+        using (Document doc = new Document())
         {
-            // Add a page
-            Page page = seed.Pages.Add();
+            // Add a page.
+            Page page = doc.Pages.Add();
 
-            // Define a rectangle for the field (left, bottom, right, top)
-            var fieldRect = new Aspose.Pdf.Rectangle(100, 700, 250, 720);
-
-            // Create a text box form field with a non‑camelCase name
-            TextBoxField txtField = new TextBoxField(page, fieldRect)
+            // Add a text box field named "First_Name".
+            TextBoxField txt = new TextBoxField(page, new Rectangle(100, 600, 300, 620))
             {
-                PartialName = "First_Name", // example name to be converted to camelCase
-                Value = "John Doe"
+                PartialName = "First_Name",
+                Value = "Sample"
             };
-            // Add the field to the document's form collection
-            seed.Form.Add(txtField);
+            doc.Form.Add(txt, 1);
 
-            // Save the seed PDF that will be used as input
-            seed.Save(inputPath);
-        }
-
-        // Load the PDF document that contains the form fields
-        using (Document doc = new Document(inputPath))
-        {
-            // Retrieve all form field names via the Form.Fields collection
-            var fieldNames = doc.Form.Fields
-                .OfType<Field>()
-                .Select(f => f.PartialName)
-                .ToArray();
-
-            // Initialize the FormEditor for batch renaming
-            using (FormEditor editor = new FormEditor(doc))
+            // Add another field with a different naming style.
+            TextBoxField txt2 = new TextBoxField(page, new Rectangle(100, 560, 300, 580))
             {
-                foreach (string oldName in fieldNames)
-                {
-                    string newName = ToCamelCase(oldName);
-                    if (!string.Equals(oldName, newName, StringComparison.Ordinal))
-                    {
-                        // Rename each field to its camelCase version
-                        editor.RenameField(oldName, newName);
-                    }
-                }
+                PartialName = "last-name",
+                Value = "Example"
+            };
+            doc.Form.Add(txt2, 1);
 
-                // Save the updated PDF
-                editor.Save(outputPath);
-            }
+            // Save the seed PDF that will be processed.
+            doc.Save(inputPdf);
         }
 
-        Console.WriteLine($"Fields renamed and saved to '{outputPath}'.");
+        // ------------------------------------------------------------
+        // Rename all form fields to camelCase using FormEditor.
+        // ------------------------------------------------------------
+        using (FormEditor editor = new FormEditor())
+        {
+            // Bind the PDF that contains the form fields.
+            editor.BindPdf(inputPdf);
+
+            // Load the same PDF as a Document to enumerate the fields.
+            Document doc = new Document(inputPdf);
+
+            foreach (Field field in doc.Form.Fields)
+            {
+                string oldName = field.PartialName;
+                string newName = ToCamelCase(oldName);
+                // Skip if the name is already camelCase.
+                if (!oldName.Equals(newName, StringComparison.Ordinal))
+                {
+                    editor.RenameField(oldName, newName);
+                }
+            }
+
+            // Save the updated PDF to the desired output path.
+            editor.Save(outputPdf);
+        }
+
+        Console.WriteLine($"Fields renamed and saved to '{outputPdf}'.");
     }
 
-    // Simple camelCase conversion: lower the first character
+    // Simple camelCase conversion: lower first character, keep the rest.
+    // If the name contains underscores, spaces or hyphens, they are removed and the following
+    // segment starts with an uppercase letter (e.g., "First_Name" -> "firstName").
     static string ToCamelCase(string input)
     {
-        if (string.IsNullOrEmpty(input) || char.IsLower(input[0]))
+        if (string.IsNullOrEmpty(input))
             return input;
 
-        return char.ToLowerInvariant(input[0]) + input.Substring(1);
+        // Split on non‑alphanumeric characters.
+        string[] parts = input.Split(new[] { '_', ' ', '-' }, StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 0)
+            return input;
+
+        StringBuilder sb = new StringBuilder();
+
+        // First part: lower case first character.
+        sb.Append(char.ToLowerInvariant(parts[0][0]));
+        if (parts[0].Length > 1)
+            sb.Append(parts[0].Substring(1));
+
+        // Remaining parts: capitalize first character.
+        for (int i = 1; i < parts.Length; i++)
+        {
+            if (parts[i].Length == 0) continue;
+            sb.Append(char.ToUpperInvariant(parts[i][0]));
+            if (parts[i].Length > 1)
+                sb.Append(parts[i].Substring(1));
+        }
+
+        return sb.ToString();
     }
 }
