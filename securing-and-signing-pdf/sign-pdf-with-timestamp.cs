@@ -3,62 +3,61 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class Program
+class SignPdfWithTimestamp
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "signed_timestamp.pdf";
-        const string certPath = "certificate.pfx";
-        const string certPassword = "password";
-        const string tsaUrl = "https://tsa.example.com";
-        const string tsaCredentials = "user:pass";
+        // Input PDF, output PDF, and signing certificate (PFX) details
+        const string inputPdfPath   = "input.pdf";
+        const string outputPdfPath  = "signed_with_timestamp.pdf";
+        const string pfxPath        = "certificate.pfx";
+        const string pfxPassword    = "pfxPassword";
 
-        if (!File.Exists(inputPath))
+        // Timestamp Authority (TSA) server URL and optional basic authentication credentials
+        const string tsaServerUrl          = "https://tsa.example.com";
+        const string tsaBasicAuthCreds     = ""; // format "username:password" or empty if not required
+
+        // Ensure the input files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(certPath))
+        if (!File.Exists(pfxPath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {certPath}");
+            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
             return;
         }
 
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Define the rectangle for the visible signature (llx, lly, urx, ury)
-            Rectangle rect = new Rectangle(100, 100, 250, 150);
+            // Create a signature field on the first page (coordinates are in points)
+            // Use fully qualified Rectangle to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            SignatureField signatureField = new SignatureField(doc.Pages[1], sigRect);
+            doc.Form.Add(signatureField);
 
-            // Create a signature field and add it to the first page of the document
-            SignatureField sigField = new SignatureField(doc.Pages[1], rect)
-            {
-                PartialName = "Signature1"
-            };
-            doc.Form.Add(sigField, 1);
+            // Initialize a PKCS#7 signature object using the PFX certificate
+            PKCS7 pkcs7Signature = new PKCS7(pfxPath, pfxPassword);
 
-            // Create a PKCS7 signature object using the certificate
-            PKCS7 pkcs7 = new PKCS7(certPath, certPassword)
-            {
-                Reason = "Signed with timestamp",
-                ContactInfo = "contact@example.com",
-                Location = "Head Office"
-            };
-
-            // Configure timestamp settings
-            TimestampSettings tsSettings = new TimestampSettings(
-                tsaUrl,
-                tsaCredentials,
+            // Configure timestamp settings (server URL, optional basic auth, hash algorithm)
+            pkcs7Signature.TimestampSettings = new TimestampSettings(
+                tsaServerUrl,
+                tsaBasicAuthCreds,
                 DigestHashAlgorithm.Sha256);
-            pkcs7.TimestampSettings = tsSettings;
 
-            // Sign the signature field
-            sigField.Sign(pkcs7);
+            // Optional: set additional signature properties (reason, location, etc.)
+            pkcs7Signature.Reason   = "Document approved";
+            pkcs7Signature.Location = "Company HQ";
 
-            // Save the signed PDF
-            doc.Save(outputPath);
+            // Sign the document using the signature field
+            signatureField.Sign(pkcs7Signature);
+
+            // Save the signed PDF (lifecycle rule: save inside using block)
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF signed and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF signed and timestamped successfully: {outputPdfPath}");
     }
 }

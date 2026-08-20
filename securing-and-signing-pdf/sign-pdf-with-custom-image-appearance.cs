@@ -7,73 +7,54 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";          // source PDF
-        const string outputPdfPath  = "signed_output.pdf";  // signed PDF
-        const string certPfxPath    = "certificate.pfx";    // signing certificate
-        const string certPassword   = "pfxPassword";        // certificate password
-        const string signatureImgPath = "signature.png";    // custom graphic for appearance
+        // Input PDF, certificate (PFX) and image for the visible signature
+        const string pdfPath      = "input.pdf";
+        const string pfxPath      = "certificate.pfx";
+        const string pfxPassword  = "yourPfxPassword";
+        const string imagePath    = "signature.png";
+        const string outputPath   = "signed_output.pdf";
 
         // Verify required files exist
-        if (!File.Exists(inputPdfPath) ||
-            !File.Exists(certPfxPath) ||
-            !File.Exists(signatureImgPath))
+        if (!File.Exists(pdfPath) || !File.Exists(pfxPath) || !File.Exists(imagePath))
         {
             Console.Error.WriteLine("One or more required files are missing.");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document (lifecycle rule: use using for disposal)
+        using (Document doc = new Document(pdfPath))
         {
-            // Choose the page where the signature will be placed (first page in this example)
-            Page page = pdfDoc.Pages[1];
+            // Define the rectangle where the signature field will be placed (coordinates in points)
+            // Adjust values as needed for your layout
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
 
-            // Define the rectangle for the signature field (left, bottom, width, height)
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 200, 50);
+            // Create a signature field on the first page
+            SignatureField sigField = new SignatureField(doc, rect);
+            doc.Pages[1].Annotations.Add(sigField);
 
-            // Create the signature field and add it to the page annotations
-            SignatureField sigField = new SignatureField(page, sigRect);
-            page.Annotations.Add(sigField);
-
-            // Prepare the PKCS#1 signature object with the custom image
-            using (FileStream imgStream = File.OpenRead(signatureImgPath))
+            // Load the image that will be used as the visible appearance
+            using (FileStream imgStream = File.OpenRead(imagePath))
             {
+                // PKCS1 constructor with image stream defines the custom appearance
                 PKCS1 pkcs1Signature = new PKCS1(imgStream);
 
-                // Set optional signature properties
-                pkcs1Signature.Reason = "Approved";
+                // Optional: set additional signature properties
+                pkcs1Signature.Reason   = "I agree to the terms.";
                 pkcs1Signature.Location = "New York, USA";
                 pkcs1Signature.ContactInfo = "contact@example.com";
-                pkcs1Signature.Date = DateTime.Now;
 
-                // Load the certificate (pfx) and associate it with the signature
-                using (FileStream pfxStream = File.OpenRead(certPfxPath))
+                // Load the certificate (PFX) as a stream
+                using (FileStream pfxStream = File.OpenRead(pfxPath))
                 {
-                    // The PKCS1 constructor that accepts only the image does not include the certificate.
-                    // Therefore we sign using the overload that takes the certificate stream.
-                    // Create a PKCS1 signature that includes both image and certificate.
-                    PKCS1 pkcs1WithCert = new PKCS1(pfxStream, certPassword);
-                    // Apply the custom image to the signature appearance
-                    pkcs1WithCert.CustomAppearance = new SignatureCustomAppearance
-                    {
-                        // The image is already set via the constructor; no further action needed.
-                        // If you need to adjust appearance, configure properties here.
-                    };
-                    // Copy the previously set properties
-                    pkcs1WithCert.Reason = pkcs1Signature.Reason;
-                    pkcs1WithCert.Location = pkcs1Signature.Location;
-                    pkcs1WithCert.ContactInfo = pkcs1Signature.ContactInfo;
-                    pkcs1WithCert.Date = pkcs1Signature.Date;
-
-                    // Sign the document using the signature field
-                    sigField.Sign(pkcs1WithCert);
+                    // Sign the field using the PKCS1 signature (appearance) and the certificate stream
+                    sigField.Sign(pkcs1Signature, pfxStream, pfxPassword);
                 }
             }
 
-            // Save the signed PDF
-            pdfDoc.Save(outputPdfPath);
+            // Save the signed PDF (lifecycle rule: save inside using block)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF signed successfully and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF signed successfully. Output saved to '{outputPath}'.");
     }
 }

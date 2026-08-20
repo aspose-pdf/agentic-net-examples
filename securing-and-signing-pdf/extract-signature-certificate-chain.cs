@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "signed.pdf";
+        const string inputPath = "signed_document.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,7 +16,7 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document (using the recommended lifecycle pattern)
         using (Document doc = new Document(inputPath))
         {
             // Iterate over all fields and process only signature fields
@@ -24,42 +24,41 @@ class Program
             {
                 if (field is SignatureField sigField)
                 {
-                    // Extract the X.509 certificate object from the signature field
+                    // Extract the X509 certificate object from the signature field
                     X509Certificate2 cert = sigField.ExtractCertificateObject();
 
                     if (cert == null)
                     {
-                        Console.WriteLine($"No certificate found in signature field: {sigField.PartialName}");
+                        Console.WriteLine($"Signature field '{sigField.PartialName}' does not contain a certificate.");
                         continue;
                     }
 
                     Console.WriteLine($"Signature field: {sigField.PartialName}");
-                    Console.WriteLine($"Subject: {cert.Subject}");
-                    Console.WriteLine($"Issuer : {cert.Issuer}");
-                    Console.WriteLine($"Valid From: {cert.NotBefore}");
-                    Console.WriteLine($"Valid To  : {cert.NotAfter}");
-                    Console.WriteLine();
+                    Console.WriteLine($"  Subject: {cert.Subject}");
+                    Console.WriteLine($"  Issuer : {cert.Issuer}");
+                    Console.WriteLine($"  Valid From: {cert.NotBefore}");
+                    Console.WriteLine($"  Valid To  : {cert.NotAfter}");
+                    Console.WriteLine($"  Expired?  : {(DateTime.UtcNow > cert.NotAfter ? "Yes" : "No")}");
 
-                    // Build the certificate chain for the extracted certificate
+                    // Build the certificate chain for this certificate
                     using (X509Chain chain = new X509Chain())
                     {
-                        // Build the chain using the default policy (revocation checks are optional)
+                        // Use default chain policy; you can customize if needed
                         chain.Build(cert);
 
-                        // Iterate over each element in the chain
+                        Console.WriteLine($"  Chain elements count: {chain.ChainElements.Count}");
+
                         for (int i = 0; i < chain.ChainElements.Count; i++)
                         {
-                            X509Certificate2 elementCert = chain.ChainElements[i].Certificate;
-                            bool isExpired = elementCert.NotAfter < DateTime.UtcNow;
-
-                            Console.WriteLine($"Chain element {i + 1}:");
-                            Console.WriteLine($"  Subject: {elementCert.Subject}");
-                            Console.WriteLine($"  Issuer : {elementCert.Issuer}");
-                            Console.WriteLine($"  Valid To: {elementCert.NotAfter} {(isExpired ? "(EXPIRED)" : "(valid)")}");
+                            X509Certificate2 chainCert = chain.ChainElements[i].Certificate;
+                            Console.WriteLine($"    Chain [{i}] Subject: {chainCert.Subject}");
+                            Console.WriteLine($"    Chain [{i}] Issuer : {chainCert.Issuer}");
+                            Console.WriteLine($"    Chain [{i}] Valid To: {chainCert.NotAfter}");
+                            Console.WriteLine($"    Chain [{i}] Expired? : {(DateTime.UtcNow > chainCert.NotAfter ? "Yes" : "No")}");
                         }
-
-                        Console.WriteLine();
                     }
+
+                    Console.WriteLine(); // blank line between signatures
                 }
             }
         }
