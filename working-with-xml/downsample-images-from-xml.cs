@@ -7,8 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string xmlPath = "input.xml";
-        const string outputPdf = "optimized_output.pdf";
+        const string xmlPath      = "input.xml";   // XML that references images
+        const string outputPdf    = "optimized.pdf";
+        const int   maxResolution = 150; // DPI – images above this will be down‑sampled
 
         if (!File.Exists(xmlPath))
         {
@@ -18,18 +19,16 @@ class Program
 
         try
         {
-            // Load XML and create a PDF document from it
+            // Load the XML and create a PDF document from it
             using (Document doc = new Document())
             {
-                doc.BindXml(xmlPath);
+                doc.BindXml(xmlPath); // XML → PDF
 
-                // Set up optimization options: downsample images with resolution higher than 150 DPI
-                OptimizationOptions opt = new OptimizationOptions
-                {
-                    MaxResoultion = 150 // downsample threshold (DPI)
-                };
+                // Configure optimization: down‑sample images exceeding maxResolution DPI
+                OptimizationOptions opt = new OptimizationOptions();
+                opt.MaxResoultion = maxResolution; // note: property name is MaxResoultion (typo in API)
 
-                // Apply the optimization (downsampling + resource cleanup)
+                // Apply the optimization (removes unused resources, merges duplicates, down‑samples)
                 doc.OptimizeResources(opt);
 
                 // Save the optimized PDF

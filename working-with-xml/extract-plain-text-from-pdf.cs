@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string outputTxt = "extracted.txt";
+        const string pdfPath = "input.pdf";          // PDF generated from XML
+        const string outputPath = "extracted.txt";   // Plain‑text output for indexing
 
         if (!File.Exists(pdfPath))
         {
@@ -16,24 +16,25 @@ class Program
             return;
         }
 
-        // Load the PDF document (generated from XML) inside a using block for proper disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(pdfPath))
         {
-            // Set extraction options to obtain plain text (Pure formatting mode)
-            TextExtractionOptions extractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+            // Set extraction options to plain text (no layout formatting)
+            TextExtractionOptions extractionOptions = new TextExtractionOptions(
+                TextExtractionOptions.TextFormattingMode.Pure);
 
-            // Create a TextAbsorber with the specified options
+            // Create the absorber with the options
             TextAbsorber absorber = new TextAbsorber(extractionOptions);
 
-            // Extract text from all pages of the document
+            // Extract text from all pages
             doc.Pages.Accept(absorber);
 
             // Retrieve the extracted text
             string extractedText = absorber.Text;
 
-            // Save the plain text to a file for indexing purposes
-            File.WriteAllText(outputTxt, extractedText);
-            Console.WriteLine($"Text extracted to '{outputTxt}'.");
+            // Write the plain text to a file (or any other storage)
+            File.WriteAllText(outputPath, extractedText);
+            Console.WriteLine($"Plain text extracted to '{outputPath}'.");
         }
     }
 }

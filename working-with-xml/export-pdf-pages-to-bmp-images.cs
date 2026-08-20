@@ -1,45 +1,50 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // Image devices (BmpDevice, Resolution, etc.)
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath   = "input.xml";          // Source XML file
-        const string outputDir = "PageImages";         // Folder for exported images
+        // Path to the source XML file that will be transformed into a PDF.
+        const string xmlPath = "input.xml";
 
-        // Verify that the XML source exists
+        // Directory where each page image will be saved.
+        const string outputDir = "PageImages";
+
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure the output directory exists.
         Directory.CreateDirectory(outputDir);
 
-        // Create a PDF document from the XML content
+        // Load the XML and create a PDF document from it.
         using (Document pdfDoc = new Document())
         {
-            // Bind the XML to the document – this generates the PDF structure
+            // Bind the XML content to the document.
             pdfDoc.BindXml(xmlPath);
 
-            // Configure image resolution (e.g., 300 DPI) for the exported images
+            // Optional: save the generated PDF if you need it.
+            // pdfDoc.Save(Path.Combine(outputDir, "generated.pdf"));
+
+            // Prepare an image device – BMP format with 300 DPI resolution.
             Resolution resolution = new Resolution(300);
             BmpDevice bmpDevice = new BmpDevice(resolution);
 
-            // Export each page as a separate BMP image file
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++) // 1‑based indexing
+            // Export each page as a separate BMP image file.
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
-                string outPath = Path.Combine(outputDir, $"page_{pageNum}.bmp");
-                using (FileStream outStream = new FileStream(outPath, FileMode.Create))
+                string imagePath = Path.Combine(outputDir, $"page_{pageNum}.bmp");
+                using (FileStream imgStream = new FileStream(imagePath, FileMode.Create))
                 {
-                    // Convert the specific page to BMP and write to the stream
-                    bmpDevice.Process(pdfDoc.Pages[pageNum], outStream);
+                    // Convert the current page to an image and write it to the stream.
+                    bmpDevice.Process(pdfDoc.Pages[pageNum], imgStream);
                 }
-                Console.WriteLine($"Saved page {pageNum} → {outPath}");
+                Console.WriteLine($"Saved page {pageNum} as {imagePath}");
             }
         }
     }

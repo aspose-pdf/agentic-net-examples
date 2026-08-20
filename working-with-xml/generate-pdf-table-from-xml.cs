@@ -1,61 +1,65 @@
 using System;
 using System.Data;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core PDF API
+using Aspose.Pdf.Text;          // For text-related types if needed
 
-class ReportGenerator
+class Program
 {
     static void Main()
     {
-        // Paths for input XML and output PDF
-        const string xmlPath = "report_data.xml";
-        const string pdfPath = "report.pdf";
+        const string xmlPath = "report.xml";   // Input XML containing tabular data
+        const string pdfPath = "report.pdf";   // Output PDF file
 
+        // Verify that the XML source exists
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Load the XML into a DataSet (tabular data)
+        // Load the XML into a DataSet; the first DataTable is assumed to hold the report data
         DataSet dataSet = new DataSet();
         dataSet.ReadXml(xmlPath);
-
-        // Assume the first DataTable contains the data to report
         if (dataSet.Tables.Count == 0)
         {
             Console.Error.WriteLine("No tables found in the XML file.");
             return;
         }
 
-        DataTable tableData = dataSet.Tables[0];
+        DataTable dataTable = dataSet.Tables[0];   // Use the first table
 
-        // Create a new PDF document
+        // Create a new PDF document (lifecycle: create)
         using (Document pdfDoc = new Document())
         {
-            // Add a page to the document
+            // Add a single page to host the table
             Page page = pdfDoc.Pages.Add();
 
-            // Create a Table object
-            Table pdfTable = new Table();
+            // Instantiate a Table object (lifecycle: create)
+            Table table = new Table
+            {
+                // Optional visual styling
+                Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black),
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Gray),
+                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
+                // Column widths can be set via table.ColumnWidths if required
+            };
 
-            // Optional: set table appearance
-            // Use BorderInfo (the correct class for table borders in recent Aspose.Pdf versions)
-            pdfTable.DefaultCellBorder = new BorderInfo(BorderSide.All);
-            pdfTable.DefaultCellPadding = new MarginInfo(5, 5, 5, 5);
-            pdfTable.Alignment = HorizontalAlignment.Center;
+            // Import the DataTable into the Aspose.Pdf.Table
+            // Parameters:
+            //   dataTable                – source data
+            //   true                     – import column names as the first row
+            //   0                        – start at the first row of the PDF table (zero‑based)
+            //   0                        – start at the first column of the PDF table (zero‑based)
+            table.ImportDataTable(dataTable, true, 0, 0);
 
-            // Import the DataTable into the PDF table.
-            // Parameters: (DataTable, import column names, first row, first column)
-            pdfTable.ImportDataTable(tableData, true, 0, 0);
+            // Add the populated table to the page's paragraph collection
+            page.Paragraphs.Add(table);
 
-            // Add the table to the page
-            page.Paragraphs.Add(pdfTable);
-
-            // Save the PDF document
+            // Save the PDF document to disk (lifecycle: save)
             pdfDoc.Save(pdfPath);
         }
 
-        Console.WriteLine($"Report generated: {pdfPath}");
+        Console.WriteLine($"PDF report generated successfully: {pdfPath}");
     }
 }

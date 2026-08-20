@@ -6,18 +6,19 @@ class Program
 {
     static void Main()
     {
-        // Paths to the input XML file and the output PDF file.
-        const string xmlPath = "input.xml";
-        const string pdfPath = "output.pdf";
+        // Paths to the input XML and the output PDF.
+        string dataDir = @"YOUR_DATA_DIRECTORY";
+        string xmlPath = Path.Combine(dataDir, "input.xml");
+        string pdfPath = Path.Combine(dataDir, "output.pdf");
 
         // Verify that the XML file exists.
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"Error: XML file not found at '{xmlPath}'.");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Initialize load options for XML without providing an explicit XSLT file.
+        // Initialize load options for XML without providing an XSL file.
         XmlLoadOptions loadOptions = new XmlLoadOptions();
 
         // Load the XML and convert it to a PDF document.
@@ -27,6 +28,6 @@ class Program
             pdfDocument.Save(pdfPath);
         }
 
-        Console.WriteLine($"PDF successfully created at '{pdfPath}'.");
+        Console.WriteLine($"PDF generated successfully at '{pdfPath}'.");
     }
 }

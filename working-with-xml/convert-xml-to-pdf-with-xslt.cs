@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // XmlLoadOptions and Document are in this namespace
 
 class Program
 {
@@ -8,7 +8,7 @@ class Program
     {
         // Paths to the source XML, the XSLT stylesheet, and the output PDF.
         const string xmlPath = "input.xml";
-        const string xslPath = "transform.xsl";
+        const string xslPath = "transform.xslt";
         const string pdfPath = "output.pdf";
 
         // Verify that the required files exist.
@@ -23,16 +23,17 @@ class Program
             return;
         }
 
-        // Create XmlLoadOptions with the XSLT file.
-        // This tells Aspose.Pdf to apply the stylesheet while loading the XML.
+        // Load the XML and apply the XSLT during loading using XmlLoadOptions.
+        // The constructor XmlLoadOptions(string xslFile) attaches the stylesheet.
         XmlLoadOptions loadOptions = new XmlLoadOptions(xslPath);
 
-        // Load the XML (with XSLT applied) and convert it to PDF.
+        // Create the PDF document from the XML + XSLT.
         using (Document pdfDocument = new Document(xmlPath, loadOptions))
         {
+            // Save the resulting PDF.
             pdfDocument.Save(pdfPath);
         }
 
-        Console.WriteLine($"PDF successfully created at '{pdfPath}'.");
+        Console.WriteLine($"PDF generated successfully at '{pdfPath}'.");
     }
 }

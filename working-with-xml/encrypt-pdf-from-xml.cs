@@ -25,13 +25,13 @@ class Program
         XmlLoadOptions loadOptions = new XmlLoadOptions();
         using (Document doc = new Document(xmlPath, loadOptions))
         {
-            // Define desired permissions (e.g., allow printing and content extraction)
+            // Define permissions for the encrypted PDF (allow printing and content extraction)
             Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-            // Apply password protection using AES-256 encryption
+            // Apply password protection using AES‑256 encryption
             doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // Save the encrypted PDF
+            // Save the encrypted PDF to the specified path
             doc.Save(pdfPath);
         }
 

@@ -7,41 +7,56 @@ class Program
 {
     static void Main()
     {
-        const string xmlPath = "layout.xml";
-        const string pdfPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdfPath  = "input.pdf";      // source PDF
+        const string layoutXmlPath = "layout.xml";     // XML with orientation info
+        const string outputPdfPath = "output.pdf";     // result PDF
 
-        // Verify input files exist
-        if (!File.Exists(xmlPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"XML layout file not found: {xmlPath}");
-            return;
-        }
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load XML layout and read the orientation attribute
-        XDocument layoutDoc = XDocument.Load(xmlPath);
-        // Expected format: <Layout orientation="landscape"/> (default to portrait)
-        string orientation = (string)layoutDoc.Root.Attribute("orientation") ?? "portrait";
-        bool isLandscape = string.Equals(orientation, "landscape", StringComparison.OrdinalIgnoreCase);
-
-        // Load the PDF document
-        using (Document pdfDoc = new Document(pdfPath))
+        if (!File.Exists(layoutXmlPath))
         {
-            // Apply the orientation to every page in the document
-            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+            Console.Error.WriteLine($"XML not found: {layoutXmlPath}");
+            return;
+        }
+
+        try
+        {
+            // Load the PDF document
+            using (Document doc = new Document(inputPdfPath))
             {
-                pdfDoc.Pages[i].PageInfo.IsLandscape = isLandscape;
+                // Load the XML layout definition
+                XDocument layoutDoc = XDocument.Load(layoutXmlPath);
+
+                // Iterate over each <Page> element in the XML
+                foreach (XElement pageElem in layoutDoc.Root.Elements("Page"))
+                {
+                    // Read the page number (1‑based) and desired orientation
+                    int pageNumber = (int?)pageElem.Attribute("number") ?? 0;
+                    string orientation = (string)pageElem.Attribute("orientation") ?? "portrait";
+
+                    // Validate page number
+                    if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+                        continue; // skip invalid page numbers
+
+                    // Set the page orientation based on the XML attribute
+                    // PageInfo.IsLandscape = true makes the page landscape; false makes it portrait
+                    doc.Pages[pageNumber].PageInfo.IsLandscape = 
+                        orientation.Equals("landscape", StringComparison.OrdinalIgnoreCase);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPdfPath);
             }
 
-            // Save the modified PDF
-            pdfDoc.Save(outputPath);
+            Console.WriteLine($"PDF saved with custom orientations to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Saved PDF with {(isLandscape ? "landscape" : "portrait")} orientation to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

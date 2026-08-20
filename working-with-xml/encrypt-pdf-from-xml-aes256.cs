@@ -6,29 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string xmlInputPath   = "input.xml";
-        const string pdfOutputPath  = "output.pdf";
-        const string userPassword   = "user123";
-        const string ownerPassword  = "owner123";
+        // Input XML file and output PDF file paths
+        const string xmlPath = "input.xml";
+        const string pdfPath = "encrypted_output.pdf";
 
-        if (!File.Exists(xmlInputPath))
+        // Passwords for encryption
+        const string userPassword = "user123";
+        const string ownerPassword = "owner123";
+
+        // Verify that the XML source exists
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlInputPath}");
+            Console.Error.WriteLine($"Error: XML file not found at '{xmlPath}'.");
             return;
         }
 
-        // Load XML and convert to PDF
+        // Load the XML document using XmlLoadOptions (no XSL required)
         XmlLoadOptions loadOptions = new XmlLoadOptions();
-        using (Document pdfDoc = new Document(xmlInputPath, loadOptions))
-        {
-            // Apply encryption with a strong algorithm
-            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-            pdfDoc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // Save encrypted PDF
-            pdfDoc.Save(pdfOutputPath);
+        // Open the document within a using block for deterministic disposal
+        using (Document doc = new Document(xmlPath, loadOptions))
+        {
+            // Define desired permissions (e.g., allow printing and content extraction)
+            Permissions permissions = Permissions.PrintDocument | Permissions.ExtractContent;
+
+            // Apply encryption with a strong algorithm (AES‑256)
+            doc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.AESx256);
+
+            // Save the encrypted PDF
+            doc.Save(pdfPath);
         }
 
-        Console.WriteLine($"Encrypted PDF saved to '{pdfOutputPath}'.");
+        Console.WriteLine($"Encrypted PDF successfully saved to '{pdfPath}'.");
     }
 }
