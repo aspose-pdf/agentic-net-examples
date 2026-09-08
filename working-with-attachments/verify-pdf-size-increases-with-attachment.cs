@@ -1,0 +1,12 @@
+// URL-STABILITY STUB
+//
+// verify pdf size increases with attachment
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/working-with-attachments/verify-pdf-size-increase-after-adding-file-attachment.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
+
+class Program { static void Main() { } }
