@@ -7,58 +7,78 @@ using Aspose.Pdf.Comparison;
 
 class Program
 {
-    // Entry point
-    static void Main()
+    // Represents a pair of PDF files to be compared.
+    private class PdfPair
     {
-        // Define PDF pairs to compare and their result files
-        var comparisons = new List<(string FileA, string FileB, string Result)>
-        {
-            ("doc1_a.pdf", "doc1_b.pdf", "doc1_result.pdf"),
-            ("doc2_a.pdf", "doc2_b.pdf", "doc2_result.pdf"),
-            ("doc3_a.pdf", "doc3_b.pdf", "doc3_result.pdf")
-        };
+        public string File1 { get; }
+        public string File2 { get; }
+        public string ResultPath { get; }
 
-        // Create a task for each comparison
-        var tasks = new List<Task>();
-        foreach (var item in comparisons)
+        public PdfPair(string file1, string file2, string resultPath)
         {
-            tasks.Add(Task.Run(() => CompareAndSave(item.FileA, item.FileB, item.Result)));
+            File1 = file1;
+            File2 = file2;
+            ResultPath = resultPath;
         }
-
-        // Wait for all comparisons to finish
-        Task.WaitAll(tasks.ToArray());
-
-        Console.WriteLine("All PDF comparisons have completed.");
     }
 
-    // Performs a side‑by‑side comparison of two PDFs and saves the result
-    static void CompareAndSave(string pathA, string pathB, string resultPath)
+    static void Main()
     {
-        // Verify input files exist
-        if (!File.Exists(pathA) || !File.Exists(pathB))
+        // Example input: list of PDF file pairs.
+        var pairs = new List<PdfPair>
         {
-            Console.Error.WriteLine($"Missing input file(s) for comparison: '{pathA}' or '{pathB}'.");
-            return;
+            new PdfPair("docA1.pdf", "docA2.pdf", "resultA.pdf"),
+            new PdfPair("docB1.pdf", "docB2.pdf", "resultB.pdf"),
+            new PdfPair("docC1.pdf", "docC2.pdf", "resultC.pdf")
+        };
+
+        // Validate that all source files exist before starting.
+        foreach (var p in pairs)
+        {
+            if (!File.Exists(p.File1))
+                Console.Error.WriteLine($"Source file not found: {p.File1}");
+            if (!File.Exists(p.File2))
+                Console.Error.WriteLine($"Source file not found: {p.File2}");
         }
 
-        try
+        // Create a list of tasks, each performing a comparison in its own thread.
+        var tasks = new List<Task>();
+
+        foreach (var pair in pairs)
         {
-            // Load both documents inside using blocks for deterministic disposal
-            using (Document docA = new Document(pathA))
-            using (Document docB = new Document(pathB))
+            // Capture the current pair for the lambda.
+            var currentPair = pair;
+
+            var task = Task.Run(() =>
             {
-                // Create default comparison options (customize if needed)
-                SideBySideComparisonOptions options = new SideBySideComparisonOptions();
+                try
+                {
+                    // Load the first document.
+                    using (Document doc1 = new Document(currentPair.File1))
+                    // Load the second document.
+                    using (Document doc2 = new Document(currentPair.File2))
+                    {
+                        // Configure side‑by‑side comparison options (default settings are fine).
+                        SideBySideComparisonOptions options = new SideBySideComparisonOptions();
 
-                // Perform the comparison; result is written to resultPath
-                SideBySidePdfComparer.Compare(docA, docB, resultPath, options);
-            }
+                        // Perform the comparison; the result is written directly to the target PDF file.
+                        SideBySidePdfComparer.Compare(doc1, doc2, currentPair.ResultPath, options);
+                    }
 
-            Console.WriteLine($"Compared '{Path.GetFileName(pathA)}' with '{Path.GetFileName(pathB)}' -> '{resultPath}'.");
+                    Console.WriteLine($"Comparison completed: {currentPair.ResultPath}");
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error comparing '{currentPair.File1}' and '{currentPair.File2}': {ex.Message}");
+                }
+            });
+
+            tasks.Add(task);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error comparing '{pathA}' and '{pathB}': {ex.Message}");
-        }
+
+        // Wait for all comparison tasks to finish.
+        Task.WaitAll(tasks.ToArray());
+
+        Console.WriteLine("All comparisons finished.");
     }
 }
