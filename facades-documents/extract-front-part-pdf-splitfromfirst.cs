@@ -6,14 +6,14 @@ class Program
 {
     static void Main()
     {
-        // Path to the source PDF file
+        // Input PDF file path
         const string inputPath = "input.pdf";
-        // Path where the extracted front part will be saved
+        // Output PDF file path (front part of the document)
         const string outputPath = "front_part.pdf";
-        // The page number up to which the PDF should be split (inclusive)
-        int endPage = 5;
+        // Page number up to which the document will be split (inclusive)
+        const int endPage = 5;
 
-        // Verify that the source file exists before attempting the operation
+        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
@@ -22,10 +22,10 @@ class Program
 
         try
         {
-            // PdfFileEditor does NOT implement IDisposable, so no using block is required
+            // PdfFileEditor does NOT implement IDisposable, so do NOT use a using block
             PdfFileEditor editor = new PdfFileEditor();
 
-            // SplitFromFirst extracts pages from the first page up to 'endPage' and saves them
+            // Split from the first page to the specified location and save the front part
             bool success = editor.SplitFromFirst(inputPath, endPage, outputPath);
 
             if (success)
@@ -35,7 +35,7 @@ class Program
         }
         catch (Exception ex)
         {
-            // Catch any unexpected errors and report them
+            // Handle any unexpected errors
             Console.Error.WriteLine($"Error during split operation: {ex.Message}");
         }
     }

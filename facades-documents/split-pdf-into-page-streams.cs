@@ -7,42 +7,40 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputDir = "SplitPages";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
-
-        // Open the source PDF as a read‑only stream
+        // Open the source PDF as a read‑only stream.
         using (FileStream sourceStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
         {
-            // PdfFileEditor provides the SplitToPages method that returns an array of MemoryStream,
-            // each containing a single‑page PDF document.
+            // PdfFileEditor does not implement IDisposable, so a plain instance is sufficient.
             PdfFileEditor editor = new PdfFileEditor();
+
+            // Split the PDF into individual pages.
+            // Each element of the returned array is a MemoryStream that contains a single‑page PDF.
             MemoryStream[] pageStreams = editor.SplitToPages(sourceStream);
 
-            // Iterate over the returned streams and write each page to a separate file.
+            // Optional: write each page to a separate file and dispose the streams.
             for (int i = 0; i < pageStreams.Length; i++)
             {
-                // Reset the position to the beginning before copying.
+                string outPath = $"page_{i + 1}.pdf";
+
+                // Reset position before copying.
                 pageStreams[i].Position = 0;
 
-                string outPath = Path.Combine(outputDir, $"page_{i + 1}.pdf");
                 using (FileStream outFile = new FileStream(outPath, FileMode.Create, FileAccess.Write))
                 {
                     pageStreams[i].CopyTo(outFile);
                 }
 
-                // Dispose the individual page stream after it has been saved.
-                pageStreams[i].Dispose();
-
                 Console.WriteLine($"Saved page {i + 1} to {outPath}");
+
+                // Release the memory used by the stream.
+                pageStreams[i].Dispose();
             }
         }
     }

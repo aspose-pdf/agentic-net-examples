@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using NUnit.Framework;
+using NUnit.Framework; // Added to bring NUnit stub types into scope
 
 // Minimal NUnit stubs to allow compilation when the NUnit package is not referenced.
 namespace NUnit.Framework
@@ -23,6 +23,10 @@ namespace NUnit.Framework
 
     public static class Assert
     {
+        /// <summary>
+        /// Executes the supplied delegate and returns the caught exception of type T.
+        /// Throws a generic Exception if no exception or a different exception type is thrown.
+        /// </summary>
         public static T Throws<T>(TestDelegate code) where T : Exception
         {
             try
@@ -47,27 +51,26 @@ namespace AsposePdfTests
     [TestFixture]
     public class PdfFileEditorDeleteTests
     {
-        private string? _inputPdfPath;
-        private string? _outputPdfPath;
+        private string? _tempDir;
+        private string? _inputPdf;
+        private string? _outputPdf;
 
-        // Set up a simple PDF with two pages before each test
+        // Set up a temporary folder and a simple 2‑page PDF before each test
         [SetUp]
         public void SetUp()
         {
-            // Create temporary file paths
-            _inputPdfPath = Path.Combine(Path.GetTempPath(), $"input_{Guid.NewGuid()}.pdf");
-            _outputPdfPath = Path.Combine(Path.GetTempPath(), $"output_{Guid.NewGuid()}.pdf");
+            _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(_tempDir!);
 
-            // Create a PDF document with two blank pages
+            _inputPdf = Path.Combine(_tempDir, "input.pdf");
+            _outputPdf = Path.Combine(_tempDir, "output.pdf");
+
+            // Create a PDF with two blank pages
             using (Document doc = new Document())
             {
-                // Add first page
-                doc.Pages.Add();
-                // Add second page
-                doc.Pages.Add();
-
-                // Save the document (required lifecycle rule: use Document.Save)
-                doc.Save(_inputPdfPath);
+                doc.Pages.Add(); // page 1
+                doc.Pages.Add(); // page 2
+                doc.Save(_inputPdf);
             }
         }
 
@@ -75,37 +78,30 @@ namespace AsposePdfTests
         [TearDown]
         public void TearDown()
         {
-            if (!string.IsNullOrEmpty(_inputPdfPath) && File.Exists(_inputPdfPath))
-                File.Delete(_inputPdfPath);
-            if (!string.IsNullOrEmpty(_outputPdfPath) && File.Exists(_outputPdfPath))
-                File.Delete(_outputPdfPath);
+            try { if (File.Exists(_inputPdf)) File.Delete(_inputPdf); } catch { }
+            try { if (File.Exists(_outputPdf)) File.Delete(_outputPdf); } catch { }
+            try { if (Directory.Exists(_tempDir)) Directory.Delete(_tempDir, true); } catch { }
         }
 
-        // Test that Delete throws when page numbers exceed the document length
+        // Verify that Delete throws when a page number larger than the document length is supplied
         [Test]
-        public void Delete_WithOutOfRangePageNumbers_ShouldThrowException()
+        public void Delete_PageNumberExceedsDocumentLength_ThrowsException()
         {
-            // Arrange: request deletion of page 5 (document only has 2 pages)
+            // The input PDF has only 2 pages; attempt to delete page 5
             int[] pagesToDelete = new[] { 5 };
 
-            // Act & Assert: Delete should throw an exception (ArgumentException or similar)
+            // PdfFileEditor does NOT implement IDisposable, so do NOT use a using statement.
             PdfFileEditor editor = new PdfFileEditor();
-
-            // The Delete method (not TryDelete) is expected to throw on failure
-            Assert.Throws<Exception>(() =>
-            {
-                // This call uses the Delete overload that throws on error
-                editor.Delete(_inputPdfPath!, pagesToDelete, _outputPdfPath!);
-            });
+            Assert.Throws<Exception>(() => editor.Delete(_inputPdf!, pagesToDelete, _outputPdf!));
         }
     }
 }
 
-// Provide an entry point so the project builds as a console application.
+// Dummy entry point to satisfy the compiler when building as a console application.
 public static class Program
 {
     public static void Main(string[] args)
     {
-        // No runtime logic required – the presence of Main satisfies the compiler.
+        // No runtime logic required – tests are executed by the test runner.
     }
 }

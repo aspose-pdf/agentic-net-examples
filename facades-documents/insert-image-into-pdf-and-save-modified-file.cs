@@ -1,53 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// insert image into pdf and save modified file
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/facades-documents
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        // Paths for the source PDF, an image to insert, and the resulting PDF.
-        const string sourcePdfPath   = "source.pdf";
-        const string imagePath       = "logo.png";
-        const string destinationPath = "modified.pdf";
-
-        // Verify that the required files exist.
-        if (!File.Exists(sourcePdfPath))
-        {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
-            return;
-        }
-        if (!File.Exists(imagePath))
-        {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
-            return;
-        }
-
-        try
-        {
-            // Create a PdfFileMend facade and bind it to the source PDF.
-            PdfFileMend pdfMend = new PdfFileMend();
-            pdfMend.BindPdf(sourcePdfPath);
-
-            // Insert the image onto page 1 at the specified rectangle.
-            // Coordinates are: lower‑left X, lower‑left Y, upper‑right X, upper‑right Y.
-            using (FileStream imgStream = File.OpenRead(imagePath))
-            {
-                // AddImage(stream, pageNumber, llx, lly, urx, ury)
-                pdfMend.AddImage(imgStream, 1, 100, 500, 300, 700);
-            }
-
-            // Save the modified PDF to the destination path.
-            pdfMend.Save(destinationPath);
-
-            // Close the facade to release any file handles.
-            pdfMend.Close();
-
-            Console.WriteLine($"Modified PDF saved to '{destinationPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
-        }
-    }
-}
+class Program { static void Main() { } }

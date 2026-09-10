@@ -6,13 +6,13 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";               // source PDF file
-        const string outputDir = "SplitPages";              // folder for individual pages
+        const string inputPath = "input.pdf";
+        const string outputDir = "SplitPages";
 
-        // Verify source file exists
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
@@ -22,32 +22,31 @@ class Program
         // Open the source PDF as a read‑only stream
         using (FileStream inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
         {
-            // PdfFileEditor provides the SplitToPages method for stream input
+            // PdfFileEditor does NOT implement IDisposable, so no using block
             PdfFileEditor editor = new PdfFileEditor();
 
-            // Split the PDF; each element in the array is a MemoryStream containing one page
+            // Split the PDF into individual pages; each page is returned as a MemoryStream
             MemoryStream[] pageStreams = editor.SplitToPages(inputStream);
 
-            // Iterate over the resulting streams and write each to a separate file
+            // Write each page stream to a separate PDF file
             for (int i = 0; i < pageStreams.Length; i++)
             {
-                // Build the output file name (pages are 1‑based)
-                string outPath = Path.Combine(outputDir, $"Page_{i + 1}.pdf");
-
-                // Reset stream position before copying
+                // Reset stream position before reading
                 pageStreams[i].Position = 0;
 
-                // Write the page stream to disk
+                string outPath = Path.Combine(outputDir, $"Page_{i + 1}.pdf");
+
+                // Write the MemoryStream to a file stream
                 using (FileStream outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
                 {
                     pageStreams[i].CopyTo(outStream);
                 }
 
-                // Dispose the individual MemoryStream
+                // Dispose the MemoryStream after use
                 pageStreams[i].Dispose();
             }
         }
 
-        Console.WriteLine("PDF split into individual pages successfully.");
+        Console.WriteLine("PDF successfully split into individual page files.");
     }
 }

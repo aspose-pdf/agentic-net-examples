@@ -1,60 +1,58 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main(string[] args)
     {
-        // Expect at least two input PDFs and one output path:
-        //   args[0..n-2] = input files, args[n-1] = output file
-        if (args.Length < 3)
+        // Expect at least two input PDF files
+        if (args.Length < 2)
         {
-            Console.Error.WriteLine("Usage: concat <input1.pdf> <input2.pdf> [<input3.pdf> ...] <output.pdf>");
+            Console.Error.WriteLine("Usage: ConcatenatePdf <input1.pdf> <input2.pdf> [<input3.pdf> ...]");
             return;
         }
 
-        // Separate input and output arguments
-        string outputPath = args[args.Length - 1];
-        string[] inputPaths = new string[args.Length - 1];
-        Array.Copy(args, inputPaths, args.Length - 1);
+        // Output file name (can be changed as needed)
+        const string outputPath = "output.pdf";
 
-        // Verify that all input files exist
-        foreach (string path in inputPaths)
-        {
-            if (!File.Exists(path))
-            {
-                Console.Error.WriteLine($"Input file not found: {path}");
-                return;
-            }
-        }
+        // Prepare a list to hold the input streams
+        List<Stream> inputStreams = new List<Stream>();
 
-        // Prepare streams for inputs and output
-        var inputStreams = new List<Stream>();
         try
         {
-            foreach (string path in inputPaths)
+            // Open each input PDF as a read‑only FileStream
+            foreach (string inputPath in args)
             {
-                // Open each input PDF as a read‑only stream
-                inputStreams.Add(new FileStream(path, FileMode.Open, FileAccess.Read));
+                if (!File.Exists(inputPath))
+                {
+                    Console.Error.WriteLine($"File not found: {inputPath}");
+                    // Clean up any streams already opened
+                    foreach (var s in inputStreams) s.Dispose();
+                    return;
+                }
+
+                // FileAccess.Read ensures the stream can be used for concatenation
+                FileStream fs = new FileStream(inputPath, FileMode.Open, FileAccess.Read);
+                inputStreams.Add(fs);
             }
 
             // Create the output stream (will be overwritten if it exists)
-            using (Stream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+            using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
-                // PdfFileEditor does NOT implement IDisposable, so no using block for it
-                PdfFileEditor editor = new PdfFileEditor
-                {
-                    // Automatically close all streams after concatenation
-                    CloseConcatenatedStreams = true
-                };
+                // PdfFileEditor provides the Concatenate overload that works with streams
+                PdfFileEditor editor = new PdfFileEditor();
 
-                // Concatenate all input streams into the output stream
+                // Optional: close the input streams automatically after concatenation
+                editor.CloseConcatenatedStreams = true;
+
+                // Perform concatenation
                 bool success = editor.Concatenate(inputStreams.ToArray(), outputStream);
+
                 if (success)
                 {
-                    Console.WriteLine($"Successfully concatenated {inputPaths.Length} files into '{outputPath}'.");
+                    Console.WriteLine($"Successfully concatenated {args.Length} PDFs into '{outputPath}'.");
                 }
                 else
                 {
@@ -65,9 +63,9 @@ class Program
         finally
         {
             // Ensure all input streams are disposed in case CloseConcatenatedStreams is false or an exception occurs
-            foreach (var stream in inputStreams)
+            foreach (var s in inputStreams)
             {
-                stream.Dispose();
+                s.Dispose();
             }
         }
     }

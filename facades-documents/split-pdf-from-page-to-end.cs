@@ -8,32 +8,31 @@ class Program
     {
         // Input PDF file path
         const string inputPath = "input.pdf";
-        // Output PDF file path (contains pages from startPage to the end)
-        const string outputPath = "split_output.pdf";
+        // Output PDF file path (the split part from startPage to the end)
+        const string outputPath = "output_split.pdf";
         // Page number from which to start the split (1‑based indexing)
         const int startPage = 3;
 
-        // Verify the input file exists
+        // Validate input file existence
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // PdfFileEditor does NOT implement IDisposable, so do NOT wrap it in a using block
+        // Create the PdfFileEditor instance (does NOT implement IDisposable)
         PdfFileEditor editor = new PdfFileEditor();
 
-        // Split from the specified start page to the end of the document
-        // SplitToEnd returns true on success, false otherwise
+        // Split the document from startPage to the end and save to outputPath
         bool success = editor.SplitToEnd(inputPath, startPage, outputPath);
 
-        if (success && File.Exists(outputPath))
+        if (success)
         {
-            Console.WriteLine($"PDF successfully split. Output saved to '{outputPath}'.");
+            Console.WriteLine($"PDF successfully split. Pages {startPage}‑end saved to '{outputPath}'.");
         }
         else
         {
-            Console.Error.WriteLine("Failed to split the PDF.");
+            Console.Error.WriteLine("Failed to split the PDF file.");
         }
     }
 }

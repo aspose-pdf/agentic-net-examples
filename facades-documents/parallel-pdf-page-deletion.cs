@@ -6,73 +6,68 @@ using Aspose.Pdf.Facades;
 
 class ParallelPdfPageDeletion
 {
-    // Deletes the specified pages from each PDF in the input list concurrently.
-    // inputFiles   : full paths of source PDFs
-    // pagesToDelete: page numbers (1‑based) to remove from every PDF
-    // outputDir    : directory where the processed PDFs will be saved
-    public static void DeletePagesFromMultiplePdfs(
-        IEnumerable<string> inputFiles,
-        int[] pagesToDelete,
-        string outputDir)
+    // Represents a single deletion job
+    private class DeletionJob
     {
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        public string InputPath { get; }
+        public int[] PagesToDelete { get; }
+        public string OutputPath { get; }
 
-        // Parallel processing – each file gets its own PdfFileEditor instance
-        Parallel.ForEach(inputFiles, inputPath =>
+        public DeletionJob(string inputPath, int[] pagesToDelete, string outputPath)
+        {
+            InputPath = inputPath;
+            PagesToDelete = pagesToDelete;
+            OutputPath = outputPath;
+        }
+    }
+
+    static void Main()
+    {
+        // Example list of jobs – replace with real data as needed
+        var jobs = new List<DeletionJob>
+        {
+            new DeletionJob("doc1.pdf", new[] { 2, 3 }, "doc1_clean.pdf"),
+            new DeletionJob("doc2.pdf", new[] { 1 }, "doc2_clean.pdf"),
+            new DeletionJob("doc3.pdf", new[] { 5, 6, 7 }, "doc3_clean.pdf")
+        };
+
+        // Process all jobs in parallel
+        Parallel.ForEach(jobs, job =>
         {
             try
             {
-                if (!File.Exists(inputPath))
+                // Verify input file exists before attempting deletion
+                if (!File.Exists(job.InputPath))
                 {
-                    Console.Error.WriteLine($"File not found: {inputPath}");
+                    Console.Error.WriteLine($"Input file not found: {job.InputPath}");
                     return;
                 }
 
-                // Build output file name (preserve original name)
-                string outputPath = Path.Combine(
-                    outputDir,
-                    Path.GetFileNameWithoutExtension(inputPath) + "_trimmed.pdf");
-
-                // Each iteration uses a fresh PdfFileEditor (not thread‑safe)
+                // Each parallel iteration creates its own PdfFileEditor instance
+                // (PdfFileEditor is not thread‑safe, so we must not share it)
                 PdfFileEditor editor = new PdfFileEditor();
 
-                // Delete the pages; method returns true on success
-                bool success = editor.Delete(inputPath, pagesToDelete, outputPath);
+                // Delete the specified pages and write the result to the output file
+                bool success = editor.Delete(job.InputPath, job.PagesToDelete, job.OutputPath);
 
                 if (success)
                 {
-                    Console.WriteLine($"Processed: {inputPath} → {outputPath}");
+                    Console.WriteLine($"Deleted pages {string.Join(",", job.PagesToDelete)} from '{job.InputPath}' → '{job.OutputPath}'");
                 }
                 else
                 {
-                    Console.Error.WriteLine($"Deletion failed for: {inputPath}");
+                    Console.Error.WriteLine($"Failed to delete pages from '{job.InputPath}'");
                 }
+
+                // No need to call Close() – PdfFileEditor does not implement IDisposable
+                // and does not hold unmanaged resources that require explicit release.
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{job.InputPath}': {ex.Message}");
             }
         });
-    }
 
-    // Example usage
-    static void Main()
-    {
-        // List of PDF files to process
-        var pdfFiles = new List<string>
-        {
-            "C:\\Docs\\Report1.pdf",
-            "C:\\Docs\\Report2.pdf",
-            "C:\\Docs\\Report3.pdf"
-        };
-
-        // Pages to delete (e.g., remove pages 2 and 3 from each document)
-        int[] pagesToRemove = new int[] { 2, 3 };
-
-        // Destination folder for the resulting PDFs
-        string outputFolder = "C:\\Docs\\Processed";
-
-        DeletePagesFromMultiplePdfs(pdfFiles, pagesToRemove, outputFolder);
+        Console.WriteLine("Parallel deletion completed.");
     }
 }

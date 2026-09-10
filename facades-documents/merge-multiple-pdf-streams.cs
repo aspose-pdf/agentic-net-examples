@@ -1,48 +1,66 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // Added namespace for TextFragment
 
-public static class PdfMerger
+class Program
 {
-    /// <summary>
-    /// Merges multiple PDF streams into a single PDF stream using Aspose.Pdf.Facades.PdfFileEditor.
-    /// </summary>
-    /// <param name="inputStreams">Array of input PDF streams. Each stream must be readable.</param>
-    /// <param name="outputStream">Writable stream where the merged PDF will be written.</param>
-    /// <returns>True if the concatenation succeeded; otherwise, false.</returns>
-    public static bool MergePdfStreams(Stream[] inputStreams, Stream outputStream)
+    // Creates a simple one‑page PDF and returns it as a MemoryStream.
+    private static MemoryStream CreateSamplePdf(string title)
     {
-        if (inputStreams == null) throw new ArgumentNullException(nameof(inputStreams));
-        if (outputStream == null) throw new ArgumentNullException(nameof(outputStream));
-
-        // PdfFileEditor does NOT implement IDisposable, so we do NOT wrap it in a using block.
-        PdfFileEditor editor = new PdfFileEditor();
-
-        // Optional: automatically close the input streams after concatenation.
-        editor.CloseConcatenatedStreams = true;
-
-        // Perform concatenation. This overload concatenates an array of streams into a single output stream.
-        bool success = editor.Concatenate(inputStreams, outputStream);
-
-        // No need to call any Save method; Concatenate writes directly to the output stream.
-        return success;
+        var doc = new Document();
+        var page = doc.Pages.Add();
+        // Add a simple text paragraph so the PDF is not empty.
+        page.Paragraphs.Add(new TextFragment(title));
+        var ms = new MemoryStream();
+        doc.Save(ms);
+        ms.Position = 0; // reset for reading
+        return ms;
     }
-}
 
-// Entry point required for a console‑type project.
-public class Program
-{
-    public static void Main(string[] args)
+    // Merges multiple PDF streams into a single PDF stream using PdfFileEditor.
+    static void MergePdfStreams(Stream[] inputStreams, Stream outputStream)
     {
-        // The Main method is intentionally minimal; it only satisfies the compiler.
-        // Real usage can be added here or the class can be referenced from another project.
-        // Example (commented out):
-        // using (FileStream in1 = File.OpenRead("file1.pdf"))
-        // using (FileStream in2 = File.OpenRead("file2.pdf"))
-        // using (FileStream outStream = File.Create("merged.pdf"))
-        // {
-        //     bool result = PdfMerger.MergePdfStreams(new Stream[] { in1, in2 }, outStream);
-        //     Console.WriteLine($"Merge successful: {result}");
-        // }
+        // PdfFileEditor does NOT implement IDisposable; instantiate directly.
+        var editor = new PdfFileEditor();
+        // Automatically close the input streams after concatenation.
+        editor.CloseConcatenatedStreams = true;
+        // Perform concatenation. Returns true if successful.
+        bool success = editor.Concatenate(inputStreams, outputStream);
+        if (!success)
+        {
+            throw new InvalidOperationException("PDF concatenation failed.");
+        }
+        // No need to call any Save method; Concatenate writes directly to outputStream.
+    }
+
+    static void Main()
+    {
+        // Create three sample PDFs in memory.
+        var sampleStreams = new[]
+        {
+            CreateSamplePdf("Sample PDF 1"),
+            CreateSamplePdf("Sample PDF 2"),
+            CreateSamplePdf("Sample PDF 3")
+        };
+
+        // Output file path for the merged PDF.
+        const string outputFile = "merged.pdf";
+
+        // Merge the PDFs into a file.
+        using (var outStream = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
+        {
+            MergePdfStreams(sampleStreams, outStream);
+        }
+
+        // Input streams are closed automatically because CloseConcatenatedStreams = true.
+        // No explicit disposal required, but disposing is safe.
+        foreach (var s in sampleStreams)
+        {
+            s.Dispose();
+        }
+
+        Console.WriteLine($"Merged PDF saved to '{outputFile}'.");
     }
 }
