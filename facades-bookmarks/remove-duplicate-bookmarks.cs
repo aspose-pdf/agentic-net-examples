@@ -1,7 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
@@ -16,52 +17,38 @@ class Program
             return;
         }
 
-        try
+        // Bind the PDF to the bookmark editor
+        PdfBookmarkEditor editor = new PdfBookmarkEditor();
+        editor.BindPdf(inputPath);
+
+        // Extract all existing bookmarks
+        Bookmarks allBookmarks = editor.ExtractBookmarks();
+
+        // Determine unique bookmarks based on Title and PageNumber
+        var seenKeys = new HashSet<string>();
+        var uniqueBookmarks = new List<Bookmark>();
+
+        foreach (Bookmark bm in allBookmarks)
         {
-            // CREATE – instantiate the facade
-            PdfBookmarkEditor editor = new PdfBookmarkEditor();
-
-            // LOAD – bind the PDF document
-            editor.BindPdf(inputPath);
-
-            // EXTRACT existing bookmarks
-            Bookmarks allBookmarks = editor.ExtractBookmarks();
-
-            // Identify unique bookmarks (by title + page number)
-            var unique = new List<Aspose.Pdf.Facades.Bookmark>();
-            var seen = new HashSet<string>(); // composite key: title|page
-
-            foreach (Aspose.Pdf.Facades.Bookmark bm in allBookmarks)
+            // Combine title and page number to form a unique key
+            string key = $"{bm.Title}|{bm.PageNumber}";
+            if (!seenKeys.Contains(key))
             {
-                string key = $"{bm.Title}|{bm.PageNumber}";
-                if (!seen.Contains(key))
-                {
-                    seen.Add(key);
-                    unique.Add(bm);
-                }
+                seenKeys.Add(key);
+                uniqueBookmarks.Add(bm);
             }
-
-            // DELETE all bookmarks
-            editor.DeleteBookmarks();
-
-            // RE‑ADD only the unique bookmarks
-            foreach (Aspose.Pdf.Facades.Bookmark bm in unique)
-            {
-                // CreateBookmarkOfPage adds a single bookmark for the given page
-                editor.CreateBookmarkOfPage(bm.Title, bm.PageNumber);
-            }
-
-            // SAVE the modified PDF
-            editor.Save(outputPath);
-
-            // OPTIONAL: release resources held by the facade
-            editor.Close();
-
-            Console.WriteLine($"Duplicate bookmarks removed. Output saved to '{outputPath}'.");
         }
-        catch (Exception ex)
+
+        // Delete all bookmarks from the document
+        editor.DeleteBookmarks();
+
+        // Re‑create only the unique bookmarks
+        foreach (Bookmark bm in uniqueBookmarks)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            editor.CreateBookmarkOfPage(bm.Title, bm.PageNumber);
         }
+
+        // Save the cleaned PDF
+        editor.Save(outputPath);
     }
 }

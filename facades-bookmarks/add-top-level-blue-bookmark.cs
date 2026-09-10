@@ -1,37 +1,12 @@
-using System;
-using System.IO;
-using System.Drawing;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// add top level blue bookmark
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-bookmarks/add-top-level-blue-bookmark-to-pdf.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
-        {
-            editor.BindPdf(inputPath);
-
-            // Create a top‑level bookmark that points to the first page
-            Bookmark bookmark = new Bookmark
-            {
-                Title = "First Page Bookmark",
-                PageNumber = 1,
-                TitleColor = Color.Blue // blue title color
-            };
-
-            editor.CreateBookmarks(bookmark);
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Bookmark added and saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

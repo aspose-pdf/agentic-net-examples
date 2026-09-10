@@ -1,51 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// set bookmark zoom to 150 percent
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-bookmarks/set-bookmark-zoom-level-150-percent.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_zoom.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Bind the PDF to the bookmark editor
-        PdfBookmarkEditor editor = new PdfBookmarkEditor();
-        editor.BindPdf(inputPath);
-
-        // Extract the bookmarks collection (not an array)
-        Bookmarks bookmarks = editor.ExtractBookmarks();
-
-        // Update each bookmark (including nested ones) to open at 150% zoom
-        if (bookmarks != null)
-        {
-            SetZoomRecursive(bookmarks, 150);
-        }
-
-        // Save the modified PDF
-        editor.Save(outputPath);
-        editor.Close();
-
-        Console.WriteLine($"Bookmarks updated with 150% zoom. Saved to '{outputPath}'.");
-    }
-
-    // Recursively set the zoom level for a collection of bookmarks
-    private static void SetZoomRecursive(Bookmarks collection, int zoomPercent)
-    {
-        foreach (Bookmark bm in collection)
-        {
-            bm.PageDisplay_Zoom = zoomPercent; // 150% magnification
-            // If the bookmark has child items, apply the same zoom to them
-            if (bm.ChildItems != null && bm.ChildItems.Count > 0)
-            {
-                SetZoomRecursive(bm.ChildItems, zoomPercent);
-            }
-        }
-    }
-}
+class Program { static void Main() { } }

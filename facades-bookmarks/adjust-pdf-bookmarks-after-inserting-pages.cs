@@ -6,11 +6,28 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Helper method to collect all bookmarks (flat list) from a Bookmark hierarchy
+    static void CollectBookmarks(Bookmark bm, List<(string Title, int PageNumber)> list)
+    {
+        if (bm == null) return;
+
+        // Add current bookmark if it has a title and a page number
+        if (!string.IsNullOrEmpty(bm.Title) && bm.PageNumber > 0)
+            list.Add((bm.Title, bm.PageNumber));
+
+        // Recursively process child items (if any) using the new ChildItems property
+        if (bm.ChildItems != null)
+        {
+            foreach (Bookmark child in bm.ChildItems)
+                CollectBookmarks(child, list);
+        }
+    }
+
     static void Main()
     {
-        const string inputPdf  = "original.pdf";      // source PDF with existing bookmarks
-        const string outputPdf = "updated.pdf";       // result PDF after insertion
-        const int pagesToInsert = 2;                  // number of new pages to add at the beginning
+        const string inputPdf   = "input.pdf";          // source PDF
+        const string outputPdf  = "output.pdf";         // result PDF
+        const int    pagesToAdd = 2;                    // number of pages to insert at the beginning
 
         if (!File.Exists(inputPdf))
         {
@@ -18,46 +35,59 @@ class Program
             return;
         }
 
-        // Load the document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Insert blank pages at the very start (position 1 is the first page)
-            for (int i = 0; i < pagesToInsert; i++)
+            // -------------------------------------------------
+            // Load the original document and extract existing bookmarks
+            // -------------------------------------------------
+            using (Document doc = new Document(inputPdf))
             {
-                doc.Pages.Insert(1); // inserts an empty page
+                // Extract bookmarks using PdfBookmarkEditor
+                PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
+                bookmarkEditor.BindPdf(doc);
+
+                // Extract the root bookmark collection
+                Bookmarks rootBookmarks = bookmarkEditor.ExtractBookmarks();
+
+                // Flatten the hierarchy into a list of (title, page) pairs
+                List<(string Title, int PageNumber)> originalBookmarks = new List<(string, int)>();
+                foreach (Bookmark bm in rootBookmarks)
+                {
+                    CollectBookmarks(bm, originalBookmarks);
+                }
+
+                // -------------------------------------------------
+                // Insert blank pages at the beginning of the document
+                // -------------------------------------------------
+                for (int i = 0; i < pagesToAdd; i++)
+                {
+                    // Insert creates a new empty page automatically (1‑based index)
+                    doc.Pages.Insert(1);
+                }
+
+                // -------------------------------------------------
+                // Re‑create bookmarks with adjusted page numbers
+                // -------------------------------------------------
+                // Remove all existing bookmarks
+                bookmarkEditor.DeleteBookmarks();
+
+                // Add each bookmark back, shifting its page number by the number of inserted pages
+                foreach (var (Title, PageNumber) in originalBookmarks)
+                {
+                    int newPageNumber = PageNumber + pagesToAdd;
+                    bookmarkEditor.CreateBookmarkOfPage(Title, newPageNumber);
+                }
+
+                // Save the modified document (bookmarks are saved via the editor)
+                bookmarkEditor.Save(outputPdf);
+                bookmarkEditor.Close(); // release resources held by the facade
             }
 
-            // -----------------------------------------------------------------
-            // Adjust existing bookmarks so they point to the correct pages
-            // -----------------------------------------------------------------
-            // Bind the document to a PdfBookmarkEditor facade
-            PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
-            bookmarkEditor.BindPdf(doc);
-
-            // Extract current bookmarks (returns a collection of Bookmark objects)
-            // Store title and original page number for later recreation
-            List<(string Title, int PageNumber)> originalBookmarks = new List<(string, int)>();
-            foreach (Bookmark bm in bookmarkEditor.ExtractBookmarks())
-            {
-                // Guard against null titles
-                string title = bm.Title ?? $"Bookmark_{bm.PageNumber}";
-                originalBookmarks.Add((title, bm.PageNumber));
-            }
-
-            // Remove all existing bookmarks
-            bookmarkEditor.DeleteBookmarks();
-
-            // Re‑create each bookmark with its page number shifted by the inserted pages
-            foreach (var (title, page) in originalBookmarks)
-            {
-                int newPageNumber = page + pagesToInsert;
-                bookmarkEditor.CreateBookmarkOfPage(title, newPageNumber);
-            }
-
-            // Save the modified document (PDF format, no SaveOptions needed)
-            doc.Save(outputPdf);
+            Console.WriteLine($"Bookmarks adjusted and document saved to '{outputPdf}'.");
         }
-
-        Console.WriteLine($"Document saved with adjusted bookmarks to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

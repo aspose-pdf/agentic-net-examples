@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Drawing; // System.Drawing.Color is required by PdfContentEditor
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,53 +8,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputPdf = "bookmarked_output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_bookmarks.pdf";
 
+        // Ensure a source PDF exists – create a minimal one if it does not.
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
+            var placeholder = new Document();
+            placeholder.Pages.Add();
+            placeholder.Save(inputPdf);
         }
 
         // Define bookmark titles and their target URLs
-        string[] titles = { "Aspose Home", "GitHub", "Stack Overflow" };
-        string[] urls   = { "https://www.aspose.com", "https://github.com", "https://stackoverflow.com" };
+        string[] titles = { "Google", "Microsoft", "GitHub" };
+        string[] urls   = { "https://www.google.com", "https://www.microsoft.com", "https://github.com" };
+        // Use System.Drawing.Color because PdfContentEditor.CreateBookmarksAction expects it
+        System.Drawing.Color[] colors = { System.Drawing.Color.Blue, System.Drawing.Color.Green, System.Drawing.Color.Purple };
 
-        // Ensure the arrays have the same length
-        if (titles.Length != urls.Length)
+        // Use PdfContentEditor (a Facades class) to add bookmarks with URI actions
+        using (PdfContentEditor editor = new PdfContentEditor())
         {
-            Console.Error.WriteLine("Titles and URLs count mismatch.");
-            return;
-        }
+            // Load the PDF document
+            editor.BindPdf(inputPdf);
 
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
-        {
-            // Initialize the bookmark editor and bind it to the document
-            using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+            // Create a bookmark for each URL
+            for (int i = 0; i < titles.Length; i++)
             {
-                editor.BindPdf(doc);
-
-                // Create a bookmark for each URL
-                for (int i = 0; i < titles.Length; i++)
-                {
-                    Bookmark bm = new Bookmark
-                    {
-                        Title      = titles[i],
-                        Action     = "URI",          // specifies an external link
-                        Destination = urls[i]        // the target web address
-                    };
-
-                    // Add the bookmark to the document
-                    editor.CreateBookmarks(bm);
-                }
-
-                // Save the modified PDF
-                editor.Save(outputPdf);
+                // actionType "URI" creates a bookmark that opens an external web address
+                editor.CreateBookmarksAction(
+                    title:       titles[i],
+                    color:       colors[i],
+                    boldFlag:    true,
+                    italicFlag:  false,
+                    file:        null,          // not required for URI action
+                    actionType:  "URI",
+                    destination: urls[i]);      // external URL
             }
+
+            // Save the modified PDF
+            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Bookmarks added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Bookmarks with external links saved to '{outputPdf}'.");
     }
 }

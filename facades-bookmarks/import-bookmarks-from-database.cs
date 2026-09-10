@@ -1,5 +1,6 @@
 using System;
-using System.Data;
+using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,55 +8,57 @@ class Program
 {
     static void Main()
     {
-        const string sourcePdfPath = "source.pdf";
-        const string outputPdfPath = "bookmarked_output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_with_bookmarks.pdf";
 
-        // ---------------------------------------------------------------------
-        // Ensure the source PDF exists. In sandbox examples we must create the
-        // file inline because the environment starts empty.
-        // ---------------------------------------------------------------------
-        if (!System.IO.File.Exists(sourcePdfPath))
+        // Ensure the source PDF exists – create a minimal one if it does not.
+        if (!File.Exists(inputPdf))
         {
-            using (Document doc = new Document())
-            {
-                doc.Pages.Add(); // add a single blank page
-                doc.Save(sourcePdfPath);
-            }
+            using var placeholder = new Document();
+            placeholder.Pages.Add();
+            placeholder.Save(inputPdf);
         }
 
-        // ---------------------------------------------------------------------
-        // In‑memory DataTable that mimics a database result set.
-        // ---------------------------------------------------------------------
-        DataTable bookmarksTable = new DataTable();
-        bookmarksTable.Columns.Add("Title", typeof(string));
-        bookmarksTable.Columns.Add("PageNumber", typeof(int));
+        // Simulated database query result: list of (title, pageNumber) tuples
+        List<(string Title, int PageNumber)> records = GetBookmarkRecordsFromDatabase();
 
-        bookmarksTable.Rows.Add("Chapter 1", 1);
-        bookmarksTable.Rows.Add("Chapter 2", 5);
-        bookmarksTable.Rows.Add("Conclusion", 12);
-
-        // ---------------------------------------------------------------------
-        // Add bookmarks to the PDF.
-        // ---------------------------------------------------------------------
+        // Initialize the bookmark editor and bind the existing PDF
         using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            editor.BindPdf(sourcePdfPath);
+            editor.BindPdf(inputPdf);
 
-            foreach (DataRow row in bookmarksTable.Rows)
+            // Insert a bookmark for each record
+            foreach (var rec in records)
             {
-                var bm = new Aspose.Pdf.Facades.Bookmark
+                // Create a Bookmark instance and set its properties
+                Bookmark bm = new Bookmark
                 {
-                    Title = (string)row["Title"],
-                    PageNumber = (int)row["PageNumber"],
-                    Action = "GoTo" // standard navigation action
+                    Title = rec.Title,
+                    PageNumber = rec.PageNumber,
+                    Action = "GoTo"
                 };
 
+                // Add the bookmark to the document
                 editor.CreateBookmarks(bm);
             }
 
-            editor.Save(outputPdfPath);
+            // Save the PDF with the newly added bookmarks
+            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Bookmarks imported and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Bookmarks imported and saved to '{outputPdf}'.");
+    }
+
+    // Placeholder for actual database access; returns sample data
+    static List<(string Title, int PageNumber)> GetBookmarkRecordsFromDatabase()
+    {
+        // Replace this with real DB query logic (e.g., ADO.NET, Dapper, EF Core)
+        return new List<(string, int)>
+        {
+            ("Introduction", 1),
+            ("Chapter 1", 3),
+            ("Chapter 2", 7),
+            ("Conclusion", 12)
+        };
     }
 }
