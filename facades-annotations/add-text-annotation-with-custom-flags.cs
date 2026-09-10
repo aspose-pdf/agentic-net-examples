@@ -1,7 +1,8 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -10,38 +11,36 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output_modified.pdf";
 
-        // Verify the source PDF exists
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the document to obtain a Page instance for the annotation constructor
-        Document doc = new Document(inputPath);
-        Page firstPage = doc.Pages[1];
+        // Bind the PDF to the annotation editor
+        PdfAnnotationEditor editor = new PdfAnnotationEditor();
+        editor.BindPdf(inputPath);
 
-        // Create the TextAnnotation using the (Page, Rectangle) constructor
-        TextAnnotation customAnnot = new TextAnnotation(firstPage,
-            new Aspose.Pdf.Rectangle(100, 500, 300, 550))
+        // Get a reference page (any page will do – we use the first one for the constructor)
+        Page referencePage = editor.Document.Pages[1];
+        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+        // Create a new text annotation using the (Page, Rectangle) constructor
+        TextAnnotation annotation = new TextAnnotation(referencePage, rect)
         {
-            Flags = AnnotationFlags.Print | AnnotationFlags.Locked,
-            Title = "Custom Flag",
+            Title    = "Custom Flag",
             Contents = "Annotation with custom flags",
-            Color = Aspose.Pdf.Color.Yellow
+            Color    = Aspose.Pdf.Color.Yellow,
+            // Combine custom flags (e.g., Invisible and NoZoom)
+            Flags    = AnnotationFlags.Invisible | AnnotationFlags.NoZoom
         };
 
-        // Initialize the annotation editor and bind the same document instance
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-        {
-            editor.BindPdf(doc);
+        // Apply the annotation to all pages (1‑based indexing)
+        editor.ModifyAnnotations(1, editor.Document.Pages.Count, annotation);
 
-            // Apply the modified annotation to pages 1 through 2
-            editor.ModifyAnnotations(1, 2, customAnnot);
-
-            // Save the updated PDF
-            editor.Save(outputPath);
-        }
+        // Save the modified document
+        editor.Save(outputPath);
+        editor.Close();
 
         Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }

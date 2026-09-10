@@ -1,51 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// delete annotations from pdfs
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-annotations/delete-annotations-from-pdf.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main(string[] args)
-    {
-        if (args.Length < 1)
-        {
-            Console.WriteLine("Usage: AsposePdfDeleteAnnotations <SourceFolder> [OutputFolder]");
-            return;
-        }
-
-        string sourceFolder = args[0];
-        string outputFolder = args.Length > 1 ? args[1] : Path.Combine(sourceFolder, "Cleaned");
-
-        if (!Directory.Exists(sourceFolder))
-        {
-            Console.WriteLine($"Source folder does not exist: {sourceFolder}");
-            return;
-        }
-
-        if (!Directory.Exists(outputFolder))
-        {
-            Directory.CreateDirectory(outputFolder);
-        }
-
-        foreach (string pdfPath in Directory.GetFiles(sourceFolder, "*.pdf"))
-        {
-            try
-            {
-                string fileName = Path.GetFileNameWithoutExtension(pdfPath);
-                string outputPath = Path.Combine(outputFolder, $"{fileName}_clean.pdf");
-
-                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-                {
-                    editor.BindPdf(pdfPath);
-                    editor.DeleteAnnotations();
-                    editor.Save(outputPath);
-                }
-
-                Console.WriteLine($"Processed: {pdfPath} -> {outputPath}");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to process '{pdfPath}': {ex.Message}");
-            }
-        }
-    }
-}
+class Program { static void Main() { } }

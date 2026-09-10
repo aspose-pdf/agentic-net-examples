@@ -2,55 +2,52 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations; // for AnnotationType enum
 
 class Program
 {
     static void Main()
     {
-        // Path to the PDF that already contains annotations
-        const string targetPdf = "target.pdf";
+        // Paths for the target PDF (which already contains annotations) and the output PDF.
+        const string targetPdfPath = "target.pdf";
+        const string outputPdfPath = "target_with_added_annotations.pdf";
 
-        // Path where the resulting PDF will be saved
-        const string outputPdf = "merged_annotations.pdf";
+        // Paths of source PDFs that contain the annotations you want to import.
+        string[] sourcePdfPaths = { "source1.pdf", "source2.pdf" };
 
-        // PDFs that contain the new annotations to be imported
-        string[] sourcePdfs = { "source1.pdf", "source2.pdf" };
-
-        // Optional: limit import to specific annotation types
-        AnnotationType[] types = {
-            AnnotationType.Highlight,
-            AnnotationType.Text,
-            AnnotationType.Line,
-            AnnotationType.Square
-        };
-
-        // Verify that all files exist before proceeding
-        if (!File.Exists(targetPdf))
+        // Verify that all files exist before proceeding.
+        if (!File.Exists(targetPdfPath))
         {
-            Console.Error.WriteLine($"Target file not found: {targetPdf}");
+            Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
             return;
         }
 
-        foreach (var src in sourcePdfs)
+        foreach (string src in sourcePdfPaths)
         {
             if (!File.Exists(src))
             {
-                Console.Error.WriteLine($"Source file not found: {src}");
+                Console.Error.WriteLine($"Source PDF not found: {src}");
                 return;
             }
         }
 
-        // Use PdfAnnotationEditor to bind the target PDF, import annotations,
-        // and save the result. Existing annotations are preserved because
-        // ImportAnnotations adds to the document without overwriting.
+        // Use PdfAnnotationEditor (a facade) to work with annotations.
+        // The facade implements IDisposable, so wrap it in a using block.
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            editor.BindPdf(targetPdf);                     // Load target PDF
-            editor.ImportAnnotations(sourcePdfs, types);   // Import new annotations
-            editor.Save(outputPdf);                         // Save merged PDF
+            // Bind the existing PDF that already has annotations.
+            editor.BindPdf(targetPdfPath);
+
+            // Import annotations from the source PDFs.
+            // The ImportAnnotations method adds annotations; it does NOT overwrite existing ones,
+            // so the original annotations in the target PDF are preserved automatically.
+            // If you need to import only specific types, use the overload that accepts
+            // Aspose.Pdf.AnnotationType[] (e.g., Highlight, Text, etc.).
+            editor.ImportAnnotations(sourcePdfPaths);
+
+            // Save the resulting PDF. Existing annotations remain, and new ones are added.
+            editor.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Annotations imported and saved to '{outputPdf}'.");
+        Console.WriteLine($"Annotations imported successfully. Output saved to '{outputPdfPath}'.");
     }
 }

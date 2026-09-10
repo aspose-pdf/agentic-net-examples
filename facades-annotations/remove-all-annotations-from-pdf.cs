@@ -11,23 +11,18 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfAnnotationEditor implements IDisposable via SaveableFacade, so use a using block.
+        // Initialize the annotation editor, bind the PDF, delete all annotations, and save.
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Bind the existing PDF document.
-            editor.BindPdf(inputPath);
-
-            // Delete all annotations in the document.
-            editor.DeleteAnnotations();
-
-            // Save the modified PDF to a new file.
-            editor.Save(outputPath);
+            editor.BindPdf(inputPath);          // Load the PDF into the editor.
+            editor.DeleteAnnotations();         // Remove every annotation in the document.
+            editor.Save(outputPath);            // Persist the cleaned PDF.
         }
 
-        Console.WriteLine($"Annotations removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"All annotations removed. Saved to '{outputPath}'.");
     }
 }

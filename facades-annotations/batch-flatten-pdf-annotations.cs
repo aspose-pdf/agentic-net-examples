@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        // Folder containing the PDF files to process
-        const string inputFolder = @"C:\PdfFolder";
+        // Folder containing the source PDFs
+        const string inputFolder = "input_pdfs";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -15,36 +15,28 @@ class Program
             return;
         }
 
-        // Get all PDF files in the folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
+        // Process each PDF file in the folder
+        foreach (string sourcePath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
+            string directory = Path.GetDirectoryName(sourcePath);
+            string baseName   = Path.GetFileNameWithoutExtension(sourcePath);
+            string outputPath = Path.Combine(directory, $"{baseName}_flattened.pdf");
+
             try
             {
-                // Build the output file name with "_flattened" suffix
-                string directory = Path.GetDirectoryName(pdfPath);
-                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-                string outputPath = Path.Combine(directory, $"{fileNameWithoutExt}_flattened.pdf");
-
-                // Use PdfAnnotationEditor to flatten annotations
+                // Create the facade, load the PDF, flatten annotations, and save the result
                 using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
                 {
-                    // Load the source PDF
-                    editor.BindPdf(pdfPath);
-
-                    // Flatten all annotations in the document
-                    editor.FlatteningAnnotations();
-
-                    // Save the flattened PDF to the new file
-                    editor.Save(outputPath);
+                    editor.BindPdf(sourcePath);          // load PDF
+                    editor.FlatteningAnnotations();     // flatten all annotations
+                    editor.Save(outputPath);             // save flattened PDF
                 }
 
-                Console.WriteLine($"Flattened: '{pdfPath}' → '{outputPath}'");
+                Console.WriteLine($"Flattened: {outputPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{sourcePath}': {ex.Message}");
             }
         }
     }

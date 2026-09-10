@@ -1,36 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// flatten pdf tag flatten date
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-annotations/flatten-pdf-tag-flattened-date.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "flattened_tagged.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF, flatten it, add custom metadata, and save.
-        using (Document doc = new Document(inputPath))
-        {
-            // Remove all form fields and replace them with their appearance.
-            doc.Flatten();
-
-            // Use PdfFileInfo facade to set a custom metadata entry.
-            PdfFileInfo info = new PdfFileInfo(doc);
-            string flattenDate = DateTime.UtcNow.ToString("o"); // ISO 8601 format
-            info.SetMetaInfo("FlattenDate", flattenDate);
-
-            // Save the modified PDF.
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

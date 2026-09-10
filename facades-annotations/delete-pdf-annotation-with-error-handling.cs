@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
         const string annotationName = "nonexistent-annotation-id";
 
@@ -17,36 +17,39 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Initialize the annotation editor with the loaded document
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor(doc))
+            // Initialize the annotation editor and bind the PDF file
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                // Bind the editor to the document (optional when using ctor with Document)
-                editor.BindPdf(doc);
+                editor.BindPdf(inputPath);
 
                 try
                 {
-                    // Attempt to delete the annotation by name
+                    // Attempt to delete the annotation by its name (ID)
                     editor.DeleteAnnotation(annotationName);
-                    Console.WriteLine($"Annotation '{annotationName}' deleted successfully.");
+                    Console.WriteLine($"Annotation '{annotationName}' deleted.");
                 }
                 catch (PdfException ex)
                 {
-                    // Handle the case where the annotation does not exist or other PDF errors
+                    // Aspose.Pdf throws PdfException when the annotation cannot be found
                     Console.Error.WriteLine($"Failed to delete annotation '{annotationName}': {ex.Message}");
                 }
                 catch (Exception ex)
                 {
-                    // Catch any other unexpected exceptions
-                    Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+                    // Catch any other unexpected errors
+                    Console.Error.WriteLine($"Unexpected error while deleting annotation: {ex.Message}");
                 }
 
-                // Save the modified PDF
+                // Save the modified PDF to a new file
                 editor.Save(outputPath);
-                Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
             }
+
+            Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

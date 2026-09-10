@@ -1,63 +1,69 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
-class Program
+namespace AnnotationExtractionDemo
 {
-    static void Main()
+    // Simple DTO to hold extracted annotation details
+    public class AnnotationInfo
     {
-        const string inputPath = "input.pdf";
+        public string Name { get; set; }               // Annotation name (may be empty)
+        public string Type { get; set; }               // Annotation type as string
+        public Aspose.Pdf.Rectangle Rect { get; set; } // Annotation rectangle (coordinates)
+    }
 
-        if (!File.Exists(inputPath))
+    class Program
+    {
+        static void Main()
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            const string inputPdf = "input.pdf";
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document doc = new Document(inputPath))
-        {
-            // Initialize the annotation editor with the loaded document
-            PdfAnnotationEditor editor = new PdfAnnotationEditor(doc);
-
-            // Extract all annotations from all pages. Use Array.Empty<AnnotationType>()
-            // to avoid passing a null literal to a non‑nullable parameter.
-            IList<Annotation> annotations = editor.ExtractAnnotations(
-                1,
-                doc.Pages.Count,
-                Array.Empty<AnnotationType>());
-
-            // Convert to custom DTO objects
-            List<AnnotationInfo> infoList = new List<AnnotationInfo>();
-            foreach (Annotation ann in annotations)
+            // Ensure the source PDF exists
+            if (!System.IO.File.Exists(inputPdf))
             {
-                infoList.Add(new AnnotationInfo
-                {
-                    Name = ann.Name,
-                    Type = ann.AnnotationType.ToString(),
-                    Rectangle = ann.Rect
-                });
+                Console.Error.WriteLine($"File not found: {inputPdf}");
+                return;
             }
 
-            // Output the extracted details (example usage)
-            foreach (AnnotationInfo info in infoList)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                Console.WriteLine(
-                    $"Name: {info.Name}, Type: {info.Type}, Rect: [{info.Rectangle.LLX}, {info.Rectangle.LLY}, {info.Rectangle.URX}, {info.Rectangle.URY}]");
+                // Initialize the PdfAnnotationEditor facade on the loaded document
+                using (PdfAnnotationEditor editor = new PdfAnnotationEditor(doc))
+                {
+                    // Prepare a list to collect all annotation details
+                    List<AnnotationInfo> extracted = new List<AnnotationInfo>();
+
+                    // Determine the page range (1‑based indexing)
+                    int firstPage = 1;
+                    int lastPage  = doc.Pages.Count;
+
+                    // Retrieve all possible annotation types
+                    AnnotationType[] allTypes = (AnnotationType[])Enum.GetValues(typeof(AnnotationType));
+
+                    // Extract annotations from the specified page range
+                    IList<Annotation> annotations = editor.ExtractAnnotations(firstPage, lastPage, allTypes);
+
+                    // Transform each Aspose.Pdf.Annotation into our DTO
+                    foreach (Annotation ann in annotations)
+                    {
+                        extracted.Add(new AnnotationInfo
+                        {
+                            Name = ann.Name,
+                            Type = ann.AnnotationType.ToString(),
+                            Rect = ann.Rect // rectangle is already an Aspose.Pdf.Rectangle
+                        });
+                    }
+
+                    // Example usage: print extracted information to console
+                    foreach (AnnotationInfo info in extracted)
+                    {
+                        Console.WriteLine($"Name: {info.Name ?? "(none)"} | Type: {info.Type} | Rect: [{info.Rect.LLX}, {info.Rect.LLY}, {info.Rect.URX}, {info.Rect.URY}]");
+                    }
+                }
             }
         }
     }
-}
-
-// Custom data transfer object to hold annotation details
-public class AnnotationInfo
-{
-    // Made nullable to satisfy the non‑nullable warnings when the object is
-    // instantiated without setting the properties via a constructor.
-    public string? Name { get; set; }
-    public string? Type { get; set; }
-    public Aspose.Pdf.Rectangle? Rectangle { get; set; }
 }

@@ -1,49 +1,61 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class BatchAnnotationAuthorUpdater
 {
     static void Main()
     {
-        // Folder containing source PDF files
+        // Folder containing source PDFs
         const string inputFolder = @"C:\PdfInput";
         // Folder where updated PDFs will be saved
         const string outputFolder = @"C:\PdfOutput";
 
-        // Author names: source (to replace) and destination (new value)
+        // Author names – replace as needed
         const string sourceAuthor = "Old Author";
-        const string newAuthor    = "New Author";
+        const string destinationAuthor = "New Author";
 
-        // Ensure output directory exists
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
+
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        foreach (string inputPath in pdfFiles)
         {
-            // Build output file path (adds "_updated" suffix)
-            string outputPath = Path.Combine(
-                outputFolder,
-                Path.GetFileNameWithoutExtension(inputPath) + "_updated.pdf");
-
-            // Use PdfAnnotationEditor to modify annotation authors
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            try
             {
-                // Load the PDF document into the editor
+                // Prepare output path with same file name
+                string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
+
+                // Initialize the annotation editor facade
+                PdfAnnotationEditor editor = new PdfAnnotationEditor();
+
+                // Bind the PDF document
                 editor.BindPdf(inputPath);
 
-                // Determine the total number of pages (1‑based indexing)
-                int pageCount = editor.Document.Pages.Count;
+                // Determine the page range (Aspose.Pdf uses 1‑based indexing)
+                int startPage = 1;
+                int endPage = editor.Document.Pages.Count;
 
-                // Update the author field for all annotations in the document
-                editor.ModifyAnnotationsAuthor(1, pageCount, sourceAuthor, newAuthor);
+                // Modify the author of all matching annotations in the range
+                editor.ModifyAnnotationsAuthor(startPage, endPage, sourceAuthor, destinationAuthor);
 
                 // Save the modified PDF
                 editor.Save(outputPath);
-            }
 
-            Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {Path.GetFileName(outputPath)}");
+                // Close the facade (releases the bound document)
+                editor.Close();
+
+                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {outputPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+            }
         }
 
         Console.WriteLine("Batch update completed.");

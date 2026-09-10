@@ -4,58 +4,67 @@ using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
-public static class AnnotationReporter
+public static class AnnotationReport
 {
-    // Returns a dictionary where the key is the page number (1‑based) and the value is the total
-    // number of annotations on that page.
+    // Returns a dictionary where key = page number (1‑based) and value = annotation count on that page
     public static Dictionary<int, int> GetAnnotationsCountPerPage(string pdfPath)
     {
-        if (string.IsNullOrEmpty(pdfPath))
-            throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
-
         var counts = new Dictionary<int, int>();
-
-        // PdfAnnotationEditor is a Facades class that works with annotations.
-        // It implements IDisposable, so we can use a using block for deterministic cleanup.
+        // Use a using‑statement to guarantee disposal of the facade
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Bind the PDF file to the editor.
             editor.BindPdf(pdfPath);
-
-            // Access the underlying Document to obtain the page count.
             Document doc = editor.Document;
-            int pageCount = doc.Pages.Count; // Pages are 1‑based.
-
-            // Loop through each page and extract all annotations.
-            for (int page = 1; page <= pageCount; page++)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // ExtractAnnotations returns an IList<Annotation> for the specified page range.
-                // Passing null for the AnnotationType[] parameter retrieves all annotation types.
-                // The cast removes the ambiguity between the overloads that accept string[]
-                // and AnnotationType[].
-                IList<Annotation> pageAnnotations = editor.ExtractAnnotations(page, page, (AnnotationType[])null);
-                counts[page] = pageAnnotations?.Count ?? 0;
+                Page page = doc.Pages[i];
+                counts[i] = page.Annotations.Count;
             }
-
-            // Close the editor (optional because of using, but explicit for clarity).
             editor.Close();
         }
-
         return counts;
     }
+}
 
-    // Dummy entry point to satisfy the compiler when the project is built as a console app.
-    // In a real library this method can be removed or the project type changed to a class library.
-    public static void Main(string[] args)
+class Program
+{
+    static void Main()
     {
-        // No operation – the API is intended to be called from other code.
-    }
+        const string samplePath = "sample.pdf";
 
-    // Example usage (commented out for library builds):
-    // static void Main()
-    // {
-    //     var result = GetAnnotationsCountPerPage("sample.pdf");
-    //     foreach (var kvp in result)
-    //         Console.WriteLine($"Page {kvp.Key}: {kvp.Value} annotation(s)");
-    // }
+        // ------------------------------------------------------------
+        // Create a self‑contained sample PDF with a few pages/annotations
+        // ------------------------------------------------------------
+        using (Document doc = new Document())
+        {
+            // Page 1 – two text annotations
+            Page page1 = doc.Pages.Add();
+            var rect1 = new Aspose.Pdf.Rectangle(100, 600, 200, 650);
+            var ann1 = new TextAnnotation(page1, rect1) { Title = "Note1", Contents = "First note" };
+            page1.Annotations.Add(ann1);
+
+            var rect2 = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
+            var ann2 = new TextAnnotation(page1, rect2) { Title = "Note2", Contents = "Second note" };
+            page1.Annotations.Add(ann2);
+
+            // Page 2 – one text annotation
+            Page page2 = doc.Pages.Add();
+            var rect3 = new Aspose.Pdf.Rectangle(100, 600, 200, 650);
+            var ann3 = new TextAnnotation(page2, rect3) { Title = "Note3", Contents = "Third note" };
+            page2.Annotations.Add(ann3);
+
+            // Persist the PDF so the reporting method can open it
+            doc.Save(samplePath);
+        }
+
+        // ------------------------------------------------------------
+        // Retrieve annotation counts per page
+        // ------------------------------------------------------------
+        Dictionary<int, int> pageAnnotationCounts = AnnotationReport.GetAnnotationsCountPerPage(samplePath);
+
+        foreach (var kvp in pageAnnotationCounts)
+        {
+            Console.WriteLine($"Page {kvp.Key}: {kvp.Value} annotation(s)");
+        }
+    }
 }

@@ -1,66 +1,84 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
+using System.Xml;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF containing annotations
-        const string inputPdfPath = "input.pdf";
-
-        // Desired output XFDF file path
-        const string outputXfdfPath = "custom_namespace.xfdf";
-
-        // Custom XFDF namespace required by enterprise standards
-        const string customNamespace = "http://mycompany.com/xfdf";
+        // Paths for input PDF, temporary XFDF, and final XFDF with custom namespace
+        const string pdfPath = "input.pdf";
+        const string xfdfPath = "annotations.xfdf";
+        const string customNamespace = "http://myenterprise.com/xfdf";
 
         // Ensure the input PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Use PdfAnnotationEditor facade to work with annotations
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        // Load the PDF document (lifecycle rule: use using for Document)
+        using (Document doc = new Document(pdfPath))
         {
-            // Bind the PDF document to the editor
-            editor.BindPdf(inputPdfPath);
+            // Initialize the PdfAnnotationEditor facade and bind the PDF
+            PdfAnnotationEditor editor = new PdfAnnotationEditor();
+            editor.BindPdf(doc);
 
-            // Export annotations to an in‑memory stream (default XFDF)
-            using (MemoryStream tempStream = new MemoryStream())
+            // Export all annotations to a memory stream
+            using (MemoryStream ms = new MemoryStream())
             {
-                editor.ExportAnnotationsToXfdf(tempStream);
-                tempStream.Position = 0; // Reset for reading
+                editor.ExportAnnotationsToXfdf(ms);
+                ms.Position = 0; // Reset stream position for reading
 
-                // Load the XFDF XML
-                XDocument xfdfDoc = XDocument.Load(tempStream);
+                // Load the exported XFDF XML
+                XmlDocument xfdfXml = new XmlDocument();
+                xfdfXml.Load(ms);
 
-                // Replace the default namespace with the custom one
-                // Set the xmlns attribute on the root element
-                xfdfDoc.Root.SetAttributeValue("xmlns", customNamespace);
+                // Change the default namespace to the custom one
+                // Create a new XmlNamespaceManager for the original namespace
+                string originalNs = xfdfXml.DocumentElement.NamespaceURI;
+                XmlNamespaceManager nsmgr = new XmlNamespaceManager(xfdfXml.NameTable);
+                nsmgr.AddNamespace("old", originalNs);
 
-                // If the document contains elements that explicitly use the old namespace,
-                // rename them to the new namespace as well
-                XNamespace oldNs = xfdfDoc.Root.GetDefaultNamespace();
-                XNamespace newNs = customNamespace;
+                // Rename the root element with the custom namespace
+                XmlElement oldRoot = xfdfXml.DocumentElement;
+                XmlElement newRoot = xfdfXml.CreateElement(oldRoot.Prefix, oldRoot.LocalName, customNamespace);
 
-                foreach (XElement elem in xfdfDoc.Descendants())
+                // Copy attributes (if any) from old root to new root
+                foreach (XmlAttribute attr in oldRoot.Attributes)
                 {
-                    // Change element name to use the new namespace
-                    elem.Name = newNs + elem.Name.LocalName;
+                    XmlAttribute newAttr = (XmlAttribute)attr.CloneNode(true);
+                    newRoot.Attributes.Append(newAttr);
                 }
 
-                // Save the modified XFDF to the target file
-                xfdfDoc.Save(outputXfdfPath);
+                // Move all child nodes to the new root
+                while (oldRoot.HasChildNodes)
+                {
+                    XmlNode child = oldRoot.FirstChild;
+                    oldRoot.RemoveChild(child);
+                    newRoot.AppendChild(child);
+                }
+
+                // Replace the old root with the new one
+                xfdfXml.ReplaceChild(newRoot, oldRoot);
+
+                // Update namespace declarations for all descendant elements
+                // (If elements use the default namespace, they will inherit the new one automatically)
+
+                // Save the modified XFDF to the final file
+                using (FileStream outFs = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
+                {
+                    xfdfXml.Save(outFs);
+                }
             }
 
-            // Close the editor (optional, as using will dispose it)
+            // Close the editor (PdfAnnotationEditor does not implement IDisposable)
             editor.Close();
         }
 
-        Console.WriteLine($"Annotations exported with custom namespace to '{outputXfdfPath}'.");
+        Console.WriteLine($"Annotations exported with custom namespace to '{xfdfPath}'.");
     }
 }

@@ -1,14 +1,13 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input500.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "flattened_output.pdf";
 
         if (!File.Exists(inputPath))
@@ -20,21 +19,16 @@ class Program
         // Start timing
         Stopwatch sw = Stopwatch.StartNew();
 
-        // Use PdfAnnotationEditor facade to flatten annotations
+        // Use PdfAnnotationEditor to flatten all annotations
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Load the PDF
-            editor.BindPdf(inputPath);
-
-            // Flatten all annotations in the document
-            editor.FlatteningAnnotations();
-
-            // Save the result
-            editor.Save(outputPath);
+            editor.BindPdf(inputPath);               // Load the PDF
+            editor.FlatteningAnnotations();          // Flatten all annotations
+            editor.Save(outputPath);                  // Save the result
         }
 
         // Stop timing
         sw.Stop();
-        Console.WriteLine($"Flattening annotations completed in {sw.Elapsed.TotalSeconds:F2} seconds.");
+        Console.WriteLine($"Flattening completed in {sw.Elapsed.TotalSeconds:F2} seconds.");
     }
 }

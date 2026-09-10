@@ -1,36 +1,50 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+class HealthCheck
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        const string samplePdfPath = "sample.pdf";
+        // Path to a sample PDF used for the health check
+        const string samplePath = "sample.pdf";
 
-        // Verify the sample PDF exists before attempting to bind.
-        if (!File.Exists(samplePdfPath))
+        // Ensure the sample PDF exists – create a minimal one if necessary
+        if (!File.Exists(samplePath))
         {
-            Console.Error.WriteLine($"Health check failed: file not found – {samplePdfPath}");
-            return;
+            // Create a simple PDF with a single blank page
+            using (Document doc = new Document())
+            {
+                doc.Pages.Add();               // Add an empty page
+                doc.Save(samplePath);          // Save as PDF
+            }
         }
 
+        // Attempt to bind PdfAnnotationEditor to the sample PDF
         try
         {
-            // Create the PdfAnnotationEditor facade.
+            // PdfAnnotationEditor implements IDisposable, so use a using block
             using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                // Bind the PDF file to the editor. This is the health‑check operation.
-                editor.BindPdf(samplePdfPath);
+                // Bind the editor to the PDF file
+                editor.BindPdf(samplePath);
 
-                // If we reach this point, binding succeeded.
-                Console.WriteLine("Health check passed: PdfAnnotationEditor bound to the PDF successfully.");
+                // Verify that the underlying Document was loaded successfully
+                if (editor.Document != null)
+                {
+                    Console.WriteLine("PdfAnnotationEditor successfully bound to the PDF.");
+                }
+                else
+                {
+                    Console.WriteLine("PdfAnnotationEditor bound, but Document is null.");
+                }
             }
         }
         catch (Exception ex)
         {
-            // Any exception indicates a problem with the binding operation.
-            Console.Error.WriteLine($"Health check failed: {ex.GetType().Name} – {ex.Message}");
+            // Report any binding errors
+            Console.Error.WriteLine($"PdfAnnotationEditor binding failed: {ex.Message}");
         }
     }
 }

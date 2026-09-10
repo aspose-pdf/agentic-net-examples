@@ -1,28 +1,14 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
-
-class AnnotationInfo
-{
-    public int PageNumber { get; set; }
-    public string? AnnotationName { get; set; }
-    public string? AnnotationType { get; set; }
-    public string? Title { get; set; }
-    public string? Contents { get; set; }
-    public string? Color { get; set; }
-    public bool Open { get; set; }
-}
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string logPath = "annotations_log.json";
+        const string jsonLog  = "annotations_log.json";
 
         if (!File.Exists(inputPdf))
         {
@@ -30,61 +16,34 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Initialize the facade and bind the PDF document
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            // Initialize the annotation editor facade
+            using (PdfAnnotationEditor annotEditor = new PdfAnnotationEditor())
             {
-                editor.BindPdf(inputPdf);               // Load PDF into the facade
-                Document doc = editor.Document;         // Access underlying Document
+                annotEditor.BindPdf(doc);
 
-                var annotations = new List<AnnotationInfo>();
-
-                // Iterate through pages (1‑based indexing)
-                for (int pageIdx = 1; pageIdx <= doc.Pages.Count; pageIdx++)
+                // Export form fields (widget annotations) to JSON using the Form facade
+                using (Form form = new Form(doc))
                 {
-                    Page page = doc.Pages[pageIdx];
-
-                    // Iterate through annotations on the page (1‑based)
-                    for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
+                    using (FileStream jsonStream = new FileStream(jsonLog, FileMode.Create, FileAccess.Write))
                     {
-                        Annotation ann = page.Annotations[annIdx];
-
-                        // Determine the Open flag only for annotation types that expose it
-                        bool isOpen = false;
-                        if (ann is TextAnnotation textAnn)
-                            isOpen = textAnn.Open;
-                        else if (ann is PopupAnnotation popupAnn)
-                            isOpen = popupAnn.Open;
-
-                        AnnotationInfo info = new AnnotationInfo
-                        {
-                            PageNumber = pageIdx,
-                            AnnotationName = ann.Name,
-                            AnnotationType = ann.GetType().Name,
-                            Title = ann is MarkupAnnotation ma ? ma.Title : null,
-                            Contents = ann.Contents,
-                            Color = ann.Color?.ToString(),
-                            Open = isOpen
-                        };
-
-                        annotations.Add(info);
+                        // Export all form fields to JSON; indented for readability
+                        form.ExportJson(jsonStream, indented: true);
                     }
                 }
 
-                // Serialize the collected data to indented JSON
-                JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(annotations, jsonOptions);
-
-                // Write JSON to the audit log file
-                File.WriteAllText(logPath, json);
+                // Optional: export all annotations to XFDF (XML) if needed
+                // using (FileStream xfdfStream = new FileStream("annotations.xfdf", FileMode.Create, FileAccess.Write))
+                // {
+                //     annotEditor.ExportAnnotationsToXfdf(xfdfStream);
+                // }
             }
 
-            Console.WriteLine($"Annotations exported to JSON log: {logPath}");
+            // No modifications are made to the PDF, so no Save() call is required here.
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Annotation data exported to JSON log: {jsonLog}");
     }
 }

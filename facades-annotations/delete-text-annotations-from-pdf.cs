@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_no_text_annots.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,7 +15,7 @@ class Program
             return;
         }
 
-        // Initialize the annotation editor and bind the PDF file
+        // Initialize the annotation editor and bind the PDF
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
             editor.BindPdf(inputPath);
