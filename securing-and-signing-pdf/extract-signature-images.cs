@@ -16,14 +16,14 @@ class ExtractSignatureImages
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
         // Load the PDF document (wrapped in using for deterministic disposal)
         using (Document doc = new Document(inputPdf))
         {
             // Iterate over all form fields in the document
-            foreach (Field field in doc.Form)
+            foreach (Field field in doc.Form.Fields)
             {
                 // Process only signature fields
                 if (field is SignatureField signature)
@@ -33,8 +33,8 @@ class ExtractSignatureImages
 
                     if (imageStream != null)
                     {
-                        // Build a unique file name using page index and field name
-                        string fileName = $"sig_page{signature.PageIndex}_field_{signature.Name}.jpg";
+                        // Build a unique file name using the field name and page index
+                        string fileName = $"{signature.FullName}_Page{signature.PageIndex}.jpg";
                         string outputPath = Path.Combine(outputFolder, fileName);
 
                         // Save the extracted image to disk
@@ -43,11 +43,11 @@ class ExtractSignatureImages
                             imageStream.CopyTo(file);
                         }
 
-                        Console.WriteLine($"Extracted signature image saved to: {outputPath}");
+                        Console.WriteLine($"Extracted image saved to: {outputPath}");
                     }
                     else
                     {
-                        Console.WriteLine($"No image found for signature field '{signature.Name}' on page {signature.PageIndex}.");
+                        Console.WriteLine($"No image found for signature field: {signature.FullName}");
                     }
                 }
             }

@@ -6,59 +6,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "signed.pdf";
-        const string outputRoot = "ExtractedImages";
+        const string inputPdfPath = "signed.pdf";
+        const string outputRootFolder = "ExtractedImages";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the root folder for extracted images exists
-        Directory.CreateDirectory(outputRoot);
+        // Ensure the root output directory exists
+        Directory.CreateDirectory(outputRootFolder);
 
-        try
+        // Load the signed PDF (Document implements IDisposable)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the signed PDF (Document implements IDisposable)
-            using (Document doc = new Document(inputPath))
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                // Pages are 1‑based in Aspose.Pdf
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                Page page = pdfDoc.Pages[pageNumber];
+
+                // Create a folder for this page's images
+                string pageFolder = Path.Combine(outputRootFolder, $"Page_{pageNumber}");
+                Directory.CreateDirectory(pageFolder);
+
+                int imageIndex = 1;
+
+                // Iterate over the XImage collection (not a dictionary)
+                foreach (XImage img in page.Resources.Images)
                 {
-                    Page page = doc.Pages[i];
-                    string pageFolder = Path.Combine(outputRoot, $"Page_{i}");
-                    Directory.CreateDirectory(pageFolder);
-
-                    int imageIndex = 1;
-                    // Iterate over images on the current page
-                    foreach (XImage img in page.Resources.Images)
+                    // Save each image as PNG using a FileStream (XImage.Save expects a Stream)
+                    string imagePath = Path.Combine(pageFolder, $"Image_{imageIndex}.png");
+                    using (FileStream fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
                     {
-                        string ext = GetImageExtension(); // default to .png
-                        string filePath = Path.Combine(pageFolder, $"Image_{imageIndex}{ext}");
-
-                        // XImage.Save expects a Stream, not a file path
-                        using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-                        {
-                            img.Save(fs);
-                        }
-
-                        imageIndex++;
+                        img.Save(fs);
                     }
+                    imageIndex++;
                 }
             }
-
-            Console.WriteLine("All images have been extracted successfully.");
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
-        }
-    }
 
-    // Aspose.Pdf.XImage does not expose MIME information; default to PNG
-    static string GetImageExtension()
-    {
-        return ".png";
+        Console.WriteLine("All images have been extracted to page‑specific folders.");
     }
 }

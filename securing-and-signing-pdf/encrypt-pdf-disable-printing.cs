@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // CryptoAlgorithm, Permissions, Document
+using Aspose.Pdf; // CryptoAlgorithm and Permissions are in this namespace
 
 class Program
 {
@@ -11,24 +11,26 @@ class Program
         const string userPassword  = "user123";
         const string ownerPassword = "owner123";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the existing PDF
+            // Load the PDF document (lifecycle rule: use Document constructor)
             using (Document doc = new Document(inputPath))
             {
-                // Define permissions without PrintDocument to disable printing
+                // Define permissions without the PrintDocument flag to disable printing
+                // Example: allow modifying content and extracting content, but not printing
                 Permissions perms = Permissions.ModifyContent | Permissions.ExtractContent;
 
-                // Encrypt using AES-256 algorithm
+                // Encrypt using the recommended CryptoAlgorithm (AESx256)
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                // Save the encrypted PDF
+                // Save the encrypted PDF (lifecycle rule: use Document.Save)
                 doc.Save(outputPath);
             }
 

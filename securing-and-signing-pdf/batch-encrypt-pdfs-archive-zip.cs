@@ -1,61 +1,80 @@
 using System;
 using System.IO;
 using System.IO.Compression;
-using Aspose.Pdf;
+using System.Collections.Generic;
+using Aspose.Pdf;               // Aspose.Pdf core API
+using Aspose.Pdf.Security;    // CryptoAlgorithm and Permissions enums are in Aspose.Pdf namespace (no separate Security namespace needed, but this using is harmless)
 
-class Program
+class BatchEncryptAndArchive
 {
+    // Generates a random password using a GUID (ensures uniqueness)
+    private static string GeneratePassword()
+    {
+        return Guid.NewGuid().ToString("N"); // 32‑character alphanumeric string
+    }
+
     static void Main()
     {
-        const string inputFolder = "input_pdfs";
-        const string tempFolder = "encrypted_pdfs";
-        const string zipPath = "encrypted_archive.zip";
+        // Input folder containing PDFs to process
+        const string inputFolder = @"C:\InputPdfs";
+        // Temporary folder to store encrypted PDFs before archiving
+        const string tempFolder = @"C:\TempEncrypted";
+        // Output ZIP archive path
+        const string zipPath = @"C:\EncryptedPdfs.zip";
 
-        // Verify that the input folder exists before trying to enumerate files.
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.WriteLine($"Input folder '{inputFolder}' does not exist. No PDFs to process.");
-            return;
-        }
-
-        // Clean/create temporary folder for encrypted PDFs.
+        // Ensure temporary folder exists and is empty
         if (Directory.Exists(tempFolder))
             Directory.Delete(tempFolder, true);
         Directory.CreateDirectory(tempFolder);
 
-        // Get all PDF files in the input folder.
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found in the input folder.");
-            return;
-        }
+        // Dictionary to keep track of original file name -> password (optional, for reference)
+        var passwordMap = new Dictionary<string, string>();
 
-        foreach (string pdfPath in pdfFiles)
+        // Process each PDF file in the input folder
+        foreach (string pdfFile in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Generate unique passwords for each PDF.
-            string userPassword = Guid.NewGuid().ToString("N");
-            string ownerPassword = Guid.NewGuid().ToString("N");
+            string fileName = Path.GetFileName(pdfFile);
+            string encryptedFilePath = Path.Combine(tempFolder, fileName);
+            string userPassword = GeneratePassword();
+            string ownerPassword = GeneratePassword(); // could be same or different; using separate for demonstration
 
-            // Load, encrypt, and save the PDF.
-            using (Document doc = new Document(pdfPath))
+            // Store passwords (optional)
+            passwordMap[fileName] = userPassword;
+
+            // Load, encrypt, and save the PDF using Aspose.Pdf
+            using (Document doc = new Document(pdfFile))
             {
-                // Allow printing and content extraction.
+                // Define permissions (example: allow printing and content extraction)
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                // Encrypt with AES‑256 (core API, no Facades).
+                // Encrypt with AES‑256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                string encryptedFileName = Path.GetFileNameWithoutExtension(pdfPath) + "_enc.pdf";
-                string encryptedPath = Path.Combine(tempFolder, encryptedFileName);
-                doc.Save(encryptedPath);
+                // Save encrypted PDF (PDF format, no SaveOptions needed)
+                doc.Save(encryptedFilePath);
             }
         }
 
-        // Create a ZIP archive containing all encrypted PDFs.
+        // Create ZIP archive containing all encrypted PDFs
         if (File.Exists(zipPath))
             File.Delete(zipPath);
-        ZipFile.CreateFromDirectory(tempFolder, zipPath);
-        Console.WriteLine($"Encrypted archive created at '{zipPath}'.");
+
+        ZipFile.CreateFromDirectory(tempFolder, zipPath, CompressionLevel.Optimal, false);
+
+        // Optional: write passwords to a text file for reference
+        string passwordFile = Path.Combine(Path.GetDirectoryName(zipPath), "Passwords.txt");
+        using (StreamWriter writer = new StreamWriter(passwordFile))
+        {
+            foreach (var kvp in passwordMap)
+            {
+                writer.WriteLine($"{kvp.Key}: {kvp.Value}");
+            }
+        }
+
+        // Cleanup temporary folder
+        Directory.Delete(tempFolder, true);
+
+        Console.WriteLine($"Encryption complete. Archive created at: {zipPath}");
+        Console.WriteLine($"Passwords saved to: {passwordFile}");
     }
 }

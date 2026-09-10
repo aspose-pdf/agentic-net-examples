@@ -1,47 +1,80 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "signed_input.pdf";
-        const string outputDir = "ExtractedImages";
+        const string inputPdfPath = "signed.pdf";
+        const string outputFolder = "ExtractedImages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document (signed PDFs are handled automatically)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document (wrapped in a using block for deterministic disposal)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // -----------------------------------------------------------------
+            // 1) Extract images that are part of signature fields (if any)
+            // -----------------------------------------------------------------
+            foreach (var field in pdfDoc.Form)
             {
-                Page page = doc.Pages[pageNum];
-                int imgIndex = 1;
-
-                // Iterate over all images defined in the page resources
-                foreach (XImage img in page.Resources.Images)
+                if (field is SignatureField sigField)
                 {
-                    // Build a unique file name per page and image
-                    string fileName = $"page_{pageNum}_img_{imgIndex}.png";
-                    string outPath  = Path.Combine(outputDir, fileName);
-
-                    // Save the image as PNG; Aspose.Pdf requires a Stream overload
-                    using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                    // Extract the signature image as a stream
+                    using (Stream imgStream = sigField.ExtractImage())
                     {
-                        img.Save(fs);
+                        if (imgStream != null)
+                        {
+                            string sigImagePath = Path.Combine(
+                                outputFolder,
+                                $"{sigField.PartialName ?? "signature"}_{Guid.NewGuid()}.png");
+
+                            // Save the extracted stream to a PNG file
+                            using (FileStream fileOut = new FileStream(sigImagePath, FileMode.Create, FileAccess.Write))
+                            {
+                                imgStream.CopyTo(fileOut);
+                            }
+
+                            Console.WriteLine($"Signature image saved: {sigImagePath}");
+                        }
+                    }
+                }
+            }
+
+            // -----------------------------------------------------------------
+            // 2) Extract all other embedded images from each page
+            // -----------------------------------------------------------------
+            int pageNumber = 1;
+            foreach (Page page in pdfDoc.Pages)
+            {
+                int imageIndex = 1;
+                foreach (XImage xImg in page.Resources.Images)
+                {
+                    // Build a unique file name for each image
+                    string imagePath = Path.Combine(
+                        outputFolder,
+                        $"page{pageNumber}_img{imageIndex}.png");
+
+                    // XImage.Save expects a Stream, so write to a FileStream
+                    using (FileStream imgOut = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
+                    {
+                        xImg.Save(imgOut);
                     }
 
-                    Console.WriteLine($"Saved image: {outPath}");
-                    imgIndex++;
+                    Console.WriteLine($"Image extracted: {imagePath}");
+                    imageIndex++;
                 }
+
+                pageNumber++;
             }
         }
 

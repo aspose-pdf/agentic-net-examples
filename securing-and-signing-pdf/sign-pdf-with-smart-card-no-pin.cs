@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
@@ -10,93 +8,82 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "signed_output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "signed.pdf";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document.
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPdf))
         {
-            // -----------------------------------------------------------------
-            // 1. Create a signature field on the first page (adjust rectangle as needed)
-            // -----------------------------------------------------------------
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-            // SignatureField constructor takes only page and rectangle; set the name via PartialName.
-            SignatureField sigField = new SignatureField(doc.Pages[1], rect)
-            {
-                PartialName = "SmartCardSignature"
-            };
-            doc.Form.Add(sigField);
+            // Ensure the document has at least one page.
+            if (doc.Pages.Count == 0)
+                doc.Pages.Add();
 
-            // -----------------------------------------------------------------
-            // 2. Obtain the X509Certificate2 from the smart card (example: first cert with a private key)
-            // -----------------------------------------------------------------
+            // Define the rectangle where the visible signature will appear.
+            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
+
+            // Create a signature field on the first page.
+            Aspose.Pdf.Forms.SignatureField sigField = new Aspose.Pdf.Forms.SignatureField(doc, sigRect);
+            doc.Pages[1].Annotations.Add(sigField);
+
+            // Obtain the X509Certificate2 from the smart card (no PIN prompt).
+            // This method should select a certificate whose private key is accessible
+            // without UI interaction (e.g., using a CSP that does not request a PIN).
             X509Certificate2 cert = GetCertificateFromSmartCard();
+
             if (cert == null)
             {
-                Console.Error.WriteLine("No suitable certificate found on the smart card.");
+                Console.Error.WriteLine("Smart card certificate not found.");
                 return;
             }
 
-            // -----------------------------------------------------------------
-            // 3. Create an ExternalSignature that uses the certificate.
-            //    Set CustomSignHash delegate to perform the signing silently.
-            // -----------------------------------------------------------------
-            ExternalSignature externalSig = new ExternalSignature(cert)
+            // Create an ExternalSignature that uses the smart‑card certificate.
+            Aspose.Pdf.Forms.ExternalSignature externalSig = new Aspose.Pdf.Forms.ExternalSignature(cert)
             {
-                Reason = "Document approved",
-                Location = "Office",
-                Date = DateTime.UtcNow
+                Reason      = "Document approved",
+                ContactInfo = "john.doe@example.com",
+                Location    = "Head Office"
             };
 
-            // CustomSignHash delegate: receives the hash bytes (and algorithm name) and returns the signature bytes.
-            externalSig.CustomSignHash = (hash, algorithm) =>
-            {
-                // The algorithm argument is ignored because we know we are using SHA256.
-                using (RSA rsa = cert.GetRSAPrivateKey())
-                {
-                    return rsa.SignHash(hash, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-                }
-            };
-
-            // -----------------------------------------------------------------
-            // 4. Sign the PDF using the signature field and the external signature.
-            // -----------------------------------------------------------------
+            // Sign the field with the external signature.
             sigField.Sign(externalSig);
 
-            // -----------------------------------------------------------------
-            // 5. Save the signed PDF.
-            // -----------------------------------------------------------------
+            // Save the signed PDF.
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF signed successfully: {outputPdf}");
+        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
     }
 
-    // Helper method to retrieve a certificate with a private key from the smart card.
-    // Adjust the selection criteria (e.g., subject name) as required.
+    // Retrieves a certificate from the smart card. Adjust the search criteria as needed.
     private static X509Certificate2 GetCertificateFromSmartCard()
     {
-        // Open the personal (My) store of the current user.
+        // Look in the CurrentUser's "My" store for a certificate that has a private key
+        // and is marked as a smart‑card certificate (e.g., by checking the ProviderName).
         using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
         {
-            store.Open(OpenFlags.ReadOnly);
+            store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
+            foreach (X509Certificate2 cert in store.Certificates)
+            {
+                // Ensure the certificate has a private key.
+                if (!cert.HasPrivateKey)
+                    continue;
 
-            // Find certificates that have a private key and are valid.
-            var certs = store.Certificates
-                .Find(X509FindType.FindByTimeValid, DateTime.Now, false)
-                .Find(X509FindType.FindByKeyUsage, X509KeyUsageFlags.DigitalSignature, false)
-                .Cast<X509Certificate2>()
-                .Where(c => c.HasPrivateKey);
-
-            // Example: pick the first matching certificate.
-            // In a real scenario, refine the selection (e.g., by subject name or thumbprint).
-            return certs.FirstOrDefault();
+                // Example heuristic: the certificate's private key is provided by a CSP
+                // whose name contains "SmartCard". Adjust according to your environment.
+                var keyInfo = cert.PrivateKey?.ToString() ?? string.Empty;
+                if (keyInfo.IndexOf("SmartCard", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return cert;
+                }
+            }
         }
+
+        return null; // No suitable certificate found.
     }
 }
