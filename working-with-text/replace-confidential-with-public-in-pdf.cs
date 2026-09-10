@@ -16,25 +16,23 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create search options – false = case‑insensitive
-            TextSearchOptions searchOptions = new TextSearchOptions(false);
+            // Find every occurrence of "Confidential"
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber("Confidential");
+            // Optional: make the search case‑sensitive (true) or case‑insensitive (false)
+            absorber.TextSearchOptions = new TextSearchOptions(true);
 
-            // Create a TextFragmentAbsorber to locate all occurrences of "Confidential"
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber("Confidential", searchOptions);
-
-            // Apply the absorber to all pages of the document
+            // Apply the absorber to all pages
             doc.Pages.Accept(absorber);
 
-            // Replace each found fragment with the new text "Public"
+            // Replace the found text with "Public"
             foreach (TextFragment fragment in absorber.TextFragments)
             {
                 fragment.Text = "Public";
             }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

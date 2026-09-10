@@ -16,31 +16,40 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Iterate through all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create a text fragment for the watermark
+                // Create a TextBuilder for the current page
+                TextBuilder builder = new TextBuilder(page);
+
+                // Create the watermark text fragment
                 TextFragment watermark = new TextFragment("CONFIDENTIAL");
-                // Position the text (center of the page)
+
+                // Position the text roughly at the center of the page
+                // (you may adjust X/Y as needed)
                 watermark.Position = new Position(page.PageInfo.Width / 2, page.PageInfo.Height / 2);
-                // Set visual properties
-                watermark.TextState.FontSize = 72;
+
+                // Set visual appearance
                 watermark.TextState.Font = FontRepository.FindFont("Helvetica");
+                watermark.TextState.FontSize = 72;
                 watermark.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
-                // Rotate the text (e.g., 45 degrees)
+
+                // Rotate the text (45 degrees)
                 watermark.TextState.Rotation = 45;
 
-                // Append the watermark to the current page using TextBuilder
-                TextBuilder builder = new TextBuilder(page);
+                // Optionally send the watermark behind page content
+                watermark.ZIndex = -1; // negative ZIndex places it behind other graphics
+
+                // Append the fragment to the page
                 builder.AppendText(watermark);
             }
 
-            // Save the modified PDF
+            // Save the modified document as PDF
             doc.Save(outputPath);
         }
 

@@ -1,39 +1,12 @@
-using System;
-using System.IO;
-using System.Text;
-using Aspose.Pdf;
-using Aspose.Pdf.Text;
+// URL-STABILITY STUB
+//
+// extract pdf text to utf8 file
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/working-with-text/extract-text-from-pdf-to-utf8-file.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf = "input.pdf";
-        const string outputTxt = "output.txt";
-
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
-
-        // Load the PDF document; the using block ensures deterministic disposal
-        using (Document doc = new Document(inputPdf))
-        {
-            // Create a TextAbsorber to collect text from all pages
-            TextAbsorber absorber = new TextAbsorber();
-
-            // Apply the absorber to the document's pages
-            doc.Pages.Accept(absorber);
-
-            // Retrieve the concatenated text (empty string if null)
-            string extractedText = absorber.Text ?? string.Empty;
-
-            // Write the result to a UTF‑8 encoded text file
-            File.WriteAllText(outputTxt, extractedText, Encoding.UTF8);
-        }
-
-        Console.WriteLine($"All text extracted to '{outputTxt}'.");
-    }
-}
+class Program { static void Main() { } }

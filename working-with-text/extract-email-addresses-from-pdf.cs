@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using Aspose.Pdf;
@@ -17,39 +16,26 @@ class Program
             return;
         }
 
-        // Regular expression for email addresses (case‑insensitive)
-        Regex emailRegex = new Regex(@"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", RegexOptions.IgnoreCase);
-
-        // Enable regular‑expression search
-        TextSearchOptions searchOptions = new TextSearchOptions(true);
-
-        // Absorber that searches using the email regex
-        TextFragmentAbsorber absorber = new TextFragmentAbsorber(emailRegex, searchOptions);
-
-        // Load the PDF and search each page
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            foreach (Page page in doc.Pages)
-            {
-                page.Accept(absorber);
-            }
-        }
+            // Regular expression for email addresses
+            Regex emailRegex = new Regex(@"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", RegexOptions.IgnoreCase);
+            TextSearchOptions searchOptions = new TextSearchOptions(true); // enable regex search
 
-        // Collect all matched email strings
-        List<string> emails = new List<string>();
-        foreach (KeyValuePair<Regex, TextFragmentCollection> entry in absorber.RegexResults)
-        {
-            foreach (TextFragment fragment in entry.Value)
+            // Iterate through all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                emails.Add(fragment.Text);
-            }
-        }
+                // Create an absorber for the current page
+                TextFragmentAbsorber absorber = new TextFragmentAbsorber(emailRegex, searchOptions);
+                doc.Pages[i].Accept(absorber);
 
-        // Output the results
-        Console.WriteLine("Found email addresses:");
-        foreach (string email in emails)
-        {
-            Console.WriteLine(email);
+                // Output each found email with its page number
+                foreach (TextFragment fragment in absorber.TextFragments)
+                {
+                    Console.WriteLine($"Page {i}: {fragment.Text}");
+                }
+            }
         }
     }
 }

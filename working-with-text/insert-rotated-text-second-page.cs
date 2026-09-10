@@ -16,7 +16,7 @@ class Program
             return;
         }
 
-        // Load the existing PDF
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
             // Ensure the document has at least two pages
@@ -31,16 +31,17 @@ class Program
 
             // Create a text fragment with the desired content
             TextFragment tf = new TextFragment("Rotated Text");
-            // Position where the text will start (coordinates are in points)
-            tf.Position = new Position(100, 500);
+            // Set the position where the text will start
+            tf.Position = new Position(200, 400);
             // Set font, size and colors
             tf.TextState.Font = FontRepository.FindFont("Helvetica");
             tf.TextState.FontSize = 24;
             tf.TextState.ForegroundColor = Color.Blue;
-            // Rotate the text fragment by 45 degrees
+            tf.TextState.BackgroundColor = Color.LightGray;
+            // Rotate the text by 45 degrees
             tf.TextState.Rotation = 45;
 
-            // Append the fragment to the page using TextBuilder
+            // Use TextBuilder to append the fragment to the page
             TextBuilder builder = new TextBuilder(page);
             builder.AppendText(tf);
 
@@ -48,6 +49,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Rotated text added to page 2 and saved as '{outputPath}'.");
+        Console.WriteLine($"Rotated text added and saved to '{outputPath}'.");
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Text;
 
 class Program
@@ -16,36 +17,34 @@ class Program
             return;
         }
 
-        // Open the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
             // Define the visual style of the watermark text
             TextState textState = new TextState
             {
-                // Use a standard font; FontRepository is in Aspose.Pdf.Text
-                Font = FontRepository.FindFont("Helvetica"),
-                FontSize = 72,
-                // Use a gray color for the text
-                ForegroundColor = Aspose.Pdf.Color.Gray
+                Font          = FontRepository.FindFont("Helvetica"),
+                FontSize      = 72,
+                ForegroundColor = Aspose.Pdf.Color.FromRgb(0.5, 0.5, 0.5) // light gray
             };
 
-            // Create a TextStamp with the desired text and the defined TextState
-            TextStamp watermark = new TextStamp("CONFIDENTIAL", textState)
-            {
-                // Semi‑transparent appearance
-                Opacity = 0.3,
-                // Place the stamp behind the page content
-                Background = true,
-                // Center the stamp on each page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center
-            };
-
-            // Apply the same watermark to every page in the document
+            // Apply the watermark to every page
             foreach (Page page in doc.Pages)
             {
-                // Add the stamp to the current page
-                page.AddStamp(watermark);
+                // Use the full page rectangle as the annotation bounds
+                Aspose.Pdf.Rectangle pageRect = page.Rect;
+
+                // Create a WatermarkAnnotation covering the whole page
+                WatermarkAnnotation watermark = new WatermarkAnnotation(page, pageRect)
+                {
+                    Opacity = 0.3 // 30% opacity for semi‑transparent effect
+                };
+
+                // Set the watermark text and associate the TextState
+                watermark.SetTextAndState(new[] { "CONFIDENTIAL" }, textState);
+
+                // Add the annotation to the page
+                page.Annotations.Add(watermark);
             }
 
             // Save the modified PDF

@@ -33,33 +33,32 @@ class Program
             TextParagraph paragraph = new TextParagraph();
 
             // Define the rectangle where the paragraph will be placed
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 500, 400, 600);
+            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 500, 400, 700);
 
             // Rotate the paragraph by 45 degrees
             paragraph.Rotation = 45;
 
-            // Build a TextFragment with mixed font styles
-            TextFragment mixedFragment = new TextFragment();
+            // Create TextState objects for different styles
+            TextState boldState = new TextState
+            {
+                Font = FontRepository.FindFont("Helvetica-Bold"),
+                FontSize = 14,
+                ForegroundColor = Aspose.Pdf.Color.Blue
+            };
 
-            // First segment: bold font
-            TextSegment boldSegment = new TextSegment("Bold Text");
-            boldSegment.TextState.Font = FontRepository.FindFont("Helvetica-Bold");
-            boldSegment.TextState.FontSize = 14;
-            boldSegment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
-            mixedFragment.Segments.Add(boldSegment);
+            TextState italicState = new TextState
+            {
+                Font = FontRepository.FindFont("Helvetica-Oblique"),
+                FontSize = 12,
+                ForegroundColor = Aspose.Pdf.Color.Green
+            };
 
-            // Second segment: italic font
-            TextSegment italicSegment = new TextSegment(" and Italic Text");
-            italicSegment.TextState.Font = FontRepository.FindFont("Helvetica-Oblique");
-            italicSegment.TextState.FontSize = 14;
-            italicSegment.TextState.ForegroundColor = Aspose.Pdf.Color.Green;
-            mixedFragment.Segments.Add(italicSegment);
+            // Append lines with mixed styles
+            paragraph.AppendLine("This line is bold and blue.", boldState);
+            paragraph.AppendLine("This line is italic and green.", italicState);
+            paragraph.AppendLine("Normal line with default style.");
 
-            // Append the mixed‑style fragment as a line in the paragraph
-            paragraph.AppendLine(mixedFragment);
-
-            // Use TextBuilder to place the paragraph on the page
+            // Append the paragraph to the page using TextBuilder
             TextBuilder builder = new TextBuilder(page);
             builder.AppendParagraph(paragraph);
 

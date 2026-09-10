@@ -1,13 +1,34 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Text;                // For TextState if needed (not used here)
 
-class Program
+class EmbedCssInHtmlFragment
 {
     static void Main()
     {
-        // Paths for output PDF
-        const string outputPath = "HtmlFragmentWithCss.pdf";
+        // Path for the output PDF
+        const string outputPath = "HtmlWithCss.pdf";
+
+        // HTML content with embedded CSS to control font, color, and spacing
+        string html = @"
+            <html>
+                <head>
+                    <style>
+                        /* CSS rules applied to the paragraph */
+                        p {
+                            font-family: Arial, Helvetica, sans-serif;   /* Font */
+                            color: #FF0000;                               /* Text color (red) */
+                            margin-top: 15px;                             /* Top margin */
+                            margin-bottom: 15px;                          /* Bottom margin */
+                            line-height: 1.5;                             /* Line spacing */
+                        }
+                    </style>
+                </head>
+                <body>
+                    <p>This paragraph is styled using embedded CSS.</p>
+                </body>
+            </html>";
 
         // Create a new PDF document
         using (Document doc = new Document())
@@ -15,24 +36,10 @@ class Program
             // Add a blank page to the document
             Page page = doc.Pages.Add();
 
-            // Define HTML with embedded CSS to control font, color, and spacing
-            string htmlContent = @"
-                <style>
-                    .styledText {
-                        font-family: Arial, Helvetica, sans-serif;   /* Font */
-                        color: #0033CC;                               /* Text color */
-                        margin: 15px 0 10px 0;                        /* Top, right, bottom, left margins */
-                        line-height: 1.5;                             /* Line spacing */
-                    }
-                </style>
-                <div class='styledText'>
-                    This is a sample paragraph styled with embedded CSS.
-                </div>";
-
             // Create an HtmlFragment from the HTML string
-            HtmlFragment htmlFragment = new HtmlFragment(htmlContent);
+            HtmlFragment htmlFragment = new HtmlFragment(html);
 
-            // Optionally set horizontal alignment for the fragment (centered)
+            // Optional: set horizontal alignment of the fragment (centered)
             htmlFragment.HorizontalAlignment = HorizontalAlignment.Center;
 
             // Add the HtmlFragment to the page's paragraph collection
@@ -42,6 +49,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with styled HtmlFragment saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with embedded CSS saved to '{outputPath}'.");
     }
 }

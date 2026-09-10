@@ -6,67 +6,66 @@ using Aspose.Pdf.Text;
 public static class PdfTitleRotator
 {
     /// <summary>
-    /// Rotates all text fragments (treated as title text) in each PDF by 45 degrees and saves the result.
+    /// Rotates all text fragments in each PDF to 45 degrees and saves the files.
     /// </summary>
-    /// <param name="pdfPaths">Array of input PDF file paths.</param>
-    /// <param name="outputDirectory">Directory where rotated PDFs will be saved.</param>
-    public static void RotateTitleText(string[] pdfPaths, string outputDirectory)
+    /// <param name="pdfPaths">Array of full file paths to PDF documents.</param>
+    public static void RotateTitleText(string[] pdfPaths)
     {
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDirectory);
+        if (pdfPaths == null) throw new ArgumentNullException(nameof(pdfPaths));
 
-        foreach (string inputPath in pdfPaths)
+        foreach (string path in pdfPaths)
         {
-            if (!File.Exists(inputPath))
-            {
-                Console.Error.WriteLine($"File not found: {inputPath}");
-                continue;
-            }
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+                continue; // skip invalid entries
 
             // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            using (Document doc = new Document(path))
             {
-                // Absorb all text fragments from the document
-                TextFragmentAbsorber absorber = new TextFragmentAbsorber();
-                doc.Pages.Accept(absorber);
-
-                // Rotate each text fragment by 45 degrees
-                foreach (TextFragment fragment in absorber.TextFragments)
+                // Iterate through all pages (1‑based indexing)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    // Set rotation (in degrees) on the fragment's TextState
-                    fragment.TextState.Rotation = 45;
+                    Page page = doc.Pages[i];
+
+                    // Absorb all text fragments on the current page
+                    TextFragmentAbsorber absorber = new TextFragmentAbsorber();
+                    absorber.Visit(page);
+
+                    // Rotate each text fragment by 45 degrees
+                    foreach (TextFragment fragment in absorber.TextFragments)
+                    {
+                        fragment.TextState.Rotation = 45;
+                    }
                 }
 
-                // Build output file path preserving original file name
-                string outputPath = Path.Combine(outputDirectory, Path.GetFileName(inputPath));
-
-                // Save the modified document (PDF format)
-                doc.Save(outputPath);
+                // Overwrite the original file with the rotated content
+                doc.Save(path);
             }
-
-            Console.WriteLine($"Rotated PDF saved to: {Path.Combine(outputDirectory, Path.GetFileName(inputPath))}");
         }
     }
 }
 
-public class Program
+public static class Program
 {
     /// <summary>
     /// Entry point required for a console application.
-    /// Expected arguments: <outputDirectory> <pdfPath1> [pdfPath2] ...
+    /// Pass PDF file paths as command‑line arguments.
     /// </summary>
     public static void Main(string[] args)
     {
-        if (args.Length < 2)
+        if (args == null || args.Length == 0)
         {
-            Console.WriteLine("Usage: <outputDirectory> <pdfPath1> [pdfPath2] ...");
+            Console.WriteLine("Usage: PdfTitleRotator <pdfPath1> <pdfPath2> ...");
             return;
         }
 
-        string outputDirectory = args[0];
-        // C# 8 range operator to get the remaining arguments as the PDF paths array
-        string[] pdfPaths = args[1..];
-
-        PdfTitleRotator.RotateTitleText(pdfPaths, outputDirectory);
+        try
+        {
+            PdfTitleRotator.RotateTitleText(args);
+            Console.WriteLine("Processing completed.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
