@@ -15,7 +15,7 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule for disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
             // Iterate through all pages (1‑based indexing)
@@ -24,22 +24,24 @@ class Program
                 Page page = doc.Pages[i];
 
                 // Get the current CropBox
-                Aspose.Pdf.Rectangle crop = page.CropBox;
+                Aspose.Pdf.Rectangle cropBox = page.CropBox;
 
-                // Extend 5 points on each side to create the BleedBox
-                double bleedLeft   = crop.LLX - 5;
-                double bleedBottom = crop.LLY - 5;
-                double bleedRight  = crop.URX + 5;
-                double bleedTop    = crop.URY + 5;
+                // Extend the box by 5 points on each side for bleed
+                Aspose.Pdf.Rectangle bleedBox = new Aspose.Pdf.Rectangle(
+                    cropBox.LLX - 5,   // left
+                    cropBox.LLY - 5,   // bottom
+                    cropBox.URX + 5,   // right
+                    cropBox.URY + 5    // top
+                );
 
                 // Assign the new BleedBox
-                page.BleedBox = new Aspose.Pdf.Rectangle(bleedLeft, bleedBottom, bleedRight, bleedTop);
+                page.BleedBox = bleedBox;
             }
 
-            // Save the modified PDF (using rule for disposal)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with BleedBox extended: {outputPath}");
+        Console.WriteLine($"BleedBox extended and saved to '{outputPath}'.");
     }
 }

@@ -8,17 +8,18 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "resized_output.pdf";
+        const double targetWidth = 800.0; // points
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Iterate through all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
@@ -27,21 +28,20 @@ class Program
                 double originalWidth  = page.PageInfo.Width;
                 double originalHeight = page.PageInfo.Height;
 
-                // Desired fixed width
-                const double targetWidth = 800.0;
-
-                // Compute scaling factor to preserve aspect ratio
+                // Compute scaling factor to achieve the target width
                 double scale = targetWidth / originalWidth;
-                double targetHeight = originalHeight * scale;
 
-                // Apply the new size to the page
-                page.SetPageSize(targetWidth, targetHeight);
+                // New height preserving aspect ratio
+                double newHeight = originalHeight * scale;
+
+                // Apply the new size
+                page.SetPageSize(targetWidth, newHeight);
             }
 
-            // Save the modified document (PDF format)
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Pages resized to width 800 points and saved to '{outputPath}'.");
+        Console.WriteLine($"Pages resized to width {targetWidth} points and saved to '{outputPath}'.");
     }
 }

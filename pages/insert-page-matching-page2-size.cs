@@ -18,29 +18,29 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Verify that the document has at least two pages
+            // Verify that there are at least two pages
             if (doc.Pages.Count < 2)
             {
                 Console.Error.WriteLine("The document must contain at least two pages.");
                 return;
             }
 
-            // Retrieve dimensions of page 2 (1‑based indexing)
-            Page pageTwo = doc.Pages[2];
-            double width = pageTwo.PageInfo.Width;
-            double height = pageTwo.PageInfo.Height;
+            // Retrieve width and height of page 2 (pages are 1‑based)
+            Page sourcePage = doc.Pages[2];
+            double width = sourcePage.PageInfo.Width;
+            double height = sourcePage.PageInfo.Height;
 
             // Insert a new empty page at position 5
+            // If the document has fewer than 5 pages, the page is added at the end
             Page newPage = doc.Pages.Insert(5);
 
             // Set the new page size to match page 2
             newPage.SetPageSize(width, height);
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
-
-            // Report success while still inside the using block where width/height are in scope
-            Console.WriteLine($"Inserted new page at position 5 with size {width}x{height} and saved to '{outputPath}'.");
         }
+
+        Console.WriteLine($"Inserted page at position 5 with dimensions of page 2. Saved to '{outputPath}'.");
     }
 }

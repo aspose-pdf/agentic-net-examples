@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -21,7 +21,7 @@ class Program
             // Insert an empty page at the beginning (position 1, 1‑based indexing)
             Page newPage = doc.Pages.Insert(1);
 
-            // Set custom dimensions: 200 × 300 points
+            // Set the custom page size: 200 × 300 points
             newPage.SetPageSize(200, 300);
 
             // Save the modified document

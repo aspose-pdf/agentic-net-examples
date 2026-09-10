@@ -15,25 +15,26 @@ class Program
             return;
         }
 
+        // Load the PDF document (wrapped in using for proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Verify the document has at least seven pages
+            // Verify that the document contains at least seven pages (1‑based indexing)
             if (doc.Pages.Count < 7)
             {
-                Console.Error.WriteLine("The document contains fewer than 7 pages.");
+                Console.Error.WriteLine("The document has fewer than 7 pages.");
                 return;
             }
 
-            // Retrieve the seventh page (1‑based indexing)
-            Page page = doc.Pages[7];
+            // Retrieve page 7
+            Page page7 = doc.Pages[7];
 
-            // Obtain Letter page dimensions
+            // Obtain the predefined Letter page size
             PageSize letterSize = PageSize.PageLetter;
 
-            // Apply Letter size using SetPageSize
-            page.SetPageSize(letterSize.Width, letterSize.Height);
+            // Change the page size using SetPageSize(width, height)
+            page7.SetPageSize(letterSize.Width, letterSize.Height);
 
-            // Save the updated PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 

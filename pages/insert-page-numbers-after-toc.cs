@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;   // for OutlineItemCollection (core API)
-using Aspose.Pdf.Text;          // for PageNumberStamp (inherits from TextStamp)
+using Aspose.Pdf.Annotations;
 
-class Program
+class InsertPageNumbersAfterToc
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_numbered.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,80 +16,83 @@ class Program
             return;
         }
 
-        // Open the PDF document
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
             // ------------------------------------------------------------
-            // 1. Detect the page that contains the Table of Contents (TOC)
+            // Detect the bookmark (outline) that represents the Table of Contents.
+            // The outline title is searched case‑insensitively for the phrase
+            // "Table of Contents". If found, its destination page is used.
             // ------------------------------------------------------------
-            // The core API stores bookmarks in the Outlines collection.
-            // We look for a bookmark whose title contains "Table of Contents".
-            // If found, we try to obtain the destination page number.
-            // If the bookmark structure is different, fallback to page 1.
-            // ------------------------------------------------------------
-            int tocPageNumber = 1; // default fallback
+            int tocPageNumber = 0; // 0 means not found; fallback to first page
 
-            if (doc.Outlines != null && doc.Outlines.Count > 0)
+            foreach (OutlineItemCollection outline in doc.Outlines)
             {
-                foreach (OutlineItemCollection outline in doc.Outlines)
+                if (outline.Title != null &&
+                    outline.Title.IndexOf("Table of Contents", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    if (outline.Title != null &&
-                        outline.Title.IndexOf("Table of Contents", StringComparison.OrdinalIgnoreCase) >= 0)
+                    // Try to obtain the target page from the Action (GoToAction)
+                    if (outline.Action is GoToAction goTo && goTo.Destination != null)
                     {
-                        // The Destination of a bookmark is usually a GoToAction.
-                        // Its Destination property points to an explicit destination that
-                        // holds a reference to the target page.
-                        if (outline.Destination is GoToAction goTo && goTo.Destination != null)
+                        var pageProp = goTo.Destination.GetType().GetProperty("Page");
+                        if (pageProp != null)
                         {
-                            // Many explicit destination types expose a Page property.
-                            // Use reflection to obtain it safely without depending on a specific subclass.
-                            var destPageProp = goTo.Destination.GetType().GetProperty("Page");
-                            if (destPageProp != null)
+                            Page targetPage = pageProp.GetValue(goTo.Destination) as Page;
+                            if (targetPage != null)
                             {
-                                var pageObj = destPageProp.GetValue(goTo.Destination) as Page;
-                                if (pageObj != null)
-                                {
-                                    // Pages collection is 1‑based, so we can get the index directly.
-                                    tocPageNumber = doc.Pages.IndexOf(pageObj);
-                                    // IndexOf returns 0‑based, add 1 to match the collection indexing.
-                                    tocPageNumber += 1;
-                                }
+                                tocPageNumber = targetPage.Number;
+                                break;
                             }
                         }
-                        break; // stop after the first matching bookmark
+                    }
+
+                    // If the Action did not give a page, try the Destination directly
+                    if (outline.Destination != null)
+                    {
+                        var pageProp = outline.Destination.GetType().GetProperty("Page");
+                        if (pageProp != null)
+                        {
+                            Page targetPage = pageProp.GetValue(outline.Destination) as Page;
+                            if (targetPage != null)
+                            {
+                                tocPageNumber = targetPage.Number;
+                                break;
+                            }
+                        }
                     }
                 }
             }
 
+            // If the TOC bookmark was not found, assume it starts on page 1.
+            if (tocPageNumber == 0)
+                tocPageNumber = 1;
+
             // ------------------------------------------------------------
-            // 2. Add page numbers to all pages after the TOC page.
+            // Insert page numbers on all pages that follow the TOC.
+            // Page numbers start at 1 for the first page after the TOC.
             // ------------------------------------------------------------
-            // PageNumberStamp replaces the '#' character with the actual page number.
-            // Adding the same stamp to each page works because the stamp evaluates the
-            // current page number at the time of stamping.
-            // ------------------------------------------------------------
-            for (int i = tocPageNumber + 1; i <= doc.Pages.Count; i++)
+            int firstNumberedPage = tocPageNumber + 1;
+
+            for (int i = firstNumberedPage; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[i];
+                // Calculate the logical page number (1‑based after TOC)
+                int logicalNumber = i - tocPageNumber;
 
-                // Create a stamp with the desired format.
-                PageNumberStamp pageNumberStamp = new PageNumberStamp("Page #");
+                PageNumberStamp stamp = new PageNumberStamp
+                {
+                    StartingNumber = logicalNumber,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    BottomMargin = 20 // points from the bottom edge
+                };
 
-                // Optional: adjust appearance (font size, alignment, etc.)
-                pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
-                pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
-                pageNumberStamp.BottomMargin       = 20; // distance from bottom edge
-
-                // Add the stamp to the current page.
-                page.AddStamp(pageNumberStamp);
+                doc.Pages[i].AddStamp(stamp);
             }
 
-            // ------------------------------------------------------------
-            // 3. Save the modified document.
-            // ------------------------------------------------------------
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page numbers added. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Page numbers inserted. Output saved to '{outputPath}'.");
     }
 }

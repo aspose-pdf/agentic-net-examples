@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "rotated_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "rotated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,17 +15,16 @@ class Program
             return;
         }
 
-        // Load the PDF document; using ensures proper disposal.
+        // Load the PDF document; using ensures deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages collection is 1‑based.
+            // Pages are 1‑based; rotate each page 180 degrees
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Rotate each page by 180 degrees.
                 doc.Pages[i].Rotate = Rotation.on180;
             }
 
-            // Save the rotated document.
+            // Save the rotated document
             doc.Save(outputPath);
         }
 

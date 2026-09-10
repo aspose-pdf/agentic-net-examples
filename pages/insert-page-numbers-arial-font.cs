@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;   // needed for FontRepository and TextState
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_chapter_numbers.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,7 +16,7 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Iterate over all pages (1‑based indexing)
@@ -25,17 +24,17 @@ class Program
             {
                 Page page = doc.Pages[i];
 
-                // Create a PageNumberStamp with custom format "Chapter #"
-                // The character '#' will be replaced by the page number.
-                PageNumberStamp stamp = new PageNumberStamp("Chapter #");
+                // Create a page number stamp; default format is "#"
+                PageNumberStamp stamp = new PageNumberStamp();
 
-                // Position the stamp at the bottom‑center of the page
+                // Configure the text appearance: Arial, 14 points
+                stamp.TextState.Font = FontRepository.FindFont("Arial");
+                stamp.TextState.FontSize = 14;
+
+                // Optional: set alignment and margins as desired
                 stamp.HorizontalAlignment = HorizontalAlignment.Center;
                 stamp.VerticalAlignment   = VerticalAlignment.Bottom;
-
-                // Optional: adjust margins or opacity if desired
                 stamp.BottomMargin = 20; // distance from bottom edge
-                stamp.Opacity      = 0.8f;
 
                 // Add the stamp to the current page
                 page.AddStamp(stamp);
@@ -45,6 +44,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with chapter page numbers: {outputPath}");
+        Console.WriteLine($"Page numbers added and saved to '{outputPath}'.");
     }
 }

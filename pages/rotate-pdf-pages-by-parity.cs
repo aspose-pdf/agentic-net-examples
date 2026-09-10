@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core API namespace
 
 class Program
 {
@@ -15,23 +15,20 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Document disposal must be handled with a using block (document-disposal-with-using rule)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based; iterate through all pages
+            // Pages are 1‑based (page-indexing-one-based rule)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Even‑numbered pages: rotate 90 degrees
-                // Odd‑numbered pages: no rotation
-                if (i % 2 == 0)
-                    page.Rotate = Rotation.on90;   // correct enum value
-                else
-                    page.Rotate = Rotation.None;   // no rotation
+                // Set rotation based on page number parity
+                // Odd pages → 90° clockwise, Even pages → no rotation
+                page.Rotate = (i % 2 == 1) ? Rotation.on90 : Rotation.None;
             }
 
-            // Save the modified document
+            // Save the modified PDF (standard Save for PDF format)
             doc.Save(outputPath);
         }
 

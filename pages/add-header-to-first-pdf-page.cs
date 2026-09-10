@@ -16,34 +16,35 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (1‑based indexing)
-            Page firstPage = doc.Pages[1];
-
-            // Create a HeaderFooter object for the header
+            // Create a HeaderFooter object for the first page header
             HeaderFooter header = new HeaderFooter();
 
-            // Configure margin information (example: 20 points top margin)
-            // In recent Aspose.Pdf versions MarginInfo uses the properties Top, Bottom, Left, Right
+            // Configure the margin for the header using MarginInfo (values are in points)
             header.Margin = new MarginInfo
             {
-                Top = 20 // set the desired top margin in points
+                Top = 20,    // 20 points from the top of the page
+                Left = 0,
+                Right = 0,
+                Bottom = 0
             };
 
-            // Add a text fragment to the header
+            // Create a text fragment that will appear in the header
             TextFragment headerText = new TextFragment("Document Header");
+            // Set visual appearance of the header text via the existing TextState instance
             headerText.TextState.Font = FontRepository.FindFont("Helvetica");
             headerText.TextState.FontSize = 12;
-            headerText.TextState.ForegroundColor = Aspose.Pdf.Color.DarkGray;
+            headerText.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
 
+            // Add the text fragment to the header's paragraph collection
             header.Paragraphs.Add(headerText);
 
             // Assign the header to the first page
-            firstPage.Header = header;
+            doc.Pages[1].Header = header;
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: save inside using)
             doc.Save(outputPath);
         }
 

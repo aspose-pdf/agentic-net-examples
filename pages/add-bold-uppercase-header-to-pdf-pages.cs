@@ -19,30 +19,34 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Add a header to every page
-            foreach (Page page in doc.Pages)
+            // Iterate over all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Create a TextFragment that will act as the header
-                TextFragment header = new TextFragment("SECTION HEADING")
-                {
-                    // Position the header near the top centre of the page
-                    Position = new Position(page.PageInfo.Width / 2, page.PageInfo.Height - 20)
-                };
+                Page page = doc.Pages[i];
 
-                // Apply bold, uppercase styling and centre alignment
-                header.TextState.Font = FontRepository.FindFont("Helvetica-Bold");
-                header.TextState.FontSize = 12;
-                header.TextState.FontStyle = FontStyles.Bold;
-                header.TextState.HorizontalAlignment = HorizontalAlignment.Center;
+                // Create a header/footer container
+                HeaderFooter header = new HeaderFooter();
 
-                // Add the header to the page's paragraph collection
-                page.Paragraphs.Add(header);
+                // Create a text fragment for the header (bold, uppercase)
+                TextFragment tf = new TextFragment("Section Heading".ToUpper());
+
+                // Modify the existing TextState (do NOT assign a new TextState object)
+                tf.TextState.Font = FontRepository.FindFont("Helvetica-Bold");
+                tf.TextState.FontSize = 12;
+                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                tf.TextState.FontStyle = FontStyles.Bold; // optional, redundant with bold font
+
+                // Add the text fragment to the header
+                header.Paragraphs.Add(tf);
+
+                // Assign the header to the page
+                page.Header = header;
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with header: '{outputPath}'");
+        Console.WriteLine($"PDF saved with headers to '{outputPath}'.");
     }
 }

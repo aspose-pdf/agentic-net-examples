@@ -6,48 +6,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";      // source PDF
-        const string watermark  = "logo.png";       // watermark image file
-        const string outputPdf  = "watermarked.pdf"; // result PDF
+        const string inputPath  = "input.pdf";
+        const string outputPath = "watermarked.pdf";
+        const string imagePath  = "logo.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+        if (!File.Exists(imagePath))
+        {
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        if (!File.Exists(watermark))
+        // Load the PDF document inside a using block for proper disposal
+        using (Document pdf = new Document(inputPath))
         {
-            Console.Error.WriteLine($"Watermark image not found: {watermark}");
-            return;
-        }
-
-        // Load the PDF document (lifecycle: load)
-        using (Document doc = new Document(inputPdf))
-        {
-            // Iterate over all pages and apply the image stamp
-            foreach (Page page in doc.Pages)
+            // Create an image stamp with 20% opacity
+            ImageStamp stamp = new ImageStamp(imagePath)
             {
-                // Create an ImageStamp with the watermark image
-                ImageStamp imgStamp = new ImageStamp(watermark)
-                {
-                    // Set opacity to 20% (0.2)
-                    Opacity = 0.2,
-                    // Place the stamp behind the page content (optional)
-                    Background = false,
-                    // Center the stamp on the page (optional)
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Center
-                };
+                Opacity = 0.2,                     // 20 percent opacity
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
+                Background = false                 // stamp appears on top of page content
+            };
 
-                // Add the stamp to the current page (lifecycle: modify)
-                page.AddStamp(imgStamp);
+            // Apply the stamp to each page individually
+            foreach (Page page in pdf.Pages)
+            {
+                page.AddStamp(stamp);
             }
 
-            // Save the modified PDF (lifecycle: save)
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            pdf.Save(outputPath);
         }
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

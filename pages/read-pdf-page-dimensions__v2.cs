@@ -15,22 +15,22 @@ class Program
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
+        // Open the PDF document (wrapped in using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based; iterate through all pages
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            int pageCount = doc.Pages.Count;
+            Console.WriteLine($"Document contains {pageCount} page(s).");
+
+            // Pages are 1‑based indexed
+            for (int i = 1; i <= pageCount; i++)
             {
                 Page page = doc.Pages[i];
-
-                // Get the page rectangle (crop box or media box)
+                // Fully qualified Rectangle to avoid ambiguity with System.Drawing
                 Aspose.Pdf.Rectangle rect = page.Rect;
 
-                // Calculate width and height from rectangle coordinates
-                double width  = rect.URX - rect.LLX;
-                double height = rect.URY - rect.LLY;
+                double width = rect.Width;
+                double height = rect.Height;
 
-                // Log the dimensions
                 Console.WriteLine($"Page {i}: Width = {width}, Height = {height}");
             }
         }

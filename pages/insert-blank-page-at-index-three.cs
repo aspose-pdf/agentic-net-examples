@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,14 +15,17 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule for loading)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Insert a blank page at position 3.
-            // Page numbers are 1‑based, so index 3 inserts after pages 1 and 2.
-            doc.Pages.Insert(3);
+            // Insert a blank page at position 3 (pages are 1‑based)
+            Page insertedPage = doc.Pages.Insert(3);
 
-            // Save the modified document (using rule for saving)
+            // Optional: adjust page size if needed
+            // insertedPage.PageInfo.Width = doc.Pages[1].PageInfo.Width;
+            // insertedPage.PageInfo.Height = doc.Pages[1].PageInfo.Height;
+
+            // Save the updated document
             doc.Save(outputPath);
         }
 

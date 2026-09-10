@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "watermarked.pdf";
-        const string watermarkText = "CONFIDENTIAL";
+        const string watermark   = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
@@ -17,47 +17,34 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (lifecycle rule: use using)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Iterate through all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create a text stamp with the desired watermark text
-                TextStamp stamp = new TextStamp(watermarkText);
+                // Create a TextStamp with the desired watermark text
+                TextStamp stamp = new TextStamp(watermark);
 
-                // Make the stamp a background element so it appears behind page content
-                stamp.Background = true;
-
-                // Set opacity (0.0 – 1.0)
-                stamp.Opacity = 0.3f;
-
-                // Rotate the stamp to create a diagonal effect
-                stamp.RotateAngle = -45; // degrees
-
-                // Size the stamp to cover the whole page
-                stamp.Width  = page.PageInfo.Width;
-                stamp.Height = page.PageInfo.Height;
-
-                // Center the text within the stamp rectangle
+                // Configure stamp appearance
+                stamp.Background   = true;               // place behind page content
+                stamp.Opacity      = 0.2;                // semi‑transparent
+                stamp.RotateAngle  = -45;                // diagonal orientation
                 stamp.HorizontalAlignment = HorizontalAlignment.Center;
                 stamp.VerticalAlignment   = VerticalAlignment.Center;
-                // The TextAlignment property is not available in older SDK versions;
-                // horizontal/vertical alignment already centers the text.
 
-                // Configure text appearance
-                stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-                stamp.TextState.FontSize = 72;
-                stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-                stamp.TextState.FontStyle = FontStyles.Bold;
+                // Set text style
+                stamp.TextState.Font       = FontRepository.FindFont("Helvetica");
+                stamp.TextState.FontSize   = 72;
+                stamp.TextState.ForegroundColor = Color.Red;
 
                 // Add the stamp to the current page
                 page.AddStamp(stamp);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use Save inside using)
             doc.Save(outputPath);
         }
 

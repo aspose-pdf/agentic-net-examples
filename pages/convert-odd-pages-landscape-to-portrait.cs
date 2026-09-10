@@ -15,36 +15,43 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule for document disposal)
+        // Load the PDF document inside a using block (ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over odd‑numbered pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i += 2)
+            // Iterate over all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[i];
-
-                // Get current MediaBox
-                Aspose.Pdf.Rectangle mediaBox = page.MediaBox;
-
-                double width  = mediaBox.URX - mediaBox.LLX;
-                double height = mediaBox.URY - mediaBox.LLY;
-
-                // If the page is landscape (width > height), swap dimensions
-                if (width > height)
+                // Process only odd‑numbered pages
+                if (i % 2 == 1)
                 {
-                    // Create a new rectangle with swapped width/height
-                    Aspose.Pdf.Rectangle newBox = new Aspose.Pdf.Rectangle(
-                        mediaBox.LLX,               // same lower‑left X
-                        mediaBox.LLY,               // same lower‑left Y
-                        mediaBox.LLX + height,      // new upper‑right X (old height)
-                        mediaBox.LLY + width);      // new upper‑right Y (old width)
+                    Page page = doc.Pages[i];
 
-                    // Apply the new MediaBox
-                    page.MediaBox = newBox;
+                    // Determine current orientation via PageInfo.IsLandscape
+                    if (page.PageInfo.IsLandscape)
+                    {
+                        // Retrieve current MediaBox dimensions
+                        Aspose.Pdf.Rectangle mb = page.MediaBox;
+                        double llx = mb.LLX;
+                        double lly = mb.LLY;
+                        double urx = mb.URX;
+                        double ury = mb.URY;
+                        double width  = urx - llx;
+                        double height = ury - lly;
+
+                        // Swap width and height to convert to portrait
+                        double newUrx = llx + height;
+                        double newUry = lly + width;
+
+                        // Apply the new MediaBox
+                        page.MediaBox = new Aspose.Pdf.Rectangle(llx, lly, newUrx, newUry);
+
+                        // Update the PageInfo flag
+                        page.PageInfo.IsLandscape = false;
+                    }
                 }
             }
 
-            // Save the modified document (using rule for saving)
+            // Save the modified document (PDF format)
             doc.Save(outputPath);
         }
 

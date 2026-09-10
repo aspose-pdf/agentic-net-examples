@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf.Text;          // Required for PageSize (if not already included)
 
 class Program
 {
@@ -11,23 +12,24 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Append an empty page at the end of the document
-            Page newPage = doc.Pages.Add();
+            Page addedPage = doc.Pages.Add();
 
-            // Set the new page size to A4
-            newPage.Resize(PageSize.A4);
+            // Resize the newly added page to A4 dimensions
+            // PageSize.A4 provides width and height in points
+            addedPage.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
 
-            // Save the updated PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with added A4 page to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with an extra A4 page: {outputPath}");
     }
 }

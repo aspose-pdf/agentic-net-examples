@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_doubled.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,17 +15,16 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Store the original page count (1‑based indexing)
             int originalCount = doc.Pages.Count;
 
-            // Insert a blank page after each existing page.
-            // Iterate backwards to avoid shifting indices of pages yet to be processed.
+            // Iterate backwards to avoid index shifting when inserting pages
             for (int i = originalCount; i >= 1; i--)
             {
-                // Insert an empty page at position i+1 (after the current page)
+                // Insert a blank page after the current page (position i+1)
                 doc.Pages.Insert(i + 1);
             }
 
@@ -33,6 +32,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved with doubled pages: {outputPath}");
+        Console.WriteLine($"Blank pages inserted. Output saved to '{outputPath}'.");
     }
 }

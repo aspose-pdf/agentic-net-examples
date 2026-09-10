@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,16 +15,16 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Page numbers are 1‑based; delete the first page
+            // Delete the first page (page numbers are 1‑based)
             doc.Pages.Delete(1);
 
-            // Save the modified document (PDF format)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"First page deleted. Result saved to '{outputPath}'.");
+        Console.WriteLine($"First page removed. Saved to '{outputPath}'.");
     }
 }

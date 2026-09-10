@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_custom_size.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,20 +15,19 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (wrapped in using for proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Verify that the document has at least one page
-            if (doc.Pages.Count >= 1)
-            {
-                // Change the size of the first page to 500 × 700 points
-                doc.Pages[1].SetPageSize(500, 700);
-            }
+            // Pages are 1‑based; get the first page
+            Page firstPage = doc.Pages[1];
+
+            // Change the page size to 500 × 700 points
+            firstPage.SetPageSize(500, 700);
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"First page resized and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with custom first‑page size to '{outputPath}'.");
     }
 }
