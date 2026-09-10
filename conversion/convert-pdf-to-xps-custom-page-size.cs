@@ -6,46 +6,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputXps = "output.xps";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.xps";
 
-        // Desired page size: 8.5 x 11 inches (points: 1 inch = 72 points)
-        double width  = 8.5 * 72; // 612 points
-        double height = 11  * 72; // 792 points
+        // Custom page size (width x height) in points (1 point = 1/72 inch)
+        // Example: 842 x 595 points = A4 landscape
+        double customWidth = 842; // points
+        double customHeight = 595; // points
 
-        // Set orientation: true = landscape, false = portrait
-        bool landscape = true;
-
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block (ensures disposal)
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Apply custom size and orientation to every page
-            foreach (Page page in doc.Pages)
+            // Apply custom size and orientation to each page
+            foreach (Page page in pdfDoc.Pages)
             {
-                if (landscape)
-                {
-                    // Swap dimensions for landscape orientation
-                    page.SetPageSize(height, width);
-                    page.PageInfo.IsLandscape = true;
-                }
-                else
-                {
-                    page.SetPageSize(width, height);
-                    page.PageInfo.IsLandscape = false;
-                }
+                page.SetPageSize(customWidth, customHeight);
+                // Set orientation to landscape via PageInfo
+                page.PageInfo.IsLandscape = true;
             }
 
-            // Save as XPS using explicit XpsSaveOptions
-            XpsSaveOptions saveOptions = new XpsSaveOptions();
-            doc.Save(outputXps, saveOptions);
+            // Initialize XPS save options (options live in the Aspose.Pdf namespace)
+            var xpsOptions = new XpsSaveOptions();
+
+            // Save the document as XPS using the save options
+            pdfDoc.Save(outputPath, xpsOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to XPS: {outputXps}");
+        Console.WriteLine($"PDF successfully converted to XPS: {outputPath}");
     }
 }

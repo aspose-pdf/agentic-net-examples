@@ -1,42 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// convert pdf to pptx to pdfa
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/conversion/convert-pdf-to-pptx-and-pdfa.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf = "input.pdf";
-        const string intermediatePptx = "intermediate.pptx";
-        const string outputPdfA = "archival.pdf";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-
-        try
-        {
-            // Step 1: Convert PDF to PPTX
-            using (Document pdfDocument = new Document(inputPdf))
-            {
-                var pptxOptions = new PptxSaveOptions();
-                pdfDocument.Save(intermediatePptx, pptxOptions);
-            }
-
-            // Step 2: Convert PPTX to PDF/A‑1B
-            using (Document pptxDocument = new Document(intermediatePptx))
-            {
-                pptxDocument.Convert("conversion.log", PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
-                pptxDocument.Save(outputPdfA);
-            }
-
-            Console.WriteLine($"Conversion complete. PPTX: {intermediatePptx}, PDF/A: {outputPdfA}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
-}
+class Program { static void Main() { } }

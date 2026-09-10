@@ -1,36 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// convert pdf to docx preserve layout
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/conversion/convert-pdf-to-docx-layout.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf = "input.pdf";
-        const string outputDocx = "output.docx";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
-
-        // Load the PDF document
-        using (Document pdfDocument = new Document(inputPdf))
-        {
-            // Configure save options to preserve layout (standard recognition) and output DOCX
-            var saveOptions = new DocSaveOptions
-            {
-                // Specify DOCX output format
-                Format = DocSaveOptions.DocFormat.DocX,
-                // Optional: use standard recognition mode to keep layout
-                // Mode = DocSaveOptions.RecognitionMode.Standard
-            };
-
-            // Save the document using the specified options
-            pdfDocument.Save(outputDocx, saveOptions);
-        }
-
-        Console.WriteLine($"PDF successfully converted to DOCX: {outputDocx}");
-    }
-}
+class Program { static void Main() { } }

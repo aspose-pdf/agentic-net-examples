@@ -6,40 +6,27 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputHtml = "output.html";
+        const string inputPdfPath  = "input.pdf";
+        const string outputHtmlPath = "output.html";
 
-        if (!File.Exists(inputPdf))
+        // Verify that the source PDF exists.
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal.
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Load the PDF document (using block ensures proper disposal)
-            using (Document pdfDocument = new Document(inputPdf))
-            {
-                // Configure HTML conversion options
-                HtmlSaveOptions htmlOptions = new HtmlSaveOptions();
-                // Enable compression of SVG graphics (produces SVGZ files)
-                htmlOptions.CompressSvgGraphicsIfAny = true;
+            // Initialize HtmlSaveOptions and enable SVG compression.
+            HtmlSaveOptions htmlOptions = new HtmlSaveOptions();
+            htmlOptions.CompressSvgGraphicsIfAny = true; // compress SVG graphics into SVGZ
 
-                // HTML conversion relies on GDI+; handle non‑Windows platforms gracefully
-                try
-                {
-                    pdfDocument.Save(outputHtml, htmlOptions);
-                    Console.WriteLine($"HTML saved to '{outputHtml}' with compressed SVG graphics.");
-                }
-                catch (TypeInitializationException)
-                {
-                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
-                }
-            }
+            // Save the document as HTML using the configured options.
+            pdfDocument.Save(outputHtmlPath, htmlOptions);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF successfully converted to HTML with compressed SVGs: '{outputHtmlPath}'");
     }
 }

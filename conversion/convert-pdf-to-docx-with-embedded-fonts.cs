@@ -1,57 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Document, DocSaveOptions
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
+        const string inputPdfPath  = "input.pdf";
+        const string outputDocxPath = "output.docx";
 
-        // Output DOCX file path
-        const string outputDocx = "output.docx";
-
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the source PDF
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Load the PDF document (lifecycle rule: wrap in using for deterministic disposal)
-            using (Document pdfDocument = new Document(inputPdf))
+            // Configure DOCX save options
+            DocSaveOptions docOptions = new DocSaveOptions
             {
-                // Configure DOCX conversion options
-                var saveOptions = new DocSaveOptions
-                {
-                    // Save as DOCX (correct enum value)
-                    Format = DocSaveOptions.DocFormat.DocX,
+                // Output format: DOCX
+                Format = DocSaveOptions.DocFormat.DocX,
 
-                    // Use the Flow recognition mode for maximum editability
-                    Mode = DocSaveOptions.RecognitionMode.Flow,
+                // Use flow recognition for better layout
+                Mode = DocSaveOptions.RecognitionMode.Flow,
 
-                    // Convert Type3 fonts to TrueType so they appear as text, not images
-                    ConvertType3Fonts = true,
+                // Enable font re‑saving so that fonts are embedded in the resulting DOCX
+                ReSaveFonts = true,
 
-                    // Re‑save fonts on each page to ensure they are embedded in the DOCX
-                    ReSaveFonts = true,
+                // Convert Type3 fonts to TrueType (helps preserve text instead of images)
+                ConvertType3Fonts = true,
 
-                    // Optional: cache glyphs for better performance during conversion
-                    CacheGlyphs = true
-                };
+                // Optional: improve bullet detection
+                RecognizeBullets = true
+            };
 
-                // Save the converted document as DOCX with the specified options
-                pdfDocument.Save(outputDocx, saveOptions);
-            }
-
-            Console.WriteLine($"Conversion completed successfully. DOCX saved to '{outputDocx}'.");
+            // Save the PDF as DOCX with the specified options
+            pdfDocument.Save(outputDocxPath, docOptions);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF successfully converted to DOCX with embedded fonts: {outputDocxPath}");
     }
 }

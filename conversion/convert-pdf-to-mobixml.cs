@@ -1,40 +1,34 @@
 using System;
 using System.IO;
-using Aspose.Pdf;   // MobiXmlSaveOptions and Document are in this namespace
+using Aspose.Pdf; // Aspose.Pdf namespace contains Document, MobiXmlSaveOptions, etc.
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the destination MobiXML file.
-        const string inputPdfPath  = "input.pdf";
-        const string outputMobiPath = "output.mobi";
+        // Input PDF file path
+        const string inputPdfPath = "input.pdf";
 
-        // Verify that the input file exists.
+        // Output MobiXml file path
+        const string outputMobiXmlPath = "output.mobixml";
+
+        // Verify that the input file exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document and save it as MobiXml using default options
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal.
-            using (Document pdfDocument = new Document(inputPdfPath))
-            {
-                // Initialize the save options for MobiXML format (default settings).
-                MobiXmlSaveOptions mobiOptions = new MobiXmlSaveOptions();
+            // Initialize default MobiXml save options
+            MobiXmlSaveOptions mobiOptions = new MobiXmlSaveOptions();
 
-                // Save the document as MobiXML using the explicit save options.
-                pdfDocument.Save(outputMobiPath, mobiOptions);
-            }
+            // Save the document in MobiXml format
+            pdfDocument.Save(outputMobiXmlPath, mobiOptions);
+        }
 
-            Console.WriteLine($"PDF successfully converted to MobiXML: {outputMobiPath}");
-        }
-        catch (Exception ex)
-        {
-            // Handle any errors that may occur during loading or saving.
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"PDF successfully converted to MobiXml: '{outputMobiXmlPath}'");
     }
 }

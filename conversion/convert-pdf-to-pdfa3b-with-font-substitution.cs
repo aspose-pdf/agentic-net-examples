@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text; // for FontEmbeddingOptions
 
 class Program
 {
@@ -19,22 +20,23 @@ class Program
         using (Document doc = new Document(inputPath))
         {
             // Configure conversion options for PDF/A‑3b
-            PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_3B);
+            PdfFormatConversionOptions convOptions = new PdfFormatConversionOptions(PdfFormat.PDF_A_3B);
+
             // Enable default font substitution for fonts that cannot be embedded
-            options.FontEmbeddingOptions.UseDefaultSubstitution = true;
+            convOptions.FontEmbeddingOptions.UseDefaultSubstitution = true;
 
             // Perform the conversion
-            bool success = doc.Convert(options);
+            bool success = doc.Convert(convOptions);
             if (!success)
             {
                 Console.Error.WriteLine("Conversion to PDF/A‑3b failed.");
                 return;
             }
 
-            // Save the converted document
+            // Save the resulting PDF/A‑3b document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF/A‑3b file saved to '{outputPath}'.");
+        Console.WriteLine($"PDF successfully converted to PDF/A‑3b and saved as '{outputPath}'.");
     }
 }
