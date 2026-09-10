@@ -1,9 +1,9 @@
 using System;
 using System.IO;
-using System.Drawing;                     // needed for DefaultAppearance color
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;                    // for DefaultAppearance
+using Aspose.Pdf.Text;          // for DefaultAppearance
+using System.Drawing;          // System.Drawing.Color required by DefaultAppearance
 
 class Program
 {
@@ -31,11 +31,12 @@ class Program
             // Get page five (1‑based indexing)
             Page pageFive = doc.Pages[5];
 
-            // Define the rectangle where the free‑text annotation will appear
+            // Define the rectangle for the free‑text annotation
             // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create a DefaultAppearance (font name, size, System.Drawing.Color)
+            // Create a DefaultAppearance (font name, size, color)
+            // Note: the constructor expects System.Drawing.Color for the third argument
             DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
 
             // Create the free‑text annotation on page five
@@ -46,17 +47,16 @@ class Program
                 Color = Aspose.Pdf.Color.LightGray
             };
 
+            // Hide the annotation while keeping its data using the annotation flags
+            freeText.Flags = AnnotationFlags.Hidden;
+
             // Add the annotation to the page
             pageFive.Annotations.Add(freeText);
-
-            // Hide the annotation while keeping its data
-            // The Hidden flag makes the annotation invisible in the viewer
-            freeText.Flags = AnnotationFlags.Hidden;
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with hidden free‑text annotation on page 5: {outputPath}");
+        Console.WriteLine($"Free‑text annotation hidden on page 5 and saved to '{outputPath}'.");
     }
 }

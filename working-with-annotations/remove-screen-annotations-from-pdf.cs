@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
@@ -16,28 +17,28 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (using statement ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Iterate through all pages
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[pageNum];
-                AnnotationCollection annots = page.Annotations;
-
-                // Delete ScreenAnnotation instances.
-                // Iterate backwards to avoid index shifting when deleting.
-                for (int i = annots.Count; i >= 1; i--)
+                // Collect ScreenAnnotation instances to remove
+                var toRemove = new List<Annotation>();
+                foreach (Annotation ann in page.Annotations)
                 {
-                    Annotation ann = annots[i];
                     if (ann is ScreenAnnotation)
-                    {
-                        annots.Delete(ann);
-                    }
+                        toRemove.Add(ann);
+                }
+
+                // Delete the collected ScreenAnnotations
+                foreach (Annotation ann in toRemove)
+                {
+                    page.Annotations.Delete(ann);
                 }
             }
 
-            // Save the cleaned PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

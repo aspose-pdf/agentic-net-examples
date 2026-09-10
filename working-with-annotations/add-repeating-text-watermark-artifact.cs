@@ -16,6 +16,7 @@ class Program
             return;
         }
 
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
             // Define the visual style of the watermark text
@@ -23,23 +24,27 @@ class Program
             {
                 Font = FontRepository.FindFont("Helvetica"),
                 FontSize = 48,
-                ForegroundColor = Color.LightGray
+                ForegroundColor = Color.FromRgb(0.8, 0.8, 0.8) // light gray
             };
 
-            // Add a repeating watermark artifact to each page
+            // Create a watermark artifact that will repeat across the page
+            WatermarkArtifact watermark = new WatermarkArtifact
+            {
+                IsBackground = true,                     // place behind page content
+                Opacity = 0.2,                           // semi‑transparent
+                Text = "CONFIDENTIAL",                   // repeated text
+                TextState = textState,                   // apply the defined style
+                ArtifactHorizontalAlignment = HorizontalAlignment.Center,
+                ArtifactVerticalAlignment = VerticalAlignment.Center
+            };
+
+            // Add the artifact to every page in the document
             foreach (Page page in doc.Pages)
             {
-                WatermarkArtifact artifact = new WatermarkArtifact();
-                artifact.IsBackground = true;               // place behind page content
-                artifact.Opacity = 0.3;                     // semi‑transparent
-                artifact.Text = "CONFIDENTIAL";             // watermark text
-                artifact.TextState = textState;             // apply style
-                artifact.ArtifactHorizontalAlignment = HorizontalAlignment.Center;
-                artifact.ArtifactVerticalAlignment = VerticalAlignment.Center;
-
-                page.Artifacts.Add(artifact);
+                page.Artifacts.Add(watermark);
             }
 
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

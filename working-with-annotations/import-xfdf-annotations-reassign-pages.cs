@@ -2,13 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";   // source PDF
-        const string xfdfPath  = "annotations.xfdf"; // XFDF file containing annotations
+        // Input PDF and XFDF files
+        const string pdfPath   = "input.pdf";
+        const string xfdfPath  = "annotations.xfdf";
         const string outputPdf = "output.pdf";
 
         if (!File.Exists(pdfPath))
@@ -23,61 +25,61 @@ class Program
             return;
         }
 
-        // Mapping of original page numbers (as stored in XFDF) to target page numbers in the PDF.
+        // Mapping of source page numbers (as stored in XFDF) to target page numbers in the PDF
         // Example: annotations originally on page 1 should be moved to page 2, etc.
         var pageMapping = new Dictionary<int, int>
         {
             { 1, 2 },
             { 2, 3 },
-            // add more mappings as required
+            // add more mappings as needed
         };
 
-        try
+        // Load the PDF, import XFDF annotations, re‑assign them according to the mapping, and save.
+        using (Document doc = new Document(pdfPath))
         {
-            // Load the PDF document.
-            using (Document doc = new Document(pdfPath))
+            // Import all annotations from the XFDF file into the document.
+            doc.ImportAnnotationsFromXfdf(xfdfPath);
+
+            // Collect annotations that need to be moved.
+            var moves = new List<(Annotation annotation, int targetPage)>();
+
+            foreach (var kvp in pageMapping)
             {
-                // Import all annotations from the XFDF file into the document.
-                // This method adds the annotations to the pages indicated inside the XFDF.
-                doc.ImportAnnotationsFromXfdf(xfdfPath);
+                int srcPageNum = kvp.Key;
+                int tgtPageNum = kvp.Value;
 
-                // Re‑assign annotations according to the mapping dictionary.
-                foreach (var kvp in pageMapping)
+                // Ensure both source and target pages exist.
+                if (srcPageNum < 1 || srcPageNum > doc.Pages.Count ||
+                    tgtPageNum < 1 || tgtPageNum > doc.Pages.Count)
                 {
-                    int sourcePageNumber = kvp.Key;
-                    int targetPageNumber = kvp.Value;
-
-                    // Validate page numbers.
-                    if (sourcePageNumber < 1 || sourcePageNumber > doc.Pages.Count ||
-                        targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
-                    {
-                        Console.WriteLine($"Skipping invalid mapping: {sourcePageNumber} -> {targetPageNumber}");
-                        continue;
-                    }
-
-                    Page sourcePage = doc.Pages[sourcePageNumber];
-                    Page targetPage = doc.Pages[targetPageNumber];
-
-                    // Move each annotation from the source page to the target page.
-                    // AnnotationCollection uses 1‑based indexing, so iterate backwards when deleting.
-                    for (int i = sourcePage.Annotations.Count; i >= 1; i--)
-                    {
-                        var annotation = sourcePage.Annotations[i];
-                        // Add to target page (preserves rectangle and other properties).
-                        targetPage.Annotations.Add(annotation);
-                        // Remove from source page.
-                        sourcePage.Annotations.Delete(i);
-                    }
+                    continue; // skip invalid mapping entries
                 }
 
-                // Save the modified PDF.
-                doc.Save(outputPdf);
-                Console.WriteLine($"Annotations imported and reassigned. Saved to '{outputPdf}'.");
+                Page srcPage = doc.Pages[srcPageNum];
+                // Copy annotations to the move list.
+                foreach (Annotation ann in srcPage.Annotations)
+                {
+                    moves.Add((ann, tgtPageNum));
+                }
+
+                // Remove all annotations from the source page (iterate backwards to avoid index shift).
+                for (int i = srcPage.Annotations.Count; i >= 1; i--)
+                {
+                    srcPage.Annotations.Delete(i);
+                }
             }
+
+            // Add the collected annotations to their new target pages.
+            foreach (var (annotation, targetPage) in moves)
+            {
+                Page tgtPage = doc.Pages[targetPage];
+                tgtPage.Annotations.Add(annotation);
+            }
+
+            // Save the modified PDF.
+            doc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Annotations imported and reassigned. Saved to '{outputPdf}'.");
     }
 }

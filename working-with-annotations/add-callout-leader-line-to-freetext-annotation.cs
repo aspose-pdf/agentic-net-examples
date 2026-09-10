@@ -1,9 +1,9 @@
 using System;
 using System.IO;
-using System.Drawing; // for System.Drawing.Color used by DefaultAppearance
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text;      // for DefaultAppearance
+using System.Drawing;      // for System.Drawing.Color (required by DefaultAppearance)
 
 class Program
 {
@@ -18,50 +18,42 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Ensure there is at least one page
-            if (doc.Pages.Count == 0)
-            {
-                Console.Error.WriteLine("The document has no pages.");
-                return;
-            }
+            // Choose the page where the annotation will be placed (first page)
+            Page page = doc.Pages[1];   // 1‑based indexing
 
-            // Create a DefaultAppearance for the free‑text annotation.
-            // The constructor expects a System.Drawing.Color for the text color.
-            DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
-
-            // Define the rectangle where the annotation will be displayed.
-            // Fully qualify Aspose.Pdf.Rectangle to avoid ambiguity with System.Drawing.Rectangle.
+            // Define the rectangle for the free‑text annotation
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create the FreeTextAnnotation on the first page.
-            FreeTextAnnotation freeText = new FreeTextAnnotation(doc.Pages[1], rect, appearance)
+            // Create DefaultAppearance (font name, size, text color)
+            // Note: the constructor requires System.Drawing.Color for the color argument
+            DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
+
+            // Create the FreeTextAnnotation
+            FreeTextAnnotation ft = new FreeTextAnnotation(page, rect, appearance)
             {
-                Contents = "Callout annotation with leader line",
-                // Set the intent to indicate this annotation functions as a callout.
-                Intent = FreeTextIntent.FreeTextCallout,
-                // Optional visual styling
-                Color = Aspose.Pdf.Color.Yellow,
-                Opacity = 0.8
+                Contents = "Callout example",
+                Color    = Aspose.Pdf.Color.Yellow,               // border color
+                Intent   = FreeTextIntent.FreeTextCallout        // indicate this is a callout
             };
 
-            // Define the three points required for the Callout property:
-            // 1. Start point (inside the annotation rectangle)
-            // 2. Knee point (where the line bends)
-            // 3. End point (the tip of the leader line)
-            freeText.Callout = new Aspose.Pdf.Point[]
+            // Set the Callout property – exactly three points:
+            //   1. Start point (inside the annotation)
+            //   2. Knee point (bend of the leader line)
+            //   3. End point (target point the line points to)
+            ft.Callout = new Aspose.Pdf.Point[]
             {
-                new Aspose.Pdf.Point(150, 540), // start inside annotation
-                new Aspose.Pdf.Point(200, 580), // knee
-                new Aspose.Pdf.Point(250, 620)  // end (leader line tip)
+                new Aspose.Pdf.Point(150, 525), // start (inside the annotation)
+                new Aspose.Pdf.Point(200, 600), // knee (bend)
+                new Aspose.Pdf.Point(250, 650)  // end (pointing to target)
             };
 
-            // Add the annotation to the page's annotation collection.
-            doc.Pages[1].Annotations.Add(freeText);
+            // Add the annotation to the page
+            page.Annotations.Add(ft);
 
-            // Save the modified PDF.
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

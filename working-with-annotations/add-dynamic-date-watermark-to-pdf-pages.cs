@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "watermarked_output.pdf";
+        const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,7 +17,7 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Iterate over all pages (1‑based indexing)
@@ -26,8 +26,8 @@ class Program
                 Page page = doc.Pages[i];
 
                 // Define the rectangle where the watermark will appear
-                // Adjust coordinates as needed (left, bottom, right, top)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 750, 300, 800);
+                // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
                 // Create a WatermarkAnnotation for the current page
                 WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect);
@@ -43,17 +43,17 @@ class Program
                     ForegroundColor = Aspose.Pdf.Color.Gray
                 };
 
-                // Set the watermark text (as a single-element string array) and its appearance
+                // Set the watermark text; SetTextAndState expects a string array
                 watermark.SetTextAndState(new[] { dateString }, textState);
 
-                // Optionally set opacity (0 = fully transparent, 1 = fully opaque)
-                watermark.Opacity = 0.5;
+                // Optionally set opacity (0.0 = fully transparent, 1.0 = opaque)
+                watermark.Opacity = 0.5f;
 
                 // Add the annotation to the page
                 page.Annotations.Add(watermark);
             }
 
-            // Save the modified PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 

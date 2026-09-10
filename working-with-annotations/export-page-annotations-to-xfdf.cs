@@ -1,49 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// export page annotations to xfdf
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/working-with-annotations/export-pdf-annotations-to-xfdf-stream.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class ExportPageAnnotations
-{
-    static void Main()
-    {
-        // Path to the source PDF file
-        const string pdfPath = "input.pdf";
-
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
-            return;
-        }
-
-        // Determine the page whose annotations we want to export (1‑based index)
-        const int pageNumber = 1; // change as needed
-
-        // Build the XFDF file name – same folder, same base name, .xfdf extension
-        string xfdfPath = Path.Combine(
-            Path.GetDirectoryName(pdfPath) ?? string.Empty,
-            Path.GetFileNameWithoutExtension(pdfPath) + ".xfdf");
-
-        try
-        {
-            // Load the original PDF
-            using (Document sourceDoc = new Document(pdfPath))
-            {
-                // Create a temporary document that contains only the desired page
-                using (Document singlePageDoc = new Document())
-                {
-                    // Add the selected page (pages are 1‑based)
-                    singlePageDoc.Pages.Add(sourceDoc.Pages[pageNumber]);
-
-                    // Export all annotations of this single‑page document to XFDF
-                    singlePageDoc.ExportAnnotationsToXfdf(xfdfPath);
-                }
-            }
-
-            Console.WriteLine($"Annotations from page {pageNumber} exported to: {xfdfPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
-}
+class Program { static void Main() { } }

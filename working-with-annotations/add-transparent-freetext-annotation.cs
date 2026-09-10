@@ -1,8 +1,9 @@
 using System;
 using System.IO;
+using System.Drawing;                     // Required for DefaultAppearance color
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using System.Drawing; // needed for DefaultAppearance constructor
+using Aspose.Pdf.Text;                    // For DefaultAppearance
 
 class Program
 {
@@ -17,14 +18,14 @@ class Program
             return;
         }
 
-        // Load the PDF, add a free‑text annotation with transparent background, and save.
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page to annotate (first page in this example)
+            // Choose the page to place the annotation (first page, 1‑based indexing)
             Page page = doc.Pages[1];
 
             // Define the annotation rectangle (left, bottom, width, height)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 150);
 
             // Default appearance for the text (font, size, color)
             DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
@@ -32,11 +33,11 @@ class Program
             // Create the free‑text annotation
             FreeTextAnnotation freeText = new FreeTextAnnotation(page, rect, appearance)
             {
-                Contents = "Overlay note",
-                // Transparent border/background
-                Color    = Aspose.Pdf.Color.Transparent,
-                // Semi‑transparent annotation (0.0 = fully transparent, 1.0 = opaque)
-                Opacity  = 0.5
+                Contents = "Overlay note – transparent background",
+                // Transparent background color
+                Color = Aspose.Pdf.Color.Transparent,
+                // Semi‑transparent overall annotation (0 = fully transparent, 1 = opaque)
+                Opacity = 0.3
             };
 
             // Add the annotation to the page

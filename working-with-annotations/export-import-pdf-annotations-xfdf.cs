@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -7,59 +6,55 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";          // source PDF with annotations
-        const string xfdfPath = "annotations.xfdf";       // temporary XFDF file
-        const string outputPdfPath = "output.pdf";       // PDF after re‑import
+        // -----------------------------------------------------------------
+        // Prepare sample PDFs so the example is self‑contained.
+        // -----------------------------------------------------------------
+        const string sourcePdfPath = "source.pdf";
+        const string targetPdfPath = "target.pdf";
+        const string xfdfPath       = "annotations.xfdf";
 
-        if (!File.Exists(inputPdfPath))
+        // Create a source PDF with a simple text annotation.
+        using (Document sourceDoc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
-            return;
+            Page page = sourceDoc.Pages.Add();
+            // Define the rectangle for the annotation (llx, lly, urx, ury).
+            var rect = new Rectangle(100, 600, 300, 650);
+            var textAnn = new TextAnnotation(page, rect)
+            {
+                Title = "Sample",
+                Subject = "Demo",
+                Contents = "This is a sample annotation",
+                Color = Color.Yellow
+            };
+            page.Annotations.Add(textAnn);
+            sourceDoc.Save(sourcePdfPath);
         }
 
-        // ------------------------------------------------------------
-        // Step 1 – Load the source document and export its annotations
-        // ------------------------------------------------------------
-        int originalAnnotationCount = 0;
-        using (Document srcDoc = new Document(inputPdfPath))
+        // Create a target PDF (initially without annotations).
+        using (Document targetDoc = new Document())
         {
-            // Count all annotations in the source document
-            foreach (Page page in srcDoc.Pages)
-                originalAnnotationCount += page.Annotations.Count;
-
-            // Export annotations to XFDF file
-            srcDoc.ExportAnnotationsToXfdf(xfdfPath);
+            targetDoc.Pages.Add();
+            targetDoc.Save(targetPdfPath);
         }
 
-        // ------------------------------------------------------------
-        // Step 2 – Load a fresh copy of the PDF, clear existing annotations,
-        //          then import the previously exported XFDF data
-        // ------------------------------------------------------------
-        int importedAnnotationCount = 0;
-        using (Document targetDoc = new Document(inputPdfPath))
+        // -----------------------------------------------------------------
+        // Export all annotations from the source PDF to an XFDF file.
+        // -----------------------------------------------------------------
+        using (Document sourceDoc = new Document(sourcePdfPath))
         {
-            // Optional: remove existing annotations to ensure a clean round‑trip
-            foreach (Page page in targetDoc.Pages)
-                page.Annotations.Clear(); // <-- Fixed: use Clear() instead of DeleteAll()
+            sourceDoc.ExportAnnotationsToXfdf(xfdfPath);
+        }
 
-            // Import annotations from the XFDF file
+        // -----------------------------------------------------------------
+        // Import the previously exported XFDF annotations into the target PDF.
+        // -----------------------------------------------------------------
+        using (Document targetDoc = new Document(targetPdfPath))
+        {
             targetDoc.ImportAnnotationsFromXfdf(xfdfPath);
-
-            // Count annotations after import
-            foreach (Page page in targetDoc.Pages)
-                importedAnnotationCount += page.Annotations.Count;
-
-            // Save the document that now contains the re‑imported annotations
-            targetDoc.Save(outputPdfPath);
+            // Save the updated PDF with the imported annotations.
+            targetDoc.Save("target_with_annotations.pdf");
         }
 
-        // ------------------------------------------------------------
-        // Step 3 – Verify round‑trip integrity
-        // ------------------------------------------------------------
-        Console.WriteLine($"Original annotation count : {originalAnnotationCount}");
-        Console.WriteLine($"Imported annotation count : {importedAnnotationCount}");
-        Console.WriteLine(importedAnnotationCount == originalAnnotationCount
-            ? "Round‑trip successful: annotation counts match."
-            : "Round‑trip failed: annotation counts differ.");
+        Console.WriteLine("Annotations exported to XFDF and imported into target PDF successfully.");
     }
 }

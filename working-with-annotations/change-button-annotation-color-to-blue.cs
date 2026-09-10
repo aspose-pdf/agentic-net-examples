@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,18 +17,16 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over all pages
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
-
                 // Iterate over all annotations on the page
                 foreach (Annotation ann in page.Annotations)
                 {
-                    // Change the color of button annotations (ButtonField) to blue
+                    // Change color of button annotations to blue
                     if (ann is ButtonField button)
                     {
                         button.Color = Aspose.Pdf.Color.Blue;
@@ -40,6 +38,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with button colors changed to blue: '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

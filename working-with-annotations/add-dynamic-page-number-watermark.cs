@@ -2,8 +2,8 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades; // for FormattedText
-using Aspose.Pdf.Text;   // for TextState if needed
+using Aspose.Pdf.Text;          // needed for TextState and FontRepository
+using Aspose.Pdf.Drawing;      // for Rectangle (fully qualified below)
 
 class Program
 {
@@ -18,39 +18,34 @@ class Program
             return;
         }
 
-        // Load the PDF document and ensure deterministic disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Define the position and size of the watermark annotation
+            // Rectangle(left, bottom, right, top)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+            // Loop through all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Define the rectangle where the watermark annotation will appear
-                // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 750, 550, 800);
-
-                // Create a WatermarkAnnotation on the current page
+                // Create a WatermarkAnnotation for the current page
                 WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect);
 
-                // FormattedText constructor requires System.Drawing.Color for the text color
-                // Use "#" as the placeholder; Aspose.Pdf will replace it with the page number
-                FormattedText ft = new FormattedText(
-                    "#",                         // placeholder for page number
-                    System.Drawing.Color.Black, // text color
-                    "Helvetica",                 // font name
-                    EncodingType.Winansi,        // encoding
-                    false,                       // embedded flag
-                    12);                         // font size
+                // Prepare the text state (font, size, color)
+                TextState textState = new TextState
+                {
+                    Font = FontRepository.FindFont("Helvetica"),
+                    FontSize = 12,
+                    ForegroundColor = Aspose.Pdf.Color.Black
+                };
 
-                // Assign the formatted text to the annotation
-                watermark.SetText(ft);
+                // Set the page number as the annotation text
+                // SetTextAndState expects an array of strings (supports multi‑line)
+                watermark.SetTextAndState(new string[] { i.ToString() }, textState);
 
-                // Optional: set appearance properties
-                watermark.Color   = Aspose.Pdf.Color.LightGray; // annotation border color
-                watermark.Opacity = 0.5;                         // semi‑transparent
-
-                // Add the annotation to the page's annotation collection
+                // Add the annotation to the page
                 page.Annotations.Add(watermark);
             }
 

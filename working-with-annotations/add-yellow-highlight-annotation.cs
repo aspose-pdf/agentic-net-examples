@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "highlighted.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,30 +16,28 @@ class Program
             return;
         }
 
-        // Load the PDF document (deterministic disposal)
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[1];
-
-            // Define the rectangle that the highlight will cover
-            // (left, bottom, right, top) in points
+            // Define the rectangle area for the highlight annotation (example coordinates)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
 
-            // Create the highlight annotation and set its visual properties
-            HighlightAnnotation highlight = new HighlightAnnotation(page, rect)
-            {
-                Color = Aspose.Pdf.Color.Yellow, // yellow color
-                Opacity = 0.8                     // 80 % opacity
-            };
+            // Create a HighlightAnnotation on the first page
+            HighlightAnnotation highlight = new HighlightAnnotation(doc.Pages[1], rect);
 
-            // Attach the annotation to the page
-            page.Annotations.Add(highlight);
+            // Set the annotation color to yellow
+            highlight.Color = Aspose.Pdf.Color.Yellow;
+
+            // Set the annotation opacity to 80%
+            highlight.Opacity = 0.8;
+
+            // Add the annotation to the page's annotation collection
+            doc.Pages[1].Annotations.Add(highlight);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved highlighted PDF to '{outputPath}'.");
+        Console.WriteLine($"Highlighted PDF saved to '{outputPath}'.");
     }
 }

@@ -7,53 +7,50 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputPdf = "output_with_gif.pdf"; // result PDF
-        const string gifPath   = "animation.gif";      // animated GIF to embed
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string gifFile   = "animation.gif";
 
+        // Verify input files exist
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
-        if (!File.Exists(gifPath))
+        if (!File.Exists(gifFile))
         {
-            Console.Error.WriteLine($"GIF file not found: {gifPath}");
+            Console.Error.WriteLine($"Animated GIF not found: {gifFile}");
             return;
         }
 
-        // Load the PDF (using the recommended load pattern)
+        // Load the PDF document (lifecycle rule: wrap Document in using)
         using (Document doc = new Document(inputPdf))
         {
-            // Ensure the document has at least three pages
+            // Ensure the document has at least three pages (page indexing is 1‑based)
             if (doc.Pages.Count < 3)
             {
-                Console.Error.WriteLine("The document must contain at least three pages.");
+                Console.Error.WriteLine("The document contains fewer than 3 pages.");
                 return;
             }
 
-            // Page 3 (1‑based indexing)
+            // Get page three
             Page page = doc.Pages[3];
 
-            // Define the rectangle where the annotation will appear
-            // (left, bottom, right, top) – adjust as needed
+            // Define the rectangle where the annotation will be placed
+            // Rectangle(left, bottom, right, top) – values are in points
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
 
-            // Create the ScreenAnnotation with the GIF file
-            ScreenAnnotation screenAnn = new ScreenAnnotation(page, rect, gifPath);
+            // Create a ScreenAnnotation that references the animated GIF
+            // Constructor: ScreenAnnotation(Page, Rectangle, string mediaFile)
+            ScreenAnnotation screen = new ScreenAnnotation(page, rect, gifFile);
 
-            // The ScreenAnnotation automatically plays the media; most viewers loop GIFs by default.
-            // If additional looping control is required, it can be set via the underlying RichMediaAction,
-            // but the basic constructor is sufficient for a continuously looping animated GIF.
+            // Add the annotation to the page's annotation collection
+            page.Annotations.Add(screen);
 
-            // Add the annotation to the page
-            page.Annotations.Add(screenAnn);
-
-            // Save the modified PDF
+            // Save the modified PDF (saving without explicit SaveOptions writes PDF)
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with animated GIF saved to '{outputPdf}'.");
+        Console.WriteLine($"Screen annotation with animated GIF added to page 3 and saved as '{outputPdf}'.");
     }
 }

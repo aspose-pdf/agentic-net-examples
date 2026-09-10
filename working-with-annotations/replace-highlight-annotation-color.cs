@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "highlight_modified.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,33 +16,35 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Open the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                Page page = doc.Pages[pageNum];
+                Page page = doc.Pages[pageIndex];
 
-                // Iterate through all annotations on the page
-                foreach (Annotation ann in page.Annotations)
+                // Iterate over all annotations on the current page
+                for (int annotIndex = 1; annotIndex <= page.Annotations.Count; annotIndex++)
                 {
-                    // Process only HighlightAnnotation instances
-                    if (ann is HighlightAnnotation highlight)
-                    {
-                        // Change the annotation color to a custom shade (light orange)
-                        highlight.Color = Color.FromRgb(255, 204, 128);
+                    Annotation annotation = page.Annotations[annotIndex];
 
-                        // Ensure the appearance stream is regenerated with the new color.
-                        Annotation.UpdateAppearanceOnConvert = true;
+                    // Process only Highlight annotations
+                    if (annotation is HighlightAnnotation highlight)
+                    {
+                        // Example: retrieve the appearance dictionary (optional)
+                        // var appearanceDict = highlight.Appearance;
+
+                        // Replace the highlight color with a custom shade (light orange)
+                        highlight.Color = Aspose.Pdf.Color.FromRgb(1.0, 0.8, 0.6);
                     }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

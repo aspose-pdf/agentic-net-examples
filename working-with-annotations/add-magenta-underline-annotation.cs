@@ -2,13 +2,12 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;   // for Rectangle
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,29 +16,32 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle where the underline will appear (llx, lly, urx, ury)
+            // Select the page where the annotation will be placed (first page in this example)
+            Page page = doc.Pages[1];
+
+            // Define the rectangle that bounds the underline annotation
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
 
-            // Create the underline annotation on the first page
-            UnderlineAnnotation underline = new UnderlineAnnotation(doc.Pages[1], rect);
+            // Create the underline annotation
+            UnderlineAnnotation underline = new UnderlineAnnotation(page, rect)
+            {
+                // Set the annotation color to magenta
+                Color = Aspose.Pdf.Color.Magenta
+            };
 
-            // Set the annotation color to magenta
-            underline.Color = Aspose.Pdf.Color.Magenta;
-
-            // Set the line thickness to 2 points via the Border property
-            // Border requires the parent annotation in its constructor
+            // Set the border (thickness) to 2 points
             underline.Border = new Border(underline) { Width = 2 };
 
             // Add the annotation to the page
-            doc.Pages[1].Annotations.Add(underline);
+            page.Annotations.Add(underline);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Underline annotation saved to '{outputPath}'.");
+        Console.WriteLine($"Underline annotation added and saved to '{outputPath}'.");
     }
 }

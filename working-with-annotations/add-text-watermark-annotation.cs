@@ -2,14 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text; // FontRepository, TextState, FontStyles
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "watermarked_output.pdf";
+        const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,42 +17,42 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Iterate over all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Define a rectangle at the top of the page.
-                // llx = 0, lly = page height - 50, urx = page width, ury = page height
+                // Define a rectangle at the top of the page
+                // left = 0, bottom = page height - 50, right = page width, top = page height
                 Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
                     0,
                     page.PageInfo.Height - 50,
                     page.PageInfo.Width,
                     page.PageInfo.Height);
 
-                // Create the WatermarkAnnotation for the current page.
+                // Create the watermark annotation
                 WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect);
 
-                // Configure the text appearance (bold font, size, color).
+                // Prepare text state: bold Helvetica, size 24, red color
                 TextState textState = new TextState
                 {
-                    Font = FontRepository.FindFont("Helvetica-Bold"),
+                    Font = FontRepository.FindFont("Helvetica"),
                     FontSize = 24,
                     FontStyle = FontStyles.Bold,
-                    ForegroundColor = Color.Red
+                    ForegroundColor = Aspose.Pdf.Color.Red
                 };
 
-                // Set the watermark text.
+                // Set the watermark text
                 watermark.SetTextAndState(new[] { "Confidential" }, textState);
 
-                // Add the annotation to the page.
+                // Add the annotation to the page
                 page.Annotations.Add(watermark);
             }
 
-            // Save the modified document.
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

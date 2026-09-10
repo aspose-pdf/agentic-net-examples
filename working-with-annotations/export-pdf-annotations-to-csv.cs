@@ -8,8 +8,7 @@ class Program
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "processed.pdf";
-        const string csvPath = "annotations.csv";
+        const string outputCsvPath = "annotations.csv";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -17,46 +16,57 @@ class Program
             return;
         }
 
-        // Load the PDF document (load rule)
+        // Open the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPdfPath))
+        // Open a StreamWriter for the CSV output
+        using (StreamWriter csvWriter = new StreamWriter(outputCsvPath))
         {
-            // Prepare CSV file for writing
-            using (StreamWriter csvWriter = new StreamWriter(csvPath, false))
+            // Write CSV header
+            csvWriter.WriteLine("Page,Index,Type,Name,Title,Contents,Rect");
+
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // CSV header
-                csvWriter.WriteLine("Page,Type,Rect,Contents,Title");
+                Page page = doc.Pages[pageIndex];
 
-                // Iterate over all pages (1‑based indexing)
-                for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
+                // Annotations collection is also 1‑based
+                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
                 {
-                    Page page = doc.Pages[pageNumber];
+                    Annotation ann = page.Annotations[annIndex];
 
-                    // Iterate over all annotations on the current page
-                    foreach (Annotation annotation in page.Annotations)
+                    // Basic details
+                    string typeName = ann.GetType().Name;
+                    string name = ann.Name ?? string.Empty;
+                    string contents = ann.Contents ?? string.Empty;
+
+                    // Title is available on markup annotations
+                    string title = string.Empty;
+                    if (ann is MarkupAnnotation markup)
                     {
-                        // Basic details
-                        string typeName = annotation.GetType().Name;
-                        string rect = $"{annotation.Rect.LLX},{annotation.Rect.LLY},{annotation.Rect.URX},{annotation.Rect.URY}";
-                        string contents = annotation.Contents?.Replace("\"", "\"\"") ?? string.Empty;
-
-                        // Title is available only on markup annotations
-                        string title = string.Empty;
-                        if (annotation is MarkupAnnotation markup)
-                        {
-                            title = markup.Title?.Replace("\"", "\"\"") ?? string.Empty;
-                        }
-
-                        // Write a CSV line (values are quoted to handle commas)
-                        csvWriter.WriteLine($"{pageNumber},\"{typeName}\",\"{rect}\",\"{contents}\",\"{title}\"");
+                        title = markup.Title ?? string.Empty;
                     }
+
+                    // Rectangle coordinates (fully qualified to avoid ambiguity)
+                    Aspose.Pdf.Rectangle rect = ann.Rect;
+                    string rectString = $"{rect.LLX},{rect.LLY},{rect.URX},{rect.URY}";
+
+                    // Write a CSV line, escaping fields that may contain commas or quotes
+                    csvWriter.WriteLine($"{pageIndex},{annIndex},{typeName},{EscapeCsv(name)},{EscapeCsv(title)},{EscapeCsv(contents)},{rectString}");
                 }
             }
-
-            // Save the (unchanged) document (save rule)
-            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Annotation audit CSV saved to '{csvPath}'.");
-        Console.WriteLine($"Processed PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Annotation audit CSV saved to '{outputCsvPath}'.");
+    }
+
+    // Helper to escape CSV fields according to RFC 4180
+    static string EscapeCsv(string value)
+    {
+        if (value.Contains(",") || value.Contains("\"") || value.Contains("\n"))
+        {
+            value = value.Replace("\"", "\"\"");
+            return $"\"{value}\"";
+        }
+        return value;
     }
 }

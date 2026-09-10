@@ -23,27 +23,20 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document; using ensures proper disposal
+        using (Document doc = new Document(pdfPath))
         {
-            // Load the source PDF
-            using (Document doc = new Document(pdfPath))
+            // Open the FDF file as a stream
+            using (FileStream fdfStream = File.OpenRead(fdfPath))
             {
-                // Open the FDF file stream
-                using (FileStream fdfStream = File.OpenRead(fdfPath))
-                {
-                    // Import annotations; page numbers in the FDF are applied automatically
-                    FdfReader.ReadAnnotations(fdfStream, doc);
-                }
-
-                // Save the PDF with the imported annotations
-                doc.Save(outputPath);
+                // Import annotations; page numbers embedded in the FDF are applied automatically
+                FdfReader.ReadAnnotations(fdfStream, doc);
             }
 
-            Console.WriteLine($"Annotations imported and saved to '{outputPath}'.");
+            // Save the updated PDF with imported annotations
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Annotations imported and saved to '{outputPath}'.");
     }
 }
