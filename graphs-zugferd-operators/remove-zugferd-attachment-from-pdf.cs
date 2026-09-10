@@ -8,6 +8,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const string attachmentName = "ZUGFeRD.xml"; // typical ZUGFeRD attachment name
 
         if (!File.Exists(inputPath))
         {
@@ -15,27 +16,39 @@ class Program
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // ZUGFeRD attachments are typically named "ZUGFeRD-invoice.xml"
-            const string zugFerdName = "ZUGFeRD-invoice.xml";
-
-            // Attempt to delete the ZUGFeRD attachment; ignore if it does not exist
-            try
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                doc.EmbeddedFiles.Delete(zugFerdName);
-            }
-            catch (Exception ex)
-            {
-                // Log but continue – the attachment may simply be absent
-                Console.WriteLine($"Could not delete attachment '{zugFerdName}': {ex.Message}");
+                // If the document contains embedded files, attempt to delete the ZUGFeRD attachment
+                if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+                {
+                    try
+                    {
+                        doc.EmbeddedFiles.Delete(attachmentName);
+                        Console.WriteLine($"Deleted attachment: {attachmentName}");
+                    }
+                    catch (Exception)
+                    {
+                        // Attachment not present – ignore
+                        Console.WriteLine($"Attachment '{attachmentName}' not found.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No embedded files found in the document.");
+                }
+
+                // Save the modified PDF, preserving all other content
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF, preserving all other content
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF saved without ZUGFeRD attachment to '{outputPath}'.");
         }
-
-        Console.WriteLine($"ZUGFeRD attachment removed (if present). Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,30 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+// URL-STABILITY STUB
+//
+// auto print pdf on open
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/graphs-zugferd-operators
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string outputPath = "print_on_open.pdf";
-
-        // Create a new PDF document and add a blank page
-        using (Document doc = new Document())
-        {
-            doc.Pages.Add();
-
-            // JavaScript that opens the print dialog when the document is opened
-            // "this.print(true);" shows the dialog and forces printing
-            JavascriptAction jsAction = new JavascriptAction("this.print(true);");
-
-            // Assign the JavaScript as the document's open action
-            doc.OpenAction = jsAction;
-
-            // Save the PDF
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"PDF saved to '{outputPath}' with auto‑print on open.");
-    }
-}
+class Program { static void Main() { } }

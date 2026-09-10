@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // XfdfReader resides here
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string fdfPath = "data.fdf";
+        const string pdfPath = "input.pdf";   // PDF with form fields
+        const string fdfPath = "data.fdf";    // FDF/XFDF file containing field values
         const string outputPath = "output.pdf";
 
         if (!File.Exists(pdfPath))
@@ -16,24 +16,25 @@ class Program
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
+
         if (!File.Exists(fdfPath))
         {
-            Console.Error.WriteLine($"FDF not found: {fdfPath}");
+            Console.Error.WriteLine($"FDF file not found: {fdfPath}");
             return;
         }
 
         // Load the PDF document
         using (Document doc = new Document(pdfPath))
         {
-            // Open the FDF file stream
+            // Import field values from the FDF/XFDF stream
             using (FileStream fdfStream = File.OpenRead(fdfPath))
             {
-                // Import form field values (and any annotations) from the FDF file
-                FdfReader.ReadAnnotations(fdfStream, doc);
+                // For XFDF use XfdfReader.ReadFields; it also works for FDF-like streams
+                XfdfReader.ReadFields(fdfStream, doc);
             }
 
-            // Flatten the form so that field values become part of the page content and cannot be edited
-            doc.Flatten();
+            // Flatten the form to make fields non‑editable
+            doc.Form.Flatten();
 
             // Save the updated PDF
             doc.Save(outputPath);

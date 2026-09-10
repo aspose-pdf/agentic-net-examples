@@ -9,6 +9,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string language   = "en-US";
 
         if (!File.Exists(inputPath))
         {
@@ -16,17 +17,26 @@ class Program
             return;
         }
 
-        // Load the PDF, set its primary language, and save.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Access tagged content and set the document language (e.g., English US).
-            ITaggedContent tagged = doc.TaggedContent;
-            tagged.SetLanguage("en-US");
+            // Load the existing PDF
+            using (Document doc = new Document(inputPath))
+            {
+                // Access tagged content and set the document language
+                ITaggedContent tagged = doc.TaggedContent;
+                tagged.SetLanguage(language);
+                // Optionally set a title for the PDF
+                tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Persist the change.
-            doc.Save(outputPath);
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Document language set to '{language}' and saved as '{outputPath}'.");
         }
-
-        Console.WriteLine($"Language set and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

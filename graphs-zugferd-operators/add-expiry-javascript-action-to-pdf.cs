@@ -16,27 +16,26 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
+        // Load the PDF, add a document‑level JavaScript action that closes the document
+        // after a specific expiry date (e.g., 2025‑12‑31). The script runs when the PDF is opened.
         using (Document doc = new Document(inputPath))
         {
-            // JavaScript that checks the current date and closes the document
-            // after the specified expiry date (e.g., 2025-12-31).
-            string js = @"
-                Date expiry = new Date('2025-12-31T23:59:59');
+            string script = @"
                 Date now = new Date();
+                Date expiry = new Date('2025-12-31T23:59:59');
                 if (now > expiry) {
-                    app.alert('This document has expired and will be closed.');
+                    app.alert('This document has expired.');
                     this.closeDoc();
                 }
             ";
 
-            // Assign the JavaScript as a document‑level open action
-            doc.OpenAction = new JavascriptAction(js);
+            // Assign the JavaScript action to the document's OpenAction property.
+            doc.OpenAction = new JavascriptAction(script);
 
-            // Save the modified PDF
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with expiry JavaScript: '{outputPath}'");
+        Console.WriteLine($"PDF saved with expiry JavaScript: '{outputPath}'.");
     }
 }

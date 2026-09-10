@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input_zugferd.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_zugferd.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,17 +15,17 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
             // Add custom metadata entries
-            doc.Metadata.Add("ProjectCode", "PRJ-2023-001");
-            doc.Metadata.Add("Department", "Finance");
+            doc.Metadata.Add("ProjectCode", "PRJ-001");
+            doc.Metadata.Add("Department", "Accounting");
 
-            // Save the modified PDF
+            // Save the PDF with the new metadata
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Custom metadata added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with custom metadata to '{outputPath}'.");
     }
 }

@@ -6,45 +6,54 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the ZUGFeRD XML file
-        const string inputPdfPath = "invoice.pdf";
-        const string zugferdXmlPath = "invoice.xml";
-        const string outputPdfPath = "invoice_with_zugferd.pdf";
+        const string pdfPath = "invoice.pdf";          // source PDF
+        const string zugferdXml = "invoice.xml";       // ZUGFeRD XML file
+        const string outputPdf = "invoice_with_zugferd.pdf";
 
-        // Verify that the required files exist
-        if (!File.Exists(inputPdfPath))
+        // Verify input files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
+        }
+        if (!File.Exists(zugferdXml))
+        {
+            Console.Error.WriteLine($"ZUGFeRD XML not found: {zugferdXml}");
             return;
         }
 
-        if (!File.Exists(zugferdXmlPath))
+        try
         {
-            Console.Error.WriteLine($"ZUGFeRD XML not found: {zugferdXmlPath}");
-            return;
-        }
-
-        // Load the PDF document, embed the ZUGFeRD XML, convert to PDF/A‑3B and save the result
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            // Embed the ZUGFeRD XML as an attached file with AFRelationship.Data
-            using (FileStream xmlStream = File.OpenRead(zugferdXmlPath))
+            // Load the PDF document
+            using (Document doc = new Document(pdfPath))
             {
-                var fileSpec = new FileSpecification(
-                    xmlStream,
-                    Path.GetFileName(zugferdXmlPath),
-                    "ZUGFeRD Invoice XML")
+                // Embed the ZUGFeRD XML as an attached file (AFRelationship.Data)
+                using (FileStream xmlStream = File.OpenRead(zugferdXml))
                 {
-                    MIMEType = "application/xml",
-                    AFRelationship = AFRelationship.Data
-                };
-                pdfDoc.EmbeddedFiles.Add(fileSpec);
+                    var fileSpec = new FileSpecification(
+                        xmlStream,
+                        Path.GetFileName(zugferdXml),
+                        "ZUGFeRD Invoice XML")
+                    {
+                        MIMEType = "application/xml",
+                        AFRelationship = AFRelationship.Data
+                    };
+                    doc.EmbeddedFiles.Add(fileSpec);
+                }
+
+                // Convert the document to PDF/A‑3B (required for ZUGFeRD compliance)
+                // The first argument is a log file path; it can be any writable location.
+                doc.Convert("convert_log.xml", PdfFormat.PDF_A_3B, ConvertErrorAction.Delete);
+
+                // Save the updated PDF
+                doc.Save(outputPdf);
             }
 
-            // Convert the document to PDF/A‑3B (required for ZUGFeRD compliance) and save
-            pdfDoc.Convert(outputPdfPath, PdfFormat.PDF_A_3B, ConvertErrorAction.Delete);
+            Console.WriteLine($"ZUGFeRD XML attached and saved to '{outputPdf}'.");
         }
-
-        Console.WriteLine($"ZUGFeRD XML attached and saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,39 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// set pdf permissions allow printing only
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/graphs-zugferd-operators/set-pdf-permissions-allow-printing.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "protected.pdf";
-        const string userPassword  = "user123";
-        const string ownerPassword = "owner123";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Allow printing only; do NOT include ExtractContent or ModifyTextAnnotations.
-        Permissions perms = Permissions.PrintDocument;
-
-        try
-        {
-            // Load the PDF, encrypt with the specified permissions, and save.
-            using (Document doc = new Document(inputPath))
-            {
-                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
-}
+class Program { static void Main() { } }

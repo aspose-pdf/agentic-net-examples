@@ -6,14 +6,14 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "encrypted.pdf";
-        const string userPassword = "user123";
+        const string inputPath  = "input_zugferd.pdf";
+        const string outputPath = "encrypted_zugferd.pdf";
+        const string userPassword  = "user123";
         const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
@@ -22,10 +22,10 @@ class Program
             // Load the ZUGFeRD PDF
             using (Document doc = new Document(inputPath))
             {
-                // Set desired permissions (e.g., allow printing and content extraction)
+                // Define desired permissions (example: allow printing and content extraction)
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                // Encrypt with user and owner passwords using AES-256
+                // Encrypt with user and owner passwords using AES‑256
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF

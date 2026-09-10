@@ -1,36 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+// URL-STABILITY STUB
+//
+// hide toolbar menu bar pdf
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/graphs-zugferd-operators/hide-toolbar-menu-bar-pdf-javascript.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Optional: set the viewer preference flags directly
-            doc.HideToolBar = true;
-            doc.HideMenubar = true;
-
-            // Add JavaScript that runs when the document is opened
-            // This script hides the toolbar and the menu bar in the PDF viewer
-            doc.OpenAction = new JavascriptAction("app.hideToolbar(); app.hideMenuBar();");
-
-            // Save the updated PDF
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"PDF saved with hidden toolbar and menu bar: {outputPath}");
-    }
-}
+class Program { static void Main() { } }

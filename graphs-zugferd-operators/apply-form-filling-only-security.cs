@@ -1,42 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// apply form filling only security
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/graphs-zugferd-operators
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-        const string outputPath = "secured.pdf";
-        const string userPassword = "user123";
-        const string ownerPassword = "owner123";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        try
-        {
-            // Load the existing PDF document
-            using (Document doc = new Document(inputPath))
-            {
-                // Allow only form filling; all other actions (editing, printing, extracting) are denied
-                Permissions perms = Permissions.FillForm;
-
-                // Encrypt the document using AES-256 algorithm
-                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-
-                // Save the encrypted PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
-}
+class Program { static void Main() { } }

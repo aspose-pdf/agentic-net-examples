@@ -6,19 +6,21 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "graph_embedded.pdf";
+        const string outputPath = "graph_output.pdf";
 
         // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a blank page (first page)
+            // Add a blank page to the document
             Page page = doc.Pages.Add();
 
-            // Create a Graph container (width: 400pt, height: 200pt) using double literals as required
+            // Graph constructor now expects double values (float overload is obsolete)
             Graph graph = new Graph(400.0, 200.0);
 
-            // Draw a rectangle (left, bottom, width, height) – use Aspose.Pdf.Drawing.Rectangle
-            var rect = new Aspose.Pdf.Drawing.Rectangle(50f, 150f, 300f, 100f);
+            // ----- Example vector shapes -----
+
+            // Use Aspose.Pdf.Drawing.Rectangle for shapes inside a Graph
+            var rect = new Aspose.Pdf.Drawing.Rectangle(50f, 50f, 150f, 100f);
             rect.GraphInfo = new GraphInfo
             {
                 FillColor = Color.LightGray,
@@ -27,8 +29,8 @@ class Program
             };
             graph.Shapes.Add(rect);
 
-            // Draw a line using a float array { x1, y1, x2, y2 }
-            float[] linePoints = { 50f, 150f, 350f, 250f };
+            // Line shape
+            float[] linePoints = { 200f, 150f, 350f, 150f };
             var line = new Line(linePoints);
             line.GraphInfo = new GraphInfo
             {
@@ -37,10 +39,10 @@ class Program
             };
             graph.Shapes.Add(line);
 
-            // Embed the vector graphic into the page by adding the Graph to the page's paragraphs
+            // Add the Graph (vector graphic) to the page
             page.Paragraphs.Add(graph);
 
-            // Save the PDF document
+            // Save the PDF – this embeds the vector graphic directly in the page content
             doc.Save(outputPath);
         }
 

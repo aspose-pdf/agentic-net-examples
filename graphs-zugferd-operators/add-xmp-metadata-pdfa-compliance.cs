@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "pdfa_compliant.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_pdfa.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,36 +15,25 @@ class Program
             return;
         }
 
-        // Load the source PDF (using the standard load constructor)
+        // Load the source PDF, add required XMP metadata, and save as PDF/A compliant document
         using (Document doc = new Document(inputPath))
         {
-            // Basic document info (optional but useful)
-            doc.Info.Title = "PDF/A Compliant Document";
-            doc.Info.Creator = "MyApp 1.0";
+            // Standard document information (optional but useful)
+            doc.Info.Title    = "PDF/A Document";
+            doc.Info.Creator  = "MyApp";
             doc.Info.Producer = "Aspose.Pdf";
 
-            // -----------------------------------------------------------------
-            // Add required XMP metadata entries for PDF/A compliance
-            // -----------------------------------------------------------------
-            // The Metadata property gives direct access to the native XMP dictionary.
-            // Add standard XMP properties.
-            doc.Metadata.Add("xmp:CreateDate", DateTime.UtcNow);
-            doc.Metadata.Add("xmp:ModifyDate", DateTime.UtcNow);
-            doc.Metadata.Add("xmp:MetadataDate", DateTime.UtcNow);
+            // Add XMP metadata entries required for PDF/A compliance
+            // Creator tool (who created the PDF)
             doc.Metadata.Add("xmp:CreatorTool", "MyApp 1.0");
-            doc.Metadata.Add("xmp:DocumentID", "uuid:" + Guid.NewGuid().ToString());
 
-            // -----------------------------------------------------------------
-            // Add PDF/A extension schema entries (pdfaid) required for PDF/A-1a
-            // -----------------------------------------------------------------
-            // Directly add the pdfaid properties – Aspose.Pdf embeds them in the
-            // appropriate PDF/A extension schema when they are present.
-            doc.Metadata.Add("pdfaid:part", "1");          // PDF/A‑1
-            doc.Metadata.Add("pdfaid:conformance", "A"); // PDF/A‑1a
+            // Creation date (UTC)
+            doc.Metadata.Add("xmp:CreateDate", DateTime.UtcNow);
 
-            // -----------------------------------------------------------------
-            // Save the PDF. The XMP metadata added above will be embedded.
-            // -----------------------------------------------------------------
+            // Document identifier (must be a UUID prefixed with "uuid:")
+            doc.Metadata.Add("pdf:DocumentID", "uuid:" + Guid.NewGuid().ToString());
+
+            // Save the document (PDF/A compliance will be validated on save)
             doc.Save(outputPath);
         }
 

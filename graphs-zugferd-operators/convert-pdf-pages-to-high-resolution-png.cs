@@ -2,44 +2,44 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
-using Aspose.Pdf.Text; // Added for TextFragment
 
-class PdfToPngConverter
+class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string outputDir = "PngPages";
+        // Directory containing the PDF file
+        string dataDir = @"C:\Data\";
+        // PDF file name
+        string pdfFile = "sample.pdf";
 
-        // Create a minimal PDF if it does not already exist in the sandbox
+        string pdfPath = Path.Combine(dataDir, pdfFile);
         if (!File.Exists(pdfPath))
         {
-            using (Document seed = new Document())
-            {
-                // Add a single page with some placeholder content
-                Page page = seed.Pages.Add();
-                page.Paragraphs.Add(new TextFragment("Sample page for PNG conversion"));
-                seed.Save(pdfPath);
-            }
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
         }
 
-        // Ensure the output folder exists
-        Directory.CreateDirectory(outputDir);
-
-        // Load the PDF and convert each page to a 300 DPI PNG image
+        // Load the PDF document inside a using block for proper disposal
         using (Document pdfDocument = new Document(pdfPath))
         {
-            Resolution resolution = new Resolution(300); // 300 DPI for high quality
+            // Create a Resolution object for 300 DPI
+            Resolution resolution = new Resolution(300);
+            // Initialize the PNG device with the desired resolution
             PngDevice pngDevice = new PngDevice(resolution);
 
+            // Iterate over all pages (1‑based indexing)
             for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
-                string pngPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
-                using (FileStream pngStream = new FileStream(pngPath, FileMode.Create))
+                // Output PNG file path for the current page
+                string outPath = Path.Combine(dataDir, $"page{pageNumber}.png");
+
+                // Convert the page to PNG and write to a file stream
+                using (FileStream pngStream = new FileStream(outPath, FileMode.Create))
                 {
                     pngDevice.Process(pdfDocument.Pages[pageNumber], pngStream);
                 }
-                Console.WriteLine($"Page {pageNumber} saved as PNG: {pngPath}");
+
+                Console.WriteLine($"Page {pageNumber} saved as PNG to: {outPath}");
             }
         }
     }
