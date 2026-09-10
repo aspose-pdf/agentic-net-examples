@@ -15,13 +15,13 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
+        // Load the existing PDF, add a blank page, and save the result.
         using (Document doc = new Document(inputPath))
         {
-            // Add a new blank page at the end of the document
+            // Add an empty page to the end of the document.
             doc.Pages.Add();
 
-            // Save the updated PDF
+            // Save the updated PDF.
             doc.Save(outputPath);
         }
 

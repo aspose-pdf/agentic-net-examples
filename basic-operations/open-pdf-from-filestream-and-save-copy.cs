@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_copy.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,11 +15,11 @@ class Program
             return;
         }
 
-        // Open the PDF from a FileStream and ensure resources are disposed properly
+        // Open the source PDF via a FileStream and ensure deterministic disposal.
         using (FileStream inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
         using (Document pdfDoc = new Document(inputStream))
         {
-            // Save the document to a new file using default settings
+            // Save the document to a new file using default PDF settings.
             pdfDoc.Save(outputPath);
         }
 

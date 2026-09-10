@@ -6,45 +6,47 @@ class Program
 {
     static void Main()
     {
-        const string sourcePath = "source.pdf";   // PDF containing the page to insert
-        const string targetPath = "target.pdf";   // PDF into which the page will be inserted
-        const string outputPath = "merged.pdf";   // Resulting PDF
-        const int sourcePageNumber = 1;           // Page number in source (1‑based)
-        const int insertPosition = 2;             // Position in target where page will be inserted (1‑based)
+        // Paths for the target PDF, the source PDF (page to insert), and the result PDF
+        const string targetPath = "target.pdf";
+        const string sourcePath = "source.pdf";
+        const string outputPath = "merged.pdf";
 
-        if (!File.Exists(sourcePath))
-        {
-            Console.Error.WriteLine($"Source file not found: {sourcePath}");
-            return;
-        }
+        // Verify that both input files exist
         if (!File.Exists(targetPath))
         {
             Console.Error.WriteLine($"Target file not found: {targetPath}");
             return;
         }
+        if (!File.Exists(sourcePath))
+        {
+            Console.Error.WriteLine($"Source file not found: {sourcePath}");
+            return;
+        }
 
         try
         {
-            // Load the source document (the page to be inserted)
+            // Load the target document (the one into which we will insert a page)
+            using (Document targetDoc = new Document(targetPath))
+            // Load the source document (the page we want to insert)
             using (Document sourceDoc = new Document(sourcePath))
             {
-                // Load the target document (where the page will be inserted)
-                using (Document targetDoc = new Document(targetPath))
-                {
-                    // Retrieve the page from the source document (1‑based indexing)
-                    Page pageToInsert = sourceDoc.Pages[sourcePageNumber];
+                // Choose the page number from the source document to insert.
+                // Aspose.Pdf uses 1‑based indexing, so page 1 is the first page.
+                Page pageToInsert = sourceDoc.Pages[1];
 
-                    // Insert the page into the target document at the specified position
-                    // Insert overload: Insert(int pageNumber, Page entity)
-                    targetDoc.Pages.Insert(insertPosition, pageToInsert);
+                // Define the position in the target document where the page will be inserted.
+                // For example, insert after the first page (position 2).
+                int insertPosition = 2; // 1‑based index
 
-                    // Save the modified target document
-                    targetDoc.Save(outputPath);
-                }
+                // Insert the page into the target document at the specified position.
+                // The Insert overload copies the page into the target collection.
+                targetDoc.Pages.Insert(insertPosition, pageToInsert);
+
+                // Save the modified document.
+                targetDoc.Save(outputPath);
             }
 
-            Console.WriteLine($"Inserted page {sourcePageNumber} from '{sourcePath}' into '{targetPath}' at position {insertPosition}.");
-            Console.WriteLine($"Result saved as '{outputPath}'.");
+            Console.WriteLine($"Page inserted successfully. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

@@ -1,42 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// encrypt pdf owner password aes256
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/basic-operations/encrypt-pdf-owner-password-only.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-        const string outputPath = "encrypted.pdf";
-        const string ownerPassword = "owner123";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        try
-        {
-            // Load the PDF document.
-            using (Document doc = new Document(inputPath))
-            {
-                // No user password (empty string) – only the owner password is set.
-                // Restrict all user permissions by passing 0 (no flags set).
-                Permissions userPermissions = 0;
-
-                // Encrypt with the owner password, no user password, no permissions, using AES-256.
-                doc.Encrypt(string.Empty, ownerPassword, userPermissions, CryptoAlgorithm.AESx256);
-
-                // Save the encrypted PDF.
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
-}
+class Program { static void Main() { } }

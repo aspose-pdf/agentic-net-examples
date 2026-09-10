@@ -6,34 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string newTitle   = "My New Title";
+        const string newTitle = "My Sample PDF";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF, set its title, and save it
+        // Open the PDF, set its title, and save it.
         using (Document doc = new Document(inputPath))
         {
-            // Set title via Document.SetTitle method
-            doc.SetTitle(newTitle);
-            // Also update DocumentInfo.Title for consistency
-            doc.Info.Title = newTitle;
-            doc.Save(outputPath);
+            doc.SetTitle(newTitle);          // Set the document title.
+            doc.Save(outputPath);            // Save as PDF (no SaveOptions needed for PDF).
         }
 
-        // Re-open the saved PDF to verify the title
+        // Re-open the saved PDF to verify the title.
         using (Document verifyDoc = new Document(outputPath))
         {
-            string savedTitle = verifyDoc.Info.Title;
+            string savedTitle = verifyDoc.Info.Title;   // Retrieve the title from DocumentInfo.
             Console.WriteLine($"Saved title: '{savedTitle}'");
-            Console.WriteLine(savedTitle == newTitle
-                ? "Title verification succeeded."
-                : "Title verification failed.");
+
+            if (savedTitle == newTitle)
+                Console.WriteLine("Title verification succeeded.");
+            else
+                Console.WriteLine("Title verification failed.");
         }
     }
 }

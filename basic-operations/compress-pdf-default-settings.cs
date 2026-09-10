@@ -1,16 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Optimization;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "compressed.pdf";
+        const string outputPath = "compressed_output.pdf";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
@@ -19,29 +17,21 @@ class Program
 
         // Get original file size
         long originalSize = new FileInfo(inputPath).Length;
+        Console.WriteLine($"Original size: {originalSize} bytes");
 
-        // Load the PDF, apply default compression, and save
+        // Load, save with default compression, and dispose properly
         using (Document doc = new Document(inputPath))
         {
-            // Create default optimization options (enable object compression)
-            OptimizationOptions opt = new OptimizationOptions
-            {
-                CompressObjects = true
-            };
-
-            // Optimize resources using the options
-            doc.OptimizeResources(opt);
-
-            // Save the compressed PDF
+            // Save using default compression settings
             doc.Save(outputPath);
         }
 
         // Get compressed file size
         long compressedSize = new FileInfo(outputPath).Length;
-
-        // Output size comparison
-        Console.WriteLine($"Original size:   {originalSize} bytes");
         Console.WriteLine($"Compressed size: {compressedSize} bytes");
-        Console.WriteLine($"Size reduction:  {originalSize - compressedSize} bytes");
+
+        // Show reduction
+        long reduction = originalSize - compressedSize;
+        Console.WriteLine($"Size reduction: {reduction} bytes ({(originalSize == 0 ? 0 : (reduction * 100.0 / originalSize)):F2}%)");
     }
 }
