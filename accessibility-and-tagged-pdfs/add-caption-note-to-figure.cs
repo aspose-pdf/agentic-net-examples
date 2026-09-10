@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "tagged_with_note.pdf";
+        const string outputPath = "output_with_note.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,35 +17,38 @@ class Program
             return;
         }
 
-        // Load the existing PDF
+        // Load the PDF and obtain the tagged‑content interface
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged‑content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Set language and title for the document (optional)
+            // Set language and title for the tagged document (optional)
             tagged.SetLanguage("en-US");
             tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Get the root structure element (no cast needed)
+            // Get the root structure element (no cast required)
             StructureElement root = tagged.RootElement;
 
-            // Create a Figure element that will represent the figure
+            // Create a Figure element (represents an illustration such as an image)
             FigureElement figure = tagged.CreateFigureElement();
-            figure.AlternativeText = "Illustration of the data analysis results.";
-            // Append the figure to the root of the structure tree
+            figure.AlternativeText = "Illustration of the main concept";
+
+            // Append the Figure to the root of the structure tree
             root.AppendChild(figure);
 
             // Create a Note element that will serve as the caption/description
             NoteElement note = tagged.CreateNoteElement();
-            note.SetText("Figure 1: Summary of quarterly revenue trends.");
-            // Append the note as a child of the figure element
+            note.SetText("Figure 1: This diagram illustrates the workflow of the system.");
+            // Optionally set alternative text for assistive technologies
+            note.AlternativeText = "Caption for Figure 1";
+
+            // Append the Note as a child of the Figure element
             figure.AppendChild(note);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Tagged PDF with note saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with caption note: {outputPath}");
     }
 }

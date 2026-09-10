@@ -8,35 +8,35 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "heading.pdf";
+        const string outputPath = "heading_document.pdf";
 
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Access the tagged‑content API
+            // Access tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Set document‑level language and title (optional)
+            // Set the document language (applies to all content unless overridden)
             tagged.SetLanguage("en-US");
+            // Optional: set a title for the PDF
             tagged.SetTitle("Document with Heading");
 
-            // Get the root structure element (no cast required)
+            // Get the root of the logical structure tree
             StructureElement root = tagged.RootElement;
 
-            // Create a level‑1 heading element
+            // Create a heading element (level 1)
             HeaderElement heading = tagged.CreateHeaderElement(1);
-            heading.SetText("Chapter 1: Introduction");
-
-            // Assign a language attribute to the heading element
+            heading.SetText("Sample Heading");
+            // Assign a language attribute specifically to this heading
             heading.Language = "en-US";
 
-            // Attach the heading to the root of the structure tree
-            root.AppendChild(heading); // bool parameter has a default value
+            // Attach the heading to the root element
+            root.AppendChild(heading);
 
             // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF created and saved to '{outputPath}'.");
     }
 }

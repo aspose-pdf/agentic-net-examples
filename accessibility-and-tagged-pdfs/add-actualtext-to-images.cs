@@ -10,6 +10,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output_with_actualtext.pdf";
+        const string altText    = "Screen‑reader description of the image";
 
         if (!File.Exists(inputPath))
         {
@@ -20,28 +21,30 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged‑content API
+            // Access tagged‑content API
             ITaggedContent tagged = doc.TaggedContent;
+            // Ensure the document is marked as tagged (no explicit setter needed)
+            // Set language for accessibility (optional)
+            tagged.SetLanguage("en-US");
 
-            // Ensure the document has a root structure element
+            // Root element of the structure tree
             StructureElement root = tagged.RootElement;
 
-            // Iterate over all pages
+            // Iterate over all pages and their image resources
             foreach (Page page in doc.Pages)
             {
-                // Iterate over each image resource on the page
                 foreach (XImage img in page.Resources.Images)
                 {
                     // Create a FigureElement (illustration structure element)
                     FigureElement figure = tagged.CreateFigureElement();
 
                     // Set the ActualText attribute – this is the text a screen reader will read
-                    figure.ActualText = "Description of the image for accessibility";
+                    figure.ActualText = altText;
 
-                    // Bind the FigureElement to the XImage instance
+                    // Bind the structure element to the actual XImage on the page
                     figure.Tag(img);
 
-                    // Append the figure element to the document's structure tree
+                    // Attach the figure element to the structure tree
                     root.AppendChild(figure);
                 }
             }

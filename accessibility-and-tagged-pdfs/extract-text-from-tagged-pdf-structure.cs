@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
 using Aspose.Pdf.LogicalStructure;
@@ -20,7 +19,7 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content interface
+            // Access tagged content; if null the PDF is not tagged
             ITaggedContent tagged = doc.TaggedContent;
             if (tagged == null)
             {
@@ -28,36 +27,31 @@ class Program
                 return;
             }
 
-            // Root of the structure tree
+            // Root of the logical structure tree
             StructureElement root = tagged.RootElement;
 
-            StringBuilder sb = new StringBuilder();
-            TraverseStructure(root, sb, 0);
-
-            Console.WriteLine("Extracted textual content from the tagged PDF:");
-            Console.WriteLine(sb.ToString());
+            Console.WriteLine("Extracted textual content from the structure tree:");
+            TraverseStructure(root, 0);
         }
     }
 
-    // Recursively walk the structure tree and collect text
-    static void TraverseStructure(StructureElement element, StringBuilder sb, int depth)
+    // Recursively walk the structure tree and output any text found
+    static void TraverseStructure(StructureElement element, int depth)
     {
-        // Indentation for readability (optional)
         string indent = new string(' ', depth * 2);
-
-        // ActualText holds the visible text of the element
         string text = element.ActualText ?? string.Empty;
+
         if (!string.IsNullOrWhiteSpace(text))
         {
-            sb.AppendLine($"{indent}{text}");
+            Console.WriteLine($"{indent}{text}");
         }
 
-        // Iterate over child elements
+        // ChildElements returns an ElementList; iterate over it
         foreach (Element child in element.ChildElements)
         {
-            if (child is StructureElement childStruct)
+            if (child is StructureElement childStructure)
             {
-                TraverseStructure(childStruct, sb, depth + 1);
+                TraverseStructure(childStructure, depth + 1);
             }
         }
     }

@@ -1,38 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// validate pdf ua compliance xml report
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/accessibility-and-tagged-pdfs/validate-pdf-ua-compliance-export-xml.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdfPath = "input.pdf";
-        const string reportFilePath = "validation_report.xml";
-
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
-            return;
-        }
-
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            // Validate the document against PDF/UA‑1. The method writes a log (XML) to the specified file.
-            bool isCompliant = pdfDoc.Validate(reportFilePath, PdfFormat.PDF_UA_1);
-
-            Console.WriteLine($"PDF/UA validation result: {(isCompliant ? "Compliant" : "Non‑compliant")}");
-
-            // Display the generated XML report (if the file was created)
-            if (File.Exists(reportFilePath))
-            {
-                string reportXml = File.ReadAllText(reportFilePath);
-                Console.WriteLine("=== Validation Report (XML) ===");
-                Console.WriteLine(reportXml);
-            }
-
-            // Additionally, the Document exposes a property that reflects PDF/UA compliance
-            Console.WriteLine($"Document.IsPdfUaCompliant property: {pdfDoc.IsPdfUaCompliant}");
-        }
-    }
-}
+class Program { static void Main() { } }

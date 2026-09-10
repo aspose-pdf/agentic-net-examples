@@ -17,34 +17,34 @@ class Program
             return;
         }
 
-        // Open the PDF with deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Get the root structure element (no cast needed)
+            // Get the root of the logical structure tree
             StructureElement root = tagged.RootElement;
 
             // Create a TOCI (Table of Contents Item) element
             TOCIElement toci = tagged.CreateTOCIElement();
 
-            // Create a paragraph element to be placed under the TOCI
+            // Append the TOCI element to the root (single-argument AppendChild uses default bool)
+            root.AppendChild(toci);
+
+            // Create a paragraph element that will be a child of the TOCI element
             ParagraphElement paragraph = tagged.CreateParagraphElement();
 
-            // Set the actual text for accessibility (screen readers will read this)
-            paragraph.ActualText = "Descriptive paragraph for the TOC entry.";
+            // Set the ActualText property for accessibility purposes
+            paragraph.ActualText = "This paragraph is part of a TOCI entry for screen readers.";
 
-            // Append the paragraph to the TOCI element
-            toci.AppendChild(paragraph); // bool parameter omitted (defaults to true)
-
-            // Append the TOCI element to the document root
-            root.AppendChild(toci); // bool parameter omitted
+            // Append the paragraph under the TOCI element
+            toci.AppendChild(paragraph);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
     }
 }

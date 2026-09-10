@@ -1,58 +1,69 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "styled_table.pdf";
-
-        if (!File.Exists(inputPath))
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
+            // Add a page to the document
+            Page page = doc.Pages.Add();
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Create a new table and define column widths
+            // Create a table and set column widths (two columns of equal width)
             Table table = new Table
             {
-                ColumnWidths = "120 120 120" // three equal columns
+                ColumnWidths = "200 200", // width in points
+                // Optional: set a border for the whole table
+                Border = new BorderInfo(BorderSide.All, 1, Aspose.Pdf.Color.Black),
+                // Set default padding for all cells (can be overridden per cell)
+                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
             };
 
-            // Add rows and cells, applying visual styles to each cell
-            for (int rowIndex = 0; rowIndex < 3; rowIndex++)
-            {
-                Row row = table.Rows.Add();
+            // ---------- First Row ----------
+            Row row1 = table.Rows.Add();
 
-                for (int colIndex = 0; colIndex < 3; colIndex++)
-                {
-                    // Create a cell with sample text
-                    Cell cell = row.Cells.Add($"R{rowIndex + 1}C{colIndex + 1}");
+            // Cell (1,1)
+            Cell cell11 = row1.Cells.Add();
+            cell11.Paragraphs.Add(new TextFragment("Cell 1"));
+            cell11.BackgroundColor = Aspose.Pdf.Color.LightYellow;                     // Background color
+            cell11.Border = new BorderInfo(BorderSide.All, 2, Aspose.Pdf.Color.Red);   // Border thickness & color
+            cell11.Margin = new MarginInfo(4, 4, 4, 4);                                 // Padding (left, right, top, bottom)
 
-                    // Set background color for visual accessibility
-                    cell.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            // Cell (1,2)
+            Cell cell12 = row1.Cells.Add();
+            cell12.Paragraphs.Add(new TextFragment("Cell 2"));
+            cell12.BackgroundColor = Aspose.Pdf.Color.LightGreen;
+            cell12.Border = new BorderInfo(BorderSide.All, 2, Aspose.Pdf.Color.Blue);
+            cell12.Margin = new MarginInfo(4, 4, 4, 4);
 
-                    // Define a solid border with thickness 2 and black color using the proper constructor
-                    cell.Border = new BorderInfo(BorderSide.All, 2f, Aspose.Pdf.Color.Black);
+            // ---------- Second Row ----------
+            Row row2 = table.Rows.Add();
 
-                    // Apply padding (margin) inside the cell
-                    cell.Margin = new MarginInfo(5, 5, 5, 5);
-                }
-            }
+            // Cell (2,1)
+            Cell cell21 = row2.Cells.Add();
+            cell21.Paragraphs.Add(new TextFragment("Cell 3"));
+            cell21.BackgroundColor = Aspose.Pdf.Color.LightCyan;
+            cell21.Border = new BorderInfo(BorderSide.All, 2, Aspose.Pdf.Color.DarkGray);
+            cell21.Margin = new MarginInfo(4, 4, 4, 4);
 
-            // Add the styled table to the first page of the document
-            doc.Pages[1].Paragraphs.Add(table);
+            // Cell (2,2)
+            Cell cell22 = row2.Cells.Add();
+            cell22.Paragraphs.Add(new TextFragment("Cell 4"));
+            cell22.BackgroundColor = Aspose.Pdf.Color.LightPink;
+            cell22.Border = new BorderInfo(BorderSide.All, 2, Aspose.Pdf.Color.Purple);
+            cell22.Margin = new MarginInfo(4, 4, 4, 4);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Add the table to the page
+            page.Paragraphs.Add(table);
+
+            // Save the PDF document
+            doc.Save("styled_table.pdf");
         }
 
-        Console.WriteLine($"PDF with styled table saved to '{outputPath}'.");
+        Console.WriteLine("PDF with styled table cells saved as 'styled_table.pdf'.");
     }
 }

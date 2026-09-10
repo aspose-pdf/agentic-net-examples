@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_span.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,35 +17,32 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule: document-disposal-with-using)
+        // Open the PDF document (lifecycle managed by using)
         using (Document doc = new Document(inputPath))
         {
             // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Optional: set language and title for the tagged PDF
+            // Optional: set the document language
             tagged.SetLanguage("en-US");
-            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Get the root structure element (no cast needed)
-            StructureElement root = tagged.RootElement;
-
-            // Create a Span element
+            // Create a Span element (inline text structure)
             SpanElement span = tagged.CreateSpanElement();
 
-            // Set the hidden pronunciation text via ActualText
-            span.ActualText = "pronunciation";
+            // Set the visible text of the span (if needed)
+            span.SetText("example");
 
-            // Optionally set visible text for the span
-            span.SetText("Visible text");
+            // Supply hidden pronunciation text via ActualText
+            span.ActualText = "ɪɡˈzæmpəl";
 
-            // Append the span to the root of the structure tree
-            root.AppendChild(span); // AppendChild with one argument (bool defaults)
+            // Attach the span to the root of the structure tree
+            StructureElement root = tagged.RootElement;
+            root.AppendChild(span); // AppendChild with one argument (default bool)
 
-            // Save the modified PDF (using rule: document-disposal-with-using)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with Span ActualText to '{outputPath}'.");
+        Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
     }
 }

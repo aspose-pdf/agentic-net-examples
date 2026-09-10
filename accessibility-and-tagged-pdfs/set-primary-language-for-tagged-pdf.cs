@@ -10,7 +10,6 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output_with_language.pdf";
-        const string language   = "en-US";
 
         if (!File.Exists(inputPath))
         {
@@ -18,23 +17,23 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content API
+            // Access the tagged content interface
             ITaggedContent taggedContent = doc.TaggedContent;
 
-            // Set the document‑wide language attribute
-            taggedContent.SetLanguage(language);
+            // Set the primary language for the whole document
+            taggedContent.SetLanguage("en-US");
 
-            // Also set the language on the root structure element (optional but explicit)
+            // Optionally, also set the language on the root structure element
             StructureElement root = taggedContent.RootElement;
-            root.Language = language;
+            root.Language = "en-US";
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with language '{language}' to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with language attribute: {outputPath}");
     }
 }

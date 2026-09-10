@@ -18,29 +18,35 @@ class Program
             return;
         }
 
-        // Load the PDF, modify its tagged structure, and save.
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content API.
+            // Access tagged content (creates one if missing)
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Optional: set document language and title for accessibility.
+            // Optional: set language and title for the whole document
             tagged.SetLanguage("en-US");
             tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Get the root element of the structure tree (no cast needed).
+            // Get the root structure element (no cast required)
             StructureElement root = tagged.RootElement;
 
-            // Create a LinkElement, set its display text, title, and hyperlink.
+            // Create a LinkElement via the ITaggedContent factory
             LinkElement link = tagged.CreateLinkElement();
-            link.SetText("Visit Example.com");               // Visible text for the link.
-            link.Title = "Example Site";                     // Title attribute.
-            link.Hyperlink = new WebHyperlink("https://example.com"); // External URL.
 
-            // Append the link element to the root of the structure tree.
-            root.AppendChild(link);
+            // Set the visible text of the link
+            link.SetText("Visit Aspose.Pdf");
 
-            // Save the modified PDF.
+            // Assign the external URL using WebHyperlink
+            link.Hyperlink = new WebHyperlink("https://www.aspose.com/pdf");
+
+            // Define the Title attribute (appears as tooltip in PDF viewers)
+            link.Title = "Aspose.Pdf product page";
+
+            // Append the link element to the document's structure tree
+            root.AppendChild(link);   // AppendChild with one argument (bool defaults)
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

@@ -18,25 +18,20 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for proper disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content API
+            // Access tagged content (no casting needed)
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Get the root structure element (no cast needed)
+            // Get the root structure element and set its Title property
             StructureElement root = tagged.RootElement;
-
-            // Set the title on the root structure element
             root.Title = rootTitle;
-
-            // Optionally also set the document's Info.Title for completeness
-            doc.Info.Title = rootTitle;
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved PDF with root title to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with root title to '{outputPath}'.");
     }
 }
