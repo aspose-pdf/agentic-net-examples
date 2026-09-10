@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,33 +15,30 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (wrapped in using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
             // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageIndex];
+                Page page = doc.Pages[i];
 
-                // Create an absorber that finds all image placements on the current page
+                // Search for image placements on the current page
                 ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-
-                // Perform the search on the page
                 page.Accept(absorber);
 
                 // Examine each found image placement
                 foreach (ImagePlacement placement in absorber.ImagePlacements)
                 {
-                    // Resolution is expressed in DPI (dots per inch)
-                    // Hide the image if either horizontal or vertical resolution is below 72 DPI
+                    // If either horizontal or vertical DPI is lower than 72, remove the image
                     if (placement.Resolution.X < 72 || placement.Resolution.Y < 72)
                     {
-                        placement.Hide(); // Removes the image from the page
+                        placement.Hide(); // Deletes the image from the page
                     }
                 }
             }
 
-            // Optional: clean up unused resources after deletions
+            // Clean up any now‑unused resources (optional but recommended)
             doc.OptimizeResources();
 
             // Save the modified PDF

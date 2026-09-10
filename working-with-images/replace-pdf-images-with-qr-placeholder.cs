@@ -1,48 +1,58 @@
 using System;
 using System.IO;
-using Aspose.Pdf;   // Core Aspose.Pdf namespace (no Facades)
+using Aspose.Pdf;
 
-class Program
+class ReplaceImagesWithQrPlaceholder
 {
     static void Main()
     {
-        const string inputPdfPath      = "input.pdf";          // Source PDF
-        const string outputPdfPath     = "output.pdf";         // Result PDF
-        const string placeholderImgPath = "qr_placeholder.png"; // QR‑code placeholder image
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string qrPlaceholderPath = "qr_placeholder.png"; // QR code image file
 
-        // Verify required files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(placeholderImgPath))
+
+        if (!File.Exists(qrPlaceholderPath))
         {
-            Console.Error.WriteLine($"Placeholder image not found: {placeholderImgPath}");
+            Console.Error.WriteLine($"QR placeholder image not found: {qrPlaceholderPath}");
             return;
         }
 
-        // Open the PDF document
+        // Load the PDF document
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate over every page in the document
-            foreach (Page page in pdfDoc.Pages)
+            // Iterate through all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
-                // Access the image collection of the current page
-                XImageCollection images = page.Resources.Images;
+                Page page = pdfDoc.Pages[pageNum];
+                var images = page.Resources.Images;
 
-                // XImageCollection uses 1‑based indexing, so loop from 1 to Count inclusive
-                for (int i = 1; i <= images.Count; i++)
+                // If the page contains no images, skip it
+                if (images.Count == 0)
+                    continue;
+
+                // Iterate over the images collection using 1‑based index
+                for (int imgIndex = 1; imgIndex <= images.Count; imgIndex++)
                 {
-                    // OPTIONAL: retrieve original image information (e.g., name) here
-                    // string originalName = images[i].Name;
+                    // Capture the original image reference and its name (used as source identifier)
+                    XImage originalImage = images[imgIndex];
+                    string originalImageName = images.GetImageName(originalImage);
 
-                    // Replace the image at position i with the QR‑code placeholder.
-                    // A fresh stream is required for each Replace call.
-                    using (FileStream placeholderStream = File.OpenRead(placeholderImgPath))
+                    // Replace the image with the QR code placeholder
+                    using (FileStream placeholderStream = File.OpenRead(qrPlaceholderPath))
                     {
-                        images.Replace(i, placeholderStream);
+                        // Replace expects a 1‑based index and a stream containing the new image data
+                        images.Replace(imgIndex, placeholderStream);
                     }
+
+                    // After replacement, obtain the new image object to set alternative text
+                    XImage replacedImage = images[imgIndex];
+                    // Store the original image identifier as alternative text (acts as a link to the source)
+                    replacedImage.TrySetAlternativeText($"Original image source: {originalImageName}", page);
                 }
             }
 
@@ -50,6 +60,6 @@ class Program
             pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"All images have been replaced with the QR placeholder. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved with QR placeholders: {outputPdfPath}");
     }
 }

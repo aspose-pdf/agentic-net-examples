@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - working-with-images
 
-> **Working with images** in PDF using C# / .NET -- **72** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with images** in PDF using C# / .NET -- **72** verified, compile-tested examples for **Aspose.PDF for .NET** 26.8.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -25,20 +25,20 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 - `using Aspose.Pdf;` (72/72 files) ← category-specific
 - `using Aspose.Pdf.Devices;` (10/72 files)
-- `using Aspose.Pdf.Text;` (6/72 files)
+- `using Aspose.Pdf.Facades;` (6/72 files)
 - `using Aspose.Pdf.Vector;` (6/72 files)
-- `using Aspose.Pdf.Facades;` (5/72 files)
+- `using Aspose.Pdf.Text;` (5/72 files)
+- `using Aspose.Pdf.Drawing;` (4/72 files)
 - `using Aspose.Pdf.Annotations;` (3/72 files)
-- `using Aspose.Pdf.Drawing;` (2/72 files)
 - `using Aspose.Pdf.Optimization;` (2/72 files)
-- `using Aspose.Pdf.LogicalStructure;` (1/72 files)
 - `using System;` (72/72 files)
 - `using System.IO;` (72/72 files)
-- `using System.Collections.Generic;` (7/72 files)
-- `using System.Drawing.Imaging;` (4/72 files)
-- `using System.Drawing;` (3/72 files)
+- `using System.Collections.Generic;` (5/72 files)
 - `using System.Text.Json;` (3/72 files)
+- `using System.Drawing.Imaging;` (2/72 files)
+- `using System.Drawing;` (1/72 files)
 - `using System.Linq;` (1/72 files)
+- `using System.Security.Cryptography;` (1/72 files)
 
 ## Common Code Pattern
 
@@ -56,36 +56,36 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-alternative-text-to-pdf-images](./add-alternative-text-to-pdf-images.cs) | Add Alternative Text to PDF Images | `Document`, `Page`, `XImage` | Demonstrates how to load a PDF, iterate through its pages and image resources, and set alternativ... |
-| [add-background-image-to-pdf-pages](./add-background-image-to-pdf-pages.cs) | Add Background Image to PDF Pages with Opacity | `Document`, `Page`, `BackgroundArtifact` | Shows how to place a background image on every page of a PDF and set its opacity to 30% using Asp... |
-| [add-background-image-to-pdf](./add-background-image-to-pdf.cs) | Add Background Image to PDF Pages | `Document`, `Page`, `BackgroundArtifact` | Demonstrates loading an existing PDF, adding a background image to each page using a BackgroundAr... |
-| [add-background-pattern-image-to-pdf-pages](./add-background-pattern-image-to-pdf-pages.cs) | Add Background Pattern Image to PDF Pages | `Document`, `Page`, `BackgroundArtifact` | Demonstrates how to place a semi‑transparent pattern image as a background on every page of a PDF... |
-| [add-background-pattern-image-to-pdf-pages__v2](./add-background-pattern-image-to-pdf-pages__v2.cs) | Add Background Pattern Image to PDF Pages | `Document`, `Page`, `BackgroundArtifact` | Shows how to place a semi‑transparent background pattern image on every page of a PDF using Aspos... |
-| [add-background-texture-overlay-to-pdf-pages](./add-background-texture-overlay-to-pdf-pages.cs) | Add Background Texture Overlay to PDF Pages | `Document`, `Page`, `BackgroundArtifact` | Demonstrates how to add a semi‑transparent background image to each page of a PDF using Aspose.Pd... |
-| [add-company-logo-to-first-page](./add-company-logo-to-first-page.cs) | Add Company Logo to First Page of PDF | `Document`, `ImageStamp`, `AddStamp` | Shows how to load a PDF, create a centered ImageStamp for a logo, add it only to the first page, ... |
-| [add-decorative-header-image-to-pdf-pages](./add-decorative-header-image-to-pdf-pages.cs) | Add Decorative Header Image to PDF Pages | `Document`, `Page`, `ImageStamp` | Shows how to place a header image at the top of each page in a PDF using Aspose.Pdf, calculating ... |
-| [add-diagonal-image-watermark-to-pdf](./add-diagonal-image-watermark-to-pdf.cs) | Add Diagonal Image Watermark to PDF | `Document`, `ImageStamp`, `RotateAngle` | Demonstrates how to overlay a semi‑transparent image watermark on every page of a PDF and rotate ... |
-| [add-dicom-image-to-pdf-using-filestream](./add-dicom-image-to-pdf-using-filestream.cs) | Add DICOM Image to PDF Using FileStream | `Document`, `Image`, `ImageStream` | Shows how to load a DICOM file via a FileStream, create an Aspose.Pdf.Image, and embed it on a PD... |
-| [add-image-with-alt-text-to-pdf](./add-image-with-alt-text-to-pdf.cs) | Add Image with Alternative Text to PDF | `Document`, `Page`, `Image` | Shows how to insert an image into a PDF using Aspose.Pdf and assign alternative (alt) text for ac... |
-| [add-png-logo-to-first-pdf-page](./add-png-logo-to-first-pdf-page.cs) | Add PNG Logo to First PDF Page | `Document`, `Page`, `Rectangle` | Shows how to load a PDF with Aspose.Pdf, place a PNG logo at specific coordinates on the first pa... |
-| [add-raster-image-to-new-pdf-page](./add-raster-image-to-new-pdf-page.cs) | Add Raster Image to a New PDF Page | `Document`, `Image`, `Pages` | Shows how to place a raster image (PNG, JPEG, etc.) on a newly added PDF page using Aspose.Pdf's ... |
-| [add-scalable-footer-image-to-pdf-pages](./add-scalable-footer-image-to-pdf-pages.cs) | Add Scalable Footer Image to PDF Pages | `Document`, `Page`, `Image` | Shows how to insert a decorative footer image on every page of a PDF and scale it proportionally ... |
-| [add-semi-transparent-image-watermark-to-pdf-pages](./add-semi-transparent-image-watermark-to-pdf-pages.cs) | Add Semi-Transparent Image Watermark to PDF Pages | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to overlay a semi‑transparent PNG image as a watermark on every page of a PDF us... |
-| [add-semi-transparent-overlay-image-to-pdf](./add-semi-transparent-overlay-image-to-pdf.cs) | Add Semi-Transparent Overlay Image to PDF | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to apply a semi‑transparent image overlay to every page of a PDF using Aspose.Pd... |
-| [add-semi-transparent-overlay-to-pdf-pages](./add-semi-transparent-overlay-to-pdf-pages.cs) | Add Semi-Transparent Color Overlay to PDF Pages | `Document`, `Page`, `Graph` | Shows how to load a theme configuration from a JSON file and apply a semi‑transparent color overl... |
-| [add-transparent-png-overlay-to-pdf-pages](./add-transparent-png-overlay-to-pdf-pages.cs) | Add Transparent PNG Overlay to PDF Pages | `Document`, `Page`, `ImageStamp` | Demonstrates loading a PDF, iterating through its pages, and applying a transparent PNG overlay u... |
-| [add-vector-graphics-collection-to-pdf-page](./add-vector-graphics-collection-to-pdf-page.cs) | Add Vector Graphics Collection to PDF Page | `Document`, `Page`, `Graph` | Demonstrates how to create a collection of vector shapes (line, rectangle, ellipse) and add them ... |
-| [batch-extract-images-from-pdfs](./batch-extract-images-from-pdfs.cs) | Batch Extract Images from PDFs | `Document`, `Page`, `XImage` | Shows how to process multiple PDF files in a folder, load each with Aspose.Pdf, and extract all e... |
-| [batch-extract-vector-graphics-from-pdfs](./batch-extract-vector-graphics-from-pdfs.cs) | Batch Extract Vector Graphics from PDFs to SVG | `Document`, `Page`, `SvgExtractor` | Demonstrates how to iterate through multiple PDF files, detect pages with vector graphics, and ex... |
-| [compress-large-images-in-pdf](./compress-large-images-in-pdf.cs) | Compress Large Images in PDF | `Document`, `OptimizationOptions`, `ImageCompressionOptions` | Shows how to reduce PDF size by compressing images (e.g., those over 1 MB) using Aspose.Pdf's opt... |
-| [compress-large-images-in-pdf__v2](./compress-large-images-in-pdf__v2.cs) | Compress Large Images in PDF with JPEG Optimization | `Document`, `OptimizationOptions`, `ImageCompressionOptions` | Demonstrates loading a PDF, configuring image compression options to replace images larger than 2... |
-| [convert-pdf-images-to-monochrome](./convert-pdf-images-to-monochrome.cs) | Convert PDF Images to Monochrome | `Document`, `Page`, `ImageCollection` | Shows how to replace each image in a PDF with its grayscale version using Aspose.Pdf, resulting i... |
-| [convert-pdf-pages-to-png-with-default-font](./convert-pdf-pages-to-png-with-default-font.cs) | Convert PDF Pages to PNG Images with Default Font Arial | `RenderingOptions`, `PngDevice`, `Document` | Demonstrates setting RenderingOptions.DefaultFontName to Arial and converting each page of a PDF ... |
-| [convert-pdf-to-multi-page-tiff](./convert-pdf-to-multi-page-tiff.cs) | Convert PDF to Multi‑Page TIFF with Default Font | `Document`, `Resolution`, `TiffSettings` | Demonstrates converting an entire PDF document to a multi‑page TIFF file using Aspose.Pdf, config... |
-| [convert-pdf-to-png-with-default-font](./convert-pdf-to-png-with-default-font.cs) | Convert PDF Pages to PNG with Default Font Override | `Document`, `RenderingOptions`, `PngDevice` | Loads a PDF, sets RenderingOptions.DefaultFontName to "Times New Roman" to replace missing fonts,... |
-| [copy-vector-graphics-between-pdf-pages](./copy-vector-graphics-between-pdf-pages.cs) | Copy Vector Graphics Between PDF Pages | `Document`, `Page`, `GraphicsAbsorber` | Shows how to extract vector graphics from a source PDF page using GraphicsAbsorber and insert eac... |
-| [correct-exif-orientation-in-pdf](./correct-exif-orientation-in-pdf.cs) | Correct EXIF Orientation of Images in PDF | `Document`, `Page`, `XImage` | The example loads a PDF, detects EXIF orientation metadata in each embedded image, rotates/flips ... |
-| [delete-low-resolution-images-from-pdf](./delete-low-resolution-images-from-pdf.cs) | Delete Low-Resolution Images from PDF | `Document`, `Page`, `ImagePlacementAbsorber` | Shows how to remove images with a DPI lower than 72 from a PDF using ImagePlacementAbsorber, hide... |
+| [add-alternative-text-to-pdf-images](./add-alternative-text-to-pdf-images.cs) | Add Alternative Text to PDF Images | `Document`, `Page`, `XImage` | Demonstrates how to load a PDF, iterate through its pages and images, set alternative text for ea... |
+| [add-background-image-to-pdf-pages](./add-background-image-to-pdf-pages.cs) | Add Background Image to PDF Pages with Opacity | `Document`, `ImageStamp`, `AddStamp` | Shows how to place a semi‑transparent background image on every page of a PDF using Aspose.Pdf's ... |
+| [add-background-image-to-pdf](./add-background-image-to-pdf.cs) | Add Background Image to PDF Pages | `Document`, `Page`, `BackgroundArtifact` | Shows how to place a background image on each page of an existing PDF using Aspose.Pdf, configuri... |
+| [add-background-pattern-image-to-pdf-pages](./add-background-pattern-image-to-pdf-pages.cs) | Add Background Pattern Image to PDF Pages | `Document`, `Page`, `BackgroundArtifact` | Shows how to place a semi‑transparent background pattern image on each page of a PDF document usi... |
+| [add-centered-logo-to-first-pdf-page](./add-centered-logo-to-first-pdf-page.cs) | Add Centered Logo to First PDF Page | `Document`, `Page`, `ImageStamp` | Shows how to load a PDF, create an ImageStamp for a logo, center it on the first page, and save t... |
+| [add-decorative-footer-image-to-pdf-pages](./add-decorative-footer-image-to-pdf-pages.cs) | Add Decorative Footer Image to PDF Pages | `Document`, `Page`, `Rectangle` | Shows how to insert a footer image on every page of a PDF, scaling it proportionally to the page ... |
+| [add-diagonal-image-watermark-to-pdf](./add-diagonal-image-watermark-to-pdf.cs) | Add Diagonal Image Watermark to PDF | `Document`, `ImageStamp`, `AddStamp` | Shows how to load a PDF, create an ImageStamp with a 45° rotation and semi‑transparent opacity, a... |
+| [add-dicom-image-to-pdf-page](./add-dicom-image-to-pdf-page.cs) | Add DICOM Image to PDF Page using FileStream | `Document`, `Page`, `Image` | Shows how to load an existing PDF, read a DICOM image via a FileStream, and place the image on a ... |
+| [add-header-image-to-pdf-pages](./add-header-image-to-pdf-pages.cs) | Add Header Image to Each PDF Page | `Document`, `Page`, `Rectangle` | Shows how to place a decorative header image at the top of every page in a PDF using Aspose.Pdf, ... |
+| [add-image-with-alt-text-to-pdf](./add-image-with-alt-text-to-pdf.cs) | Add Image with Alternative Text to PDF | `Document`, `Page`, `Rectangle` | Shows how to insert an image into an existing PDF document and assign alternative (alt) text for ... |
+| [add-png-logo-to-first-page](./add-png-logo-to-first-page.cs) | Add PNG Logo to First Page of PDF | `Document`, `Page`, `Rectangle` | Shows how to load a PDF with Aspose.Pdf, place a PNG logo at specific coordinates on the first pa... |
+| [add-raster-image-to-pdf-page](./add-raster-image-to-pdf-page.cs) | Add Raster Image to PDF Page | `Document`, `Image`, `Add` | Demonstrates how to insert a raster image (PNG, JPEG, etc.) onto a newly created PDF page using A... |
+| [add-semi-transparent-image-watermark-to-pdf-pages](./add-semi-transparent-image-watermark-to-pdf-pages.cs) | Add Semi-Transparent Image Watermark to PDF Pages | `Document`, `Page`, `ImageStamp` | Demonstrates how to overlay a semi-transparent PNG watermark on every page of a PDF using Aspose.... |
+| [add-semi-transparent-overlay-image-to-pdf](./add-semi-transparent-overlay-image-to-pdf.cs) | Add Semi-Transparent Overlay Image to PDF | `Document`, `ImageStamp`, `Page` | Demonstrates how to apply a semi‑transparent PNG overlay to every page of a PDF using Aspose.Pdf,... |
+| [add-semi-transparent-overlay-to-pdf-pages](./add-semi-transparent-overlay-to-pdf-pages.cs) | Add Semi-Transparent Overlay to PDF Pages from Theme Config | `Document`, `Page`, `Graph` | Shows how to read a JSON theme file, parse a hex color with opacity, and draw a full‑page semi‑tr... |
+| [add-subtle-background-pattern-to-pdf-pages](./add-subtle-background-pattern-to-pdf-pages.cs) | Add Subtle Background Pattern to PDF Pages | `Document`, `Page`, `BackgroundArtifact` | Demonstrates how to apply a low‑opacity pattern image as a background artifact on every page of a... |
+| [add-texture-background-image-to-pdf-pages](./add-texture-background-image-to-pdf-pages.cs) | Add Texture Background Image to PDF Pages | `Document`, `Page`, `BackgroundArtifact` | Shows how to place a subtle texture image as a background on every page of a PDF using Aspose.Pdf... |
+| [add-transparent-png-overlay-to-pdf-pages](./add-transparent-png-overlay-to-pdf-pages.cs) | Add Transparent PNG Overlay to PDF Pages | `Document`, `Page`, `Rectangle` | Shows how to load a PDF, iterate through each page, and place a full‑page transparent PNG overlay... |
+| [add-vector-graphics-to-pdf-page](./add-vector-graphics-to-pdf-page.cs) | Add Vector Graphics to a PDF Page | `Document`, `Page`, `Graph` | Shows how to create a new PDF page, build a Graph with rectangle, ellipse, and line shapes, and a... |
+| [batch-extract-vector-graphics-from-pdfs](./batch-extract-vector-graphics-from-pdfs.cs) | Batch Extract Vector Graphics from PDFs | `Document`, `Page`, `SvgExtractor` | Loads all PDF files from a specified input folder, iterates through each page, and extracts any v... |
+| [collect-image-resolution-metadata](./collect-image-resolution-metadata.cs) | Collect Image Resolution Metadata from PDF Pages | `Document`, `Page`, `ImagePlacementAbsorber` | Loads a PDF, iterates through each page, finds all images using ImagePlacementAbsorber, and repor... |
+| [compress-large-images-in-pdf](./compress-large-images-in-pdf.cs) | Compress Large Images in PDF | `Document`, `OptimizationOptions`, `ImageCompressionOptions` | Shows how to load a PDF, configure image compression to replace images larger than 2 MB with comp... |
+| [compress-pdf-images-using-optimization](./compress-pdf-images-using-optimization.cs) | Compress Images in PDF Using Aspose.Pdf Optimization | `Document`, `OptimizationOptions`, `ImageCompressionOptions` | The example loads a PDF, configures image compression options (quality and resolution), applies r... |
+| [convert-even-pdf-pages-to-grayscale](./convert-even-pdf-pages-to-grayscale.cs) | Convert Even PDF Pages to Grayscale | `Document`, `PageCollection`, `Page` | Shows how to load a PDF, iterate through its pages, apply a grayscale conversion only to even-num... |
+| [convert-pdf-images-to-monochrome](./convert-pdf-images-to-monochrome.cs) | Convert PDF Images to Monochrome | `Document`, `Page`, `XImageCollection` | Shows how to open a PDF, iterate through each page's images, and replace them with a black‑and‑wh... |
+| [convert-pdf-pages-to-png-with-default-font](./convert-pdf-pages-to-png-with-default-font.cs) | Convert PDF Pages to PNG with Default Font | `Document`, `Page`, `RenderingOptions` | Shows how to load a PDF, set RenderingOptions.DefaultFontName to Arial, and convert each page to ... |
+| [convert-pdf-pages-to-png-with-default-font__v2](./convert-pdf-pages-to-png-with-default-font__v2.cs) | Convert PDF Pages to PNG with Default Font Override | `Document`, `Resolution`, `PngDevice` | Demonstrates how to set RenderingOptions.DefaultFontName to "Times New Roman" and convert each pa... |
+| [convert-pdf-to-multi-page-tiff-default-font](./convert-pdf-to-multi-page-tiff-default-font.cs) | Convert PDF to Multi-Page TIFF with Default Font | `Document`, `Resolution`, `TiffSettings` | Demonstrates converting an entire PDF document into a multi‑page TIFF file using Aspose.Pdf, sett... |
+| [copy-vector-graphics-between-pdf-pages](./copy-vector-graphics-between-pdf-pages.cs) | Copy Vector Graphics Between PDF Pages | `Document`, `Page`, `GraphicsAbsorber` | Demonstrates how to extract vector graphic objects from a source PDF page using GraphicsAbsorber ... |
+| [correct-pdf-image-orientation](./correct-pdf-image-orientation.cs) | Correct PDF Image Orientation Using EXIF Data | `Document`, `Page`, `XImageCollection` | Loads a PDF, reads each embedded image's EXIF orientation, rotates or flips the image accordingly... |
 | ... | | | *and 42 more files* |
 
 ## Category Statistics
@@ -133,5 +133,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for working-with-images patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-07-17 | Run: `20260717_171638_da3b3e`
+Updated: 2026-08-20 | Run: `20260820_001147_12d7b3`
 <!-- AUTOGENERATED:END -->

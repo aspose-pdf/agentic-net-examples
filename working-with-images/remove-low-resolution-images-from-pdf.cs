@@ -15,33 +15,37 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
             for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                Page page = doc.Pages[pageIndex];
-
-                // Search for image placements on the current page
+                // Create an absorber to find image placements on the current page
                 ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-                page.Accept(absorber);
 
-                // Remove images whose DPI is lower than 72
-                foreach (ImagePlacement imgPlacement in absorber.ImagePlacements)
+                // Perform the search on the page
+                doc.Pages[pageIndex].Accept(absorber);
+
+                // Examine each found image placement
+                foreach (ImagePlacement placement in absorber.ImagePlacements)
                 {
-                    // Resolution.X and Resolution.Y represent horizontal and vertical DPI
-                    if (imgPlacement.Resolution.X < 72 || imgPlacement.Resolution.Y < 72)
+                    // Image resolution is expressed in DPI (horizontal and vertical)
+                    double dpiX = placement.Resolution.X;
+                    double dpiY = placement.Resolution.Y;
+
+                    // Delete images whose DPI is lower than 72 on either axis
+                    if (dpiX < 72 || dpiY < 72)
                     {
-                        imgPlacement.Hide(); // Delete the image from the page
+                        placement.Hide(); // removes the image from the page
                     }
                 }
             }
 
-            // Optional: clean up unused resources after deletions
+            // Optional: remove now‑unused resources to shrink the file
             doc.OptimizeResources();
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPath);
         }
 

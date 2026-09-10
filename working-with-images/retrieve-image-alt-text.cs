@@ -15,31 +15,31 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through each page (1‑based indexing)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
+                Console.WriteLine($"Page {i}:");
 
-                // Iterate over all XImage objects on the page
+                // Iterate over each XImage resource on the page
                 foreach (XImage img in page.Resources.Images)
                 {
-                    // Retrieve alternative text(s) for the image on this page
+                    // Retrieve alternative text for the image on this page
                     List<string> altTexts = img.GetAlternativeText(page);
 
-                    // Log each alternative text entry; if none, indicate missing alt text
                     if (altTexts != null && altTexts.Count > 0)
                     {
                         foreach (string alt in altTexts)
                         {
-                            Console.WriteLine($"Page {i}, Image \"{img.Name}\": Alt Text = \"{alt}\"");
+                            Console.WriteLine($"  Image [{img.Name}] Alt Text: \"{alt}\"");
                         }
                     }
                     else
                     {
-                        Console.WriteLine($"Page {i}, Image \"{img.Name}\": No alternative text set.");
+                        Console.WriteLine($"  Image [{img.Name}] has no alternative text.");
                     }
                 }
             }

@@ -1,45 +1,44 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Vector; // Vector graphics handling lives here
+using Aspose.Pdf.Vector;
 
 class Program
 {
     static void Main()
     {
-        const string sourcePath = "source.pdf";
-        const string targetPath = "target.pdf";
-        const string outputPath = "merged.pdf";
+        const string sourcePdfPath = "source.pdf";
+        const string targetPdfPath = "target.pdf";
+        const string outputPdfPath = "merged.pdf";
 
-        if (!File.Exists(sourcePath) || !File.Exists(targetPath))
+        if (!File.Exists(sourcePdfPath) || !File.Exists(targetPdfPath))
         {
             Console.Error.WriteLine("Source or target PDF not found.");
             return;
         }
 
-        // Load the source and target PDFs with deterministic disposal
-        using (Document srcDoc = new Document(sourcePath))
-        using (Document tgtDoc = new Document(targetPath))
+        // Load source and target documents
+        using (Document sourceDoc = new Document(sourcePdfPath))
+        using (Document targetDoc = new Document(targetPdfPath))
         {
-            // Work with the first page of each document (adjust as needed)
-            Page srcPage = srcDoc.Pages[1];
-            Page tgtPage = tgtDoc.Pages[1];
+            // Choose pages (1‑based indexing)
+            Page sourcePage = sourceDoc.Pages[1];
+            Page targetPage = targetDoc.Pages[1];
 
-            // Absorb vector graphics from the source page
+            // Absorb vector graphics from the source page using the correct absorber class
             GraphicsAbsorber absorber = new GraphicsAbsorber();
-            absorber.Visit(srcPage);
+            absorber.Visit(sourcePage);
 
-            // Add each extracted graphic to the target page
-            foreach (var graphic in absorber.Elements)
+            // Add each extracted graphic element individually to the target page
+            foreach (var element in absorber.Elements)
             {
-                // AddOnPage creates a copy of the graphic on the specified page
-                graphic.AddOnPage(tgtPage);
+                element.AddOnPage(targetPage);
             }
 
             // Save the modified target document
-            tgtDoc.Save(outputPath);
+            targetDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Vector graphics copied to '{outputPath}'.");
+        Console.WriteLine($"Vector graphics copied to '{outputPdfPath}'.");
     }
 }

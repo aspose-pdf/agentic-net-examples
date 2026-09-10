@@ -6,10 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";
-        const string outputPdf  = "output_with_image.pdf";
-        const string imagePath  = "picture.png";
-        const string altText    = "A scenic mountain landscape";
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string outputPdf = "output_with_image.pdf"; // result PDF
+        const string imagePath = "picture.jpg";        // image to add
+        const string altText   = "A scenic mountain view"; // descriptive alt text
 
         if (!File.Exists(inputPdf))
         {
@@ -23,41 +23,37 @@ class Program
             return;
         }
 
-        try
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // Open the existing PDF document.
-            using (Document doc = new Document(inputPdf))
+            // Choose the page where the image will be placed (first page in this example)
+            Page page = doc.Pages[1];
+
+            // Define the rectangle where the image will appear (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+
+            // Add the image to the page and to the page resources
+            using (FileStream imgStream = File.OpenRead(imagePath))
             {
-                // Ensure there is at least one page.
-                if (doc.Pages.Count == 0)
-                    doc.Pages.Add();
-
-                // Add the image to the first page.
-                Page page = doc.Pages[1];
-                Image img = new Image();
-                img.File = imagePath;               // Load image from file.
-                page.Paragraphs.Add(img);           // Insert image into page content.
-
-                // Set alternative text for the newly added image.
-                // XImage collection is not a dictionary; iterate directly.
-                foreach (XImage xImg in page.Resources.Images)
-                {
-                    // TrySetAlternativeText returns false if the image cannot be uniquely identified.
-                    // In this simple scenario it will succeed for the image we just added.
-                    bool ok = xImg.TrySetAlternativeText(altText, page);
-                    if (!ok)
-                        Console.WriteLine("Warning: Could not set alt text for an image on the page.");
-                }
-
-                // Save the modified PDF.
-                doc.Save(outputPdf);
+                // This adds the image to the page resources and draws it at the specified rectangle
+                page.AddImage(imgStream, rect);
             }
 
-            Console.WriteLine($"PDF saved with image and alt text: {outputPdf}");
+            // Retrieve the XImage that was just added.
+            // XImageCollection is 1‑based; the newly added image is the last entry.
+            XImage addedImage = page.Resources.Images[page.Resources.Images.Count];
+
+            // Set alternative text for accessibility
+            bool success = addedImage.TrySetAlternativeText(altText, page);
+            if (!success)
+            {
+                Console.Error.WriteLine("Failed to set alternative text for the image.");
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Image added with alt text and saved to '{outputPdf}'.");
     }
 }

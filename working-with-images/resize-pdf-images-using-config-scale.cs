@@ -1,19 +1,19 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
 class Program
 {
     // Simple POCO to map the configuration file
-    private class AppSettings
+    private class AppConfig
     {
         public double ImageScaleFactor { get; set; }
     }
 
     static void Main()
     {
-        // Load scaling factor from appsettings.json without using Microsoft.Extensions.Configuration
+        // Load scaling factor from appsettings.json using System.Text.Json
         const string configPath = "appsettings.json";
         if (!File.Exists(configPath))
         {
@@ -25,13 +25,13 @@ class Program
         try
         {
             string json = File.ReadAllText(configPath);
-            var settings = JsonSerializer.Deserialize<AppSettings>(json, new JsonSerializerOptions
+            var config = JsonSerializer.Deserialize<AppConfig>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (config == null)
             {
-                PropertyNameCaseInsensitive = true
-            });
-            if (settings == null)
-                throw new InvalidOperationException("Failed to deserialize configuration.");
-            scaleFactor = settings.ImageScaleFactor;
+                Console.Error.WriteLine("Failed to deserialize configuration.");
+                return;
+            }
+            scaleFactor = config.ImageScaleFactor;
         }
         catch (Exception ex)
         {
@@ -39,7 +39,7 @@ class Program
             return;
         }
 
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_resized.pdf";
 
         if (!File.Exists(inputPath))
@@ -48,19 +48,20 @@ class Program
             return;
         }
 
-        // Open the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document (lifecycle rule: use Document constructor)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages
+            // Iterate all pages (Aspose.Pdf uses 1‑based indexing)
             foreach (Page page in doc.Pages)
             {
-                // Iterate through all paragraph elements on the page (1‑based collection)
+                // Iterate all paragraphs on the page
                 for (int i = 1; i <= page.Paragraphs.Count; i++)
                 {
-                    // Identify Image objects and apply the scaling factor
-                    if (page.Paragraphs[i] is Image img)
+                    // Identify Image paragraphs
+                    if (page.Paragraphs[i] is Aspose.Pdf.Image img)
                     {
-                        img.ImageScale = scaleFactor; // Resize image proportionally
+                        // Apply the scaling factor (ImageScale property)
+                        img.ImageScale = scaleFactor;
                     }
                 }
             }
@@ -69,6 +70,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Images resized by a factor of {scaleFactor} and saved to '{outputPath}'.");
+        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
     }
 }

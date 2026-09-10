@@ -6,13 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";   // source PDF
-        const string outputPdf = "output.pdf"; // result PDF
-        const string dicomImage = "image.dcm"; // DICOM image to embed
-
-        // Desired size of the image on the page (points)
-        double customWidth = 200; // e.g., 200 points
-        double customHeight = 150; // e.g., 150 points
+        const string inputPdf   = "input.pdf";   // source PDF
+        const string outputPdf  = "output.pdf";  // result PDF
+        const string dicomImage = "image.dcm";   // DICOM image file
 
         // Verify files exist
         if (!File.Exists(inputPdf))
@@ -26,23 +22,31 @@ class Program
             return;
         }
 
-        // Load the PDF (wrapped in using for deterministic disposal)
+        // Open the PDF, add the DICOM image with custom size, and save.
         using (Document doc = new Document(inputPdf))
         {
-            // Use the first page; add a new page if the document is empty
-            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
+            // Desired dimensions in points (1 point = 1/72 inch).
+            // Adjust these values to achieve the required resolution.
+            double desiredWidth  = 200; // e.g., 200 points (~2.78 inches)
+            double desiredHeight = 300; // e.g., 300 points (~4.17 inches)
 
-            // Create an ImageStamp, set custom dimensions and position, then add it to the page
-            ImageStamp imgStamp = new ImageStamp(dicomImage);
-            imgStamp.Width = (float)customWidth;
-            imgStamp.Height = (float)customHeight;
-            // Position the stamp – XIndent = distance from the left edge, YIndent = distance from the bottom edge
-            imgStamp.XIndent = 50;   // X coordinate (points)
-            imgStamp.YIndent = 500; // Y coordinate (points)
+            // Create an ImageStamp for the DICOM image.
+            ImageStamp imgStamp = new ImageStamp(dicomImage)
+            {
+                // Set explicit width and height.
+                Width  = desiredWidth,
+                Height = desiredHeight,
+                // Position the image using XIndent (left) and YIndent (top).
+                // XIndent = distance from the left edge of the page.
+                // YIndent = distance from the bottom edge of the page.
+                XIndent = 100,
+                YIndent = 500
+            };
 
-            page.AddStamp(imgStamp);
+            // Add the stamp to the first page of the document.
+            doc.Pages[1].AddStamp(imgStamp);
 
-            // Save the modified PDF
+            // Save the modified PDF.
             doc.Save(outputPdf);
         }
 

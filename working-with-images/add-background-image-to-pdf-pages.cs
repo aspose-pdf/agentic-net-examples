@@ -22,29 +22,28 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document – wrapped in a using block for proper disposal
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Iterate over all pages
-            foreach (Page page in doc.Pages)
+            // Create an ImageStamp that will serve as the background image
+            ImageStamp bgStamp = new ImageStamp(imagePath)
             {
-                // Create a background artifact
-                BackgroundArtifact bgArtifact = new BackgroundArtifact();
+                // Render the stamp behind the page content
+                Background = true,
+                // Set opacity to 30 % (value range 0.0‑1.0)
+                Opacity = 0.3
+            };
 
-                // Set the background image (file path)
-                bgArtifact.SetImage(imagePath);
-
-                // Set opacity to 30% (0.3)
-                bgArtifact.Opacity = 0.3;
-
-                // Add the artifact to the page
-                page.Artifacts.Add(bgArtifact);
+            // Apply the stamp to every page (Pages collection is 1‑based)
+            foreach (Page page in pdfDoc.Pages)
+            {
+                page.AddStamp(bgStamp);
             }
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with background image to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with background image: {outputPath}");
     }
 }

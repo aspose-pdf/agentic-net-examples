@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_grayscale_images.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,19 +15,18 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
                 // Process only even‑numbered pages
-                if (i % 2 == 0)
+                if (pageNum % 2 == 0)
                 {
-                    // Convert the whole page to grayscale.
-                    // This effectively replaces all images on the page with their grayscale versions.
-                    // (Aspose.Pdf does not provide a direct per‑image grayscale replace without using Facades.)
-                    doc.Pages[i].MakeGrayscale();
+                    // Convert the entire page to grayscale.
+                    // This includes all images on the page while leaving odd pages untouched.
+                    doc.Pages[pageNum].MakeGrayscale();
                 }
             }
 

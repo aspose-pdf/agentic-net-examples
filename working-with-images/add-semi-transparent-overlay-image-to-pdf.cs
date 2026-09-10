@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";
-        const string overlayImg = "overlay.png";
-        const string outputPdf  = "output.pdf";
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string overlayImg = "overlay.png";       // semi‑transparent overlay image
+        const string outputPdf = "output.pdf";         // result PDF
 
         if (!File.Exists(inputPdf))
         {
@@ -23,33 +22,33 @@ class Program
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPdf))
         {
-            // Create an image stamp from the overlay image
+            // Create an ImageStamp that will be applied to each page
             ImageStamp stamp = new ImageStamp(overlayImg)
             {
-                // Set semi‑transparent opacity (0.0 = fully transparent, 1.0 = opaque)
-                Opacity = 0.3,          // 30 % opacity
-                Background = false      // place on top of page content
+                // Semi‑transparent (0.0 = fully transparent, 1.0 = opaque)
+                Opacity = 0.3f,
+                // Place the stamp on top of existing content
+                Background = false,
+                // Stretch the image to cover the whole page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center
             };
-
-            // Size the stamp to cover the whole page (assumes all pages have same size)
-            stamp.Width  = doc.Pages[1].PageInfo.Width;
-            stamp.Height = doc.Pages[1].PageInfo.Height;
-            stamp.HorizontalAlignment = HorizontalAlignment.Center;
-            stamp.VerticalAlignment   = VerticalAlignment.Center;
 
             // Apply the stamp to every page
             foreach (Page page in doc.Pages)
             {
+                // Adjust stamp size to match the current page dimensions
+                stamp.Width  = page.PageInfo.Width;
+                stamp.Height = page.PageInfo.Height;
+
+                // Add the stamp to the page
                 page.AddStamp(stamp);
             }
 
-            // Flatten transparency so the overlay becomes part of the page raster
-            doc.FlattenTransparency();
-
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use Save with path)
             doc.Save(outputPdf);
         }
 
