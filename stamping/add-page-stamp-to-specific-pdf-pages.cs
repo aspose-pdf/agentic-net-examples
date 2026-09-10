@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "stamped_output.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,25 +18,22 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Choose a page to use as the stamp source (e.g., the first page)
-            Aspose.Pdf.Page sourcePage = doc.Pages[1];
+            // Choose a source page to be used as the stamp (e.g., the first page)
+            Page sourcePage = doc.Pages[1];
 
             // Create a PdfPageStamp from the source page
-            PdfPageStamp pageStamp = new PdfPageStamp(sourcePage)
-            {
-                // Example: place the stamp as background and set opacity
-                Background = true,
-                Opacity    = 0.5f
-            };
+            Aspose.Pdf.PdfPageStamp pageStamp = new Aspose.Pdf.PdfPageStamp(sourcePage);
+
+            // Optional: configure stamp appearance (background, opacity, etc.)
+            pageStamp.Background = false;   // stamp appears on top of content
+            pageStamp.Opacity   = 0.8;      // semi‑transparent
 
             // Apply the stamp to pages 5 through 10 (inclusive)
             // Ensure we do not exceed the actual page count
-            int start = 5;
-            int end   = Math.Min(10, doc.Pages.Count);
-
-            for (int i = start; i <= end; i++)
+            int lastPage = Math.Min(10, doc.Pages.Count);
+            for (int i = 5; i <= lastPage; i++)
             {
-                // Each target page receives the same stamp
+                // Each page has an AddStamp method that accepts a Stamp instance
                 doc.Pages[i].AddStamp(pageStamp);
             }
 

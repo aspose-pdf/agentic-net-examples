@@ -6,47 +6,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string stampImagePath = "stamp.png";
-        const string outputPdfPath  = "output.pdf";
+        const string inputPdf  = "input.pdf";   // source PDF with AcroForm fields
+        const string stampImg  = "stamp.png";   // image to be used as stamp
+        const string outputPdf = "output.pdf";  // result PDF (fields preserved)
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(stampImagePath))
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document (AcroForm fields are loaded automatically)
+        using (Document doc = new Document(inputPdf))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            foreach (Page page in pdfDoc.Pages)
+            // Create an ImageStamp instance – this does NOT affect form fields
+            ImageStamp imgStamp = new ImageStamp(stampImg)
             {
-                // Create an image stamp from the specified file
-                ImageStamp imgStamp = new ImageStamp(stampImagePath);
+                // Example visual settings (optional)
+                Background          = false,                     // stamp on top of page content
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
+                Opacity             = 0.5f                       // 50% transparent
+            };
 
-                // Configure stamp appearance (optional)
-                imgStamp.HorizontalAlignment = HorizontalAlignment.Right;
-                imgStamp.VerticalAlignment   = VerticalAlignment.Bottom;
-                // Use XIndent/YIndent instead of the non‑existent Margin property
-                imgStamp.XIndent = 10; // distance from the right edge when Right alignment is used
-                imgStamp.YIndent = 10; // distance from the bottom edge when Bottom alignment is used
-                imgStamp.Opacity = 0.5f; // semi‑transparent
-
-                // Add the stamp to the current page
+            // Apply the stamp to every page (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                Page page = doc.Pages[i];
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF; AcroForm fields are preserved automatically
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF – AcroForm fields remain intact
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image stamp applied and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
     }
 }

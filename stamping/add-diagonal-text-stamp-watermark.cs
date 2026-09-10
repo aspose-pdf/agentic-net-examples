@@ -16,39 +16,36 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document inside a using block (lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Create a text stamp that will be used on every page
+            TextStamp stamp = new TextStamp("CONFIDENTIAL")
+            {
+                // Center the stamp on the page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
+                // Rotate 45 degrees (arbitrary angle)
+                RotateAngle = 45,
+                // Make the stamp semi‑transparent
+                Opacity = 0.3,
+                // Optional: place stamp above content (default)
+                Background = false
+            };
+
+            // Configure visual appearance of the text
+            stamp.TextState.Font = FontRepository.FindFont("Helvetica");
+            stamp.TextState.FontSize = 72;
+            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
+            stamp.TextState.FontStyle = FontStyles.Bold;
+
+            // Apply the stamp to each page using Page.AddStamp (per‑page method)
             foreach (Page page in doc.Pages)
             {
-                // Create a textual stamp that will serve as the diagonal watermark
-                TextStamp stamp = new TextStamp("CONFIDENTIAL")
-                {
-                    // Center the stamp on the page
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Center,
-
-                    // Rotate the stamp by an arbitrary angle (45 degrees)
-                    RotateAngle = 45,
-
-                    // Make the stamp semi‑transparent
-                    Opacity = 0.3,
-
-                    // Ensure the stamp is drawn on top of page content
-                    Background = false
-                };
-
-                // Configure visual appearance of the text
-                stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-                stamp.TextState.FontSize = 72;
-                stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-
-                // Add the stamp to the current page
                 page.AddStamp(stamp);
             }
 
-            // Save the modified document
+            // Save the modified PDF (lifecycle rule)
             doc.Save(outputPath);
         }
 

@@ -8,7 +8,8 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_stamp.pdf";
+        const string outputPath = "output.pdf";
+        const string stampText  = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
@@ -16,27 +17,28 @@ class Program
             return;
         }
 
-        // Load the existing PDF inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create a text stamp with the desired text
-            TextStamp stamp = new TextStamp("CONFIDENTIAL");
+            // Create a text stamp with the desired value
+            TextStamp stamp = new TextStamp(stampText);
 
-            // Configure text appearance
-            stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-            stamp.TextState.FontSize = 24;
-            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.White;          // Text color
-            stamp.TextState.BackgroundColor = Aspose.Pdf.Color.Black;          // Background box color
-            stamp.TextState.FontStyle = FontStyles.Bold;
+            // Place the stamp on top of page content (default) and make it semi‑transparent
+            stamp.Background = false;               // draw on top
+            stamp.Opacity    = 0.6;                 // 60 % opacity
 
-            // Position the stamp in the center of each page
+            // Define a background color for the text (e.g., black box) and foreground color (e.g., white text)
+            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.White;
+            stamp.TextState.BackgroundColor = Aspose.Pdf.Color.Black;
+
+            // Center the stamp horizontally and vertically on each page
             stamp.HorizontalAlignment = HorizontalAlignment.Center;
             stamp.VerticalAlignment   = VerticalAlignment.Center;
 
-            // Optional: make the stamp semi‑transparent
-            stamp.Opacity = 0.6f;
+            // Optionally let the stamp auto‑adjust its font size to fit the rectangle
+            stamp.AutoAdjustFontSizeToFitStampRectangle = true;
 
-            // Add the stamp to every page
+            // Apply the stamp to every page in the document
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(stamp);
@@ -46,6 +48,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with text stamp: {outputPath}");
+        Console.WriteLine($"Text stamp added and saved to '{outputPath}'.");
     }
 }

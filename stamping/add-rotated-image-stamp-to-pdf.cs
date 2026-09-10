@@ -6,49 +6,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF
-        const string stampPath  = "stamp.png";   // image to use as stamp
-        const string outputPath = "output.pdf";  // result PDF
+        const string inputPdfPath  = "input.pdf";
+        const string stampImagePath = "stamp.png";
+        const string outputPdfPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Verify input files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(stampImagePath))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        if (!File.Exists(stampPath))
+        // Load the PDF document (wrapped in using for deterministic disposal)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
-            return;
+            // Create an image stamp from the specified image file
+            ImageStamp imgStamp = new ImageStamp(stampImagePath);
+
+            // Rotate the stamp by an arbitrary angle (45 degrees)
+            imgStamp.RotateAngle = 45;
+
+            // Optional: set the position of the stamp on the page
+            imgStamp.XIndent = 100; // distance from the left edge
+            imgStamp.YIndent = 100; // distance from the bottom edge
+
+            // Add the rotated stamp to the first page of the PDF
+            pdfDoc.Pages[1].AddStamp(imgStamp);
+
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
-        using (Document pdfDoc = new Document(inputPath))
-        {
-            // Create an image stamp
-            ImageStamp stamp = new ImageStamp(stampPath)
-            {
-                // Place stamp in the centre of each page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
-
-                // Make the stamp semi‑transparent
-                Opacity = 0.5,
-
-                // Rotate the stamp content by 90° to match portrait‑to‑landscape pages
-                Rotate = Rotation.on90
-            };
-
-            // Apply the stamp to every page
-            foreach (Page page in pdfDoc.Pages)
-            {
-                page.AddStamp(stamp);
-            }
-
-            // Save the modified PDF (lifecycle rule: use Save without extra options for PDF)
-            pdfDoc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with rotated image stamp at '{outputPdfPath}'.");
     }
 }

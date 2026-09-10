@@ -16,26 +16,26 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TextState with custom font, size, and blue color
+            // Create a TextState to define font, size, and color
             TextState textState = new TextState
             {
-                Font = FontRepository.FindFont("Helvetica"), // choose a font that exists
+                Font = FontRepository.FindFont("Helvetica"), // custom font
                 FontSize = 24,                               // custom size
-                ForegroundColor = Aspose.Pdf.Color.Blue    // blue color
+                ForegroundColor = Aspose.Pdf.Color.Blue     // custom blue color
             };
 
-            // Create a TextStamp with the desired text and the custom TextState
-            TextStamp stamp = new TextStamp("Sample Text Stamp", textState)
+            // Create the TextStamp with the desired text and the TextState
+            TextStamp stamp = new TextStamp("Custom Text Stamp", textState)
             {
-                // Position the stamp (coordinates are from the bottom-left corner)
-                XIndent = 100,   // horizontal offset
-                YIndent = 700,   // vertical offset
-                // Optional: alignments, margins, etc.
+                // Position the stamp on the page (example coordinates)
+                XIndent = 100,   // distance from the left edge
+                YIndent = 700,   // distance from the bottom edge
+                // Optional alignment settings
                 HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment   = VerticalAlignment.Bottom
+                VerticalAlignment   = VerticalAlignment.Top
             };
 
             // Add the stamp to the first page (pages are 1‑based)
