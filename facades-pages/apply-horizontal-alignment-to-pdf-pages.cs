@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "aligned_output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,22 +16,21 @@ class Program
             return;
         }
 
-        // Initialize the editor and bind the source PDF
-        PdfPageEditor editor = new PdfPageEditor();
-        editor.BindPdf(inputPath);
+        // Initialize the PdfPageEditor facade and bind the source PDF
+        using (PdfPageEditor editor = new PdfPageEditor())
+        {
+            editor.BindPdf(inputPath);
 
-        // Apply left horizontal alignment to all pages
-        editor.HorizontalAlignment = HorizontalAlignment.Left;
+            // Set horizontal alignment for all pages to left‑justified
+            editor.HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Left;
 
-        // Commit the changes
-        editor.ApplyChanges();
+            // Apply the changes to the document
+            editor.ApplyChanges();
 
-        // Save the result
-        editor.Save(outputPath);
+            // Save the edited PDF
+            editor.Save(outputPath);
+        }
 
-        // Release resources
-        editor.Close();
-
-        Console.WriteLine($"Horizontal alignment applied. Saved to '{outputPath}'.");
+        Console.WriteLine($"Horizontal alignment applied. Output saved to '{outputPath}'.");
     }
 }

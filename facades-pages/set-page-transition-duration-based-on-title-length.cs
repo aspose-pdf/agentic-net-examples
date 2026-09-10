@@ -1,14 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Document, Page
-using Aspose.Pdf.Facades; // PdfPageEditor
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_transitions.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,39 +17,38 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a PdfPageEditor facade and bind the loaded document
-            PdfPageEditor editor = new PdfPageEditor();
-            editor.BindPdf(doc);
-
-            // Example: use page bookmarks as titles (if any). For simplicity, we'll use a placeholder title.
-            // In a real scenario, retrieve the actual title for each page (e.g., from bookmarks or structure).
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Initialize PdfPageEditor with the loaded document
+            using (PdfPageEditor editor = new PdfPageEditor(doc))
             {
-                // Placeholder: generate a title based on page number
-                string pageTitle = $"Page {i} Title";
+                // Iterate through all pages (1‑based indexing)
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    // Extract visible text from the current page
+                    TextAbsorber absorber = new TextAbsorber();
+                    doc.Pages[i].Accept(absorber);
+                    string pageText = absorber.Text ?? string.Empty;
 
-                // Determine transition duration based on title length (e.g., 1 second per 10 characters)
-                int duration = Math.Max(1, pageTitle.Length / 10);
+                    // Determine transition duration based on title length (here using text length)
+                    // Example: 1 second per 10 characters, capped at 10 seconds
+                    int duration = Math.Min(pageText.Length / 10 + 1, 10);
 
-                // Set the page to be processed
-                editor.ProcessPages = new int[] { i };
+                    // Configure the editor for the current page only
+                    editor.ProcessPages = new int[] { i };
+                    editor.TransitionDuration = duration;          // duration in seconds
+                    editor.TransitionType = PdfPageEditor.DISSOLVE; // any transition style
 
-                // Apply transition settings
-                editor.TransitionDuration = duration;          // duration in seconds
-                editor.TransitionType = PdfPageEditor.BLINDV; // example transition style
-
-                // Apply changes for this page
-                editor.ApplyChanges();
+                    // Apply the changes to the page
+                    editor.ApplyChanges();
+                }
             }
 
             // Save the modified PDF
-            editor.Save(outputPath);
-            editor.Close(); // optional, releases resources
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with transitions to '{outputPath}'.");
+        Console.WriteLine($"PDF with transitions saved to '{outputPath}'.");
     }
 }

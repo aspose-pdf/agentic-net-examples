@@ -16,26 +16,22 @@ class Program
             return;
         }
 
-        // Load the source PDF document
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the PdfPageEditor facade
-            using (PdfPageEditor editor = new PdfPageEditor())
+            // Initialize the PdfPageEditor with the loaded document
+            using (PdfPageEditor editor = new PdfPageEditor(doc))
             {
-                // Bind the document to the editor
-                editor.BindPdf(doc);
+                // Set the desired page size (width, height) in points.
+                // Example: A4 size = 595 x 842 points.
+                editor.PageSize = new PageSize(595, 842);
 
-                // Set the target page size (e.g., A4). This changes the page dimensions
-                // while preserving existing content, including annotations.
-                editor.PageSize = Aspose.Pdf.PageSize.A4;
-
-                // Apply the changes to all pages (ProcessPages null means all pages)
-                editor.ProcessPages = null;
+                // Apply the changes to all pages (default behavior).
                 editor.ApplyChanges();
-
-                // Save the modified document
-                doc.Save(outputPath);
             }
+
+            // Save the modified document; annotations are preserved automatically.
+            doc.Save(outputPath);
         }
 
         Console.WriteLine($"Resized PDF saved to '{outputPath}'.");

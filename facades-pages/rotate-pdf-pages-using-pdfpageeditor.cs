@@ -4,34 +4,55 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Allowed rotation angles in degrees.
+    private static readonly int[] AllowedAngles = { 0, 90, 180, 270 };
+
     static void Main()
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "rotated_output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Example rotation value – in real scenarios this could come from user input.
+        int rotation = 90;
+
+        // Validate the rotation before applying it.
+        if (!IsValidRotation(rotation))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Invalid rotation value: {rotation}. Allowed values are 0, 90, 180, 270.");
             return;
         }
 
-        // PdfPageEditor is a facade for page-level operations (rotate, zoom, etc.)
+        // Ensure the source file exists.
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            return;
+        }
+
+        // Use PdfPageEditor (a Facades class) to load, rotate, and save the PDF.
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the source PDF into the editor
+            // Load the PDF document.
             editor.BindPdf(inputPath);
 
-            // Set rotation for all pages.
-            // Allowed values are 0, 90, 180, or 270 degrees.
-            editor.Rotation = 90;
+            // Apply the validated rotation to all pages.
+            editor.Rotation = rotation;
 
-            // Apply the pending changes to the underlying document
-            editor.ApplyChanges();
-
-            // Save the modified PDF. No SaveOptions needed for PDF output.
+            // Save the modified PDF.
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}' with rotation {rotation} degrees.");
+    }
+
+    // Helper method to check if the rotation angle is one of the allowed values.
+    private static bool IsValidRotation(int angle)
+    {
+        foreach (int allowed in AllowedAngles)
+        {
+            if (angle == allowed)
+                return true;
+        }
+        return false;
     }
 }

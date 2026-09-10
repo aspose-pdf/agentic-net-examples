@@ -1,46 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// set display duration for pdf pages
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-pages/set-display-duration-even-pages.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "slideshow.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Bind the PDF to the PdfPageEditor facade.
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            editor.BindPdf(inputPath);
-
-            // Total number of pages in the document.
-            int pageCount = editor.GetPages();
-
-            // Set a display duration (in seconds) for each page.
-            // Here each page is set to 5 seconds; adjust as needed.
-            for (int i = 1; i <= pageCount; i++)
-            {
-                // Restrict changes to the current page.
-                editor.ProcessPages = new int[] { i };
-
-                // Duration for the current page.
-                editor.DisplayDuration = 5; // seconds
-
-                // Apply the change to the bound document.
-                editor.ApplyChanges();
-            }
-
-            // Save the modified PDF.
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Slideshow PDF saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

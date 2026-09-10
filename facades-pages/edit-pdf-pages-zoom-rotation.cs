@@ -1,37 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// edit pdf pages zoom rotation
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-pages/edit-pdf-page-zoom-save.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "edited.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
-
-        // PdfPageEditor is a facade for page-level editing.
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            // Load the source PDF.
-            editor.BindPdf(inputPath);
-
-            // Example page modifications.
-            editor.Zoom     = 0.75f; // 75 % zoom.
-            editor.Rotation = 90;    // Rotate pages 90 degrees.
-
-            // Apply the queued changes.
-            editor.ApplyChanges();
-
-            // Persist the edited document to a new file.
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }
