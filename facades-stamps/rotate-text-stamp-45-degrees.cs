@@ -1,52 +1,45 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf;                 // Core PDF API
+using Aspose.Pdf.Text;           // TextStamp class
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "rotated_stamp.pdf";
 
-        // ---------------------------------------------------------------------
-        // Create a minimal source PDF if it does not already exist.
-        // This satisfies the sandbox where no external files are present.
-        // ---------------------------------------------------------------------
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            using (Document seed = new Document())
-            {
-                seed.Pages.Add(); // add a blank page
-                seed.Save(inputPath);
-            }
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
         }
 
-        // Load the PDF document
-        Document pdfDoc = new Document(inputPath);
-
-        // Create a text stamp
-        TextStamp stamp = new TextStamp("CONFIDENTIAL");
-        stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-        stamp.TextState.FontSize = 36;
-        stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red; // fully‑qualified Aspose color
-        stamp.RotateAngle = 45f; // rotate 45 degrees around its centre (correct property)
-        stamp.HorizontalAlignment = HorizontalAlignment.Center;
-        stamp.VerticalAlignment = VerticalAlignment.Center;
-        // Optional: adjust position if needed
-        // stamp.XIndent = 200; // not required when using centre alignment
-        // stamp.YIndent = 400;
-
-        // Apply the stamp to every page (or select specific pages as needed)
-        foreach (Page page in pdfDoc.Pages)
+        // Open the source PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            page.AddStamp(stamp);
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
+
+            // Create a textual stamp with the desired text
+            TextStamp textStamp = new TextStamp("CONFIDENTIAL");
+
+            // Rotate the stamp 45 degrees around its centre
+            // RotateAngle allows arbitrary angles (in degrees)
+            textStamp.RotateAngle = 45;
+
+            // Optional: position the stamp on the page
+            textStamp.XIndent = 100; // distance from the left edge
+            textStamp.YIndent = 500; // distance from the bottom edge
+
+            // Add the stamp to the page
+            page.AddStamp(textStamp);
+
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
-        // Save the stamped PDF
-        pdfDoc.Save(outputPath);
-
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with rotated text stamp: {outputPdf}");
     }
 }

@@ -1,8 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // for EncodingType
+using Aspose.Pdf.Text; // for TextStamp
 
 class Program
 {
@@ -17,28 +16,31 @@ class Program
             return;
         }
 
-        // Get the file name to use in the header
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        // Prepare the header stamp – display the file name of the PDF
         string fileName = Path.GetFileName(inputPath);
+        TextStamp headerStamp = new TextStamp(fileName)
+        {
+            // Position the stamp at the top of the page (header)
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Top,
+            YIndent = 20f // distance from the top edge
+        };
+        // Configure the visual appearance of the stamp
+        headerStamp.TextState.Font = FontRepository.FindFont("Helvetica");
+        headerStamp.TextState.FontSize = 12;
+        headerStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-        // Initialize the PdfFileStamp facade
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.InputFile = inputPath;
-        fileStamp.OutputFile = outputPath;
+        // Add the stamp to every page in the document
+        foreach (Page page in pdfDocument.Pages)
+        {
+            page.AddStamp(headerStamp);
+        }
 
-        // Create formatted text for the header (using System.Drawing.Color as required by FormattedText)
-        FormattedText header = new FormattedText(
-            fileName,
-            System.Drawing.Color.Black,
-            "Helvetica",
-            EncodingType.Winansi,
-            false,
-            12);
-
-        // Add the header with a top margin (e.g., 20 points)
-        fileStamp.AddHeader(header, 20);
-
-        // Save the result
-        fileStamp.Close();
+        // Save the stamped PDF
+        pdfDocument.Save(outputPath);
 
         Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
