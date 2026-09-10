@@ -15,32 +15,32 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (wrapped in using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the TableAbsorber
+            // Create a TableAbsorber to locate tables in the document
             TableAbsorber absorber = new TableAbsorber();
 
             // Extract tables from the entire document
             absorber.Visit(doc);
 
-            // Iterate through each absorbed table
+            // Iterate over each absorbed table
             for (int t = 0; t < absorber.TableList.Count; t++)
             {
                 var table = absorber.TableList[t];
                 Console.WriteLine($"Table {t + 1} on page {table.PageNum}:");
 
-                // Iterate through rows of the table
+                // Iterate over rows in the current table
                 for (int r = 0; r < table.RowList.Count; r++)
                 {
                     var row = table.RowList[r];
 
-                    // Iterate through cells of the row
+                    // Iterate over cells in the current row
                     for (int c = 0; c < row.CellList.Count; c++)
                     {
                         var cell = row.CellList[c];
 
-                        // Concatenate text from all fragments within the cell
+                        // Concatenate all text fragments inside the cell
                         string cellText = string.Empty;
                         foreach (TextFragment fragment in cell.TextFragments)
                         {

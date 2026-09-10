@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;   // TableAbsorber resides here
+using Aspose.Pdf.Text;
 
 class ReplaceTableExample
 {
@@ -17,43 +17,50 @@ class ReplaceTableExample
             return;
         }
 
-        // Open the PDF document inside a using block for proper disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber to locate tables in the document
-            TableAbsorber absorber = new TableAbsorber();
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            {
+                Page page = doc.Pages[pageIndex];
 
-            // Visit each page to collect tables
-            foreach (Page page in doc.Pages)
+                // Find all tables on the current page
+                TableAbsorber absorber = new TableAbsorber();
                 absorber.Visit(page);
 
-            // Work on a copy of the TableList because Replace modifies the collection
-            var absorbedTables = absorber.TableList.Cast<AbsorbedTable>().ToList();
+                // Work on a copy of the TableList because Replace modifies the collection
+                var absorbedTables = absorber.TableList.ToList();
 
-            foreach (AbsorbedTable oldTable in absorbedTables)
-            {
-                // Retrieve the page that contains the old table
-                Page page = doc.Pages[oldTable.PageNum];
+                foreach (AbsorbedTable oldTable in absorbedTables)
+                {
+                    // Create a new Table that will replace the old one
+                    Table newTable = new Table();
 
-                // Create a new Table that will replace the old one
-                Table newTable = new Table();
+                    // Position the new table at the same rectangle as the old table
+                    // Rectangle coordinates: LLX, LLY, URX, URY
+                    newTable.Left = (float)oldTable.Rectangle.LLX;
+                    newTable.Top  = (float)oldTable.Rectangle.URY;
 
-                // Position the new table at the same rectangle as the old table
-                // Rectangle: (LLX, LLY) lower‑left, (URX, URY) upper‑right
-                newTable.Left = (float)oldTable.Rectangle.LLX;
-                newTable.Top  = (float)oldTable.Rectangle.URY;
+                    // Optionally copy column widths if they exist – AbsorbedTable does not expose ColumnWidths,
+                    // so this step is omitted. You can set custom widths here if needed.
 
-                // (Optional) copy column widths from the old table if desired
-                // newTable.ColumnWidths = oldTable.ColumnWidths;
+                    // Add a single row with a single cell containing placeholder text
+                    Row row = new Row();
+                    Cell cell = new Cell();
+                    cell.Paragraphs.Add(new TextFragment("Replaced table"));
+                    row.Cells.Add(cell);
+                    newTable.Rows.Add(row);
 
-                // Replace the absorbed table with the new Table
-                absorber.Replace(page, oldTable, newTable);
+                    // Replace the absorbed table with the newly created table
+                    absorber.Replace(page, oldTable, newTable);
+                }
             }
 
-            // Save the modified PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table replacement completed. Saved to '{outputPath}'.");
+        Console.WriteLine($"Table replacement completed. Output saved to '{outputPath}'.");
     }
 }

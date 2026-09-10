@@ -6,29 +6,25 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";      // source PDF
-        const string outputPdfPath = "output.pdf";     // result PDF
-        const string imagePath     = "image.png";      // image to embed
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string imagePath     = "image.png";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdfPath) || !File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-
-        if (!File.Exists(imagePath))
-        {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            Console.Error.WriteLine("Input PDF or image file not found.");
             return;
         }
 
         // Load the existing PDF document
         using (Document doc = new Document(inputPdfPath))
         {
+            // Ensure there is at least one page to work with
+            Page page = doc.Pages[1];
+
             // Create a table with a single column
             Table table = new Table();
-            // Define column width (optional)
-            table.ColumnWidths = "200";
+            table.ColumnWidths = "200"; // width of the column in points
 
             // Add a row to the table
             Row row = table.Rows.Add();
@@ -36,21 +32,23 @@ class Program
             // Add a cell to the row
             Cell cell = row.Cells.Add();
 
-            // Load the image from a memory stream and add it to the cell
+            // Load the image into a memory stream and place it into the cell
             using (FileStream imgStream = File.OpenRead(imagePath))
             {
                 Image img = new Image
                 {
-                    // Assign the stream containing the image data
-                    ImageStream = imgStream
+                    ImageStream = imgStream, // assign the stream directly
+                    // Optional: set explicit dimensions
+                    FixWidth  = 180,
+                    FixHeight = 120
                 };
+
                 // Add the image to the cell's paragraph collection
                 cell.Paragraphs.Add(img);
             }
 
-            // Insert the table into the first page of the PDF
-            Page firstPage = doc.Pages[1];
-            firstPage.Paragraphs.Add(table);
+            // Add the table to the page
+            page.Paragraphs.Add(table);
 
             // Save the modified PDF
             doc.Save(outputPdfPath);

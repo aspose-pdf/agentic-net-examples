@@ -1,92 +1,91 @@
 using System;
 using System.Data;
-using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class TableExtractor
 {
     static void Main()
     {
-        // Path to the source PDF file containing tables
-        const string inputPdf = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        // -------------------------------------------------
+        // Create a sample PDF with a simple table if it does not exist
+        // -------------------------------------------------
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
+            using (Document seed = new Document())
+            {
+                Page page = seed.Pages.Add();
+
+                // Build a simple 2x3 table
+                Table table = new Table
+                {
+                    ColumnWidths = "100 100 100"
+                };
+
+                // Header row
+                Row header = table.Rows.Add();
+                header.Cells.Add("Header 1");
+                header.Cells.Add("Header 2");
+                header.Cells.Add("Header 3");
+
+                // Data rows
+                Row row1 = table.Rows.Add();
+                row1.Cells.Add("R1C1");
+                row1.Cells.Add("R1C2");
+                row1.Cells.Add("R1C3");
+
+                Row row2 = table.Rows.Add();
+                row2.Cells.Add("R2C1");
+                row2.Cells.Add("R2C2");
+                row2.Cells.Add("R2C3");
+
+                page.Paragraphs.Add(table);
+                seed.Save(inputPath);
+            }
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber to find tables in the document
             TableAbsorber absorber = new TableAbsorber();
-
-            // Extract tables from the whole document
             absorber.Visit(doc);
 
-            // Iterate over each detected table
-            int tableIndex = 1;
-            foreach (AbsorbedTable absorbedTable in absorber.TableList)
+            for (int t = 0; t < absorber.TableList.Count; t++)
             {
-                // Create a DataTable to hold the extracted data
-                DataTable dataTable = new DataTable($"Table_{tableIndex}");
+                var absorbedTable = absorber.TableList[t];
 
-                // Determine the maximum number of columns in the table
-                int maxColumns = 0;
-                foreach (AbsorbedRow row in absorbedTable.RowList)
+                int maxColumns = absorbedTable.RowList.Max(r => r.CellList.Count);
+                DataTable dataTable = new DataTable($"Table_{t + 1}");
+
+                for (int c = 0; c < maxColumns; c++)
                 {
-                    if (row.CellList.Count > maxColumns)
-                        maxColumns = row.CellList.Count;
+                    dataTable.Columns.Add($"Column{c + 1}", typeof(string));
                 }
 
-                // Add columns to the DataTable
-                for (int col = 0; col < maxColumns; col++)
-                {
-                    dataTable.Columns.Add($"Column_{col + 1}", typeof(string));
-                }
-
-                // Populate rows
-                foreach (AbsorbedRow row in absorbedTable.RowList)
+                foreach (var row in absorbedTable.RowList)
                 {
                     DataRow dataRow = dataTable.NewRow();
 
-                    for (int col = 0; col < row.CellList.Count; col++)
+                    for (int c = 0; c < row.CellList.Count; c++)
                     {
-                        AbsorbedCell cell = row.CellList[col];
-
-                        // Concatenate all text fragments inside the cell
-                        string cellText = string.Empty;
-                        foreach (TextFragment fragment in cell.TextFragments)
-                        {
-                            cellText += fragment.Text;
-                        }
-
-                        dataRow[col] = cellText;
+                        var cell = row.CellList[c];
+                        string cellText = string.Concat(cell.TextFragments.Select(tf => tf.Text));
+                        dataRow[c] = cellText;
                     }
 
                     dataTable.Rows.Add(dataRow);
                 }
 
-                // Example usage: write the DataTable to console
-                Console.WriteLine($"--- Extracted Table {tableIndex} ---");
-                foreach (DataColumn column in dataTable.Columns)
-                {
-                    Console.Write($"{column.ColumnName}\t");
-                }
-                Console.WriteLine();
-
+                Console.WriteLine($"--- Extracted {dataTable.TableName} ---");
                 foreach (DataRow dr in dataTable.Rows)
                 {
-                    foreach (var item in dr.ItemArray)
-                    {
-                        Console.Write($"{item}\t");
-                    }
-                    Console.WriteLine();
+                    string line = string.Join(" | ", dr.ItemArray.Select(v => v?.ToString() ?? string.Empty));
+                    Console.WriteLine(line);
                 }
-
-                tableIndex++;
+                Console.WriteLine();
             }
         }
     }

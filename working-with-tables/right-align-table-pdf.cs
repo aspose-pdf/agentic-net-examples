@@ -1,5 +1,6 @@
 using System;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -7,10 +8,10 @@ class Program
     {
         const string outputPath = "right_aligned_table.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a blank page (pages are 1‑based)
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
             // Create a table instance
@@ -19,22 +20,22 @@ class Program
             // Align the table to the right margin
             table.Alignment = HorizontalAlignment.Right;
 
-            // Adjust the left coordinate if needed; setting to 0 lets the alignment handle positioning
+            // Adjust the left coordinate if needed (optional)
             table.Left = 0;
 
-            // Optional: define column widths (three equal columns)
-            table.ColumnWidths = "100 100 100";
+            // Populate the table with sample data
+            Row header = table.Rows.Add();
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
 
-            // Add a single row with three cells
-            Row row = table.Rows.Add();
-            row.Cells.Add("Cell 1");
-            row.Cells.Add("Cell 2");
-            row.Cells.Add("Cell 3");
+            Row dataRow = table.Rows.Add();
+            dataRow.Cells.Add("Cell 1");
+            dataRow.Cells.Add("Cell 2");
 
-            // Insert the table into the page's paragraph collection
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF to the specified path
+            // Save the PDF document
             doc.Save(outputPath);
         }
 

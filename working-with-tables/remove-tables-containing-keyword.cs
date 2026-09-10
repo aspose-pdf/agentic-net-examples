@@ -18,59 +18,56 @@ class Program
             return;
         }
 
-        try
+        RemoveTablesContainingKeyword(inputPath, outputPath, keyword);
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+    }
+
+    static void RemoveTablesContainingKeyword(string inputFile, string outputFile, string keyword)
+    {
+        // Load the PDF document
+        using (Document doc = new Document(inputFile))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            // Create a TableAbsorber to find tables in the document
+            TableAbsorber absorber = new TableAbsorber();
+
+            // Extract tables from the whole document
+            absorber.Visit(doc);
+
+            // Work on a copy of the TableList to avoid collection modification issues
+            var tables = absorber.TableList.Cast<AbsorbedTable>().ToList();
+
+            foreach (AbsorbedTable table in tables)
             {
-                // Create a TableAbsorber to find all tables in the document
-                TableAbsorber absorber = new TableAbsorber();
+                bool shouldRemove = false;
 
-                // Extract tables from the whole document
-                absorber.Visit(doc);
-
-                // Work on a copy of the TableList because Remove() modifies the collection
-                var tables = absorber.TableList.ToList();
-
-                foreach (AbsorbedTable table in tables)
+                // Scan all cells of the table for the keyword
+                foreach (var row in table.RowList)
                 {
-                    bool containsKeyword = false;
-
-                    // Iterate over rows and cells to search for the keyword
-                    foreach (var row in table.RowList)
+                    foreach (var cell in row.CellList)
                     {
-                        foreach (var cell in row.CellList)
+                        foreach (var fragment in cell.TextFragments)
                         {
-                            foreach (TextFragment fragment in cell.TextFragments)
+                            if (!string.IsNullOrEmpty(fragment.Text) &&
+                                fragment.Text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
                             {
-                                if (fragment.Text != null &&
-                                    fragment.Text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
-                                {
-                                    containsKeyword = true;
-                                    break;
-                                }
+                                shouldRemove = true;
+                                break;
                             }
-                            if (containsKeyword) break;
                         }
-                        if (containsKeyword) break;
+                        if (shouldRemove) break;
                     }
-
-                    // If the keyword is found in any cell, remove the table from the page
-                    if (containsKeyword)
-                    {
-                        absorber.Remove(table);
-                    }
+                    if (shouldRemove) break;
                 }
 
-                // Save the modified PDF
-                doc.Save(outputPath);
+                // Remove the table if the keyword was found
+                if (shouldRemove)
+                {
+                    absorber.Remove(table);
+                }
             }
 
-            Console.WriteLine($"Tables containing \"{keyword}\" have been removed. Output saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Save the modified document
+            doc.Save(outputFile);
         }
     }
 }

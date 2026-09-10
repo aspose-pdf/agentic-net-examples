@@ -1,47 +1,51 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text; // for BorderInfo and BorderSide if needed
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "table_no_split.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a single page (1‑based indexing)
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a table and disable automatic splitting across pages
+        // Load the source PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Create a new table
             Table table = new Table
             {
-                IsBroken = false,                 // Force the table to stay on one page
-                ColumnWidths = "100 100 100"      // Simple column width definition
+                // Disable automatic splitting across pages
+                IsBroken = false,
+
+                // Example column widths (adjust as needed)
+                ColumnWidths = "150 150 150",
+
+                // Optional: set a simple border for visibility
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
             };
 
-            // Header row
-            Row header = table.Rows.Add();
-            header.Cells.Add("Header 1");
-            header.Cells.Add("Header 2");
-            header.Cells.Add("Header 3");
+            // Add a single row with three cells
+            Row row = table.Rows.Add();
+            row.Cells.Add("Cell 1");
+            row.Cells.Add("Cell 2");
+            row.Cells.Add("Cell 3");
 
-            // Add many rows to exceed a page height (if splitting were allowed)
-            for (int i = 0; i < 50; i++)
-            {
-                Row row = table.Rows.Add();
-                row.Cells.Add($"Row {i + 1} Col 1");
-                row.Cells.Add($"Row {i + 1} Col 2");
-                row.Cells.Add($"Row {i + 1} Col 3");
-            }
-
-            // Insert the table into the page's content
+            // Add the table to the first page of the document
+            Page page = doc.Pages[1]; // 1‑based indexing
             page.Paragraphs.Add(table);
 
-            // Save the PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'. Table will not split across pages.");
+        Console.WriteLine($"PDF saved with table that will not split: '{outputPath}'.");
     }
 }

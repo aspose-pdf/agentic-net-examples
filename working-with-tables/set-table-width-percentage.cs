@@ -6,35 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "table_fixed_width.pdf";
+        const string outputPath = "table_percent.pdf";
 
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
             // Create a table instance
             Table table = new Table();
 
-            // Fix the table width to 500 points (total width)
-            table.ColumnWidths = "500";
+            // Set the table width to 80% of the page width.
+            // By defining a single column width as "80%" the table occupies 80% of the page.
+            table.ColumnWidths = "80%";
 
             // Optional: center the table on the page
             table.Alignment = HorizontalAlignment.Center;
 
-            // Add a single row
+            // Add a sample row and cell with some text
             Row row = table.Rows.Add();
-
-            // Add a cell to the row and insert some text
             Cell cell = row.Cells.Add();
-            TextFragment tf = new TextFragment("Fixed width table cell");
-            cell.Paragraphs.Add(tf);
+            cell.Paragraphs.Add(new TextFragment("Sample cell with 80% width"));
 
-            // Place the table on the page
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 

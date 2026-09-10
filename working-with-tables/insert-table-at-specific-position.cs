@@ -1,47 +1,49 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for MarginInfo if needed (actually MarginInfo is in Aspose.Pdf)
+using Aspose.Pdf.Text; // needed for TextState, FontRepository, MarginInfo
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_with_table.pdf";
 
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page where the table will be placed (first page in this example)
+            // Get the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Create a new table
+            // Create a new table (use Aspose.Pdf.Table, not the one from Aspose.Pdf.Text)
             Table table = new Table();
 
+            // Set absolute positioning using MarginInfo (Table inherits from Paragraph)
+            // Left = 100 points, Bottom = 500 points from the bottom of the page
+            table.Margin = new MarginInfo(100, 0, 0, 500);
+
             // Define column widths (optional)
-            table.ColumnWidths = "100 150 100";
+            table.ColumnWidths = "200 200";
 
             // Add a header row
             Row header = table.Rows.Add();
-            header.Cells.Add("Product");
-            header.Cells.Add("Quantity");
-            header.Cells.Add("Price");
+            Cell cell1 = header.Cells.Add("Header 1");
+            Cell cell2 = header.Cells.Add("Header 2");
+            // Apply simple styling to header cells
+            cell1.DefaultCellTextState = new TextState { FontSize = 12, Font = FontRepository.FindFont("Helvetica-Bold") };
+            cell2.DefaultCellTextState = new TextState { FontSize = 12, Font = FontRepository.FindFont("Helvetica-Bold") };
 
             // Add a data row
-            Row data = table.Rows.Add();
-            data.Cells.Add("Widget A");
-            data.Cells.Add("10");
-            data.Cells.Add("$5.00");
-
-            // Set the absolute position of the table on the page using MarginInfo
-            // Left = X coordinate, Top = Y coordinate measured from the top of the page
-            table.Margin = new MarginInfo { Left = 100, Top = 500 };
+            Row dataRow = table.Rows.Add();
+            dataRow.Cells.Add("Value A");
+            dataRow.Cells.Add("Value B");
 
             // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);

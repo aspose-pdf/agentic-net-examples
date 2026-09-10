@@ -1,56 +1,67 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Path for the output PDF
-        const string outputPath = "TableColumnRemoved.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Specify which column to remove (0‑based index)
-        int columnToRemove = 1; // removes the second column
+        // Index of the column to remove (zero‑based)
+        const int columnIndexToRemove = 2;
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a table with 4 columns and 3 rows
-            Table table = new Table();
+        // Load the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Assume the table is on the first page; adjust as needed
+            Page page = doc.Pages[1];
 
-            for (int i = 0; i < 3; i++)
+            // Locate the first Table object on the page
+            Table table = null;
+            foreach (var paragraph in page.Paragraphs)
             {
-                // Add a new row
-                Row row = table.Rows.Add();
-
-                // Populate the row with 4 cells
-                for (int j = 0; j < 4; j++)
+                if (paragraph is Table t)
                 {
-                    // Each cell contains simple text indicating its position
-                    row.Cells.Add($"R{i + 1}C{j + 1}");
+                    table = t;
+                    break;
                 }
             }
 
-            // Delete the cell at the specified column index from every row
-            foreach (Row row in table.Rows)
+            if (table == null)
             {
-                if (columnToRemove < row.Cells.Count)
+                Console.WriteLine("No table found on the first page.");
+            }
+            else
+            {
+                // Iterate over each row and delete the cell at the specified column index
+                foreach (Row row in table.Rows)
                 {
-                    // Cells collection does not expose RemoveAt; remove by value instead
-                    var cellToRemove = row.Cells[columnToRemove];
-                    row.Cells.Remove(cellToRemove);
+                    // Ensure the column index is within the current row's cell count
+                    if (columnIndexToRemove >= 0 && columnIndexToRemove < row.Cells.Count)
+                    {
+                        // Retrieve the cell to be removed
+                        var cellToRemove = row.Cells[columnIndexToRemove];
+
+                        // Remove the cell from the row's cell collection
+                        row.Cells.Remove(cellToRemove);
+                    }
                 }
+
+                Console.WriteLine($"Column {columnIndexToRemove} removed from the table.");
             }
 
-            // Add the modified table to the page
-            page.Paragraphs.Add(table);
-
-            // Save the PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'. Column {columnToRemove + 1} has been removed.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }
