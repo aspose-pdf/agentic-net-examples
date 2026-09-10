@@ -1,56 +1,29 @@
 using System;
-using System.IO;
-using System.Xml;
-using Aspose.Pdf.Facades;   // PdfXmpMetadata resides here
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Verify that the PDF file exists before proceeding.
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Bind the PDF to the XMP metadata facade
+        // Create a PdfXmpMetadata facade and bind it to the PDF file.
         using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            xmp.BindPdf(inputPdf);
+            xmp.BindPdf(inputPath);
 
-            // Retrieve the whole XMP packet as XML bytes
-            byte[] xmlBytes = xmp.GetXmpMetadata();
+            // Retrieve the entire XMP metadata as a byte array.
+            byte[] metadataBytes = xmp.GetXmpMetadata();
 
-            // Load the XML into an XmlDocument for querying
-            XmlDocument xmlDoc = new XmlDocument();
-            using (MemoryStream ms = new MemoryStream(xmlBytes))
-            {
-                xmlDoc.Load(ms);
-            }
-
-            // Prepare namespace manager for common XMP prefixes
-            XmlNamespaceManager ns = new XmlNamespaceManager(xmlDoc.NameTable);
-            ns.AddNamespace("dc",  "http://purl.org/dc/elements/1.1/");
-            ns.AddNamespace("xmp", "http://ns.adobe.com/xap/1.0/");
-            ns.AddNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-
-            // Helper to fetch the inner text of the first node matching an XPath
-            string GetNodeValue(string xpath)
-            {
-                XmlNode node = xmlDoc.SelectSingleNode(xpath, ns);
-                return node?.InnerText ?? "(not found)";
-            }
-
-            // Example: read creator, title and creation date from the XMP packet
-            string creator    = GetNodeValue("//dc:creator/rdf:Seq/rdf:li");
-            string title      = GetNodeValue("//dc:title/rdf:Alt/rdf:li");
-            string createDate = GetNodeValue("//xmp:CreateDate");
-
-            Console.WriteLine($"Creator   : {creator}");
-            Console.WriteLine($"Title     : {title}");
-            Console.WriteLine($"CreateDate: {createDate}");
+            // Example output: display the size of the retrieved metadata.
+            Console.WriteLine($"XMP metadata size: {metadataBytes.Length} bytes");
         }
     }
 }

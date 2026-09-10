@@ -1,35 +1,12 @@
-using System;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// remove nickname from pdf xmp metadata
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-xmp-metadata/remove-nickname-from-xmp-metadata.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        // Ensure the source file exists
-        if (!System.IO.File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Use PdfXmpMetadata facade to manipulate XMP metadata
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-        {
-            // Load the PDF document into the facade
-            xmp.BindPdf(inputPath);
-
-            // Remove the Nickname element from XMP metadata
-            // Two overloads are available; using the enum version is type‑safe
-            xmp.Remove(DefaultMetadataProperties.Nickname);
-
-            // Save the modified PDF back to disk
-            xmp.Save(outputPath);
-        }
-
-        Console.WriteLine($"Nickname element removed. Output saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

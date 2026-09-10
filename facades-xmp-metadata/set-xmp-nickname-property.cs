@@ -1,34 +1,31 @@
 using System;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the output PDF
         const string inputPdf  = "input.pdf";
         const string outputPdf = "output.pdf";
+        const string nickname  = "CustomIdentifier123";
 
-        // Ensure the input file exists
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Use PdfXmpMetadata (a SaveableFacade) to manipulate XMP metadata
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-        {
-            // Bind the facade to the existing PDF document
-            xmp.BindPdf(inputPdf);
+        // Initialize the XMP metadata facade and bind the source PDF
+        PdfXmpMetadata xmp = new PdfXmpMetadata();
+        xmp.BindPdf(inputPdf);
 
-            // Add or replace the xmp:Nickname property with a custom identifier
-            xmp.Add(DefaultMetadataProperties.Nickname, "CustomIdentifier");
+        // Add or update the xmp:Nickname property
+        xmp.Add(DefaultMetadataProperties.Nickname, nickname);
 
-            // Save the PDF with the updated XMP metadata
-            xmp.Save(outputPdf);
-        }
+        // Save the PDF with the updated XMP metadata
+        xmp.Save(outputPdf);
 
-        Console.WriteLine($"XMP Nickname set and PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Nickname '{nickname}' has been set and saved to '{outputPdf}'.");
     }
 }

@@ -1,56 +1,82 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Xml.Linq;
 using Aspose.Pdf.Facades; // PdfXmpMetadata resides here
-using Aspose.Pdf;          // XmpValue resides here
 
 public static class XmpHelper
 {
     /// <summary>
-    /// Extracts XMP metadata from a PDF and returns it as a dictionary of string key/value pairs.
+    /// Extracts XMP metadata from a PDF and returns it as a dictionary of string keys and string values.
     /// </summary>
-    /// <param name="pdfPath">Full path to the source PDF file.</param>
-    /// <returns>Dictionary where each key is an XMP property name and the value is its string representation.</returns>
-    public static Dictionary<string, string> ExtractMetadata(string pdfPath)
+    /// <param name="pdfPath">Path to the source PDF file.</param>
+    /// <returns>Dictionary where each key is the XMP property name and each value is its string representation.</returns>
+    public static Dictionary<string, string> GetXmpMetadata(string pdfPath)
     {
-        // Prepare the result container
-        var metadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        // Validate input.
+        if (string.IsNullOrWhiteSpace(pdfPath) || !File.Exists(pdfPath))
+            throw new ArgumentException("PDF file not found.", nameof(pdfPath));
 
-        // Use the PdfXmpMetadata facade to bind to the PDF (load operation)
+        // PdfXmpMetadata implements IDisposable, so use a using block.
         using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            xmp.BindPdf(pdfPath); // loads the PDF for XMP processing
+            // Bind the PDF document to the facade.
+            xmp.BindPdf(pdfPath);
 
-            // PdfXmpMetadata implements IDictionary<string, XmpValue>
-            // Iterate over all keys and retrieve their corresponding values
-            foreach (string key in xmp.Keys)
+            // Retrieve the raw XMP XML bytes.
+            byte[] rawBytes = xmp.GetXmpMetadata();
+            if (rawBytes == null || rawBytes.Length == 0)
+                return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            // Convert the byte array to a UTF‑8 string.
+            string rawXml = Encoding.UTF8.GetString(rawBytes);
+            if (string.IsNullOrWhiteSpace(rawXml))
+                return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            // Parse the XML and flatten it into a dictionary.
+            var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            XDocument doc = XDocument.Parse(rawXml);
+
+            // Walk through all leaf elements (elements that contain only text and no child elements).
+            foreach (var element in doc.Descendants())
             {
-                // Retrieve the XmpValue; it may be null for missing entries
-                XmpValue value = xmp[key];
-
-                // Convert the XmpValue to a readable string.
-                // XmpValue overrides ToString() to provide a suitable representation.
-                string stringValue = value?.ToString() ?? string.Empty;
-
-                // Store in the result dictionary
-                metadata[key] = stringValue;
+                if (!element.HasElements)
+                {
+                    // Use the element's fully qualified name (including namespace prefix if any) as the key.
+                    string key = element.Name.LocalName;
+                    // If the element belongs to a namespace, prepend the prefix for clarity.
+                    if (!string.IsNullOrEmpty(element.Name.NamespaceName))
+                    {
+                        // Try to get the prefix from the document's namespace declarations.
+                        string prefix = element.GetPrefixOfNamespace(element.Name.Namespace);
+                        if (!string.IsNullOrEmpty(prefix))
+                            key = $"{prefix}:{key}";
+                    }
+                    string value = element.Value ?? string.Empty;
+                    // Avoid duplicate keys – later values overwrite earlier ones.
+                    result[key] = value;
+                }
             }
-        } // Dispose of the facade automatically
 
-        return metadata;
+            return result;
+        }
     }
 }
 
-// Dummy entry point to satisfy the compiler when building as an executable.
-public class Program
+// Minimal entry point required for a console‑application project.
+public static class Program
 {
     public static void Main(string[] args)
     {
-        // Optional demonstration (can be removed in production).
-        // if (args.Length > 0)
-        // {
-        //     var dict = XmpHelper.ExtractMetadata(args[0]);
-        //     foreach (var kvp in dict)
-        //         Console.WriteLine($"{kvp.Key}: {kvp.Value}");
-        // }
+        // Optional demo: if a PDF path is supplied, print its XMP metadata.
+        if (args.Length > 0 && File.Exists(args[0]))
+        {
+            var metadata = XmpHelper.GetXmpMetadata(args[0]);
+            foreach (var kvp in metadata)
+            {
+                Console.WriteLine($"{kvp.Key} = {kvp.Value}");
+            }
+        }
     }
 }

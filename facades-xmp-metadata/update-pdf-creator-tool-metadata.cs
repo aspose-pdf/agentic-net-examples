@@ -6,7 +6,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Expect at least the folder path; optional second argument is the new Creator value.
+        // Expect at least the folder path; optional second argument is the new CreatorTool value.
         if (args.Length < 1)
         {
             Console.Error.WriteLine("Usage: UpdateCreator <folderPath> [creatorTool]");
@@ -22,25 +22,21 @@ class Program
             return;
         }
 
+        // Get all PDF files in the specified folder (non‑recursive).
         string[] pdfFiles = Directory.GetFiles(folderPath, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found in the specified folder.");
-            return;
-        }
 
         foreach (string pdfPath in pdfFiles)
         {
             try
             {
-                // Bind the PDF file using the PdfFileInfo facade.
+                // Load the PDF metadata using the PdfFileInfo facade.
                 using (PdfFileInfo info = new PdfFileInfo(pdfPath))
                 {
                     // Update the Creator property.
                     info.Creator = newCreator;
 
-                    // Save the updated information back to the same file.
-                    // SaveNewInfo overwrites the existing PDF with the modified metadata.
+                    // Save the updated metadata back to the same file.
+                    // SaveNewInfo overwrites the original PDF with the modified info.
                     info.SaveNewInfo(pdfPath);
                 }
 
@@ -48,10 +44,10 @@ class Program
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Failed to update '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
 
-        Console.WriteLine("Processing completed.");
+        Console.WriteLine("Processing complete.");
     }
 }
