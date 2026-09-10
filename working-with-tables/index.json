@@ -1,18 +1,52 @@
 {
   "category": "working-with-tables",
   "nuget_version": "26.8.0",
-  "last_updated": "2026-08-20T08:55:30Z",
+  "last_updated": "2026-09-10T12:45:08Z",
   "examples": {
-    "create-table-with-header-and-data-rows": {
-      "title": "Create Table with Header and Data Rows in PDF",
-      "filename": "create-table-with-header-and-data-rows.cs",
-      "description": "Demonstrates how to programmatically create a PDF, add a table with a styled header row, populate it with data rows, and save the document using Aspose.Pdf for .NET.",
+    "add-auto-numbered-column-to-pdf-table": {
+      "title": "Add Auto‑Numbered Column to PDF Table",
+      "filename": "add-auto-numbered-column-to-pdf-table.cs",
+      "description": "Shows how to create a PDF table with Aspose.Pdf and fill the first column with sequential numbers using the Table.ImportArray method.",
+      "tags": [
+        "pdf",
+        "table",
+        "autonumber",
+        "importarray",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.BorderInfo",
+        "Aspose.Pdf.MarginInfo",
+        "Aspose.Pdf.Text.TextState"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "add-background-color-to-table-cell": {
+      "title": "Add Background Color To Table Cell",
+      "filename": "add-background-color-to-table-cell.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "add-centered-paragraph-to-table-cell": {
+      "title": "Add Centered Paragraph to Table Cell",
+      "filename": "add-centered-paragraph-to-table-cell.cs",
+      "description": "Demonstrates how to create a PDF table with Aspose.Pdf and insert a paragraph into a cell with horizontal center alignment.",
       "tags": [
         "table",
+        "paragraph",
+        "center-alignment",
         "pdf",
-        "aspose-pdf",
-        "csharp",
-        "styling"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -20,23 +54,258 @@
         "Aspose.Pdf.Table",
         "Aspose.Pdf.Row",
         "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.HorizontalAlignment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "add-checkbox-form-field-in-table-cell": {
+      "title": "Add Checkbox Form Field Inside Table Cell",
+      "filename": "add-checkbox-form-field-in-table-cell.cs",
+      "description": "Shows how to create a PDF with a table and place a checkbox form field inside one of the table's cells using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "table",
+        "checkbox",
+        "form",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Forms.CheckboxField",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "add-checkbox-in-table-cell": {
+      "title": "Add Checkbox In Table Cell",
+      "filename": "add-checkbox-in-table-cell.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "add-footer-row-to-pdf-table": {
+      "title": "Add Footer Row To Pdf Table",
+      "filename": "add-footer-row-to-pdf-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "add-footnote-references-in-pdf-table": {
+      "title": "Add Footnote References In Pdf Table",
+      "filename": "add-footnote-references-in-pdf-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "add-footnote-references-to-table-cells": {
+      "title": "Add Footnote References to Table Cells in PDF",
+      "filename": "add-footnote-references-to-table-cells.cs",
+      "description": "Shows how to insert superscript footnote markers inside table cells, attach Aspose.Pdf footnote notes, and save the updated PDF.",
+      "tags": [
+        "table",
+        "footnote",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Note"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "add-gradient-background-behind-table": {
+      "title": "Add Gradient Background Behind Table",
+      "filename": "add-gradient-background-behind-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "add-hyperlink-to-table-cell": {
+      "title": "Add Hyperlink To Table Cell",
+      "filename": "add-hyperlink-to-table-cell.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "add-list-items-in-table-cell": {
+      "title": "Add List Items Inside a Table Cell",
+      "filename": "add-list-items-in-table-cell.cs",
+      "description": "Shows how to create a bullet list within a PDF table cell by adding TextFragment paragraphs with list markers.",
+      "tags": [
+        "table",
+        "list",
+        "cell",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.FontRepository"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "add-multiline-text-to-table-cell": {
+      "title": "Add Multiline Text to Table Cell in PDF",
+      "filename": "add-multiline-text-to-table-cell.cs",
+      "description": "Demonstrates how to insert multiline text into a PDF table cell by adding separate TextFragment objects and a line‑break fragment.",
+      "tags": [
+        "table",
+        "multiline",
+        "textfragment",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.FontRepository.FindFont"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
-    "insert-table-into-pdf": {
-      "title": "Insert Table into Existing PDF Page",
-      "filename": "insert-table-into-pdf.cs",
-      "description": "Shows how to load an existing PDF with Aspose.Pdf, create and style a Table, position it on a specific page, and save the updated document.",
+    "add-numbered-list-in-table-cell": {
+      "title": "Add Numbered List In Table Cell",
+      "filename": "add-numbered-list-in-table-cell.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "add-radio-button-group-in-table-cell": {
+      "title": "Add Radio Button Group Inside a Table Cell",
+      "filename": "add-radio-button-group-in-table-cell.cs",
+      "description": "Demonstrates how to place a group of radio buttons inside a table cell by creating a RadioButtonField, adding options, and attaching it to the PDF form.",
+      "tags": [
+        "radio-button",
+        "table",
+        "form",
+        "aspdf",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Forms.RadioButtonField",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Form.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "add-solid-border-to-pdf-table": {
+      "title": "Add Solid Border to PDF Table",
+      "filename": "add-solid-border-to-pdf-table.cs",
+      "description": "Demonstrates how to load an existing PDF, create a table, apply a solid black border to the entire table, and save the modified document using Aspose.Pdf.",
       "tags": [
         "table",
+        "border",
         "pdf",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.BorderInfo",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.MarginInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "add-styled-text-to-table-cell": {
+      "title": "Add Styled Text To Table Cell",
+      "filename": "add-styled-text-to-table-cell.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "add-table-footer-to-pdf": {
+      "title": "Add Table Footer Row Repeated on Each PDF Page",
+      "filename": "add-table-footer-to-pdf.cs",
+      "description": "Demonstrates how to add a visual table with a footer row that repeats at the bottom of each page and how to create the corresponding logical (tagged) structure using Aspose.Pdf.",
+      "tags": [
+        "table",
+        "footer",
+        "tagged-pdf",
+        "aspose-pdf",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.TableElement",
+        "Aspose.Pdf.Tagged.TableTFootElement",
+        "Aspose.Pdf.Tagged.TableTRElement",
+        "Aspose.Pdf.Tagged.TableTDElement"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "add-table-to-specific-pdf-page": {
+      "title": "Add Table to Specific PDF Page",
+      "filename": "add-table-to-specific-pdf-page.cs",
+      "description": "Shows how to insert a formatted table onto a chosen page of a PDF document using Aspose.Pdf, including page validation, table construction, cell population, positioning, and saving.",
+      "tags": [
+        "pdf",
+        "table",
         "aspose.pdf",
-        "insert",
-        "c#"
+        "page",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -44,12 +313,192 @@
         "Aspose.Pdf.Table",
         "Aspose.Pdf.Row",
         "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.BorderInfo"
+        "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "add-table-with-background-color": {
+      "title": "Add Table with Background Color to PDF",
+      "filename": "add-table-with-background-color.cs",
+      "description": "Demonstrates creating a PDF, inserting a table, and applying a solid background color while noting that gradient backgrounds are not supported via the Table.BackgroundColor property.",
+      "tags": [
+        "table",
+        "background-color",
+        "pdf",
+        "aspose-pdf",
+        "gradient-limitations"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "add-table-with-semi-transparent-background": {
+      "title": "Add Table with Semi-Transparent Background to PDF",
+      "filename": "add-table-with-semi-transparent-background.cs",
+      "description": "Demonstrates how to create a PDF, add a table, and set the table's background color with opacity using Aspose.Pdf.",
+      "tags": [
+        "table",
+        "background-color",
+        "opacity",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Paragraphs.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "add-text-fragment-to-table-cell": {
+      "title": "Add TextFragment with Font and Size to a PDF Table Cell",
+      "filename": "add-text-fragment-to-table-cell.cs",
+      "description": "Demonstrates how to insert text with a specific font and size into a table cell by creating a TextFragment, configuring its TextState, and adding it to the cell's paragraphs.",
+      "tags": [
+        "table",
+        "textfragment",
+        "font",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "adjust-table-column-widths-proportionally": {
+      "title": "Adjust Table Column Widths Proportionally in PDF",
+      "filename": "adjust-table-column-widths-proportionally.cs",
+      "description": "Shows how to compute the total width of a table's columns, convert each width to a percentage of that total, and apply the proportional widths to a PDF table using Aspose.Pdf.",
+      "tags": [
+        "table",
+        "column-width",
+        "percentage",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.BorderInfo",
+        "Aspose.Pdf.ColumnAdjustment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "adjust-table-column-widths": {
+      "title": "Adjust Table Column Widths",
+      "filename": "adjust-table-column-widths.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "alternating-row-colors-pdf-table": {
+      "title": "Alternating Row Colors Pdf Table",
+      "filename": "alternating-row-colors-pdf-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "apply-different-autofit-behavior-to-tables": {
+      "title": "Apply Different Autofit Behavior To Tables",
+      "filename": "apply-different-autofit-behavior-to-tables.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "apply-different-autofit-behaviors-to-tables": {
+      "title": "Apply Different AutoFit Behaviors to Tables in a PDF",
+      "filename": "apply-different-autofit-behaviors-to-tables.cs",
+      "description": "Demonstrates how to add multiple tables to a PDF and set distinct ColumnAdjustment (AutoFitToContent and AutoFitToWindow) for each, showing varied column sizing behavior.",
+      "tags": [
+        "autofit",
+        "tables",
+        "pdf",
+        "aspose",
+        "columnadjustment"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.ColumnAdjustment",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Drawing.BorderInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "apply-double-border-to-pdf-table": {
+      "title": "Apply Double Border to PDF Table",
+      "filename": "apply-double-border-to-pdf-table.cs",
+      "description": "Creates a PDF with a 3x3 table and sets a double‑border effect by configuring BorderInfo with width and color.",
+      "tags": [
+        "table",
+        "border",
+        "pdf",
+        "Aspose.Pdf",
+        "double-border"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Drawing.BorderInfo",
+        "Aspose.Pdf.Drawing.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "apply-solid-border-to-pdf-table": {
+      "title": "Apply Solid Border To Pdf Table",
+      "filename": "apply-solid-border-to-pdf-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
     "auto-fit-table-columns-to-content": {
@@ -75,13 +524,149 @@
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
-    "stretch-table-to-page-width": {
-      "title": "Stretch Table Across Page Width",
-      "filename": "stretch-table-to-page-width.cs",
-      "description": "Creates a PDF document, adds a table, and configures it to automatically fit the page width before saving the file.",
+    "auto-fit-table-row-height": {
+      "title": "Auto‑Fit Table Row Height in PDF",
+      "filename": "auto-fit-table-row-height.cs",
+      "description": "Demonstrates how to let a table row automatically adjust its height to fit wrapped cell content by leaving FixedRowHeight unset and setting MinRowHeight to zero.",
       "tags": [
         "table",
         "autofit",
+        "row-height",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "auto-fit-table-to-page-width": {
+      "title": "Auto Fit Table To Page Width",
+      "filename": "auto-fit-table-to-page-width.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "batch-add-table-with-logo-to-pdfs": {
+      "title": "Batch Add Table with Company Logo to PDFs",
+      "filename": "batch-add-table-with-logo-to-pdfs.cs",
+      "description": "Demonstrates how to iterate through a folder of PDF files, insert a two‑column table containing a company logo and descriptive text on the first page of each document, and save the modified files.",
+      "tags": [
+        "pdf",
+        "table",
+        "logo",
+        "batch",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.FontRepository",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "batch-replace-tables-in-multiple-pdfs": {
+      "title": "Batch Replace Tables in Multiple PDFs",
+      "filename": "batch-replace-tables-in-multiple-pdfs.cs",
+      "description": "Demonstrates how to iterate over PDF files, locate each table with TableAbsorber, create a replacement Table, and replace the original tables across all documents.",
+      "tags": [
+        "tables",
+        "batch-processing",
+        "replace",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.TableAbsorber",
+        "Aspose.Pdf.TableAbsorber.Visit",
+        "Aspose.Pdf.TableAbsorber.Replace",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "batch-replace-tables-in-pdfs": {
+      "title": "Batch Replace Tables In Pdfs",
+      "filename": "batch-replace-tables-in-pdfs.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "calculate-remaining-page-height-add-table": {
+      "title": "Calculate Remaining Page Height Add Table",
+      "filename": "calculate-remaining-page-height-add-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "calculate-remaining-page-space-add-table": {
+      "title": "Calculate Remaining Page Space and Add Table to PDF",
+      "filename": "calculate-remaining-page-space-add-table.cs",
+      "description": "Demonstrates how to compute the usable vertical space on a PDF page by subtracting margins and existing content, then conditionally place a table based on the remaining space.",
+      "tags": [
+        "pdf",
+        "table",
+        "space",
+        "margin",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.CalculateContentBBox",
+        "Aspose.Pdf.PageInfo.PureHeight",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Table.GetHeight",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "center-align-table": {
+      "title": "Center Align Table",
+      "filename": "center-align-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "center-table-horizontally": {
+      "title": "Center Table Horizontally in PDF",
+      "filename": "center-table-horizontally.cs",
+      "description": "Shows how to create a table, set its HorizontalAlignment to Center, and add it to a PDF page using Aspose.Pdf.",
+      "tags": [
+        "table",
+        "alignment",
         "pdf",
         "aspose",
         "csharp"
@@ -91,22 +676,101 @@
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Table",
         "Aspose.Pdf.Row",
-        "Aspose.Pdf.ColumnAdjustment"
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "beginner",
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
-    "insert-svg-image-into-table-cell": {
-      "title": "Insert SVG Image into Table Cell",
-      "filename": "insert-svg-image-into-table-cell.cs",
-      "description": "Demonstrates how to embed an SVG file into a PDF by creating an Image object, adding it to a Table cell, and saving the document.",
+    "check-table-break-across-pages": {
+      "title": "Check Table Break Across Pages",
+      "filename": "check-table-break-across-pages.cs",
+      "description": "Creates a PDF with a simple two‑column table, adds it to a page, and reads the Table.IsBroken property to determine whether the table would split across pages.",
       "tags": [
-        "svg",
         "table",
-        "image",
+        "isbroken",
         "pdf",
-        "aspose-pdf"
+        "aspose",
+        "page-break"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Table.IsBroken",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "conditional-formatting-table-cells": {
+      "title": "Conditional Formatting of Table Cells in PDF",
+      "filename": "conditional-formatting-table-cells.cs",
+      "description": "Demonstrates how to create a PDF table with Aspose.Pdf, add data rows, and apply background colors to cells when numeric values exceed defined thresholds.",
+      "tags": [
+        "pdf",
+        "table",
+        "conditional-formatting",
+        "color",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.TableRow",
+        "Aspose.Pdf.TableCell",
+        "Aspose.Pdf.Drawing.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "count-tables-in-pdf-using-tableabsorber": {
+      "title": "Count Tables In Pdf Using Tableabsorber",
+      "filename": "count-tables-in-pdf-using-tableabsorber.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "count-tables-in-pdf": {
+      "title": "Count Tables in PDF using TableAbsorber",
+      "filename": "count-tables-in-pdf.cs",
+      "description": "Shows how to use Aspose.Pdf's TableAbsorber to locate and count tables in a PDF document.",
+      "tags": [
+        "table",
+        "pdf",
+        "aspose-pdf",
+        "csharp",
+        "count"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.TableAbsorber",
+        "Aspose.Pdf.TableAbsorber.Visit",
+        "Aspose.Pdf.TableAbsorber.TableList"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "create-fixed-width-table-pdf": {
+      "title": "Create Fixed-Width Table in PDF",
+      "filename": "create-fixed-width-table-pdf.cs",
+      "description": "Shows how to set a table's total width to 500 points, add content, and save it as a PDF using Aspose.Pdf.",
+      "tags": [
+        "table",
+        "fixed-width",
+        "pdf",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -114,10 +778,296 @@
         "Aspose.Pdf.Table",
         "Aspose.Pdf.Row",
         "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Drawing.Image"
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.HorizontalAlignment"
       ],
       "difficulty": "beginner",
       "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "create-pdf-report-multiple-tables": {
+      "title": "Create PDF Report with Multiple Tables",
+      "filename": "create-pdf-report-multiple-tables.cs",
+      "description": "Demonstrates building a PDF document that contains several tables, each imported from a DataTable representing data from different databases.",
+      "tags": [
+        "pdf",
+        "tables",
+        "aspose",
+        "datatable",
+        "report"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.BorderInfo",
+        "Aspose.Pdf.MarginInfo",
+        "Aspose.Pdf.Position"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "create-pdf-table-alternating-row-colors": {
+      "title": "Create PDF Table with Alternating Row Colors",
+      "filename": "create-pdf-table-alternating-row-colors.cs",
+      "description": "Shows how to generate a PDF table using Aspose.Pdf and apply alternating background colors to each data row.",
+      "tags": [
+        "pdf",
+        "table",
+        "alternating-rows",
+        "background-color",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.BorderInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "create-pdf-table-dynamic-row-count": {
+      "title": "Create PDF Table with Dynamic Row Count",
+      "filename": "create-pdf-table-dynamic-row-count.cs",
+      "description": "Demonstrates building a DataTable at runtime, importing it into an Aspose.Pdf.Table, and saving the PDF with a dynamically sized table.",
+      "tags": [
+        "pdf",
+        "table",
+        "dynamic",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.BorderInfo",
+        "Aspose.Pdf.Table.ImportDataTable"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "create-pdf-table-from-datatable": {
+      "title": "Create PDF Table from a DataTable with Aspose.Pdf",
+      "filename": "create-pdf-table-from-datatable.cs",
+      "description": "Demonstrates how to fill an in‑memory DataTable, import it into an Aspose.Pdf Table, and save the result as a PDF document.",
+      "tags": [
+        "pdf",
+        "datatable",
+        "aspose",
+        "table",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Table.ImportDataTable",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "create-pdf-table-from-datatable__v2": {
+      "title": "Create Pdf Table From Datatable__V2",
+      "filename": "create-pdf-table-from-datatable__v2.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "create-pdf-table-from-filtered-dataview": {
+      "title": "Create PDF Table from Filtered DataView",
+      "filename": "create-pdf-table-from-filtered-dataview.cs",
+      "description": "Demonstrates filtering a DataView and manually populating an Aspose.Pdf Table to generate a PDF, avoiding the ImportDataView bug.",
+      "tags": [
+        "DataView",
+        "Table",
+        "PDF",
+        "Filtering",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Drawing.ColumnAdjustment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "create-repeating-table-header": {
+      "title": "Create Repeating Table Header in PDF",
+      "filename": "create-repeating-table-header.cs",
+      "description": "Shows how to add a table with a header row that repeats on each new page using Aspose.Pdf's tagged content API.",
+      "tags": [
+        "table",
+        "header",
+        "repeat",
+        "tagged-content",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.TableElement",
+        "Aspose.Pdf.Tagged.TableTHeadElement",
+        "Aspose.Pdf.Tagged.TableTRElement",
+        "Aspose.Pdf.Tagged.TableTHElement",
+        "Aspose.Pdf.Tagged.TableTBodyElement",
+        "Aspose.Pdf.Tagged.TableTDElement"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "create-table-double-border": {
+      "title": "Create Table Double Border",
+      "filename": "create-table-double-border.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "create-table-on-new-pdf-page": {
+      "title": "Create Table On New Pdf Page",
+      "filename": "create-table-on-new-pdf-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "create-table-with-header-and-data-rows": {
+      "title": "Create Table with Header and Data Rows in PDF",
+      "filename": "create-table-with-header-and-data-rows.cs",
+      "description": "Demonstrates how to programmatically create a PDF, add a table with a styled header row, populate it with data rows, and save the document using Aspose.Pdf for .NET.",
+      "tags": [
+        "table",
+        "pdf",
+        "aspose-pdf",
+        "csharp",
+        "styling"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.FontRepository.FindFont"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "create-table-with-repeating-header": {
+      "title": "Create Table With Repeating Header",
+      "filename": "create-table-with-repeating-header.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "create-table-with-rows-and-cells": {
+      "title": "Create Table With Rows And Cells",
+      "filename": "create-table-with-rows-and-cells.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "detect-extract-tables-rotated-pages": {
+      "title": "Detect and Extract Tables on Rotated PDF Pages",
+      "filename": "detect-extract-tables-rotated-pages.cs",
+      "description": "Demonstrates checking each page's rotation angle and using TableAbsorber to locate and enumerate tables on rotated PDF pages.",
+      "tags": [
+        "table extraction",
+        "rotation",
+        "pdf",
+        "Aspose.Pdf",
+        "TableAbsorber"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rotation",
+        "Aspose.Pdf.Text.TableAbsorber",
+        "Aspose.Pdf.Text.TableAbsorber.Visit",
+        "Aspose.Pdf.Text.TableAbsorber.TableList",
+        "Aspose.Pdf.Text.Table.RowList",
+        "Aspose.Pdf.Text.Row.CellList"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "detect-merged-cells-in-pdf-tables": {
+      "title": "Detect Merged Cells in PDF Tables Using TableAbsorber",
+      "filename": "detect-merged-cells-in-pdf-tables.cs",
+      "description": "Shows how to use Aspose.Pdf's TableAbsorber with the FlowEngine to find tables that contain merged cells by examining each cell's ColSpan and RowSpan values.",
+      "tags": [
+        "table",
+        "merged-cells",
+        "aspose.pdf",
+        "tableabsorber",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.TableAbsorber",
+        "Aspose.Pdf.TableAbsorber.Visit",
+        "Aspose.Pdf.TableAbsorber.TableList",
+        "Aspose.Pdf.Table.RowList",
+        "Aspose.Pdf.Row.CellList",
+        "Aspose.Pdf.Cell.ColSpan"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "determine-table-page-break-isbroken": {
+      "title": "Determine Table Page Break Isbroken",
+      "filename": "determine-table-page-break-isbroken.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "embed-html-fragment-in-table-cell": {
+      "title": "Embed Html Fragment In Table Cell",
+      "filename": "embed-html-fragment-in-table-cell.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
     "embed-html-in-table-cell": {
@@ -145,6 +1095,439 @@
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
+    "enable-table-splitting-across-pdf-pages": {
+      "title": "Enable Table Splitting Across Pdf Pages",
+      "filename": "enable-table-splitting-across-pdf-pages.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "export-pdf-table-structure-to-json": {
+      "title": "Export PDF Table Structure to JSON",
+      "filename": "export-pdf-table-structure-to-json.cs",
+      "description": "Shows how to extract the logical table structure from a tagged PDF using Aspose.Pdf, iterate rows and cells, and serialize their properties into a JSON file.",
+      "tags": [
+        "pdf",
+        "table",
+        "json",
+        "export",
+        "tagged-content"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.StructureElement",
+        "Aspose.Pdf.Tagged.TableElement",
+        "Aspose.Pdf.Tagged.TableTRElement",
+        "Aspose.Pdf.Tagged.TableTDElement"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "export-pdf-table-to-csv": {
+      "title": "Export PDF Table Data to CSV",
+      "filename": "export-pdf-table-to-csv.cs",
+      "description": "Shows how to extract tables from a PDF using Aspose.Pdf's TableAbsorber and write each cell's text to a CSV file with proper escaping.",
+      "tags": [
+        "pdf",
+        "table",
+        "csv",
+        "aspose-pdf",
+        "export"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.TableAbsorber",
+        "Aspose.Pdf.TableAbsorber.Visit",
+        "Aspose.Pdf.TableAbsorber.TableList",
+        "Aspose.Pdf.Table.RowList",
+        "Aspose.Pdf.TableCell.TextFragments"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "export-pdf-to-csv": {
+      "title": "Export Pdf To Csv",
+      "filename": "export-pdf-to-csv.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "extract-pdf-tables-to-csv": {
+      "title": "Extract PDF Tables to CSV using TableAbsorber",
+      "filename": "extract-pdf-tables-to-csv.cs",
+      "description": "Demonstrates how to locate tables in a PDF with Aspose.Pdf's TableAbsorber and export each table to a separate CSV file, handling cell text and proper CSV escaping.",
+      "tags": [
+        "table extraction",
+        "csv",
+        "aspose pdf",
+        "tableabsorber",
+        "pdf processing"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.TableAbsorber",
+        "Aspose.Pdf.TableAbsorber.Visit",
+        "Aspose.Pdf.TableAbsorber.TableList",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "extract-pdf-tables-to-datatable": {
+      "title": "Extract PDF Tables into DataTable with TableAbsorber",
+      "filename": "extract-pdf-tables-to-datatable.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's TableAbsorber to read tables from a PDF and populate them into .NET DataTable objects, including creating a sample PDF if needed.",
+      "tags": [
+        "table-extraction",
+        "pdf",
+        "aspose",
+        "datatable",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.TableAbsorber",
+        "Aspose.Pdf.TableAbsorber.Visit",
+        "Aspose.Pdf.TableAbsorber.TableList"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "extract-table-coordinates-from-pdf": {
+      "title": "Extract Table Coordinates from PDF",
+      "filename": "extract-table-coordinates-from-pdf.cs",
+      "description": "Demonstrates how to locate tables in a PDF and retrieve their bounding rectangle coordinates using Aspose.Pdf's TableAbsorber.",
+      "tags": [
+        "table",
+        "coordinates",
+        "pdf",
+        "aspose",
+        "extraction"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.TableAbsorber",
+        "Aspose.Pdf.TableAbsorber.Visit",
+        "Aspose.Pdf.AbsorbedTable",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "extract-tables-from-pdf": {
+      "title": "Extract Tables from PDF Using TableAbsorber",
+      "filename": "extract-tables-from-pdf.cs",
+      "description": "Demonstrates how to load a PDF, use Aspose.Pdf's TableAbsorber to detect tables, iterate through rows, cells, and text fragments, and save the document.",
+      "tags": [
+        "tables",
+        "pdf",
+        "extraction",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.TableAbsorber",
+        "Aspose.Pdf.TableAbsorber.Visit",
+        "Aspose.Pdf.TableAbsorber.TableList",
+        "Aspose.Pdf.AbsorbedTable",
+        "Aspose.Pdf.AbsorbedRow",
+        "Aspose.Pdf.AbsorbedCell",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "extract-tables-from-rotated-pdf-pages": {
+      "title": "Extract Tables From Rotated Pdf Pages",
+      "filename": "extract-tables-from-rotated-pdf-pages.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "extract-text-from-pdf-tables": {
+      "title": "Extract Text from PDF Tables Using TableAbsorber",
+      "filename": "extract-text-from-pdf-tables.cs",
+      "description": "Demonstrates how to load a PDF, locate tables with TableAbsorber, iterate through rows and cells, and concatenate the text fragments inside each cell.",
+      "tags": [
+        "pdf",
+        "table",
+        "text-extraction",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.TableAbsorber",
+        "Aspose.Pdf.TableAbsorber.TableAbsorbed",
+        "Aspose.Pdf.TableAbsorber.TableAbsorbed.Row",
+        "Aspose.Pdf.TableAbsorber.TableAbsorbed.Cell",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "generate-pdf-report-multiple-tables": {
+      "title": "Generate Pdf Report Multiple Tables",
+      "filename": "generate-pdf-report-multiple-tables.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "get-rendered-table-width-after-layout": {
+      "title": "Get Rendered Table Width After Layout",
+      "filename": "get-rendered-table-width-after-layout.cs",
+      "description": "Loads a PDF, inserts a table, and shows how to read the calculated width of the rendered table after layout using Aspose.Pdf.",
+      "tags": [
+        "table",
+        "width",
+        "layout",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table.GetWidth"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "get-rendered-table-width": {
+      "title": "Get Rendered Table Width",
+      "filename": "get-rendered-table-width.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "import-datatable-images-into-pdf-table": {
+      "title": "Import Datatable Images Into Pdf Table",
+      "filename": "import-datatable-images-into-pdf-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "import-datatable-into-pdf-table": {
+      "title": "Import DataTable into PDF Table",
+      "filename": "import-datatable-into-pdf-table.cs",
+      "description": "Shows how to import an in‑memory DataTable into an Aspose.Pdf Table and save it as a PDF document.",
+      "tags": [
+        "datatable",
+        "pdf",
+        "table",
+        "import",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Table.ImportDataTable",
+        "Aspose.Pdf.Page.Paragraphs.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "import-dataview-into-pdf-table": {
+      "title": "Import Dataview Into Pdf Table",
+      "filename": "import-dataview-into-pdf-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "import-filtered-dataview-into-pdf-table": {
+      "title": "Import Filtered DataView into PDF Table",
+      "filename": "import-filtered-dataview-into-pdf-table.cs",
+      "description": "Shows how to filter a DataTable with a DataView and import the filtered rows into an Aspose.Pdf Table, then save the result as a PDF document.",
+      "tags": [
+        "dataview",
+        "table",
+        "import",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Table.ImportDataView",
+        "Aspose.Pdf.Page.Paragraphs.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "import-images-from-datatable-into-pdf-table": {
+      "title": "Import Images from DataTable into a PDF Table",
+      "filename": "import-images-from-datatable-into-pdf-table.cs",
+      "description": "Demonstrates how to load image byte arrays from a DataTable, create Image objects, and place them into cells of an Aspose.Pdf Table, then save the result as a PDF.",
+      "tags": [
+        "pdf",
+        "image",
+        "datatable",
+        "table",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Drawing.Image",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Paragraphs.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "insert-column-into-pdf-table": {
+      "title": "Insert Column Into Pdf Table",
+      "filename": "insert-column-into-pdf-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "insert-external-image-into-pdf-table-cell": {
+      "title": "Insert External Image Into Pdf Table Cell",
+      "filename": "insert-external-image-into-pdf-table-cell.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "insert-hyperlink-into-table-cell": {
+      "title": "Insert Hyperlink into a Table Cell with LinkAnnotation",
+      "filename": "insert-hyperlink-into-table-cell.cs",
+      "description": "Demonstrates how to add a clickable hyperlink inside a table cell by creating a LinkAnnotation, positioning it over the cell text, and saving the updated PDF.",
+      "tags": [
+        "linkannotation",
+        "table",
+        "hyperlink",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "insert-image-into-pdf-table-cell": {
+      "title": "Insert Image from Memory Stream into PDF Table Cell",
+      "filename": "insert-image-into-pdf-table-cell.cs",
+      "description": "Shows how to load an image into a memory stream and embed it into a table cell of an existing PDF document using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "table",
+        "image",
+        "memory-stream",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Image"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "insert-image-into-table-cell": {
+      "title": "Insert Image into a PDF Table Cell",
+      "filename": "insert-image-into-table-cell.cs",
+      "description": "Demonstrates how to create a PDF document, add a table, and place an external image file inside a table cell using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "table",
+        "image",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "insert-new-column-into-pdf-table": {
+      "title": "Insert New Column into PDF Table",
+      "filename": "insert-new-column-into-pdf-table.cs",
+      "description": "Shows how to add a new column to each row of a table in a PDF by inserting a Cell at a specified zero‑based index using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "table",
+        "column",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
     "insert-page-break-after-table-row": {
       "title": "Insert Page Break After Specific Table Row",
       "filename": "insert-page-break-after-table-row.cs",
@@ -169,26 +1552,252 @@
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
-    "render-table-on-new-pdf-page": {
-      "title": "Render Table on a New PDF Page",
-      "filename": "render-table-on-new-pdf-page.cs",
-      "description": "Shows how to create a PDF document with Aspose.Pdf, add a new page, build a table with header and data rows, and save the result.",
+    "insert-svg-image-into-pdf-table-cell": {
+      "title": "Insert Svg Image Into Pdf Table Cell",
+      "filename": "insert-svg-image-into-pdf-table-cell.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "insert-svg-image-into-table-cell": {
+      "title": "Insert SVG Image into Table Cell",
+      "filename": "insert-svg-image-into-table-cell.cs",
+      "description": "Demonstrates how to embed an SVG file into a PDF by creating an Image object, adding it to a Table cell, and saving the document.",
       "tags": [
-        "pdf",
+        "svg",
         "table",
-        "aspose-pdf",
-        "csharp",
-        "document"
+        "image",
+        "pdf",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Table",
         "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Drawing.Image"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "insert-table-after-paragraph": {
+      "title": "Insert Table After Specific Paragraph in PDF",
+      "filename": "insert-table-after-paragraph.cs",
+      "description": "Demonstrates how to locate a paragraph by its text, create a simple 2x2 table, and insert the table immediately after the found paragraph in a PDF document using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "table",
+        "search",
+        "insert",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "insert-table-after-paragraph__v2": {
+      "title": "Insert Table After Paragraph__V2",
+      "filename": "insert-table-after-paragraph__v2.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "insert-table-at-specific-position": {
+      "title": "Insert Table at Specific Position in PDF",
+      "filename": "insert-table-at-specific-position.cs",
+      "description": "Demonstrates how to add an Aspose.Pdf.Table to an existing PDF page and position it at exact X/Y coordinates using MarginInfo.",
+      "tags": [
+        "table",
+        "position",
+        "pdf",
+        "aspose",
+        "margininfo"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.MarginInfo",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "insert-table-before-first-image": {
+      "title": "Insert Table Before First Image in PDF",
+      "filename": "insert-table-before-first-image.cs",
+      "description": "Demonstrates how to locate the first image on each PDF page, create a simple 2x2 table, and insert the table before the image using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "table",
+        "image",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.BorderInfo",
         "Aspose.Pdf.MarginInfo"
       ],
-      "difficulty": "beginner",
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "insert-table-before-image": {
+      "title": "Insert Table Before Image",
+      "filename": "insert-table-before-image.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "insert-table-into-paragraph-collection": {
+      "title": "Insert Table into Paragraph Collection in PDF",
+      "filename": "insert-table-into-paragraph-collection.cs",
+      "description": "Shows how to add a TextFragment and then insert a Table as a paragraph into a PDF page using Aspose.Pdf.",
+      "tags": [
+        "table",
+        "paragraph",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Drawing.Position",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.ParagraphCollection.Insert"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "insert-table-into-pdf-page": {
+      "title": "Insert Table Into Pdf Page",
+      "filename": "insert-table-into-pdf-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "insert-table-into-pdf": {
+      "title": "Insert Table into Existing PDF Page",
+      "filename": "insert-table-into-pdf.cs",
+      "description": "Shows how to load an existing PDF with Aspose.Pdf, create and style a Table, position it on a specific page, and save the updated document.",
+      "tags": [
+        "table",
+        "pdf",
+        "aspose.pdf",
+        "insert",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.BorderInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "insert-table-into-textbox-field": {
+      "title": "Insert Table Into Textbox Field",
+      "filename": "insert-table-into-textbox-field.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "landscape-pdf-with-wide-table": {
+      "title": "Landscape Pdf With Wide Table",
+      "filename": "landscape-pdf-with-wide-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "map-datatable-columns-to-pdf-table": {
+      "title": "Map DataTable Columns to PDF Table Using ImportDataTable",
+      "filename": "map-datatable-columns-to-pdf-table.cs",
+      "description": "Shows how to map selected DataTable columns to specific PDF table columns by building a column‑mapping dictionary and using Table.ImportDataTable.",
+      "tags": [
+        "datatable",
+        "column-mapping",
+        "pdf-table",
+        "aspose-pdf",
+        "import"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Table.ImportDataTable"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "mark-table-header-enable-column-repeat": {
+      "title": "Mark Table Header and Enable Column Repeat",
+      "filename": "mark-table-header-enable-column-repeat.cs",
+      "description": "Shows how to mark a table column as a header and enable column repeat so the header appears on each new page, using both visual Table and tagged PDF structure for accessibility.",
+      "tags": [
+        "table",
+        "header",
+        "column-repeat",
+        "tagged-pdf",
+        "accessibility"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.TableElement",
+        "Aspose.Pdf.Tagged.TableTHeadElement",
+        "Aspose.Pdf.Tagged.TableTHElement",
+        "Aspose.Pdf.Tagged.TableTBodyElement"
+      ],
+      "difficulty": "intermediate",
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
@@ -240,39 +1849,26 @@
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
-    "set-custom-cell-margins-in-pdf-table": {
-      "title": "Set Custom Cell Margins in a PDF Table",
-      "filename": "set-custom-cell-margins-in-pdf-table.cs",
-      "description": "Demonstrates how to configure margins for a table cell using MarginInfo and assign it to the cell's Margin property in Aspose.Pdf.",
-      "tags": [
-        "table",
-        "cell-margins",
-        "pdf",
-        "aspose-pdf",
-        "margininfo"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.MarginInfo"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
+    "merge-table-columns-using-cell-colspan": {
+      "title": "Merge Table Columns Using Cell Colspan",
+      "filename": "merge-table-columns-using-cell-colspan.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
-    "set-default-cell-padding-for-pdf-table": {
-      "title": "Set Default Cell Padding for a PDF Table",
-      "filename": "set-default-cell-padding-for-pdf-table.cs",
-      "description": "Creates a PDF document, adds a table, and applies uniform cell padding to all cells by setting Table.DefaultCellPadding with a MarginInfo instance.",
+    "offset-table-left-margin": {
+      "title": "Offset Table from Left Margin in PDF",
+      "filename": "offset-table-left-margin.cs",
+      "description": "Demonstrates how to shift a table away from the left page margin by setting Table.Margin.Left using MarginInfo, and adds a simple two‑column table to a PDF page.",
       "tags": [
         "table",
-        "padding",
-        "margininfo",
-        "aspose-pdf",
-        "csharp"
+        "margin",
+        "offset",
+        "pdf",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -285,206 +1881,56 @@
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
-    "get-rendered-table-width-after-layout": {
-      "title": "Get Rendered Table Width After Layout",
-      "filename": "get-rendered-table-width-after-layout.cs",
-      "description": "Loads a PDF, inserts a table, and shows how to read the calculated width of the rendered table after layout using Aspose.Pdf.",
+    "populate-pdf-table-from-linq-data": {
+      "title": "Populate PDF Table from LINQ Query via DataTable",
+      "filename": "populate-pdf-table-from-linq-data.cs",
+      "description": "Demonstrates converting a LINQ query result to a DataTable, importing it into an Aspose.Pdf Table, and saving the table in a PDF document.",
       "tags": [
-        "table",
-        "width",
-        "layout",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table.GetWidth"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "import-datatable-into-pdf-table": {
-      "title": "Import DataTable into PDF Table",
-      "filename": "import-datatable-into-pdf-table.cs",
-      "description": "Shows how to import an in‑memory DataTable into an Aspose.Pdf Table and save it as a PDF document.",
-      "tags": [
+        "linq",
         "datatable",
         "pdf",
         "table",
-        "import",
         "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Table",
-        "Aspose.Pdf.Table.ImportDataTable",
-        "Aspose.Pdf.Page.Paragraphs.Add"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "import-filtered-dataview-into-pdf-table": {
-      "title": "Import Filtered DataView into PDF Table",
-      "filename": "import-filtered-dataview-into-pdf-table.cs",
-      "description": "Shows how to filter a DataTable with a DataView and import the filtered rows into an Aspose.Pdf Table, then save the result as a PDF document.",
-      "tags": [
-        "dataview",
-        "table",
-        "import",
-        "pdf",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Table.ImportDataView",
-        "Aspose.Pdf.Page.Paragraphs.Add"
+        "Aspose.Pdf.BorderInfo",
+        "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
-    "create-pdf-table-from-datatable": {
-      "title": "Create PDF Table from a DataTable with Aspose.Pdf",
-      "filename": "create-pdf-table-from-datatable.cs",
-      "description": "Demonstrates how to fill an in‑memory DataTable, import it into an Aspose.Pdf Table, and save the result as a PDF document.",
-      "tags": [
-        "pdf",
-        "datatable",
-        "aspose",
-        "table",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Table.ImportDataTable",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
+    "populate-pdf-table-from-linq-query": {
+      "title": "Populate Pdf Table From Linq Query",
+      "filename": "populate-pdf-table-from-linq-query.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
-    "check-table-break-across-pages": {
-      "title": "Check Table Break Across Pages",
-      "filename": "check-table-break-across-pages.cs",
-      "description": "Creates a PDF with a simple two‑column table, adds it to a page, and reads the Table.IsBroken property to determine whether the table would split across pages.",
+    "prevent-table-splitting": {
+      "title": "Prevent Table Splitting Across PDF Pages",
+      "filename": "prevent-table-splitting.cs",
+      "description": "Shows how to keep an Aspose.Pdf table on a single page by setting Table.IsBroken to false and adding the table to a PDF document.",
       "tags": [
         "table",
-        "isbroken",
         "pdf",
         "aspose",
-        "page-break"
+        "csharp",
+        "nosplit"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.BorderInfo",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Table.IsBroken",
-        "Aspose.Pdf.Page.Paragraphs.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "mark-table-header-enable-column-repeat": {
-      "title": "Mark Table Header and Enable Column Repeat",
-      "filename": "mark-table-header-enable-column-repeat.cs",
-      "description": "Shows how to mark a table column as a header and enable column repeat so the header appears on each new page, using both visual Table and tagged PDF structure for accessibility.",
-      "tags": [
-        "table",
-        "header",
-        "column-repeat",
-        "tagged-pdf",
-        "accessibility"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.TableElement",
-        "Aspose.Pdf.Tagged.TableTHeadElement",
-        "Aspose.Pdf.Tagged.TableTHElement",
-        "Aspose.Pdf.Tagged.TableTBodyElement"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "extract-tables-from-pdf": {
-      "title": "Extract Tables from PDF Using TableAbsorber",
-      "filename": "extract-tables-from-pdf.cs",
-      "description": "Demonstrates how to load a PDF, use Aspose.Pdf's TableAbsorber to detect tables, iterate through rows, cells, and text fragments, and save the document.",
-      "tags": [
-        "tables",
-        "pdf",
-        "extraction",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.TableAbsorber.Visit",
-        "Aspose.Pdf.TableAbsorber.TableList",
-        "Aspose.Pdf.AbsorbedTable",
-        "Aspose.Pdf.AbsorbedRow",
-        "Aspose.Pdf.AbsorbedCell",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "replace-table-in-pdf": {
-      "title": "Replace Table in PDF Using Aspose.Pdf",
-      "filename": "replace-table-in-pdf.cs",
-      "description": "Shows how to locate tables on each PDF page with TableAbsorber, create a new Table, and replace the original table while keeping its position.",
-      "tags": [
-        "table",
-        "replace",
-        "pdf",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.TableAbsorber.Replace"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "remove-first-table-from-pdf": {
-      "title": "Remove First Table from PDF using TableAbsorber",
-      "filename": "remove-first-table-from-pdf.cs",
-      "description": "Shows how to locate tables in a PDF with TableAbsorber and delete the first detected table.",
-      "tags": [
-        "table",
-        "remove",
-        "pdf",
-        "aspose-pdf",
-        "tableabsorber"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.TableAbsorber.Visit",
-        "Aspose.Pdf.TableAbsorber.Remove",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
       "generated_at": "2026-08-20T08:55:30Z",
@@ -513,897 +1959,6 @@
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
-    "batch-add-table-with-logo-to-pdfs": {
-      "title": "Batch Add Table with Company Logo to PDFs",
-      "filename": "batch-add-table-with-logo-to-pdfs.cs",
-      "description": "Demonstrates how to iterate through a folder of PDF files, insert a two‑column table containing a company logo and descriptive text on the first page of each document, and save the modified files.",
-      "tags": [
-        "pdf",
-        "table",
-        "logo",
-        "batch",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Image",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.FontRepository",
-        "Aspose.Pdf.Page"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "batch-replace-tables-in-multiple-pdfs": {
-      "title": "Batch Replace Tables in Multiple PDFs",
-      "filename": "batch-replace-tables-in-multiple-pdfs.cs",
-      "description": "Demonstrates how to iterate over PDF files, locate each table with TableAbsorber, create a replacement Table, and replace the original tables across all documents.",
-      "tags": [
-        "tables",
-        "batch-processing",
-        "replace",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.TableAbsorber.Visit",
-        "Aspose.Pdf.TableAbsorber.Replace",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "apply-different-autofit-behaviors-to-tables": {
-      "title": "Apply Different AutoFit Behaviors to Tables in a PDF",
-      "filename": "apply-different-autofit-behaviors-to-tables.cs",
-      "description": "Demonstrates how to add multiple tables to a PDF and set distinct ColumnAdjustment (AutoFitToContent and AutoFitToWindow) for each, showing varied column sizing behavior.",
-      "tags": [
-        "autofit",
-        "tables",
-        "pdf",
-        "aspose",
-        "columnadjustment"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.ColumnAdjustment",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Drawing.BorderInfo"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "set-cell-background-color-in-pdf-table": {
-      "title": "Set Cell Background Color in PDF Table",
-      "filename": "set-cell-background-color-in-pdf-table.cs",
-      "description": "Creates a PDF document, adds a table, and sets the background color of a specific cell to light gray.",
-      "tags": [
-        "pdf",
-        "table",
-        "cell",
-        "background-color",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "add-solid-border-to-pdf-table": {
-      "title": "Add Solid Border to PDF Table",
-      "filename": "add-solid-border-to-pdf-table.cs",
-      "description": "Demonstrates how to load an existing PDF, create a table, apply a solid black border to the entire table, and save the modified document using Aspose.Pdf.",
-      "tags": [
-        "table",
-        "border",
-        "pdf",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.MarginInfo"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "insert-image-into-table-cell": {
-      "title": "Insert Image into a PDF Table Cell",
-      "filename": "insert-image-into-table-cell.cs",
-      "description": "Demonstrates how to create a PDF document, add a table, and place an external image file inside a table cell using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "table",
-        "image",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Image",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "insert-image-into-pdf-table-cell": {
-      "title": "Insert Image from Memory Stream into PDF Table Cell",
-      "filename": "insert-image-into-pdf-table-cell.cs",
-      "description": "Shows how to load an image into a memory stream and embed it into a table cell of an existing PDF document using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "table",
-        "image",
-        "memory-stream",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Image"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "add-text-fragment-to-table-cell": {
-      "title": "Add TextFragment with Font and Size to a PDF Table Cell",
-      "filename": "add-text-fragment-to-table-cell.cs",
-      "description": "Demonstrates how to insert text with a specific font and size into a table cell by creating a TextFragment, configuring its TextState, and adding it to the cell's paragraphs.",
-      "tags": [
-        "table",
-        "textfragment",
-        "font",
-        "pdf",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Page"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "add-centered-paragraph-to-table-cell": {
-      "title": "Add Centered Paragraph to Table Cell",
-      "filename": "add-centered-paragraph-to-table-cell.cs",
-      "description": "Demonstrates how to create a PDF table with Aspose.Pdf and insert a paragraph into a cell with horizontal center alignment.",
-      "tags": [
-        "table",
-        "paragraph",
-        "center-alignment",
-        "pdf",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.HorizontalAlignment"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "set-cell-vertical-alignment-middle": {
-      "title": "Set Cell Vertical Alignment to Middle in PDF Table",
-      "filename": "set-cell-vertical-alignment-middle.cs",
-      "description": "Demonstrates how to create a PDF table with Aspose.Pdf, add a cell containing text, and set the cell's vertical alignment to middle using the VerticalAlignment property.",
-      "tags": [
-        "table",
-        "cell-alignment",
-        "pdf",
-        "aspose-pdf",
-        "vertical-alignment"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.VerticalAlignment"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "center-table-horizontally": {
-      "title": "Center Table Horizontally in PDF",
-      "filename": "center-table-horizontally.cs",
-      "description": "Shows how to create a table, set its HorizontalAlignment to Center, and add it to a PDF page using Aspose.Pdf.",
-      "tags": [
-        "table",
-        "alignment",
-        "pdf",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "offset-table-left-margin": {
-      "title": "Offset Table from Left Margin in PDF",
-      "filename": "offset-table-left-margin.cs",
-      "description": "Demonstrates how to shift a table away from the left page margin by setting Table.Margin.Left using MarginInfo, and adds a simple two‑column table to a PDF page.",
-      "tags": [
-        "table",
-        "margin",
-        "offset",
-        "pdf",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.MarginInfo",
-        "Aspose.Pdf.Row"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "split-table-across-pdf-pages": {
-      "title": "Split Table Across PDF Pages with Aspose.Pdf",
-      "filename": "split-table-across-pdf-pages.cs",
-      "description": "Demonstrates enabling table breaking so a large table automatically continues onto subsequent pages in a PDF document using Aspose.Pdf.",
-      "tags": [
-        "table",
-        "page-splitting",
-        "pdf",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.MarginInfo"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "prevent-table-splitting": {
-      "title": "Prevent Table Splitting Across PDF Pages",
-      "filename": "prevent-table-splitting.cs",
-      "description": "Shows how to keep an Aspose.Pdf table on a single page by setting Table.IsBroken to false and adding the table to a PDF document.",
-      "tags": [
-        "table",
-        "pdf",
-        "aspose",
-        "csharp",
-        "nosplit"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "calculate-remaining-page-space-add-table": {
-      "title": "Calculate Remaining Page Space and Add Table to PDF",
-      "filename": "calculate-remaining-page-space-add-table.cs",
-      "description": "Demonstrates how to compute the usable vertical space on a PDF page by subtracting margins and existing content, then conditionally place a table based on the remaining space.",
-      "tags": [
-        "pdf",
-        "table",
-        "space",
-        "margin",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.CalculateContentBBox",
-        "Aspose.Pdf.PageInfo.PureHeight",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Table.GetHeight",
-        "Aspose.Pdf.Page.Paragraphs.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "create-fixed-width-table-pdf": {
-      "title": "Create Fixed-Width Table in PDF",
-      "filename": "create-fixed-width-table-pdf.cs",
-      "description": "Shows how to set a table's total width to 500 points, add content, and save it as a PDF using Aspose.Pdf.",
-      "tags": [
-        "table",
-        "fixed-width",
-        "pdf",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.HorizontalAlignment"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "set-table-width-percentage": {
-      "title": "Set Table Width as Percentage of Page Width",
-      "filename": "set-table-width-percentage.cs",
-      "description": "Shows how to define a table's width as a percentage of the page width using Aspose.Pdf and optionally center the table on the page.",
-      "tags": [
-        "table",
-        "percentage-width",
-        "pdf",
-        "alignment",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.HorizontalAlignment"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "map-datatable-columns-to-pdf-table": {
-      "title": "Map DataTable Columns to PDF Table Using ImportDataTable",
-      "filename": "map-datatable-columns-to-pdf-table.cs",
-      "description": "Shows how to map selected DataTable columns to specific PDF table columns by building a column‑mapping dictionary and using Table.ImportDataTable.",
-      "tags": [
-        "datatable",
-        "column-mapping",
-        "pdf-table",
-        "aspose-pdf",
-        "import"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Table.ImportDataTable"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "create-pdf-table-from-filtered-dataview": {
-      "title": "Create PDF Table from Filtered DataView",
-      "filename": "create-pdf-table-from-filtered-dataview.cs",
-      "description": "Demonstrates filtering a DataView and manually populating an Aspose.Pdf Table to generate a PDF, avoiding the ImportDataView bug.",
-      "tags": [
-        "DataView",
-        "Table",
-        "PDF",
-        "Filtering",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Drawing.ColumnAdjustment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "populate-pdf-table-from-linq-data": {
-      "title": "Populate PDF Table from LINQ Query via DataTable",
-      "filename": "populate-pdf-table-from-linq-data.cs",
-      "description": "Demonstrates converting a LINQ query result to a DataTable, importing it into an Aspose.Pdf Table, and saving the table in a PDF document.",
-      "tags": [
-        "linq",
-        "datatable",
-        "pdf",
-        "table",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "add-table-to-specific-pdf-page": {
-      "title": "Add Table to Specific PDF Page",
-      "filename": "add-table-to-specific-pdf-page.cs",
-      "description": "Shows how to insert a formatted table onto a chosen page of a PDF document using Aspose.Pdf, including page validation, table construction, cell population, positioning, and saving.",
-      "tags": [
-        "pdf",
-        "table",
-        "aspose.pdf",
-        "page",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "insert-table-after-paragraph": {
-      "title": "Insert Table After Specific Paragraph in PDF",
-      "filename": "insert-table-after-paragraph.cs",
-      "description": "Demonstrates how to locate a paragraph by its text, create a simple 2x2 table, and insert the table immediately after the found paragraph in a PDF document using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "table",
-        "search",
-        "insert",
-        "aspnet"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "insert-table-before-first-image": {
-      "title": "Insert Table Before First Image in PDF",
-      "filename": "insert-table-before-first-image.cs",
-      "description": "Demonstrates how to locate the first image on each PDF page, create a simple 2x2 table, and insert the table before the image using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "table",
-        "image",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Image",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.MarginInfo"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "create-repeating-table-header": {
-      "title": "Create Repeating Table Header in PDF",
-      "filename": "create-repeating-table-header.cs",
-      "description": "Shows how to add a table with a header row that repeats on each new page using Aspose.Pdf's tagged content API.",
-      "tags": [
-        "table",
-        "header",
-        "repeat",
-        "tagged-content",
-        "pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.TableElement",
-        "Aspose.Pdf.Tagged.TableTHeadElement",
-        "Aspose.Pdf.Tagged.TableTRElement",
-        "Aspose.Pdf.Tagged.TableTHElement",
-        "Aspose.Pdf.Tagged.TableTBodyElement",
-        "Aspose.Pdf.Tagged.TableTDElement"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "style-table-header-row-pdf": {
-      "title": "Style Table Header Row in PDF with Aspose.Pdf",
-      "filename": "style-table-header-row-pdf.cs",
-      "description": "Creates a PDF document containing a table whose header row is styled with a background color and bold font using Aspose.Pdf.",
-      "tags": [
-        "table",
-        "header",
-        "styling",
-        "pdf",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "add-table-footer-to-pdf": {
-      "title": "Add Table Footer Row Repeated on Each PDF Page",
-      "filename": "add-table-footer-to-pdf.cs",
-      "description": "Demonstrates how to add a visual table with a footer row that repeats at the bottom of each page and how to create the corresponding logical (tagged) structure using Aspose.Pdf.",
-      "tags": [
-        "table",
-        "footer",
-        "tagged-pdf",
-        "aspose-pdf",
-        "pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.TableElement",
-        "Aspose.Pdf.Tagged.TableTFootElement",
-        "Aspose.Pdf.Tagged.TableTRElement",
-        "Aspose.Pdf.Tagged.TableTDElement"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "create-pdf-table-alternating-row-colors": {
-      "title": "Create PDF Table with Alternating Row Colors",
-      "filename": "create-pdf-table-alternating-row-colors.cs",
-      "description": "Shows how to generate a PDF table using Aspose.Pdf and apply alternating background colors to each data row.",
-      "tags": [
-        "pdf",
-        "table",
-        "alternating-rows",
-        "background-color",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "insert-hyperlink-into-table-cell": {
-      "title": "Insert Hyperlink into a Table Cell with LinkAnnotation",
-      "filename": "insert-hyperlink-into-table-cell.cs",
-      "description": "Demonstrates how to add a clickable hyperlink inside a table cell by creating a LinkAnnotation, positioning it over the cell text, and saving the updated PDF.",
-      "tags": [
-        "linkannotation",
-        "table",
-        "hyperlink",
-        "pdf",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Annotations.LinkAnnotation",
-        "Aspose.Pdf.Annotations.GoToURIAction",
-        "Aspose.Pdf.Annotations.Border",
-        "Aspose.Pdf.Rectangle"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "add-checkbox-form-field-in-table-cell": {
-      "title": "Add Checkbox Form Field Inside Table Cell",
-      "filename": "add-checkbox-form-field-in-table-cell.cs",
-      "description": "Shows how to create a PDF with a table and place a checkbox form field inside one of the table's cells using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "table",
-        "checkbox",
-        "form",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Forms.CheckboxField",
-        "Aspose.Pdf.Rectangle"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "add-radio-button-group-in-table-cell": {
-      "title": "Add Radio Button Group Inside a Table Cell",
-      "filename": "add-radio-button-group-in-table-cell.cs",
-      "description": "Demonstrates how to place a group of radio buttons inside a table cell by creating a RadioButtonField, adding options, and attaching it to the PDF form.",
-      "tags": [
-        "radio-button",
-        "table",
-        "form",
-        "aspdf",
-        "pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Forms.RadioButtonField",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Document.Form.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "export-pdf-table-structure-to-json": {
-      "title": "Export PDF Table Structure to JSON",
-      "filename": "export-pdf-table-structure-to-json.cs",
-      "description": "Shows how to extract the logical table structure from a tagged PDF using Aspose.Pdf, iterate rows and cells, and serialize their properties into a JSON file.",
-      "tags": [
-        "pdf",
-        "table",
-        "json",
-        "export",
-        "tagged-content"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.StructureElement",
-        "Aspose.Pdf.Tagged.TableElement",
-        "Aspose.Pdf.Tagged.TableTRElement",
-        "Aspose.Pdf.Tagged.TableTDElement"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "export-pdf-table-to-csv": {
-      "title": "Export PDF Table Data to CSV",
-      "filename": "export-pdf-table-to-csv.cs",
-      "description": "Shows how to extract tables from a PDF using Aspose.Pdf's TableAbsorber and write each cell's text to a CSV file with proper escaping.",
-      "tags": [
-        "pdf",
-        "table",
-        "csv",
-        "aspose-pdf",
-        "export"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.TableAbsorber.Visit",
-        "Aspose.Pdf.TableAbsorber.TableList",
-        "Aspose.Pdf.Table.RowList",
-        "Aspose.Pdf.TableCell.TextFragments"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "serialize-pdf-table-to-xml": {
-      "title": "Serialize PDF Table to XML",
-      "filename": "serialize-pdf-table-to-xml.cs",
-      "description": "Shows how to create a PDF table from a DataTable, save the PDF, then read the table back and serialize its rows and cells into an XML document.",
-      "tags": [
-        "pdf",
-        "table",
-        "xml",
-        "serialization",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Table.ImportDataTable"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "render-xml-table-to-pdf": {
-      "title": "Render XML-defined Table to PDF",
-      "filename": "render-xml-table-to-pdf.cs",
-      "description": "The example reads a table layout from an XML file, builds a DataTable, and uses Aspose.Pdf to create a PDF document with the table rendered on a page.",
-      "tags": [
-        "xml",
-        "datatable",
-        "pdf",
-        "aspose-pdf",
-        "table"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Table.ImportDataTable"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "count-tables-in-pdf": {
-      "title": "Count Tables in PDF using TableAbsorber",
-      "filename": "count-tables-in-pdf.cs",
-      "description": "Shows how to use Aspose.Pdf's TableAbsorber to locate and count tables in a PDF document.",
-      "tags": [
-        "table",
-        "pdf",
-        "aspose-pdf",
-        "csharp",
-        "count"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.TableAbsorber.Visit",
-        "Aspose.Pdf.TableAbsorber.TableList"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "extract-table-coordinates-from-pdf": {
-      "title": "Extract Table Coordinates from PDF",
-      "filename": "extract-table-coordinates-from-pdf.cs",
-      "description": "Demonstrates how to locate tables in a PDF and retrieve their bounding rectangle coordinates using Aspose.Pdf's TableAbsorber.",
-      "tags": [
-        "table",
-        "coordinates",
-        "pdf",
-        "aspose",
-        "extraction"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.TableAbsorber.Visit",
-        "Aspose.Pdf.AbsorbedTable",
-        "Aspose.Pdf.Rectangle"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "extract-text-from-pdf-tables": {
-      "title": "Extract Text from PDF Tables Using TableAbsorber",
-      "filename": "extract-text-from-pdf-tables.cs",
-      "description": "Demonstrates how to load a PDF, locate tables with TableAbsorber, iterate through rows and cells, and concatenate the text fragments inside each cell.",
-      "tags": [
-        "pdf",
-        "table",
-        "text-extraction",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.TableAbsorber.TableAbsorbed",
-        "Aspose.Pdf.TableAbsorber.TableAbsorbed.Row",
-        "Aspose.Pdf.TableAbsorber.TableAbsorbed.Cell",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "replace-text-in-pdf-table-cells": {
-      "title": "Replace Text in PDF Table Cells",
-      "filename": "replace-text-in-pdf-table-cells.cs",
-      "description": "Shows how to locate tables in a PDF, find cells that contain a specific keyword, and replace the cell text using Aspose.Pdf's TableAbsorber and TextFragment classes.",
-      "tags": [
-        "table",
-        "text-replacement",
-        "pdf",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.TableAbsorber.Visit",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
     "remove-column-from-pdf-table": {
       "title": "Remove a Column from a PDF Table",
       "filename": "remove-column-from-pdf-table.cs",
@@ -1426,260 +1981,78 @@
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
-    "insert-new-column-into-pdf-table": {
-      "title": "Insert New Column into PDF Table",
-      "filename": "insert-new-column-into-pdf-table.cs",
-      "description": "Shows how to add a new column to each row of a table in a PDF by inserting a Cell at a specified zero‑based index using Aspose.Pdf.",
+    "remove-first-table-from-pdf": {
+      "title": "Remove First Table from PDF using TableAbsorber",
+      "filename": "remove-first-table-from-pdf.cs",
+      "description": "Shows how to locate tables in a PDF with TableAbsorber and delete the first detected table.",
       "tags": [
-        "pdf",
         "table",
-        "column",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "reorder-pdf-table-columns": {
-      "title": "Reorder PDF Table Columns",
-      "filename": "reorder-pdf-table-columns.cs",
-      "description": "Demonstrates extracting a table from a PDF, rebuilding it with a custom column order, and replacing the original table using Aspose.Pdf.",
-      "tags": [
+        "remove",
         "pdf",
-        "table",
-        "column-reorder",
         "aspose-pdf",
-        "csharp"
+        "tableabsorber"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.AbsorbedTable",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "adjust-table-column-widths-proportionally": {
-      "title": "Adjust Table Column Widths Proportionally in PDF",
-      "filename": "adjust-table-column-widths-proportionally.cs",
-      "description": "Shows how to compute the total width of a table's columns, convert each width to a percentage of that total, and apply the proportional widths to a PDF table using Aspose.Pdf.",
-      "tags": [
-        "table",
-        "column-width",
-        "percentage",
-        "pdf",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.ColumnAdjustment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "set-minimum-column-width": {
-      "title": "Set Minimum Column Width for PDF Table",
-      "filename": "set-minimum-column-width.cs",
-      "description": "Demonstrates how to enforce a minimum column width in a PDF table by using the Table.DefaultColumnWidth property and optionally defining explicit column widths with Aspose.Pdf.",
-      "tags": [
-        "table",
-        "column-width",
-        "pdf",
-        "aspose-pdf",
-        "default-column-width"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "set-maximum-table-column-width": {
-      "title": "Limit Table Column Widths in PDF",
-      "filename": "set-maximum-table-column-width.cs",
-      "description": "Demonstrates how to set a default column width and explicit column widths to prevent table columns from expanding beyond a specified point measurement in a PDF using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "table",
-        "column-width",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
+        "Aspose.Pdf.TableAbsorber.Visit",
+        "Aspose.Pdf.TableAbsorber.Remove",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
-    "add-auto-numbered-column-to-pdf-table": {
-      "title": "Add Auto‑Numbered Column to PDF Table",
-      "filename": "add-auto-numbered-column-to-pdf-table.cs",
-      "description": "Shows how to create a PDF table with Aspose.Pdf and fill the first column with sequential numbers using the Table.ImportArray method.",
+    "remove-table-from-pdf": {
+      "title": "Remove Table From Pdf",
+      "filename": "remove-table-from-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "remove-tables-containing-keyword": {
+      "title": "Remove Tables Containing a Keyword from a PDF",
+      "filename": "remove-tables-containing-keyword.cs",
+      "description": "Demonstrates how to locate tables in a PDF using Aspose.Pdf's TableAbsorber, scan each cell for a specific keyword, and delete the matching tables before saving the document.",
       "tags": [
+        "tables",
+        "keyword",
         "pdf",
-        "table",
-        "autonumber",
-        "importarray",
-        "aspose-pdf"
+        "removal",
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.MarginInfo",
-        "Aspose.Pdf.Text.TextState"
+        "Aspose.Pdf.TableAbsorber",
+        "Aspose.Pdf.AbsorbedTable",
+        "Aspose.Pdf.TableAbsorber.Visit",
+        "Aspose.Pdf.TableAbsorber.Remove"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
-    "add-table-with-semi-transparent-background": {
-      "title": "Add Table with Semi-Transparent Background to PDF",
-      "filename": "add-table-with-semi-transparent-background.cs",
-      "description": "Demonstrates how to create a PDF, add a table, and set the table's background color with opacity using Aspose.Pdf.",
-      "tags": [
-        "table",
-        "background-color",
-        "opacity",
-        "pdf",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.Paragraphs.Add"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
+    "render-rotated-table-pdf": {
+      "title": "Render Rotated Table Pdf",
+      "filename": "render-rotated-table-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
-    "add-table-with-background-color": {
-      "title": "Add Table with Background Color to PDF",
-      "filename": "add-table-with-background-color.cs",
-      "description": "Demonstrates creating a PDF, inserting a table, and applying a solid background color while noting that gradient backgrounds are not supported via the Table.BackgroundColor property.",
-      "tags": [
-        "table",
-        "background-color",
-        "pdf",
-        "aspose-pdf",
-        "gradient-limitations"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "set-table-z-index": {
-      "title": "Set Table Z-Index to Control Overlap in PDF",
-      "filename": "set-table-z-index.cs",
-      "description": "Demonstrates how to assign a ZIndex value to a Table so it renders above other page elements such as a background rectangle in an Aspose.Pdf document.",
-      "tags": [
-        "z-index",
-        "table",
-        "pdf",
-        "aspose-pdf",
-        "overlap"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Drawing.Graph",
-        "Aspose.Pdf.Drawing.Rectangle",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.BorderInfo"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "insert-table-into-paragraph-collection": {
-      "title": "Insert Table into Paragraph Collection in PDF",
-      "filename": "insert-table-into-paragraph-collection.cs",
-      "description": "Shows how to add a TextFragment and then insert a Table as a paragraph into a PDF page using Aspose.Pdf.",
-      "tags": [
-        "table",
-        "paragraph",
-        "pdf",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Drawing.Position",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.ParagraphCollection.Insert"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "import-images-from-datatable-into-pdf-table": {
-      "title": "Import Images from DataTable into a PDF Table",
-      "filename": "import-images-from-datatable-into-pdf-table.cs",
-      "description": "Demonstrates how to load image byte arrays from a DataTable, create Image objects, and place them into cells of an Aspose.Pdf Table, then save the result as a PDF.",
-      "tags": [
-        "pdf",
-        "image",
-        "datatable",
-        "table",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Drawing.Image",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Paragraphs.Add"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
+    "render-table-from-xml-to-pdf": {
+      "title": "Render Table From Xml To Pdf",
+      "filename": "render-table-from-xml-to-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
     "render-table-high-dpi-images": {
@@ -1705,447 +2078,24 @@
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
-    "create-pdf-report-multiple-tables": {
-      "title": "Create PDF Report with Multiple Tables",
-      "filename": "create-pdf-report-multiple-tables.cs",
-      "description": "Demonstrates building a PDF document that contains several tables, each imported from a DataTable representing data from different databases.",
-      "tags": [
-        "pdf",
-        "tables",
-        "aspose",
-        "datatable",
-        "report"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.MarginInfo",
-        "Aspose.Pdf.Position"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "create-pdf-table-dynamic-row-count": {
-      "title": "Create PDF Table with Dynamic Row Count",
-      "filename": "create-pdf-table-dynamic-row-count.cs",
-      "description": "Demonstrates building a DataTable at runtime, importing it into an Aspose.Pdf.Table, and saving the PDF with a dynamically sized table.",
+    "render-table-on-new-pdf-page": {
+      "title": "Render Table on a New PDF Page",
+      "filename": "render-table-on-new-pdf-page.cs",
+      "description": "Shows how to create a PDF document with Aspose.Pdf, add a new page, build a table with header and data rows, and save the result.",
       "tags": [
         "pdf",
         "table",
-        "dynamic",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.Table.ImportDataTable"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "conditional-formatting-table-cells": {
-      "title": "Conditional Formatting of Table Cells in PDF",
-      "filename": "conditional-formatting-table-cells.cs",
-      "description": "Demonstrates how to create a PDF table with Aspose.Pdf, add data rows, and apply background colors to cells when numeric values exceed defined thresholds.",
-      "tags": [
-        "pdf",
-        "table",
-        "conditional-formatting",
-        "color",
-        "aspnet"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.TableRow",
-        "Aspose.Pdf.TableCell",
-        "Aspose.Pdf.Drawing.Color"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "rotate-text-in-table-cell": {
-      "title": "Rotate Text Inside a Table Cell",
-      "filename": "rotate-text-in-table-cell.cs",
-      "description": "Creates a PDF, adds a table with a single cell, and rotates the text inside that cell by setting the TextFragment's TextState.Rotation property.",
-      "tags": [
-        "text-rotation",
-        "table",
-        "pdf",
         "aspose-pdf",
-        "csharp"
+        "csharp",
+        "document"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Table",
         "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextState.Rotation"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "rotate-table-90-degrees-pdf": {
-      "title": "Render a 90° Rotated Table in a PDF",
-      "filename": "rotate-table-90-degrees-pdf.cs",
-      "description": "Demonstrates creating a table from a DataTable, adding it to a PDF page, and rotating the entire page (including the table) by 90 degrees using Aspose.Pdf.",
-      "tags": [
-        "table",
-        "rotation",
-        "pdf",
-        "aspose.pdf",
-        "c#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
         "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.Rotation",
-        "Aspose.Pdf.Table.ImportDataTable",
-        "Aspose.Pdf.Page.Paragraphs.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "detect-merged-cells-in-pdf-tables": {
-      "title": "Detect Merged Cells in PDF Tables Using TableAbsorber",
-      "filename": "detect-merged-cells-in-pdf-tables.cs",
-      "description": "Shows how to use Aspose.Pdf's TableAbsorber with the FlowEngine to find tables that contain merged cells by examining each cell's ColSpan and RowSpan values.",
-      "tags": [
-        "table",
-        "merged-cells",
-        "aspose.pdf",
-        "tableabsorber",
-        "c#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.TableAbsorber.Visit",
-        "Aspose.Pdf.TableAbsorber.TableList",
-        "Aspose.Pdf.Table.RowList",
-        "Aspose.Pdf.Row.CellList",
-        "Aspose.Pdf.Cell.ColSpan"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "replace-merged-table-cells": {
-      "title": "Replace Merged Table Cells with Separate Cells",
-      "filename": "replace-merged-table-cells.cs",
-      "description": "Shows how to use TableAbsorber to detect merged cells in a PDF table, split them into individual cells, and insert a new table without merged spans.",
-      "tags": [
-        "pdf",
-        "table",
-        "merged-cells",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.AbsorbedTable",
-        "Aspose.Pdf.AbsorbedRow",
-        "Aspose.Pdf.AbsorbedCell",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "add-footnote-references-to-table-cells": {
-      "title": "Add Footnote References to Table Cells in PDF",
-      "filename": "add-footnote-references-to-table-cells.cs",
-      "description": "Shows how to insert superscript footnote markers inside table cells, attach Aspose.Pdf footnote notes, and save the updated PDF.",
-      "tags": [
-        "table",
-        "footnote",
-        "pdf",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Note"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "insert-table-at-specific-position": {
-      "title": "Insert Table at Specific Position in PDF",
-      "filename": "insert-table-at-specific-position.cs",
-      "description": "Demonstrates how to add an Aspose.Pdf.Table to an existing PDF page and position it at exact X/Y coordinates using MarginInfo.",
-      "tags": [
-        "table",
-        "position",
-        "pdf",
-        "aspose",
-        "margininfo"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.MarginInfo",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "right-align-table-pdf": {
-      "title": "Right Align Table in PDF",
-      "filename": "right-align-table-pdf.cs",
-      "description": "Demonstrates how to align a table to the right margin of a PDF page using Aspose.Pdf by setting the table's Alignment property and optionally adjusting its left coordinate.",
-      "tags": [
-        "table",
-        "alignment",
-        "right-margin",
-        "pdf",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "set-table-border-thickness": {
-      "title": "Set Table Border Thickness in PDF",
-      "filename": "set-table-border-thickness.cs",
-      "description": "Shows how to create a PDF table with a 2‑point border using Aspose.Pdf, including column widths, cell padding, and adding header and data rows.",
-      "tags": [
-        "table",
-        "border",
-        "pdf",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.Row",
         "Aspose.Pdf.MarginInfo"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "apply-double-border-to-pdf-table": {
-      "title": "Apply Double Border to PDF Table",
-      "filename": "apply-double-border-to-pdf-table.cs",
-      "description": "Creates a PDF with a 3x3 table and sets a double‑border effect by configuring BorderInfo with width and color.",
-      "tags": [
-        "table",
-        "border",
-        "pdf",
-        "Aspose.Pdf",
-        "double-border"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Drawing.BorderInfo",
-        "Aspose.Pdf.Drawing.Color"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "add-multiline-text-to-table-cell": {
-      "title": "Add Multiline Text to Table Cell in PDF",
-      "filename": "add-multiline-text-to-table-cell.cs",
-      "description": "Demonstrates how to insert multiline text into a PDF table cell by adding separate TextFragment objects and a line‑break fragment.",
-      "tags": [
-        "table",
-        "multiline",
-        "textfragment",
-        "pdf",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.FontRepository.FindFont"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "add-list-items-in-table-cell": {
-      "title": "Add List Items Inside a Table Cell",
-      "filename": "add-list-items-in-table-cell.cs",
-      "description": "Shows how to create a bullet list within a PDF table cell by adding TextFragment paragraphs with list markers.",
-      "tags": [
-        "table",
-        "list",
-        "cell",
-        "pdf",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.FontRepository"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "extract-pdf-tables-to-csv": {
-      "title": "Extract PDF Tables to CSV using TableAbsorber",
-      "filename": "extract-pdf-tables-to-csv.cs",
-      "description": "Demonstrates how to locate tables in a PDF with Aspose.Pdf's TableAbsorber and export each table to a separate CSV file, handling cell text and proper CSV escaping.",
-      "tags": [
-        "table extraction",
-        "csv",
-        "aspose pdf",
-        "tableabsorber",
-        "pdf processing"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.TableAbsorber.Visit",
-        "Aspose.Pdf.TableAbsorber.TableList",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "extract-pdf-tables-to-datatable": {
-      "title": "Extract PDF Tables into DataTable with TableAbsorber",
-      "filename": "extract-pdf-tables-to-datatable.cs",
-      "description": "Demonstrates how to use Aspose.Pdf's TableAbsorber to read tables from a PDF and populate them into .NET DataTable objects, including creating a sample PDF if needed.",
-      "tags": [
-        "table-extraction",
-        "pdf",
-        "aspose",
-        "datatable",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.TableAbsorber.Visit",
-        "Aspose.Pdf.TableAbsorber.TableList"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "set-custom-row-height-in-pdf-table": {
-      "title": "Set Custom Row Height in PDF Table",
-      "filename": "set-custom-row-height-in-pdf-table.cs",
-      "description": "Shows how to create a PDF document with a table and assign a fixed height to a specific row using Aspose.Pdf for .NET.",
-      "tags": [
-        "table",
-        "row-height",
-        "pdf",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Page.Paragraphs.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "auto-fit-table-row-height": {
-      "title": "Auto‑Fit Table Row Height in PDF",
-      "filename": "auto-fit-table-row-height.cs",
-      "description": "Demonstrates how to let a table row automatically adjust its height to fit wrapped cell content by leaving FixedRowHeight unset and setting MinRowHeight to zero.",
-      "tags": [
-        "table",
-        "autofit",
-        "row-height",
-        "pdf",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:55:30Z",
-      "status": "verified"
-    },
-    "set-fixed-row-height-for-pdf-table-rows": {
-      "title": "Set Fixed Row Height for PDF Table Rows",
-      "filename": "set-fixed-row-height-for-pdf-table-rows.cs",
-      "description": "Shows how to create a PDF table and enforce a fixed height for each row using Aspose.Pdf in C#.",
-      "tags": [
-        "pdf",
-        "table",
-        "row-height",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "beginner",
       "generated_at": "2026-08-20T08:55:30Z",
@@ -2176,6 +2126,166 @@
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
+    "render-xml-table-to-pdf": {
+      "title": "Render XML-defined Table to PDF",
+      "filename": "render-xml-table-to-pdf.cs",
+      "description": "The example reads a table layout from an XML file, builds a DataTable, and uses Aspose.Pdf to create a PDF document with the table rendered on a page.",
+      "tags": [
+        "xml",
+        "datatable",
+        "pdf",
+        "aspose-pdf",
+        "table"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.BorderInfo",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Table.ImportDataTable"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "reorder-pdf-table-columns": {
+      "title": "Reorder PDF Table Columns",
+      "filename": "reorder-pdf-table-columns.cs",
+      "description": "Demonstrates extracting a table from a PDF, rebuilding it with a custom column order, and replacing the original table using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "table",
+        "column-reorder",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.TableAbsorber",
+        "Aspose.Pdf.AbsorbedTable",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "reorder-table-columns-in-pdf": {
+      "title": "Reorder Table Columns In Pdf",
+      "filename": "reorder-table-columns-in-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "replace-merged-table-cells": {
+      "title": "Replace Merged Table Cells with Separate Cells",
+      "filename": "replace-merged-table-cells.cs",
+      "description": "Shows how to use TableAbsorber to detect merged cells in a PDF table, split them into individual cells, and insert a new table without merged spans.",
+      "tags": [
+        "pdf",
+        "table",
+        "merged-cells",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.TableAbsorber",
+        "Aspose.Pdf.AbsorbedTable",
+        "Aspose.Pdf.AbsorbedRow",
+        "Aspose.Pdf.AbsorbedCell",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "replace-table-cell-text-by-keyword": {
+      "title": "Replace Table Cell Text By Keyword",
+      "filename": "replace-table-cell-text-by-keyword.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "replace-table-in-pdf": {
+      "title": "Replace Table in PDF Using Aspose.Pdf",
+      "filename": "replace-table-in-pdf.cs",
+      "description": "Shows how to locate tables on each PDF page with TableAbsorber, create a new Table, and replace the original table while keeping its position.",
+      "tags": [
+        "table",
+        "replace",
+        "pdf",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.TableAbsorber",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.TableAbsorber.Replace"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "replace-text-in-pdf-table-cells": {
+      "title": "Replace Text in PDF Table Cells",
+      "filename": "replace-text-in-pdf-table-cells.cs",
+      "description": "Shows how to locate tables in a PDF, find cells that contain a specific keyword, and replace the cell text using Aspose.Pdf's TableAbsorber and TextFragment classes.",
+      "tags": [
+        "table",
+        "text-replacement",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.TableAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.TableAbsorber.Visit",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "right-align-table-pdf": {
+      "title": "Right Align Table in PDF",
+      "filename": "right-align-table-pdf.cs",
+      "description": "Demonstrates how to align a table to the right margin of a PDF page using Aspose.Pdf by setting the table's Alignment property and optionally adjusting its left coordinate.",
+      "tags": [
+        "table",
+        "alignment",
+        "right-margin",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
     "rotate-page-add-table": {
       "title": "Rotate PDF Page and Add Table",
       "filename": "rotate-page-add-table.cs",
@@ -2198,51 +2308,511 @@
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
-    "detect-extract-tables-rotated-pages": {
-      "title": "Detect and Extract Tables on Rotated PDF Pages",
-      "filename": "detect-extract-tables-rotated-pages.cs",
-      "description": "Demonstrates checking each page's rotation angle and using TableAbsorber to locate and enumerate tables on rotated PDF pages.",
+    "rotate-table-90-degrees-pdf": {
+      "title": "Render a 90° Rotated Table in a PDF",
+      "filename": "rotate-table-90-degrees-pdf.cs",
+      "description": "Demonstrates creating a table from a DataTable, adding it to a PDF page, and rotating the entire page (including the table) by 90 degrees using Aspose.Pdf.",
       "tags": [
-        "table extraction",
+        "table",
         "rotation",
         "pdf",
-        "Aspose.Pdf",
-        "TableAbsorber"
+        "aspose.pdf",
+        "c#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.BorderInfo",
         "Aspose.Pdf.Rotation",
-        "Aspose.Pdf.Text.TableAbsorber",
-        "Aspose.Pdf.Text.TableAbsorber.Visit",
-        "Aspose.Pdf.Text.TableAbsorber.TableList",
-        "Aspose.Pdf.Text.Table.RowList",
-        "Aspose.Pdf.Text.Row.CellList"
+        "Aspose.Pdf.Table.ImportDataTable",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T08:55:30Z",
       "status": "verified"
     },
-    "remove-tables-containing-keyword": {
-      "title": "Remove Tables Containing a Keyword from a PDF",
-      "filename": "remove-tables-containing-keyword.cs",
-      "description": "Demonstrates how to locate tables in a PDF using Aspose.Pdf's TableAbsorber, scan each cell for a specific keyword, and delete the matching tables before saving the document.",
+    "rotate-text-in-table-cell": {
+      "title": "Rotate Text Inside a Table Cell",
+      "filename": "rotate-text-in-table-cell.cs",
+      "description": "Creates a PDF, adds a table with a single cell, and rotates the text inside that cell by setting the TextFragment's TextState.Rotation property.",
       "tags": [
-        "tables",
-        "keyword",
+        "text-rotation",
+        "table",
         "pdf",
-        "removal",
-        "Aspose.Pdf"
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.AbsorbedTable",
-        "Aspose.Pdf.TableAbsorber.Visit",
-        "Aspose.Pdf.TableAbsorber.Remove"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextState.Rotation"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "serialize-pdf-table-to-xml": {
+      "title": "Serialize PDF Table to XML",
+      "filename": "serialize-pdf-table-to-xml.cs",
+      "description": "Shows how to create a PDF table from a DataTable, save the PDF, then read the table back and serialize its rows and cells into an XML document.",
+      "tags": [
+        "pdf",
+        "table",
+        "xml",
+        "serialization",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Table.ImportDataTable"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "serialize-table-to-xml": {
+      "title": "Serialize Table To Xml",
+      "filename": "serialize-table-to-xml.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "set-cell-background-color-in-pdf-table": {
+      "title": "Set Cell Background Color in PDF Table",
+      "filename": "set-cell-background-color-in-pdf-table.cs",
+      "description": "Creates a PDF document, adds a table, and sets the background color of a specific cell to light gray.",
+      "tags": [
+        "pdf",
+        "table",
+        "cell",
+        "background-color",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "set-cell-vertical-alignment-middle": {
+      "title": "Set Cell Vertical Alignment to Middle in PDF Table",
+      "filename": "set-cell-vertical-alignment-middle.cs",
+      "description": "Demonstrates how to create a PDF table with Aspose.Pdf, add a cell containing text, and set the cell's vertical alignment to middle using the VerticalAlignment property.",
+      "tags": [
+        "table",
+        "cell-alignment",
+        "pdf",
+        "aspose-pdf",
+        "vertical-alignment"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.VerticalAlignment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "set-custom-cell-margins-in-pdf-table": {
+      "title": "Set Custom Cell Margins in a PDF Table",
+      "filename": "set-custom-cell-margins-in-pdf-table.cs",
+      "description": "Demonstrates how to configure margins for a table cell using MarginInfo and assign it to the cell's Margin property in Aspose.Pdf.",
+      "tags": [
+        "table",
+        "cell-margins",
+        "pdf",
+        "aspose-pdf",
+        "margininfo"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.MarginInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "set-custom-row-height-in-pdf-table": {
+      "title": "Set Custom Row Height in PDF Table",
+      "filename": "set-custom-row-height-in-pdf-table.cs",
+      "description": "Shows how to create a PDF document with a table and assign a fixed height to a specific row using Aspose.Pdf for .NET.",
+      "tags": [
+        "table",
+        "row-height",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "set-default-cell-padding-for-pdf-table": {
+      "title": "Set Default Cell Padding for a PDF Table",
+      "filename": "set-default-cell-padding-for-pdf-table.cs",
+      "description": "Creates a PDF document, adds a table, and applies uniform cell padding to all cells by setting Table.DefaultCellPadding with a MarginInfo instance.",
+      "tags": [
+        "table",
+        "padding",
+        "margininfo",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.MarginInfo",
+        "Aspose.Pdf.Row"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "set-fixed-row-height-for-pdf-table-rows": {
+      "title": "Set Fixed Row Height for PDF Table Rows",
+      "filename": "set-fixed-row-height-for-pdf-table-rows.cs",
+      "description": "Shows how to create a PDF table and enforce a fixed height for each row using Aspose.Pdf in C#.",
+      "tags": [
+        "pdf",
+        "table",
+        "row-height",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "set-fixed-row-height-table-rows": {
+      "title": "Set Fixed Row Height Table Rows",
+      "filename": "set-fixed-row-height-table-rows.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "set-maximum-column-widths-for-pdf-table": {
+      "title": "Set Maximum Column Widths For Pdf Table",
+      "filename": "set-maximum-column-widths-for-pdf-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "set-maximum-table-column-width": {
+      "title": "Limit Table Column Widths in PDF",
+      "filename": "set-maximum-table-column-width.cs",
+      "description": "Demonstrates how to set a default column width and explicit column widths to prevent table columns from expanding beyond a specified point measurement in a PDF using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "table",
+        "column-width",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "set-minimum-column-width-for-pdf-tables": {
+      "title": "Set Minimum Column Width For Pdf Tables",
+      "filename": "set-minimum-column-width-for-pdf-tables.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "set-minimum-column-width": {
+      "title": "Set Minimum Column Width for PDF Table",
+      "filename": "set-minimum-column-width.cs",
+      "description": "Demonstrates how to enforce a minimum column width in a PDF table by using the Table.DefaultColumnWidth property and optionally defining explicit column widths with Aspose.Pdf.",
+      "tags": [
+        "table",
+        "column-width",
+        "pdf",
+        "aspose-pdf",
+        "default-column-width"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.BorderInfo",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "set-table-background-color": {
+      "title": "Set Table Background Color",
+      "filename": "set-table-background-color.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "set-table-border-thickness-2-points": {
+      "title": "Set Table Border Thickness 2 Points",
+      "filename": "set-table-border-thickness-2-points.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "set-table-border-thickness": {
+      "title": "Set Table Border Thickness in PDF",
+      "filename": "set-table-border-thickness.cs",
+      "description": "Shows how to create a PDF table with a 2‑point border using Aspose.Pdf, including column widths, cell padding, and adding header and data rows.",
+      "tags": [
+        "table",
+        "border",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.BorderInfo",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.MarginInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "set-table-width-80-percent": {
+      "title": "Set Table Width 80 Percent",
+      "filename": "set-table-width-80-percent.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "set-table-width-percentage": {
+      "title": "Set Table Width as Percentage of Page Width",
+      "filename": "set-table-width-percentage.cs",
+      "description": "Shows how to define a table's width as a percentage of the page width using Aspose.Pdf and optionally center the table on the page.",
+      "tags": [
+        "table",
+        "percentage-width",
+        "pdf",
+        "alignment",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.HorizontalAlignment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "set-table-z-index-pdf": {
+      "title": "Set Table Z Index Pdf",
+      "filename": "set-table-z-index-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "set-table-z-index": {
+      "title": "Set Table Z-Index to Control Overlap in PDF",
+      "filename": "set-table-z-index.cs",
+      "description": "Demonstrates how to assign a ZIndex value to a Table so it renders above other page elements such as a background rectangle in an Aspose.Pdf document.",
+      "tags": [
+        "z-index",
+        "table",
+        "pdf",
+        "aspose-pdf",
+        "overlap"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.BorderInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "split-merged-table-cells": {
+      "title": "Split Merged Table Cells",
+      "filename": "split-merged-table-cells.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "split-table-across-pdf-pages": {
+      "title": "Split Table Across PDF Pages with Aspose.Pdf",
+      "filename": "split-table-across-pdf-pages.cs",
+      "description": "Demonstrates enabling table breaking so a large table automatically continues onto subsequent pages in a PDF document using Aspose.Pdf.",
+      "tags": [
+        "table",
+        "page-splitting",
+        "pdf",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.BorderInfo",
+        "Aspose.Pdf.MarginInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "stretch-table-to-page-width": {
+      "title": "Stretch Table Across Page Width",
+      "filename": "stretch-table-to-page-width.cs",
+      "description": "Creates a PDF document, adds a table, and configures it to automatically fit the page width before saving the file.",
+      "tags": [
+        "table",
+        "autofit",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.ColumnAdjustment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "style-table-header-row-pdf": {
+      "title": "Style Table Header Row in PDF with Aspose.Pdf",
+      "filename": "style-table-header-row-pdf.cs",
+      "description": "Creates a PDF document containing a table whose header row is styled with a background color and bold font using Aspose.Pdf.",
+      "tags": [
+        "table",
+        "header",
+        "styling",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:55:30Z",
+      "status": "verified"
+    },
+    "style-table-header-row": {
+      "title": "Style Table Header Row",
+      "filename": "style-table-header-row.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "table-with-repeating-header-and-column": {
+      "title": "Table With Repeating Header And Column",
+      "filename": "table-with-repeating-header-and-column.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     }
   }

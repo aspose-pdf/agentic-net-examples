@@ -1,0 +1,63 @@
+# Compare PDF
+
+> **Compare PDF** in PDF using C# / .NET -- **44** verified, compile-tested examples for **Aspose.PDF for .NET** 26.8.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+
+- Category: `compare-pdf`
+- Examples: 44
+- NuGet: `Aspose.PDF 26.8.0` -- target `net10.0`
+
+## Examples
+
+- [`batch-pdf-comparison-parallel.cs`](./batch-pdf-comparison-parallel.cs) -- Batch pdf comparison parallel
+- [`compare-encrypted-pdfs-side-by-side.cs`](./compare-encrypted-pdfs-side-by-side.cs) -- Compare encrypted pdfs side by side
+- [`compare-pdf-documents-page-by-page-diff.cs`](./compare-pdf-documents-page-by-page-diff.cs) -- Compare pdf documents page by page diff
+- [`compare-pdf-documents-page-by-page.cs`](./compare-pdf-documents-page-by-page.cs) -- Compare pdf documents page by page
+- [`compare-pdf-text-ignoring-compression.cs`](./compare-pdf-text-ignoring-compression.cs) -- Compare pdf text ignoring compression
+- [`compare-pdfs-detect-font-differences.cs`](./compare-pdfs-detect-font-differences.cs) -- Compare pdfs detect font differences
+- [`compare-pdfs-different-page-sizes.cs`](./compare-pdfs-different-page-sizes.cs) -- Compare pdfs different page sizes
+- [`compare-pdfs-excluding-footer-areas.cs`](./compare-pdfs-excluding-footer-areas.cs) -- Compare pdfs excluding footer areas
+- [`compare-pdfs-font-differences.cs`](./compare-pdfs-font-differences.cs) -- Compare pdfs font differences
+- [`compare-pdfs-from-streams.cs`](./compare-pdfs-from-streams.cs) -- Compare pdfs from streams
+- [`compare-pdfs-generate-json-diff-report.cs`](./compare-pdfs-generate-json-diff-report.cs) -- Compare pdfs generate json diff report
+- [`compare-pdfs-ignore-compression.cs`](./compare-pdfs-ignore-compression.cs) -- Compare pdfs ignore compression
+- [`compare-pdfs-ignore-signature-fields.cs`](./compare-pdfs-ignore-signature-fields.cs) -- Compare pdfs ignore signature fields
+- [`compare-pdfs-including-form-field-values.cs`](./compare-pdfs-including-form-field-values.cs) -- Compare pdfs including form field values
+- [`compare-pdfs-log-diff-operations.cs`](./compare-pdfs-log-diff-operations.cs) -- Compare pdfs log diff operations
+- [`compare-pdfs-log-differences.cs`](./compare-pdfs-log-differences.cs) -- Compare pdfs log differences
+- [`compare-pdfs-unicode-text-differences.cs`](./compare-pdfs-unicode-text-differences.cs) -- Compare pdfs unicode text differences
+- [`compare-pdfs-with-form-fields.cs`](./compare-pdfs-with-form-fields.cs) -- Compare pdfs with form fields
+- [`compare-selected-page-range-pdfs.cs`](./compare-selected-page-range-pdfs.cs) -- Compare selected page range pdfs
+- [`compare-selected-pdf-pages-side-by-side.cs`](./compare-selected-pdf-pages-side-by-side.cs) -- Compare selected pdf pages side by side
+- [`compare-selected-pdf-pages.cs`](./compare-selected-pdf-pages.cs) -- Compare selected pdf pages
+- [`compare-specific-page-range-pdf.cs`](./compare-specific-page-range-pdf.cs) -- Compare specific page range pdf
+- [`compare-two-pdfs-and-generate-visual-diff.cs`](./compare-two-pdfs-and-generate-visual-diff.cs) -- Compare two pdfs and generate visual diff
+- [`compare-two-pdfs-aspdf-comparison.cs`](./compare-two-pdfs-aspdf-comparison.cs) -- Compare two pdfs aspdf comparison
+- [`compare-two-pdfs-visual-diff.cs`](./compare-two-pdfs-visual-diff.cs) -- Compare two pdfs visual diff
+- [`exclude-annotations-from-pdf-comparison.cs`](./exclude-annotations-from-pdf-comparison.cs) -- Exclude annotations from pdf comparison
+- [`exclude-areas-from-pdf-comparison.cs`](./exclude-areas-from-pdf-comparison.cs) -- Exclude areas from pdf comparison
+- [`exclude-footer-areas-in-pdf-comparison.cs`](./exclude-footer-areas-in-pdf-comparison.cs) -- Exclude footer areas in pdf comparison
+- [`generate-diff-pdf-by-comparing-two-pdfs.cs`](./generate-diff-pdf-by-comparing-two-pdfs.cs) -- Generate diff pdf by comparing two pdfs
+- [`generate-diff-pdf-highlighted-text-changes.cs`](./generate-diff-pdf-highlighted-text-changes.cs) -- Generate diff pdf highlighted text changes
+- [`generate-pdf-diff-images-zip.cs`](./generate-pdf-diff-images-zip.cs) -- Generate pdf diff images zip
+- [`generate-pdf-difference-image.cs`](./generate-pdf-difference-image.cs) -- Generate pdf difference image
+- [`generate-visual-diff-pdf.cs`](./generate-visual-diff-pdf.cs) -- Generate visual diff pdf
+- [`get-image-differences-between-pdf-pages.cs`](./get-image-differences-between-pdf-pages.cs) -- Get image differences between pdf pages
+- [`in-memory-pdf-comparison-diff.cs`](./in-memory-pdf-comparison-diff.cs) -- In memory pdf comparison diff
+- [`multi-threaded-pdf-comparison.cs`](./multi-threaded-pdf-comparison.cs) -- Multi threaded pdf comparison
+- [`parallel-batch-pdf-comparison.cs`](./parallel-batch-pdf-comparison.cs) -- Parallel batch pdf comparison
+- [`pdf-diff-images-to-zip.cs`](./pdf-diff-images-to-zip.cs) -- Pdf diff images to zip
+- [`pdf-diff-report-json.cs`](./pdf-diff-report-json.cs) -- Pdf diff report json
+- [`preserve-original-metadata-in-diff-pdf.cs`](./preserve-original-metadata-in-diff-pdf.cs) -- Preserve original metadata in diff pdf
+- [`preserve-pdf-metadata-after-comparison.cs`](./preserve-pdf-metadata-after-comparison.cs) -- Preserve pdf metadata after comparison
+- [`replace-text-using-diffoperation.cs`](./replace-text-using-diffoperation.cs) -- Replace text using diffoperation
+- [`set-custom-image-similarity-tolerance-pdf-comparison.cs`](./set-custom-image-similarity-tolerance-pdf-comparison.cs) -- Set custom image similarity tolerance pdf comparison
+- [`write-pdf-diff-to-http-response.cs`](./write-pdf-diff-to-http-response.cs) -- Write pdf diff to http response
+
+## See Also
+
+- [`AGENTS.md`](./AGENTS.md) -- category-specific anti-patterns, API surface, and conventions for AI coding agents
+- [`../AGENTS.md`](../AGENTS.md) -- repository-wide agent guide
+- [`../README.md`](../README.md) -- full category index and project overview
+- [Aspose.PDF for .NET docs](https://docs.aspose.com/pdf/net/)
+
+> Each `.cs` file is a standalone, build-validated console example. Drop into a fresh `dotnet new console` project, add the `Aspose.PDF` NuGet (version above), and run.

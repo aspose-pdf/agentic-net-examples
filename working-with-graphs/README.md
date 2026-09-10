@@ -1,0 +1,148 @@
+# Working with graphs
+
+> **Working with graphs** in PDF using C# / .NET -- **129** verified, compile-tested examples for **Aspose.PDF for .NET** 26.8.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+
+- Category: `working-with-graphs`
+- Examples: 129
+- NuGet: `Aspose.PDF 26.8.0` -- target `net10.0`
+
+## Examples
+
+- [`add-background-image-and-graph-to-pdf.cs`](./add-background-image-and-graph-to-pdf.cs) -- Add background image and graph to pdf
+- [`add-centered-graph-to-pdf-page.cs`](./add-centered-graph-to-pdf-page.cs) -- Add centered graph to pdf page
+- [`add-colored-line-segments-to-pdf-graph.cs`](./add-colored-line-segments-to-pdf-graph.cs) -- Add colored line segments to pdf graph
+- [`add-dashed-rectangle-to-graph.cs`](./add-dashed-rectangle-to-graph.cs) -- Add dashed rectangle to graph
+- [`add-dashed-rectangle-to-pdf-graph.cs`](./add-dashed-rectangle-to-pdf-graph.cs) -- Add dashed rectangle to pdf graph
+- [`add-ellipse-to-pdf-page.cs`](./add-ellipse-to-pdf-page.cs) -- Add ellipse to pdf page
+- [`add-ellipse-with-border-and-centered-text.cs`](./add-ellipse-with-border-and-centered-text.cs) -- Add ellipse with border and centered text
+- [`add-filled-arc-to-pdf-graph.cs`](./add-filled-arc-to-pdf-graph.cs) -- Add filled arc to pdf graph
+- [`add-filled-arc-with-radial-gradient.cs`](./add-filled-arc-with-radial-gradient.cs) -- Add filled arc with radial gradient
+- [`add-filled-circle-to-pdf-graph.cs`](./add-filled-circle-to-pdf-graph.cs) -- Add filled circle to pdf graph
+- [`add-filled-circle-to-pdf.cs`](./add-filled-circle-to-pdf.cs) -- Add filled circle to pdf
+- [`add-filled-curve-to-pdf-graph.cs`](./add-filled-curve-to-pdf-graph.cs) -- Add filled curve to pdf graph
+- [`add-filled-curve-with-opacity-and-border.cs`](./add-filled-curve-with-opacity-and-border.cs) -- Add filled curve with opacity and border
+- [`add-filled-rectangle-dashed-border-to-pdf-graph.cs`](./add-filled-rectangle-dashed-border-to-pdf-graph.cs) -- Add filled rectangle dashed border to pdf graph
+- [`add-filled-rectangle-with-dashed-border.cs`](./add-filled-rectangle-with-dashed-border.cs) -- Add filled rectangle with dashed border
+- [`add-full-size-graph-to-pdf-page.cs`](./add-full-size-graph-to-pdf-page.cs) -- Add full size graph to pdf page
+- [`add-gradient-ellipse-graphs-to-pdfs.cs`](./add-gradient-ellipse-graphs-to-pdfs.cs) -- Add gradient ellipse graphs to pdfs
+- [`add-graph-matching-page-size.cs`](./add-graph-matching-page-size.cs) -- Add graph matching page size
+- [`add-graph-rectangle-watermark-to-pdf.cs`](./add-graph-rectangle-watermark-to-pdf.cs) -- Add graph rectangle watermark to pdf
+- [`add-graph-to-pdf.cs`](./add-graph-to-pdf.cs) -- Add graph to pdf
+- [`add-graph-watermark-to-pdf-pages.cs`](./add-graph-watermark-to-pdf-pages.cs) -- Add graph watermark to pdf pages
+- [`add-graph-with-shapes-to-pdf.cs`](./add-graph-with-shapes-to-pdf.cs) -- Add graph with shapes to pdf
+- [`add-line-to-pdf-graph.cs`](./add-line-to-pdf-graph.cs) -- Add line to pdf graph
+- [`add-multi-colored-line-segments-to-pdf-graph.cs`](./add-multi-colored-line-segments-to-pdf-graph.cs) -- Add multi colored line segments to pdf graph
+- [`add-non-overlapping-rectangles-to-pdf-graph.cs`](./add-non-overlapping-rectangles-to-pdf-graph.cs) -- Add non overlapping rectangles to pdf graph
+- [`add-polygon-annotation-with-dashed-outline.cs`](./add-polygon-annotation-with-dashed-outline.cs) -- Add polygon annotation with dashed outline
+- [`add-rectangle-ellipse-graph-to-pdf.cs`](./add-rectangle-ellipse-graph-to-pdf.cs) -- Add rectangle ellipse graph to pdf
+- [`add-rectangle-radial-gradient-pdf.cs`](./add-rectangle-radial-gradient-pdf.cs) -- Add rectangle radial gradient pdf
+- [`add-rectangle-solid-red-fill-to-pdf-graph.cs`](./add-rectangle-solid-red-fill-to-pdf-graph.cs) -- Add rectangle solid red fill to pdf graph
+- [`add-rectangle-with-bounds-checking.cs`](./add-rectangle-with-bounds-checking.cs) -- Add rectangle with bounds checking
+- [`add-rectangle-with-drop-shadow-to-pdf.cs`](./add-rectangle-with-drop-shadow-to-pdf.cs) -- Add rectangle with drop shadow to pdf
+- [`add-rectangle-with-shadow-to-pdf.cs`](./add-rectangle-with-shadow-to-pdf.cs) -- Add rectangle with shadow to pdf
+- [`add-regular-hexagon-to-pdf-graph.cs`](./add-regular-hexagon-to-pdf-graph.cs) -- Add regular hexagon to pdf graph
+- [`add-rotated-ellipse-to-pdf.cs`](./add-rotated-ellipse-to-pdf.cs) -- Add rotated ellipse to pdf
+- [`add-rounded-rectangle-with-fill-to-pdf-graph.cs`](./add-rounded-rectangle-with-fill-to-pdf-graph.cs) -- Add rounded rectangle with fill to pdf graph
+- [`add-rounded-rectangle-with-fill.cs`](./add-rounded-rectangle-with-fill.cs) -- Add rounded rectangle with fill
+- [`add-semi-transparent-rectangle-using-transparency-layer.cs`](./add-semi-transparent-rectangle-using-transparency-layer.cs) -- Add semi transparent rectangle using transparency layer
+- [`add-semi-transparent-rectangle.cs`](./add-semi-transparent-rectangle.cs) -- Add semi transparent rectangle
+- [`add-shadow-effect-to-filled-rectangle.cs`](./add-shadow-effect-to-filled-rectangle.cs) -- Add shadow effect to filled rectangle
+- [`add-shapes-with-bounds-checking.cs`](./add-shapes-with-bounds-checking.cs) -- Add shapes with bounds checking
+- [`add-solid-red-rectangle-to-pdf-graph.cs`](./add-solid-red-rectangle-to-pdf-graph.cs) -- Add solid red rectangle to pdf graph
+- [`add-text-inside-graph-pdf.cs`](./add-text-inside-graph-pdf.cs) -- Add text inside graph pdf
+- [`add-text-inside-graph.cs`](./add-text-inside-graph.cs) -- Add text inside graph
+- [`add-unfilled-arc-with-custom-stroke.cs`](./add-unfilled-arc-with-custom-stroke.cs) -- Add unfilled arc with custom stroke
+- [`add-unfilled-arc-with-line-width-and-dash-style.cs`](./add-unfilled-arc-with-line-width-and-dash-style.cs) -- Add unfilled arc with line width and dash style
+- [`adjust-rectangle-bounds-in-pdf.cs`](./adjust-rectangle-bounds-in-pdf.cs) -- Adjust rectangle bounds in pdf
+- [`align-graph-to-left-margin-pdf.cs`](./align-graph-to-left-margin-pdf.cs) -- Align graph to left margin pdf
+- [`apply-background-image-to-pdf-graph.cs`](./apply-background-image-to-pdf-graph.cs) -- Apply background image to pdf graph
+- [`apply-clipping-region-to-graph.cs`](./apply-clipping-region-to-graph.cs) -- Apply clipping region to graph
+- [`batch-insert-company-logo-graph-into-pdfs.cs`](./batch-insert-company-logo-graph-into-pdfs.cs) -- Batch insert company logo graph into pdfs
+- [`batch-insert-logo-graph-into-pdfs.cs`](./batch-insert-logo-graph-into-pdfs.cs) -- Batch insert logo graph into pdfs
+- [`build-reusable-graph-for-pdf-pages.cs`](./build-reusable-graph-for-pdf-pages.cs) -- Build reusable graph for pdf pages
+- [`center-text-in-rectangle-pdf.cs`](./center-text-in-rectangle-pdf.cs) -- Center text in rectangle pdf
+- [`check-adjust-shape-bounds-pdf.cs`](./check-adjust-shape-bounds-pdf.cs) -- Check adjust shape bounds pdf
+- [`clip-graph-to-rectangle-pdf.cs`](./clip-graph-to-rectangle-pdf.cs) -- Clip graph to rectangle pdf
+- [`clip-shapes-within-graph-region.cs`](./clip-shapes-within-graph-region.cs) -- Clip shapes within graph region
+- [`combine-multiple-graphs-pdf-collage.cs`](./combine-multiple-graphs-pdf-collage.cs) -- Combine multiple graphs pdf collage
+- [`configure-graph-border-add-rectangle.cs`](./configure-graph-border-add-rectangle.cs) -- Configure graph border add rectangle
+- [`configure-graph-border-rectangle-dash-style.cs`](./configure-graph-border-rectangle-dash-style.cs) -- Configure graph border rectangle dash style
+- [`configure-shape-fill-colors-json-pdf-graph.cs`](./configure-shape-fill-colors-json-pdf-graph.cs) -- Configure shape fill colors json pdf graph
+- [`configure-shape-fill-colors-pdf-graph.cs`](./configure-shape-fill-colors-pdf-graph.cs) -- Configure shape fill colors pdf graph
+- [`create-bar-graph-with-legend.cs`](./create-bar-graph-with-legend.cs) -- Create bar graph with legend
+- [`create-bezier-curve-in-pdf-graph.cs`](./create-bezier-curve-in-pdf-graph.cs) -- Create bezier curve in pdf graph
+- [`create-custom-star-shape-pdf.cs`](./create-custom-star-shape-pdf.cs) -- Create custom star shape pdf
+- [`create-dimension-line-in-pdf-graph.cs`](./create-dimension-line-in-pdf-graph.cs) -- Create dimension line in pdf graph
+- [`create-dimension-specific-rectangle-pdf.cs`](./create-dimension-specific-rectangle-pdf.cs) -- Create dimension specific rectangle pdf
+- [`create-dimension-specific-rectangle.cs`](./create-dimension-specific-rectangle.cs) -- Create dimension specific rectangle
+- [`create-ellipse-pdf-graph.cs`](./create-ellipse-pdf-graph.cs) -- Create ellipse pdf graph
+- [`create-graph-with-rectangle-and-ellipse.cs`](./create-graph-with-rectangle-and-ellipse.cs) -- Create graph with rectangle and ellipse
+- [`create-horizontal-bar-chart-pdf.cs`](./create-horizontal-bar-chart-pdf.cs) -- Create horizontal bar chart pdf
+- [`create-layered-shapes-in-pdf.cs`](./create-layered-shapes-in-pdf.cs) -- Create layered shapes in pdf
+- [`create-multi-page-pdf-with-full-page-graphs.cs`](./create-multi-page-pdf-with-full-page-graphs.cs) -- Create multi page pdf with full page graphs
+- [`create-new-pdf-single-page.cs`](./create-new-pdf-single-page.cs) -- Create new pdf single page
+- [`create-pdf-collage-multiple-graphs.cs`](./create-pdf-collage-multiple-graphs.cs) -- Create pdf collage multiple graphs
+- [`create-pdf-graph-border-colors.cs`](./create-pdf-graph-border-colors.cs) -- Create pdf graph border colors
+- [`create-pdf-graph-filled-outline-shapes.cs`](./create-pdf-graph-filled-outline-shapes.cs) -- Create pdf graph filled outline shapes
+- [`create-pdf-graph-styled-text.cs`](./create-pdf-graph-styled-text.cs) -- Create pdf graph styled text
+- [`create-pdf-graph-with-border-colors.cs`](./create-pdf-graph-with-border-colors.cs) -- Create pdf graph with border colors
+- [`create-pdf-pages-with-proportional-graph-shapes.cs`](./create-pdf-pages-with-proportional-graph-shapes.cs) -- Create pdf pages with proportional graph shapes
+- [`create-pdf-with-filled-arc-graph.cs`](./create-pdf-with-filled-arc-graph.cs) -- Create pdf with filled arc graph
+- [`create-pdf-with-graph.cs`](./create-pdf-with-graph.cs) -- Create pdf with graph
+- [`create-pdf-with-single-default-page.cs`](./create-pdf-with-single-default-page.cs) -- Create pdf with single default page
+- [`create-proportional-graphs-pdf.cs`](./create-proportional-graphs-pdf.cs) -- Create proportional graphs pdf
+- [`create-rotate-ellipse-pdf-graph.cs`](./create-rotate-ellipse-pdf-graph.cs) -- Create rotate ellipse pdf graph
+- [`create-sample-graph-pdf.cs`](./create-sample-graph-pdf.cs) -- Create sample graph pdf
+- [`create-semi-transparent-ellipse-fill.cs`](./create-semi-transparent-ellipse-fill.cs) -- Create semi transparent ellipse fill
+- [`create-semi-transparent-shape-graph.cs`](./create-semi-transparent-shape-graph.cs) -- Create semi transparent shape graph
+- [`create-star-shape-pdf.cs`](./create-star-shape-pdf.cs) -- Create star shape pdf
+- [`deserialize-pdf-add-graph-label.cs`](./deserialize-pdf-add-graph-label.cs) -- Deserialize pdf add graph label
+- [`draw-straight-line-in-pdf-graph.cs`](./draw-straight-line-in-pdf-graph.cs) -- Draw straight line in pdf graph
+- [`draw-straight-line-with-custom-cap.cs`](./draw-straight-line-with-custom-cap.cs) -- Draw straight line with custom cap
+- [`ellipse-with-transparent-fill-and-centered-text.cs`](./ellipse-with-transparent-fill-and-centered-text.cs) -- Ellipse with transparent fill and centered text
+- [`enable-bounds-check-mode-graph.cs`](./enable-bounds-check-mode-graph.cs) -- Enable bounds check mode graph
+- [`enable-boundscheckmode-validate-graph-shape.cs`](./enable-boundscheckmode-validate-graph-shape.cs) -- Enable boundscheckmode validate graph shape
+- [`export-graph-to-pdf.cs`](./export-graph-to-pdf.cs) -- Export graph to pdf
+- [`export-pdf-to-memory-stream-and-save.cs`](./export-pdf-to-memory-stream-and-save.cs) -- Export pdf to memory stream and save
+- [`export-pdf-to-memorystream-and-save-to-file.cs`](./export-pdf-to-memorystream-and-save-to-file.cs) -- Export pdf to memorystream and save to file
+- [`graph-filled-and-outline-shapes.cs`](./graph-filled-and-outline-shapes.cs) -- Graph filled and outline shapes
+- [`handle-shape-bounds-exceptions.cs`](./handle-shape-bounds-exceptions.cs) -- Handle shape bounds exceptions
+- [`insert-centered-textfragment-rectangle.cs`](./insert-centered-textfragment-rectangle.cs) -- Insert centered textfragment rectangle
+- [`insert-dashed-polyline-annotation.cs`](./insert-dashed-polyline-annotation.cs) -- Insert dashed polyline annotation
+- [`insert-graph-into-pdf-footer.cs`](./insert-graph-into-pdf-footer.cs) -- Insert graph into pdf footer
+- [`insert-rotate-scaled-image-pdf.cs`](./insert-rotate-scaled-image-pdf.cs) -- Insert rotate scaled image pdf
+- [`insert-rounded-rectangle-into-pdf-graph.cs`](./insert-rounded-rectangle-into-pdf-graph.cs) -- Insert rounded rectangle into pdf graph
+- [`insert-scaled-rotated-image-into-pdf.cs`](./insert-scaled-rotated-image-into-pdf.cs) -- Insert scaled rotated image into pdf
+- [`iterate-graph-shapes-bounding-boxes.cs`](./iterate-graph-shapes-bounding-boxes.cs) -- Iterate graph shapes bounding boxes
+- [`log-graph-shapes-bounding-boxes.cs`](./log-graph-shapes-bounding-boxes.cs) -- Log graph shapes bounding boxes
+- [`map-shape-colors-to-pdf-graph.cs`](./map-shape-colors-to-pdf-graph.cs) -- Map shape colors to pdf graph
+- [`map-shape-identifiers-to-fill-colors.cs`](./map-shape-identifiers-to-fill-colors.cs) -- Map shape identifiers to fill colors
+- [`measure-ellipse-bounding-box.cs`](./measure-ellipse-bounding-box.cs) -- Measure ellipse bounding box
+- [`non-uniform-graph-scaling.cs`](./non-uniform-graph-scaling.cs) -- Non uniform graph scaling
+- [`non-uniform-scale-graph.cs`](./non-uniform-scale-graph.cs) -- Non uniform scale graph
+- [`out-of-bounds-rectangle-throws-exception.cs`](./out-of-bounds-rectangle-throws-exception.cs) -- Out of bounds rectangle throws exception
+- [`parallel-gradient-ellipse-pdf.cs`](./parallel-gradient-ellipse-pdf.cs) -- Parallel gradient ellipse pdf
+- [`pdf-report-with-colored-bar-graph.cs`](./pdf-report-with-colored-bar-graph.cs) -- Pdf report with colored bar graph
+- [`place-graph-left-margin-offset.cs`](./place-graph-left-margin-offset.cs) -- Place graph left margin offset
+- [`rotate-graph-in-pdf.cs`](./rotate-graph-in-pdf.cs) -- Rotate graph in pdf
+- [`scale-graph-shapes-150-percent.cs`](./scale-graph-shapes-150-percent.cs) -- Scale graph shapes 150 percent
+- [`semi-transparent-ellipse-pdf.cs`](./semi-transparent-ellipse-pdf.cs) -- Semi transparent ellipse pdf
+- [`serialize-pdf-graph-to-byte-array.cs`](./serialize-pdf-graph-to-byte-array.cs) -- Serialize pdf graph to byte array
+- [`serialize-pdf-to-byte-array.cs`](./serialize-pdf-to-byte-array.cs) -- Serialize pdf to byte array
+- [`set-graph-dimensions-pdf.cs`](./set-graph-dimensions-pdf.cs) -- Set graph dimensions pdf
+- [`set-rectangle-fill-opacity-50-argb.cs`](./set-rectangle-fill-opacity-50-argb.cs) -- Set rectangle fill opacity 50 argb
+- [`skew-graph-x-axis.cs`](./skew-graph-x-axis.cs) -- Skew graph x axis
+- [`test-out-of-bounds-rectangle-throws-exception.cs`](./test-out-of-bounds-rectangle-throws-exception.cs) -- Test out of bounds rectangle throws exception
+- [`toggle-graph-bounds-check-mode.cs`](./toggle-graph-bounds-check-mode.cs) -- Toggle graph bounds check mode
+- [`toggle-graph-boundscheckmode.cs`](./toggle-graph-boundscheckmode.cs) -- Toggle graph boundscheckmode
+- [`translate-graph-position-in-pdf.cs`](./translate-graph-position-in-pdf.cs) -- Translate graph position in pdf
+- [`translate-graph-rectangle.cs`](./translate-graph-rectangle.cs) -- Translate graph rectangle
+
+## See Also
+
+- [`AGENTS.md`](./AGENTS.md) -- category-specific anti-patterns, API surface, and conventions for AI coding agents
+- [`../AGENTS.md`](../AGENTS.md) -- repository-wide agent guide
+- [`../README.md`](../README.md) -- full category index and project overview
+- [Aspose.PDF for .NET docs](https://docs.aspose.com/pdf/net/)
+
+> Each `.cs` file is a standalone, build-validated console example. Drop into a fresh `dotnet new console` project, add the `Aspose.PDF` NuGet (version above), and run.

@@ -1,204 +1,42 @@
 {
   "category": "facades-metadata",
   "nuget_version": "26.8.0",
-  "last_updated": "2026-08-20T07:54:21Z",
+  "last_updated": "2026-09-10T12:45:08Z",
   "examples": {
-    "read-update-pdf-metadata": {
-      "title": "Read and Update PDF Metadata",
-      "filename": "read-update-pdf-metadata.cs",
-      "description": "Demonstrates how to open a PDF, read its existing metadata, modify fields such as title and author, and save the updated information to a new file using Aspose.Pdf.",
+    "add-custom-metadata-field-to-pdf": {
+      "title": "Add Custom Metadata Field to PDF Using PdfFileInfo",
+      "filename": "add-custom-metadata-field-to-pdf.cs",
+      "description": "Demonstrates how to preserve existing custom metadata in a PDF and add a new \"Version\" field using the PdfFileInfo facade, then save the updated document.",
       "tags": [
         "metadata",
         "pdf",
         "aspose",
-        "read",
-        "update"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "PdfFileInfo.BindPdf",
-        "PdfFileInfo.Title",
-        "PdfFileInfo.Author",
-        "PdfFileInfo.SaveNewInfo"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "read-pdf-author-metadata": {
-      "title": "Read PDF Author Metadata Using PdfFileInfo",
-      "filename": "read-pdf-author-metadata.cs",
-      "description": "Demonstrates how to open a PDF with Aspose.Pdf.Facades.PdfFileInfo and retrieve the Author metadata property, outputting it to the console.",
-      "tags": [
-        "pdf",
-        "metadata",
-        "author",
-        "aspose.pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "PdfFileInfo.Author"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "read-pdf-title-metadata-log": {
-      "title": "Read PDF Title Metadata and Write to Log",
-      "filename": "read-pdf-title-metadata-log.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileInfo to read the Title metadata from a PDF file and write the result to a log file.",
-      "tags": [
-        "metadata",
-        "pdf",
-        "title",
-        "logging",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.Title"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "retrieve-pdf-keywords-metadata": {
-      "title": "Retrieve PDF Keywords Metadata using PdfFileInfo",
-      "filename": "retrieve-pdf-keywords-metadata.cs",
-      "description": "Demonstrates how to open a PDF with Aspose.Pdf.Facades.PdfFileInfo and read the Keywords metadata property, then display it on the console.",
-      "tags": [
-        "pdf",
-        "metadata",
-        "keywords",
-        "aspose.pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.Keywords"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "read-pdf-creator-metadata": {
-      "title": "Read PDF Creator Metadata",
-      "filename": "read-pdf-creator-metadata.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfFileInfo to retrieve the Creator metadata property from an existing PDF file.",
-      "tags": [
-        "pdf",
-        "metadata",
-        "creator",
-        "aspose.pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.Creator"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "read-pdf-modification-date": {
-      "title": "Read PDF Modification Date with PdfFileInfo",
-      "filename": "read-pdf-modification-date.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.PdfFileInfo to obtain the ModDate metadata from a PDF and output it in a friendly format.",
-      "tags": [
-        "pdf",
-        "metadata",
-        "moddate",
-        "aspose.pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.ModDate",
-        "Aspose.Pdf.Facades.PdfFileInfo.Dispose"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "update-pdf-author-metadata": {
-      "title": "Update PDF Author Metadata with PdfFileInfo",
-      "filename": "update-pdf-author-metadata.cs",
-      "description": "Demonstrates how to modify the Author property of a PDF file using the Aspose.Pdf.Facades.PdfFileInfo class and persist the changes to a new file with SaveNewInfo.",
-      "tags": [
-        "pdf",
-        "metadata",
-        "author",
-        "aspose.pdf",
+        "custom-metadata",
         "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileInfo",
-        "PdfFileInfo.Author",
-        "PdfFileInfo.SaveNewInfo",
-        "PdfFileInfo.Dispose",
-        "PdfFileInfo(string)"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "update-pdf-title-metadata": {
-      "title": "Update PDF Title Metadata using PdfFileInfo",
-      "filename": "update-pdf-title-metadata.cs",
-      "description": "Demonstrates how to modify the Title property of a PDF file using Aspose.Pdf.Facades.PdfFileInfo and save the changes to a new document.",
-      "tags": [
-        "metadata",
-        "title",
-        "pdf",
-        "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.Title",
+        "Aspose.Pdf.Facades.PdfFileInfo.SetMetaInfo",
         "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
       ],
       "difficulty": "beginner",
       "generated_at": "2026-08-20T07:54:21Z",
       "status": "verified"
     },
-    "set-pdf-keywords-metadata": {
-      "title": "Set PDF Keywords Metadata Using PdfFileInfo",
-      "filename": "set-pdf-keywords-metadata.cs",
-      "description": "Demonstrates how to assign a Keywords metadata value to a PDF file with Aspose.Pdf.Facades.PdfFileInfo, save the updated document, and verify the change.",
+    "add-custom-metadata-reviewedby-to-pdf": {
+      "title": "Add Custom Metadata 'ReviewedBy' to PDF",
+      "filename": "add-custom-metadata-reviewedby-to-pdf.cs",
+      "description": "Demonstrates how to set a custom metadata field in a PDF using Aspose.Pdf.Facades.PdfFileInfo and persist the changes to a new file.",
       "tags": [
-        "pdf",
         "metadata",
-        "keywords",
-        "aspose.pdf",
-        "csharp"
+        "custom",
+        "pdf",
+        "aspose",
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileInfo",
-        "PdfFileInfo.Keywords",
-        "PdfFileInfo.SaveNewInfo",
-        "PdfFileInfo.Dispose",
-        "PdfFileInfo (constructor)"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "set-pdf-creator-metadata": {
-      "title": "Set PDF Creator Metadata Using PdfFileInfo",
-      "filename": "set-pdf-creator-metadata.cs",
-      "description": "Demonstrates how to assign a custom Creator value to a PDF file by using Aspose.Pdf.Facades.PdfFileInfo and persisting the change with SaveNewInfo.",
-      "tags": [
-        "pdf",
-        "metadata",
-        "creator",
-        "aspose.pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.Creator",
+        "Aspose.Pdf.Facades.PdfFileInfo.SetMetaInfo",
         "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
       ],
       "difficulty": "beginner",
@@ -225,64 +63,6 @@
       "generated_at": "2026-08-20T07:54:21Z",
       "status": "verified"
     },
-    "retrieve-custom-pdf-metadata": {
-      "title": "Retrieve Custom PDF Metadata (ProjectCode)",
-      "filename": "retrieve-custom-pdf-metadata.cs",
-      "description": "Shows how to read a custom metadata entry named \"ProjectCode\" from a PDF file using Aspose.Pdf.Facades.PdfFileInfo.",
-      "tags": [
-        "metadata",
-        "pdf",
-        "aspose",
-        "custom",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.GetMetaInfo"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "add-custom-metadata-reviewedby-to-pdf": {
-      "title": "Add Custom Metadata 'ReviewedBy' to PDF",
-      "filename": "add-custom-metadata-reviewedby-to-pdf.cs",
-      "description": "Demonstrates how to set a custom metadata field in a PDF using Aspose.Pdf.Facades.PdfFileInfo and persist the changes to a new file.",
-      "tags": [
-        "metadata",
-        "custom",
-        "pdf",
-        "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.SetMetaInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "retrieve-custom-pdf-metadata-reviewedby": {
-      "title": "Retrieve Custom PDF Metadata (ReviewedBy)",
-      "filename": "retrieve-custom-pdf-metadata-reviewedby.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileInfo to read a custom metadata property from a PDF document and log its value.",
-      "tags": [
-        "metadata",
-        "pdf",
-        "aspose",
-        "custom-property",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.GetMetaInfo"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
     "add-department-metadata-to-pdfs": {
       "title": "Add Custom Department Metadata to PDFs",
       "filename": "add-department-metadata-to-pdfs.cs",
@@ -298,67 +78,6 @@
         "Aspose.Pdf.Facades.PdfFileInfo",
         "PdfFileInfo.SetMetaInfo",
         "PdfFileInfo.SaveNewInfo"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "add-custom-metadata-field-to-pdf": {
-      "title": "Add Custom Metadata Field to PDF Using PdfFileInfo",
-      "filename": "add-custom-metadata-field-to-pdf.cs",
-      "description": "Demonstrates how to preserve existing custom metadata in a PDF and add a new \"Version\" field using the PdfFileInfo facade, then save the updated document.",
-      "tags": [
-        "metadata",
-        "pdf",
-        "aspose",
-        "custom-metadata",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.SetMetaInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "remove-custom-pdf-metadata-entry": {
-      "title": "Remove Custom PDF Metadata Entry",
-      "filename": "remove-custom-pdf-metadata-entry.cs",
-      "description": "Demonstrates how to delete a specific custom metadata field from a PDF by setting its value to an empty string using the PdfFileInfo facade.",
-      "tags": [
-        "metadata",
-        "pdf",
-        "remove",
-        "custom",
-        "Aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileInfo.SetMetaInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "read-custom-pdf-metadata-existence-check": {
-      "title": "Read Custom PDF Metadata with Existence Check",
-      "filename": "read-custom-pdf-metadata-existence-check.cs",
-      "description": "Shows how to verify a PDF file exists and safely read a custom metadata key \"Confidential\" using Aspose.Pdf.Facades.",
-      "tags": [
-        "pdf",
-        "metadata",
-        "custom",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.GetMetaInfo"
       ],
       "difficulty": "beginner",
       "generated_at": "2026-08-20T07:54:21Z",
@@ -385,71 +104,23 @@
       "generated_at": "2026-08-20T07:54:21Z",
       "status": "verified"
     },
-    "update-pdf-metadata-save-new-file": {
-      "title": "Update PDF Metadata and Save to New File",
-      "filename": "update-pdf-metadata-save-new-file.cs",
-      "description": "Demonstrates how to modify PDF metadata such as title, author, subject, keywords, creator, and modification date using Aspose.Pdf.Facades.PdfFileInfo and save the updated information to a new PDF file.",
+    "apply-metadata-changes-to-multiple-pdfs-in-parallel": {
+      "title": "Apply Metadata Changes to Multiple PDFs in Parallel",
+      "filename": "apply-metadata-changes-to-multiple-pdfs-in-parallel.cs",
+      "description": "Demonstrates how to update the Title, Author, and Subject metadata of several PDF files concurrently using Aspose.Pdf.Facades and the Task Parallel Library.",
       "tags": [
         "metadata",
+        "parallel",
         "pdf",
         "aspose",
-        "csharp",
-        "save"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "PdfFileInfo.Title",
-        "PdfFileInfo.Author",
-        "PdfFileInfo.Subject",
-        "PdfFileInfo.Keywords",
-        "PdfFileInfo.Creator",
-        "PdfFileInfo.ModDate",
-        "PdfFileInfo.SaveNewInfo"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "load-pdf-retrieve-file-info-and-save": {
-      "title": "Load PDF, Retrieve File Info, and Save with Proper Disposal",
-      "filename": "load-pdf-retrieve-file-info-and-save.cs",
-      "description": "Demonstrates loading a PDF using Aspose.Pdf.Document inside a using block, accessing file‑level information with PdfFileInfo, and saving the document while ensuring both objects are correctly disposed.",
-      "tags": [
-        "pdf",
-        "aspose.pdf",
-        "disposal",
-        "fileinfo",
-        "document"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Facades.PdfFileInfo.IsEncrypted",
-        "Aspose.Pdf.Facades.PdfFileInfo.Close"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "backup-and-update-pdf-metadata": {
-      "title": "Backup PDFs and Update Metadata with PdfFileInfo",
-      "filename": "backup-and-update-pdf-metadata.cs",
-      "description": "The example creates a backup of each PDF in a folder, then uses Aspose.Pdf.Facades.PdfFileInfo to modify common metadata fields and saves the changes to the original file.",
-      "tags": [
-        "pdf",
-        "metadata",
-        "backup",
-        "aspose",
-        "facade"
+        "tpl"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileInfo",
         "Aspose.Pdf.Facades.PdfFileInfo.Title",
         "Aspose.Pdf.Facades.PdfFileInfo.Author",
         "Aspose.Pdf.Facades.PdfFileInfo.Subject",
-        "Aspose.Pdf.Facades.PdfFileInfo.Keywords",
-        "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
+        "Aspose.Pdf.Facades.PdfFileInfo.Save"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T07:54:21Z",
@@ -480,151 +151,80 @@
       "generated_at": "2026-08-20T07:54:21Z",
       "status": "verified"
     },
-    "handle-readonly-file-errors-when-saving-pdf-metadata": {
-      "title": "Handle Read‑Only File Errors When Saving PDF Metadata",
-      "filename": "handle-readonly-file-errors-when-saving-pdf-metadata.cs",
-      "description": "Demonstrates how to modify PDF metadata with Aspose.Pdf.Facades and reliably save it even when the target file is marked as read‑only by clearing the attribute and retrying.",
+    "backup-and-update-pdf-metadata": {
+      "title": "Backup PDFs and Update Metadata with PdfFileInfo",
+      "filename": "backup-and-update-pdf-metadata.cs",
+      "description": "The example creates a backup of each PDF in a folder, then uses Aspose.Pdf.Facades.PdfFileInfo to modify common metadata fields and saves the changes to the original file.",
       "tags": [
         "pdf",
         "metadata",
-        "readonly",
-        "exception-handling",
-        "aspose-pdf"
+        "backup",
+        "aspose",
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileInfo",
         "Aspose.Pdf.Facades.PdfFileInfo.Title",
-        "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "update-pdf-metadata-memorystream": {
-      "title": "Update PDF Metadata Using MemoryStream and PdfFileInfo",
-      "filename": "update-pdf-metadata-memorystream.cs",
-      "description": "Demonstrates loading a PDF into a MemoryStream, modifying its metadata with PdfFileInfo, and saving the updated document to a new file.",
-      "tags": [
-        "metadata",
-        "pdf",
-        "memorystream",
-        "aspose-pdf",
-        "facades"
-      ],
-      "apis_used": [
-        "PdfFileInfo",
-        "PdfFileInfo.Title",
-        "PdfFileInfo.Author",
-        "PdfFileInfo.SetMetaInfo",
-        "PdfFileInfo.SaveNewInfo"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "update-pdf-keywords-metadata": {
-      "title": "Update PDF Keywords Metadata Using PdfFileInfo",
-      "filename": "update-pdf-keywords-metadata.cs",
-      "description": "Demonstrates how to open a PDF from a stream with Aspose.Pdf.Facades.PdfFileInfo, modify the Keywords metadata, and save the updated document to a new file.",
-      "tags": [
-        "pdf",
-        "metadata",
-        "keywords",
-        "aspose.pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.Author",
+        "Aspose.Pdf.Facades.PdfFileInfo.Subject",
         "Aspose.Pdf.Facades.PdfFileInfo.Keywords",
         "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
       ],
-      "difficulty": "beginner",
+      "difficulty": "intermediate",
       "generated_at": "2026-08-20T07:54:21Z",
       "status": "verified"
     },
-    "update-pdf-author-metadata-conditional": {
-      "title": "Update PDF Author Metadata Conditionally",
-      "filename": "update-pdf-author-metadata-conditional.cs",
-      "description": "Shows how to read a PDF's Author metadata with PdfFileInfo, set it only when the field is empty, and save the updated document.",
+    "backup-pdfs-update-metadata": {
+      "title": "Backup Pdfs Update Metadata",
+      "filename": "backup-pdfs-update-metadata.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "check-custom-metadata-key": {
+      "title": "Check Custom Metadata Key",
+      "filename": "check-custom-metadata-key.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pdfa-1b-using-pdffileinfo": {
+      "title": "Convert PDF to PDF/A-1B Using PdfFileInfo",
+      "filename": "convert-pdf-to-pdfa-1b-using-pdffileinfo.cs",
+      "description": "Demonstrates how to load a PDF with PdfFileInfo, convert it to PDF/A‑1B compliance, and save the archival‑ready file.",
       "tags": [
-        "pdf",
-        "metadata",
-        "author",
-        "conditional",
-        "aspose"
+        "PDF/A",
+        "Aspose.Pdf",
+        "PdfFileInfo",
+        "conversion",
+        "archival"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.Author",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction",
         "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
       ],
       "difficulty": "beginner",
       "generated_at": "2026-08-20T07:54:21Z",
       "status": "verified"
     },
-    "list-custom-pdf-metadata-keys": {
-      "title": "List Custom PDF Metadata Keys Alphabetically",
-      "filename": "list-custom-pdf-metadata-keys.cs",
-      "description": "Shows how to extract all custom metadata keys from a PDF, sort them alphabetically, and output each key with its value using Aspose.Pdf.",
-      "tags": [
-        "metadata",
-        "custom",
-        "pdf",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.GetMetaInfo",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Metadata",
-        "Aspose.Pdf.DocumentInfo.IsPredefinedKey"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "merge-xmp-metadata-with-pdf-fileinfo": {
-      "title": "Merge XMP Metadata with PDF FileInfo",
-      "filename": "merge-xmp-metadata-with-pdf-fileinfo.cs",
-      "description": "Demonstrates how to combine standard PDF FileInfo metadata with custom XMP metadata in a PDF using Aspose.Pdf.",
-      "tags": [
-        "metadata",
-        "xmp",
-        "pdf",
-        "aspose",
-        "fileinfo"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Info",
-        "Aspose.Pdf.Document.Metadata",
-        "Aspose.Pdf.Document.Metadata.RegisterNamespaceUri",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:54:21Z",
-      "status": "verified"
-    },
-    "read-pdf-version": {
-      "title": "Read PDF Version Using Aspose.Pdf Facade",
-      "filename": "read-pdf-version.cs",
-      "description": "Shows how to bind a PDF file with PdfFileInfo and retrieve its version string for later use.",
-      "tags": [
-        "pdf",
-        "version",
-        "aspose",
-        "facade",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileInfo.GetPdfVersion",
-        "Aspose.Pdf.Facades.SaveableFacade"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:54:21Z",
+    "convert-pdf-to-pdfa-1b-with-pdffileinfo": {
+      "title": "Convert Pdf To Pdfa 1B With Pdffileinfo",
+      "filename": "convert-pdf-to-pdfa-1b-with-pdffileinfo.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
     "export-pdf-metadata-to-json": {
@@ -647,6 +247,36 @@
         "Aspose.Pdf.Facades.PdfFileInfo.Header"
       ],
       "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "handle-readonly-file-errors-saving-pdf-metadata": {
+      "title": "Handle Readonly File Errors Saving Pdf Metadata",
+      "filename": "handle-readonly-file-errors-saving-pdf-metadata.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "handle-readonly-file-errors-when-saving-pdf-metadata": {
+      "title": "Handle Read‑Only File Errors When Saving PDF Metadata",
+      "filename": "handle-readonly-file-errors-when-saving-pdf-metadata.cs",
+      "description": "Demonstrates how to modify PDF metadata with Aspose.Pdf.Facades and reliably save it even when the target file is marked as read‑only by clearing the attribute and retrying.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "readonly",
+        "exception-handling",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.Title",
+        "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
+      ],
+      "difficulty": "intermediate",
       "generated_at": "2026-08-20T07:54:21Z",
       "status": "verified"
     },
@@ -674,72 +304,167 @@
       "generated_at": "2026-08-20T07:54:21Z",
       "status": "verified"
     },
-    "apply-metadata-changes-to-multiple-pdfs-in-parallel": {
-      "title": "Apply Metadata Changes to Multiple PDFs in Parallel",
-      "filename": "apply-metadata-changes-to-multiple-pdfs-in-parallel.cs",
-      "description": "Demonstrates how to update the Title, Author, and Subject metadata of several PDF files concurrently using Aspose.Pdf.Facades and the Task Parallel Library.",
+    "import-pdf-metadata-from-json": {
+      "title": "Import Pdf Metadata From Json",
+      "filename": "import-pdf-metadata-from-json.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "list-custom-pdf-metadata-keys": {
+      "title": "List Custom PDF Metadata Keys Alphabetically",
+      "filename": "list-custom-pdf-metadata-keys.cs",
+      "description": "Shows how to extract all custom metadata keys from a PDF, sort them alphabetically, and output each key with its value using Aspose.Pdf.",
       "tags": [
         "metadata",
-        "parallel",
+        "custom",
         "pdf",
         "aspose",
-        "tpl"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.Title",
-        "Aspose.Pdf.Facades.PdfFileInfo.Author",
-        "Aspose.Pdf.Facades.PdfFileInfo.Subject",
-        "Aspose.Pdf.Facades.PdfFileInfo.Save"
+        "Aspose.Pdf.Facades.PdfFileInfo.GetMetaInfo",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Metadata",
+        "Aspose.Pdf.DocumentInfo.IsPredefinedKey"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T07:54:21Z",
       "status": "verified"
     },
-    "thread-safe-parallel-pdf-metadata-update": {
-      "title": "Thread‑Safe Parallel PDF Metadata Update with PdfFileInfo",
-      "filename": "thread-safe-parallel-pdf-metadata-update.cs",
-      "description": "Demonstrates processing multiple PDF files concurrently and safely updating their metadata using Aspose.Pdf.Facades.PdfFileInfo with per‑file locking.",
+    "load-pdf-retrieve-file-info-and-save": {
+      "title": "Load PDF, Retrieve File Info, and Save with Proper Disposal",
+      "filename": "load-pdf-retrieve-file-info-and-save.cs",
+      "description": "Demonstrates loading a PDF using Aspose.Pdf.Document inside a using block, accessing file‑level information with PdfFileInfo, and saving the document while ensuring both objects are correctly disposed.",
       "tags": [
         "pdf",
-        "metadata",
-        "parallel",
-        "thread-safe",
-        "aspose"
+        "aspose.pdf",
+        "disposal",
+        "fileinfo",
+        "document"
       ],
       "apis_used": [
-        "PdfFileInfo",
-        "PdfFileInfo.BindPdf",
-        "PdfFileInfo.Title",
-        "PdfFileInfo.Author",
-        "PdfFileInfo.Subject",
-        "PdfFileInfo.SaveNewInfo"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Facades.PdfFileInfo.IsEncrypted",
+        "Aspose.Pdf.Facades.PdfFileInfo.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "merge-xmp-metadata-with-pdf-fileinfo": {
+      "title": "Merge XMP Metadata with PDF FileInfo",
+      "filename": "merge-xmp-metadata-with-pdf-fileinfo.cs",
+      "description": "Demonstrates how to combine standard PDF FileInfo metadata with custom XMP metadata in a PDF using Aspose.Pdf.",
+      "tags": [
+        "metadata",
+        "xmp",
+        "pdf",
+        "aspose",
+        "fileinfo"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Info",
+        "Aspose.Pdf.Document.Metadata",
+        "Aspose.Pdf.Document.Metadata.RegisterNamespaceUri",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T07:54:21Z",
       "status": "verified"
     },
-    "validate-set-pdf-metadata-with-regex": {
-      "title": "Validate and Set PDF Metadata with Regex using PdfFileInfo",
-      "filename": "validate-set-pdf-metadata-with-regex.cs",
-      "description": "The example loads a PDF with Aspose.Pdf.Facades.PdfFileInfo, validates each metadata value against a regular expression, sets standard and custom properties, and saves the updated file.",
+    "preserve-pdf-metadata-add-version": {
+      "title": "Preserve Pdf Metadata Add Version",
+      "filename": "preserve-pdf-metadata-add-version.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "read-custom-pdf-metadata-existence-check": {
+      "title": "Read Custom PDF Metadata with Existence Check",
+      "filename": "read-custom-pdf-metadata-existence-check.cs",
+      "description": "Shows how to verify a PDF file exists and safely read a custom metadata key \"Confidential\" using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
         "metadata",
-        "validation",
-        "regex",
-        "aspose"
+        "custom",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileInfo",
-        "PdfFileInfo.Title",
-        "PdfFileInfo.Author",
-        "PdfFileInfo.SetMetaInfo",
-        "PdfFileInfo.SaveNewInfo",
-        "PdfFileInfo.CreationDate"
+        "Aspose.Pdf.Facades.PdfFileInfo.GetMetaInfo"
       ],
-      "difficulty": "intermediate",
+      "difficulty": "beginner",
       "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "read-pdf-author-metadata": {
+      "title": "Read PDF Author Metadata Using PdfFileInfo",
+      "filename": "read-pdf-author-metadata.cs",
+      "description": "Demonstrates how to open a PDF with Aspose.Pdf.Facades.PdfFileInfo and retrieve the Author metadata property, outputting it to the console.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "author",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "PdfFileInfo.Author"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "read-pdf-creator-metadata": {
+      "title": "Read PDF Creator Metadata",
+      "filename": "read-pdf-creator-metadata.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfFileInfo to retrieve the Creator metadata property from an existing PDF file.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "creator",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.Creator"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "read-pdf-metadata-add-blank-page": {
+      "title": "Read Pdf Metadata Add Blank Page",
+      "filename": "read-pdf-metadata-add-blank-page.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "read-pdf-metadata-safely": {
+      "title": "Read Pdf Metadata Safely",
+      "filename": "read-pdf-metadata-safely.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
     "read-pdf-metadata-with-null-handling": {
@@ -763,21 +488,276 @@
       "generated_at": "2026-08-20T07:54:21Z",
       "status": "verified"
     },
-    "update-pdf-subject-metadata": {
-      "title": "Update PDF Subject Metadata with PdfFileInfo",
-      "filename": "update-pdf-subject-metadata.cs",
-      "description": "Demonstrates how to modify the Subject field of a PDF's metadata using the Aspose.Pdf.Facades.PdfFileInfo class and save the changes to a new file.",
+    "read-pdf-modification-date": {
+      "title": "Read PDF Modification Date with PdfFileInfo",
+      "filename": "read-pdf-modification-date.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfFileInfo to obtain the ModDate metadata from a PDF and output it in a friendly format.",
       "tags": [
         "pdf",
         "metadata",
-        "subject",
+        "moddate",
         "aspose.pdf",
-        "facade"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.Subject",
+        "Aspose.Pdf.Facades.PdfFileInfo.ModDate",
+        "Aspose.Pdf.Facades.PdfFileInfo.Dispose"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "read-pdf-title-metadata-log": {
+      "title": "Read PDF Title Metadata and Write to Log",
+      "filename": "read-pdf-title-metadata-log.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileInfo to read the Title metadata from a PDF file and write the result to a log file.",
+      "tags": [
+        "metadata",
+        "pdf",
+        "title",
+        "logging",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.Title"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "read-pdf-version-using-aspose-pdf-facade": {
+      "title": "Read Pdf Version Using Aspose Pdf Facade",
+      "filename": "read-pdf-version-using-aspose-pdf-facade.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "read-pdf-version": {
+      "title": "Read PDF Version Using Aspose.Pdf Facade",
+      "filename": "read-pdf-version.cs",
+      "description": "Shows how to bind a PDF file with PdfFileInfo and retrieve its version string for later use.",
+      "tags": [
+        "pdf",
+        "version",
+        "aspose",
+        "facade",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileInfo.GetPdfVersion",
+        "Aspose.Pdf.Facades.SaveableFacade"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "read-update-pdf-metadata": {
+      "title": "Read and Update PDF Metadata",
+      "filename": "read-update-pdf-metadata.cs",
+      "description": "Demonstrates how to open a PDF, read its existing metadata, modify fields such as title and author, and save the updated information to a new file using Aspose.Pdf.",
+      "tags": [
+        "metadata",
+        "pdf",
+        "aspose",
+        "read",
+        "update"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "PdfFileInfo.BindPdf",
+        "PdfFileInfo.Title",
+        "PdfFileInfo.Author",
+        "PdfFileInfo.SaveNewInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "remove-custom-pdf-metadata-entry": {
+      "title": "Remove Custom PDF Metadata Entry",
+      "filename": "remove-custom-pdf-metadata-entry.cs",
+      "description": "Demonstrates how to delete a specific custom metadata field from a PDF by setting its value to an empty string using the PdfFileInfo facade.",
+      "tags": [
+        "metadata",
+        "pdf",
+        "remove",
+        "custom",
+        "Aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileInfo.SetMetaInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "retrieve-custom-pdf-metadata-alphabetically": {
+      "title": "Retrieve Custom Pdf Metadata Alphabetically",
+      "filename": "retrieve-custom-pdf-metadata-alphabetically.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "retrieve-custom-pdf-metadata-projectcode": {
+      "title": "Retrieve Custom Pdf Metadata Projectcode",
+      "filename": "retrieve-custom-pdf-metadata-projectcode.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "retrieve-custom-pdf-metadata-reviewedby": {
+      "title": "Retrieve Custom PDF Metadata (ReviewedBy)",
+      "filename": "retrieve-custom-pdf-metadata-reviewedby.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileInfo to read a custom metadata property from a PDF document and log its value.",
+      "tags": [
+        "metadata",
+        "pdf",
+        "aspose",
+        "custom-property",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.GetMetaInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "retrieve-custom-pdf-metadata": {
+      "title": "Retrieve Custom PDF Metadata (ProjectCode)",
+      "filename": "retrieve-custom-pdf-metadata.cs",
+      "description": "Shows how to read a custom metadata entry named \"ProjectCode\" from a PDF file using Aspose.Pdf.Facades.PdfFileInfo.",
+      "tags": [
+        "metadata",
+        "pdf",
+        "aspose",
+        "custom",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.GetMetaInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "retrieve-pdf-keywords-metadata": {
+      "title": "Retrieve PDF Keywords Metadata using PdfFileInfo",
+      "filename": "retrieve-pdf-keywords-metadata.cs",
+      "description": "Demonstrates how to open a PDF with Aspose.Pdf.Facades.PdfFileInfo and read the Keywords metadata property, then display it on the console.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "keywords",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.Keywords"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "retrieve-reviewedby-metadata": {
+      "title": "Retrieve Reviewedby Metadata",
+      "filename": "retrieve-reviewedby-metadata.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "set-pdf-creator-metadata": {
+      "title": "Set PDF Creator Metadata Using PdfFileInfo",
+      "filename": "set-pdf-creator-metadata.cs",
+      "description": "Demonstrates how to assign a custom Creator value to a PDF file by using Aspose.Pdf.Facades.PdfFileInfo and persisting the change with SaveNewInfo.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "creator",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.Creator",
         "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "set-pdf-document-id-using-guid": {
+      "title": "Set PDF Document ID Using GUID Metadata",
+      "filename": "set-pdf-document-id-using-guid.cs",
+      "description": "Generates a new GUID and stores it as a custom metadata entry (DocumentID) in a PDF using the PdfFileInfo facade. The updated PDF is saved with the new identifier.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "guid",
+        "aspose.pdf",
+        "document-id"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileInfo.SetMetaInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "set-pdf-document-id-using-pdffileinfo": {
+      "title": "Set Pdf Document Id Using Pdffileinfo",
+      "filename": "set-pdf-document-id-using-pdffileinfo.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "set-pdf-keywords-metadata": {
+      "title": "Set PDF Keywords Metadata Using PdfFileInfo",
+      "filename": "set-pdf-keywords-metadata.cs",
+      "description": "Demonstrates how to assign a Keywords metadata value to a PDF file with Aspose.Pdf.Facades.PdfFileInfo, save the updated document, and verify the change.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "keywords",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "PdfFileInfo.Keywords",
+        "PdfFileInfo.SaveNewInfo",
+        "PdfFileInfo.Dispose",
+        "PdfFileInfo (constructor)"
       ],
       "difficulty": "beginner",
       "generated_at": "2026-08-20T07:54:21Z",
@@ -805,46 +785,246 @@
       "generated_at": "2026-08-20T07:54:21Z",
       "status": "verified"
     },
-    "convert-pdf-to-pdfa-1b-using-pdffileinfo": {
-      "title": "Convert PDF to PDF/A-1B Using PdfFileInfo",
-      "filename": "convert-pdf-to-pdfa-1b-using-pdffileinfo.cs",
-      "description": "Demonstrates how to load a PDF with PdfFileInfo, convert it to PDF/A‑1B compliance, and save the archival‑ready file.",
+    "thread-safe-parallel-pdf-metadata-update": {
+      "title": "Thread‑Safe Parallel PDF Metadata Update with PdfFileInfo",
+      "filename": "thread-safe-parallel-pdf-metadata-update.cs",
+      "description": "Demonstrates processing multiple PDF files concurrently and safely updating their metadata using Aspose.Pdf.Facades.PdfFileInfo with per‑file locking.",
       "tags": [
-        "PDF/A",
-        "Aspose.Pdf",
+        "pdf",
+        "metadata",
+        "parallel",
+        "thread-safe",
+        "aspose"
+      ],
+      "apis_used": [
         "PdfFileInfo",
-        "conversion",
-        "archival"
+        "PdfFileInfo.BindPdf",
+        "PdfFileInfo.Title",
+        "PdfFileInfo.Author",
+        "PdfFileInfo.Subject",
+        "PdfFileInfo.SaveNewInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "thread-safe-pdf-metadata-update": {
+      "title": "Thread Safe Pdf Metadata Update",
+      "filename": "thread-safe-pdf-metadata-update.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "update-pdf-author-metadata-conditional": {
+      "title": "Update PDF Author Metadata Conditionally",
+      "filename": "update-pdf-author-metadata-conditional.cs",
+      "description": "Shows how to read a PDF's Author metadata with PdfFileInfo, set it only when the field is empty, and save the updated document.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "author",
+        "conditional",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Convert",
-        "Aspose.Pdf.PdfFormat",
-        "Aspose.Pdf.ConvertErrorAction",
+        "Aspose.Pdf.Facades.PdfFileInfo.Author",
         "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
       ],
       "difficulty": "beginner",
       "generated_at": "2026-08-20T07:54:21Z",
       "status": "verified"
     },
-    "set-pdf-document-id-using-guid": {
-      "title": "Set PDF Document ID Using GUID Metadata",
-      "filename": "set-pdf-document-id-using-guid.cs",
-      "description": "Generates a new GUID and stores it as a custom metadata entry (DocumentID) in a PDF using the PdfFileInfo facade. The updated PDF is saved with the new identifier.",
+    "update-pdf-author-metadata": {
+      "title": "Update PDF Author Metadata with PdfFileInfo",
+      "filename": "update-pdf-author-metadata.cs",
+      "description": "Demonstrates how to modify the Author property of a PDF file using the Aspose.Pdf.Facades.PdfFileInfo class and persist the changes to a new file with SaveNewInfo.",
       "tags": [
         "pdf",
         "metadata",
-        "guid",
+        "author",
         "aspose.pdf",
-        "document-id"
+        "facade"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileInfo.SetMetaInfo",
+        "PdfFileInfo.Author",
+        "PdfFileInfo.SaveNewInfo",
+        "PdfFileInfo.Dispose",
+        "PdfFileInfo(string)"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "update-pdf-keywords-metadata": {
+      "title": "Update PDF Keywords Metadata Using PdfFileInfo",
+      "filename": "update-pdf-keywords-metadata.cs",
+      "description": "Demonstrates how to open a PDF from a stream with Aspose.Pdf.Facades.PdfFileInfo, modify the Keywords metadata, and save the updated document to a new file.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "keywords",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.Keywords",
         "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "update-pdf-metadata-audit": {
+      "title": "Update Pdf Metadata Audit",
+      "filename": "update-pdf-metadata-audit.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "update-pdf-metadata-in-parallel": {
+      "title": "Update Pdf Metadata In Parallel",
+      "filename": "update-pdf-metadata-in-parallel.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "update-pdf-metadata-memorystream": {
+      "title": "Update PDF Metadata Using MemoryStream and PdfFileInfo",
+      "filename": "update-pdf-metadata-memorystream.cs",
+      "description": "Demonstrates loading a PDF into a MemoryStream, modifying its metadata with PdfFileInfo, and saving the updated document to a new file.",
+      "tags": [
+        "metadata",
+        "pdf",
+        "memorystream",
+        "aspose-pdf",
+        "facades"
+      ],
+      "apis_used": [
+        "PdfFileInfo",
+        "PdfFileInfo.Title",
+        "PdfFileInfo.Author",
+        "PdfFileInfo.SetMetaInfo",
+        "PdfFileInfo.SaveNewInfo"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "update-pdf-metadata-save-new-file": {
+      "title": "Update PDF Metadata and Save to New File",
+      "filename": "update-pdf-metadata-save-new-file.cs",
+      "description": "Demonstrates how to modify PDF metadata such as title, author, subject, keywords, creator, and modification date using Aspose.Pdf.Facades.PdfFileInfo and save the updated information to a new PDF file.",
+      "tags": [
+        "metadata",
+        "pdf",
+        "aspose",
+        "csharp",
+        "save"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "PdfFileInfo.Title",
+        "PdfFileInfo.Author",
+        "PdfFileInfo.Subject",
+        "PdfFileInfo.Keywords",
+        "PdfFileInfo.Creator",
+        "PdfFileInfo.ModDate",
+        "PdfFileInfo.SaveNewInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "update-pdf-metadata-using-memorystream": {
+      "title": "Update Pdf Metadata Using Memorystream",
+      "filename": "update-pdf-metadata-using-memorystream.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "update-pdf-subject-metadata": {
+      "title": "Update PDF Subject Metadata with PdfFileInfo",
+      "filename": "update-pdf-subject-metadata.cs",
+      "description": "Demonstrates how to modify the Subject field of a PDF's metadata using the Aspose.Pdf.Facades.PdfFileInfo class and save the changes to a new file.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "subject",
+        "aspose.pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.Subject",
+        "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "update-pdf-title-metadata": {
+      "title": "Update PDF Title Metadata using PdfFileInfo",
+      "filename": "update-pdf-title-metadata.cs",
+      "description": "Demonstrates how to modify the Title property of a PDF file using Aspose.Pdf.Facades.PdfFileInfo and save the changes to a new document.",
+      "tags": [
+        "metadata",
+        "title",
+        "pdf",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.Title",
+        "Aspose.Pdf.Facades.PdfFileInfo.SaveNewInfo"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:54:21Z",
+      "status": "verified"
+    },
+    "validate-pdf-metadata-with-regex": {
+      "title": "Validate Pdf Metadata With Regex",
+      "filename": "validate-pdf-metadata-with-regex.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "validate-set-pdf-metadata-with-regex": {
+      "title": "Validate and Set PDF Metadata with Regex using PdfFileInfo",
+      "filename": "validate-set-pdf-metadata-with-regex.cs",
+      "description": "The example loads a PDF with Aspose.Pdf.Facades.PdfFileInfo, validates each metadata value against a regular expression, sets standard and custom properties, and saves the updated file.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "validation",
+        "regex",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "PdfFileInfo.Title",
+        "PdfFileInfo.Author",
+        "PdfFileInfo.SetMetaInfo",
+        "PdfFileInfo.SaveNewInfo",
+        "PdfFileInfo.CreationDate"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T07:54:21Z",
