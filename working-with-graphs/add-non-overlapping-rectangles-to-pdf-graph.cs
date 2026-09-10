@@ -7,87 +7,78 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "graph.pdf";
-
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a single page to host the graph
+            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Graph container (width, height) – acts as a canvas for vector shapes
-            // Use the double‑based constructor (the float overload is obsolete)
-            Graph graph = new Graph(500.0, 500.0);
+            // Create a Graph container that matches the page size (Graph constructor accepts double values)
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Keep track of occupied page‑level rectangles to detect overlaps
-            List<Aspose.Pdf.Rectangle> occupied = new List<Aspose.Pdf.Rectangle>();
+            // Keep track of rectangles that have already been placed
+            List<Aspose.Pdf.Rectangle> placedBounds = new List<Aspose.Pdf.Rectangle>();
 
-            // Define rectangles with varying positions and sizes
-            var rectSpecs = new[]
+            // Define a set of rectangles with varying positions and sizes
+            var rectSpecs = new (double llx, double lly, double width, double height)[]
             {
-                new { LLX = 50.0,  LLY = 400.0, Width = 100.0, Height = 80.0 },
-                new { LLX = 200.0, LLY = 350.0, Width = 150.0, Height = 120.0 },
-                new { LLX = 120.0, LLY = 200.0, Width = 80.0,  Height = 60.0 },
-                new { LLX = 300.0, LLY = 100.0, Width = 120.0, Height = 90.0 }
+                (100, 500, 150, 80),
+                (200, 400, 120, 100),
+                (300, 600, 200, 150),
+                (120, 520, 80, 60),
+                (400, 300, 100, 200)
             };
 
+            // Iterate over each rectangle specification
             foreach (var spec in rectSpecs)
             {
-                // Build a page‑level rectangle for bounds checking (double constructor is fine)
-                Aspose.Pdf.Rectangle bounds = new Aspose.Pdf.Rectangle(
-                    spec.LLX,
-                    spec.LLY,
-                    spec.LLX + spec.Width,
-                    spec.LLY + spec.Height);
+                // Compute the upper‑right coordinates
+                double urx = spec.llx + spec.width;
+                double ury = spec.lly + spec.height;
 
-                // Verify that the new rectangle does not intersect any existing one
+                // Create a bounding rectangle for overlap checking (Aspose.Pdf.Rectangle uses double)
+                Aspose.Pdf.Rectangle candidateBounds = new Aspose.Pdf.Rectangle(spec.llx, spec.lly, urx, ury);
+
+                // Check against all previously placed rectangles
                 bool overlaps = false;
-                foreach (var existing in occupied)
+                foreach (var existing in placedBounds)
                 {
-                    if (bounds.IsIntersect(existing))
+                    if (candidateBounds.IsIntersect(existing))
                     {
                         overlaps = true;
                         break;
                     }
                 }
 
+                // If no overlap, add the rectangle shape to the graph
                 if (!overlaps)
                 {
-                    // Record the rectangle as occupied
-                    occupied.Add(bounds);
+                    // Drawing.Rectangle constructor expects float values (left, bottom, width, height)
+                    Aspose.Pdf.Drawing.Rectangle shape = new Aspose.Pdf.Drawing.Rectangle(
+                        (float)spec.llx,
+                        (float)spec.lly,
+                        (float)spec.width,
+                        (float)spec.height);
 
-                    // Create the drawing rectangle (shape) – the constructor expects float values
-                    var shape = new Aspose.Pdf.Drawing.Rectangle(
-                        (float)spec.LLX,
-                        (float)spec.LLY,
-                        (float)spec.Width,
-                        (float)spec.Height);
-
-                    // Set visual appearance via GraphInfo (FillColor, Border Color, LineWidth)
+                    // Set visual appearance via GraphInfo (LineWidth is a float)
                     shape.GraphInfo = new GraphInfo
                     {
                         FillColor = Aspose.Pdf.Color.LightGray,
                         Color = Aspose.Pdf.Color.Black,
-                        LineWidth = 1f // float literal
+                        LineWidth = 1f
                     };
 
-                    // Add the shape to the graph
+                    // Add shape to the graph and record its bounds
                     graph.Shapes.Add(shape);
-                }
-                else
-                {
-                    // Overlap detected – skip or handle as needed
-                    Console.WriteLine($"Skipped overlapping rectangle at ({spec.LLX}, {spec.LLY}).");
+                    placedBounds.Add(candidateBounds);
                 }
             }
 
-            // Attach the graph to the page
+            // Add the graph (containing all non‑overlapping rectangles) to the page
             page.Paragraphs.Add(graph);
 
-            // Persist the PDF
-            doc.Save(outputPath);
+            // Save the PDF
+            doc.Save("output.pdf");
         }
-
-        Console.WriteLine($"Graph PDF saved to '{outputPath}'.");
     }
 }

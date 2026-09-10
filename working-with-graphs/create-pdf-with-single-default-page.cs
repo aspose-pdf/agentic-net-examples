@@ -1,22 +1,12 @@
-using System;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// create pdf with single default page
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/working-with-graphs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string outputPath = "output.pdf";
-
-        // Create a new empty PDF document and ensure proper disposal
-        using (Document doc = new Document())
-        {
-            // Add a single default‑size page (A4 is the default page size)
-            doc.Pages.Add();
-
-            // Save the document as PDF
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"PDF created at '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

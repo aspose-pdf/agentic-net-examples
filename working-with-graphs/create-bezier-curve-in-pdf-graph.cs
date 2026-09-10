@@ -6,44 +6,43 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a blank page
+            // Add a blank page (1‑based indexing)
             Page page = doc.Pages.Add();
 
-            // Create a Graph container (width: 400, height: 200)
-            Graph graph = new Graph(400, 200);
+            // Create a graph container with desired dimensions
+            Graph graph = new Graph(500, 400);
 
-            // Define four control points for the Bezier curve (8 float values)
+            // Define four control points for the Bezier curve
+            // (x0, y0), (x1, y1), (x2, y2), (x3, y3)
             float[] controlPoints = new float[]
             {
-                50f, 150f,   // P0
-                150f, 250f,  // P1
-                250f, 50f,   // P2
-                350f, 150f   // P3
+                100f, 300f, // first point
+                150f, 350f, // second point
+                250f, 250f, // third point
+                300f, 300f  // fourth point
             };
 
-            // Create the Curve shape with the control points
+            // Create the curve shape using the control points
             Curve bezier = new Curve(controlPoints);
 
             // Set stroke color and line width via GraphInfo
             bezier.GraphInfo = new GraphInfo
             {
-                Color = Aspose.Pdf.Color.Blue,
+                Color = Color.Blue, // stroke color
                 LineWidth = 2
             };
 
             // Add the curve to the graph
             graph.Shapes.Add(bezier);
 
-            // Add the graph to the page
+            // Add the graph to the page's content
             page.Paragraphs.Add(graph);
 
-            // Save the PDF
+            // Save the PDF document
             doc.Save("BezierCurve.pdf");
         }
-
-        Console.WriteLine("PDF with Bezier curve created successfully.");
     }
 }

@@ -10,39 +10,37 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "rotated_graph.pdf";
 
-        if (!File.Exists(inputPath))
+        using (Document doc = File.Exists(inputPath) ? new Document(inputPath) : new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Ensure at least one page exists
+            if (doc.Pages.Count == 0)
+                doc.Pages.Add();
 
-        // Load the PDF document inside a using block (lifecycle rule)
-        using (Document doc = new Document(inputPath))
-        {
-            // Create a Graph container (width, height)
-            Graph graph = new Graph(200, 200);
+            Page page = doc.Pages[1];
 
-            // Apply rotation in degrees (e.g., 45°) via GraphInfo.RotationAngle
-            graph.GraphInfo.RotationAngle = 45; // degrees
+            // Graph container – constructor expects double values
+            Graph graph = new Graph(400.0, 200.0);
 
-            // Add a sample rectangle shape to the graph
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0, 0, 100, 50);
+            // Apply rotation (degrees) to the whole graph
+            graph.GraphInfo.RotationAngle = 45.0;
+
+            // Rectangle shape to visualise the rotation – use Aspose.Pdf.Drawing.Rectangle
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 100f, 50f);
             rect.GraphInfo = new GraphInfo
             {
                 FillColor = Color.LightGray,
                 Color = Color.Black,
-                LineWidth = 1
+                LineWidth = 1f
             };
             graph.Shapes.Add(rect);
 
-            // Add the graph to the first page of the document
-            Page page = doc.Pages[1];
+            // Add the graph to the page
             page.Paragraphs.Add(graph);
 
-            // Save the modified PDF (PDF format, no extra SaveOptions needed)
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Rotated graph PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Saved rotated graph PDF to '{outputPath}'.");
     }
 }

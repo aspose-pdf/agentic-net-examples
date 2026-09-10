@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -9,44 +10,52 @@ class Program
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a single page
             Page page = doc.Pages.Add();
 
-            // Create a footer and assign it to the page
+            // Configure the page footer
             HeaderFooter footer = new HeaderFooter();
 
-            // Set footer margins (e.g., 20 points from the bottom edge)
-            footer.Margin = new MarginInfo { Bottom = 20 };
-
-            // Attach the footer to the page
-            page.Footer = footer;
-
-            // Create a graph with a specific size (width = 200 pt, height = 100 pt)
-            // Use the double‑parameter constructor as the float overload is obsolete
-            Graph graph = new Graph(200.0, 100.0);
-
-            // Position the graph within the footer using its own margins
-            graph.Margin = new MarginInfo { Left = 30, Bottom = 5 };
-
-            // Center the graph horizontally within the footer area
-            graph.HorizontalAlignment = HorizontalAlignment.Center;
-
-            // Add a rectangle shape to the graph as a visual element
-            // Use Aspose.Pdf.Drawing.Rectangle (not Aspose.Pdf.Rectangle) and float values
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 200f, 100f);
-            rect.GraphInfo = new GraphInfo
+            // Set footer margins (using page margins as reference)
+            footer.Margin = new MarginInfo
             {
-                FillColor = Color.LightGray,
-                Color = Color.Black,
-                LineWidth = 1f
+                Bottom = 20,   // distance from the bottom edge of the page
+                Left   = 20,   // distance from the left edge
+                Right  = 20,   // distance from the right edge
+                Top    = 0     // no extra top margin inside the footer area
             };
-            graph.Shapes.Add(rect);
+
+            // Create a Graph object (width, height in points)
+            Graph graph = new Graph(200, 100);
+
+            // Define visual appearance of the graph
+            graph.GraphInfo = new GraphInfo
+            {
+                FillColor = Aspose.Pdf.Color.LightGray,
+                Color     = Aspose.Pdf.Color.Black,
+                LineWidth = 1
+            };
+
+            // Add a simple rectangle shape to the graph
+            Aspose.Pdf.Drawing.Rectangle shapeRect = new Aspose.Pdf.Drawing.Rectangle(0, 0, 200, 100);
+            shapeRect.GraphInfo = new GraphInfo
+            {
+                FillColor = Aspose.Pdf.Color.Yellow,
+                Color     = Aspose.Pdf.Color.DarkBlue,
+                LineWidth = 1
+            };
+            graph.Shapes.Add(shapeRect);
 
             // Add the graph to the footer's paragraph collection
             footer.Paragraphs.Add(graph);
 
+            // Assign the configured footer to the page
+            page.Footer = footer;
+
             // Save the PDF document
             doc.Save("GraphInFooter.pdf");
         }
+
+        Console.WriteLine("PDF with graph in footer created successfully.");
     }
 }

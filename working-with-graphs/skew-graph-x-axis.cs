@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -7,49 +6,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
         const string outputPath = "skewed_graph.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and ensure deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a single page to the document
+            Page page = doc.Pages.Add();
 
-        // Load the PDF document (use using for proper disposal)
-        using (Document doc = new Document(inputPath))
-        {
-            // Get the first page (page indexing is 1‑based)
-            Page page = doc.Pages[1];
+            // Create a Graph container (width, height) that will hold vector shapes
+            // Use the double‑precision constructor as the float overload is obsolete
+            Graph graph = new Graph(400.0, 200.0);
 
-            // Create a graph – the constructor now expects double values
-            Graph graph = new Graph(200.0, 100.0);
+            // Configure GraphInfo to apply a skew on the X‑axis (e.g., 30 degrees)
+            graph.GraphInfo = new GraphInfo
+            {
+                SkewAngleX = 30
+            };
 
-            // Apply a skew on the X axis (float value)
-            graph.GraphInfo.SkewAngleX = 30f;
-
-            // Optional visual styling for the graph background
-            graph.GraphInfo.FillColor = Color.LightGray;
-            graph.GraphInfo.Color = Color.Black;
-            graph.GraphInfo.LineWidth = 1f;
-
-            // Add a rectangle shape inside the graph to illustrate the skew effect
-            var rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 200f, 100f);
+            // Create a rectangle shape to demonstrate the skew
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0, 0, 200, 100);
+            // Set visual styling via the shape's GraphInfo (FillColor, Border Color, LineWidth)
             rect.GraphInfo = new GraphInfo
             {
-                FillColor = Color.Yellow,
-                Color = Color.DarkBlue,
-                LineWidth = 2f
+                FillColor = Color.LightGray,
+                Color = Color.Black,
+                LineWidth = 2
             };
+            // Add the rectangle to the graph's shape collection
             graph.Shapes.Add(rect);
+
+            // Position the graph on the page (optional). Graph does not expose a Bottom property;
+            // positioning can be done via Left and Top (or simply rely on the default placement).
+            graph.Left = 100;
+            // graph.Top = 400; // Uncomment if you need to set the vertical position explicitly.
 
             // Add the graph to the page's paragraph collection
             page.Paragraphs.Add(graph);
 
-            // Save the modified PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Skewed graph PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }
