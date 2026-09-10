@@ -16,19 +16,22 @@ class Program
             return;
         }
 
-        // Load the existing PDF inside a using block for proper disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a JavaScript action that shows an alert dialog
-            JavascriptAction jsAction = new JavascriptAction("app.alert('Document opened');");
+            // JavaScript to display an alert when the document opens
+            string script = "app.alert('Document opened!');";
 
-            // Assign the action to be executed when the document is opened
+            // Create a JavascriptAction with the script
+            JavascriptAction jsAction = new JavascriptAction(script);
+
+            // Assign the action to the document's OpenAction property
             doc.OpenAction = jsAction;
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with JavaScript open action to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with JavaScript action: {outputPath}");
     }
 }

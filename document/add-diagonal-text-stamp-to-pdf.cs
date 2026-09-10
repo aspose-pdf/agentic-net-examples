@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // required for FontRepository and TextState
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -11,31 +11,29 @@ class Program
         const string outputPath = "output.pdf";
         const string message    = "CONFIDENTIAL";
 
+        // Ensure the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TextStamp with the custom message
+            // Create a TextStamp that will display the custom message
             TextStamp stamp = new TextStamp(message);
 
             // Configure visual appearance of the stamp
             stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-            stamp.TextState.FontSize = 72;                     // large font size
-            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
-            stamp.Opacity = 0.5;                               // semi‑transparent
-            stamp.Background = false;                          // draw on top of page content
+            stamp.TextState.FontSize = 72;                                   // Large font size
+            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red;          // Text color
+            stamp.HorizontalAlignment = HorizontalAlignment.Center;          // Center horizontally
+            stamp.VerticalAlignment   = VerticalAlignment.Center;            // Center vertically
+            stamp.RotateAngle = -45;                                          // Diagonal across the page
+            stamp.Opacity = 0.3f;                                             // Semi‑transparent
 
-            // Position the stamp so it runs across the page diagonally
-            stamp.RotateAngle = 45;                            // rotate 45 degrees
-            stamp.HorizontalAlignment = HorizontalAlignment.Center;
-            stamp.VerticalAlignment   = VerticalAlignment.Center;
-
-            // Apply the stamp to each page in the document
+            // Apply the stamp to every page in the document
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(stamp);

@@ -6,20 +6,22 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        // Verify the file exists before attempting to load it
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF file into a Document instance.
-        // The using block ensures the Document is disposed properly.
-        using (Document doc = new Document(inputPath))
+        // Load the PDF into a Document instance.
+        // The using block ensures the Document is disposed properly,
+        // releasing file handles and other resources.
+        using (Document pdfDoc = new Document(pdfPath))
         {
             // The document is now ready for further processing.
-            Console.WriteLine($"PDF loaded successfully. Page count: {doc.Pages.Count}");
+            Console.WriteLine($"PDF loaded successfully. Page count: {pdfDoc.Pages.Count}");
         }
     }
 }

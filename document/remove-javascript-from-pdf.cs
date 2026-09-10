@@ -3,12 +3,12 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-class RemoveJavaScript
+class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_no_js.pdf";
+        const string outputPath = "output_clean.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,43 +19,32 @@ class RemoveJavaScript
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // ----- Remove document‑level JavaScript actions -----
-            // Clear the document OpenAction (executed when the PDF is opened).
+            // ----- Remove document‑level JavaScript -----
             doc.OpenAction = null;
 
-            // ----- Remove page‑level JavaScript actions -----
+            // ----- Remove page‑level JavaScript -----
             foreach (Page page in doc.Pages)
             {
-                // Page actions only expose OnOpen and OnClose.
                 page.Actions.OnOpen = null;
                 page.Actions.OnClose = null;
             }
 
-            // ----- Remove JavaScript actions from annotations -----
-            // Iterate all pages and their annotations.
+            // ----- Remove JavaScript from link annotations -----
             foreach (Page page in doc.Pages)
             {
-                // Annotation collections are 1‑based.
                 for (int i = 1; i <= page.Annotations.Count; i++)
                 {
-                    Annotation annotation = page.Annotations[i];
-
-                    // Only LinkAnnotation (and its subclasses) expose the Action property.
-                    if (annotation is LinkAnnotation linkAnnotation)
+                    if (page.Annotations[i] is LinkAnnotation link && link.Action is JavascriptAction)
                     {
-                        // If the action is a JavaScript action, clear it.
-                        if (linkAnnotation.Action is JavascriptAction)
-                        {
-                            linkAnnotation.Action = null;
-                        }
+                        link.Action = null;
                     }
                 }
             }
 
-            // Save the cleaned PDF.
+            // Save the cleaned PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"JavaScript removed. Clean PDF saved to '{outputPath}'.");
+        Console.WriteLine($"JavaScript removed. Saved to '{outputPath}'.");
     }
 }

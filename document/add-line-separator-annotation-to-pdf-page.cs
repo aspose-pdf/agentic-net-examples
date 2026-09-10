@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,22 +16,27 @@ class Program
             return;
         }
 
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            // Select the page where the separator will be placed (first page in this example)
             Page page = doc.Pages[1];
 
-            // Define a zero‑size rectangle; the line geometry is defined by start/end points
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
+            // Define start and end points of the line (coordinates are in points)
+            Aspose.Pdf.Point start = new Aspose.Pdf.Point(50, 750);
+            Aspose.Pdf.Point end   = new Aspose.Pdf.Point(550, 750);
 
-            // Define start and end points for the separator line
-            Aspose.Pdf.Point start = new Aspose.Pdf.Point(50, 500);
-            Aspose.Pdf.Point end   = new Aspose.Pdf.Point(550, 500);
+            // Define a rectangle that encloses the line (required by the constructor)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 750, 550, 750);
 
-            // Create the line annotation first, then set its properties separately
-            LineAnnotation line = new LineAnnotation(page, rect, start, end);
-            line.Color = Aspose.Pdf.Color.Gray;                     // line colour
-            line.Border = new Border(line) { Width = 1 };            // line width via Border
+            // Create the line annotation
+            LineAnnotation line = new LineAnnotation(page, rect, start, end)
+            {
+                Color = Aspose.Pdf.Color.Gray
+            };
+
+            // Set line width via Border (requires the parent annotation in the constructor)
+            line.Border = new Border(line) { Width = 1 };
 
             // Add the annotation to the page
             page.Annotations.Add(line);

@@ -15,20 +15,20 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block (ensures proper disposal)
+        // Load the existing PDF, modify its metadata, and save it.
         using (Document doc = new Document(inputPath))
         {
-            // Set creation and modification dates
+            // Set creation and modification dates.
             doc.Info.CreationDate = DateTime.Now;
             doc.Info.ModDate      = DateTime.Now;
 
-            // Set custom keywords (comma‑separated)
-            doc.Info.Keywords = "Aspose, PDF, Metadata, Example";
+            // Set custom keywords (semicolon‑separated list is typical).
+            doc.Info.Keywords = "example; Aspose.Pdf; metadata";
 
-            // Save the updated document
+            // Save the updated PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Document saved with updated properties to '{outputPath}'.");
     }
 }

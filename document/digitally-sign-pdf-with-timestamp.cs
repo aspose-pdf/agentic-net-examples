@@ -7,19 +7,16 @@ class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF and signing certificate
-        const string inputPdf   = "input.pdf";
-        const string outputPdf  = "signed_output.pdf";
-        const string certPath   = "certificate.pfx";
-        const string certPass   = "password";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed_output.pdf";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "password";
+        const string tsaUrl = "https://freetsa.org/tsr"; // Trusted Time‑Stamp Authority URL
+        const string tsaCredentials = "user:pass";      // "username:password"
 
-        // Time‑Stamp Authority (TSA) details
-        const string tsaUrl      = "https://tsa.example.com";          // replace with a real TSA URL
-        const string tsaCreds    = "tsaUser:tsaPassword";              // "username:password"
-
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
         if (!File.Exists(certPath))
@@ -28,39 +25,34 @@ class Program
             return;
         }
 
-        // Open the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document (lifecycle rule: using block)
+        using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle where the signature will appear (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
             // Create a signature field on the first page
-            SignatureField sigField = new SignatureField(doc.Pages[1], sigRect)
-            {
-                PartialName = "Signature1"   // optional field name
-            };
+            // Fully qualified Rectangle avoids ambiguity with System.Drawing
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            SignatureField sigField = new SignatureField(doc.Pages[1], rect);
+            doc.Form.Add(sigField);
 
-            // Create a PKCS#7 signature object using the certificate
-            PKCS7 pkcs7 = new PKCS7(certPath, certPass)
-            {
-                Reason      = "Approved for release",
-                ContactInfo = "contact@example.com",
-                Location    = "New York"
-            };
+            // Create a PKCS#7 signature using the PFX certificate
+            PKCS7 pkcs7 = new PKCS7(certPath, certPassword);
+            pkcs7.Reason = "Approved";
+            pkcs7.Location = "Office";
+            pkcs7.ContactInfo = "contact@example.com";
 
-            // Attach timestamp settings (TSA) to the signature
-            pkcs7.TimestampSettings = new TimestampSettings(tsaUrl, tsaCreds);
+            // Attach timestamp settings from a trusted TSA
+            pkcs7.TimestampSettings = new TimestampSettings(
+                tsaUrl,
+                tsaCredentials,
+                DigestHashAlgorithm.Sha256);
 
-            // Sign the document using the signature field
+            // Sign the field with the configured signature
             sigField.Sign(pkcs7);
 
-            // Add the signature field to the page annotations collection
-            doc.Pages[1].Annotations.Add(sigField);
-
-            // Save the signed PDF
-            doc.Save(outputPdf);
+            // Save the signed PDF (lifecycle rule: using block)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document signed and saved to '{outputPdf}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
     }
 }

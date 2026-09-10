@@ -1,13 +1,12 @@
 using System;
 using System.IO;
-using System.Drawing;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "scanned_input.pdf";   // scanned PDF with image pages
+        const string inputPdf  = "scanned_input.pdf";
         const string outputPdf = "searchable_output.pdf";
 
         if (!File.Exists(inputPdf))
@@ -16,23 +15,22 @@ class Program
             return;
         }
 
-        // Load the scanned PDF
+        // Load the scanned PDF (image‑only pages)
         using (Document doc = new Document(inputPdf))
         {
-            // Perform OCR conversion – the second argument indicates whether to flatten images.
-            // 'false' keeps the original images and adds an invisible text layer.
-            // The Convert method accepts a delegate that receives the page image and must return HOCR XML.
-            // Here we use a simple lambda; replace the body with a real OCR implementation.
-            doc.Convert(
-                image =>
-                {
-                    // TODO: perform OCR on 'image' and return HOCR string.
-                    // Returning an empty string results in no overlay text.
-                    return string.Empty;
-                },
-                flattenImages: false);
+            // Perform OCR conversion: overlay invisible text (HOCR) on the scanned pages.
+            // The second argument indicates whether to flatten images (false keeps original images).
+            // The lambda receives the image bytes of each page and should return HOCR XML.
+            // In a real scenario you would call an OCR engine here.
+            doc.Convert((imageBytes, pageNumber) =>
+            {
+                // imageBytes – raw image data of the page
+                // pageNumber – 1‑based page index
+                // TODO: integrate an OCR service and return HOCR markup.
+                return string.Empty; // placeholder – no overlay text
+            }, flattenImages: false);
 
-            // Save the searchable PDF
+            // Save the resulting searchable PDF.
             doc.Save(outputPdf);
         }
 

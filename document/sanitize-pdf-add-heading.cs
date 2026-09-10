@@ -8,12 +8,12 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "clean_navigable.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
@@ -24,30 +24,25 @@ class Program
             AutoTaggingSettings.Default.EnableAutoTagging = true;
             AutoTaggingSettings.Default.HeadingRecognitionStrategy = HeadingRecognitionStrategy.Auto;
 
-            // Access the tagged‑content API
+            // Access tagged‑content API
             ITaggedContent tagged = doc.TaggedContent;
             tagged.SetLanguage("en-US");
             tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Root element of the structure tree
+            // Root of the structure tree
             StructureElement root = tagged.RootElement;
 
-            // Create a top‑level heading (H1) for the document title
-            HeaderElement h1 = tagged.CreateHeaderElement(1);
-            h1.SetText("Document Title");
-            root.AppendChild(h1);
+            // Create a top‑level heading (e.g., H1) for the document title
+            HeaderElement titleHeader = tagged.CreateHeaderElement(1);
+            titleHeader.SetText("Document Title");
+            root.AppendChild(titleHeader);
 
-            // Create a second‑level heading (H2) for a section
-            HeaderElement h2 = tagged.CreateHeaderElement(2);
-            h2.SetText("Section 1");
-            root.AppendChild(h2);
-
-            // Add a paragraph under the second heading
+            // Add a paragraph under the heading
             ParagraphElement para = tagged.CreateParagraphElement();
-            para.SetText("This is the first paragraph of Section 1.");
+            para.SetText("This PDF has been sanitized and structured for better navigation.");
             root.AppendChild(para);
 
-            // Save the cleaned, navigable PDF
+            // Save the resulting PDF
             doc.Save(outputPath);
         }
 

@@ -23,36 +23,34 @@ class Program
             return;
         }
 
-        // Load the source document
+        // Load the document (lifecycle rule: use using)
         using (Document doc = new Document(inputPdf))
         {
             // Choose the page where the link will be placed (first page in this example)
             Page page = doc.Pages[1];
 
-            // Define the clickable rectangle (coordinates are in points; lower‑left origin)
-            // Fully qualify to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the clickable rectangle (fully qualified to avoid ambiguity)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
             // Create the link annotation
-            LinkAnnotation link = new LinkAnnotation(page, linkRect)
+            LinkAnnotation link = new LinkAnnotation(page, rect)
             {
-                // Optional visual appearance
+                // Optional visual styling
                 Color = Aspose.Pdf.Color.Blue,
                 Contents = "Open attached PDF"
             };
 
-            // Set the action to open the external PDF file.
-            // GoToRemoteAction opens a PDF document at the specified page.
-            // Here we open page 1 of the attachment.
+            // Set the action to open the external PDF file at its first page
+            // GoToRemoteAction opens a PDF document (remotePdf) and jumps to a page number.
             link.Action = new GoToRemoteAction(attachment, 1);
 
             // Add the annotation to the page
             page.Annotations.Add(link);
 
-            // Save the modified document
+            // Save the modified document (lifecycle rule: use using, then Save)
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with link annotation saved to '{outputPdf}'.");
+        Console.WriteLine($"Link annotation added. Output saved to '{outputPdf}'.");
     }
 }

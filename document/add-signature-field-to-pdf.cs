@@ -3,7 +3,6 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;
 
 class AddSignatureField
 {
@@ -18,36 +17,29 @@ class AddSignatureField
             return;
         }
 
-        // Load the PDF document
+        // Load the existing PDF (lifecycle: using block ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the form object exists
-            Form form = doc.Form;
-
-            // Set a default appearance for all form fields (font, size, color)
-            // DefaultAppearance.Font is read‑only; use the constructor that accepts font name, size and color.
-            form.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
-
-            // Define the rectangle where the signature field will be placed (llx, lly, urx, ury)
-            // Fully qualify to avoid ambiguity with System.Drawing.Rectangle.
+            // Define the rectangle for the signature field (left, bottom, right, top)
             Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create a new signature field on the first page
+            // Create a signature field on the first page
             SignatureField sigField = new SignatureField(doc.Pages[1], sigRect)
             {
-                Name = "UserSignature",               // field name
-                AlternateName = "Sign Here",          // tooltip shown in Acrobat
-                Color = Aspose.Pdf.Color.LightGray   // border color (optional)
+                // Set a logical name for the field (used in form data)
+                Name = "UserSignature",
+                // Set the default appearance to match the document style
+                // Use the constructor overload because DefaultAppearance.Font is read‑only
+                DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black)
             };
 
-            // Add the signature field to the form on page 1
-            form.Add(sigField, 1);
+            // Add the field to the form on page 1
+            doc.Form.Add(sigField, 1);
 
-            // Add an additional appearance for the field (optional, matches document style)
-            // This places another visual representation of the field on the same page.
-            form.AddFieldAppearance(sigField, 1, sigRect);
+            // Optionally add an additional appearance (ensures the field is visible)
+            doc.Form.AddFieldAppearance(sigField, 1, sigRect);
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle: save inside using block)
             doc.Save(outputPath);
         }
 

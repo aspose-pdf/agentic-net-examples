@@ -1,38 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+// URL-STABILITY STUB
+//
+// remove annotations attachments from pdf
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/document/remove-annotations-and-attachments.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "cleaned.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF, process, and save within a using block for proper disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Remove all annotations (comments, markup, etc.)
-            // The simple overload flattens and discards annotations.
-            doc.Flatten();
-
-            // Remove all embedded files (attachments)
-            doc.EmbeddedFiles.Delete();
-
-            // Optional: clean up unused resources after removals
-            doc.OptimizeResources();
-
-            // Save the cleaned PDF
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"PDF cleaned and saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

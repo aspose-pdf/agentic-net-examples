@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 
 class Program
@@ -8,33 +7,10 @@ class Program
     {
         const string inputPath = "input.pdf";
 
-        // Create a sample PDF with outlines if it does not already exist
-        if (!File.Exists(inputPath))
+        if (!System.IO.File.Exists(inputPath))
         {
-            using (Document seed = new Document())
-            {
-                // Add a blank page (required for a valid PDF)
-                seed.Pages.Add();
-
-                // Create a top‑level outline entry
-                OutlineItemCollection top = new OutlineItemCollection(seed.Outlines)
-                {
-                    Title = "Chapter 1",
-                    Open = true
-                };
-                seed.Outlines.Add(top);
-
-                // Create a child outline entry under the top‑level one
-                OutlineItemCollection child = new OutlineItemCollection(seed.Outlines)
-                {
-                    Title = "Section 1.1",
-                    Open = false
-                };
-                top.Add(child);
-
-                // Save the seed PDF so the later load has a file to read
-                seed.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
         // Load the PDF document
@@ -42,31 +18,33 @@ class Program
         {
             OutlineCollection outlines = doc.Outlines;
 
-            // Verify that the document contains outline entries
-            if (outlines == null || outlines.Count == 0)
+            if (outlines.VisibleCount == 0)
             {
-                Console.WriteLine("No outline entries found in the document.");
+                Console.WriteLine("The document has no outline entries.");
                 return;
             }
 
-            // Iterate over top‑level outline items and print the hierarchy
-            foreach (OutlineItemCollection topItem in outlines)
+            Console.WriteLine("Document Outline:");
+            // Iterate over top‑level outline items
+            foreach (OutlineItemCollection item in outlines)
             {
-                PrintOutlineItem(topItem, 0);
+                PrintOutline(item, string.Empty);
             }
         }
     }
 
     // Recursively prints an outline item and its children with indentation
-    static void PrintOutlineItem(OutlineItemCollection item, int depth)
+    static void PrintOutline(OutlineItemCollection item, string indent)
     {
-        string indent = new string(' ', depth * 2);
-        Console.WriteLine($"{indent}- {item.Title}");
+        // Title may be null; fallback to empty string
+        string title = item.Title ?? "(no title)";
+        Console.WriteLine($"{indent}- {title}");
 
-        // Each OutlineItemCollection also acts as a collection of its child items
+        // Each OutlineItemCollection can contain child outline items.
+        // Iterate over them recursively.
         foreach (OutlineItemCollection child in item)
         {
-            PrintOutlineItem(child, depth + 1);
+            PrintOutline(child, indent + "  ");
         }
     }
 }

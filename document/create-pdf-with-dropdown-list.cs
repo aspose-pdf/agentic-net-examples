@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -11,37 +10,34 @@ class Program
         const string outputPath = "DropdownForm.pdf";
 
         // Sample items for the dropdown list
-        string[] items = { "Option A", "Option B", "Option C", "Option D" };
+        string[] dropdownItems = { "Option A", "Option B", "Option C", "Option D" };
 
-        // Create a new PDF document
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a blank page (required for placing the field)
+            // Add a blank page to the document
             Page page = doc.Pages.Add();
 
-            // Define the rectangle where the ComboBox (dropdown) will appear
-            // Rectangle(left, bottom, right, top)
-            // Here we want a box 200 points wide and 20 points high starting at (100,600)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 620);
+            // Define the rectangle where the dropdown will appear (llx, lly, urx, ury)
+            var rect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
 
-            // Create a ComboBox field on the specific page within the defined rectangle
-            ComboBoxField combo = new ComboBoxField(page, rect)
+            // Create a ComboBox (dropdown) field on the page
+            ComboBoxField comboBox = new ComboBoxField(page, rect)
             {
-                // Set a unique name for the field (used when accessing the field later)
-                PartialName = "SampleDropdown"
+                // Set a unique name for the field
+                PartialName = "SampleDropdown",
+                // Optional: set a default selected index (1‑based). 0 means no selection.
+                Selected = 0
             };
 
-            // Populate the dropdown with items from the array
-            foreach (string item in items)
+            // Populate the dropdown list with items from the array using AddOption
+            foreach (string item in dropdownItems)
             {
-                combo.AddOption(item);
+                comboBox.AddOption(item);
             }
 
-            // Optionally set a default selected value (index starts at 1)
-            combo.Selected = 1; // selects "Option A"
-
-            // Add the field to the form (required for the field to be part of the PDF form)
-            doc.Form.Add(combo);
+            // Add the field to the document's form collection (optional but explicit)
+            doc.Form.Add(comboBox);
 
             // Save the PDF document
             doc.Save(outputPath);

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
 using Aspose.Pdf.LogicalStructure;
@@ -9,27 +10,23 @@ class Program
     {
         const string outputPath = "heading.pdf";
 
-        // Create a new PDF document and ensure proper disposal
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
             // Access the tagged content API
-            ITaggedContent tagged = doc.TaggedContent;
-
-            // Optional: set language and title for the PDF
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle("Document with Heading");
+            ITaggedContent taggedContent = doc.TaggedContent;
 
             // Get the root structure element (no cast needed)
-            StructureElement root = tagged.RootElement;
+            StructureElement root = taggedContent.RootElement;
 
             // Create a Level 1 heading element
-            HeaderElement heading = tagged.CreateHeaderElement(1);
+            HeaderElement heading = taggedContent.CreateHeaderElement(1);
             heading.SetText("Level 1 Heading");
 
-            // Attach the heading to the document structure
+            // Attach the heading to the document's structure tree
             root.AppendChild(heading);
 
-            // Save the PDF to disk
+            // Save the PDF file (PDF format by default)
             doc.Save(outputPath);
         }
 

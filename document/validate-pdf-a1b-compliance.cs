@@ -6,29 +6,31 @@ class Program
 {
     static void Main()
     {
-        // Path to the PDF to be validated
-        const string inputPdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
+        const string logPath   = "validation_log.txt";
 
-        // Path where the validation log will be written
-        const string validationLogPath = "validation_log.txt";
-
-        // Ensure the input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document and automatically dispose it when done
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Validate the document against PDF/A‑1B compliance.
-            // The method returns true if validation succeeds, false otherwise.
-            bool validationResult = pdfDoc.Validate(validationLogPath, PdfFormat.PDF_A_1B);
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
+            {
+                // Validate against PDF/A‑1B and write the log
+                bool validationSucceeded = doc.Validate(logPath, PdfFormat.PDF_A_1B);
 
-            // Output the validation outcome and the compliance flag.
-            Console.WriteLine($"PDF/A‑1B validation result: {(validationResult ? "Passed" : "Failed")}");
-            Console.WriteLine($"Document.IsPdfaCompliant: {pdfDoc.IsPdfaCompliant}");
+                Console.WriteLine($"Validation succeeded: {validationSucceeded}");
+                Console.WriteLine($"PDF/A‑1B compliant: {doc.IsPdfaCompliant}");
+                Console.WriteLine($"Log file: {logPath}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

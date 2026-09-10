@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -22,29 +22,32 @@ class Program
             // Choose the page to modify (first page in this example)
             Page page = doc.Pages[1];
 
-            double pageWidth = page.PageInfo.Width;
-            double pageHeight = page.PageInfo.Height;
+            // Create a Graph container (size can be larger than the page)
+            Graph graph = new Graph(page.Rect.Width, page.Rect.Height);
 
-            // Graph container – use the double constructor (obsolete float ctor removed)
-            Graph graph = new Graph(pageWidth, pageHeight);
+            // Define a rectangle that covers the whole page
+            // Cast double values to float because Aspose.Pdf.Drawing.Rectangle expects float parameters.
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(
+                (float)page.Rect.LLX,   // left
+                (float)page.Rect.LLY,   // bottom
+                (float)page.Rect.Width, // width
+                (float)page.Rect.Height // height
+            );
 
-            // Rectangle shape that covers the whole page – use Aspose.Pdf.Drawing.Rectangle (float parameters)
-            var rect = new Aspose.Pdf.Drawing.Rectangle(
-                0f,
-                0f,
-                (float)pageWidth,
-                (float)pageHeight);
-
-            // Set visual properties via GraphInfo. Use ARGB for opacity.
+            // Set visual properties via GraphInfo.
+            // Use FromArgb(alpha, r, g, b) where alpha 0-255 defines opacity.
+            // Example: 128 (≈50% opacity) semi‑transparent blue.
             rect.GraphInfo = new GraphInfo
             {
-                FillColor = Color.FromArgb(128, 255, 0, 0), // 50% transparent red
-                Color = Color.Transparent,                // no border color
+                FillColor = Color.FromArgb(128, 0, 0, 255), // semi‑transparent blue
+                Color     = Color.Empty, // no stroke
                 LineWidth = 0f
             };
 
-            // Add the rectangle to the graph and the graph to the page
+            // Add the rectangle shape to the graph
             graph.Shapes.Add(rect);
+
+            // Add the graph to the page's paragraphs collection
             page.Paragraphs.Add(graph);
 
             // Save the modified PDF

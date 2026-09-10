@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
@@ -8,6 +8,8 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string newAuthor  = "John Doe";
+        const string newTitle   = "Updated Document Title";
 
         if (!File.Exists(inputPath))
         {
@@ -18,17 +20,18 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Read existing metadata (optional, shown for demonstration)
-            string currentAuthor = doc.Info.Author;
-            string currentTitle  = doc.Info.Title;
-            Console.WriteLine($"Current Author: {currentAuthor}");
-            Console.WriteLine($"Current Title : {currentTitle}");
+            // Read existing metadata
+            string oldAuthor = doc.Info.Author;
+            string oldTitle  = doc.Info.Title;
 
-            // Modify the Author and Title fields
-            doc.Info.Author = "New Author Name";
-            doc.Info.Title  = "New Document Title";
+            Console.WriteLine($"Original Author: {oldAuthor}");
+            Console.WriteLine($"Original Title : {oldTitle}");
 
-            // Save the changes back to a PDF file
+            // Modify metadata fields
+            doc.Info.Author = newAuthor;
+            doc.Info.Title  = newTitle;
+
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 

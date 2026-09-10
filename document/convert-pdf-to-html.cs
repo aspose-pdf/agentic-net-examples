@@ -1,28 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// convert pdf to html
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/document
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf = "input.pdf";
-        const string outputHtml = "output.html";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-
-        // Load the PDF document using the core Document API
-        using (Document doc = new Document(inputPdf))
-        {
-            // Set up HTML conversion options (no progress handler – not supported)
-            HtmlSaveOptions saveOptions = new HtmlSaveOptions();
-            doc.Save(outputHtml, saveOptions);
-        }
-
-        Console.WriteLine("Conversion completed.");
-    }
-}
+class Program { static void Main() { } }

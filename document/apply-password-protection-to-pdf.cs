@@ -13,7 +13,7 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
@@ -22,7 +22,7 @@ class Program
             // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Define permissions (e.g., allow printing and content extraction)
+                // Set desired permissions (e.g., allow printing and content extraction)
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
                 // Encrypt the document using AES-256 algorithm
