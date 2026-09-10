@@ -1,55 +1,55 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input_form.pdf";
+        const string inputPdf = "form.pdf";
         const string jsonPath = "form_fields.json";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Bind the PDF to the Form facade
-        using (Form form = new Form(pdfPath))
+        try
         {
-            // Export all form fields to a JSON file
-            using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
+            // Load the PDF document (lifecycle rule: using block for disposal)
+            using (Document doc = new Document(inputPdf))
             {
-                form.ExportJson(jsonStream, indented: true);
-            }
-
-            // Verify the exported JSON structure
-            try
-            {
-                string jsonContent = File.ReadAllText(jsonPath);
-                using (JsonDocument doc = JsonDocument.Parse(jsonContent))
+                // Initialize the Form facade with the loaded document
+                using (Form form = new Form(doc))
                 {
-                    if (doc.RootElement.ValueKind != JsonValueKind.Object)
+                    // Export all form fields to a JSON file (ExportJson writes to a stream)
+                    using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
                     {
-                        Console.Error.WriteLine("Invalid JSON: root element is not an object.");
+                        form.ExportJson(jsonStream); // indented = true by default
                     }
-                    else
-                    {
-                        foreach (JsonProperty prop in doc.RootElement.EnumerateObject())
-                        {
-                            Console.WriteLine($"{prop.Name}: {prop.Value}");
-                        }
-                    }
+
+                    Console.WriteLine($"Form fields exported to '{jsonPath}'.");
                 }
             }
-            catch (JsonException ex)
+
+            // Verify the JSON structure by reading it back
+            string jsonContent = File.ReadAllText(jsonPath);
+            using (JsonDocument jsonDoc = JsonDocument.Parse(jsonContent))
             {
-                Console.Error.WriteLine($"JSON parsing error: {ex.Message}");
+                Console.WriteLine("Exported JSON structure:");
+                // Aspose exports a JSON object where each property is a field name
+                foreach (JsonProperty prop in jsonDoc.RootElement.EnumerateObject())
+                {
+                    Console.WriteLine($"Field: {prop.Name}, Value: {prop.Value}");
+                }
             }
         }
-
-        Console.WriteLine($"Form fields exported to '{jsonPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

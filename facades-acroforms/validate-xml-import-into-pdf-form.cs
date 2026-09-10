@@ -20,7 +20,8 @@ class Program
         }
 
         // Validate the XML file against the XSD schema.
-        if (!ValidateXml(xmlData, xsdSchema))
+        bool isValid = ValidateXml(xmlData, xsdSchema);
+        if (!isValid)
         {
             Console.Error.WriteLine("XML validation failed. Import aborted.");
             return;
@@ -33,7 +34,7 @@ class Program
             {
                 form.ImportXml(xmlStream);
             }
-            form.Save(); // Save using Aspose.Pdf.Facades SaveableFacade method.
+            form.Save();
         }
 
         Console.WriteLine($"XML data successfully imported to '{outputPdf}'.");
@@ -41,31 +42,31 @@ class Program
 
     static bool ValidateXml(string xmlPath, string xsdPath)
     {
-        XmlSchemaSet schemaSet = new XmlSchemaSet();
-        schemaSet.Add(null, xsdPath);
-
+        bool valid = true;
         XmlReaderSettings settings = new XmlReaderSettings
         {
-            ValidationType = ValidationType.Schema,
-            Schemas = schemaSet
+            ValidationType = ValidationType.Schema
         };
-        settings.ValidationEventHandler += (sender, e) =>
+        settings.Schemas.Add(null, xsdPath);
+        settings.ValidationEventHandler += (sender, args) =>
         {
-            Console.Error.WriteLine($"Validation {e.Severity}: {e.Message}");
+            Console.Error.WriteLine($"Validation error: {args.Message}");
+            valid = false;
         };
 
-        try
+        using (XmlReader reader = XmlReader.Create(xmlPath, settings))
         {
-            using (XmlReader reader = XmlReader.Create(xmlPath, settings))
+            try
             {
                 while (reader.Read()) { }
             }
-            return true;
+            catch (XmlException ex)
+            {
+                Console.Error.WriteLine($"XML parsing error: {ex.Message}");
+                valid = false;
+            }
         }
-        catch (XmlException ex)
-        {
-            Console.Error.WriteLine($"XML parsing error: {ex.Message}");
-            return false;
-        }
+
+        return valid;
     }
 }

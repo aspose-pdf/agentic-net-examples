@@ -1,9 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
+using System.Text;
 using System.Text.Json;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms; // for accessing form fields
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -14,7 +15,8 @@ class Program
         // Output JSON file that will contain aggregated form data
         const string outputJsonPath = "merged_form_data.json";
 
-        // Dictionary to collect values for each field across all PDFs
+        // Dictionary to hold aggregated values:
+        // key = field name, value = list of values from each PDF
         var aggregatedData = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
         foreach (string pdfPath in pdfFiles)
@@ -25,31 +27,57 @@ class Program
                 continue;
             }
 
-            // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+            // Load the PDF document (lifecycle rule: wrap in using)
             using (Document doc = new Document(pdfPath))
             {
-                // Iterate over each form field and capture its value
-                foreach (Field field in doc.Form.Fields)
+                // Initialize the Form facade and bind the document (facade rule)
+                using (Form form = new Form())
                 {
-                    // The field name (partial name) is the key we use for aggregation
-                    string fieldName = field.PartialName;
-                    // Most field types expose a Value property; fallback to empty string if null
-                    string fieldValue = field?.Value?.ToString() ?? string.Empty;
+                    form.BindPdf(doc);
 
-                    if (!aggregatedData.ContainsKey(fieldName))
-                        aggregatedData[fieldName] = new List<string>();
+                    // Export form fields to JSON via a memory stream
+                    using (MemoryStream jsonStream = new MemoryStream())
+                    {
+                        // ExportJson(bool) – true to include empty fields
+                        form.ExportJson(jsonStream, true);
+                        jsonStream.Position = 0;
 
-                    aggregatedData[fieldName].Add(fieldValue);
+                        // Read the JSON text
+                        string jsonText = Encoding.UTF8.GetString(jsonStream.ToArray());
+
+                        // Deserialize into a simple dictionary (fieldName -> fieldValue)
+                        var fieldDict = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonText);
+
+                        if (fieldDict != null)
+                        {
+                            foreach (var kvp in fieldDict)
+                            {
+                                if (!aggregatedData.TryGetValue(kvp.Key, out var list))
+                                {
+                                    list = new List<string>();
+                                    aggregatedData[kvp.Key] = list;
+                                }
+                                list.Add(kvp.Value);
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        // Prepare the final JSON where each field maps to an array of its collected values
-        var finalJson = JsonSerializer.Serialize(aggregatedData, new JsonSerializerOptions { WriteIndented = true });
+        // Prepare final JSON structure: each field maps to an array of its collected values
+        var finalJson = new Dictionary<string, string[]>();
+        foreach (var kvp in aggregatedData)
+        {
+            finalJson[kvp.Key] = kvp.Value.ToArray();
+        }
 
-        // Save the aggregated JSON to the output file (lifecycle rule: use Document.Save only for PDFs;
-        // here we are writing a plain file, so File.WriteAllText is appropriate)
-        File.WriteAllText(outputJsonPath, finalJson);
+        // Serialize the aggregated result with indentation for readability
+        JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true };
+        string resultJson = JsonSerializer.Serialize(finalJson, options);
+
+        // Write the aggregated JSON to the output file
+        File.WriteAllText(outputJsonPath, resultJson, Encoding.UTF8);
 
         Console.WriteLine($"Aggregated form data saved to '{outputJsonPath}'.");
     }

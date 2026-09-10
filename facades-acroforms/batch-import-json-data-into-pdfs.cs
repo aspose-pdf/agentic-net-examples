@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Aspose.Pdf.Facades;
 
@@ -8,53 +8,59 @@ class Program
 {
     static void Main()
     {
-        // Input directory containing PDFs and matching JSON files
-        const string inputDir = @"C:\InputFiles";
-        // Output directory for PDFs with imported data
-        const string outputDir = @"C:\OutputFiles";
+        // Folder containing the PDF files and their matching JSON files
+        const string inputFolder = @"C:\InputFiles";
+        // Folder where the PDFs with imported data will be saved
+        const string outputFolder = @"C:\OutputFiles";
 
-        if (!Directory.Exists(inputDir))
+        // Ensure output folder exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Gather all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        var workItems = new List<(string pdfPath, string jsonPath, string outputPath)>();
+
+        foreach (string pdfPath in pdfFiles)
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDir}");
-            return;
+            string baseName = Path.GetFileNameWithoutExtension(pdfPath);
+            string jsonPath = Path.Combine(inputFolder, baseName + ".json");
+
+            // Only process if a matching JSON file exists
+            if (File.Exists(jsonPath))
+            {
+                string outputPath = Path.Combine(outputFolder, baseName + "_filled.pdf");
+                workItems.Add((pdfPath, jsonPath, outputPath));
+            }
+            else
+            {
+                Console.Error.WriteLine($"Warning: No JSON file found for '{pdfPath}'. Skipping.");
+            }
         }
 
-        Directory.CreateDirectory(outputDir);
-
-        // Gather all PDF files
-        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        // Process each PDF (and its JSON) in parallel
-        Parallel.ForEach(pdfFiles, pdfPath =>
+        // Process each PDF/JSON pair in parallel
+        Parallel.ForEach(workItems, item =>
         {
             try
             {
-                // Determine corresponding JSON file (same base name)
-                string jsonPath = Path.ChangeExtension(pdfPath, ".json");
-                if (!File.Exists(jsonPath))
+                // Initialize the Form facade with input and output PDF paths
+                using (Form form = new Form(item.pdfPath, item.outputPath))
                 {
-                    Console.Error.WriteLine($"JSON file missing for PDF: {Path.GetFileName(pdfPath)}");
-                    return;
-                }
-
-                // Prepare output PDF path
-                string outputPdfPath = Path.Combine(outputDir, Path.GetFileName(pdfPath));
-
-                // Import JSON data into the PDF using Aspose.Pdf.Facades.Form
-                using (Form form = new Form(pdfPath, outputPdfPath))
-                {
-                    using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Open, FileAccess.Read))
+                    // Open the JSON file as a read‑only stream
+                    using (FileStream jsonStream = new FileStream(item.jsonPath, FileMode.Open, FileAccess.Read))
                     {
+                        // Import all form field values from the JSON stream
                         form.ImportJson(jsonStream);
                     }
-                    form.Save(); // Save the modified PDF
+
+                    // Save the modified PDF (output path was supplied in the constructor)
+                    form.Save();
                 }
 
-                Console.WriteLine($"Imported data from '{Path.GetFileName(jsonPath)}' into '{Path.GetFileName(outputPdfPath)}'.");
+                Console.WriteLine($"Successfully imported data into '{item.outputPath}'.");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{Path.GetFileName(pdfPath)}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{item.pdfPath}': {ex.Message}");
             }
         });
     }
