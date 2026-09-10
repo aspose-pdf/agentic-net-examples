@@ -1,40 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// import xfdf data into pdf form fields
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-forms/import-xfdf-data-into-pdf-form.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string pdfPath = "input.pdf";      // Existing PDF with form fields
-        const string xfdfPath = "data.xfdf";     // XFDF file containing field values
-        const string outputPath = "output.pdf";  // Resulting PDF after import
-
-        // Verify input files exist
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
-            return;
-        }
-        if (!File.Exists(xfdfPath))
-        {
-            Console.Error.WriteLine($"XFDF not found: {xfdfPath}");
-            return;
-        }
-
-        // Form facade handles AcroForm operations; it implements IDisposable
-        using (Form form = new Form(pdfPath, outputPath))
-        {
-            // Open XFDF stream and import field values; matching is done by full field names
-            using (FileStream xfdfStream = new FileStream(xfdfPath, FileMode.Open, FileAccess.Read))
-            {
-                form.ImportXfdf(xfdfStream);
-            }
-
-            // Persist changes to the output PDF
-            form.Save();
-        }
-
-        Console.WriteLine($"Form fields imported and saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

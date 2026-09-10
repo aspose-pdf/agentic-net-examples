@@ -1,34 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// remove form field from pdf
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/facades-forms
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string fieldName = "ObsoleteField";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-
-        // FormEditor implements SaveableFacade, which is disposable.
-        using (FormEditor formEditor = new FormEditor())
-        {
-            // Bind the source PDF file.
-            formEditor.BindPdf(inputPdf);
-
-            // Remove the specified form field.
-            formEditor.RemoveField(fieldName);
-
-            // Save the modified PDF.
-            formEditor.Save(outputPdf);
-        }
-
-        Console.WriteLine($"Field \"{fieldName}\" removed. Output saved to '{outputPdf}'.");
-    }
-}
+class Program { static void Main() { } }

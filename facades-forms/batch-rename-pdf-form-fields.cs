@@ -1,37 +1,42 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPdf  = "input.pdf";          // source PDF with form fields
+        const string outputPdf = "output_renamed.pdf"; // result PDF after renaming
 
-        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Initialize the Form facade with source and destination PDFs
-        Form form = new Form(inputPdf, outputPdf);
-
-        // Loop through all form fields and rename those starting with "Old_"
-        foreach (string fieldName in form.FieldNames)
+        // Load the PDF as a Form to obtain the list of field names
+        using (Form form = new Form(inputPdf))
         {
-            if (fieldName.StartsWith("Old_"))
+            // Create a FormEditor bound to the same document for editing
+            using (FormEditor editor = new FormEditor(form.Document))
             {
-                string newName = "New_" + fieldName.Substring("Old_".Length);
-                form.RenameField(fieldName, newName);
+                // Iterate over all field names and rename those that start with "Old_"
+                foreach (string fieldName in form.FieldNames)
+                {
+                    if (fieldName.StartsWith("Old_"))
+                    {
+                        string newFieldName = "New_" + fieldName.Substring("Old_".Length);
+                        editor.RenameField(fieldName, newFieldName);
+                    }
+                }
+
+                // Save the edited PDF to the output file
+                editor.Save(outputPdf);
             }
         }
 
-        // Persist the changes to the output PDF
-        form.Save();
-
-        Console.WriteLine($"Fields renamed and saved to '{outputPdf}'.");
+        Console.WriteLine($"Renamed fields saved to '{outputPdf}'.");
     }
 }

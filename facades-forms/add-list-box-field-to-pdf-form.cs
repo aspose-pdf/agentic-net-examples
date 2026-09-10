@@ -6,39 +6,34 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
 
-        // Ensure the input file exists
+        // Ensure the source PDF exists – create a minimal placeholder if missing.
         if (!System.IO.File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
+            using (var placeholder = new Document())
+            {
+                placeholder.Pages.Add();
+                placeholder.Save(inputPdf);
+            }
         }
 
-        // Use FormEditor to modify the PDF form
+        // Create a FormEditor, bind the source PDF and add a list box field.
         using (FormEditor formEditor = new FormEditor())
         {
-            // Load the existing PDF
+            // Load the existing PDF.
             formEditor.BindPdf(inputPdf);
 
-            // Define the items for the list box
+            // Define the items for the list box.
             formEditor.Items = new string[] { "Low", "Medium", "High" };
 
-            // Add a ListBox field named "Priority" with default selection "Medium"
-            // Parameters: field type, field name, default value, page number, llx, lly, urx, ury
-            formEditor.AddField(
-                FieldType.ListBox,
-                "Priority",
-                "Medium",
-                1,
-                100f,   // lower‑left X
-                500f,   // lower‑left Y
-                200f,   // upper‑right X
-                600f    // upper‑right Y
-            );
+            // Add a ListBox field named "Priority" on page 1.
+            // Parameters: field type, field name, default value, page number,
+            // lower‑left X, lower‑left Y, upper‑right X, upper‑right Y.
+            formEditor.AddField(FieldType.ListBox, "Priority", "Medium", 1, 100, 500, 200, 550);
 
-            // Save the modified PDF
+            // Save the modified PDF.
             formEditor.Save(outputPdf);
         }
 

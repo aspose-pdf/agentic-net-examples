@@ -6,35 +6,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // PDF containing the "Quantity" field
-        const string outputPdf = "output.pdf";  // PDF with the updated field limit
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string fieldName = "Quantity";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // FormEditor is a facade for editing AcroForm fields.
-        // It implements IDisposable, so wrap it in a using block.
+        // Open the PDF form for editing
         using (FormEditor formEditor = new FormEditor())
         {
-            // Load the source PDF.
-            formEditor.BindPdf(inputPdf);
+            formEditor.BindPdf(inputPath);
 
-            // Set the maximum character count for the "Quantity" field.
-            // A limit of 3 characters allows values from 1 up to 100.
-            bool success = formEditor.SetFieldLimit("Quantity", 3);
-            if (!success)
-            {
-                Console.Error.WriteLine("Failed to set field limit for 'Quantity'.");
-                return;
-            }
+            // Set maximum character count to 3 (enough for values up to 100)
+            formEditor.SetFieldLimit(fieldName, 3);
 
-            // Save the modified PDF.
-            formEditor.Save(outputPdf);
+            // Optional: add JavaScript validation to enforce numeric range 1‑100
+            string validationScript = "if (event.value < 1 || event.value > 100) { app.alert('Enter a value between 1 and 100'); event.rc = false; }";
+            formEditor.SetFieldScript(fieldName, validationScript);
+
+            // Save the updated PDF
+            formEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"Field limit applied and saved to '{outputPdf}'.");
+        Console.WriteLine($"Field limit applied and saved to '{outputPath}'.");
     }
 }

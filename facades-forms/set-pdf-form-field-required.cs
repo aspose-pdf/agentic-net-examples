@@ -1,35 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// set pdf form field required
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-forms/mark-pdf-form-field-required.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // FormEditor handles loading and saving internally via its constructor.
-        using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
-        {
-            // Mark the "Agreement" field as required.
-            bool success = formEditor.SetFieldAttribute("Agreement", PropertyFlag.Required);
-            if (!success)
-            {
-                Console.Error.WriteLine("Unable to set the required attribute on field 'Agreement'.");
-            }
-
-            // Persist the changes.
-            formEditor.Save();
-        }
-
-        Console.WriteLine($"Field 'Agreement' set to required. Output saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

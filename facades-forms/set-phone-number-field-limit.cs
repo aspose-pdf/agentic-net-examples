@@ -9,23 +9,34 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Initialize FormEditor with source and destination PDFs
-        using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
+        // FormEditor follows the typical create‑load‑save pattern.
+        // 1. Create the FormEditor instance.
+        // 2. Load the PDF via BindPdf.
+        // 3. Apply the field limit.
+        // 4. Save the modified document.
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Set the maximum character length of the "PhoneNumber" field to 15
-            bool success = formEditor.SetFieldLimit("PhoneNumber", 15);
-            Console.WriteLine($"SetFieldLimit succeeded: {success}");
+            // Load the source PDF.
+            formEditor.BindPdf(inputPath);
 
-            // Persist the changes to the output file
-            formEditor.Save();
+            // Set the maximum character count of the "PhoneNumber" field to 15.
+            bool success = formEditor.SetFieldLimit("PhoneNumber", 15);
+            if (!success)
+            {
+                Console.Error.WriteLine("Failed to set field limit for 'PhoneNumber'.");
+            }
+
+            // Save the updated PDF to the specified output path.
+            formEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Field limit applied and saved to '{outputPath}'.");
     }
 }

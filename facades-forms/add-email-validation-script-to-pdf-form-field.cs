@@ -1,40 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// add email validation script to pdf form field
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-forms/add-email-validation-to-pdf-form-field.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Open the PDF for form editing
-        using (FormEditor formEditor = new FormEditor())
-        {
-            formEditor.BindPdf(inputPath);
-
-            // JavaScript that validates the Email field using a regular expression
-            string validationScript = @"
-var email = event.value;
-var re = /^[\w\-\.+]+@([\w\-]+\.)+[\w\-]{2,4}$/;
-if (!re.test(email)) {
-    app.alert('Invalid email address');
-    event.rc = false;
-}";
-            // Attach the script to the field named "Email"
-            formEditor.SetFieldScript("Email", validationScript);
-
-            // Save the modified PDF
-            formEditor.Save(outputPath);
-        }
-
-        Console.WriteLine($"PDF saved with email validation: '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

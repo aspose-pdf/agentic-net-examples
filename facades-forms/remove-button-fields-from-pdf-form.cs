@@ -1,15 +1,15 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms; // for ButtonField and Form operations
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_no_buttons.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,28 +17,27 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
+        // Load the PDF document.
+        Document pdfDocument = new Document(inputPath);
 
-        // Collect the names of all button fields
-        List<string> buttonFieldNames = new List<string>();
-        foreach (var field in doc.Form.Fields)
+        // Collect button fields first because the collection cannot be modified while iterating.
+        List<Field> buttonsToRemove = new List<Field>();
+        foreach (Field field in pdfDocument.Form.Fields)
         {
             if (field is ButtonField)
-            {
-                buttonFieldNames.Add(field.PartialName);
-            }
+                buttonsToRemove.Add(field);
         }
 
-        // Remove each button field from the form
-        foreach (string name in buttonFieldNames)
+        // Remove the collected button fields using the Form.Delete method (by field name).
+        foreach (Field btn in buttonsToRemove)
         {
-            doc.Form.Delete(name);
+            // The Delete method expects the field's partial name.
+            pdfDocument.Form.Delete(btn.PartialName);
         }
 
-        // Save the updated PDF
-        doc.Save(outputPath);
+        // Save the modified PDF.
+        pdfDocument.Save(outputPath);
 
-        Console.WriteLine($"All button fields removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"All button fields removed. Output saved to '{outputPath}'.");
     }
 }

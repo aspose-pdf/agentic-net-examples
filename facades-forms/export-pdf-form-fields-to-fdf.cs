@@ -6,33 +6,26 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFdfPath = "output.fdf";
+        const string inputPdf = "input.pdf";
+        const string outputFdf = "output.fdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF form using the Form facade (loads the document internally)
+        using (Form form = new Form(inputPdf))
         {
-            // Initialize the Form facade with the source PDF
-            using (Form form = new Form(inputPdfPath))
+            // Create a file stream for the FDF output
+            using (FileStream fdfStream = new FileStream(outputFdf, FileMode.Create, FileAccess.Write))
             {
-                // Create the output FDF file stream
-                using (FileStream fdfStream = new FileStream(outputFdfPath, FileMode.Create, FileAccess.Write))
-                {
-                    // Export all form fields to the FDF stream
-                    form.ExportFdf(fdfStream);
-                }
+                // Export all form fields to the FDF stream
+                form.ExportFdf(fdfStream);
             }
+        }
 
-            Console.WriteLine($"Form fields exported successfully to '{outputFdfPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during export: {ex.Message}");
-        }
+        Console.WriteLine($"Form fields exported to '{outputFdf}'.");
     }
 }

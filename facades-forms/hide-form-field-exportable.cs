@@ -1,40 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
+// URL-STABILITY STUB
+//
+// hide form field exportable
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/facades-forms
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string fieldName = "EmployeeID";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
-
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
-        {
-            // Initialize the FormEditor facade with the loaded document
-            FormEditor formEditor = new FormEditor(doc);
-
-            // Set the field appearance to NoView (hidden but still exportable)
-            bool result = formEditor.SetFieldAppearance(fieldName, AnnotationFlags.NoView);
-            if (!result)
-            {
-                Console.Error.WriteLine($"Failed to set appearance for field '{fieldName}'.");
-            }
-
-            // Save the modified PDF
-            formEditor.Save(outputPdf);
-        }
-
-        Console.WriteLine($"Field '{fieldName}' set to hidden (exportable) and saved to '{outputPdf}'.");
-    }
-}
+class Program { static void Main() { } }

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -16,22 +15,22 @@ class Program
             return;
         }
 
-        // Use PdfContentEditor facade to add a JavaScript action that runs on document open.
+        // Use PdfContentEditor facade to add a document‑level JavaScript action.
         using (PdfContentEditor editor = new PdfContentEditor())
         {
             // Bind the existing PDF.
             editor.BindPdf(inputPdf);
 
-            // JavaScript code: set the value of the field named "Date" to the current date.
+            // JavaScript that runs when the document is opened and sets the "Date" field.
             string jsCode = "this.getField('Date').value = new Date().toLocaleDateString();";
 
-            // Add the script to the Document Open event.
+            // Add the script to the DocumentOpen event.
             editor.AddDocumentAdditionalAction(PdfContentEditor.DocumentOpen, jsCode);
 
             // Save the modified PDF.
             editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with JavaScript to '{outputPdf}'.");
+        Console.WriteLine($"PDF with form‑load JavaScript saved to '{outputPdf}'.");
     }
 }

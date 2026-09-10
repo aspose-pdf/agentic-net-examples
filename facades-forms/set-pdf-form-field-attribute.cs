@@ -1,32 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// set pdf form field attribute
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/facades-forms
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-
-        // Initialize FormEditor with source and destination PDF files
-        FormEditor formEditor = new FormEditor(inputPdf, outputPdf);
-
-        // NOTE: FormEditor.SetFieldAttribute supports only predefined PropertyFlag values
-        // (NoExport, ReadOnly, Required). Setting an arbitrary custom attribute such as
-        // "data-id" is not supported by this API. As a workaround you can set one of the
-        // available flags; here we set the field as required as an example.
-        formEditor.SetFieldAttribute("OrderNumber", PropertyFlag.Required);
-
-        // Save the modified PDF
-        formEditor.Save();
-
-        Console.WriteLine($"PDF saved to '{outputPdf}'.");
-    }
-}
+class Program { static void Main() { } }

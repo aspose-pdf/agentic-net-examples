@@ -1,35 +1,39 @@
 using System;
-using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string oldName    = "OldName";
-        const string newName    = "NewName";
+        const string inputPdf = "input.pdf";   // source PDF containing the form field
+        const string outputPdf = "output.pdf"; // PDF that will receive the renamed field
 
-        if (!File.Exists(inputPath))
+        // ------------------------------------------------------------
+        // Create a minimal PDF with a form field named "OldName".
+        // This makes the example self‑contained and avoids FileNotFoundException.
+        // ------------------------------------------------------------
+        Document seedDoc = new Document();
+        Page seedPage = seedDoc.Pages.Add();
+        // Define a rectangle for the text box field (left, bottom, right, top).
+        var fieldRect = new Rectangle(100, 700, 200, 750);
+        TextBoxField oldField = new TextBoxField(seedPage, fieldRect)
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            PartialName = "OldName",
+            Value = "Sample value"
+        };
+        // Add the field to the document's form collection (not directly to page annotations).
+        seedDoc.Form.Add(oldField);
+        seedDoc.Save(inputPdf);
 
-        // Use FormEditor facade to rename a form field
-        using (FormEditor editor = new FormEditor())
-        {
-            // Load the PDF document
-            editor.BindPdf(inputPath);
-
-            // Rename the field throughout the document
-            editor.RenameField(oldName, newName);
-
-            // Save the modified PDF
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Field '{oldName}' renamed to '{newName}' and saved as '{outputPath}'.");
+        // ------------------------------------------------------------
+        // Rename the field from "OldName" to "NewName" using FormEditor.
+        // Use the non‑obsolete constructor and the Save(string) overload.
+        // ------------------------------------------------------------
+        FormEditor formEditor = new FormEditor();
+        formEditor.BindPdf(inputPdf);
+        formEditor.RenameField("OldName", "NewName");
+        formEditor.Save(outputPdf);
     }
 }

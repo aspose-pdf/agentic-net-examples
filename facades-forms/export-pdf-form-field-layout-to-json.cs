@@ -2,8 +2,6 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -19,46 +17,47 @@ class Program
             return;
         }
 
-        // Use the Form class from Aspose.Pdf.Facades explicitly to avoid ambiguity with Aspose.Pdf.Forms.Form
-        using (Aspose.Pdf.Facades.Form pdfForm = new Aspose.Pdf.Facades.Form(inputPdf))
+        // Initialize the Facade for the PDF form
+        Form form = new Form(inputPdf);
+
+        // Collect layout information for each field
+        var fieldInfos = new List<FieldInfo>();
+        foreach (string fieldName in form.FieldNames)
         {
-            // Access the underlying Document object
-            Document doc = pdfForm.Document;
+            // Obtain the facade for the specific field
+            FormFieldFacade fieldFacade = form.GetFieldFacade(fieldName);
 
-            // Collect layout information for each form field
-            var fieldInfos = new List<object>();
-
-            // Iterate over the fields defined in the PDF form
-            foreach (Field field in doc.Form.Fields)
+            // Position returns an array: { llx, lly, urx, ury }
+            float[] pos = fieldFacade.Position;
+            if (pos != null && pos.Length == 4)
             {
-                // Get the field rectangle (account for page rotation)
-                Aspose.Pdf.Rectangle rect = field.GetRectangle(true);
-
-                // PageIndex is 1‑based in Aspose.Pdf
-                int pageNumber = field.PageIndex;
-
-                fieldInfos.Add(new
+                fieldInfos.Add(new FieldInfo
                 {
-                    Name = field.FullName,
-                    Page = pageNumber,
-                    Rect = new
-                    {
-                        LLX = rect.LLX,
-                        LLY = rect.LLY,
-                        URX = rect.URX,
-                        URY = rect.URY
-                    }
+                    Name   = fieldName,
+                    Left   = pos[0],
+                    Bottom = pos[1],
+                    Right  = pos[2],
+                    Top    = pos[3]
                 });
             }
-
-            // Serialize the layout data to indented JSON
-            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(fieldInfos, jsonOptions);
-
-            // Write JSON to the output file
-            File.WriteAllText(outputJson, json);
         }
 
-        Console.WriteLine($"Form field layout exported to '{outputJson}'.");
+        // Serialize the layout data to indented JSON
+        var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+        string json = JsonSerializer.Serialize(fieldInfos, jsonOptions);
+
+        // Write JSON to the output file
+        File.WriteAllText(outputJson, json);
+        Console.WriteLine($"Exported field layout to '{outputJson}'.");
+    }
+
+    // Simple DTO for JSON output
+    private class FieldInfo
+    {
+        public string Name   { get; set; }
+        public float  Left   { get; set; }
+        public float  Bottom { get; set; }
+        public float  Right  { get; set; }
+        public float  Top    { get; set; }
     }
 }

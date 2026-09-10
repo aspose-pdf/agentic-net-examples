@@ -1,34 +1,37 @@
 using System;
-using System.Drawing;                     // System.Drawing.Color is required for FormFieldFacade
-using Aspose.Pdf.Facades;                // FormEditor and FormFieldFacade
+using System.IO;
+using Aspose.Pdf.Facades;
+using System.Drawing; // Required for System.Drawing.Color
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Ensure the source file exists
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create a FormEditor for the source PDF and specify the output file
-        FormEditor formEditor = new FormEditor(inputPdf, outputPdf);
+        // Initialize FormEditor with input and output PDF files
+        using (FormEditor editor = new FormEditor(inputPath, outputPath))
+        {
+            // Create a new facade to define visual attributes
+            editor.Facade = new FormFieldFacade();
 
-        // Set visual attributes via the Facade object
-        formEditor.Facade = new FormFieldFacade();
-        formEditor.Facade.BackgroundColor = Color.LightGreen;   // light green background
+            // Set the background color of the field to light green
+            editor.Facade.BackgroundColor = Color.LightGreen;
 
-        // Apply the appearance changes to the field named "Status"
-        formEditor.DecorateField("Status");
+            // Apply the visual attributes to the specific field named "Status"
+            editor.DecorateField("Status");
 
-        // Persist the changes
-        formEditor.Save();
+            // Persist the changes to the output PDF
+            editor.Save();
+        }
 
-        Console.WriteLine($"Field \"Status\" background set to light green and saved to '{outputPdf}'.");
+        Console.WriteLine($"Background color of field \"Status\" set to light green. Saved to '{outputPath}'.");
     }
 }

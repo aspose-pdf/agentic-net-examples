@@ -1,33 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// copy image form field to another
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-forms/copy-image-field-to-another-field.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string sourceField = "Logo";
-        const string targetField = "HeaderLogo";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-
-        // FormEditor copies fields within the same document (or to another document).
-        // The constructor takes the source PDF and the destination PDF.
-        using (FormEditor formEditor = new FormEditor(inputPdf, outputPdf))
-        {
-            // CopyInnerField copies the existing field to a new field with the same position.
-            // pageNum = -1 keeps the field on the original page.
-            // newFieldName is the fully qualified name of the new field.
-            formEditor.CopyInnerField(sourceField, targetField, -1);
-            formEditor.Save();
-        }
-
-        Console.WriteLine($"Field '{sourceField}' copied to '{targetField}' in '{outputPdf}'.");
-    }
-}
+class Program { static void Main() { } }

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Facades;            // Form handling API
 
 class Program
 {
@@ -16,16 +16,14 @@ class Program
             return;
         }
 
-        // Load the PDF using the Form facade (provides field access)
-        using (Form form = new Form(inputPath))
+        // Load the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Retrieve the facade for the field named "Signature"
+            // Create a Form facade bound to the loaded document
+            Form form = new Form(doc);
+
+            // Retrieve the field facade for the field named "Signature"
             FormFieldFacade signatureField = form.GetFieldFacade("Signature");
-            if (signatureField == null)
-            {
-                Console.Error.WriteLine("Field 'Signature' not found.");
-                return;
-            }
 
             // Apply a custom border thickness of 2 points
             signatureField.BorderWidth = 2;
