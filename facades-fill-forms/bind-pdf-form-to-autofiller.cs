@@ -5,24 +5,20 @@ class Program
 {
     static void Main()
     {
-        // Path to the source PDF form file
-        const string pdfPath = "form.pdf";
+        // Path to the source PDF form
+        const string sourcePdfPath = "input_form.pdf";
 
-        // Verify that the file exists before attempting to bind
-        if (!System.IO.File.Exists(pdfPath))
+        // Create an AutoFiller instance and bind it to the PDF form
+        using (AutoFiller autoFiller = new AutoFiller())
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
-            return;
+            // Bind the PDF file – this initializes the facade with the document
+            autoFiller.BindPdf(sourcePdfPath);
+
+            // At this point the AutoFiller is ready for further operations
+            // (e.g., importing data, saving the filled PDF, etc.).
+            // For demonstration we simply close the facade after binding.
         }
 
-        // Create an AutoFiller instance (facade for filling PDF forms)
-        AutoFiller autoFiller = new AutoFiller();
-
-        // Bind the PDF form to the AutoFiller using the file path
-        autoFiller.BindPdf(pdfPath);
-
-        // The AutoFiller is now ready for further operations such as importing data,
-        // filling fields, and saving the result.
-        Console.WriteLine("PDF form successfully bound to AutoFiller.");
+        Console.WriteLine("AutoFiller bound to PDF form successfully.");
     }
 }
