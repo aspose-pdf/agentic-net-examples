@@ -1,16 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
-class Program
+class PortfolioExtractor
 {
     static void Main()
     {
-        // Input PDF Portfolio file
+        // Input PDF portfolio file
         const string inputPdf = "portfolio.pdf";
-
-        // Root directory where extracted files will be written
-        const string outputRoot = "ExtractedFiles";
+        // Output directory where extracted files will be saved
+        const string outputDir = "ExtractedFiles";
 
         if (!File.Exists(inputPdf))
         {
@@ -18,62 +17,67 @@ class Program
             return;
         }
 
-        // Ensure the root output directory exists
-        Directory.CreateDirectory(outputRoot);
-
         try
         {
-            // Load the PDF Portfolio inside a using block for deterministic disposal
+            // Open the PDF document (wrapped in using for deterministic disposal)
             using (Document doc = new Document(inputPdf))
             {
-                // Iterate over all embedded files in the portfolio using reflection
+                // Ensure the output root directory exists
+                Directory.CreateDirectory(outputDir);
+
+                // Check if the document contains any embedded files (portfolio items)
+                if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
+                {
+                    Console.WriteLine("No embedded files found in the PDF portfolio.");
+                    return;
+                }
+
+                // Iterate over each embedded file in the portfolio using reflection to avoid
+                // a direct compile‑time dependency on the EmbeddedFile type (which may not be
+                // available in the core Aspose.Pdf namespace).
                 foreach (var embedded in doc.EmbeddedFiles)
                 {
-                    // Retrieve the file name via reflection (property "Name")
+                    // Retrieve the virtual path/name of the embedded file.
                     var nameProp = embedded.GetType().GetProperty("Name");
-                    string relativePath = nameProp?.GetValue(embedded) as string ?? "UnnamedFile";
+                    string virtualPath = nameProp?.GetValue(embedded) as string ?? "UnnamedFile";
 
-                    // Determine the full path on disk where the file will be saved
-                    string fullPath = Path.Combine(outputRoot, relativePath);
+                    // Build the full destination path on the local file system.
+                    string destinationPath = Path.Combine(outputDir, virtualPath);
 
-                    // Ensure the directory hierarchy exists
-                    string? directory = Path.GetDirectoryName(fullPath);
-                    if (!string.IsNullOrEmpty(directory))
+                    // Ensure the directory hierarchy exists before saving the file.
+                    string destinationDir = Path.GetDirectoryName(destinationPath);
+                    if (!string.IsNullOrEmpty(destinationDir))
                     {
-                        Directory.CreateDirectory(directory);
+                        Directory.CreateDirectory(destinationDir);
                     }
 
-                    // Invoke the Save(string) method via reflection
+                    // Try to invoke the Save(string) method that Aspose.Pdf provides for embedded files.
                     var saveMethod = embedded.GetType().GetMethod("Save", new[] { typeof(string) });
                     if (saveMethod != null)
                     {
-                        saveMethod.Invoke(embedded, new object[] { fullPath });
-                        Console.WriteLine($"Extracted: {fullPath}");
+                        saveMethod.Invoke(embedded, new object[] { destinationPath });
                     }
                     else
                     {
-                        // Fallback: try to copy the raw stream if Save method is unavailable
+                        // Fallback: extract the raw stream from the FileSpecification if Save is unavailable.
                         var fileSpecProp = embedded.GetType().GetProperty("FileSpecification");
                         var fileSpec = fileSpecProp?.GetValue(embedded);
                         var contentsProp = fileSpec?.GetType().GetProperty("Contents");
                         var contents = contentsProp?.GetValue(fileSpec) as Stream;
                         if (contents != null)
                         {
-                            using (var outStream = File.Create(fullPath))
+                            using (var outStream = File.Create(destinationPath))
                             {
                                 contents.CopyTo(outStream);
                             }
-                            Console.WriteLine($"Extracted (stream): {fullPath}");
-                        }
-                        else
-                        {
-                            Console.Error.WriteLine($"Unable to extract embedded file: {relativePath}");
                         }
                     }
+
+                    Console.WriteLine($"Extracted: {virtualPath} -> {destinationPath}");
                 }
             }
 
-            Console.WriteLine("All embedded files have been processed.");
+            Console.WriteLine("All embedded files have been extracted successfully.");
         }
         catch (Exception ex)
         {

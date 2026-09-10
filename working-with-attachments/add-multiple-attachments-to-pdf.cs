@@ -7,60 +7,51 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output_with_attachments.pdf";
-
-        // Create a minimal source PDF so the example can run in an empty sandbox
-        using (Document seed = new Document())
-        {
-            seed.Pages.Add(); // add a blank page
-            seed.Save(inputPdfPath);
-        }
+        // Input PDF and output PDF paths
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_with_attachments.pdf";
 
         // Collection of file paths to be attached
         List<string> attachmentPaths = new List<string>
         {
-            "doc1.txt",
+            "file1.txt",
             "image.png",
-            "report.pdf"
+            "data.csv"
         };
 
-        // Ensure the sample attachment files exist for the demo (create dummy files if needed)
-        foreach (var path in attachmentPaths)
+        // Validate input PDF exists
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+
+        // Validate each attachment file exists
+        foreach (string path in attachmentPaths)
         {
             if (!File.Exists(path))
             {
-                File.WriteAllText(path, $"Sample content for {Path.GetFileName(path)}");
+                Console.Error.WriteLine($"Attachment not found: {path}");
+                return;
             }
         }
 
-        // Load the PDF document (wrapped in using for proper disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF, add attachments, and save
+        using (Document doc = new Document(inputPdf))
         {
-            // Iterate over each file path and add it as an embedded file
-            foreach (string filePath in attachmentPaths)
+            foreach (string path in attachmentPaths)
             {
-                if (!File.Exists(filePath))
-                {
-                    Console.Error.WriteLine($"Attachment not found: {filePath}");
-                    continue;
-                }
+                // Create a file specification for the attachment
+                FileSpecification fileSpec = new FileSpecification(path);
 
-                // Create a file specification and embed the file contents
-                var fileSpec = new FileSpecification(filePath, $"Attachment: {Path.GetFileName(filePath)}")
-                {
-                    // Assign the file bytes to the Contents stream
-                    Contents = new MemoryStream(File.ReadAllBytes(filePath))
-                };
-
-                // Add the file specification to the document's embedded files collection
-                pdfDoc.EmbeddedFiles.Add(fileSpec);
+                // Add the specification to the document's embedded files collection
+                doc.EmbeddedFiles.Add(fileSpec);
             }
 
-            // Save the modified PDF with the attachments
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with attachments to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved with attachments to '{outputPdf}'.");
     }
 }
