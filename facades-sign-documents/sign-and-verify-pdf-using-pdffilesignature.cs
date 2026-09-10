@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,78 +11,79 @@ class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, the signed output PDF and the certificate (PFX) file.
+        // Paths – adjust as needed
         const string inputPdf = "input.pdf";
         const string signedPdf = "signed.pdf";
-        const string certificatePath = "certificate.pfx";
-        const string certificatePassword = "password";
+        const string certFile = "certificate.pfx";
+        const string certPassword = "password";
 
-        // Verify that required files exist.
+        // ------------------------------------------------------------
+        // 1. Ensure a source PDF exists (create a minimal placeholder)
+        // ------------------------------------------------------------
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(certificatePath))
-        {
-            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
-            return;
+            var placeholder = new Document();
+            placeholder.Pages.Add();
+            placeholder.Save(inputPdf);
         }
 
-        // -------------------------------------------------
-        // Sign the PDF using PdfFileSignature (facade API)
-        // -------------------------------------------------
-        using (PdfFileSignature pdfSigner = new PdfFileSignature())
+        // ------------------------------------------------------------
+        // 2. Ensure a signing certificate exists (create a self‑signed PFX)
+        // ------------------------------------------------------------
+        if (!File.Exists(certFile))
         {
-            // Bind the source PDF file.
-            pdfSigner.BindPdf(inputPdf);
+            using RSA rsa = RSA.Create(2048);
+            var req = new CertificateRequest(
+                "cn=AsposeTest",
+                rsa,
+                HashAlgorithmName.SHA256,
+                RSASignaturePadding.Pkcs1);
 
-            // Set the certificate (PFX) and its password.
-            pdfSigner.SetCertificate(certificatePath, certificatePassword);
+            // Basic constraints – self‑signed, not a CA
+            req.CertificateExtensions.Add(
+                new X509BasicConstraintsExtension(false, false, 0, false));
+            // Key usage – digital signature
+            req.CertificateExtensions.Add(
+                new X509KeyUsageExtension(X509KeyUsageFlags.DigitalSignature, false));
 
-            // Optional: set a visual appearance for the signature.
-            // pdfSigner.SignatureAppearance = "signature_appearance.png";
+            var cert = req.CreateSelfSigned(DateTimeOffset.Now.AddDays(-1), DateTimeOffset.Now.AddYears(1));
+            byte[] pfxBytes = cert.Export(X509ContentType.Pfx, certPassword);
+            File.WriteAllBytes(certFile, pfxBytes);
+        }
 
-            // Define the rectangle where the visible signature will be placed.
-            // PdfFileSignature expects System.Drawing.Rectangle.
-            System.Drawing.Rectangle signatureRect = new System.Drawing.Rectangle(100, 100, 200, 100);
+        // ------------------------------------------------------------
+        // 3. Sign the PDF and immediately verify the signature
+        // ------------------------------------------------------------
+        using (PdfFileSignature signer = new PdfFileSignature())
+        {
+            // Load the source PDF
+            signer.BindPdf(inputPdf);
 
-            // Sign the first page. Parameters: page number (1‑based), reason, contact, location,
-            // visibility flag, and the rectangle.
-            pdfSigner.Sign(
+            // Set the certificate used for signing (load from the generated PFX)
+            signer.SetCertificate(certFile, certPassword);
+
+            // Define the visible signature rectangle (System.Drawing.Rectangle)
+            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 200, 100);
+
+            // Create a visible signature on page 1
+            signer.Sign(
                 page: 1,
                 SigReason: "Document approved",
                 SigContact: "john.doe@example.com",
                 SigLocation: "New York",
                 visible: true,
-                annotRect: signatureRect);
+                annotRect: rect);
 
-            // Save the signed PDF.
-            pdfSigner.Save(signedPdf);
-        }
+            // Save the signed PDF
+            signer.Save(signedPdf);
 
-        // -------------------------------------------------
-        // Verify the signature(s) in the signed PDF
-        // -------------------------------------------------
-        using (PdfFileSignature pdfVerifier = new PdfFileSignature())
-        {
-            // Bind the signed PDF file.
-            pdfVerifier.BindPdf(signedPdf);
-
-            // Retrieve all signature names (true => include empty fields, false => only filled).
-            var signatureNames = pdfVerifier.GetSignatureNames(true);
-
-            // Iterate over each signature and verify its authenticity using the new API.
-            foreach (var sigName in signatureNames)
+            // Verify all signatures present in the document
+            IList<SignatureName> signatureNames = signer.GetSignatureNames(true);
+            foreach (SignatureName sigName in signatureNames)
             {
-                // VerifySignature returns a boolean indicating validity.
-                bool isValid = pdfVerifier.VerifySignature(sigName);
+                bool isValid = signer.VerifySignature(sigName);
                 Console.WriteLine($"Signature '{sigName.Name}' validity: {isValid}");
             }
-
-            // Additionally, you can check if the document contains any signatures at all.
-            bool hasSignature = pdfVerifier.ContainsSignature();
-            Console.WriteLine($"Document contains signature(s): {hasSignature}");
         }
     }
 }

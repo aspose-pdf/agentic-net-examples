@@ -1,58 +1,67 @@
 using System;
-using System.Drawing;
+using System.IO;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
+using System.Drawing; // needed for Rectangle
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";
-        const string outputPdf  = "signed.pdf";
-        const string pfxPath    = "certificate.pfx";
-        const string pfxPassword = "password";
+        // Input PDF, output signed PDF, certificate file and its password
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "signed_output.pdf";
+        const string certificatePfx = "certificate.pfx";
+        const string certificatePassword = "password";
 
-        // Ensure the input files exist before proceeding
-        if (!System.IO.File.Exists(inputPdf))
+        // Verify that required files exist
+        if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!System.IO.File.Exists(pfxPath))
+        if (!File.Exists(certificatePfx))
         {
-            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
+            Console.Error.WriteLine($"Certificate file not found: {certificatePfx}");
             return;
         }
 
-        // Use PdfFileSignature facade to sign the document
-        using (PdfFileSignature pdfSigner = new PdfFileSignature())
+        try
         {
-            // Bind the source PDF
-            pdfSigner.BindPdf(inputPdf);
+            // Initialize the PdfFileSignature facade
+            using (PdfFileSignature signer = new PdfFileSignature())
+            {
+                // Bind the PDF file to be signed
+                signer.BindPdf(inputPdf);
 
-            // Provide the certificate and its password
-            pdfSigner.SetCertificate(pfxPath, pfxPassword);
+                // Optional: set a visual appearance for the signature (image file)
+                // signer.SignatureAppearance = "signature_image.jpg";
 
-            // Optional: set a visual appearance for the signature (image file)
-            // pdfSigner.SignatureAppearance = "signature_appearance.png";
+                // Provide the certificate (PFX) and its password
+                signer.SetCertificate(certificatePfx, certificatePassword);
 
-            // Define the rectangle where the visible signature will appear
-            // Rectangle(x, y, width, height) – coordinates are in points (1/72 inch)
-            Rectangle signatureRect = new Rectangle(100, 100, 200, 100);
+                // Define the rectangle where the visible signature will be placed
+                // Rectangle(x, y, width, height) – coordinates are in points (1/72 inch)
+                Rectangle rect = new Rectangle(100, 100, 200, 100);
 
-            // Sign page 1 with reason, contact, location, visibility flag, and rectangle
-            pdfSigner.Sign(
-                page: 1,
-                SigReason: "Document approved",
-                SigContact: "john.doe@example.com",
-                SigLocation: "New York, USA",
-                visible: true,
-                annotRect: signatureRect);
+                // Sign the document on page 1 with desired metadata
+                signer.Sign(
+                    page: 1,
+                    SigReason: "Document approved",
+                    SigContact: "john.doe@example.com",
+                    SigLocation: "New York",
+                    visible: true,
+                    annotRect: rect
+                );
 
-            // Save the signed PDF
-            pdfSigner.Save(outputPdf);
+                // Save the signed PDF
+                signer.Save(outputPdf);
+            }
+
+            Console.WriteLine($"PDF signed successfully and saved to '{outputPdf}'.");
         }
-
-        Console.WriteLine($"PDF signed successfully and saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during signing: {ex.Message}");
+        }
     }
 }

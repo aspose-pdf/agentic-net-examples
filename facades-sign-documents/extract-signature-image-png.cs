@@ -1,45 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;          // PdfFileSignature
-using Aspose.Pdf;                 // for any PDF related types (kept for completeness)
-using System.Drawing;            // Image handling (Windows only)
-using System.Drawing.Imaging;    // ImageFormat
+// URL-STABILITY STUB
+//
+// extract signature image png
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-sign-documents/extract-witness-signature-image.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf = "input.pdf";
-        const string outputPng = "WitnessSignature.png";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
-
-        // Bind the PDF to the PdfFileSignature facade
-        using (PdfFileSignature pdfSignature = new PdfFileSignature())
-        {
-            pdfSignature.BindPdf(inputPdf);
-
-            // Extract the image stream for the signature field named "WitnessSignature"
-            // The ExtractImage method accepts the field name directly (string overload).
-            Stream jpegStream = pdfSignature.ExtractImage("WitnessSignature");
-            if (jpegStream == null)
-            {
-                Console.Error.WriteLine("Signature image not found.");
-                return;
-            }
-
-            // Convert the JPEG stream to PNG and save it
-            using (jpegStream)
-            using (System.Drawing.Image img = System.Drawing.Image.FromStream(jpegStream))
-            {
-                img.Save(outputPng, ImageFormat.Png);
-            }
-        }
-
-        Console.WriteLine($"Signature image saved to '{outputPng}'.");
-    }
-}
+class Program { static void Main() { } }

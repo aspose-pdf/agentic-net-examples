@@ -1,35 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// remove all pdf signatures
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-sign-documents/remove-and-replace-pdf-signature.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class RemovePdfSignatures
-{
-    static void Main()
-    {
-        // Paths – adjust as needed
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "clean_output.pdf";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-
-        // PdfFileSignature is the Facade class that can manipulate signatures.
-        // It implements IDisposable, so we wrap it in a using block for deterministic cleanup.
-        using (PdfFileSignature signer = new PdfFileSignature())
-        {
-            // Bind the source PDF file.
-            signer.BindPdf(inputPdf);
-
-            // Remove all digital signatures from the document.
-            signer.RemoveSignatures();
-
-            // Save the cleaned PDF to a new file.
-            signer.Save(outputPdf);
-        }
-
-        Console.WriteLine($"All signatures removed. Clean file saved as '{outputPdf}'.");
-    }
-}
+class Program { static void Main() { } }
