@@ -7,8 +7,10 @@ class Program
 {
     static void Main()
     {
+        // Input PDF containing form fields
         const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "form_fields_audit.csv";
+        // Output CSV file for auditing
+        const string outputCsvPath = "form_audit.csv";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -17,42 +19,47 @@ class Program
         }
 
         // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Prepare CSV writer
-            using (StreamWriter writer = new StreamWriter(outputCsvPath, false, System.Text.Encoding.UTF8))
+            // Open a StreamWriter for the CSV output
+            using (StreamWriter writer = new StreamWriter(outputCsvPath, false))
             {
                 // Write CSV header
                 writer.WriteLine("FieldName,FieldType,DefaultValue");
 
                 // Iterate over all form fields
-                foreach (Field field in pdfDoc.Form.Fields)
+                foreach (Field field in pdfDocument.Form.Fields)
                 {
+                    // The field name (full name)
                     string fieldName = field.FullName ?? string.Empty;
+
+                    // Determine the concrete field type (e.g., TextBoxField, CheckboxField, etc.)
                     string fieldType = field.GetType().Name;
-                    string defaultValue = field.Value?.ToString() ?? string.Empty;
 
-                    // Escape commas in values if necessary
-                    fieldName = EscapeCsv(fieldName);
-                    fieldType = EscapeCsv(fieldType);
-                    defaultValue = EscapeCsv(defaultValue);
+                    // Retrieve the default/value of the field
+                    string fieldValue = string.Empty;
+                    try
+                    {
+                        // Most field types expose a Value property that holds the current/default value
+                        fieldValue = field.Value?.ToString() ?? string.Empty;
+                    }
+                    catch
+                    {
+                        // If accessing Value throws, leave it empty
+                        fieldValue = string.Empty;
+                    }
 
-                    writer.WriteLine($"{fieldName},{fieldType},{defaultValue}");
+                    // Escape commas and double quotes in CSV values by surrounding with double quotes
+                    string escapedName = $"\"{fieldName.Replace("\"", "\"\"")}\"";
+                    string escapedType = $"\"{fieldType.Replace("\"", "\"\"")}\"";
+                    string escapedValue = $"\"{fieldValue.Replace("\"", "\"\"")}\"";
+
+                    // Write the CSV line
+                    writer.WriteLine($"{escapedName},{escapedType},{escapedValue}");
                 }
             }
-
-            Console.WriteLine($"Form field metadata exported to '{outputCsvPath}'.");
         }
-    }
 
-    // Simple CSV escaping for commas and double quotes
-    private static string EscapeCsv(string value)
-    {
-        if (value.Contains(",") || value.Contains("\"") || value.Contains("\n"))
-        {
-            value = value.Replace("\"", "\"\"");
-            return $"\"{value}\"";
-        }
-        return value;
+        Console.WriteLine($"Form field metadata exported to '{outputCsvPath}'.");
     }
 }

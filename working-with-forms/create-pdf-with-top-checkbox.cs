@@ -6,21 +6,21 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document and add a blank page
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
+            // Add a single page (default size)
             Page page = doc.Pages.Add();
 
-            // Define the rectangle for the checkbox (top‑positioned)
-            // Coordinates: lower‑left (50, 750), upper‑right (70, 770)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 750, 70, 770);
+            // Define the rectangle for the checkbox (positioned near the top of the page)
+            // Rectangle(left, bottom, right, top) – coordinates are in points (1/72 inch)
+            Aspose.Pdf.Rectangle chkRect = new Aspose.Pdf.Rectangle(50, 750, 70, 770);
 
-            // Create a checkbox field on the page
-            CheckboxField checkbox = new CheckboxField(page, rect)
+            // Create the checkbox field on the page
+            CheckboxField checkbox = new CheckboxField(page, chkRect)
             {
-                // Optional: set a name and default state
-                Name = "TopCheckbox",
-                Checked = false
+                Name = "TopCheckbox",   // field name
+                Checked = true          // default state (checked)
             };
 
             // Add the checkbox to the document's AcroForm

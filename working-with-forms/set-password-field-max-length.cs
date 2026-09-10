@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName  = "Password"; // replace with actual field name
+        const string fieldName = "Password"; // name of the password field in the PDF
 
         if (!File.Exists(inputPath))
         {
@@ -20,10 +20,13 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the password field by name and set its maximum length
-            if (doc.Form[fieldName] is PasswordBoxField passwordField)
+            // Retrieve the password field by name
+            PasswordBoxField pwdField = doc.Form[fieldName] as PasswordBoxField;
+
+            if (pwdField != null)
             {
-                passwordField.MaxLen = 20; // enforce max 20 characters
+                // Set maximum length to 20 characters
+                pwdField.MaxLen = 20;
             }
             else
             {

@@ -15,33 +15,34 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Access the AcroForm of the document
-            Form form = doc.Form;
-
-            // If the document contains no form fields, report it
-            if (form.Count == 0)
+            // Check if the document contains any AcroForm fields
+            if (doc.Form == null || doc.Form.Count == 0)
             {
-                Console.WriteLine("No form fields found in the document.");
-                return;
+                Console.WriteLine("No AcroForm fields found in the PDF.");
+            }
+            else
+            {
+                Console.WriteLine("AcroForm field names:");
+                // Enumerate fields via the Form.Fields collection
+                foreach (Field field in doc.Form.Fields)
+                {
+                    // The Name property holds the field's name
+                    Console.WriteLine($"- {field.Name}");
+                }
             }
 
-            // Enumerate all fields using the Fields property
-            foreach (Field field in form.Fields)
+            // If the PDF also contains an XFA form, list its field names
+            if (doc.Form != null && doc.Form.HasXfa && doc.Form.XFA != null)
             {
-                // Field.Name provides the field's partial name; FullName gives the qualified name
-                Console.WriteLine($"Field Name: {field.Name}");
+                Console.WriteLine("XFA field names:");
+                foreach (string xfaName in doc.Form.XFA.FieldNames)
+                {
+                    Console.WriteLine($"- {xfaName}");
+                }
             }
-
-            // Alternative enumeration using the form's enumerator (commented out)
-            // var enumerator = form.GetEnumerator();
-            // while (enumerator.MoveNext())
-            // {
-            //     if (enumerator.Current is Field f)
-            //         Console.WriteLine($"Field Name: {f.Name}");
-            // }
         }
     }
 }

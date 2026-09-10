@@ -7,34 +7,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";          // PDF with a form field
+        const string outputPdf = "readonly_output.pdf"; // Resulting PDF
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Access the form field named "EmployeeID"
-            // The Forms collection returns a WidgetAnnotation (base class for form fields)
-            if (doc.Form != null && doc.Form["EmployeeID"] != null)
+            // Access the form collection; replace "MyField" with the actual field name
+            if (doc.Form != null && doc.Form["MyField"] is TextBoxField textField)
             {
-                // Set the field to read‑only so users cannot modify it
-                doc.Form["EmployeeID"].ReadOnly = true;
+                // Mark the field as read‑only to prevent further editing
+                textField.ReadOnly = true;
             }
             else
             {
-                Console.Error.WriteLine("Field 'EmployeeID' not found in the document.");
+                Console.WriteLine("Form field 'MyField' not found or is not a TextBoxField.");
             }
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with read‑only field: {outputPath}");
+        Console.WriteLine($"PDF saved with read‑only field: {outputPdf}");
     }
 }

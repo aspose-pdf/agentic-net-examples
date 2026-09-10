@@ -9,15 +9,8 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-
-        // Name of the radio button field in the PDF form
-        const string radioFieldName = "MyRadioGroup";
-
-        // Name of the option whose export value we want to change
-        const string optionName = "Option1";
-
-        // The code that downstream systems expect
-        const string exportValue = "CODE123";
+        const string radioFieldName = "MyRadioGroup";   // name of the radio button field in the PDF
+        const string optionExportValue = "CODE123";     // the export value required by downstream systems
 
         if (!File.Exists(inputPath))
         {
@@ -25,13 +18,13 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
             // Access the form object
             Form form = doc.Form;
 
-            // Retrieve the radio button field by its full name
+            // Retrieve the radio button field by its name
             RadioButtonField radio = form[radioFieldName] as RadioButtonField;
             if (radio == null)
             {
@@ -39,20 +32,31 @@ class Program
                 return;
             }
 
-            // Find the specific option and set its export value
-            foreach (Option opt in radio.Options)
+            // Ensure the radio button has at least one option
+            if (radio.Options.Count == 0)
             {
-                if (opt.Name == optionName)
-                {
-                    opt.Value = exportValue; // Export value used when the form is submitted
-                    break;
-                }
+                Console.Error.WriteLine("Radio button has no options to set export value on.");
+                return;
             }
 
-            // Save the modified PDF (lifecycle rule: use Save)
+            // Example: set the export value of the first option.
+            // Options collection contains Option objects; each Option has a Value property (export value).
+            radio.Options[0].Value = optionExportValue;
+
+            // If you need to set a specific option by name, you can locate it:
+            // foreach (Option opt in radio.Options)
+            // {
+            //     if (opt.Name == "DesiredOptionName")
+            //     {
+            //         opt.Value = optionExportValue;
+            //         break;
+            //     }
+            // }
+
+            // Save the modified PDF (lifecycle rule: use the same Document instance)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Export value set and saved to '{outputPath}'.");
+        Console.WriteLine($"Export value set and PDF saved to '{outputPath}'.");
     }
 }

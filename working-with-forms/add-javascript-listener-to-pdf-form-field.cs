@@ -2,15 +2,15 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // for JavascriptAction
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_listener.pdf";
-        const string targetFieldName = "myField"; // name of the field to monitor
+        const string outputPath = "output.pdf";
+        const string fieldName = "MyField"; // name of the field to monitor
 
         if (!File.Exists(inputPath))
         {
@@ -18,24 +18,20 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the field by its name; the Form indexer returns a WidgetAnnotation,
-            // so we need to cast it to Aspose.Pdf.Forms.Field.
-            Field field = doc.Form[targetFieldName] as Field;
+            // Retrieve the form field by its name and cast to Field
+            Field field = doc.Form[fieldName] as Field;
             if (field == null)
             {
-                Console.Error.WriteLine($"Field '{targetFieldName}' not found or is not a form field.");
+                Console.Error.WriteLine($"Field '{fieldName}' not found or is not a form field.");
                 return;
             }
 
-            // Attach a JavaScript action that runs when the field value changes (OnValidate event)
-            // The JavaScript simply shows an alert; replace with any desired function.
-            field.Actions.OnValidate = new JavascriptAction("app.alert('The value of the field has changed.');");
-
-            // Optionally, you can also execute the script immediately for testing:
-            // field.ExecuteFieldJavaScript(new JavascriptAction("app.alert('Test execution');"));
+            // Attach a JavaScript action that runs when the field value changes
+            // OnValidate is triggered when the user changes the field contents
+            field.Actions.OnValidate = new JavascriptAction("app.alert('Field value changed');");
 
             // Save the modified PDF
             doc.Save(outputPath);

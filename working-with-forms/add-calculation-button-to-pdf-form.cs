@@ -2,13 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // for JavascriptAction
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";   // PDF that already contains Quantity, UnitPrice and Total fields
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,60 +17,36 @@ class Program
             return;
         }
 
-        // Load the existing PDF (lifecycle rule: use using for disposal)
+        // Load the existing PDF inside a using block (ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Ensure form fields are recalculated automatically when a field changes
-            doc.Form.AutoRecalculate = true;
+            // Define the button rectangle (fully qualified to avoid ambiguity)
+            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 540);
 
-            // Quantity field
-            Aspose.Pdf.Rectangle qtyRect = new Aspose.Pdf.Rectangle(100, 700, 200, 720);
-            TextBoxField qtyField = new TextBoxField(doc, qtyRect)
-            {
-                PartialName = "Quantity",
-                Contents    = "0"
-            };
-            doc.Form.Add(qtyField);
-
-            // Unit price field
-            Aspose.Pdf.Rectangle priceRect = new Aspose.Pdf.Rectangle(100, 660, 200, 680);
-            TextBoxField priceField = new TextBoxField(doc, priceRect)
-            {
-                PartialName = "UnitPrice",
-                Contents    = "0"
-            };
-            doc.Form.Add(priceField);
-
-            // Total field (read‑only)
-            Aspose.Pdf.Rectangle totalRect = new Aspose.Pdf.Rectangle(100, 620, 200, 640);
-            TextBoxField totalField = new TextBoxField(doc, totalRect)
-            {
-                PartialName = "Total",
-                ReadOnly    = true,
-                Contents    = "0"
-            };
-            doc.Form.Add(totalField);
-
-            // Button that triggers the calculation
-            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 580, 200, 600);
+            // Create a push button field on the document
             ButtonField calcButton = new ButtonField(doc, btnRect)
             {
+                // Set a name for the button (used as the field identifier)
                 PartialName = "CalcButton",
-                NormalCaption = "Calculate"
+                // Caption shown on the button
+                NormalCaption = "Calculate Total"
             };
 
-            // Attach JavaScript to the button's activation action
+            // JavaScript that reads Quantity and UnitPrice fields, computes Total, and writes it back
             string js = @"
                 var qty = this.getField('Quantity').value;
                 var price = this.getField('UnitPrice').value;
-                var total = parseFloat(qty) * parseFloat(price);
+                var total = qty * price;
                 this.getField('Total').value = total;
             ";
-            calcButton.OnActivated = new JavascriptAction(js);
 
+            // Attach the JavaScript to the button's mouse‑up (release) action – the correct property is OnReleaseMouseBtn
+            calcButton.Actions.OnReleaseMouseBtn = new JavascriptAction(js);
+
+            // Add the button to the form (page number is optional because the button already knows its page)
             doc.Form.Add(calcButton);
 
-            // Save the modified PDF (lifecycle rule: save inside using)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

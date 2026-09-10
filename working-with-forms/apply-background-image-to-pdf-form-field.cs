@@ -1,17 +1,17 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Drawing; // for Rectangle
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";          // PDF with the form field
-        const string outputPdfPath = "output.pdf";        // Resulting PDF
-        const string fieldName = "BrandField";           // Name of the target form field
-        const string imagePath = "brand_logo.png";       // Background image to apply
+        const string inputPdfPath = "form.pdf";
+        const string outputPdfPath = "form_with_background.pdf";
+        const string fieldName = "logoField"; // name of the form field to decorate
+        const string imagePath = "logo.png";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -25,59 +25,61 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Open the PDF document
         using (Document doc = new Document(inputPdfPath))
         {
-            // Retrieve the widget annotation that represents the form field
-            WidgetAnnotation widget = doc.Form[fieldName] as WidgetAnnotation;
-            if (widget == null)
+            // Access the AcroForm object
+            Form form = doc.Form;
+
+            // ------------------------------------------------------------
+            // 1. If the document contains an XFA form, use XFA.SetFieldImage
+            // ------------------------------------------------------------
+            if (form.HasXfa)
             {
-                Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a widget annotation.");
-                return;
+                // Set the background image for the specified XFA field
+                using (FileStream imgStream = File.OpenRead(imagePath))
+                {
+                    form.XFA.SetFieldImage(fieldName, imgStream);
+                }
+            }
+            else
+            {
+                // ------------------------------------------------------------
+                // 2. For a standard AcroForm field, add a background artifact
+                // ------------------------------------------------------------
+                // Retrieve the field (example assumes a TextBoxField)
+                var field = form[fieldName] as TextBoxField;
+                if (field != null)
+                {
+                    // Create a background artifact and assign the image
+                    BackgroundArtifact bgArtifact = new BackgroundArtifact();
+                    using (FileStream imgStream = File.OpenRead(imagePath))
+                    {
+                        bgArtifact.SetImage(imgStream);
+                    }
+
+                    // Obtain the rectangle that defines the field's location
+                    Aspose.Pdf.Rectangle fieldRect = field.Rect;
+
+                    // Add the artifact to the page that contains the field.
+                    // For simplicity we use the first page; adjust as needed.
+                    Page page = doc.Pages[1];
+                    page.Artifacts.Add(bgArtifact);
+
+                    // Ensure the field itself is rendered on top of the background.
+                    // This adds an additional appearance of the field at the same rectangle.
+                    form.AddFieldAppearance(field, 1, fieldRect);
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Field '{fieldName}' not found or not a TextBoxField.");
+                }
             }
 
-            // Determine the page that contains the field and its rectangle
-            int pageNumber = FindPageNumberContainingAnnotation(doc, widget);
-            if (pageNumber == -1)
-            {
-                Console.Error.WriteLine($"Unable to locate the page for field '{fieldName}'.");
-                return;
-            }
-            var fieldRect = widget.Rect;
-
-            // Create an ImageStamp that matches the field rectangle and set it as background
-            ImageStamp imgStamp = new ImageStamp(imagePath)
-            {
-                Background = true,
-                XIndent = fieldRect.LLX,
-                YIndent = fieldRect.LLY,
-                Width = fieldRect.Width,
-                Height = fieldRect.Height
-            };
-
-            // Add the stamp to the same page as the field
-            doc.Pages[pageNumber].AddStamp(imgStamp);
-
-            // Save the modified PDF (lifecycle rule: use Document.Save)
+            // Save the modified PDF
             doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Background image applied to field '{fieldName}' and saved to '{outputPdfPath}'.");
-    }
-
-    /// <summary>
-    /// Finds the page number that contains the specified annotation.
-    /// Returns -1 if the annotation is not found on any page.
-    /// </summary>
-    private static int FindPageNumberContainingAnnotation(Document doc, Annotation annotation)
-    {
-        foreach (Page page in doc.Pages)
-        {
-            if (page.Annotations != null && page.Annotations.Contains(annotation))
-            {
-                return page.Number; // Page numbers are 1‑based in Aspose.Pdf
-            }
-        }
-        return -1;
+        Console.WriteLine($"PDF saved with background image applied to field: {outputPdfPath}");
     }
 }

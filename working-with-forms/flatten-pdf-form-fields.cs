@@ -7,27 +7,27 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "plain_output.pdf";
+        const string outputPath = "flattened_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document
+            // Load the PDF document inside a using block for proper disposal.
             using (Document doc = new Document(inputPath))
             {
-                // Remove all form fields and keep their visual values
+                // Remove all interactive form fields and place their current values directly on the page.
                 doc.Flatten();
 
-                // Save the resulting non‑interactive PDF
+                // Save the resulting static PDF.
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Plain PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

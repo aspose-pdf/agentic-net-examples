@@ -9,6 +9,9 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const string originalFieldName = "myField";   // name of the field to clone
+        const string clonedFieldName = "myField_clone";
+        const int targetPageNumber = 2;               // page where the clone will be placed (1‑based)
 
         if (!File.Exists(inputPath))
         {
@@ -16,42 +19,40 @@ class Program
             return;
         }
 
-        // Load the source PDF
+        // Load the source PDF (using the lifecycle rule for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve an existing form field (first one found)
-            Field originalField = null;
-            foreach (Field f in doc.Form.Fields)
-            {
-                originalField = f;
-                break;
-            }
+            // Access the form object
+            Form form = doc.Form;
 
+            // Retrieve the field that will be cloned (cast from WidgetAnnotation to Field)
+            Field originalField = doc.Form[originalFieldName] as Field;
             if (originalField == null)
             {
-                Console.WriteLine("No form fields present in the document.");
-                doc.Save(outputPath);
+                Console.Error.WriteLine($"Field '{originalFieldName}' not found or is not a form field.");
                 return;
             }
 
-            // Ensure the target page exists (pages are 1‑based)
-            int targetPageNumber = 2;
-            if (doc.Pages.Count < targetPageNumber)
-                doc.Pages.Add(); // add a blank page if needed
-
             // Clone the field onto the target page with a new partial name.
-            // This uses Form.Add(Field, string, int) which creates a copy.
-            Field clonedField = doc.Form.Add(originalField, "ClonedField", targetPageNumber);
+            // The Add method returns a WidgetAnnotation; cast it to Field to work with field members.
+            Field clonedField = doc.Form.Add(originalField, clonedFieldName, targetPageNumber) as Field;
+            if (clonedField == null)
+            {
+                Console.Error.WriteLine("Failed to clone the field.");
+                return;
+            }
 
             // Modify properties of the cloned field
-            clonedField.Value = "Cloned value";
-            clonedField.ReadOnly = true;
-            // Set a new rectangle (position and size) on the target page
-            clonedField.Rect = new Aspose.Pdf.Rectangle(100, 500, 250, 550);
-            // Change the field's border color for visual distinction
-            clonedField.Color = Aspose.Pdf.Color.LightBlue;
+            // Example: change its position and size (fully qualified Rectangle to avoid ambiguity)
+            clonedField.Rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Save the updated PDF
+            // Example: set a new default value
+            clonedField.Value = "Cloned Value";
+
+            // Example: make the cloned field read‑only
+            clonedField.ReadOnly = true;
+
+            // Save the modified document (using the lifecycle rule)
             doc.Save(outputPath);
         }
 

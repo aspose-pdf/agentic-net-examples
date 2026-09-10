@@ -7,32 +7,36 @@ class Program
 {
     static void Main()
     {
-        // Output PDF file path
-        const string outputPath = "FeedbackForm.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page to the document
-            Aspose.Pdf.Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Define the rectangle where the text field will appear
-            // (llx, lly) = lower‑left corner, (urx, ury) = upper‑right corner
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Define the position and size of the text field (llx, lly, urx, ury)
             Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 400, 600);
 
-            // Create a multiline text box field named "Feedback"
-            Aspose.Pdf.Forms.TextBoxField feedbackField = new Aspose.Pdf.Forms.TextBoxField(page, fieldRect);
-            feedbackField.Name = "Feedback";          // field identifier
-            feedbackField.Multiline = true;           // allow multiple lines
-            feedbackField.MaxLen = 500;               // limit to 500 characters
+            // Create a multiline TextBoxField named "Feedback"
+            TextBoxField feedbackField = new TextBoxField(doc.Pages[1], fieldRect)
+            {
+                Name = "Feedback",
+                Multiline = true,
+                MaxLen = 500
+            };
 
-            // Optional: set a visible border color (helps users see the field)
-            feedbackField.Color = Aspose.Pdf.Color.Black;
+            // Add the field to the form on page 1
+            doc.Form.Add(feedbackField, 1);
 
-            // Save the PDF with the new form field
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with 'Feedback' field saved to '{outputPath}'.");
+        Console.WriteLine($"Feedback field added and saved to '{outputPath}'.");
     }
 }

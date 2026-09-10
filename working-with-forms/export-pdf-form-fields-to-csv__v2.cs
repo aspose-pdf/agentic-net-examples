@@ -7,50 +7,69 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "form_fields.csv";
+        const string inputPdf = "input.pdf";
+        const string outputCsv = "form_fields.csv";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdfPath))
+        try
         {
-            // Open a CSV writer
-            using (StreamWriter writer = new StreamWriter(outputCsvPath, false, System.Text.Encoding.UTF8))
+            // Load the PDF document (lifecycle rule: use using)
+            using (Document doc = new Document(inputPdf))
             {
-                // Write CSV header
-                writer.WriteLine("FieldName,Value");
-
-                // Iterate over all form fields
-                foreach (Field field in doc.Form.Fields)
+                // Verify that the PDF contains a form with fields
+                if (doc.Form == null || doc.Form.Count == 0)
                 {
-                    string name = field.FullName ?? string.Empty;
-                    string value = field.Value?.ToString() ?? string.Empty;
-
-                    // Escape values that may contain commas, quotes or newlines
-                    string escapedName = EscapeCsv(name);
-                    string escapedValue = EscapeCsv(value);
-
-                    writer.WriteLine($"{escapedName},{escapedValue}");
+                    Console.WriteLine("No form fields found in the PDF.");
+                    return;
                 }
-            }
 
-            Console.WriteLine($"Form fields exported to '{outputCsvPath}'.");
+                // Create a CSV file for output
+                using (StreamWriter writer = new StreamWriter(outputCsv, false, System.Text.Encoding.UTF8))
+                {
+                    // Write CSV header
+                    writer.WriteLine("FieldName,Value");
+
+                    // Iterate over each form field
+                    foreach (Field field in doc.Form.Fields)
+                    {
+                        // FullName provides the qualified field name
+                        string name = field.FullName ?? string.Empty;
+
+                        // Value may be null; convert to string safely
+                        string value = field.Value?.ToString() ?? string.Empty;
+
+                        // Escape CSV special characters
+                        name = EscapeCsv(name);
+                        value = EscapeCsv(value);
+
+                        // Write the CSV line
+                        writer.WriteLine($"{name},{value}");
+                    }
+                }
+
+                Console.WriteLine($"Form data exported to '{outputCsv}'.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 
-    // Helper to escape CSV fields according to RFC 4180
-    static string EscapeCsv(string text)
+    // Helper method to escape CSV fields according to RFC 4180
+    static string EscapeCsv(string field)
     {
-        if (text.Contains("\"") || text.Contains(",") || text.Contains("\n") || text.Contains("\r"))
-        {
-            text = text.Replace("\"", "\"\"");
-            return $"\"{text}\"";
-        }
-        return text;
+        if (field.Contains("\""))
+            field = field.Replace("\"", "\"\"");
+
+        if (field.Contains(",") || field.Contains("\"") || field.Contains("\n") || field.Contains("\r"))
+            field = $"\"{field}\"";
+
+        return field;
     }
 }

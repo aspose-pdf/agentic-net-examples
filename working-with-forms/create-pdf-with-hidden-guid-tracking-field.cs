@@ -1,6 +1,5 @@
 using System;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
 
 class Program
@@ -8,36 +7,30 @@ class Program
     static void Main()
     {
         // Generate a GUID at runtime for tracking
-        string trackingGuid = Guid.NewGuid().ToString();
+        string trackingId = Guid.NewGuid().ToString();
 
-        // Create a new PDF document
+        // Create a new PDF document (wrapped in using as per lifecycle rule)
         using (Document doc = new Document())
         {
-            // Add a blank page (pages are 1‑based)
+            // Add a blank page (required for placing form fields)
             Page page = doc.Pages.Add();
 
-            // Define the rectangle for the hidden text field
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 700, 300, 720);
+            // Define a zero‑size rectangle for the hidden field (position is irrelevant)
+            Rectangle fieldRect = new Rectangle(0, 0, 0, 0);
 
-            // Create a text box field on the page
+            // Create a textbox field on the page, assign a partial name and store the GUID as its value
             TextBoxField hiddenField = new TextBoxField(page, fieldRect)
             {
-                // Set the field name (partial name)
                 PartialName = "TrackingId",
-                // Store the GUID as the field value
-                Value = trackingGuid,
-                // Mark the field as hidden using the annotation flag
-                Flags = AnnotationFlags.Hidden
+                Value = trackingId
+                // No need to set a flag; the zero‑size rectangle keeps the field invisible
             };
 
-            // Add the field to the document's form collection
+            // Add the field to the document's form
             doc.Form.Add(hiddenField);
 
-            // Save the PDF (no SaveOptions needed for PDF output)
-            doc.Save("output.pdf");
+            // Save the PDF
+            doc.Save("HiddenGuid.pdf");
         }
-
-        Console.WriteLine("PDF with hidden tracking field created successfully.");
     }
 }

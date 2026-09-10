@@ -7,30 +7,42 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "spellcheck_form.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_spellcheck.pdf";
 
-        // Document must be wrapped in a using block for proper disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a new page (pages are 1‑based)
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Define the rectangle for the text box field (fully qualified to avoid ambiguity)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
+        // Load the existing PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
 
-            // Create a TextBoxField on the page
-            TextBoxField txtField = new TextBoxField(page, rect);
-            txtField.PartialName = "MyTextField";   // field name
-            txtField.MaxLen = 100;                  // optional: limit length
-            txtField.SpellCheck = true;             // enable spell checking
+            // Define the rectangle where the text box will appear
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+            // Create a new text box field on the page
+            TextBoxField txtField = new TextBoxField(page, rect)
+            {
+                PartialName = "MyTextField", // field name
+                Value = ""                    // optional default value
+            };
+
+            // Enable spell checking for this field
+            txtField.SpellCheck = true;
 
             // Add the field to the document's form collection
             doc.Form.Add(txtField);
 
-            // Save the PDF (Document.Save writes PDF regardless of extension)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with spell‑checked text field saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with spell checking enabled: {outputPath}");
     }
 }

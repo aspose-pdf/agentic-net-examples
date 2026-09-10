@@ -7,10 +7,12 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "renamed.pdf";
-        const string oldFieldName = "CustomerID";   // existing field name
-        const string newFieldName = "Cust_ID";      // new naming convention
+
+        // Example: old field name in the source PDF and the new name required by downstream systems
+        const string oldFieldName = "CustomerID";
+        const string newFieldName = "Cust_ID";
 
         if (!File.Exists(inputPath))
         {
@@ -18,44 +20,42 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Access the form object
-            Form form = doc.Form;
-
-            // Verify that the form contains fields
-            if (form == null || form.Count == 0)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Console.WriteLine("No form fields present in the document.");
+                // Access the form object
+                Form form = doc.Form;
+
+                // Verify that the field to be renamed exists
+                if (!form.HasField(oldFieldName))
+                {
+                    Console.WriteLine($"Field '{oldFieldName}' not found in the document.");
+                }
+                else
+                {
+                    // Retrieve the field (indexer returns WidgetAnnotation, cast to Field)
+                    Field field = (Field)form[oldFieldName];
+
+                    // Rename the field:
+                    // - Name: the annotation name on the page
+                    // - PartialName: logical name used by the form hierarchy
+                    // - MappingName: name used when exporting form data
+                    field.Name        = newFieldName;
+                    field.PartialName = newFieldName;
+                    field.MappingName = newFieldName;
+                }
+
+                // Save the modified PDF
                 doc.Save(outputPath);
-                return;
             }
 
-            // Ensure the target field exists
-            if (!form.HasField(oldFieldName))
-            {
-                Console.WriteLine($"Field '{oldFieldName}' not found.");
-                doc.Save(outputPath);
-                return;
-            }
-
-            // Retrieve the field by its current name
-            Field field = (Field)form[oldFieldName];
-
-            // Rename the field:
-            // - Name updates the internal field identifier (PartialName)
-            // - MappingName is used when exporting form data to external systems
-            field.Name = newFieldName;
-            field.MappingName = newFieldName;
-
-            // Optional: update the tooltip (AlternateName) for user visibility
-            field.AlternateName = $"Renamed from {oldFieldName}";
-
-            // Save the modified PDF (lifecycle rule: Document.Save)
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF with renamed field saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Field renamed and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

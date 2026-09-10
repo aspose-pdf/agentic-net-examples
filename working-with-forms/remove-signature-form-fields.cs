@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;   // WidgetAnnotation base type
-using Aspose.Pdf.Forms;        // Form, SignatureField, Field
+using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -21,21 +20,16 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Collect all signature fields (SignatureField derives from Field -> WidgetAnnotation)
-            List<WidgetAnnotation> signatures = new List<WidgetAnnotation>();
-            foreach (WidgetAnnotation field in doc.Form)
-            {
-                if (field is SignatureField)
-                {
-                    signatures.Add(field);
-                }
-            }
+            // Get the form object
+            Form form = doc.Form;
 
-            // Remove each collected signature field from the form
-            foreach (WidgetAnnotation sig in signatures)
+            // Collect all signature fields (SignatureField derives from WidgetAnnotation)
+            var signatureFields = form.OfType<SignatureField>().ToList();
+
+            // Delete each signature field from the form
+            foreach (SignatureField sigField in signatureFields)
             {
-                // Delete expects a Field; SignatureField is a Field, so cast is safe
-                doc.Form.Delete((Field)sig);
+                form.Delete(sigField);
             }
 
             // Save the modified document

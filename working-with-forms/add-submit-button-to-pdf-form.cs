@@ -1,16 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";          // existing PDF with form fields
-        const string outputPath = "output_with_submit.pdf";
-        const string submitUrl = "https://example.com/submit"; // endpoint to receive form data
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string submitUrl = "https://example.com/submit";
 
         if (!File.Exists(inputPath))
         {
@@ -18,35 +18,34 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has a form (creates one if absent)
+            // Access (or create) the AcroForm
             Form form = doc.Form;
 
-            // Define button rectangle (llx, lly, urx, ury)
-            var btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
+            // Define the button rectangle (left, bottom, right, top)
+            Rectangle btnRect = new Rectangle(100, 500, 200, 540);
 
-            // Create a push button field on the first page
-            var submitButton = new ButtonField(doc.Pages[1], btnRect)
+            // Create a push‑button field
+            ButtonField submitBtn = new ButtonField(doc, btnRect)
             {
-                PartialName = "SubmitButton",          // internal field name
-                NormalCaption = "Submit",              // text shown on the button
-                Color = Aspose.Pdf.Color.LightGray     // optional visual styling
+                PartialName      = "SubmitBtn",
+                NormalCaption    = "Submit",
+                AlternateCaption = "Submit"
             };
 
-            // Create a SubmitFormAction and set the target URL using FileSpecification
-            var submitAction = new SubmitFormAction
+            // SubmitFormAction expects a FileSpecification for the URL
+            SubmitFormAction submitAction = new SubmitFormAction
             {
-                Url = new FileSpecification(submitUrl)
-                // Optional: set ExportFormat, e.g., submitAction.ExportFormat = SubmitFormAction.ExportFormatEnum.FDF;
+                Url   = new FileSpecification(submitUrl, "Submit URL"),
+                Flags = SubmitFormAction.ExportFormat // export as HTML form (GET)
             };
 
-            // Attach the action to the button's mouse‑up (release) event using the correct property
-            submitButton.Actions.OnReleaseMouseBtn = submitAction;
+            // Assign the action to a supported button event (press mouse button)
+            submitBtn.Actions.OnPressMouseBtn = submitAction;
 
-            // Add the button to the form on page 1
-            form.Add(submitButton, 1);
+            // Add the button to page 1 of the document
+            form.Add(submitBtn, 1);
 
             // Save the modified PDF
             doc.Save(outputPath);

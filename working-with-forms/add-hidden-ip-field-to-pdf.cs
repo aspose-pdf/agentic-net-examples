@@ -3,13 +3,14 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_ip.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -20,31 +21,32 @@ class Program
         // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
-            // Create a hidden text box field on the first page.
-            // A zero‑size rectangle makes the field invisible.
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
-            TextBoxField ipField = new TextBoxField(doc.Pages[1], rect);
-            ipField.PartialName = "UserIP";
+            // Create a hidden text box field to store the IP address
+            TextBoxField ipField = new TextBoxField(doc)
+            {
+                PartialName = "UserIP",   // field name
+                Value = ""                // initial empty value
+            };
 
-            // Add the field to the form.
-            doc.Form.Add(ipField);
+            // Add the field to the form on page 1 (1‑based index)
+            doc.Form.Add(ipField, 1);
 
-            // JavaScript that runs when the document is opened.
-            // It should set the field value to the user's IP address.
-            // (Actual IP retrieval must be implemented on the client side or via a service.)
-            string js = @"
-                // TODO: replace with real IP retrieval logic.
-                var ip = '';
-                this.getField('UserIP').value = ip;
-            ";
+            // Place the field off‑page so it is not visible to the user
+            // Rectangle(left, bottom, width, height) – using zero size at (0,0)
+            doc.Form.AddFieldAppearance(ipField, 1, new Aspose.Pdf.Rectangle(0, 0, 0, 0));
 
-            // Attach the JavaScript to the document's OpenAction (read‑only property).
-            doc.OpenAction = new JavascriptAction(js);
+            // JavaScript to capture the user's IP address on form load.
+            // This is a placeholder; replace with actual JS that obtains the IP.
+            string jsCode = "this.getField('UserIP').value = app.getIP();";
+            JavascriptAction jsAction = new JavascriptAction(jsCode);
 
-            // Save the modified PDF.
+            // Attach the JavaScript to the field so it runs when the document is opened
+            ipField.ExecuteFieldJavaScript(jsAction);
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with hidden IP field saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with hidden IP field: {outputPath}");
     }
 }

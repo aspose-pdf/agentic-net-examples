@@ -7,38 +7,51 @@ class ExportTotalPriceToXml
 {
     static void Main()
     {
-        // Example data: calculate total price (could be from any source)
-        double totalPrice = 1234.56; // replace with actual calculation logic
+        // Sample data: list of item prices
+        decimal[] itemPrices = { 19.99m, 5.49m, 12.30m, 7.25m };
+        decimal totalPrice = 0;
+        foreach (decimal price in itemPrices)
+            totalPrice += price;
 
-        // Path for the temporary PDF that will hold the total price
-        string pdfPath = Path.Combine(Path.GetTempPath(), "TotalPrice.pdf");
-        // Path for the resulting XML file
-        string xmlPath = Path.Combine(Path.GetTempPath(), "TotalPrice.xml");
-
-        // Create a new PDF document, add a page and write the total price
+        // Create a new PDF document
         using (Document pdfDoc = new Document())
         {
-            // Add a blank page
+            // ------------------------------------------------------------
+            // The XML conversion requires a *tagged* PDF.  Mark the document
+            // as tagged and create a minimal structure hierarchy.
+            // ------------------------------------------------------------
+            var tagged = pdfDoc.TaggedContent; // Use 'var' to avoid direct reference to TaggedContent type
+            tagged.SetTitle("Total Price Document");
+            tagged.SetLanguage("en-US");
+
+            // Create a simple tagged structure (root → sect → div → art)
+            var root = tagged.RootElement;
+            var sect = tagged.CreateSectElement();
+            root.AppendChild(sect);
+            var div = tagged.CreateDivElement();
+            sect.AppendChild(div);
+            var art = tagged.CreateArtElement();
+            div.AppendChild(art);
+
+            // Add a page
             Page page = pdfDoc.Pages.Add();
 
-            // Create a text fragment with the total price
-            TextFragment priceFragment = new TextFragment($"Total Price: {totalPrice:C}");
-            priceFragment.TextState.FontSize = 14;
-            priceFragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            priceFragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            // Prepare the text to display the total price
+            string priceText = $"Total Price: {totalPrice:C}";
+            TextFragment fragment = new TextFragment(priceText);
+            fragment.TextState.FontSize = 14;
+            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
+            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Position the fragment near the top of the page
-            priceFragment.Position = new Position(100, 750);
-            page.Paragraphs.Add(priceFragment);
+            // Add the text fragment to the page
+            page.Paragraphs.Add(fragment);
 
-            // Save the PDF (optional, can be omitted if only XML output is needed)
-            pdfDoc.Save(pdfPath);
-
-            // Export the PDF content to XML using MobiXmlSaveOptions (works for untagged PDFs)
-            MobiXmlSaveOptions xmlOptions = new MobiXmlSaveOptions();
-            pdfDoc.Save(xmlPath, xmlOptions);
+            // Save the document as XML using XmlSaveOptions
+            string xmlOutputPath = Path.Combine(Environment.CurrentDirectory, "TotalPrice.xml");
+            XmlSaveOptions xmlOptions = new XmlSaveOptions();
+            pdfDoc.Save(xmlOutputPath, xmlOptions);
         }
 
-        Console.WriteLine($"Total price exported to XML at: {xmlPath}");
+        Console.WriteLine("Total price exported to XML successfully.");
     }
 }

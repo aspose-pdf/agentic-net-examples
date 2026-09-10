@@ -16,27 +16,29 @@ class Program
             return;
         }
 
-        // Load the existing PDF
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Ensure there is at least one page to place the checkbox
-            Page page = doc.Pages[1];
+            // Define the rectangle where the checkbox will appear (llx, lly, urx, ury)
+            // Fully qualify to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 120, 520);
 
-            // Define the position and size of the checkbox (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
+            // Create a new checkbox field on the document
+            CheckboxField checkbox = new CheckboxField(doc, rect)
+            {
+                Name = "AgreeTerms",          // Field name
+                PartialName = "AgreeTerms",   // Partial name (optional, often same as Name)
+                ExportValue = "Yes",          // Value exported when checked
+                Checked = false               // Initial state (unchecked)
+            };
 
-            // Create the checkbox field on the specified page
-            CheckboxField checkbox = new CheckboxField(page, rect);
-            checkbox.Name = "AgreeTerms";                     // field name
-            checkbox.AlternateName = "Agree to terms";        // tooltip / alternate name
-
-            // Add the checkbox to the document's form
+            // Add the checkbox to the form
             doc.Form.Add(checkbox);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Checkbox field 'AgreeTerms' added and saved to '{outputPath}'.");
+        Console.WriteLine($"Checkbox field added and saved to '{outputPath}'.");
     }
 }

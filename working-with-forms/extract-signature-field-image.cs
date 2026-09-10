@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;   // for Annotation and ExtractImage()
-using Aspose.Pdf.Forms;        // for SignatureField and field name handling
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
         const string inputPdfPath = "signed_document.pdf";
-        const string outputFolder = "SignatureImages";
+        const string outputImagePath = "signature_image.jpg";
+        const string signatureFieldName = "Signature1";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -17,50 +17,40 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Load the PDF document – wrapped in a using block for proper disposal
+        // Load the PDF document (lifecycle rule: wrap in using)
         using (Document doc = new Document(inputPdfPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Retrieve the form field by name and cast to Field (WidgetAnnotation -> Field)
+            Field? field = doc.Form[signatureFieldName] as Field;
+            if (field == null)
             {
-                Page page = doc.Pages[pageIndex];
+                Console.Error.WriteLine($"Signature field '{signatureFieldName}' not found or not a form field.");
+                return;
+            }
 
-                // Iterate through all annotations on the page
-                foreach (Annotation annotation in page.Annotations)
+            // Ensure the field is a SignatureField
+            if (field is not SignatureField sigField)
+            {
+                Console.Error.WriteLine($"Field '{signatureFieldName}' is not a signature field.");
+                return;
+            }
+
+            // Extract the visual appearance as a JPEG stream
+            using (Stream? imageStream = sigField.ExtractImage())
+            {
+                if (imageStream == null)
                 {
-                    // Look for signature fields (SignatureField derives from FormField -> Annotation)
-                    if (annotation is SignatureField signatureField)
-                    {
-                        // Try to extract the visual appearance as a JPEG stream
-                        // (ExtractImage returns null if no image is present)
-                        using (Stream imageStream = signatureField.ExtractImage())
-                        {
-                            if (imageStream != null)
-                            {
-                                // Build a file name using the field's partial name (or a fallback)
-                                string fieldName = !string.IsNullOrEmpty(signatureField.PartialName)
-                                                   ? signatureField.PartialName
-                                                   : $"Signature_{pageIndex}";
-                                string outputPath = Path.Combine(outputFolder, $"{fieldName}.jpg");
-
-                                // Save the JPEG stream to disk
-                                using (FileStream fileOut = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-                                {
-                                    imageStream.CopyTo(fileOut);
-                                }
-
-                                Console.WriteLine($"Extracted signature image saved to: {outputPath}");
-                            }
-                            else
-                            {
-                                Console.WriteLine($"No image found for signature field '{signatureField.PartialName}' on page {pageIndex}.");
-                            }
-                        }
-                    }
+                    Console.Error.WriteLine("No image data found in the signature field.");
+                    return;
                 }
+
+                // Save the extracted image to a file for audit logging
+                using (FileStream file = new FileStream(outputImagePath, FileMode.Create, FileAccess.Write))
+                {
+                    imageStream.CopyTo(file);
+                }
+
+                Console.WriteLine($"Signature image extracted and saved to '{outputImagePath}'.");
             }
         }
     }

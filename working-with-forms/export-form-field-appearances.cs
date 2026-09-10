@@ -7,43 +7,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputFolder = "FieldAppearances";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
         try
         {
             // Load the source PDF containing form fields
-            using (Document srcDoc = new Document(inputPdfPath))
+            using (Document sourceDoc = new Document(inputPdf))
             {
-                // Iterate over each form field (Field) in the document
-                foreach (Field field in srcDoc.Form)
+                // Access the form object
+                Form sourceForm = sourceDoc.Form;
+
+                // Iterate over each field in the form
+                foreach (Field field in sourceForm.Fields)
                 {
-                    // Create a new single‑page PDF to hold the field's appearance
+                    // Create a new PDF document to hold the appearance of this field
                     using (Document appearanceDoc = new Document())
                     {
-                        // Add a blank page – Aspose.Pdf does not add one automatically for a new Document
+                        // Add a blank page (size will be adjusted later)
                         appearanceDoc.Pages.Add();
 
-                        // Copy the field's appearance onto page 1 at the same rectangle
-                        // The rectangle is taken from the original field
-                        appearanceDoc.Form.AddFieldAppearance(field, 1, field.Rect);
+                        // Retrieve the rectangle of the field (its size and position)
+                        Aspose.Pdf.Rectangle fieldRect = field.Rect;
 
-                        // Build a safe file name from the field's full name
-                        string safeName = MakeFileSystemSafeName(field.FullName);
+                        // Add the field's appearance to the first page of the new document
+                        // The appearance is placed at the same size as the original field
+                        sourceForm.AddFieldAppearance(field, 1, fieldRect);
+
+                        // Optionally, you can remove the field annotation from the new document
+                        // to keep only the visual appearance (if desired)
+                        // appearanceDoc.Form.Fields.Clear();
+
+                        // Build a safe file name using the field's full name
+                        string safeName = MakeSafeFileName(field.FullName);
                         string outputPath = Path.Combine(outputFolder, $"{safeName}.pdf");
 
-                        // Save the appearance PDF
+                        // Save the appearance document
                         appearanceDoc.Save(outputPath);
-                        Console.WriteLine($"Exported appearance for field '{field.FullName}' to '{outputPath}'.");
+                        Console.WriteLine($"Exported appearance of field '{field.FullName}' to '{outputPath}'.");
                     }
                 }
             }
@@ -54,13 +64,13 @@ class Program
         }
     }
 
-    // Helper to replace characters that are invalid in file names
-    static string MakeFileSystemSafeName(string name)
+    // Helper to replace invalid filename characters
+    static string MakeSafeFileName(string name)
     {
         foreach (char c in Path.GetInvalidFileNameChars())
         {
             name = name.Replace(c, '_');
         }
-        return string.IsNullOrWhiteSpace(name) ? "UnnamedField" : name;
+        return name;
     }
 }

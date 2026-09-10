@@ -1,47 +1,27 @@
 using System;
 using System.IO;
-using System.Xml;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string xmlOutputPath = "formdata.xml";
+        const string inputPdfPath = "input.pdf";
+        const string outputXmlPath = "formData.xml";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
         // Load the PDF document
-        using (Document doc = new Document(pdfPath))
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Create an XML document to hold the field data
-            XmlDocument xmlDoc = new XmlDocument();
-            XmlElement root = xmlDoc.CreateElement("FormData");
-            xmlDoc.AppendChild(root);
-
-            // Iterate over all form fields using the Fields collection
-            foreach (Field field in doc.Form.Fields)
-            {
-                // Field name (partial name) and its current value
-                string fieldName = field.PartialName;
-                string fieldValue = field.Value?.ToString() ?? string.Empty;
-
-                XmlElement fieldElement = xmlDoc.CreateElement("Field");
-                fieldElement.SetAttribute("name", fieldName);
-                fieldElement.InnerText = fieldValue;
-                root.AppendChild(fieldElement);
-            }
-
-            // Save the XML document to the specified path
-            xmlDoc.Save(xmlOutputPath);
+            // Export the document (including its form fields) to an XML file
+            pdfDocument.SaveXml(outputXmlPath);
         }
 
-        Console.WriteLine($"Form data successfully saved to '{xmlOutputPath}'.");
+        Console.WriteLine($"Form data exported successfully to '{outputXmlPath}'.");
     }
 }

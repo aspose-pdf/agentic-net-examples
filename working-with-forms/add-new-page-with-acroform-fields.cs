@@ -1,54 +1,57 @@
 using System;
 using System.IO;
+using System.Drawing; // for System.Drawing.Color used in DefaultAppearance
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations; // for DefaultAppearance
 
-class Program
+class AddAcroFormFields
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_fields.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF (lifecycle rule: using block)
         using (Document doc = new Document(inputPath))
         {
             // Add a new blank page at the end of the document
-            Page newPage = doc.Pages.Add(); // page indexing is 1‑based
+            Page newPage = doc.Pages.Add();
 
-            // -------------------------------------------------
+            // Define rectangles for the fields (coordinates are in points; origin is bottom‑left)
+            Aspose.Pdf.Rectangle textBoxRect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
+            Aspose.Pdf.Rectangle checkBoxRect = new Aspose.Pdf.Rectangle(100, 500, 120, 520);
+
             // Create a TextBox field on the new page
-            // Rectangle constructor: (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle txtRect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
-            TextBoxField txtField = new TextBoxField(newPage, txtRect)
+            TextBoxField txtField = new TextBoxField(newPage, textBoxRect)
             {
-                PartialName = "CustomerName", // field name
-                Value = "Enter name"          // default display text
+                PartialName = "CustomerName",
+                Value = "Enter name here"
             };
-            // Add the field to the form on the specific page (page number is 1‑based)
-            doc.Form.Add(txtField, newPage.Number);
+            // Set appearance via DefaultAppearance constructor (uses System.Drawing.Color)
+            txtField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
 
-            // -------------------------------------------------
-            // Create a CheckBox field on the same page
-            Aspose.Pdf.Rectangle chkRect = new Aspose.Pdf.Rectangle(100, 500, 120, 520);
-            CheckboxField chkField = new CheckboxField(newPage, chkRect)
+            // Create a CheckBox field on the new page
+            CheckboxField chkField = new CheckboxField(newPage, checkBoxRect)
             {
-                PartialName = "Subscribe",
-                Value = "Off" // unchecked by default
+                PartialName = "SubscribeNewsletter",
+                Value = "Off",
+                Color = Aspose.Pdf.Color.Blue
             };
+
+            // Add the fields to the document's form (page numbers are 1‑based)
+            doc.Form.Add(txtField, newPage.Number);
             doc.Form.Add(chkField, newPage.Number);
 
-            // -------------------------------------------------
-            // Save the updated PDF (lifecycle rule: Save)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with new page and form fields: {outputPath}");
     }
 }

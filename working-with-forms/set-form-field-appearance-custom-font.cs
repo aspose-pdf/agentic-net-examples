@@ -1,24 +1,25 @@
 using System;
 using System.IO;
+using System.Drawing; // needed for System.Drawing.Color
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations; // for DefaultAppearance
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";          // source PDF
-        const string outputPdfPath = "output.pdf";         // result PDF
-        const string customFontPath = "customfont.ttf";    // external TTF font file
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string customFontPath = "custom.ttf";
 
-        // Ensure the input files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
+
         if (!File.Exists(customFontPath))
         {
             Console.Error.WriteLine($"Font file not found: {customFontPath}");
@@ -28,34 +29,28 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdfPath))
         {
-            // Load the custom font from the external file
-            Font customFont;
-            using (FileStream fontStream = File.OpenRead(customFontPath))
-            {
-                // OpenFont reads the font data; specify TTF type
-                customFont = FontRepository.OpenFont(fontStream, FontTypes.TTF);
-                // Ensure the font will be embedded in the PDF
-                customFont.IsEmbedded = true;
-            }
+            // Load the external TrueType font (embedding is handled automatically when the font name is used)
+            Aspose.Pdf.Text.Font customFont = FontRepository.OpenFont(customFontPath);
 
-            // Define the rectangle where the form field will be placed (llx, lly, urx, ury)
+            // Extract the font name to be used in DefaultAppearance (DefaultAppearance expects a string font name)
+            string fontName = Path.GetFileNameWithoutExtension(customFontPath);
+
+            // Define the rectangle where the form field will be placed (fully qualified to avoid ambiguity)
             Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create a textbox form field on the first page
-            TextBoxField textField = new TextBoxField(doc.Pages[1], fieldRect)
-            {
-                PartialName = "CustomFontField"
-            };
+            // Create a text box form field on page 1
+            TextBoxField txtField = new TextBoxField(doc.Pages[1], fieldRect);
+            txtField.PartialName = "CustomFontField";
 
-            // Set the field's default appearance to use the custom font
-            // Use the constructor that accepts a Font, size, and color (Aspose.Pdf.Color)
-            textField.DefaultAppearance = new DefaultAppearance(customFont, 12, System.Drawing.Color.Black);
+            // Set the field's default appearance using the custom font name and a System.Drawing.Color
+            DefaultAppearance appearance = new DefaultAppearance(fontName, 12, System.Drawing.Color.Black);
+            txtField.DefaultAppearance = appearance;
 
-            // Add the field to the document's form collection
-            doc.Form.Add(textField);
+            // Add the field to the document's form (page number is 1‑based)
+            doc.Form.Add(txtField, 1);
 
-            // Optionally add an additional appearance (same rectangle on page 1)
-            doc.Form.AddFieldAppearance(textField, 1, fieldRect);
+            // Add the visual appearance of the field to the specified page and rectangle
+            doc.Form.AddFieldAppearance(txtField, 1, fieldRect);
 
             // Save the modified PDF
             doc.Save(outputPdfPath);
