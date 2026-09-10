@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // Font, Font.IsAccessible, page.Resources.GetFonts
 
 class Program
 {
@@ -10,54 +10,61 @@ class Program
     {
         const string inputPath = "input.pdf";
 
+        // Verify the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // List to hold names of fonts that are not installed on the system
-        List<string> missingFonts = new List<string>();
-
-        // Open the PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        try
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load the PDF document (using statement ensures proper disposal)
+            using (Document doc = new Document(inputPath))
             {
-                Aspose.Pdf.Page page = doc.Pages[i];
+                // List to hold names of fonts that are not installed on the system
+                List<string> missingFonts = new List<string>();
 
-                // Get the font collection from the page resources
-                Aspose.Pdf.Text.FontCollection fonts = page.Resources.Fonts;
-
-                // Examine each font used on the page
-                foreach (Aspose.Pdf.Text.Font font in fonts)
+                // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    // If the font is not accessible (not installed), record its name
-                    if (!font.IsAccessible)
+                    Page page = doc.Pages[i];
+
+                    // Retrieve the font collection for the page; create it if absent
+                    FontCollection fonts = page.Resources.GetFonts(true);
+
+                    // Examine each font used on the page
+                    foreach (Font font in fonts)
                     {
-                        string fontName = font.FontName ?? "(Unnamed Font)";
-                        if (!missingFonts.Contains(fontName))
+                        // Font.IsAccessible indicates whether the font is present on the system
+                        if (!font.IsAccessible)
                         {
-                            missingFonts.Add(fontName);
+                            string name = font.FontName;
+                            // Avoid duplicate entries
+                            if (!missingFonts.Contains(name))
+                                missingFonts.Add(name);
                         }
+                    }
+                }
+
+                // Report the result
+                if (missingFonts.Count == 0)
+                {
+                    Console.WriteLine("All fonts used in the document are installed on the system.");
+                }
+                else
+                {
+                    Console.WriteLine("Missing fonts (not installed on the system):");
+                    foreach (string name in missingFonts)
+                    {
+                        Console.WriteLine($"- {name}");
                     }
                 }
             }
         }
-
-        // Report the results
-        if (missingFonts.Count == 0)
+        catch (Exception ex)
         {
-            Console.WriteLine("All fonts used in the document are installed on the system.");
-        }
-        else
-        {
-            Console.WriteLine("The following fonts are referenced in the PDF but are NOT installed on this system:");
-            foreach (string name in missingFonts)
-            {
-                Console.WriteLine($"- {name}");
-            }
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

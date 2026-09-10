@@ -15,35 +15,23 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document; using ensures proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the AcroForm object of the document
+            // Access the AcroForm associated with the document
             Form acroForm = doc.Form;
 
-            // If there are no fields, inform the user
-            if (acroForm.Count == 0)
-            {
-                Console.WriteLine("No AcroForm fields found.");
-                return;
-            }
-
-            Console.WriteLine($"Found {acroForm.Count} AcroForm field(s):");
-
-            // Iterate over the form fields using the collection enumerator
-            foreach (Field field in acroForm)
-            {
-                // Use FullName (qualified name) if available, otherwise fallback to Name
-                string fieldName = field.FullName ?? field.Name;
-                Console.WriteLine($"- Field: {fieldName}");
-            }
-
-            // Alternative way: use the Fields property which returns an array of Field objects
+            // Retrieve all fields at the lowest hierarchy level
             Field[] fields = acroForm.Fields;
+
+            Console.WriteLine($"Total AcroForm fields: {fields.Length}");
+
+            // Enumerate each field and output basic information
             foreach (Field field in fields)
             {
-                // Print each field's full name and its current value
-                Console.WriteLine($"Field '{field.FullName}' has value: {field.Value}");
+                // FullName provides the qualified field name
+                // Value holds the current field value (if any)
+                Console.WriteLine($"Field Name: {field.FullName}, Type: {field.GetType().Name}, Value: {field.Value}");
             }
         }
     }

@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "form.pdf";
+        const string inputPath = "input.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,29 +15,31 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Open the PDF document inside a using block (document-disposal-with-using rule)
         using (Document doc = new Document(inputPath))
         {
-            // Access the form fields collection
+            // Access the form collection
             Form form = doc.Form;
 
-            // Retrieve a checkbox field (adjust index or use field name as needed)
+            // Retrieve the first field and cast it to CheckboxField
+            // (adjust the index if the checkbox is not the first field)
             CheckboxField checkbox = form.Fields[0] as CheckboxField;
             if (checkbox == null)
             {
-                Console.WriteLine("No checkbox field found in the document.");
+                Console.Error.WriteLine("No checkbox field found at index 0.");
                 return;
             }
 
-            // Read the string value of the checkbox (e.g., "On", "Off", or a custom export value)
-            string rawValue = checkbox.Value;
-            Console.WriteLine($"Checkbox raw Value: {rawValue}");
+            // Read the Value property (string) of the checkbox
+            string rawValue = checkbox.Value; // e.g., "Off", "On", or a custom export value
 
             // Convert the string value to a Boolean.
-            // Convention: any value other than "Off" (case‑insensitive) means the box is checked.
+            // In Aspose.Pdf a checkbox is considered checked if its value is NOT "Off".
             bool isChecked = !string.Equals(rawValue, "Off", StringComparison.OrdinalIgnoreCase);
 
-            Console.WriteLine($"Checkbox is checked: {isChecked}");
+            // Output the result
+            Console.WriteLine($"Checkbox Value: \"{rawValue}\"");
+            Console.WriteLine($"Converted to Boolean: {isChecked}");
         }
     }
 }

@@ -18,14 +18,14 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPdf))
         {
-            // Create a FileStream to write the XFDF data
-            using (FileStream xfdfStream = new FileStream(outputXfdf, FileMode.Create, FileAccess.Write))
+            // Create a FileStream for the XFDF output
+            using (FileStream fs = new FileStream(outputXfdf, FileMode.Create, FileAccess.Write))
             {
-                // Export all annotations (including AcroForm fields) to the XFDF stream
-                doc.ExportAnnotationsToXfdf(xfdfStream);
+                // Export all annotations (including AcroForm fields) to XFDF via the stream
+                doc.ExportAnnotationsToXfdf(fs);
             }
         }
 
-        Console.WriteLine($"XFDF file created at '{outputXfdf}'.");
+        Console.WriteLine($"XFDF exported to '{outputXfdf}'.");
     }
 }

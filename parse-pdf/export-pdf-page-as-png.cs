@@ -1,53 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Devices; // Image devices for rasterization
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
-        // Output raster image file path (PNG format)
-        const string outputImagePath = "page1.png";
-        // Desired resolution in DPI (dots per inch)
-        const int resolutionDpi = 300;
+        const string inputPdfPath = "input.pdf";   // source PDF
+        const string outputImagePath = "page1.png"; // raster image output
+        const int dpi = 300; // desired resolution in dots per inch
 
-        // Verify that the input file exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Ensure the document contains at least one page (Aspose.Pdf uses 1‑based indexing)
-            if (pdfDocument.Pages.Count < 1)
+            // Verify that the requested page exists (pages are 1‑based)
+            if (pdfDoc.Pages.Count < 1)
             {
-                Console.Error.WriteLine("The PDF does not contain any pages.");
+                Console.Error.WriteLine("The PDF contains no pages.");
                 return;
             }
 
-            // Retrieve the first page (or change the index to target another page)
-            Page page = pdfDocument.Pages[1];
+            // Create a Resolution object with the specified DPI
+            Resolution resolution = new Resolution(dpi);
 
-            // Create a Resolution object with the required DPI
-            Resolution resolution = new Resolution(resolutionDpi);
-
-            // Initialize a PNG device with the specified resolution.
-            // The device will rasterize the page (including all vector graphics) to PNG.
+            // Initialize a PNG device with the desired resolution
             PngDevice pngDevice = new PngDevice(resolution);
 
-            // Rasterize the page and write the PNG data to the output file
-            using (FileStream outputStream = new FileStream(outputImagePath, FileMode.Create))
+            // Rasterize the first page (or any page index) to a PNG file
+            using (FileStream outStream = new FileStream(outputImagePath, FileMode.Create))
             {
-                pngDevice.Process(page, outputStream);
+                pngDevice.Process(pdfDoc.Pages[1], outStream);
             }
 
-            Console.WriteLine($"Page rasterized successfully to '{outputImagePath}' at {resolutionDpi} DPI.");
+            Console.WriteLine($"Page 1 rasterized to '{outputImagePath}' at {dpi} DPI.");
         }
     }
 }

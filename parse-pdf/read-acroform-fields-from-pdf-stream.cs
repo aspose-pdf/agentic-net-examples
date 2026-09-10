@@ -8,7 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        // Path to the source PDF file (replace with your actual file)
+        const string pdfPath = "sample.pdf";
 
         if (!File.Exists(pdfPath))
         {
@@ -16,23 +17,25 @@ class Program
             return;
         }
 
-        // Open the PDF file as a stream and create a Document from it
+        // Open the PDF file as a read‑only stream
         using (FileStream pdfStream = File.OpenRead(pdfPath))
-        using (Document doc = new Document(pdfStream))
         {
-            // Check if the document contains AcroForm fields
-            if (doc.Form == null || doc.Form.Fields == null || !doc.Form.Fields.Any())
+            // Load the PDF document from the stream
+            using (Document doc = new Document(pdfStream))
             {
-                Console.WriteLine("No AcroForm fields found in the PDF.");
-                return;
-            }
-
-            Console.WriteLine("AcroForm fields:");
-            // Iterate over each field and output its name and value
-            foreach (Field field in doc.Form.Fields)
-            {
-                string value = field.Value?.ToString() ?? "(null)";
-                Console.WriteLine($"- {field.FullName}: {value}");
+                // Ensure the document contains an AcroForm and that it has fields
+                if (doc.Form != null && doc.Form.Fields != null && doc.Form.Fields.Count() > 0)
+                {
+                    // Iterate over all form fields and output their names and values
+                    foreach (Field field in doc.Form.Fields)
+                    {
+                        Console.WriteLine($"Field Name: {field.FullName}, Value: {field.Value}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No AcroForm fields found in the document.");
+                }
             }
         }
     }
