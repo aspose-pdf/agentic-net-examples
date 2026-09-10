@@ -1,54 +1,45 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;          // For ImageFormat enum
-using Aspose.Pdf.Facades;             // PdfConverter resides here
+using Aspose.Pdf;
+using Aspose.Pdf.Devices;
+using Aspose.Pdf.Text; // added for TextFragment
 
-class Program
+class PdfToTiffConverter
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";               // Source PDF
-        const string outputDir  = "TiffPages";               // Folder for TIFF files
+        const string inputPdf = "input.pdf";   // source PDF file
+        const string outputDir = "TiffPages"; // folder for TIFF pages
 
+        // ------------------------------------------------------------
+        // Ensure a sample PDF exists (self‑contained example)
+        // ------------------------------------------------------------
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
+            using (var doc = new Document())
+            {
+                // Add a simple page with some text so the conversion has content
+                var page = doc.Pages.Add();
+                page.Paragraphs.Add(new TextFragment("Sample page for TIFF conversion"));
+                doc.Save(inputPdf);
+            }
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        try
+        // Load the PDF document
+        var pdfDocument = new Document(inputPdf);
+
+        // Convert each page to an individual TIFF file using TiffDevice (cross‑platform)
+        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
         {
-            // Initialize the converter facade
-            using (PdfConverter converter = new PdfConverter())
-            {
-                // Bind the PDF file to the converter
-                converter.BindPdf(inputPdf);
-
-                // Prepare for conversion (required step)
-                converter.DoConvert();
-
-                int pageNumber = 1;
-                // Iterate through all pages and save each as a separate TIFF file
-                while (converter.HasNextImage())
-                {
-                    string tiffPath = Path.Combine(outputDir, $"page_{pageNumber}.tiff");
-                    // Save current page image as TIFF using default settings
-                    converter.GetNextImage(tiffPath, ImageFormat.Tiff);
-                    pageNumber++;
-                }
-
-                // Release resources held by the converter
-                converter.Close();
-            }
-
-            Console.WriteLine($"PDF successfully converted to TIFF images in '{outputDir}'.");
+            string tiffPath = Path.Combine(outputDir, $"page_{pageNumber}.tiff");
+            // Resolution can be adjusted; 150 DPI is a reasonable default
+            var tiffDevice = new TiffDevice(new Resolution(150)); // TiffDevice does not implement IDisposable, so no using
+            tiffDevice.Process(pdfDocument.Pages[pageNumber], tiffPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
-        }
+
+        Console.WriteLine("PDF has been converted to individual TIFF images.");
     }
 }

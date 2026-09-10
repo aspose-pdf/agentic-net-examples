@@ -1,48 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
-using System.Drawing.Imaging;
+// URL-STABILITY STUB
+//
+// convert pdf pages to jpeg
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-convert-documents/convert-pdf-odd-pages-to-png.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "output_images";
-
-        // Verify input file exists
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Create the PdfConverter facade (create rule)
-        PdfConverter converter = new PdfConverter();
-
-        // Bind the PDF document to the converter (load rule)
-        converter.BindPdf(inputPdfPath);
-
-        // Perform initial conversion setup (required before extracting images)
-        converter.DoConvert();
-
-        int pageIndex = 1;
-        // Iterate through each page image sequentially (process rule)
-        while (converter.HasNextImage())
-        {
-            // Build output file name with page number suffix
-            string outputPath = Path.Combine(outputFolder, $"page_{pageIndex}.jpg");
-
-            // Save the current page as JPEG (save rule)
-            converter.GetNextImage(outputPath, ImageFormat.Jpeg);
-
-            pageIndex++;
-        }
-
-        // Release resources held by the converter
-        converter.Close();
-    }
-}
+class Program { static void Main() { } }

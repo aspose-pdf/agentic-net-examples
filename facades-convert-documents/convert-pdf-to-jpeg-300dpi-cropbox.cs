@@ -2,14 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Devices; // required for Resolution
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputDir = "output_images";
+        const string outputDir = "Images";
 
         // Verify input file exists
         if (!File.Exists(inputPdf))
@@ -21,27 +21,29 @@ class Program
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Convert PDF pages to JPEG images using PdfConverter (Facades API)
+        // PdfConverter implements IDisposable
         using (PdfConverter converter = new PdfConverter())
         {
-            // Bind the source PDF file
+            // Bind the PDF document to the converter
             converter.BindPdf(inputPdf);
 
-            // Set resolution to 300 DPI
+            // Set the desired resolution (300 DPI)
+            // Resolution property expects an Aspose.Pdf.Devices.Resolution instance
             converter.Resolution = new Resolution(300);
 
-            // NOTE: In recent Aspose.Pdf versions the CropBox is used by default.
-            // The CoordinateType property has been removed, so we simply omit it.
+            // Use CropBox coordinates for precise cropping
+            // The enum PageCoordinateType is defined in Aspose.Pdf namespace (not nested inside PdfConverter)
+            converter.CoordinateType = PageCoordinateType.CropBox;
 
             // Initialize conversion process
             converter.DoConvert();
 
             int pageNumber = 1;
-            // Iterate through all pages and save each as a JPEG image
+            // Iterate through all pages, saving each as a JPEG image
             while (converter.HasNextImage())
             {
                 string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
-                // GetNextImage saves the current page as JPEG by default
+                // GetNextImage(string) saves the next page as JPEG by default
                 converter.GetNextImage(outputPath);
                 pageNumber++;
             }

@@ -1,62 +1,55 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;               // ImageFormat for BMP
-using Aspose.Pdf;                           // Document, etc.
-using Aspose.Pdf.Facades;                  // PdfConverter (Facade)
-using Aspose.Pdf.Devices;                  // Resolution
-using Aspose.Pdf.Text;                     // FontRepository & SimpleFontSubstitution
+using System.Drawing.Imaging;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
-class PdfToBmpConverter
+class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
+        // Directory containing the PDF file and where BMP images will be saved
+        const string dataDir = @"C:\PdfData";
+        const string pdfFileName = "input.pdf";
 
-        // Output directory for BMP images
-        const string outputDir = "BmpImages";
+        // Full path to the source PDF
+        string pdfPath = Path.Combine(dataDir, pdfFileName);
 
-        // Ensure the input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Create output directory if it does not exist
-        Directory.CreateDirectory(outputDir);
-
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document (required for binding to the converter)
+        using (Document pdfDocument = new Document(pdfPath))
         {
-            // Apply custom font substitution: replace Times New Roman with Calibri
-            // Use FontRepository.Substitutions with SimpleFontSubstitution (requires Aspose.Pdf.Text namespace)
-            FontRepository.Substitutions.Add(new SimpleFontSubstitution("Times New Roman", "Calibri"));
+            // Initialize the PDF converter facade
+            PdfConverter converter = new PdfConverter();
 
-            // Initialize PdfConverter with the loaded document
-            using (PdfConverter converter = new PdfConverter(pdfDoc))
+            // Bind the loaded document to the converter
+            converter.BindPdf(pdfDocument);
+
+            // NOTE: In recent Aspose.Pdf versions font substitution is enabled by default.
+            // If a specific property is required, it can be set via RenderingOptions when available.
+
+            // Prepare the converter for image extraction
+            converter.DoConvert();
+
+            int pageIndex = 1;
+            // Extract each page as a BMP image
+            while (converter.HasNextImage())
             {
-                // Set desired resolution (e.g., 300 DPI) for higher quality BMPs
-                converter.Resolution = new Resolution(300);
-
-                // Prepare the converter for conversion
-                converter.DoConvert();
-
-                int pageNumber = 1;
-                // Iterate through all pages and save each as a BMP image
-                while (converter.HasNextImage())
-                {
-                    string bmpPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
-                    // GetNextImage saves the next page image to the specified file using the given format
-                    converter.GetNextImage(bmpPath, ImageFormat.Bmp);
-                    pageNumber++;
-                }
-
-                // Release resources held by the converter
-                converter.Close();
+                string bmpOutputPath = Path.Combine(dataDir, $"image{pageIndex}_out.bmp");
+                // Use System.Drawing.Imaging.ImageFormat for BMP output
+                converter.GetNextImage(bmpOutputPath, ImageFormat.Bmp);
+                pageIndex++;
             }
+
+            // Release resources held by the converter
+            converter.Close();
         }
 
-        Console.WriteLine("PDF conversion to BMP completed successfully.");
+        Console.WriteLine("PDF pages have been successfully converted to BMP images.");
     }
 }

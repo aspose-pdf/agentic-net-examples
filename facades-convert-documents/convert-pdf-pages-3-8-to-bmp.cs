@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging; // ImageFormat for BMP
 
 class Program
 {
@@ -11,39 +10,36 @@ class Program
         const string inputPdf = "input.pdf";
         const string outputFolder = "BmpImages";
 
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document (wrapped in using for proper disposal)
-        using (Document pdfDoc = new Document(inputPdf))
+        // Use PdfConverter (Facade) to convert pages to BMP
+        using (PdfConverter converter = new PdfConverter())
         {
-            // Initialize the PdfConverter facade (also disposable)
-            using (PdfConverter converter = new PdfConverter())
+            // Bind the source PDF
+            converter.BindPdf(inputPdf);
+
+            // Define the page range (1‑based indexing)
+            converter.StartPage = 3;
+            converter.EndPage   = 8;
+
+            // Prepare the converter
+            converter.DoConvert();
+
+            // Image files will be named page3.bmp, page4.bmp, ...
+            int pageNumber = converter.StartPage;
+            while (converter.HasNextImage())
             {
-                // Bind the loaded document to the converter
-                converter.BindPdf(pdfDoc);
-
-                // Set the desired page range (pages are 1‑based)
-                converter.StartPage = 3;
-                converter.EndPage   = 8;
-
-                // Prepare the conversion process
-                converter.DoConvert();
-
-                // Export each page in the range as a BMP image
-                int pageNumber = converter.StartPage;
-                while (converter.HasNextImage())
-                {
-                    string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}_out.bmp");
-                    converter.GetNextImage(outputPath, ImageFormat.Bmp);
-                    pageNumber++;
-                }
+                string outputPath = Path.Combine(outputFolder, $"page{pageNumber}.bmp");
+                converter.GetNextImage(outputPath, ImageFormat.Bmp);
+                pageNumber++;
             }
         }
 

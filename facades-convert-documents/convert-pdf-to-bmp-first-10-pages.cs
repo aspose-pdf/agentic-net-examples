@@ -1,62 +1,63 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using System.Drawing.Imaging; // ImageFormat for BMP
+using Aspose.Pdf.Facades;   // PdfConverter resides here
 
-class Program
+class PdfToBmpConverter
 {
     static void Main()
     {
-        // Input PDF file
+        // Input PDF file path
         const string inputPdf = "input.pdf";
 
         // Directory where BMP images will be saved
-        const string outputFolder = "BmpImages";
-        Directory.CreateDirectory(outputFolder);
+        const string outputDir = "BmpImages";
 
-        // Ensure the input file exists
+        // Ensure the output directory exists
+        if (!Directory.Exists(outputDir))
+        {
+            Directory.CreateDirectory(outputDir);
+        }
+
+        // Verify the source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Use PdfConverter (Facade) to convert pages to BMP images
+        // Use PdfConverter (a Facade) to convert pages to BMP images
+        // The converter implements IDisposable, so wrap it in a using block
         using (PdfConverter converter = new PdfConverter())
         {
-            // Bind the PDF document
+            // Bind the PDF file to the converter
             converter.BindPdf(inputPdf);
 
-            // Set the page range: start at page 1, end at page 10
-            converter.StartPage = 1;   // minimal value is 1
-            converter.EndPage   = 10;  // limit conversion to first ten pages
+            // Limit conversion to pages 1 through 10
+            converter.StartPage = 1;   // first page (1‑based indexing)
+            converter.EndPage   = 10;  // last page to process
 
-            // Optional: set a higher resolution for clearer images
-            // The Resolution class is not available in the current Aspose.Pdf version,
-            // and the property is optional, so we omit it.
-            // converter.Resolution = new Aspose.Pdf.Facades.Resolution(300);
-
-            // Perform any required initialization
+            // Perform any necessary initialization before extracting images
             converter.DoConvert();
 
-            int pageIndex = 1;
-            // Loop through the pages in the specified range
+            int pageNumber = 1;
+            // Iterate over each generated image until no more pages are left
             while (converter.HasNextImage())
             {
-                // Build the output file name
-                string outputPath = Path.Combine(outputFolder, $"page_{pageIndex}.bmp");
+                // Build the output file name for the current page
+                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
 
                 // Save the current page as a BMP image
+                // GetNextImage(string outputFile, ImageFormat format)
                 converter.GetNextImage(outputPath, ImageFormat.Bmp);
 
-                pageIndex++;
+                pageNumber++;
             }
 
-            // Release resources held by the converter
+            // Explicitly close the converter (optional, using will dispose)
             converter.Close();
         }
 
-        Console.WriteLine("Conversion to BMP completed.");
+        Console.WriteLine("Conversion completed.");
     }
 }

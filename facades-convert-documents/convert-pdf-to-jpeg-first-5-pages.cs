@@ -1,50 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+// URL-STABILITY STUB
+//
+// convert pdf to jpeg first 5 pages
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-convert-documents/convert-pdf-to-jpeg-first-5-pages-200-dpi.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "output_images";
-
-        // Verify input file exists
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
-            return;
-        }
-
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Load PDF document inside a using block for proper disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
-        {
-            // Create a Resolution object with 200 DPI
-            Resolution resolution = new Resolution(200);
-
-            // Initialize JpegDevice with the specified resolution
-            JpegDevice jpegDevice = new JpegDevice(resolution);
-
-            // Determine how many pages to process (max 5)
-            int pagesToConvert = Math.Min(5, pdfDocument.Pages.Count);
-
-            // Iterate over pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= pagesToConvert; pageIndex++)
-            {
-                string outputPath = Path.Combine(outputFolder, $"page_{pageIndex}.jpeg");
-
-                // Convert the page to JPEG and write to file
-                using (FileStream jpegStream = new FileStream(outputPath, FileMode.Create))
-                {
-                    jpegDevice.Process(pdfDocument.Pages[pageIndex], jpegStream);
-                }
-
-                Console.WriteLine($"Page {pageIndex} saved as JPEG to '{outputPath}'.");
-            }
-        }
-    }
-}
+class Program { static void Main() { } }

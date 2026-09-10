@@ -7,42 +7,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTiff = "output.tiff";
+        const string inputPdfPath  = "input.pdf";
+        const string outputTiffPath = "output.tiff";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the source PDF
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Set default font for missing fonts (Symbol → Arial Unicode MS)
+            // Configure font substitution: use Arial Unicode MS when a font is missing
             PdfSaveOptions saveOptions = new PdfSaveOptions
             {
                 DefaultFontName = "Arial Unicode MS"
             };
 
-            // Save the document to a memory stream with the font substitution applied
-            using (MemoryStream pdfStream = new MemoryStream())
+            // Save the PDF with the substitution settings into a memory stream
+            using (MemoryStream tempPdfStream = new MemoryStream())
             {
-                pdfDoc.Save(pdfStream, saveOptions);
-                pdfStream.Position = 0; // Reset stream position for reading
+                pdfDocument.Save(tempPdfStream, saveOptions);
+                tempPdfStream.Position = 0; // rewind for reading
 
-                // Convert the PDF (with substituted fonts) to a single multi‑page TIFF
+                // Convert the PDF (now with font substitution) to a single multi‑page TIFF
                 using (PdfConverter converter = new PdfConverter())
                 {
-                    converter.BindPdf(pdfStream);
+                    converter.BindPdf(tempPdfStream);
                     converter.DoConvert();
-
-                    // Save all pages as one TIFF file
-                    converter.SaveAsTIFF(outputTiff);
+                    converter.SaveAsTIFF(outputTiffPath);
                 }
             }
         }
 
-        Console.WriteLine($"TIFF image saved to '{outputTiff}'.");
+        Console.WriteLine($"PDF has been converted to TIFF: {outputTiffPath}");
     }
 }

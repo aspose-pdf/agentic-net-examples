@@ -1,42 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// convert pdf pages 4 9 to multi page tiff
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-convert-documents/convert-pdf-pages-3-8-to-multi-page-tiff.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdfPath  = "input.pdf";   // source PDF
-        const string outputTiffPath = "output.tiff"; // resulting TIFF file
-
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
-            return;
-        }
-
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            // Initialize the PdfConverter facade
-            using (PdfConverter converter = new PdfConverter())
-            {
-                // Bind the loaded document to the converter
-                converter.BindPdf(pdfDoc);
-
-                // Specify the page range to convert (pages are 1‑based)
-                converter.StartPage = 4;
-                converter.EndPage   = 9;
-
-                // Prepare the converter for conversion
-                converter.DoConvert();
-
-                // Save the selected pages as a single multi‑page TIFF image
-                converter.SaveAsTIFF(outputTiffPath);
-            }
-        }
-
-        Console.WriteLine($"TIFF image created: {outputTiffPath}");
-    }
-}
+class Program { static void Main() { } }

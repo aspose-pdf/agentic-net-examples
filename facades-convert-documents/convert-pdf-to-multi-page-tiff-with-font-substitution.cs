@@ -2,59 +2,42 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Text; // needed for SimpleFontSubstitution
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputTiffPath = "output.tiff";
+        const string inputPdf = "input.pdf";   // source PDF
+        const string outputTiff = "output.tiff"; // resulting multi‑page TIFF
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Step 1: Load the source PDF and apply font substitution (Symbol → Arial)
-        // The substitution is achieved by specifying a default font name.
-        // When a font is missing (e.g., Symbol), Aspose.Pdf will replace it with the default font.
-        string tempPdfPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
-        try
+        // Load the PDF inside a using block for deterministic disposal (document‑disposal‑with‑using rule)
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            using (Document srcDoc = new Document(inputPdfPath))
-            {
-                PdfSaveOptions saveOpts = new PdfSaveOptions
-                {
-                    // Use Arial as the fallback font for missing symbols.
-                    DefaultFontName = "Arial"
-                };
+            // Apply font substitution: replace any occurrence of "Courier" with "Liberation Mono"
+            // Use FontRepository.Substitutions with SimpleFontSubstitution (correct API)
+            FontRepository.Substitutions.Add(new SimpleFontSubstitution("Courier", "Liberation Mono"));
 
-                // Save the PDF with the substitution applied.
-                srcDoc.Save(tempPdfPath, saveOpts);
-            }
-
-            // Step 2: Convert the substituted PDF to a single multi‑page TIFF image.
-            using (PdfConverter converter = new PdfConverter())
+            // Initialise the PdfConverter facade with the loaded document
+            using (PdfConverter converter = new PdfConverter(pdfDoc))
             {
-                // Bind the temporary PDF that already contains the font substitution.
-                converter.BindPdf(tempPdfPath);
+                // Optional: configure rendering options if needed (e.g., resolution)
+                // converter.RenderingOptions = new RenderingOptions { Resolution = new Resolution(300) };
+
+                // Prepare the converter for conversion
                 converter.DoConvert();
 
-                // Save all pages as one TIFF file.
-                converter.SaveAsTIFF(outputTiffPath);
+                // Convert all pages to a single multi‑page TIFF file
+                converter.SaveAsTIFF(outputTiff);
             }
+        }
 
-            Console.WriteLine($"PDF successfully converted to TIFF: {outputTiffPath}");
-        }
-        finally
-        {
-            // Clean up the temporary PDF file.
-            if (File.Exists(tempPdfPath))
-            {
-                try { File.Delete(tempPdfPath); } catch { /* ignore cleanup errors */ }
-            }
-        }
+        Console.WriteLine($"PDF successfully converted to TIFF: {outputTiff}");
     }
 }
