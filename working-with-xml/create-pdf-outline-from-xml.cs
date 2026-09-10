@@ -2,14 +2,13 @@ using System;
 using System.IO;
 using System.Xml;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // for GoToAction
 
 class Program
 {
     static void Main()
     {
         const string xmlPath = "input.xml";
-        const string outputPdfPath = "output.pdf";
+        const string pdfPath = "output.pdf";
 
         if (!File.Exists(xmlPath))
         {
@@ -17,68 +16,43 @@ class Program
             return;
         }
 
-        // Load XML and convert it to PDF using XmlLoadOptions (required for XML input)
-        using (Document pdfDoc = new Document(xmlPath, new XmlLoadOptions()))
+        // Load the XML file and convert it to PDF
+        XmlLoadOptions loadOpts = new XmlLoadOptions();
+        using (Document doc = new Document(xmlPath, loadOpts))
         {
-            // Build outline hierarchy based on XML nesting
-            OutlineCollection outlines = pdfDoc.Outlines;
+            // Parse the XML to build an outline that mirrors its nesting depth
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(xmlPath);
-
-            // Start recursion from the document element (if it exists)
-            if (xmlDoc.DocumentElement != null)
-            {
-                AddOutlineFromXmlNode(xmlDoc.DocumentElement, outlines, pdfDoc, null);
-            }
+            BuildOutline(doc, xmlDoc.DocumentElement, 0);
 
             // Save the resulting PDF
-            pdfDoc.Save(outputPdfPath);
+            doc.Save(pdfPath);
         }
 
-        Console.WriteLine($"PDF with custom outline saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF with hierarchical outline saved to '{pdfPath}'.");
     }
 
-    /// <summary>
-    /// Recursively creates outline items from an XML node.
-    /// </summary>
-    /// <param name="xmlNode">Current XML node.</param>
-    /// <param name="outlines">Root outline collection (used only for top‑level items).</param>
-    /// <param name="doc">PDF document (used to create destinations).</param>
-    /// <param name="parentItem">Parent outline item; null for top‑level entries.</param>
-    private static void AddOutlineFromXmlNode(XmlNode xmlNode,
-                                              OutlineCollection outlines,
-                                              Document doc,
-                                              OutlineItemCollection? parentItem)
+    // Recursively creates outline items; indentation reflects XML nesting level
+    static void BuildOutline(Document doc, XmlNode node, int depth)
     {
-        if (xmlNode == null) return;
+        if (node == null) return;
 
-        // Create a new outline item. The constructor requires the root OutlineCollection.
-        OutlineItemCollection outlineItem = new OutlineItemCollection(outlines)
+        // Title includes spaces proportional to depth for visual hierarchy
+        string title = new string(' ', depth * 2) + node.Name;
+
+        // Create a new outline item and add it to the document's outline collection
+        OutlineItemCollection outlineItem = new OutlineItemCollection(doc.Outlines)
         {
-            Title = xmlNode.Name,
-            // For demonstration, link every outline entry to the first page.
-            Action = new GoToAction(doc.Pages[1])
+            Title = title,
+            Open = true // expand the item by default
         };
+        doc.Outlines.Add(outlineItem);
 
-        // Attach the item to the appropriate parent.
-        if (parentItem == null)
-        {
-            // Top‑level item
-            outlines.Add(outlineItem);
-        }
-        else
-        {
-            // Child item
-            parentItem.Add(outlineItem);
-        }
-
-        // Recurse for child XML nodes (only element nodes)
-        foreach (XmlNode child in xmlNode.ChildNodes)
+        // Process child elements recursively, increasing the depth
+        foreach (XmlNode child in node.ChildNodes)
         {
             if (child.NodeType == XmlNodeType.Element)
-            {
-                AddOutlineFromXmlNode(child, outlines, doc, outlineItem);
-            }
+                BuildOutline(doc, child, depth + 1);
         }
     }
 }

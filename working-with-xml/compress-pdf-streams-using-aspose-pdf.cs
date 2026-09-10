@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // PDF generated from XML
-        const string outputPdf = "output_compressed.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "compressed_output.pdf";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,20 +16,22 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF (e.g., generated from XML)
         using (Document pdfDoc = new Document(inputPdf))
         {
-            // Configure optimization: compress objects into streams
+            // Configure optimization: compress objects and clean up unused resources
             OptimizationOptions opt = new OptimizationOptions
             {
-                CompressObjects = true
-                // other options remain at their defaults
+                CompressObjects      = true,
+                RemoveUnusedObjects  = true,
+                RemoveUnusedStreams  = true,
+                LinkDuplicateStreams = true
             };
 
-            // Apply the optimization to the document resources
+            // Apply the optimization strategy
             pdfDoc.OptimizeResources(opt);
 
-            // Save the optimized PDF
+            // Save the compressed PDF
             pdfDoc.Save(outputPdf);
         }
 

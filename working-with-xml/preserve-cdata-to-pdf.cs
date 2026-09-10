@@ -8,9 +8,7 @@ class PreserveCDataToPdf
 {
     static void Main()
     {
-        // Input XML file containing CDATA sections
         const string xmlPath = "input.xml";
-        // Output PDF file
         const string pdfPath = "output.pdf";
 
         if (!File.Exists(xmlPath))
@@ -19,53 +17,60 @@ class PreserveCDataToPdf
             return;
         }
 
-        // Load the XML document using standard .NET XML APIs
+        // Load the XML document (no XSL transformation needed)
         XmlDocument xmlDoc = new XmlDocument();
         xmlDoc.Load(xmlPath);
 
         // Create a new PDF document
         using (Document pdfDoc = new Document())
         {
-            // Add a single page to host the formatted text
+            // Add a single page (you can add more pages as needed)
             Page page = pdfDoc.Pages.Add();
 
             // Starting coordinates for the first CDATA block
             double cursorY = page.PageInfo.Height - 50; // top margin
-            const double leftMargin = 50;
+            const double marginX = 50;
             const double lineSpacing = 20;
 
-            // Iterate through all CDATA sections in the XML
-            XmlNodeList cdataNodes = xmlDoc.SelectNodes("//text()"); // selects all text nodes, including CDATA
-            foreach (XmlNode node in cdataNodes)
-            {
-                if (node.NodeType != XmlNodeType.CDATA) continue;
+            // Recursively process all CDATA sections in the XML
+            ProcessNode(xmlDoc, ref cursorY, marginX, lineSpacing, page);
 
-                // Create a TextFragment with the CDATA content
-                TextFragment fragment = new TextFragment(node.Value);
-
-                // Use a monospaced font to reflect the original formatting
-                fragment.TextState.Font = FontRepository.FindFont("Courier New");
-                fragment.TextState.FontSize = 12;
-                fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-                // Position the fragment on the page
-                fragment.Position = new Position(leftMargin, cursorY);
-                page.Paragraphs.Add(fragment);
-
-                // Move the cursor down for the next block
-                cursorY -= lineSpacing;
-                // If we run out of space, add a new page
-                if (cursorY < 50)
-                {
-                    page = pdfDoc.Pages.Add();
-                    cursorY = page.PageInfo.Height - 50;
-                }
-            }
-
-            // Save the PDF document
+            // Save the PDF
             pdfDoc.Save(pdfPath);
         }
 
-        Console.WriteLine($"PDF with preserved CDATA sections saved to '{pdfPath}'.");
+        Console.WriteLine($"PDF created: {pdfPath}");
+    }
+
+    // Walks the XML tree and renders each CDATA section as formatted text
+    private static void ProcessNode(XmlNode node, ref double cursorY, double marginX, double lineSpacing, Page page)
+    {
+        foreach (XmlNode child in node.ChildNodes)
+        {
+            if (child.NodeType == XmlNodeType.CDATA)
+            {
+                // Create a text fragment for the CDATA content
+                TextFragment tf = new TextFragment(child.Value);
+
+                // Position the fragment on the page
+                tf.Position = new Position(marginX, cursorY);
+
+                // Apply simple formatting (you can customize as needed)
+                tf.TextState.Font = FontRepository.FindFont("Helvetica");
+                tf.TextState.FontSize = 12;
+                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+
+                // Add the fragment to the page
+                page.Paragraphs.Add(tf);
+
+                // Move the cursor down for the next block
+                cursorY -= lineSpacing;
+            }
+            else
+            {
+                // Recurse into element nodes
+                ProcessNode(child, ref cursorY, marginX, lineSpacing, page);
+            }
+        }
     }
 }

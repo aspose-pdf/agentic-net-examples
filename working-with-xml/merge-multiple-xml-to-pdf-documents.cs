@@ -1,52 +1,12 @@
-using System;
-using System.IO;
-using System.Collections.Generic;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// merge multiple xml to pdf documents
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/working-with-xml/merge-multiple-xml-pdfs.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        // Input XML files that will be converted to PDFs
-        string[] xmlFiles = {
-            "input1.xml",
-            "input2.xml",
-            "input3.xml"
-        };
-
-        // Output merged PDF file
-        const string outputPdf = "merged_output.pdf";
-
-        // Validate input files exist
-        foreach (string xmlPath in xmlFiles)
-        {
-            if (!File.Exists(xmlPath))
-            {
-                Console.Error.WriteLine($"File not found: {xmlPath}");
-                return;
-            }
-        }
-
-        // Load each XML into a separate Document using XmlLoadOptions
-        var documents = new List<Document>();
-        foreach (string xmlPath in xmlFiles)
-        {
-            // XmlLoadOptions is required for XML to PDF conversion
-            XmlLoadOptions loadOptions = new XmlLoadOptions();
-            Document doc = new Document(xmlPath, loadOptions);
-            documents.Add(doc);
-        }
-
-        // Create an empty target document and merge all loaded documents into it
-        using (Document target = new Document())
-        {
-            // Merge the array of documents into the target
-            target.Merge(documents.ToArray());
-
-            // Save the merged PDF
-            target.Save(outputPdf);
-        }
-
-        Console.WriteLine($"Merged PDF saved to '{outputPdf}'.");
-    }
-}
+class Program { static void Main() { } }
