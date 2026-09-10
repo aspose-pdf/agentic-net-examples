@@ -1,28 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// add xmp metadata field to pdf
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/facades-edit-document
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF into the XMP metadata facade, add the custom field, and save.
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-        {
-            xmp.BindPdf(inputPath);               // Load the source PDF
-            xmp.Add("Department", "Finance");      // Add custom XMP metadata
-            xmp.Save(outputPath);                  // Save the PDF with updated XMP
-        }
-
-        Console.WriteLine($"XMP metadata 'Department: Finance' added and saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

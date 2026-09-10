@@ -1,40 +1,40 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core PDF API
 
 class Program
 {
     static void Main()
     {
-        const string imagePath = "Photo.jpg";
-        const string outputPdf = "Photo.pdf";
+        const string inputImagePath = "Photo.jpg"; // JPEG source
+        const string outputPdfPath = "Photo.pdf";   // Resulting PDF
 
-        if (!File.Exists(imagePath))
+        // Verify the JPEG file exists
+        if (!File.Exists(inputImagePath))
         {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            Console.Error.WriteLine($"Input image not found: {inputImagePath}");
             return;
         }
 
-        // Create a new PDF document.
-        using (Document pdfDocument = new Document())
+        // Create a new PDF document
+        Document pdfDocument = new Document();
+        // Add a blank page (default margins are applied automatically)
+        Page page = pdfDocument.Pages.Add();
+
+        // Load the JPEG image and add it to the page
+        using (FileStream imageStream = new FileStream(inputImagePath, FileMode.Open, FileAccess.Read))
         {
-            // Add a page with default margins.
-            Page page = pdfDocument.Pages.Add();
-
-            // Load the JPEG image.
-            Image image = new Image
+            Aspose.Pdf.Image pdfImage = new Aspose.Pdf.Image
             {
-                ImageStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read)
+                ImageStream = imageStream
             };
-
-            // Add the image to the page. The image will be placed at the origin (0,0) and will keep its original size.
-            // If you need it centered or scaled, adjust the image's properties accordingly.
-            page.Paragraphs.Add(image);
-
-            // Save the PDF.
-            pdfDocument.Save(outputPdf);
+            // The image is added as a paragraph; it will be placed respecting the page margins.
+            page.Paragraphs.Add(pdfImage);
         }
 
-        Console.WriteLine($"PDF created successfully: {outputPdf}");
+        // Save the PDF document
+        pdfDocument.Save(outputPdfPath);
+
+        Console.WriteLine($"PDF created successfully at '{outputPdfPath}'.");
     }
 }

@@ -1,36 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// select radio button in pdf form
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-edit-document/set-radio-button-value-in-pdf-acroform.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string fieldName  = "ShippingMethod"; // full field name of the radio group
-        const string optionValue = "Express";       // the export value of the desired option
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF form
-        using (Form form = new Form(inputPath))
-        {
-            // Fill the radio button field with the specified option
-            bool success = form.FillField(fieldName, optionValue);
-            if (!success)
-            {
-                Console.Error.WriteLine($"Failed to set field '{fieldName}' to value '{optionValue}'.");
-            }
-
-            // Save the updated PDF
-            form.Save(outputPath);
-        }
-
-        Console.WriteLine($"Radio button '{optionValue}' selected and saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

@@ -1,81 +1,58 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;                 // Core API for PDF creation
+using Aspose.Pdf.Facades;        // Facades namespace as required
 
 class Program
 {
     static void Main()
     {
-        // Input PNG files – adjust the paths as needed
-        string[] pngFiles = {
-            "image1.png",
-            "image2.png",
-            "image3.png"
-        };
+        // Input folder containing PNG images (adjust as needed)
+        const string imagesFolder = "Images";
+        // Output PDF file path
+        const string outputPdf = "Combined.pdf";
 
-        // Output PDF file
-        const string outputPdf = "merged.pdf";
-
-        // List to hold individual PDF streams (one page per image)
-        List<MemoryStream> pdfPages = new List<MemoryStream>();
-
-        // Create a one‑page PDF for each PNG image
-        foreach (string pngPath in pngFiles)
+        // Validate input folder
+        if (!Directory.Exists(imagesFolder))
         {
-            if (!File.Exists(pngPath))
-            {
-                Console.Error.WriteLine($"File not found: {pngPath}");
-                continue;
-            }
+            Console.Error.WriteLine($"Folder not found: {imagesFolder}");
+            return;
+        }
 
-            // MemoryStream will hold the temporary PDF
-            MemoryStream pageStream = new MemoryStream();
+        // Get PNG files sorted alphabetically (default order)
+        string[] pngFiles = Directory.GetFiles(imagesFolder, "*.png");
+        Array.Sort(pngFiles, StringComparer.OrdinalIgnoreCase);
 
-            // Use the core Document API inside a using block (lifecycle rule)
-            using (Document doc = new Document())
+        if (pngFiles.Length == 0)
+        {
+            Console.Error.WriteLine("No PNG files found in the specified folder.");
+            return;
+        }
+
+        // Create a new PDF document (wrapped in using for deterministic disposal)
+        using (Document pdfDoc = new Document())
+        {
+            // Add a page for each PNG image
+            foreach (string pngPath in pngFiles)
             {
-                // Add a new page (default size and margins)
-                Page page = doc.Pages.Add();
+                // Add a new blank page (default size, default margins)
+                Page page = pdfDoc.Pages.Add();
 
                 // Create an Image object and set its source file
+                // Fully qualify to avoid ambiguity with System.Drawing.Image
                 Aspose.Pdf.Image img = new Aspose.Pdf.Image
                 {
                     File = pngPath
                 };
 
-                // Add the image to the page's paragraphs collection
+                // Add the image to the page's content
                 page.Paragraphs.Add(img);
-
-                // Save the one‑page PDF into the memory stream
-                doc.Save(pageStream);
             }
 
-            // Reset stream position for later reading
-            pageStream.Position = 0;
-            pdfPages.Add(pageStream);
+            // Save the assembled multi‑page PDF
+            pdfDoc.Save(outputPdf);
         }
 
-        if (pdfPages.Count == 0)
-        {
-            Console.Error.WriteLine("No valid PNG images were processed.");
-            return;
-        }
-
-        // Use PdfFileEditor (a Facades class) to concatenate the page PDFs
-        PdfFileEditor editor = new PdfFileEditor();
-
-        // Output stream for the final merged PDF
-        using (MemoryStream outputStream = new MemoryStream())
-        {
-            // Concatenate all page streams into the output stream
-            editor.Concatenate(pdfPages.ToArray(), outputStream);
-
-            // Write the merged PDF to disk
-            File.WriteAllBytes(outputPdf, outputStream.ToArray());
-        }
-
-        Console.WriteLine($"Merged PDF created at '{outputPdf}'.");
+        Console.WriteLine($"PDF created successfully: {outputPdf}");
     }
 }

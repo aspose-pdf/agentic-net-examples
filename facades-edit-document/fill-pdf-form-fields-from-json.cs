@@ -6,37 +6,36 @@ class Program
 {
     static void Main()
     {
-        // Paths to the input PDF form, the JSON data file and the output PDF.
-        const string inputPdfPath  = "template_form.pdf";
-        const string jsonDataPath  = "field_values.json";
-        const string outputPdfPath = "filled_form.pdf";
+        const string inputPdfPath  = "input.pdf";   // source PDF with form fields
+        const string outputPdfPath = "filled.pdf";  // destination PDF after filling
+        const string jsonPath      = "data.json";   // JSON file: { "FieldName1":"Value1", "FieldName2":"Value2", ... }
 
-        // Ensure the input files exist.
+        // Verify that required files exist
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Error: PDF file not found – {inputPdfPath}");
             return;
         }
-        if (!File.Exists(jsonDataPath))
+        if (!File.Exists(jsonPath))
         {
-            Console.Error.WriteLine($"JSON data file not found: {jsonDataPath}");
+            Console.Error.WriteLine($"Error: JSON file not found – {jsonPath}");
             return;
         }
 
-        // Open the PDF form with the Facades Form class.
-        using (Form form = new Form(inputPdfPath))
+        // Form facade works with two file names: source and destination.
+        // It implements IDisposable, so wrap it in a using block.
+        using (Form form = new Form(inputPdfPath, outputPdfPath))
         {
-            // Load the JSON stream and import the field values.
-            using (FileStream jsonStream = new FileStream(jsonDataPath, FileMode.Open, FileAccess.Read))
+            // Open the JSON file as a stream and import all field values.
+            using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Open, FileAccess.Read))
             {
-                // ImportJson matches fields by their full names.
-                form.ImportJson(jsonStream);
+                form.ImportJson(jsonStream);   // matches fields by their full names
             }
 
-            // Save the updated PDF to the desired output file.
-            form.Save(outputPdfPath);
+            // Persist the changes to the output PDF.
+            form.Save();
         }
 
-        Console.WriteLine($"Form fields filled and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Form fields have been populated and saved to '{outputPdfPath}'.");
     }
 }

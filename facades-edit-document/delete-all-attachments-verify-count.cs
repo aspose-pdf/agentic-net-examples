@@ -1,46 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// delete all attachments verify count
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-edit-document/delete-all-pdf-attachments-verify.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        // Paths – adjust as needed
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_no_attachments.pdf";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-
-        // ---------- Delete all attachments ----------
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPdf);                 // Load the source PDF
-        editor.DeleteAttachments();               // Remove every attachment
-        editor.Save(outputPdf);                   // Persist the changes
-
-        // ---------- Verify that no attachments remain ----------
-        PdfExtractor extractor = new PdfExtractor();
-        extractor.BindPdf(outputPdf);             // Load the modified PDF
-        extractor.ExtractAttachment();            // Required before querying attachment info
-
-        // Get the list of attachments (if any)
-        List<FileSpecification> attachmentInfo = extractor.GetAttachmentInfo();
-        int attachmentCount = attachmentInfo?.Count ?? 0;
-
-        Console.WriteLine($"Attachment count after deletion: {attachmentCount}");
-        if (attachmentCount == 0)
-        {
-            Console.WriteLine("All attachments successfully removed.");
-        }
-        else
-        {
-            Console.WriteLine("Some attachments remain.");
-        }
-    }
-}
+class Program { static void Main() { } }

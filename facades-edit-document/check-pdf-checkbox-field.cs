@@ -1,34 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;   // Facade API for form handling
+// URL-STABILITY STUB
+//
+// check pdf checkbox field
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/facades-edit-document
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf  = "input.pdf";          // source PDF containing the form
-        const string outputPdf = "output_checked.pdf"; // destination PDF after checking
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
-
-        // Load the PDF form using the Form facade (lifecycle: load)
-        using (Form form = new Form(inputPdf))
-        {
-            // Fill the checkbox field "TermsAccepted" with true (check the box)
-            bool filled = form.FillField("TermsAccepted", true);
-            if (!filled)
-            {
-                Console.Error.WriteLine("Checkbox field 'TermsAccepted' not found.");
-            }
-
-            // Save the modified document (lifecycle: save)
-            form.Save(outputPdf);
-        }
-
-        Console.WriteLine($"Checkbox updated and saved to '{outputPdf}'.");
-    }
-}
+class Program { static void Main() { } }

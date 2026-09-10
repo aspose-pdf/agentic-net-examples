@@ -1,41 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// export pdf to memorystream
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-edit-document/export-modified-pdf-to-memory-stream.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // MemoryStream will receive the modified PDF
-        using (MemoryStream outputStream = new MemoryStream())
-        {
-            // Load the PDF with a Facade that supports saving to a stream
-            using (PdfViewer viewer = new PdfViewer())
-            {
-                // Load the source PDF
-                viewer.BindPdf(inputPath);
-
-                // Perform any required modifications here (e.g., viewer.Zoom = 0.8f;)
-
-                // Export the result to the memory stream
-                viewer.Save(outputStream);
-            }
-
-            // Reset the stream position so it can be read later
-            outputStream.Position = 0;
-
-            // Example usage: display the size of the exported PDF
-            Console.WriteLine($"Exported PDF size: {outputStream.Length} bytes");
-
-            // The outputStream can now be passed to other components for further processing
-        }
-    }
-}
+class Program { static void Main() { } }

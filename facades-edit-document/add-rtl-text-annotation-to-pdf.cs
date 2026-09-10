@@ -1,40 +1,54 @@
 using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+using System.Drawing;                     // Required for Rectangle and Color used by PdfContentEditor
+using Aspose.Pdf.Facades;                // Facade API for annotation creation
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "annotated.pdf";
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string outputPdf = "annotated.pdf";      // result PDF
 
-        if (!File.Exists(inputPath))
+        // Ensure the source file exists
+        if (!System.IO.File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Sample right‑to‑left (Arabic) text to verify Unicode rendering.
-        string rtlText = "مرحبا بالعالم"; // "Hello World" in Arabic
-
-        // Define the annotation rectangle (System.Drawing.Rectangle is required by the facade API).
-        System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 500, 200, 100);
-
-        // Use the PdfContentEditor facade to add a text annotation.
+        // Use PdfContentEditor (facade) to add a text annotation.
+        // The facade implements IDisposable, so wrap it in a using block.
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Load the existing PDF.
-            editor.BindPdf(inputPath);
+            // Bind the existing PDF document.
+            editor.BindPdf(inputPdf);
 
-            // Create a text annotation with RTL content.
-            // Parameters: rectangle, title, contents, open flag, icon name, page number (1‑based).
-            editor.CreateText(rect, "RTL Annotation", rtlText, true, "Note", 1);
+            // Define the annotation rectangle (x, y, width, height) in points.
+            // Here we place the annotation near the top‑left of page 1.
+            Rectangle annotRect = new Rectangle(100, 500, 200, 100);
 
-            // Save the modified PDF.
-            editor.Save(outputPath);
+            // Arabic text (right‑to‑left) to verify Unicode rendering.
+            string rtlText = "مرحبا بالعالم"; // "Hello World" in Arabic
+
+            // Create a text annotation:
+            //   rect      – annotation rectangle
+            //   title     – annotation title (shown in the popup)
+            //   contents  – the actual text (Arabic)
+            //   open      – true to display the popup open by default
+            //   icon      – built‑in icon name (e.g., "Note")
+            //   page      – 1‑based page number where the annotation is placed
+            editor.CreateText(
+                annotRect,
+                "RTL Test",          // title
+                rtlText,             // contents (right‑to‑left language)
+                true,                // open flag
+                "Note",              // icon
+                1);                  // page number (first page)
+
+            // Save the modified PDF. The Save method is the required lifecycle operation.
+            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Text annotation added. Output saved to '{outputPdf}'.");
     }
 }

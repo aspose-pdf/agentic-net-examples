@@ -1,34 +1,43 @@
 using System;
-using System.IO;
-using System.Drawing;               // required for Rectangle
-using Aspose.Pdf.Facades;          // PdfContentEditor facade
+using System.Drawing; // needed for System.Drawing.Rectangle
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string comment    = "User comment goes here.";
+        const string inputPath = "input.pdf";          // source PDF (created if missing)
+        const string outputPath = "output.pdf";        // PDF with sticky note
+        const string title = "User Comment";          // annotation title (author)
+        const string contents = "This is a user comment added as a sticky note.";
+        const bool open = false;                       // initially closed
+        const string icon = "Note";                    // icon type (Note, Comment, etc.)
 
-        if (!File.Exists(inputPath))
+        // Ensure the input PDF exists – create a minimal placeholder if it does not.
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            using (var placeholder = new Document())
+            {
+                placeholder.Pages.Add();
+                placeholder.Save(inputPath);
+            }
         }
 
-        // Bind the PDF, create a sticky‑note (text) annotation on page 1, and save.
+        // System.Drawing.Rectangle expects (x, y, width, height).
+        // Convert the PDF‑style coordinates (left, top, right, bottom) to this form.
+        System.Drawing.Rectangle annotRect = new System.Drawing.Rectangle(100, 700, 100, 100);
+
+        // Use the facade to edit the PDF
         using (PdfContentEditor editor = new PdfContentEditor())
         {
+            // Load the PDF document
             editor.BindPdf(inputPath);
 
-            // Define the annotation rectangle (x, y, width, height).
-            Rectangle annotRect = new Rectangle(100, 500, 200, 100);
+            // Create a sticky note (text annotation) on page 1
+            editor.CreateText(annotRect, title, contents, open, icon, 1);
 
-            // CreateText creates a TextAnnotation (sticky note).
-            // Parameters: rectangle, title, contents, open flag, icon name, page number.
-            editor.CreateText(annotRect, "User", comment, true, "Note", 1);
-
+            // Save the modified PDF
             editor.Save(outputPath);
         }
 

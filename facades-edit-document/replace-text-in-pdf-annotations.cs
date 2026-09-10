@@ -1,21 +1,21 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF and replacement strings
+        // Input parameters
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string srcString  = "Old Annotation Text";   // text to look for inside annotations
-        const string destString = "New Annotation Text";   // replacement text
-
-        // Page range (1‑based). Use 0 for all pages if needed.
-        const int startPage = 1;
-        const int endPage   = 3;   // replace on pages 1 to 3 (inclusive)
+        const string srcString  = "OldText";
+        const string destString = "NewText";
+        const int startPage = 1;   // first page to process (1‑based)
+        const int endPage   = 3;   // last page to process
 
         if (!File.Exists(inputPath))
         {
@@ -23,44 +23,48 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Determine the actual page range (0 means "all pages")
-            int first = Math.Max(1, startPage);
-            int last  = endPage == 0 ? doc.Pages.Count : Math.Min(endPage, doc.Pages.Count);
-
-            // Iterate over the selected pages
-            for (int pageNum = first; pageNum <= last; pageNum++)
+            // Load the PDF document (wrapped in using for deterministic disposal)
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[pageNum];
+                // Initialize the annotation editor on the loaded document
+                PdfAnnotationEditor editor = new PdfAnnotationEditor(doc);
 
-                // Iterate over all annotations on the current page
-                foreach (Annotation annot in page.Annotations)
+                // Iterate over the specified page range
+                for (int pageNum = startPage; pageNum <= endPage; pageNum++)
                 {
-                    // We are interested only in TextAnnotation objects
-                    if (annot is TextAnnotation textAnnot)
+                    // Extract all annotation types on the current page
+                    IList<Annotation> annotations = editor.ExtractAnnotations(
+                        pageNum, pageNum,
+                        (AnnotationType[])Enum.GetValues(typeof(AnnotationType)));
+
+                    // Process each annotation
+                    foreach (Annotation annot in annotations)
                     {
-                        // If a source string is supplied, replace only matching parts;
-                        // otherwise replace the whole content.
-                        if (!string.IsNullOrEmpty(srcString) &&
-                            !string.IsNullOrEmpty(textAnnot.Contents) &&
-                            textAnnot.Contents.Contains(srcString))
+                        // Only annotations that have a Contents string can be modified
+                        if (!string.IsNullOrEmpty(annot.Contents) &&
+                            annot.Contents.Contains(srcString))
                         {
-                            textAnnot.Contents = textAnnot.Contents.Replace(srcString, destString);
-                        }
-                        else if (string.IsNullOrEmpty(srcString))
-                        {
-                            textAnnot.Contents = destString;
+                            // Replace the target text within the annotation's contents
+                            annot.Contents = annot.Contents.Replace(srcString, destString);
+
+                            // Apply the modification to the annotation on this page
+                            // ModifyAnnotations expects a single Annotation instance, not an array
+                            editor.ModifyAnnotations(pageNum, pageNum, annot);
                         }
                     }
                 }
+
+                // Save the modified document (PDF format)
+                doc.Save(outputPath);
             }
 
-            // Save the modified document.
-            doc.Save(outputPath);
+            Console.WriteLine($"Annotations updated and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Annotations updated and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

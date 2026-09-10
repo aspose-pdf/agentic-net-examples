@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -8,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_single_page.pdf";
+        const string outputPath = "single_page_view.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,19 +15,23 @@ class Program
             return;
         }
 
-        // PdfContentEditor is a facade for editing PDF content and viewer preferences.
-        // It implements IDisposable, so we wrap it in a using block.
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Use PdfContentEditor to modify viewer preferences
+        PdfContentEditor editor = new PdfContentEditor();
+        try
         {
-            // Load the source PDF.
+            // Load the PDF document
             editor.BindPdf(inputPath);
 
-            // Set the viewer preference to display one page at a time.
-            // ViewerPreference.PageLayoutSinglePage is a constant defined in Aspose.Pdf.Facades.
+            // Set the viewer preference to single‑page layout
             editor.ChangeViewerPreference(ViewerPreference.PageLayoutSinglePage);
 
-            // Save the modified PDF.
+            // Save the modified PDF
             editor.Save(outputPath);
+        }
+        finally
+        {
+            // Release resources
+            editor.Close();
         }
 
         Console.WriteLine($"Viewer preference set to single‑page layout. Saved to '{outputPath}'.");

@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;               // PdfContentEditor resides here
-using System.Drawing;                  // Required for Rectangle and Color types
+using Aspose.Pdf.Facades;
+using System.Drawing; // Rectangle is required for the CreateWebLink method
 
 class Program
 {
     static void Main()
     {
         const string inputPdf  = "input.pdf";          // source PDF
-        const string outputPdf = "output.pdf";         // PDF with hyperlink
+        const string outputPdf = "output_with_link.pdf"; // result PDF
 
         if (!File.Exists(inputPdf))
         {
@@ -16,18 +16,18 @@ class Program
             return;
         }
 
-        // Define the clickable area on page 2 (left, top, width, height)
-        // Note: System.Drawing.Rectangle uses (x, y, width, height)
-        Rectangle linkRect = new Rectangle(100, 500, 200, 50);
-
-        // Use PdfContentEditor (implements IDisposable) inside a using block
+        // Use PdfContentEditor (facade) inside a using block for deterministic disposal
         using (PdfContentEditor editor = new PdfContentEditor())
         {
             // Bind the existing PDF document
             editor.BindPdf(inputPdf);
 
-            // Create a web link that opens the specified URL when the rectangle is clicked
-            // Parameters: rectangle, URL, page number (1‑based), optional color (here omitted)
+            // Define the clickable rectangle on page 2 (x, y, width, height)
+            // Adjust the coordinates as needed for your document
+            Rectangle linkRect = new Rectangle(100, 500, 200, 50);
+
+            // Create a web link that opens the specified URL when clicked
+            // Overload without color avoids System.Drawing.Color usage
             editor.CreateWebLink(linkRect, "https://example.com", 2);
 
             // Save the modified PDF

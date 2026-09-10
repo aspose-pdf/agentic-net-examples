@@ -6,31 +6,52 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Add custom XMP metadata field "ProjectID" with value "12345"
+        // ------------------------------------------------------------
+        // 1. Add custom XMP metadata field "ProjectID" with value "12345"
+        // ------------------------------------------------------------
         using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            // Load the PDF into the XMP facade
+            // Bind the existing PDF
             xmp.BindPdf(inputPath);
-            // Add the custom metadata entry
+
+            // Add a custom XMP entry. The key can be any string; here we use "ProjectID"
             xmp.Add("ProjectID", "12345");
-            // Save the PDF with the updated XMP metadata
-            xmp.Save(outputPath);
+
+            // Save the PDF with the new XMP metadata to a temporary file
+            // (we will later add the same info to the document properties)
+            string tempPath = Path.Combine(Path.GetDirectoryName(outputPath) ?? "", "temp_with_xmp.pdf");
+            xmp.Save(tempPath);
+
+            // ------------------------------------------------------------
+            // 2. Ensure the same information appears in the document properties
+            // ------------------------------------------------------------
+            using (PdfFileInfo fileInfo = new PdfFileInfo())
+            {
+                // Bind the PDF that already contains the XMP metadata
+                fileInfo.BindPdf(tempPath);
+
+                // Set a custom property in the document's Info dictionary
+                fileInfo.SetMetaInfo("ProjectID", "12345");
+
+                // Save the final PDF, preserving the XMP metadata added earlier
+                // SaveNewInfoWithXmp keeps existing XMP data while updating the Info dictionary
+                fileInfo.SaveNewInfoWithXmp(outputPath);
+            }
+
+            // Clean up the temporary file
+            if (File.Exists(tempPath))
+                File.Delete(tempPath);
         }
 
-        // Verify that the custom metadata appears in document properties
-        using (PdfFileInfo info = new PdfFileInfo(outputPath))
-        {
-            string projectId = info.GetMetaInfo("ProjectID");
-            Console.WriteLine($"ProjectID metadata: {projectId}");
-        }
+        Console.WriteLine($"PDF saved with custom XMP field and document property: {outputPath}");
     }
 }

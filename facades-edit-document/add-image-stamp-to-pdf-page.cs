@@ -12,45 +12,41 @@ class Program
         const string outputPdf = "output.pdf";
         const string imageUrl = "https://example.com/logo.png";
 
-        // Download the image into a memory stream – handle possible 404 or other HTTP errors gracefully
-        byte[] imageBytes;
-        using (HttpClient http = new HttpClient())
+        // Verify source PDF exists
+        if (!File.Exists(inputPdf))
         {
-            try
-            {
-                HttpResponseMessage response = http.GetAsync(imageUrl).Result;
-                response.EnsureSuccessStatusCode(); // throws if status is not 2xx
-                imageBytes = response.Content.ReadAsByteArrayAsync().Result;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to download image from '{imageUrl}'. Exception: {ex.Message}");
-                // Optionally, you could provide a fallback image (e.g., a 1x1 transparent PNG) to keep the program running.
-                // For this example we abort the operation because the stamp cannot be created without an image.
-                return;
-            }
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
         }
 
-        // Use a MemoryStream so the Aspose stamp can read the image data
-        using (MemoryStream imageStream = new MemoryStream(imageBytes))
+        // Download the image safely
+        using (HttpClient httpClient = new HttpClient())
         {
-            // Initialize the facade and bind the source PDF (new API)
+            HttpResponseMessage response = httpClient.GetAsync(imageUrl).Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.Error.WriteLine($"Failed to download image. Status code: {response.StatusCode}");
+                return;
+            }
+
+            using (Stream imageStream = response.Content.ReadAsStreamAsync().Result)
             using (PdfFileStamp fileStamp = new PdfFileStamp())
             {
+                // Initialize the facade with the source PDF (new API)
                 fileStamp.BindPdf(inputPdf);
 
-                // Create a stamp based on the downloaded image
+                // Create a stamp and bind the downloaded image
                 Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-                stamp.BindImage(imageStream);          // bind the image stream
-                stamp.SetOrigin(140, 400);             // position (x, y) from bottom‑left
-                stamp.SetImageSize(50, 50);            // width and height of the stamp
-                stamp.Opacity = 0.8f;                  // semi‑transparent
-                stamp.IsBackground = false;            // place on top of page content
-                stamp.Pages = new int[] { 2 };         // apply only to page 2 (1‑based)
+                stamp.BindImage(imageStream);
+                stamp.SetOrigin(100, 500);          // X, Y position on the page
+                stamp.SetImageSize(150, 100);       // Width, Height of the stamp
+                stamp.IsBackground = false;        // Overlay the stamp
+                stamp.Pages = new int[] { 2 };      // Apply only to page 2
 
-                // Add the stamp and write the result (new API)
+                // Add the stamp and save the result (new API)
                 fileStamp.AddStamp(stamp);
                 fileStamp.Save(outputPdf);
+                fileStamp.Close(); // optional, Dispose will also close
             }
         }
     }

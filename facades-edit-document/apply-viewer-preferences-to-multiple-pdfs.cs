@@ -2,24 +2,20 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class ApplyViewerPreferences
+class Program
 {
     static void Main()
     {
         // List of PDF file paths to process
-        string[] pdfFiles = new string[]
-        {
-            @"C:\Docs\sample1.pdf",
-            @"C:\Docs\sample2.pdf",
-            @"C:\Docs\sample3.pdf"
-        };
+        string[] pdfFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
 
-        // Desired viewer preferences (combine as needed)
-        int[] preferences = new int[]
-        {
+        // Viewer preferences to apply to each PDF
+        int[] preferences = {
             ViewerPreference.HideMenubar,
             ViewerPreference.HideToolbar,
-            ViewerPreference.PageModeUseNone
+            ViewerPreference.HideWindowUI,
+            ViewerPreference.FitWindow,
+            ViewerPreference.CenterWindow
         };
 
         foreach (string inputPath in pdfFiles)
@@ -30,28 +26,25 @@ class ApplyViewerPreferences
                 continue;
             }
 
-            // Build output file name (original name with suffix)
+            // Create output file name (e.g., file1_out.pdf)
             string outputPath = Path.Combine(
                 Path.GetDirectoryName(inputPath) ?? string.Empty,
-                Path.GetFileNameWithoutExtension(inputPath) + "_pref.pdf");
+                Path.GetFileNameWithoutExtension(inputPath) + "_out.pdf");
 
-            // Use PdfContentEditor facade to modify viewer preferences
+            // Apply viewer preferences using PdfContentEditor
             using (PdfContentEditor editor = new PdfContentEditor())
             {
-                // Bind the source PDF
                 editor.BindPdf(inputPath);
 
-                // Apply each viewer preference
                 foreach (int pref in preferences)
                 {
                     editor.ChangeViewerPreference(pref);
                 }
 
-                // Save the modified PDF
                 editor.Save(outputPath);
             }
 
-            Console.WriteLine($"Processed '{inputPath}' → '{outputPath}'");
+            Console.WriteLine($"Processed: {outputPath}");
         }
     }
 }

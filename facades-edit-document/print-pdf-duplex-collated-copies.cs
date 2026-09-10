@@ -1,8 +1,8 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Printing;
-using Aspose.Pdf.Devices; // required for Aspose.Pdf.Devices.Margins
 
 class Program
 {
@@ -16,32 +16,31 @@ class Program
             return;
         }
 
-        // Initialize PdfViewer and bind the PDF file
-        using (PdfViewer viewer = new PdfViewer())
+        // Load the PDF and enable duplex mode for the document
+        using (Document doc = new Document(pdfPath))
         {
-            viewer.BindPdf(pdfPath);
+            // PrintDuplex.DuplexFlipLongEdge = double‑sided, flip on the long edge
+            doc.Duplex = PrintDuplex.DuplexFlipLongEdge;
 
-            // Configure printer settings – use Aspose.Pdf.Printing types explicitly
-            var printerSettings = new PrinterSettings
-            {
-                // Enable duplex (double‑sided) printing; choose Vertical or Horizontal as needed
-                Duplex = Duplex.Vertical,
-
-                // Number of copies; set Collate to true for collated copies (default is collated, but explicit is clearer)
-                Copies = 2,
-                Collate = true
+            // Configure printer settings: collated copies and duplex printing
+            PrinterSettings printerSettings = new PrinterSettings {
+                // Use the default system printer
+                PrinterName = new System.Drawing.Printing.PrintDocument().PrinterSettings.PrinterName,
+                Copies = 2,               // number of copies
+                Collate = true,           // collated copies
+                Duplex = Duplex.Vertical  // double‑sided printing (short‑edge flip)
             };
 
-            // Optional: configure page settings (paper size, margins, etc.) – also fully qualified
-            var pageSettings = new PageSettings
-            {
-                PaperSize = PaperSizes.A4,
-                // Use Aspose.Pdf.Devices.Margins (not System.Drawing.Printing.Margins) to match the expected type
-                Margins = new Margins(0, 0, 0, 0)
-            };
+            // Use the printer's default page settings
+            PageSettings pageSettings = printerSettings.DefaultPageSettings;
 
-            // Print the document with the specified settings
-            viewer.PrintDocumentWithSettings(pageSettings, printerSettings);
+            // Print the document using the PdfViewer facade
+            using (PdfViewer viewer = new PdfViewer())
+            {
+                viewer.BindPdf(doc);
+                viewer.PrintDocumentWithSettings(pageSettings, printerSettings);
+                viewer.Close();
+            }
         }
 
         Console.WriteLine("Print job submitted.");

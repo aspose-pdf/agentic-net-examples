@@ -6,16 +6,115 @@ using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using NUnit.Framework;
 
-// -----------------------------------------------------------------------------
+namespace AsposePdfTests
+{
+    [TestFixture]
+    public class AttachmentTests
+    {
+        private string? _tempDir; // made nullable to satisfy compiler warnings
+
+        [SetUp]
+        public void SetUp()
+        {
+            // Create a unique temporary directory for the test files
+            _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(_tempDir);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            // Clean up all files and the temporary directory
+            if (!string.IsNullOrEmpty(_tempDir) && Directory.Exists(_tempDir))
+            {
+                foreach (var file in Directory.GetFiles(_tempDir))
+                {
+                    try { File.Delete(file); } catch { /* ignore */ }
+                }
+                try { Directory.Delete(_tempDir, true); } catch { /* ignore */ }
+            }
+        }
+
+        [Test]
+        public void Attachment_Should_Appear_After_Save()
+        {
+            // Paths for source PDF, attachment file and the resulting PDF
+            string sourcePdfPath = Path.Combine(_tempDir!, "source.pdf");
+            string attachmentPath = Path.Combine(_tempDir!, "sample.txt");
+            string resultPdfPath = Path.Combine(_tempDir!, "result.pdf");
+
+            // ------------------------------------------------------------
+            // 1. Create a minimal PDF document (one blank page)
+            // ------------------------------------------------------------
+            using (Document srcDoc = new Document())
+            {
+                srcDoc.Pages.Add(); // add a blank page
+                srcDoc.Save(sourcePdfPath); // save the source PDF
+            }
+
+            // ------------------------------------------------------------
+            // 2. Create a simple attachment file
+            // ------------------------------------------------------------
+            File.WriteAllText(attachmentPath, "This is a test attachment.");
+
+            // ------------------------------------------------------------
+            // 3. Add the attachment to the PDF using PdfContentEditor (Facade)
+            // ------------------------------------------------------------
+            using (PdfContentEditor editor = new PdfContentEditor())
+            {
+                editor.BindPdf(sourcePdfPath); // load the source PDF
+                // AddDocumentAttachment adds the file as a document attachment (no visual annotation)
+                editor.AddDocumentAttachment(attachmentPath, "Test attachment description");
+                editor.Save(resultPdfPath); // persist changes to a new file
+            }
+
+            // ------------------------------------------------------------
+            // 4. Verify that the attachment exists using PdfExtractor
+            // ------------------------------------------------------------
+            using (PdfExtractor extractor = new PdfExtractor())
+            {
+                extractor.BindPdf(resultPdfPath); // load the PDF that should contain the attachment
+                extractor.ExtractAttachment();    // extract all attachments (in memory)
+
+                // GetAttachNames returns the list of attachment file names as IList<string>
+                IList<string> names = extractor.GetAttachNames();
+
+                // The test passes if at least one attachment is found and its name matches the original file
+                Assert.IsNotNull(names, "Attachment name list should not be null.");
+                Assert.IsTrue(names.Count > 0, "No attachments were found after saving the PDF.");
+
+                // Verify the exact attachment name
+                bool found = false;
+                foreach (string name in names)
+                {
+                    if (name.Equals(Path.GetFileName(attachmentPath), StringComparison.OrdinalIgnoreCase))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                Assert.IsTrue(found, $"Attachment '{Path.GetFileName(attachmentPath)}' was not found in the PDF.");
+            }
+        }
+    }
+
+    // Dummy entry point to satisfy the compiler when building as an executable.
+    public static class Program
+    {
+        public static void Main(string[] args)
+        {
+            // No operation – tests are executed by the test runner.
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Minimal NUnit stubs – used when the NUnit package is not referenced.
-// -----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 namespace NUnit.Framework
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class TestFixtureAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TestAttribute : Attribute { }
 
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class SetUpAttribute : Attribute { }
@@ -23,93 +122,21 @@ namespace NUnit.Framework
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class TearDownAttribute : Attribute { }
 
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class TestAttribute : Attribute { }
+
     public static class Assert
     {
-        public static void IsTrue(bool condition, string? message = null)
+        public static void IsNotNull(object obj, string message = null)
+        {
+            if (obj == null)
+                throw new Exception(message ?? "Assert.IsNotNull failed. Object is null.");
+        }
+
+        public static void IsTrue(bool condition, string message = null)
         {
             if (!condition)
-                throw new Exception(message ?? "Assert.IsTrue failed.");
+                throw new Exception(message ?? "Assert.IsTrue failed. Condition is false.");
         }
-    }
-}
-
-namespace AsposePdfTests
-{
-    [TestFixture]
-    public class AttachmentTests
-    {
-        private string? _tempFolder;
-
-        [SetUp]
-        public void SetUp()
-        {
-            // Create a temporary folder for test files
-            _tempFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            Directory.CreateDirectory(_tempFolder);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            // Clean up temporary files
-            if (!string.IsNullOrEmpty(_tempFolder) && Directory.Exists(_tempFolder))
-            {
-                Directory.Delete(_tempFolder, true);
-            }
-        }
-
-        [Test]
-        public void Attachment_Should_Appear_After_Save()
-        {
-            // Arrange: paths for the original PDF, attachment file and the output PDF
-            string originalPdfPath = Path.Combine(_tempFolder!, "original.pdf");
-            string attachmentPath   = Path.Combine(_tempFolder!, "sample.txt");
-            string outputPdfPath    = Path.Combine(_tempFolder!, "withAttachment.pdf");
-
-            // Create a simple PDF with one blank page
-            using (Document doc = new Document())
-            {
-                doc.Pages.Add(); // add a blank page
-                doc.Save(originalPdfPath); // save the PDF
-            }
-
-            // Create a sample attachment file
-            File.WriteAllText(attachmentPath, "This is a test attachment.");
-
-            // Act: add the attachment using PdfContentEditor and save the result
-            PdfContentEditor editor = new PdfContentEditor();
-            editor.BindPdf(originalPdfPath);
-            editor.AddDocumentAttachment(attachmentPath, "Test attachment description");
-            editor.Save(outputPdfPath);
-            editor.Close(); // close the facade
-
-            // Assert: extract attachments and verify the expected one exists
-            PdfExtractor extractor = new PdfExtractor();
-            extractor.BindPdf(outputPdfPath);
-            extractor.ExtractAttachment(); // extract all attachments
-            IList<string> attachNames = extractor.GetAttachNames();
-
-            bool attachmentFound = false;
-            foreach (object nameObj in attachNames)
-            {
-                string? name = nameObj as string;
-                if (!string.IsNullOrEmpty(name) && name.Equals(Path.GetFileName(attachmentPath), StringComparison.OrdinalIgnoreCase))
-                {
-                    attachmentFound = true;
-                    break;
-                }
-            }
-
-            Assert.IsTrue(attachmentFound, $"Attachment '{Path.GetFileName(attachmentPath)}' was not found in the PDF.");
-        }
-    }
-}
-
-// Dummy entry point to satisfy the compiler when building as an executable.
-public static class Program
-{
-    public static void Main(string[] args)
-    {
-        // No operation – the project is intended for unit testing.
     }
 }

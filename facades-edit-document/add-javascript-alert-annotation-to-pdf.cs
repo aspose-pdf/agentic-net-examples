@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using System.Drawing;               // needed for System.Drawing.Rectangle and Color
-using Aspose.Pdf;                  // core PDF types
-using Aspose.Pdf.Facades;          // PdfContentEditor facade
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using System.Drawing; // needed for Rectangle and Color used by CreateJavaScriptLink
 
 class Program
 {
@@ -17,30 +17,27 @@ class Program
             return;
         }
 
-        try
+        // Bind the PDF, add a JavaScript link annotation, and save.
+        using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Bind the PDF to the editor facade
-            PdfContentEditor editor = new PdfContentEditor();
+            // Load the source PDF.
             editor.BindPdf(inputPath);
 
-            // JavaScript code to be executed on click
+            // Define the clickable rectangle (x, y, width, height) in points.
+            // CreateJavaScriptLink expects a System.Drawing.Rectangle, so we use that type explicitly.
+            System.Drawing.Rectangle linkRect = new System.Drawing.Rectangle(100, 500, 200, 50);
+
+            // JavaScript code to be executed on click.
             string jsCode = "app.alert('Hello from Aspose.Pdf!');";
 
-            // Define the clickable rectangle (x, y, width, height) using System.Drawing.Rectangle
-            System.Drawing.Rectangle clickRect = new System.Drawing.Rectangle(100, 500, 200, 100);
+            // Create the JavaScript link on page 1 with a red border.
+            // The border color must also be a System.Drawing.Color.
+            editor.CreateJavaScriptLink(jsCode, linkRect, 1, System.Drawing.Color.Red);
 
-            // Create the JavaScript link on page 1 with a visible border color (System.Drawing.Color)
-            editor.CreateJavaScriptLink(jsCode, clickRect, 1, System.Drawing.Color.Red);
-
-            // Save the modified document
+            // Save the modified PDF.
             editor.Save(outputPath);
-            editor.Close(); // optional, releases resources held by the facade
+        }
 
-            Console.WriteLine($"JavaScript annotation added. Saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"JavaScript annotation saved to '{outputPath}'.");
     }
 }

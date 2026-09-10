@@ -2,67 +2,56 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";          // source PDF
-        const string outputPdf = "output.pdf";        // result PDF
-        const string attachmentFile = "datafile.dat"; // file to attach
-        const string description = "Data attachment"; // description for the attachment
+        // Paths – adjust as needed
+        const string inputPdf   = "input.pdf";
+        const string attachment = "datafile.bin";
+        const string outputPdf  = "output_with_attachment.pdf";
 
-        // Ensure the source PDF exists
+        // Verify files exist
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(attachment))
+        {
+            Console.Error.WriteLine($"Attachment file not found: {attachment}");
             return;
         }
 
-        // Ensure the attachment file exists
-        if (!File.Exists(attachmentFile))
+        // Use PdfContentEditor (facade) to edit the PDF
+        PdfContentEditor editor = new PdfContentEditor();
+
+        // Bind the existing PDF document
+        editor.BindPdf(inputPdf);
+
+        // Add the attachment without a visible annotation
+        // Second parameter is a description for the attachment
+        editor.AddDocumentAttachment(attachment, "Sample data attachment");
+
+        // After adding, the attachment is stored in the underlying Document's EmbeddedFiles collection.
+        // Set the relationship type (AFRelationship) to "Data" for better organization.
+        // Aspose collections are 1‑based, so the first embedded file is at index 1.
+        if (editor.Document.EmbeddedFiles != null && editor.Document.EmbeddedFiles.Count > 0)
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentFile}");
-            return;
+            // FileSpecification represents the attached file
+            var fileSpec = editor.Document.EmbeddedFiles[1]; // 1‑based index
+
+            // The AFRelationship property expects an enum value, not a string.
+            fileSpec.AFRelationship = Aspose.Pdf.AFRelationship.Data;
         }
 
-        // Use PdfContentEditor (Facade) to open, modify, and save the PDF
-        using (PdfContentEditor editor = new PdfContentEditor())
-        {
-            // Bind the existing PDF document
-            editor.BindPdf(inputPdf);
+        // Save the modified PDF
+        editor.Save(outputPdf);
 
-            // Access the underlying Document object for low‑level modifications
-            Document doc = editor.Document;
+        // Clean up
+        editor.Close();
 
-            // Create a FileSpecification describing the attachment (constructor sets file path and description)
-            FileSpecification fileSpec = new FileSpecification(attachmentFile, description)
-            {
-                // Set the AFRelationship to Data for better document organization
-                AFRelationship = AFRelationship.Data
-            };
-
-            // Choose the page where the attachment annotation will appear (first page)
-            Page page = doc.Pages[1];
-
-            // Define the rectangle for the annotation icon (position on the page)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 120, 520);
-
-            // Create the file attachment annotation using the specification
-            FileAttachmentAnnotation fileAnn = new FileAttachmentAnnotation(page, rect, fileSpec)
-            {
-                // Choose an icon style (Graph, PushPin, Paperclip, Tag)
-                Icon = FileIcon.Graph
-            };
-
-            // Add the annotation to the page
-            page.Annotations.Add(fileAnn);
-
-            // Save the modified PDF
-            editor.Save(outputPdf);
-        }
-
-        Console.WriteLine($"Attachment added with relationship 'Data' and saved to '{outputPdf}'.");
+        Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
     }
 }
