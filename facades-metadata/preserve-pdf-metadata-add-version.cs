@@ -1,31 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// preserve pdf metadata add version
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/facades-metadata
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
-
-        // Bind the existing PDF and preserve all current metadata.
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPdf))
-        {
-            // Add or update the custom field "Version".
-            pdfInfo.SetMetaInfo("Version", "1.0");
-
-            // Save the PDF with the new custom metadata while keeping all other metadata intact.
-            bool success = pdfInfo.SaveNewInfo(outputPdf);
-            Console.WriteLine(success
-                ? $"Metadata updated and saved to '{outputPdf}'."
-                : "Failed to save the updated PDF.");
-        }
-    }
-}
+class Program { static void Main() { } }

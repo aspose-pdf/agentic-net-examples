@@ -1,45 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// read pdf metadata add blank page
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/facades-metadata
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Use PdfFileInfo to read basic information (Title)
-        using (PdfFileInfo fileInfo = new PdfFileInfo(inputPath))
-        {
-            Console.WriteLine($"Title: {fileInfo.Title}");
-        }
-
-        // Retrieve page count via Document (PdfFileInfo does not expose PageCount in this version)
-        int pageCount;
-        using (Document tempDoc = new Document(inputPath))
-        {
-            pageCount = tempDoc.Pages.Count;
-        }
-        Console.WriteLine($"Page count: {pageCount}");
-
-        // Load the PDF document, modify it, and save
-        using (Document doc = new Document(inputPath))
-        {
-            // Example modification: add a blank page at the end
-            doc.Pages.Add();
-
-            // Save the modified document
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

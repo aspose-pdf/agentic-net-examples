@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Tagged;
 
 class Program
 {
@@ -17,23 +15,17 @@ class Program
             return;
         }
 
-        // Load the PDF using the Facades PdfFileInfo class.
-        // The constructor binds the file automatically.
+        // Load the PDF using the PdfFileInfo facade
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Access the underlying Document object.
-            Document doc = pdfInfo.Document;
+            // Set the language property via custom metadata key "Lang"
+            pdfInfo.SetMetaInfo("Lang", "en-US");
 
-            // Set the natural language for the entire document via the tagged content API.
-            ITaggedContent tagged = doc.TaggedContent;
-            tagged.SetLanguage("en-US");
-
-            // Save the updated PDF using PdfFileInfo.
-            // SaveNewInfo writes the changes to a new file.
+            // Save the updated PDF to a new file
             bool saved = pdfInfo.SaveNewInfo(outputPath);
             Console.WriteLine(saved
-                ? $"Language set to 'en-US' and saved to '{outputPath}'."
-                : $"Failed to save updated PDF to '{outputPath}'.");
+                ? $"Language set to 'en-US' and saved as '{outputPath}'."
+                : "Failed to save the updated PDF.");
         }
     }
 }

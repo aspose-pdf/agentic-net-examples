@@ -14,14 +14,14 @@ class Program
             return;
         }
 
-        // Initialize PdfFileInfo facade for the PDF file
+        // Initialize PdfFileInfo facade for the PDF document
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Retrieve the Keywords metadata (empty string if not set)
-            string keywords = pdfInfo.Keywords;
+            // Retrieve the custom metadata property "ReviewedBy"
+            string reviewedBy = pdfInfo.GetMetaInfo("ReviewedBy");
 
-            // Display the retrieved value
-            Console.WriteLine($"Keywords: {keywords}");
+            // Log the value (empty string if the property does not exist)
+            Console.WriteLine($"ReviewedBy: {(string.IsNullOrEmpty(reviewedBy) ? "(not set)" : reviewedBy)}");
         }
     }
 }

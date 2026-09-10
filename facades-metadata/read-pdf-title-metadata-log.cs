@@ -6,31 +6,28 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string pdfPath = "input.pdf";
         const string logPath = "metadata.log";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Initialize PdfFileInfo facade for the PDF file
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPdf))
+        // Initialize PdfFileInfo facade with the PDF file
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(pdfPath))
         {
-            // Read the Title metadata (may be null)
-            string title = pdfInfo.Title ?? string.Empty;
+            // Read the Title metadata
+            string title = pdfInfo.Title;
 
-            // Write the title to a simple log file
-            try
-            {
-                File.WriteAllText(logPath, $"Title: {title}");
-                Console.WriteLine($"Title written to '{logPath}'.");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error writing log: {ex.Message}");
-            }
+            // Prepare log entry
+            string logEntry = $"Title: {(string.IsNullOrEmpty(title) ? "(none)" : title)}";
+
+            // Write the log entry to the specified log file
+            File.WriteAllText(logPath, logEntry);
+
+            Console.WriteLine($"Title metadata written to '{logPath}'.");
         }
     }
 }

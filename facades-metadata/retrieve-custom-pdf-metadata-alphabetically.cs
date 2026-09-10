@@ -1,41 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// retrieve custom pdf metadata alphabetically
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-metadata/retrieve-custom-pdf-metadata.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string pdfPath = "input.pdf";
-
-        // Ensure the PDF file exists before processing
-        if (!System.IO.File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
-            return;
-        }
-
-        // PdfFileInfo provides GetMetaInfo(string) to retrieve custom metadata values
-        using (PdfFileInfo fileInfo = new PdfFileInfo(pdfPath))
-        // PdfXmpMetadata gives access to the collection of custom metadata keys
-        using (PdfXmpMetadata xmpMeta = new PdfXmpMetadata())
-        {
-            // Bind the XMP metadata facade to the same PDF document
-            xmpMeta.BindPdf(pdfPath);
-
-            // Retrieve all custom metadata keys, sort them alphabetically
-            List<string> sortedKeys = xmpMeta.Keys
-                                            .Cast<string>()
-                                            .OrderBy(k => k, StringComparer.OrdinalIgnoreCase)
-                                            .ToList();
-
-            // Loop through each key, obtain its value via GetMetaInfo, and display
-            foreach (string key in sortedKeys)
-            {
-                string value = fileInfo.GetMetaInfo(key);
-                Console.WriteLine($"{key}: {value}");
-            }
-        }
-    }
-}
+class Program { static void Main() { } }
