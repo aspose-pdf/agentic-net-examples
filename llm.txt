@@ -1,12 +1,12 @@
 # Aspose.PDF for .NET Examples
 > Build-validated, compiler-verified C# examples for Aspose.PDF for .NET
 
-- Examples: 2,636
+- Examples: 3,998
 - Categories: 35
 - Pass Rate: 100.0%
-- NuGet Version: 26.7.0
+- NuGet Version: 26.8.0
 - Framework: net10.0
-- Last Updated: 2026-07-21
+- Last Updated: 2026-09-10
 - Structured index: ./index.json
 - Agent instructions: ./AGENTS.md
 - Product documentation: https://docs.aspose.com/pdf/net/
@@ -32,41 +32,41 @@
 
 ## Categories
 
-- [accessibility-and-tagged-pdfs](./accessibility-and-tagged-pdfs/): 45 build-verified examples; instructions in [AGENTS.md](./accessibility-and-tagged-pdfs/AGENTS.md)
-- [basic-operations](./basic-operations/): 57 build-verified examples; instructions in [AGENTS.md](./basic-operations/AGENTS.md)
-- [compare-pdf](./compare-pdf/): 29 build-verified examples; instructions in [AGENTS.md](./compare-pdf/AGENTS.md)
-- [conversion](./conversion/): 102 build-verified examples; instructions in [AGENTS.md](./conversion/AGENTS.md)
-- [document](./document/): 117 build-verified examples; instructions in [AGENTS.md](./document/AGENTS.md)
-- [facades-acroforms](./facades-acroforms/): 41 build-verified examples; instructions in [AGENTS.md](./facades-acroforms/AGENTS.md)
-- [facades-annotations](./facades-annotations/): 106 build-verified examples; instructions in [AGENTS.md](./facades-annotations/AGENTS.md)
-- [facades-bookmarks](./facades-bookmarks/): 35 build-verified examples; instructions in [AGENTS.md](./facades-bookmarks/AGENTS.md)
-- [facades-convert-documents](./facades-convert-documents/): 36 build-verified examples; instructions in [AGENTS.md](./facades-convert-documents/AGENTS.md)
-- [facades-documents](./facades-documents/): 101 build-verified examples; instructions in [AGENTS.md](./facades-documents/AGENTS.md)
-- [facades-edit-document](./facades-edit-document/): 213 build-verified examples; instructions in [AGENTS.md](./facades-edit-document/AGENTS.md)
-- [facades-extract-images-and-text](./facades-extract-images-and-text/): 83 build-verified examples; instructions in [AGENTS.md](./facades-extract-images-and-text/AGENTS.md)
-- [facades-fill-forms](./facades-fill-forms/): 35 build-verified examples; instructions in [AGENTS.md](./facades-fill-forms/AGENTS.md)
-- [facades-forms](./facades-forms/): 85 build-verified examples; instructions in [AGENTS.md](./facades-forms/AGENTS.md)
-- [facades-metadata](./facades-metadata/): 40 build-verified examples; instructions in [AGENTS.md](./facades-metadata/AGENTS.md)
-- [facades-pages](./facades-pages/): 117 build-verified examples; instructions in [AGENTS.md](./facades-pages/AGENTS.md)
-- [facades-secure-documents](./facades-secure-documents/): 38 build-verified examples; instructions in [AGENTS.md](./facades-secure-documents/AGENTS.md)
-- [facades-sign-documents](./facades-sign-documents/): 35 build-verified examples; instructions in [AGENTS.md](./facades-sign-documents/AGENTS.md)
-- [facades-stamps](./facades-stamps/): 48 build-verified examples; instructions in [AGENTS.md](./facades-stamps/AGENTS.md)
-- [facades-texts-and-images](./facades-texts-and-images/): 28 build-verified examples; instructions in [AGENTS.md](./facades-texts-and-images/AGENTS.md)
-- [facades-xmp-metadata](./facades-xmp-metadata/): 44 build-verified examples; instructions in [AGENTS.md](./facades-xmp-metadata/AGENTS.md)
-- [graphs-zugferd-operators](./graphs-zugferd-operators/): 82 build-verified examples; instructions in [AGENTS.md](./graphs-zugferd-operators/AGENTS.md)
-- [pages](./pages/): 100 build-verified examples; instructions in [AGENTS.md](./pages/AGENTS.md)
-- [parse-pdf](./parse-pdf/): 63 build-verified examples; instructions in [AGENTS.md](./parse-pdf/AGENTS.md)
-- [securing-and-signing-pdf](./securing-and-signing-pdf/): 78 build-verified examples; instructions in [AGENTS.md](./securing-and-signing-pdf/AGENTS.md)
-- [stamping](./stamping/): 50 build-verified examples; instructions in [AGENTS.md](./stamping/AGENTS.md)
+- [accessibility-and-tagged-pdfs](./accessibility-and-tagged-pdfs/): 70 build-verified examples; instructions in [AGENTS.md](./accessibility-and-tagged-pdfs/AGENTS.md)
+- [basic-operations](./basic-operations/): 77 build-verified examples; instructions in [AGENTS.md](./basic-operations/AGENTS.md)
+- [compare-pdf](./compare-pdf/): 44 build-verified examples; instructions in [AGENTS.md](./compare-pdf/AGENTS.md)
+- [conversion](./conversion/): 150 build-verified examples; instructions in [AGENTS.md](./conversion/AGENTS.md)
+- [document](./document/): 175 build-verified examples; instructions in [AGENTS.md](./document/AGENTS.md)
+- [facades-acroforms](./facades-acroforms/): 59 build-verified examples; instructions in [AGENTS.md](./facades-acroforms/AGENTS.md)
+- [facades-annotations](./facades-annotations/): 155 build-verified examples; instructions in [AGENTS.md](./facades-annotations/AGENTS.md)
+- [facades-bookmarks](./facades-bookmarks/): 48 build-verified examples; instructions in [AGENTS.md](./facades-bookmarks/AGENTS.md)
+- [facades-convert-documents](./facades-convert-documents/): 51 build-verified examples; instructions in [AGENTS.md](./facades-convert-documents/AGENTS.md)
+- [facades-documents](./facades-documents/): 153 build-verified examples; instructions in [AGENTS.md](./facades-documents/AGENTS.md)
+- [facades-edit-document](./facades-edit-document/): 328 build-verified examples; instructions in [AGENTS.md](./facades-edit-document/AGENTS.md)
+- [facades-extract-images-and-text](./facades-extract-images-and-text/): 125 build-verified examples; instructions in [AGENTS.md](./facades-extract-images-and-text/AGENTS.md)
+- [facades-fill-forms](./facades-fill-forms/): 61 build-verified examples; instructions in [AGENTS.md](./facades-fill-forms/AGENTS.md)
+- [facades-forms](./facades-forms/): 132 build-verified examples; instructions in [AGENTS.md](./facades-forms/AGENTS.md)
+- [facades-metadata](./facades-metadata/): 58 build-verified examples; instructions in [AGENTS.md](./facades-metadata/AGENTS.md)
+- [facades-pages](./facades-pages/): 185 build-verified examples; instructions in [AGENTS.md](./facades-pages/AGENTS.md)
+- [facades-secure-documents](./facades-secure-documents/): 59 build-verified examples; instructions in [AGENTS.md](./facades-secure-documents/AGENTS.md)
+- [facades-sign-documents](./facades-sign-documents/): 61 build-verified examples; instructions in [AGENTS.md](./facades-sign-documents/AGENTS.md)
+- [facades-stamps](./facades-stamps/): 82 build-verified examples; instructions in [AGENTS.md](./facades-stamps/AGENTS.md)
+- [facades-texts-and-images](./facades-texts-and-images/): 45 build-verified examples; instructions in [AGENTS.md](./facades-texts-and-images/AGENTS.md)
+- [facades-xmp-metadata](./facades-xmp-metadata/): 72 build-verified examples; instructions in [AGENTS.md](./facades-xmp-metadata/AGENTS.md)
+- [graphs-zugferd-operators](./graphs-zugferd-operators/): 124 build-verified examples; instructions in [AGENTS.md](./graphs-zugferd-operators/AGENTS.md)
+- [pages](./pages/): 133 build-verified examples; instructions in [AGENTS.md](./pages/AGENTS.md)
+- [parse-pdf](./parse-pdf/): 97 build-verified examples; instructions in [AGENTS.md](./parse-pdf/AGENTS.md)
+- [securing-and-signing-pdf](./securing-and-signing-pdf/): 116 build-verified examples; instructions in [AGENTS.md](./securing-and-signing-pdf/AGENTS.md)
+- [stamping](./stamping/): 72 build-verified examples; instructions in [AGENTS.md](./stamping/AGENTS.md)
 - [uncategorized](./uncategorized/): 1 build-verified examples; instructions in [AGENTS.md](./uncategorized/AGENTS.md)
-- [working-with-annotations](./working-with-annotations/): 156 build-verified examples; instructions in [AGENTS.md](./working-with-annotations/AGENTS.md)
-- [working-with-attachments](./working-with-attachments/): 50 build-verified examples; instructions in [AGENTS.md](./working-with-attachments/AGENTS.md)
-- [working-with-forms](./working-with-forms/): 230 build-verified examples; instructions in [AGENTS.md](./working-with-forms/AGENTS.md)
-- [working-with-graphs](./working-with-graphs/): 77 build-verified examples; instructions in [AGENTS.md](./working-with-graphs/AGENTS.md)
-- [working-with-images](./working-with-images/): 72 build-verified examples; instructions in [AGENTS.md](./working-with-images/AGENTS.md)
-- [working-with-tables](./working-with-tables/): 96 build-verified examples; instructions in [AGENTS.md](./working-with-tables/AGENTS.md)
-- [working-with-text](./working-with-text/): 73 build-verified examples; instructions in [AGENTS.md](./working-with-text/AGENTS.md)
-- [working-with-xml](./working-with-xml/): 73 build-verified examples; instructions in [AGENTS.md](./working-with-xml/AGENTS.md)
+- [working-with-annotations](./working-with-annotations/): 216 build-verified examples; instructions in [AGENTS.md](./working-with-annotations/AGENTS.md)
+- [working-with-attachments](./working-with-attachments/): 69 build-verified examples; instructions in [AGENTS.md](./working-with-attachments/AGENTS.md)
+- [working-with-forms](./working-with-forms/): 358 build-verified examples; instructions in [AGENTS.md](./working-with-forms/AGENTS.md)
+- [working-with-graphs](./working-with-graphs/): 129 build-verified examples; instructions in [AGENTS.md](./working-with-graphs/AGENTS.md)
+- [working-with-images](./working-with-images/): 105 build-verified examples; instructions in [AGENTS.md](./working-with-images/AGENTS.md)
+- [working-with-tables](./working-with-tables/): 153 build-verified examples; instructions in [AGENTS.md](./working-with-tables/AGENTS.md)
+- [working-with-text](./working-with-text/): 114 build-verified examples; instructions in [AGENTS.md](./working-with-text/AGENTS.md)
+- [working-with-xml](./working-with-xml/): 121 build-verified examples; instructions in [AGENTS.md](./working-with-xml/AGENTS.md)
 
 ## See Also
 

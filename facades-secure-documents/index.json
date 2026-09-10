@@ -1,435 +1,16 @@
 {
   "category": "facades-secure-documents",
   "nuget_version": "26.8.0",
-  "last_updated": "2026-08-20T08:00:40Z",
+  "last_updated": "2026-09-10T12:45:08Z",
   "examples": {
-    "load-pdf-verify-page-count-facade": {
-      "title": "Load PDF and Verify Page Count Using PdfFileInfo Facade",
-      "filename": "load-pdf-verify-page-count-facade.cs",
-      "description": "Demonstrates loading a PDF file via the PdfFileInfo facade class and confirming successful loading by checking the document's page count.",
-      "tags": [
-        "pdf",
-        "load",
-        "facade",
-        "verification",
-        "pages"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.PageCollection.Count"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "check-pdf-encryption-and-toggle-protection": {
-      "title": "Check PDF Encryption and Apply or Remove Protection",
-      "filename": "check-pdf-encryption-and-toggle-protection.cs",
-      "description": "The example shows how to inspect a PDF's IsEncrypted flag using PdfFileInfo, then either encrypt the document with specific permissions or decrypt it by opening with the owner password and saving without encryption.",
-      "tags": [
-        "encryption",
-        "decryption",
-        "pdf",
-        "permissions",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.PdfFileInfo",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Permissions",
-        "Aspose.Pdf.CryptoAlgorithm"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "decrypt-pdf-owner-password": {
-      "title": "Decrypt PDF Using Owner Password",
-      "filename": "decrypt-pdf-owner-password.cs",
-      "description": "Demonstrates how to remove encryption from a PDF file by providing the owner password using Aspose.Pdf's PdfFileSecurity facade.",
-      "tags": [
-        "pdf",
-        "decryption",
-        "owner-password",
-        "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.DecryptFile"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "encrypt-pdf-256-aes": {
-      "title": "Encrypt PDF with 256‑bit AES using Aspose.Pdf",
-      "filename": "encrypt-pdf-256-aes.cs",
-      "description": "Shows how to encrypt a PDF with 256‑bit AES, set user and owner passwords, and apply a print privilege using Aspose.Pdf.Facades.",
-      "tags": [
-        "pdf encryption",
-        "aes-256",
-        "aspose.pdf",
-        "pdf security",
-        "c#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.EncryptFile",
-        "Aspose.Pdf.DocumentPrivilege",
-        "Aspose.Pdf.Facades.KeySize"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "encrypt-pdf-rc4-40": {
-      "title": "Encrypt PDF with RC4‑40 and Password",
-      "filename": "encrypt-pdf-rc4-40.cs",
-      "description": "Shows how to encrypt an existing PDF using the RC4‑40 algorithm with user and owner passwords and set printing privileges via Aspose.Pdf.Facades.",
-      "tags": [
-        "pdf",
-        "encryption",
-        "rc4",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.EncryptFile",
-        "Aspose.Pdf.DocumentPrivilege",
-        "Aspose.Pdf.Facades.KeySize",
-        "Aspose.Pdf.Facades.Algorithm"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "encrypt-pdf-aes256-custom-privileges": {
-      "title": "Encrypt PDF with AES‑256 and Custom Privileges",
-      "filename": "encrypt-pdf-aes256-custom-privileges.cs",
-      "description": "Demonstrates encrypting a PDF using AES‑256 while applying custom document privileges such as allowing printing and copying but forbidding modifications.",
-      "tags": [
-        "pdf-encryption",
-        "aes-256",
-        "custom-privileges",
-        "aspose-pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.EncryptFile",
-        "Aspose.Pdf.DocumentPrivilege",
-        "Aspose.Pdf.KeySize",
-        "Aspose.Pdf.Algorithm"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "change-user-password-of-encrypted-pdf": {
-      "title": "Change User Password of Encrypted PDF",
-      "filename": "change-user-password-of-encrypted-pdf.cs",
-      "description": "Demonstrates how to update the user password of an already encrypted PDF while keeping the existing encryption settings using Aspose.Pdf.Facades.",
-      "tags": [
-        "pdf",
-        "encryption",
-        "password",
-        "Aspose.Pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.ChangePassword",
-        "Aspose.Pdf.Facades.PdfFileSecurity..ctor",
-        "Aspose.Pdf.Facades.PdfFileSecurity.Dispose"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "update-owner-password-pdf": {
-      "title": "Update Owner Password of a Protected PDF",
-      "filename": "update-owner-password-pdf.cs",
-      "description": "Shows how to change the owner password of an encrypted PDF without altering the user password or existing privileges using Aspose.Pdf.Facades.",
-      "tags": [
-        "pdf",
-        "owner-password",
-        "encryption",
-        "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileSecurity.ChangePassword",
-        "Aspose.Pdf.Facades.PdfFileSecurity.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "change-user-and-owner-passwords": {
-      "title": "Change User and Owner Passwords in PDF",
-      "filename": "change-user-and-owner-passwords.cs",
-      "description": "Demonstrates how to change both the user and owner passwords of an encrypted PDF in a single call using Aspose.Pdf.Facades.PdfFileSecurity.",
-      "tags": [
-        "pdf",
-        "password",
-        "encryption",
-        "aspose",
-        "security"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.ChangePassword"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "set-pdf-privileges-allow-printing-only": {
-      "title": "Set PDF Privileges to Allow Printing Only",
-      "filename": "set-pdf-privileges-allow-printing-only.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades to enable printing while disabling copying for a PDF and then save the secured document.",
-      "tags": [
-        "pdf",
-        "security",
-        "privileges",
-        "printing",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.SetPrivilege",
-        "Aspose.Pdf.Facades.PdfFileSecurity.Save",
-        "Aspose.Pdf.Facades.DocumentPrivilege"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "set-pdf-privileges-allow-form-filling-disable-assembly": {
-      "title": "Set PDF Privileges: Allow Form Filling, Disable Assembly",
-      "filename": "set-pdf-privileges-allow-form-filling-disable-assembly.cs",
-      "description": "Shows how to configure PDF security privileges to permit form filling while disabling document assembly using Aspose.Pdf.Facades.",
-      "tags": [
-        "pdf",
-        "security",
-        "privileges",
-        "form-filling",
-        "assembly"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.DocumentPrivilege",
-        "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.SetPrivilege",
-        "Aspose.Pdf.Facades.DocumentPrivilege.AllowAll",
-        "Aspose.Pdf.Facades.DocumentPrivilege.AllowAssembly",
-        "Aspose.Pdf.Facades.DocumentPrivilege.AllowFillIn"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "disable-copying-enable-printing-pdf": {
-      "title": "Disable Copying While Enabling Printing for PDF",
-      "filename": "disable-copying-enable-printing-pdf.cs",
-      "description": "Demonstrates using Aspose.Pdf.Facades.PdfFileSecurity to set document privileges so that copying is disabled and printing remains allowed.",
-      "tags": [
-        "pdf",
-        "security",
-        "privileges",
-        "printing",
-        "copy-protection"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.SetPrivilege",
-        "Aspose.Pdf.Facades.DocumentPrivilege"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "remove-extended-usage-rights-from-signed-pdf": {
-      "title": "Remove Extended Usage Rights from Signed PDF",
-      "filename": "remove-extended-usage-rights-from-signed-pdf.cs",
-      "description": "Shows how to load a signed PDF, detect extended usage rights, remove them with PdfFileSignature, and save the updated document.",
-      "tags": [
-        "pdf",
-        "usage-rights",
-        "signature",
-        "remove",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSignature",
-        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileSignature.ContainsUsageRights",
-        "Aspose.Pdf.Facades.PdfFileSignature.RemoveUsageRights",
-        "Aspose.Pdf.Facades.PdfFileSignature.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "check-pdf-extended-usage-rights": {
-      "title": "Check PDF for Extended Usage Rights",
-      "filename": "check-pdf-extended-usage-rights.cs",
-      "description": "Shows how to use Aspose.Pdf's PdfFileSignature facade to determine if a PDF contains extended usage rights.",
-      "tags": [
-        "pdf",
-        "usage-rights",
-        "signature",
-        "facade",
-        "validation"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfFileSignature",
-        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileSignature.ContainsUsageRights"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "remove-usage-rights-verify": {
-      "title": "Remove Usage Rights and Verify Removal from PDF",
-      "filename": "remove-usage-rights-verify.cs",
-      "description": "Demonstrates how to remove usage rights from a PDF using Aspose.Pdf and then confirm the removal by calling ContainsUsageRights. The resulting PDF is saved without any usage rights.",
-      "tags": [
-        "usage rights",
-        "pdf security",
-        "remove",
-        "verification",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "PdfFileSignature",
-        "PdfFileSignature.BindPdf",
-        "PdfFileSignature.RemoveUsageRights",
-        "PdfFileSignature.ContainsUsageRights",
-        "PdfFileSignature.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "encrypt-pdf-with-password-and-capture-exceptions": {
-      "title": "Encrypt PDF with Password and Capture Exceptions",
-      "filename": "encrypt-pdf-with-password-and-capture-exceptions.cs",
-      "description": "Demonstrates encrypting a PDF using PdfFileSecurity, enabling AllowExceptions to suppress throws, and logging detailed exception information via LastException.",
-      "tags": [
-        "pdf encryption",
-        "exception handling",
-        "Aspose.Pdf",
-        "password protection",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSecurity",
-        "PdfFileSecurity.AllowExceptions",
-        "PdfFileSecurity.BindPdf",
-        "PdfFileSecurity.EncryptFile",
-        "PdfFileSecurity.Save",
-        "PdfFileSecurity.LastException"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "set-pdf-privilege-allow-exceptions-false": {
-      "title": "Modify PDF Privilege with Exception Propagation",
-      "filename": "set-pdf-privilege-allow-exceptions-false.cs",
-      "description": "Shows how to change a PDF document's privilege using Aspose.Pdf.Facades.PdfFileSecurity while disabling internal exception handling so that runtime exceptions are thrown.",
-      "tags": [
-        "pdf",
-        "privilege",
-        "exception",
-        "Aspose.Pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.AllowExceptions",
-        "Aspose.Pdf.Facades.PdfFileSecurity.SetPrivilege",
-        "Aspose.Pdf.Facades.DocumentPrivilege",
-        "Aspose.Pdf.PdfException"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "encrypt-pdf-to-memory-stream": {
-      "title": "Encrypt PDF and Save to MemoryStream",
-      "filename": "encrypt-pdf-to-memory-stream.cs",
-      "description": "Demonstrates loading a PDF with Aspose.Pdf, applying AES‑256 encryption with user/owner passwords and specific permissions, and writing the encrypted document to a MemoryStream for network transmission.",
-      "tags": [
-        "pdf",
-        "encryption",
-        "memorystream",
-        "permissions",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.Permissions",
-        "Aspose.Pdf.CryptoAlgorithm",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "encrypt-pdf-from-byte-array": {
-      "title": "Encrypt PDF from Byte Array using Aspose.Pdf",
-      "filename": "encrypt-pdf-from-byte-array.cs",
-      "description": "Shows how to load a PDF from a byte array, apply 256‑bit AES encryption with user and owner passwords, and return the encrypted PDF as a byte array.",
-      "tags": [
-        "pdf",
-        "encryption",
-        "byte-array",
-        "aspose",
-        "security"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.DocumentPrivilege",
-        "Aspose.Pdf.KeySize",
-        "Aspose.Pdf.Facades.PdfFileSecurity.EncryptFile",
-        "Aspose.Pdf.Facades.PdfFileSecurity.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "encrypt-pdf-with-user-password": {
-      "title": "Encrypt PDF with User Password Only",
-      "filename": "encrypt-pdf-with-user-password.cs",
-      "description": "Shows how to encrypt a PDF using Aspose.Pdf.Facades by providing only a user password (owner password left undefined) and applying 256‑bit AES encryption with print permission.",
-      "tags": [
-        "pdf encryption",
-        "user password",
-        "Aspose.Pdf",
-        "AES-256",
-        "document privilege"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.EncryptFile",
-        "Aspose.Pdf.DocumentPrivilege",
-        "Aspose.Pdf.KeySize"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
+    "add-text-annotation-to-encrypted-pdf": {
+      "title": "Add Text Annotation To Encrypted Pdf",
+      "filename": "add-text-annotation-to-encrypted-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
     "apply-password-protection-to-pdf": {
@@ -453,47 +34,31 @@
       "generated_at": "2026-08-20T08:00:40Z",
       "status": "verified"
     },
-    "retrieve-pdf-encryption-algorithm": {
-      "title": "Retrieve PDF Encryption Algorithm with Aspose.Pdf Facades",
-      "filename": "retrieve-pdf-encryption-algorithm.cs",
-      "description": "Shows how to check if a PDF is encrypted and obtain the encryption algorithm using Aspose.Pdf's Facades API, creating a sample PDF if none exists.",
-      "tags": [
-        "encryption",
-        "pdf",
-        "facades",
-        "metadata",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.IsEncrypted",
-        "Aspose.Pdf.Facades.PdfFileInfo.Document",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.CryptoAlgorithm",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:00:40Z",
+    "batch-decrypt-pdfs-from-config": {
+      "title": "Batch Decrypt Pdfs From Config",
+      "filename": "batch-decrypt-pdfs-from-config.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
-    "validate-pdf-encryption-and-decrypt": {
-      "title": "Validate PDF Encryption and Decrypt with Aspose.Pdf",
-      "filename": "validate-pdf-encryption-and-decrypt.cs",
-      "description": "Shows how to check whether a PDF is encrypted using PdfFileInfo and, if it is, decrypt it with PdfFileSecurity while handling missing files and copying unencrypted PDFs.",
+    "batch-decrypt-pdfs-owner-passwords": {
+      "title": "Batch Decrypt PDFs Using Owner Passwords",
+      "filename": "batch-decrypt-pdfs-owner-passwords.cs",
+      "description": "Shows how to read a simple configuration file containing PDF paths and owner passwords, then decrypt each PDF in a batch using Aspose.Pdf.Facades.PdfFileSecurity.",
       "tags": [
         "pdf",
-        "encryption",
         "decryption",
-        "validation",
-        "aspose"
+        "batch",
+        "owner-password",
+        "configuration"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.TryDecryptFile",
-        "Aspose.Pdf.Facades.PdfFileSecurity.Save",
-        "Aspose.Pdf.Facades.PdfFileSecurity.Close"
+        "PdfFileSecurity",
+        "PdfFileSecurity.DecryptFile",
+        "PdfFileSecurity (constructor)"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T08:00:40Z",
@@ -520,24 +85,14 @@
       "generated_at": "2026-08-20T08:00:40Z",
       "status": "verified"
     },
-    "batch-decrypt-pdfs-owner-passwords": {
-      "title": "Batch Decrypt PDFs Using Owner Passwords",
-      "filename": "batch-decrypt-pdfs-owner-passwords.cs",
-      "description": "Shows how to read a simple configuration file containing PDF paths and owner passwords, then decrypt each PDF in a batch using Aspose.Pdf.Facades.PdfFileSecurity.",
-      "tags": [
-        "pdf",
-        "decryption",
-        "batch",
-        "owner-password",
-        "configuration"
-      ],
-      "apis_used": [
-        "PdfFileSecurity",
-        "PdfFileSecurity.DecryptFile",
-        "PdfFileSecurity (constructor)"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:00:40Z",
+    "batch-encrypt-pdfs": {
+      "title": "Batch Encrypt Pdfs",
+      "filename": "batch-encrypt-pdfs.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
     "batch-update-pdf-user-passwords": {
@@ -559,22 +114,150 @@
       "generated_at": "2026-08-20T08:00:40Z",
       "status": "verified"
     },
-    "update-pdf-owner-password": {
-      "title": "Update PDF Owner Password While Preserving User Password",
-      "filename": "update-pdf-owner-password.cs",
-      "description": "Demonstrates how to change the owner password of multiple PDF files using Aspose.Pdf.Facades without affecting the existing user passwords, and saves the secured PDFs to new locations.",
+    "change-pdf-owner-password-preserve-user": {
+      "title": "Change Pdf Owner Password Preserve User",
+      "filename": "change-pdf-owner-password-preserve-user.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "change-pdf-passwords-from-csv": {
+      "title": "Change User and Owner Passwords for PDFs from CSV",
+      "filename": "change-pdf-passwords-from-csv.cs",
+      "description": "Shows how to read PDF file paths and passwords from a CSV file and use Aspose.Pdf.Facades.PdfFileSecurity to change both user and owner passwords, saving the protected PDFs.",
       "tags": [
         "pdf",
-        "owner-password",
+        "password",
+        "csv",
         "security",
-        "aspose",
-        "csharp"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSecurity",
         "Aspose.Pdf.Facades.PdfFileSecurity.BindPdf",
         "Aspose.Pdf.Facades.PdfFileSecurity.ChangePassword",
         "Aspose.Pdf.Facades.PdfFileSecurity.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "change-user-and-owner-passwords": {
+      "title": "Change User and Owner Passwords in PDF",
+      "filename": "change-user-and-owner-passwords.cs",
+      "description": "Demonstrates how to change both the user and owner passwords of an encrypted PDF in a single call using Aspose.Pdf.Facades.PdfFileSecurity.",
+      "tags": [
+        "pdf",
+        "password",
+        "encryption",
+        "aspose",
+        "security"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.ChangePassword"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "change-user-password-of-encrypted-pdf": {
+      "title": "Change User Password of Encrypted PDF",
+      "filename": "change-user-password-of-encrypted-pdf.cs",
+      "description": "Demonstrates how to update the user password of an already encrypted PDF while keeping the existing encryption settings using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "password",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.ChangePassword",
+        "Aspose.Pdf.Facades.PdfFileSecurity..ctor",
+        "Aspose.Pdf.Facades.PdfFileSecurity.Dispose"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "check-pdf-encryption-and-encrypt-decrypt": {
+      "title": "Check Pdf Encryption And Encrypt Decrypt",
+      "filename": "check-pdf-encryption-and-encrypt-decrypt.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "check-pdf-encryption-and-toggle-protection": {
+      "title": "Check PDF Encryption and Apply or Remove Protection",
+      "filename": "check-pdf-encryption-and-toggle-protection.cs",
+      "description": "The example shows how to inspect a PDF's IsEncrypted flag using PdfFileInfo, then either encrypt the document with specific permissions or decrypt it by opening with the owner password and saving without encryption.",
+      "tags": [
+        "encryption",
+        "decryption",
+        "pdf",
+        "permissions",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.PdfFileInfo",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "check-pdf-extended-usage-rights": {
+      "title": "Check PDF for Extended Usage Rights",
+      "filename": "check-pdf-extended-usage-rights.cs",
+      "description": "Shows how to use Aspose.Pdf's PdfFileSignature facade to determine if a PDF contains extended usage rights.",
+      "tags": [
+        "pdf",
+        "usage-rights",
+        "signature",
+        "facade",
+        "validation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileSignature",
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.ContainsUsageRights"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "conditional-decrypt-modify-pdf": {
+      "title": "Conditional Decrypt and Modify PDF with Aspose.Pdf",
+      "filename": "conditional-decrypt-modify-pdf.cs",
+      "description": "The example loads a PDF, detects if it is encrypted, decrypts it using the owner password when needed, adds a text fragment to the first page, and saves the modified document.",
+      "tags": [
+        "pdf",
+        "decryption",
+        "modification",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.DecryptFile",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T08:00:40Z",
@@ -604,72 +287,71 @@
       "generated_at": "2026-08-20T08:00:40Z",
       "status": "verified"
     },
-    "report-pdf-encryption-algorithms": {
-      "title": "Report PDF Encryption Algorithms Using Aspose.Pdf Facade",
-      "filename": "report-pdf-encryption-algorithms.cs",
-      "description": "Scans a directory of PDF files, determines whether each file is encrypted, and outputs the encryption algorithm used by leveraging Aspose.Pdf.Facades.",
+    "decrypt-pdf-owner-password": {
+      "title": "Decrypt PDF Using Owner Password",
+      "filename": "decrypt-pdf-owner-password.cs",
+      "description": "Demonstrates how to remove encryption from a PDF file by providing the owner password using Aspose.Pdf's PdfFileSecurity facade.",
       "tags": [
         "pdf",
-        "encryption",
-        "report",
+        "decryption",
+        "owner-password",
         "aspose",
         "facade"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.IsEncrypted",
-        "Aspose.Pdf.Facades.PdfFileInfo.GetDocumentPrivilege",
-        "Aspose.Pdf.Facades.DocumentPrivilege",
-        "Aspose.Pdf.Facades.DocumentPrivilege.CryptoAlgorithm"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:00:40Z",
-      "status": "verified"
-    },
-    "encrypt-pdf-rc4-128-print-edit-privileges": {
-      "title": "Encrypt PDF with RC4‑128 and Enable Print/Edit Privileges",
-      "filename": "encrypt-pdf-rc4-128-print-edit-privileges.cs",
-      "description": "Demonstrates how to combine print and edit privileges, then encrypt a PDF using RC4‑128 with Aspose.Pdf.Facades. The example also creates a placeholder PDF if the source file is missing.",
-      "tags": [
-        "pdf-encryption",
-        "rc4",
-        "privileges",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.DocumentPrivilege",
         "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileSecurity.EncryptFile",
-        "Aspose.Pdf.Facades.PdfFileSecurity.Save"
+        "Aspose.Pdf.Facades.PdfFileSecurity.DecryptFile"
       ],
-      "difficulty": "intermediate",
+      "difficulty": "beginner",
       "generated_at": "2026-08-20T08:00:40Z",
       "status": "verified"
     },
-    "conditional-decrypt-modify-pdf": {
-      "title": "Conditional Decrypt and Modify PDF with Aspose.Pdf",
-      "filename": "conditional-decrypt-modify-pdf.cs",
-      "description": "The example loads a PDF, detects if it is encrypted, decrypts it using the owner password when needed, adds a text fragment to the first page, and saves the modified document.",
+    "decrypt-pdf-using-owner-password-azure-key-vault": {
+      "title": "Decrypt PDF Using Owner Password from Azure Key Vault",
+      "filename": "decrypt-pdf-using-owner-password-azure-key-vault.cs",
+      "description": "Shows how to retrieve an owner password stored in Azure Key Vault and use Aspose.Pdf.Facades to decrypt an encrypted PDF file.",
       "tags": [
         "pdf",
         "decryption",
-        "modification",
-        "aspose-pdf",
-        "facade"
+        "azure-key-vault",
+        "owner-password",
+        "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.DecryptFile",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Page"
+        "Aspose.Pdf.Facades.PdfFileSecurity.DecryptFile"
       ],
       "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "decrypt-pdf-with-owner-password": {
+      "title": "Decrypt Pdf With Owner Password",
+      "filename": "decrypt-pdf-with-owner-password.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "disable-copying-enable-printing-pdf": {
+      "title": "Disable Copying While Enabling Printing for PDF",
+      "filename": "disable-copying-enable-printing-pdf.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfFileSecurity to set document privileges so that copying is disabled and printing remains allowed.",
+      "tags": [
+        "pdf",
+        "security",
+        "privileges",
+        "printing",
+        "copy-protection"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.SetPrivilege",
+        "Aspose.Pdf.Facades.DocumentPrivilege"
+      ],
+      "difficulty": "beginner",
       "generated_at": "2026-08-20T08:00:40Z",
       "status": "verified"
     },
@@ -695,27 +377,67 @@
       "generated_at": "2026-08-20T08:00:40Z",
       "status": "verified"
     },
-    "encrypt-pdfs-with-performance-timing": {
-      "title": "Encrypt PDFs with Performance Timing",
-      "filename": "encrypt-pdfs-with-performance-timing.cs",
-      "description": "Shows how to encrypt PDF files using Aspose.Pdf's PdfFileSecurity facade while measuring the time taken for each encryption operation.",
+    "encrypt-decrypt-pdf-verify-integrity": {
+      "title": "Encrypt Decrypt Pdf Verify Integrity",
+      "filename": "encrypt-decrypt-pdf-verify-integrity.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-256-aes": {
+      "title": "Encrypt PDF with 256‑bit AES using Aspose.Pdf",
+      "filename": "encrypt-pdf-256-aes.cs",
+      "description": "Shows how to encrypt a PDF with 256‑bit AES, set user and owner passwords, and apply a print privilege using Aspose.Pdf.Facades.",
       "tags": [
-        "pdf-encryption",
-        "performance",
-        "aspose-pdf",
-        "facade",
-        "csharp"
+        "pdf encryption",
+        "aes-256",
+        "aspose.pdf",
+        "pdf security",
+        "c#"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.BindPdf",
         "Aspose.Pdf.Facades.PdfFileSecurity.EncryptFile",
-        "Aspose.Pdf.Facades.PdfFileSecurity.Save",
         "Aspose.Pdf.DocumentPrivilege",
-        "Aspose.Pdf.KeySize"
+        "Aspose.Pdf.Facades.KeySize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-aes256-custom-privileges": {
+      "title": "Encrypt PDF with AES‑256 and Custom Privileges",
+      "filename": "encrypt-pdf-aes256-custom-privileges.cs",
+      "description": "Demonstrates encrypting a PDF using AES‑256 while applying custom document privileges such as allowing printing and copying but forbidding modifications.",
+      "tags": [
+        "pdf-encryption",
+        "aes-256",
+        "custom-privileges",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.EncryptFile",
+        "Aspose.Pdf.DocumentPrivilege",
+        "Aspose.Pdf.KeySize",
+        "Aspose.Pdf.Algorithm"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-aes256-to-cloud": {
+      "title": "Encrypt Pdf Aes256 To Cloud",
+      "filename": "encrypt-pdf-aes256-to-cloud.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
     "encrypt-pdf-aes256-upload": {
@@ -742,43 +464,91 @@
       "generated_at": "2026-08-20T08:00:40Z",
       "status": "verified"
     },
-    "decrypt-pdf-using-owner-password-azure-key-vault": {
-      "title": "Decrypt PDF Using Owner Password from Azure Key Vault",
-      "filename": "decrypt-pdf-using-owner-password-azure-key-vault.cs",
-      "description": "Shows how to retrieve an owner password stored in Azure Key Vault and use Aspose.Pdf.Facades to decrypt an encrypted PDF file.",
+    "encrypt-pdf-byte-array": {
+      "title": "Encrypt Pdf Byte Array",
+      "filename": "encrypt-pdf-byte-array.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-from-byte-array": {
+      "title": "Encrypt PDF from Byte Array using Aspose.Pdf",
+      "filename": "encrypt-pdf-from-byte-array.cs",
+      "description": "Shows how to load a PDF from a byte array, apply 256‑bit AES encryption with user and owner passwords, and return the encrypted PDF as a byte array.",
       "tags": [
         "pdf",
-        "decryption",
-        "azure-key-vault",
-        "owner-password",
-        "aspose"
+        "encryption",
+        "byte-array",
+        "aspose",
+        "security"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfFileSecurity",
-        "Aspose.Pdf.Facades.PdfFileSecurity.DecryptFile"
+        "Aspose.Pdf.DocumentPrivilege",
+        "Aspose.Pdf.KeySize",
+        "Aspose.Pdf.Facades.PdfFileSecurity.EncryptFile",
+        "Aspose.Pdf.Facades.PdfFileSecurity.Save"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T08:00:40Z",
       "status": "verified"
     },
-    "change-pdf-passwords-from-csv": {
-      "title": "Change User and Owner Passwords for PDFs from CSV",
-      "filename": "change-pdf-passwords-from-csv.cs",
-      "description": "Shows how to read PDF file paths and passwords from a CSV file and use Aspose.Pdf.Facades.PdfFileSecurity to change both user and owner passwords, saving the protected PDFs.",
+    "encrypt-pdf-rc4-128-allow-print-edit": {
+      "title": "Encrypt Pdf Rc4 128 Allow Print Edit",
+      "filename": "encrypt-pdf-rc4-128-allow-print-edit.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-rc4-128-print-edit-privileges": {
+      "title": "Encrypt PDF with RC4‑128 and Enable Print/Edit Privileges",
+      "filename": "encrypt-pdf-rc4-128-print-edit-privileges.cs",
+      "description": "Demonstrates how to combine print and edit privileges, then encrypt a PDF using RC4‑128 with Aspose.Pdf.Facades. The example also creates a placeholder PDF if the source file is missing.",
       "tags": [
-        "pdf",
-        "password",
-        "csv",
-        "security",
-        "aspose"
+        "pdf-encryption",
+        "rc4",
+        "privileges",
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.DocumentPrivilege",
         "Aspose.Pdf.Facades.PdfFileSecurity",
         "Aspose.Pdf.Facades.PdfFileSecurity.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileSecurity.ChangePassword",
+        "Aspose.Pdf.Facades.PdfFileSecurity.EncryptFile",
         "Aspose.Pdf.Facades.PdfFileSecurity.Save"
       ],
       "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-rc4-40": {
+      "title": "Encrypt PDF with RC4‑40 and Password",
+      "filename": "encrypt-pdf-rc4-40.cs",
+      "description": "Shows how to encrypt an existing PDF using the RC4‑40 algorithm with user and owner passwords and set printing privileges via Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "rc4",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.EncryptFile",
+        "Aspose.Pdf.DocumentPrivilege",
+        "Aspose.Pdf.Facades.KeySize",
+        "Aspose.Pdf.Facades.Algorithm"
+      ],
+      "difficulty": "beginner",
       "generated_at": "2026-08-20T08:00:40Z",
       "status": "verified"
     },
@@ -806,26 +576,184 @@
       "generated_at": "2026-08-20T08:00:40Z",
       "status": "verified"
     },
-    "pdf-encryption-summary": {
-      "title": "Generate PDF Encryption Summary with Privileges",
-      "filename": "pdf-encryption-summary.cs",
-      "description": "Demonstrates how to inspect PDF files for encryption status, algorithm (when detectable), and document privileges using Aspose.Pdf.Facades and Aspose.Pdf, then writes a summary report.",
+    "encrypt-pdf-to-memory-stream": {
+      "title": "Encrypt PDF and Save to MemoryStream",
+      "filename": "encrypt-pdf-to-memory-stream.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, applying AES‑256 encryption with user/owner passwords and specific permissions, and writing the encrypted document to a MemoryStream for network transmission.",
       "tags": [
         "pdf",
         "encryption",
-        "privileges",
-        "summary",
-        "aspose"
+        "memorystream",
+        "permissions",
+        "aspose-pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileInfo",
-        "Aspose.Pdf.Facades.PdfFileInfo.IsEncrypted",
-        "Aspose.Pdf.Facades.PdfFileInfo.GetDocumentPrivilege",
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.InvalidPasswordException"
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-with-exception-handling": {
+      "title": "Encrypt Pdf With Exception Handling",
+      "filename": "encrypt-pdf-with-exception-handling.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-with-password-and-capture-exceptions": {
+      "title": "Encrypt PDF with Password and Capture Exceptions",
+      "filename": "encrypt-pdf-with-password-and-capture-exceptions.cs",
+      "description": "Demonstrates encrypting a PDF using PdfFileSecurity, enabling AllowExceptions to suppress throws, and logging detailed exception information via LastException.",
+      "tags": [
+        "pdf encryption",
+        "exception handling",
+        "Aspose.Pdf",
+        "password protection",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "PdfFileSecurity.AllowExceptions",
+        "PdfFileSecurity.BindPdf",
+        "PdfFileSecurity.EncryptFile",
+        "PdfFileSecurity.Save",
+        "PdfFileSecurity.LastException"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-with-user-password-only": {
+      "title": "Encrypt Pdf With User Password Only",
+      "filename": "encrypt-pdf-with-user-password-only.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "encrypt-pdf-with-user-password": {
+      "title": "Encrypt PDF with User Password Only",
+      "filename": "encrypt-pdf-with-user-password.cs",
+      "description": "Shows how to encrypt a PDF using Aspose.Pdf.Facades by providing only a user password (owner password left undefined) and applying 256‑bit AES encryption with print permission.",
+      "tags": [
+        "pdf encryption",
+        "user password",
+        "Aspose.Pdf",
+        "AES-256",
+        "document privilege"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.EncryptFile",
+        "Aspose.Pdf.DocumentPrivilege",
+        "Aspose.Pdf.KeySize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "encrypt-pdfs-by-filename-algorithm": {
+      "title": "Encrypt Pdfs By Filename Algorithm",
+      "filename": "encrypt-pdfs-by-filename-algorithm.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "encrypt-pdfs-with-performance-timing": {
+      "title": "Encrypt PDFs with Performance Timing",
+      "filename": "encrypt-pdfs-with-performance-timing.cs",
+      "description": "Shows how to encrypt PDF files using Aspose.Pdf's PdfFileSecurity facade while measuring the time taken for each encryption operation.",
+      "tags": [
+        "pdf-encryption",
+        "performance",
+        "aspose-pdf",
+        "facade",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSecurity.EncryptFile",
+        "Aspose.Pdf.Facades.PdfFileSecurity.Save",
+        "Aspose.Pdf.DocumentPrivilege",
+        "Aspose.Pdf.KeySize"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "generate-encryption-usage-report": {
+      "title": "Generate Encryption Usage Report",
+      "filename": "generate-encryption-usage-report.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "generate-pdf-encryption-summary": {
+      "title": "Generate Pdf Encryption Summary",
+      "filename": "generate-pdf-encryption-summary.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "load-pdf-verify-page-count-facade": {
+      "title": "Load PDF and Verify Page Count Using PdfFileInfo Facade",
+      "filename": "load-pdf-verify-page-count-facade.cs",
+      "description": "Demonstrates loading a PDF file via the PdfFileInfo facade class and confirming successful loading by checking the document's page count.",
+      "tags": [
+        "pdf",
+        "load",
+        "facade",
+        "verification",
+        "pages"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Count"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "load-pdf-verify-page-count": {
+      "title": "Load Pdf Verify Page Count",
+      "filename": "load-pdf-verify-page-count.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "modify-pdf-privileges": {
+      "title": "Modify Pdf Privileges",
+      "filename": "modify-pdf-privileges.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
     "pdf-decryption-failure-wrong-owner-password-test": {
@@ -851,6 +779,278 @@
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "pdf-encryption-summary": {
+      "title": "Generate PDF Encryption Summary with Privileges",
+      "filename": "pdf-encryption-summary.cs",
+      "description": "Demonstrates how to inspect PDF files for encryption status, algorithm (when detectable), and document privileges using Aspose.Pdf.Facades and Aspose.Pdf, then writes a summary report.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "privileges",
+        "summary",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.IsEncrypted",
+        "Aspose.Pdf.Facades.PdfFileInfo.GetDocumentPrivilege",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.InvalidPasswordException"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "remove-extended-usage-rights-from-signed-pdf": {
+      "title": "Remove Extended Usage Rights from Signed PDF",
+      "filename": "remove-extended-usage-rights-from-signed-pdf.cs",
+      "description": "Shows how to load a signed PDF, detect extended usage rights, remove them with PdfFileSignature, and save the updated document.",
+      "tags": [
+        "pdf",
+        "usage-rights",
+        "signature",
+        "remove",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSignature",
+        "Aspose.Pdf.Facades.PdfFileSignature.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSignature.ContainsUsageRights",
+        "Aspose.Pdf.Facades.PdfFileSignature.RemoveUsageRights",
+        "Aspose.Pdf.Facades.PdfFileSignature.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "remove-usage-rights-from-signed-pdf": {
+      "title": "Remove Usage Rights From Signed Pdf",
+      "filename": "remove-usage-rights-from-signed-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "remove-usage-rights-verify": {
+      "title": "Remove Usage Rights and Verify Removal from PDF",
+      "filename": "remove-usage-rights-verify.cs",
+      "description": "Demonstrates how to remove usage rights from a PDF using Aspose.Pdf and then confirm the removal by calling ContainsUsageRights. The resulting PDF is saved without any usage rights.",
+      "tags": [
+        "usage rights",
+        "pdf security",
+        "remove",
+        "verification",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "PdfFileSignature",
+        "PdfFileSignature.BindPdf",
+        "PdfFileSignature.RemoveUsageRights",
+        "PdfFileSignature.ContainsUsageRights",
+        "PdfFileSignature.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "report-pdf-encryption-algorithms": {
+      "title": "Report PDF Encryption Algorithms Using Aspose.Pdf Facade",
+      "filename": "report-pdf-encryption-algorithms.cs",
+      "description": "Scans a directory of PDF files, determines whether each file is encrypted, and outputs the encryption algorithm used by leveraging Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "report",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.IsEncrypted",
+        "Aspose.Pdf.Facades.PdfFileInfo.GetDocumentPrivilege",
+        "Aspose.Pdf.Facades.DocumentPrivilege",
+        "Aspose.Pdf.Facades.DocumentPrivilege.CryptoAlgorithm"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "retrieve-pdf-encryption-algorithm": {
+      "title": "Retrieve PDF Encryption Algorithm with Aspose.Pdf Facades",
+      "filename": "retrieve-pdf-encryption-algorithm.cs",
+      "description": "Shows how to check if a PDF is encrypted and obtain the encryption algorithm using Aspose.Pdf's Facades API, creating a sample PDF if none exists.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "facades",
+        "metadata",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileInfo.IsEncrypted",
+        "Aspose.Pdf.Facades.PdfFileInfo.Document",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "set-pdf-privilege-allow-exceptions-false": {
+      "title": "Modify PDF Privilege with Exception Propagation",
+      "filename": "set-pdf-privilege-allow-exceptions-false.cs",
+      "description": "Shows how to change a PDF document's privilege using Aspose.Pdf.Facades.PdfFileSecurity while disabling internal exception handling so that runtime exceptions are thrown.",
+      "tags": [
+        "pdf",
+        "privilege",
+        "exception",
+        "Aspose.Pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.AllowExceptions",
+        "Aspose.Pdf.Facades.PdfFileSecurity.SetPrivilege",
+        "Aspose.Pdf.Facades.DocumentPrivilege",
+        "Aspose.Pdf.PdfException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "set-pdf-privileges-allow-form-filling-disable-assembly": {
+      "title": "Set PDF Privileges: Allow Form Filling, Disable Assembly",
+      "filename": "set-pdf-privileges-allow-form-filling-disable-assembly.cs",
+      "description": "Shows how to configure PDF security privileges to permit form filling while disabling document assembly using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "security",
+        "privileges",
+        "form-filling",
+        "assembly"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.DocumentPrivilege",
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.SetPrivilege",
+        "Aspose.Pdf.Facades.DocumentPrivilege.AllowAll",
+        "Aspose.Pdf.Facades.DocumentPrivilege.AllowAssembly",
+        "Aspose.Pdf.Facades.DocumentPrivilege.AllowFillIn"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "set-pdf-privileges-allow-printing-only": {
+      "title": "Set PDF Privileges to Allow Printing Only",
+      "filename": "set-pdf-privileges-allow-printing-only.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades to enable printing while disabling copying for a PDF and then save the secured document.",
+      "tags": [
+        "pdf",
+        "security",
+        "privileges",
+        "printing",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.SetPrivilege",
+        "Aspose.Pdf.Facades.PdfFileSecurity.Save",
+        "Aspose.Pdf.Facades.DocumentPrivilege"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "update-owner-password-pdf": {
+      "title": "Update Owner Password of a Protected PDF",
+      "filename": "update-owner-password-pdf.cs",
+      "description": "Shows how to change the owner password of an encrypted PDF without altering the user password or existing privileges using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "owner-password",
+        "encryption",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSecurity.ChangePassword",
+        "Aspose.Pdf.Facades.PdfFileSecurity.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "update-pdf-owner-password": {
+      "title": "Update PDF Owner Password While Preserving User Password",
+      "filename": "update-pdf-owner-password.cs",
+      "description": "Demonstrates how to change the owner password of multiple PDF files using Aspose.Pdf.Facades without affecting the existing user passwords, and saves the secured PDFs to new locations.",
+      "tags": [
+        "pdf",
+        "owner-password",
+        "security",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileSecurity.ChangePassword",
+        "Aspose.Pdf.Facades.PdfFileSecurity.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "validate-pdf-encryption-and-decrypt": {
+      "title": "Validate PDF Encryption and Decrypt with Aspose.Pdf",
+      "filename": "validate-pdf-encryption-and-decrypt.cs",
+      "description": "Shows how to check whether a PDF is encrypted using PdfFileInfo and, if it is, decrypt it with PdfFileSecurity while handling missing files and copying unencrypted PDFs.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "decryption",
+        "validation",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileInfo",
+        "Aspose.Pdf.Facades.PdfFileSecurity",
+        "Aspose.Pdf.Facades.PdfFileSecurity.TryDecryptFile",
+        "Aspose.Pdf.Facades.PdfFileSecurity.Save",
+        "Aspose.Pdf.Facades.PdfFileSecurity.Close"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T08:00:40Z",
+      "status": "verified"
+    },
+    "validate-pdf-encryption-before-decryption": {
+      "title": "Validate Pdf Encryption Before Decryption",
+      "filename": "validate-pdf-encryption-before-decryption.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "verify-decryption-fails-incorrect-owner-password": {
+      "title": "Verify Decryption Fails Incorrect Owner Password",
+      "filename": "verify-decryption-fails-incorrect-owner-password.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     }
   }

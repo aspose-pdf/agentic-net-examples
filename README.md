@@ -8,11 +8,11 @@ This repository provides working code examples demonstrating Aspose.PDF for .NET
 
 | Metric | Value |
 |--------|-------|
-| Total examples | 2636 |
+| Total examples | 3998 |
 | Categories | 35 |
 | Target framework | net10.0 |
-| Aspose.PDF version | 26.7.0 |
-| Last updated | 2026-07-21 |
+| Aspose.PDF version | 26.8.0 |
+| Last updated | 2026-09-10 |
 
 ## For AI Coding Agents
 
@@ -20,48 +20,48 @@ This repository is structured for direct use by AI coding agents and LLM-powered
 
 - **[`AGENTS.md`](./AGENTS.md)** — root-level guide covering API surface, anti-patterns, and category tips
 - **Per-category `AGENTS.md`** — targeted guidance inside each category folder
-- **[`index.json`](./index.json)** — machine-readable manifest of all 2636 examples with metadata
+- **[`index.json`](./index.json)** — machine-readable manifest of all 3998 examples with metadata
 - **MCP-compatible** — integrate with any MCP client (Claude Desktop, Cursor, Continue.dev)
 
 ## Categories
 
 | Category | Examples | Agent Guide |
 |----------|----------|-------------|
-| `accessibility-and-tagged-pdfs` | 45 | [AGENTS.md](./accessibility-and-tagged-pdfs/AGENTS.md) |
-| `basic-operations` | 57 | [AGENTS.md](./basic-operations/AGENTS.md) |
-| `compare-pdf` | 29 | [AGENTS.md](./compare-pdf/AGENTS.md) |
-| `conversion` | 102 | [AGENTS.md](./conversion/AGENTS.md) |
-| `document` | 117 | [AGENTS.md](./document/AGENTS.md) |
-| `facades-acroforms` | 41 | [AGENTS.md](./facades-acroforms/AGENTS.md) |
-| `facades-annotations` | 106 | [AGENTS.md](./facades-annotations/AGENTS.md) |
-| `facades-bookmarks` | 35 | [AGENTS.md](./facades-bookmarks/AGENTS.md) |
-| `facades-convert-documents` | 36 | [AGENTS.md](./facades-convert-documents/AGENTS.md) |
-| `facades-documents` | 101 | [AGENTS.md](./facades-documents/AGENTS.md) |
-| `facades-edit-document` | 213 | [AGENTS.md](./facades-edit-document/AGENTS.md) |
-| `facades-extract-images-and-text` | 83 | [AGENTS.md](./facades-extract-images-and-text/AGENTS.md) |
-| `facades-fill-forms` | 35 | [AGENTS.md](./facades-fill-forms/AGENTS.md) |
-| `facades-forms` | 85 | [AGENTS.md](./facades-forms/AGENTS.md) |
-| `facades-metadata` | 40 | [AGENTS.md](./facades-metadata/AGENTS.md) |
-| `facades-pages` | 117 | [AGENTS.md](./facades-pages/AGENTS.md) |
-| `facades-secure-documents` | 38 | [AGENTS.md](./facades-secure-documents/AGENTS.md) |
-| `facades-sign-documents` | 35 | [AGENTS.md](./facades-sign-documents/AGENTS.md) |
-| `facades-stamps` | 48 | [AGENTS.md](./facades-stamps/AGENTS.md) |
-| `facades-texts-and-images` | 28 | [AGENTS.md](./facades-texts-and-images/AGENTS.md) |
-| `facades-xmp-metadata` | 44 | [AGENTS.md](./facades-xmp-metadata/AGENTS.md) |
-| `graphs-zugferd-operators` | 82 | [AGENTS.md](./graphs-zugferd-operators/AGENTS.md) |
-| `pages` | 100 | [AGENTS.md](./pages/AGENTS.md) |
-| `parse-pdf` | 63 | [AGENTS.md](./parse-pdf/AGENTS.md) |
-| `securing-and-signing-pdf` | 78 | [AGENTS.md](./securing-and-signing-pdf/AGENTS.md) |
-| `stamping` | 50 | [AGENTS.md](./stamping/AGENTS.md) |
+| `accessibility-and-tagged-pdfs` | 70 | [AGENTS.md](./accessibility-and-tagged-pdfs/AGENTS.md) |
+| `basic-operations` | 77 | [AGENTS.md](./basic-operations/AGENTS.md) |
+| `compare-pdf` | 44 | [AGENTS.md](./compare-pdf/AGENTS.md) |
+| `conversion` | 150 | [AGENTS.md](./conversion/AGENTS.md) |
+| `document` | 175 | [AGENTS.md](./document/AGENTS.md) |
+| `facades-acroforms` | 59 | [AGENTS.md](./facades-acroforms/AGENTS.md) |
+| `facades-annotations` | 155 | [AGENTS.md](./facades-annotations/AGENTS.md) |
+| `facades-bookmarks` | 48 | [AGENTS.md](./facades-bookmarks/AGENTS.md) |
+| `facades-convert-documents` | 51 | [AGENTS.md](./facades-convert-documents/AGENTS.md) |
+| `facades-documents` | 153 | [AGENTS.md](./facades-documents/AGENTS.md) |
+| `facades-edit-document` | 328 | [AGENTS.md](./facades-edit-document/AGENTS.md) |
+| `facades-extract-images-and-text` | 125 | [AGENTS.md](./facades-extract-images-and-text/AGENTS.md) |
+| `facades-fill-forms` | 61 | [AGENTS.md](./facades-fill-forms/AGENTS.md) |
+| `facades-forms` | 132 | [AGENTS.md](./facades-forms/AGENTS.md) |
+| `facades-metadata` | 58 | [AGENTS.md](./facades-metadata/AGENTS.md) |
+| `facades-pages` | 185 | [AGENTS.md](./facades-pages/AGENTS.md) |
+| `facades-secure-documents` | 59 | [AGENTS.md](./facades-secure-documents/AGENTS.md) |
+| `facades-sign-documents` | 61 | [AGENTS.md](./facades-sign-documents/AGENTS.md) |
+| `facades-stamps` | 82 | [AGENTS.md](./facades-stamps/AGENTS.md) |
+| `facades-texts-and-images` | 45 | [AGENTS.md](./facades-texts-and-images/AGENTS.md) |
+| `facades-xmp-metadata` | 72 | [AGENTS.md](./facades-xmp-metadata/AGENTS.md) |
+| `graphs-zugferd-operators` | 124 | [AGENTS.md](./graphs-zugferd-operators/AGENTS.md) |
+| `pages` | 133 | [AGENTS.md](./pages/AGENTS.md) |
+| `parse-pdf` | 97 | [AGENTS.md](./parse-pdf/AGENTS.md) |
+| `securing-and-signing-pdf` | 116 | [AGENTS.md](./securing-and-signing-pdf/AGENTS.md) |
+| `stamping` | 72 | [AGENTS.md](./stamping/AGENTS.md) |
 | `uncategorized` | 1 | [AGENTS.md](./uncategorized/AGENTS.md) |
-| `working-with-annotations` | 156 | [AGENTS.md](./working-with-annotations/AGENTS.md) |
-| `working-with-attachments` | 50 | [AGENTS.md](./working-with-attachments/AGENTS.md) |
-| `working-with-forms` | 230 | [AGENTS.md](./working-with-forms/AGENTS.md) |
-| `working-with-graphs` | 77 | [AGENTS.md](./working-with-graphs/AGENTS.md) |
-| `working-with-images` | 72 | [AGENTS.md](./working-with-images/AGENTS.md) |
-| `working-with-tables` | 96 | [AGENTS.md](./working-with-tables/AGENTS.md) |
-| `working-with-text` | 73 | [AGENTS.md](./working-with-text/AGENTS.md) |
-| `working-with-xml` | 73 | [AGENTS.md](./working-with-xml/AGENTS.md) |
+| `working-with-annotations` | 216 | [AGENTS.md](./working-with-annotations/AGENTS.md) |
+| `working-with-attachments` | 69 | [AGENTS.md](./working-with-attachments/AGENTS.md) |
+| `working-with-forms` | 358 | [AGENTS.md](./working-with-forms/AGENTS.md) |
+| `working-with-graphs` | 129 | [AGENTS.md](./working-with-graphs/AGENTS.md) |
+| `working-with-images` | 105 | [AGENTS.md](./working-with-images/AGENTS.md) |
+| `working-with-tables` | 153 | [AGENTS.md](./working-with-tables/AGENTS.md) |
+| `working-with-text` | 114 | [AGENTS.md](./working-with-text/AGENTS.md) |
+| `working-with-xml` | 121 | [AGENTS.md](./working-with-xml/AGENTS.md) |
 
 Each category contains standalone `.cs` files that can be compiled and run independently.
 
@@ -119,7 +119,7 @@ The library runs in evaluation mode without a license (with page-count and colle
 
 ### Prerequisites
 - .NET SDK (net10.0 or compatible version)
-- Aspose.PDF for .NET NuGet package (26.7.0)
+- Aspose.PDF for .NET NuGet package (26.8.0)
 - Valid Aspose license (for production use)
 
 ### Running Examples
@@ -130,7 +130,7 @@ Each example is a self-contained C# file. To run an example:
 cd <CategoryFolder>
 dotnet new console -o ExampleProject
 cd ExampleProject
-dotnet add package Aspose.PDF --version 26.7.0
+dotnet add package Aspose.PDF --version 26.8.0
 # Copy the example .cs file as Program.cs
 dotnet run
 ```
@@ -209,4 +209,4 @@ All examples use [Aspose.PDF for .NET](https://products.aspose.com/pdf/net/) and
 
 ---
 
-*Maintained by an [agentic example generation workflow](https://metrics.aspose.com/agents/sections/examples) | For AI-friendly guidance, see [AGENTS.md](./AGENTS.md) | Last updated: 2026-07-21*
+*Maintained by an [agentic example generation workflow](https://metrics.aspose.com/agents/sections/examples) | For AI-friendly guidance, see [AGENTS.md](./AGENTS.md) | Last updated: 2026-09-10*

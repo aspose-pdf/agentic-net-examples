@@ -1,10 +1,10 @@
 # Uncategorized
 
-> **Uncategorized** in PDF using C# / .NET -- **1** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Uncategorized** in PDF using C# / .NET -- **1** verified, compile-tested examples for **Aspose.PDF for .NET** 26.8.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `uncategorized`
 - Examples: 1
-- NuGet: `Aspose.PDF 26.7.0` -- target `net10.0`
+- NuGet: `Aspose.PDF 26.8.0` -- target `net10.0`
 
 ## Examples
 

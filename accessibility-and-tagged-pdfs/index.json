@@ -1,126 +1,64 @@
 {
   "category": "accessibility-and-tagged-pdfs",
   "nuget_version": "26.8.0",
-  "last_updated": "2026-08-20T07:11:50Z",
+  "last_updated": "2026-09-10T12:45:08Z",
   "examples": {
-    "enable-auto-tagging-save-tagged-pdf": {
-      "title": "Enable Automatic Tagging and Save PDF as Tagged PDF",
-      "filename": "enable-auto-tagging-save-tagged-pdf.cs",
-      "description": "Demonstrates how to activate Aspose.Pdf's auto‑tagging feature, set basic language and title metadata, and save the document as a PDF/UA‑compliant tagged PDF.",
-      "tags": [
-        "auto-tagging",
-        "pdf/ua",
-        "tagged-pdf",
-        "accessibility",
-        "aspnet"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.AutoTaggingSettings",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.ITaggedContent.SetLanguage",
-        "Aspose.Pdf.Tagged.ITaggedContent.SetTitle",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "create-pdf-with-heading-and-language": {
-      "title": "Create PDF with Heading Element and Language Attribute",
-      "filename": "create-pdf-with-heading-and-language.cs",
-      "description": "Demonstrates how to create a new PDF, enable tagged content, set the document language, add a level‑1 heading element with its own language attribute, and save the file.",
-      "tags": [
-        "pdf",
-        "tagged-pdf",
-        "accessibility",
-        "heading",
-        "language"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.ITaggedContent.SetLanguage",
-        "Aspose.Pdf.Tagged.ITaggedContent.SetTitle",
-        "Aspose.Pdf.Tagged.ITaggedContent.CreateHeaderElement",
-        "Aspose.Pdf.LogicalStructure.StructureElement",
-        "Aspose.Pdf.LogicalStructure.HeaderElement",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "set-root-structure-element-title": {
-      "title": "Set Root Structure Element Title in Tagged PDF",
-      "filename": "set-root-structure-element-title.cs",
-      "description": "Demonstrates how to load a PDF with Aspose.Pdf, access its tagged content, retrieve the root structure element, assign a document title, and save the updated file.",
+    "add-actualtext-to-images": {
+      "title": "Add ActualText to Images for PDF Accessibility",
+      "filename": "add-actualtext-to-images.cs",
+      "description": "Demonstrates how to attach an ActualText attribute to each image in a PDF using Aspose.Pdf's tagged‑content API, enabling screen readers to read alternative text.",
       "tags": [
         "accessibility",
-        "tagged-pdf",
-        "metadata",
-        "title",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.LogicalStructure.StructureElement",
-        "Aspose.Pdf.StructureElement.Title",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "create-tagged-pdf-with-toc": {
-      "title": "Create Tagged PDF with Table of Contents",
-      "filename": "create-tagged-pdf-with-toc.cs",
-      "description": "Demonstrates how to generate a PDF, add tagged headings, configure a dedicated Table of Contents page, and build the logical TOC structure for accessibility.",
-      "tags": [
-        "tagged-pdf",
-        "toc",
-        "accessibility",
-        "aspose-pdf",
-        "pdf-structure"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.HeaderElement",
-        "Aspose.Pdf.Tagged.TOCElement",
-        "Aspose.Pdf.Tagged.TOCIElement",
-        "Aspose.Pdf.Tagged.ReferenceElement",
-        "Aspose.Pdf.Tagged.TocInfo",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "append-paragraph-actualtext-to-toci": {
-      "title": "Append Paragraph with ActualText to a TOCI Element",
-      "filename": "append-paragraph-actualtext-to-toci.cs",
-      "description": "Demonstrates how to create a TOCI (Table of Contents Item) element in a tagged PDF, add a paragraph child, set its ActualText for screen‑reader accessibility, and save the document.",
-      "tags": [
-        "tagged-pdf",
-        "accessibility",
-        "toc",
         "actualtext",
-        "pdf"
+        "tagged-pdf",
+        "image",
+        "aspnet"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Tagged.ITaggedContent",
         "Aspose.Pdf.Tagged.StructureElement",
-        "Aspose.Pdf.Tagged.TOCIElement",
-        "Aspose.Pdf.Tagged.ParagraphElement",
-        "Aspose.Pdf.Tagged.TaggedContent.CreateTOCIElement",
-        "Aspose.Pdf.Tagged.TaggedContent.CreateParagraphElement",
-        "Aspose.Pdf.StructureElement.AppendChild"
+        "Aspose.Pdf.Tagged.FigureElement",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.Tagged.TaggedContent.CreateFigureElement"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "add-caption-note-to-figure": {
+      "title": "Add Caption Note to Figure in Tagged PDF",
+      "filename": "add-caption-note-to-figure.cs",
+      "description": "Demonstrates how to create a Figure element and attach a Note element as a caption within a tagged PDF using Aspose.Pdf, improving accessibility.",
+      "tags": [
+        "tagged-pdf",
+        "accessibility",
+        "figure",
+        "note",
+        "caption"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.FigureElement",
+        "Aspose.Pdf.Tagged.NoteElement",
+        "Aspose.Pdf.Tagged.StructureElement",
+        "Aspose.Pdf.Tagged.ITaggedContent.CreateFigureElement",
+        "Aspose.Pdf.Tagged.ITaggedContent.CreateNoteElement",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "add-custom-cell-tags-and-validate-pdf": {
+      "title": "Add Custom Cell Tags And Validate Pdf",
+      "filename": "add-custom-cell-tags-and-validate-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
     "add-custom-tag-to-paragraph": {
@@ -170,6 +108,16 @@
       "generated_at": "2026-08-20T07:11:50Z",
       "status": "verified"
     },
+    "add-internal-link-element-to-tagged-pdf": {
+      "title": "Add Internal Link Element To Tagged Pdf",
+      "filename": "add-internal-link-element-to-tagged-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
     "add-internal-page-link-to-tagged-pdf": {
       "title": "Add Internal Page Link to Tagged PDF",
       "filename": "add-internal-page-link-to-tagged-pdf.cs",
@@ -190,6 +138,16 @@
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "add-missing-language-attributes-to-pdf-structure": {
+      "title": "Add Missing Language Attributes To Pdf Structure",
+      "filename": "add-missing-language-attributes-to-pdf-structure.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
     "add-note-element-to-paragraph": {
@@ -215,146 +173,364 @@
       "generated_at": "2026-08-20T07:11:50Z",
       "status": "verified"
     },
-    "add-caption-note-to-figure": {
-      "title": "Add Caption Note to Figure in Tagged PDF",
-      "filename": "add-caption-note-to-figure.cs",
-      "description": "Demonstrates how to create a Figure element and attach a Note element as a caption within a tagged PDF using Aspose.Pdf, improving accessibility.",
+    "add-page-break-to-tagged-pdf": {
+      "title": "Add Page Break Element to Tagged PDF",
+      "filename": "add-page-break-to-tagged-pdf.cs",
+      "description": "Demonstrates how to insert a page‑break element into the logical structure tree of a tagged PDF using Aspose.Pdf's tagged‑content API.",
       "tags": [
         "tagged-pdf",
+        "page-break",
         "accessibility",
-        "figure",
-        "note",
-        "caption"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.FigureElement",
-        "Aspose.Pdf.Tagged.NoteElement",
-        "Aspose.Pdf.Tagged.StructureElement",
-        "Aspose.Pdf.Tagged.ITaggedContent.CreateFigureElement",
-        "Aspose.Pdf.Tagged.ITaggedContent.CreateNoteElement",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "add-actualtext-to-images": {
-      "title": "Add ActualText to Images for PDF Accessibility",
-      "filename": "add-actualtext-to-images.cs",
-      "description": "Demonstrates how to attach an ActualText attribute to each image in a PDF using Aspose.Pdf's tagged‑content API, enabling screen readers to read alternative text.",
-      "tags": [
-        "accessibility",
-        "actualtext",
-        "tagged-pdf",
-        "image",
-        "aspnet"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.StructureElement",
-        "Aspose.Pdf.Tagged.FigureElement",
-        "Aspose.Pdf.XImage",
-        "Aspose.Pdf.Tagged.TaggedContent.CreateFigureElement"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "set-actualtext-span-pronunciation": {
-      "title": "Set ActualText on a Span for Pronunciation in Tagged PDF",
-      "filename": "set-actualtext-span-pronunciation.cs",
-      "description": "Shows how to create a span element in a tagged PDF, assign visible text, and provide hidden pronunciation text via the ActualText property.",
-      "tags": [
-        "accessibility",
-        "tagged-pdf",
-        "actualtext",
-        "pronunciation",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.SpanElement",
-        "Aspose.Pdf.Tagged.StructureElement",
-        "Aspose.Pdf.Tagged.ITaggedContent.SetLanguage",
-        "Aspose.Pdf.Tagged.SpanElement.SetText",
-        "Aspose.Pdf.Tagged.SpanElement.ActualText",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "update-tagged-element-language-french": {
-      "title": "Update Language of a Tagged PDF Structure Element to French",
-      "filename": "update-tagged-element-language-french.cs",
-      "description": "Shows how to set the document's default language and modify the language property of a specific tagged structure element in a PDF using Aspose.Pdf.",
-      "tags": [
-        "tagged-pdf",
-        "language",
-        "accessibility",
-        "structure",
+        "logical-structure",
         "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.ITaggedContent.SetLanguage",
-        "Aspose.Pdf.LogicalStructure.StructureElement",
-        "Aspose.Pdf.LogicalStructure.StructureElement.FindElements",
-        "Aspose.Pdf.LogicalStructure.StructureElement.Language"
+        "Aspose.Pdf.Tagged.StructureElement",
+        "Aspose.Pdf.Tagged.ParagraphElement",
+        "Aspose.Pdf.Tagged.DivElement"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T07:11:50Z",
       "status": "verified"
     },
-    "set-primary-language-for-tagged-pdf": {
-      "title": "Set Primary Language for a Tagged PDF",
-      "filename": "set-primary-language-for-tagged-pdf.cs",
-      "description": "Demonstrates how to add a language attribute to the structure tree of a tagged PDF using Aspose.Pdf, ensuring the document is marked with its primary content language.",
+    "add-placeholder-textbox-form-field-tagged": {
+      "title": "Add Placeholder TextBox Form Field with Tagged Structure",
+      "filename": "add-placeholder-textbox-form-field-tagged.cs",
+      "description": "Loads an existing PDF, inserts a TextBox form field with placeholder text, creates a /Form logical structure element, links the field to the tagged structure, and saves the updated document.",
       "tags": [
-        "pdf",
-        "accessibility",
-        "language",
+        "form-field",
+        "placeholder",
         "tagged-pdf",
-        "aspose"
+        "accessibility",
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.ITaggedContent.SetLanguage",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Tagged.TaggedContent",
         "Aspose.Pdf.LogicalStructure.StructureElement",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.LogicalStructure.FormElement"
       ],
-      "difficulty": "beginner",
+      "difficulty": "intermediate",
       "generated_at": "2026-08-20T07:11:50Z",
       "status": "verified"
     },
-    "propagate-language-attribute-to-tagged-pdf": {
-      "title": "Propagate Language Attribute to All Tagged PDF Elements",
-      "filename": "propagate-language-attribute-to-tagged-pdf.cs",
-      "description": "Demonstrates how to set a document‑level language and automatically propagate it to every structure element in a tagged PDF using Aspose.Pdf.",
+    "add-tagged-form-field-with-placeholder": {
+      "title": "Add Tagged Form Field With Placeholder",
+      "filename": "add-tagged-form-field-with-placeholder.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "add-tagged-table-to-pdf": {
+      "title": "Add Tagged Table To Pdf",
+      "filename": "add-tagged-table-to-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "add-textbox-form-field-tagged-pdf": {
+      "title": "Add TextBox Form Field and Tag It for Accessibility",
+      "filename": "add-textbox-form-field-tagged-pdf.cs",
+      "description": "Demonstrates how to create a TextBox form field, register it in the AcroForm, and associate it with a Form structure element to produce a tagged PDF with accessibility information using Aspose.Pdf.",
       "tags": [
-        "accessibility",
+        "form-field",
         "tagged-pdf",
-        "language",
-        "aspnet",
+        "accessibility",
+        "textbox",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.LogicalStructure.StructureElement",
+        "Aspose.Pdf.Tagged.FormElement"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "append-paragraph-actualtext-to-toci": {
+      "title": "Append Paragraph with ActualText to a TOCI Element",
+      "filename": "append-paragraph-actualtext-to-toci.cs",
+      "description": "Demonstrates how to create a TOCI (Table of Contents Item) element in a tagged PDF, add a paragraph child, set its ActualText for screen‑reader accessibility, and save the document.",
+      "tags": [
+        "tagged-pdf",
+        "accessibility",
+        "toc",
+        "actualtext",
         "pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Tagged.ITaggedContent",
         "Aspose.Pdf.Tagged.StructureElement",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Tagged.ITaggedContent.SetLanguage",
-        "Aspose.Pdf.Tagged.StructureElement.Language",
-        "Aspose.Pdf.Tagged.StructureElement.FindElements",
+        "Aspose.Pdf.Tagged.TOCIElement",
+        "Aspose.Pdf.Tagged.ParagraphElement",
+        "Aspose.Pdf.Tagged.TaggedContent.CreateTOCIElement",
+        "Aspose.Pdf.Tagged.TaggedContent.CreateParagraphElement",
+        "Aspose.Pdf.StructureElement.AppendChild"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "apply-custom-row-borders-to-pdf-table": {
+      "title": "Apply Custom Row Borders To Pdf Table",
+      "filename": "apply-custom-row-borders-to-pdf-table.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "batch-convert-pdfs-to-tagged-pdfa": {
+      "title": "Batch Convert PDFs to Tagged PDF/A with Auto‑Tagging",
+      "filename": "batch-convert-pdfs-to-tagged-pdfa.cs",
+      "description": "Demonstrates how to process a folder of untagged PDFs, enable Aspose.Pdf auto‑tagging, convert each document to a tagged PDF/A format, and save the results to a separate output directory.",
+      "tags": [
+        "pdf",
+        "auto-tagging",
+        "batch",
+        "accessibility",
+        "pdfa"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.AutoTaggingSettings",
+        "Aspose.Pdf.PdfFormatConversionOptions",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.Document.Convert",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "batch-convert-untagged-pdfs-to-tagged": {
+      "title": "Batch Convert Untagged Pdfs To Tagged",
+      "filename": "batch-convert-untagged-pdfs-to-tagged.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "batch-pdf-validation-dashboard": {
+      "title": "Batch Pdf Validation Dashboard",
+      "filename": "batch-pdf-validation-dashboard.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "batch-pdfa1b-validation-xml-logs-dashboard": {
+      "title": "Batch PDF/A-1B Validation with XML Logs and Compliance Dashboard",
+      "filename": "batch-pdfa1b-validation-xml-logs-dashboard.cs",
+      "description": "The example loads all PDF files in a folder, validates each against the PDF/A‑1B standard using Aspose.Pdf, writes XML validation logs, and displays a console dashboard with overall and per‑file compliance percentages.",
+      "tags": [
+        "pdf-validation",
+        "pdfa",
+        "xml-logging",
+        "batch",
+        "compliance-dashboard"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Validate",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.PdfFormat.PDF_A_1B",
+        "Aspose.Pdf.Document.Dispose"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "batch-tag-pdfs-in-folder": {
+      "title": "Batch Tag Pdfs In Folder",
+      "filename": "batch-tag-pdfs-in-folder.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "batch-tag-pdfs-with-suffix": {
+      "title": "Batch Tag PDFs and Save with Suffix",
+      "filename": "batch-tag-pdfs-with-suffix.cs",
+      "description": "Demonstrates how to process a folder of PDF files, enable automatic tagging, add missing structure elements, set language and title, and save each tagged PDF with a custom suffix.",
+      "tags": [
+        "pdf",
+        "tagging",
+        "batch",
+        "accessibility",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.AutoTaggingSettings",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.StructureElement",
+        "Aspose.Pdf.Tagged.ParagraphElement",
+        "Aspose.Pdf.Tagged.ITaggedContent.Save",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "batch-validate-pdfs-summary-csv": {
+      "title": "Batch Validate PDFs and Generate Summary CSV",
+      "filename": "batch-validate-pdfs-summary-csv.cs",
+      "description": "Demonstrates how to iterate through a folder of PDF files, validate each against PDF/A‑1B using Aspose.Pdf, write individual XML logs, and produce a consolidated CSV summary of the compliance results.",
+      "tags": [
+        "pdf-validation",
+        "batch-processing",
+        "csv-report",
+        "xml-log",
+        "accessibility"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.Document.Validate"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "batch-validate-pdfs-xml-logs-summary-csv": {
+      "title": "Batch Validate Pdfs Xml Logs Summary Csv",
+      "filename": "batch-validate-pdfs-xml-logs-summary-csv.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "check-pdf-ua-compliance-and-log-result": {
+      "title": "Check Pdf Ua Compliance And Log Result",
+      "filename": "check-pdf-ua-compliance-and-log-result.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "check-pdf-ua-compliance-and-log": {
+      "title": "Check PDF/UA Compliance and Log Result",
+      "filename": "check-pdf-ua-compliance-and-log.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, checking its PDF/UA accessibility compliance, and appending the boolean outcome to a log file for further processing.",
+      "tags": [
+        "pdf-ua",
+        "accessibility",
+        "logging",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.IsPdfUaCompliant"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "convert-pdf-to-pdf-ua-with-auto-tagging": {
+      "title": "Convert Pdf To Pdf Ua With Auto Tagging",
+      "filename": "convert-pdf-to-pdf-ua-with-auto-tagging.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "create-merged-table-header-tagged-pdf": {
+      "title": "Create Merged Table Header Tagged Pdf",
+      "filename": "create-merged-table-header-tagged-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "create-nested-bullet-numbered-lists-tagged-pdf": {
+      "title": "Create Nested Bullet and Numbered Lists in a Tagged PDF",
+      "filename": "create-nested-bullet-numbered-lists-tagged-pdf.cs",
+      "description": "Demonstrates how to build a PDF containing a top‑level bullet list and a numbered list with a nested bullet sub‑list using Aspose.Pdf's tagged content API for accessibility.",
+      "tags": [
+        "tagged-pdf",
+        "nested-list",
+        "accessibility",
+        "aspnet",
+        "list-structure"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.StructureElement",
+        "Aspose.Pdf.Tagged.ListElement",
+        "Aspose.Pdf.Tagged.ListLIElement",
+        "Aspose.Pdf.Tagged.ParagraphElement"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "create-nested-table-in-paragraph": {
+      "title": "Create Nested Table In Paragraph",
+      "filename": "create-nested-table-in-paragraph.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "create-pdf-with-heading-and-language": {
+      "title": "Create PDF with Heading Element and Language Attribute",
+      "filename": "create-pdf-with-heading-and-language.cs",
+      "description": "Demonstrates how to create a new PDF, enable tagged content, set the document language, add a level‑1 heading element with its own language attribute, and save the file.",
+      "tags": [
+        "pdf",
+        "tagged-pdf",
+        "accessibility",
+        "heading",
+        "language"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.ITaggedContent.SetLanguage",
+        "Aspose.Pdf.Tagged.ITaggedContent.SetTitle",
+        "Aspose.Pdf.Tagged.ITaggedContent.CreateHeaderElement",
+        "Aspose.Pdf.LogicalStructure.StructureElement",
+        "Aspose.Pdf.LogicalStructure.HeaderElement",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
       "generated_at": "2026-08-20T07:11:50Z",
       "status": "verified"
     },
@@ -381,6 +557,16 @@
       "generated_at": "2026-08-20T07:11:50Z",
       "status": "verified"
     },
+    "create-tagged-list-in-pdf": {
+      "title": "Create Tagged List In Pdf",
+      "filename": "create-tagged-list-in-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
     "create-tagged-pdf-table-with-merged-header": {
       "title": "Create Tagged PDF Table with Merged Header Cells",
       "filename": "create-tagged-pdf-table-with-merged-header.cs",
@@ -405,26 +591,49 @@
       "generated_at": "2026-08-20T07:11:50Z",
       "status": "verified"
     },
-    "style-table-cells-background-border-padding": {
-      "title": "Style Table Cells with Background Color, Border, and Padding",
-      "filename": "style-table-cells-background-border-padding.cs",
-      "description": "Shows how to apply background colors, border thickness/color, and padding to individual table cells in a PDF using Aspose.Pdf.",
+    "create-tagged-pdf-with-toc": {
+      "title": "Create Tagged PDF with Table of Contents",
+      "filename": "create-tagged-pdf-with-toc.cs",
+      "description": "Demonstrates how to generate a PDF, add tagged headings, configure a dedicated Table of Contents page, and build the logical TOC structure for accessibility.",
       "tags": [
-        "table",
-        "cell-styling",
-        "background",
-        "border",
-        "pdf"
+        "tagged-pdf",
+        "toc",
+        "accessibility",
+        "aspose-pdf",
+        "pdf-structure"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row",
-        "Aspose.Pdf.Cell",
-        "Aspose.Pdf.BorderInfo",
-        "Aspose.Pdf.MarginInfo",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.HeaderElement",
+        "Aspose.Pdf.Tagged.TOCElement",
+        "Aspose.Pdf.Tagged.TOCIElement",
+        "Aspose.Pdf.Tagged.ReferenceElement",
+        "Aspose.Pdf.Tagged.TocInfo",
         "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "create-tagged-table-with-custom-tags": {
+      "title": "Create Tagged Table with Custom DataType Tags and Validate PDF/A-1B",
+      "filename": "create-tagged-table-with-custom-tags.cs",
+      "description": "The example loads a PDF, builds a tagged table structure, assigns custom data‑type tags to individual cells, saves the document, and validates it for PDF/A‑1B compliance.",
+      "tags": [
+        "tagged-pdf",
+        "table",
+        "custom-tags",
+        "pdfa",
+        "accessibility"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.StructureElement",
+        "Aspose.Pdf.Tagged.TableElement",
+        "Aspose.Pdf.Tagged.TableTDElement",
+        "Aspose.Pdf.Document.Validate"
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T07:11:50Z",
@@ -454,375 +663,26 @@
       "generated_at": "2026-08-20T07:11:50Z",
       "status": "verified"
     },
-    "create-tagged-table-with-custom-tags": {
-      "title": "Create Tagged Table with Custom DataType Tags and Validate PDF/A-1B",
-      "filename": "create-tagged-table-with-custom-tags.cs",
-      "description": "The example loads a PDF, builds a tagged table structure, assigns custom data‑type tags to individual cells, saves the document, and validates it for PDF/A‑1B compliance.",
+    "enable-auto-tagging-save-tagged-pdf": {
+      "title": "Enable Automatic Tagging and Save PDF as Tagged PDF",
+      "filename": "enable-auto-tagging-save-tagged-pdf.cs",
+      "description": "Demonstrates how to activate Aspose.Pdf's auto‑tagging feature, set basic language and title metadata, and save the document as a PDF/UA‑compliant tagged PDF.",
       "tags": [
-        "tagged-pdf",
-        "table",
-        "custom-tags",
-        "pdfa",
-        "accessibility"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.StructureElement",
-        "Aspose.Pdf.Tagged.TableElement",
-        "Aspose.Pdf.Tagged.TableTDElement",
-        "Aspose.Pdf.Document.Validate"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "nested-table-in-paragraph-tagged-pdf": {
-      "title": "Create Nested Table Inside Paragraph in Tagged PDF",
-      "filename": "nested-table-in-paragraph-tagged-pdf.cs",
-      "description": "Demonstrates how to build a paragraph element, add an outer table, embed a nested table within a cell, set alternative text, and validate the tagging hierarchy using Aspose.Pdf's Tagged PDF API.",
-      "tags": [
-        "tagged-pdf",
-        "nested-table",
-        "accessibility",
-        "pdf-structure",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.ParagraphElement",
-        "Aspose.Pdf.Tagged.TableElement",
-        "Aspose.Pdf.Tagged.TableTHeadElement",
-        "Aspose.Pdf.Tagged.TableTRElement",
-        "Aspose.Pdf.Tagged.TableTDElement"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "create-nested-bullet-numbered-lists-tagged-pdf": {
-      "title": "Create Nested Bullet and Numbered Lists in a Tagged PDF",
-      "filename": "create-nested-bullet-numbered-lists-tagged-pdf.cs",
-      "description": "Demonstrates how to build a PDF containing a top‑level bullet list and a numbered list with a nested bullet sub‑list using Aspose.Pdf's tagged content API for accessibility.",
-      "tags": [
-        "tagged-pdf",
-        "nested-list",
-        "accessibility",
-        "aspnet",
-        "list-structure"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.StructureElement",
-        "Aspose.Pdf.Tagged.ListElement",
-        "Aspose.Pdf.Tagged.ListLIElement",
-        "Aspose.Pdf.Tagged.ParagraphElement"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "add-textbox-form-field-tagged-pdf": {
-      "title": "Add TextBox Form Field and Tag It for Accessibility",
-      "filename": "add-textbox-form-field-tagged-pdf.cs",
-      "description": "Demonstrates how to create a TextBox form field, register it in the AcroForm, and associate it with a Form structure element to produce a tagged PDF with accessibility information using Aspose.Pdf.",
-      "tags": [
-        "form-field",
+        "auto-tagging",
+        "pdf/ua",
         "tagged-pdf",
         "accessibility",
-        "textbox",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Forms.TextBoxField",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.LogicalStructure.StructureElement",
-        "Aspose.Pdf.Tagged.FormElement"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "add-placeholder-textbox-form-field-tagged": {
-      "title": "Add Placeholder TextBox Form Field with Tagged Structure",
-      "filename": "add-placeholder-textbox-form-field-tagged.cs",
-      "description": "Loads an existing PDF, inserts a TextBox form field with placeholder text, creates a /Form logical structure element, links the field to the tagged structure, and saves the updated document.",
-      "tags": [
-        "form-field",
-        "placeholder",
-        "tagged-pdf",
-        "accessibility",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.TextBoxField",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Tagged.TaggedContent",
-        "Aspose.Pdf.LogicalStructure.StructureElement",
-        "Aspose.Pdf.LogicalStructure.FormElement"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "add-page-break-to-tagged-pdf": {
-      "title": "Add Page Break Element to Tagged PDF",
-      "filename": "add-page-break-to-tagged-pdf.cs",
-      "description": "Demonstrates how to insert a page‑break element into the logical structure tree of a tagged PDF using Aspose.Pdf's tagged‑content API.",
-      "tags": [
-        "tagged-pdf",
-        "page-break",
-        "accessibility",
-        "logical-structure",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.StructureElement",
-        "Aspose.Pdf.Tagged.ParagraphElement",
-        "Aspose.Pdf.Tagged.DivElement"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "update-paragraph-actualtext-in-tagged-pdf": {
-      "title": "Update Paragraph ActualText in Tagged PDF",
-      "filename": "update-paragraph-actualtext-in-tagged-pdf.cs",
-      "description": "Demonstrates loading a PDF, locating a paragraph element by its title via the structure tree, and modifying its ActualText property for accessibility corrections.",
-      "tags": [
-        "tagged-pdf",
-        "actualtext",
-        "paragraph",
-        "accessibility",
-        "structure-tree"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.LogicalStructure.StructureElement",
-        "Aspose.Pdf.LogicalStructure.ParagraphElement",
-        "Aspose.Pdf.LogicalStructure.StructureElement.FindElements<T>",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "replace-note-element-in-tagged-pdf": {
-      "title": "Replace Note Element in Tagged PDF",
-      "filename": "replace-note-element-in-tagged-pdf.cs",
-      "description": "Shows how to locate an existing Note element in a tagged PDF, remove it, and insert an updated Note with new text using Aspose.Pdf's TaggedContent API.",
-      "tags": [
-        "tagged-pdf",
-        "accessibility",
-        "note-element",
-        "pdf-manipulation",
         "aspnet"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.AutoTaggingSettings",
         "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.StructureElement",
-        "Aspose.Pdf.Tagged.NoteElement",
-        "Aspose.Pdf.Tagged.ITaggedContent.CreateNoteElement",
-        "Aspose.Pdf.Tagged.NoteElement.SetText",
-        "Aspose.Pdf.Tagged.StructureElement.FindElements",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "iterate-tagged-pdf-structure-elements": {
-      "title": "Iterate Tagged PDF Structure Elements and Log Titles & Languages",
-      "filename": "iterate-tagged-pdf-structure-elements.cs",
-      "description": "The example loads a PDF, accesses its tagged content, and recursively walks the logical structure tree, outputting each element's title and language. It also notes the limitation of retrieving custom tags via the Aspose.PDF API.",
-      "tags": [
-        "tagged-pdf",
-        "structure",
-        "accessibility",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.TaggedContent",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.LogicalStructure.StructureElement",
-        "Aspose.Pdf.LogicalStructure.Element.ChildElements"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "set-paragraph-title-in-tagged-pdf": {
-      "title": "Set Paragraph Title in Tagged PDF for Accessibility",
-      "filename": "set-paragraph-title-in-tagged-pdf.cs",
-      "description": "Shows how to use Aspose.Pdf's TaggedContent API to create a paragraph element, assign a Title property for accessibility, and save the updated PDF.",
-      "tags": [
-        "tagged-pdf",
-        "accessibility",
-        "paragraph",
-        "title",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.StructureElement",
-        "Aspose.Pdf.Tagged.ParagraphElement",
-        "Aspose.Pdf.Tagged.TaggedContent.CreateParagraphElement",
-        "Aspose.Pdf.Tagged.ParagraphElement.SetText",
-        "Aspose.Pdf.Tagged.ParagraphElement.Title"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "set-figure-title-in-tagged-pdf": {
-      "title": "Set Figure Title in Tagged PDF",
-      "filename": "set-figure-title-in-tagged-pdf.cs",
-      "description": "Shows how to create a figure element in a tagged PDF, assign a Title and AlternativeText for accessibility, and append it to the structure tree before saving.",
-      "tags": [
-        "tagged-pdf",
-        "figure",
-        "accessibility",
-        "title",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.Tagged.FigureElement",
-        "Aspose.Pdf.Tagged.StructureElement",
+        "Aspose.Pdf.Tagged.ITaggedContent.SetLanguage",
+        "Aspose.Pdf.Tagged.ITaggedContent.SetTitle",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "validate-pdf-ua-compliance-export-xml": {
-      "title": "Validate PDF/UA Compliance and Export XML Structure",
-      "filename": "validate-pdf-ua-compliance-export-xml.cs",
-      "description": "Demonstrates how to validate a tagged PDF against PDF/UA standards using Aspose.Pdf, write a validation log, and export the document's logical structure as an XML report.",
-      "tags": [
-        "pdf-ua",
-        "validation",
-        "xml-report",
-        "tagged-pdf",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Validate",
-        "Aspose.Pdf.PdfFormat",
-        "Aspose.Pdf.Document.SaveXml"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "check-pdf-ua-compliance-and-log": {
-      "title": "Check PDF/UA Compliance and Log Result",
-      "filename": "check-pdf-ua-compliance-and-log.cs",
-      "description": "Demonstrates loading a PDF with Aspose.Pdf, checking its PDF/UA accessibility compliance, and appending the boolean outcome to a log file for further processing.",
-      "tags": [
-        "pdf-ua",
-        "accessibility",
-        "logging",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.IsPdfUaCompliant"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "summarize-pdf-validation-errors": {
-      "title": "Summarize PDF Validation Report Errors",
-      "filename": "summarize-pdf-validation-errors.cs",
-      "description": "Loads an Aspose.Pdf validation XML report, aggregates error codes and messages, and outputs a summary of error frequencies and the top error messages.",
-      "tags": [
-        "pdf",
-        "validation",
-        "xml",
-        "error-summary",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document.Validate"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "filter-xml-missing-alt-text": {
-      "title": "Filter XML Errors for Missing Alt Text",
-      "filename": "filter-xml-missing-alt-text.cs",
-      "description": "Shows how to load an XML validation report, query for errors of type \"MissingAltText\", and output the affected image IDs.",
-      "tags": [
-        "xml",
-        "accessibility",
-        "alt-text",
-        "validation",
-        "csharp"
-      ],
-      "apis_used": [],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "extract-text-from-tagged-pdf-structure": {
-      "title": "Extract Text from Tagged PDF Structure Tree",
-      "filename": "extract-text-from-tagged-pdf-structure.cs",
-      "description": "Demonstrates how to load a PDF, access its tagged content, and recursively traverse the logical structure tree to extract the actual text of each element.",
-      "tags": [
-        "tagged-pdf",
-        "text-extraction",
-        "structure-tree",
-        "accessibility",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.ITaggedContent",
-        "Aspose.Pdf.LogicalStructure.StructureElement",
-        "Aspose.Pdf.LogicalStructure.Element",
-        "Aspose.Pdf.LogicalStructure.ElementList"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "export-structure-tree-to-xml-xsl-report": {
-      "title": "Export PDF Structure Tree to XML and Generate Report via XSLT",
-      "filename": "export-structure-tree-to-xml-xsl-report.cs",
-      "description": "Loads a PDF with Aspose.Pdf, exports its logical structure tree to an XML file using XmlSaveOptions, and then applies an XSLT stylesheet to produce an HTML report.",
-      "tags": [
-        "structure-tree",
-        "xml-export",
-        "xslt",
-        "report-generation",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.XmlSaveOptions"
-      ],
-      "difficulty": "intermediate",
       "generated_at": "2026-08-20T07:11:50Z",
       "status": "verified"
     },
@@ -848,6 +708,36 @@
       "generated_at": "2026-08-20T07:11:50Z",
       "status": "verified"
     },
+    "export-pdf-structure-tree-to-xml-xsl-report": {
+      "title": "Export Pdf Structure Tree To Xml Xsl Report",
+      "filename": "export-pdf-structure-tree-to-xml-xsl-report.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "export-structure-tree-to-xml-xsl-report": {
+      "title": "Export PDF Structure Tree to XML and Generate Report via XSLT",
+      "filename": "export-structure-tree-to-xml-xsl-report.cs",
+      "description": "Loads a PDF with Aspose.Pdf, exports its logical structure tree to an XML file using XmlSaveOptions, and then applies an XSLT stylesheet to produce an HTML report.",
+      "tags": [
+        "structure-tree",
+        "xml-export",
+        "xslt",
+        "report-generation",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.XmlSaveOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
     "export-tagged-pdf-content-to-json": {
       "title": "Export Tagged PDF Content to JSON",
       "filename": "export-tagged-pdf-content-to-json.cs",
@@ -868,6 +758,16 @@
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "extract-note-elements-to-text": {
+      "title": "Extract Note Elements To Text",
+      "filename": "extract-note-elements-to-text.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     },
     "extract-notes-from-tagged-pdf": {
@@ -914,92 +814,234 @@
       "generated_at": "2026-08-20T07:11:50Z",
       "status": "verified"
     },
-    "batch-tag-pdfs-with-suffix": {
-      "title": "Batch Tag PDFs and Save with Suffix",
-      "filename": "batch-tag-pdfs-with-suffix.cs",
-      "description": "Demonstrates how to process a folder of PDF files, enable automatic tagging, add missing structure elements, set language and title, and save each tagged PDF with a custom suffix.",
+    "extract-text-from-tagged-pdf-structure": {
+      "title": "Extract Text from Tagged PDF Structure Tree",
+      "filename": "extract-text-from-tagged-pdf-structure.cs",
+      "description": "Demonstrates how to load a PDF, access its tagged content, and recursively traverse the logical structure tree to extract the actual text of each element.",
       "tags": [
-        "pdf",
-        "tagging",
-        "batch",
+        "tagged-pdf",
+        "text-extraction",
+        "structure-tree",
         "accessibility",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.LogicalStructure.StructureElement",
+        "Aspose.Pdf.LogicalStructure.Element",
+        "Aspose.Pdf.LogicalStructure.ElementList"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "filter-xml-missing-alt-text": {
+      "title": "Filter XML Errors for Missing Alt Text",
+      "filename": "filter-xml-missing-alt-text.cs",
+      "description": "Shows how to load an XML validation report, query for errors of type \"MissingAltText\", and output the affected image IDs.",
+      "tags": [
+        "xml",
+        "accessibility",
+        "alt-text",
+        "validation",
+        "csharp"
+      ],
+      "apis_used": [],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "find-images-missing-alt-text": {
+      "title": "Find Images Missing Alt Text",
+      "filename": "find-images-missing-alt-text.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "iterate-tagged-pdf-structure-elements": {
+      "title": "Iterate Tagged PDF Structure Elements and Log Titles & Languages",
+      "filename": "iterate-tagged-pdf-structure-elements.cs",
+      "description": "The example loads a PDF, accesses its tagged content, and recursively walks the logical structure tree, outputting each element's title and language. It also notes the limitation of retrieving custom tags via the Aspose.PDF API.",
+      "tags": [
+        "tagged-pdf",
+        "structure",
+        "accessibility",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.TaggedContent",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.LogicalStructure.StructureElement",
+        "Aspose.Pdf.LogicalStructure.Element.ChildElements"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "modify-paragraph-actualtext-in-tagged-pdf": {
+      "title": "Modify Paragraph Actualtext In Tagged Pdf",
+      "filename": "modify-paragraph-actualtext-in-tagged-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "nested-table-in-paragraph-tagged-pdf": {
+      "title": "Create Nested Table Inside Paragraph in Tagged PDF",
+      "filename": "nested-table-in-paragraph-tagged-pdf.cs",
+      "description": "Demonstrates how to build a paragraph element, add an outer table, embed a nested table within a cell, set alternative text, and validate the tagging hierarchy using Aspose.Pdf's Tagged PDF API.",
+      "tags": [
+        "tagged-pdf",
+        "nested-table",
+        "accessibility",
+        "pdf-structure",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.ParagraphElement",
+        "Aspose.Pdf.Tagged.TableElement",
+        "Aspose.Pdf.Tagged.TableTHeadElement",
+        "Aspose.Pdf.Tagged.TableTRElement",
+        "Aspose.Pdf.Tagged.TableTDElement"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "parse-xml-validation-report-summary": {
+      "title": "Parse Xml Validation Report Summary",
+      "filename": "parse-xml-validation-report-summary.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "propagate-language-attribute-to-tagged-pdf": {
+      "title": "Propagate Language Attribute to All Tagged PDF Elements",
+      "filename": "propagate-language-attribute-to-tagged-pdf.cs",
+      "description": "Demonstrates how to set a document‑level language and automatically propagate it to every structure element in a tagged PDF using Aspose.Pdf.",
+      "tags": [
+        "accessibility",
+        "tagged-pdf",
+        "language",
+        "aspnet",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.StructureElement",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Tagged.ITaggedContent.SetLanguage",
+        "Aspose.Pdf.Tagged.StructureElement.Language",
+        "Aspose.Pdf.Tagged.StructureElement.FindElements",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "propagate-language-to-tagged-pdf": {
+      "title": "Propagate Language To Tagged Pdf",
+      "filename": "propagate-language-to-tagged-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "replace-note-element-in-tagged-pdf": {
+      "title": "Replace Note Element in Tagged PDF",
+      "filename": "replace-note-element-in-tagged-pdf.cs",
+      "description": "Shows how to locate an existing Note element in a tagged PDF, remove it, and insert an updated Note with new text using Aspose.Pdf's TaggedContent API.",
+      "tags": [
+        "tagged-pdf",
+        "accessibility",
+        "note-element",
+        "pdf-manipulation",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.StructureElement",
+        "Aspose.Pdf.Tagged.NoteElement",
+        "Aspose.Pdf.Tagged.ITaggedContent.CreateNoteElement",
+        "Aspose.Pdf.Tagged.NoteElement.SetText",
+        "Aspose.Pdf.Tagged.StructureElement.FindElements",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "replace-note-elements-in-tagged-pdf": {
+      "title": "Replace Note Elements In Tagged Pdf",
+      "filename": "replace-note-elements-in-tagged-pdf.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "set-actualtext-span-pronunciation": {
+      "title": "Set ActualText on a Span for Pronunciation in Tagged PDF",
+      "filename": "set-actualtext-span-pronunciation.cs",
+      "description": "Shows how to create a span element in a tagged PDF, assign visible text, and provide hidden pronunciation text via the ActualText property.",
+      "tags": [
+        "accessibility",
+        "tagged-pdf",
+        "actualtext",
+        "pronunciation",
         "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Tagged.AutoTaggingSettings",
         "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.SpanElement",
         "Aspose.Pdf.Tagged.StructureElement",
-        "Aspose.Pdf.Tagged.ParagraphElement",
-        "Aspose.Pdf.Tagged.ITaggedContent.Save",
+        "Aspose.Pdf.Tagged.ITaggedContent.SetLanguage",
+        "Aspose.Pdf.Tagged.SpanElement.SetText",
+        "Aspose.Pdf.Tagged.SpanElement.ActualText",
         "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
+      "difficulty": "beginner",
       "generated_at": "2026-08-20T07:11:50Z",
       "status": "verified"
     },
-    "batch-convert-pdfs-to-tagged-pdfa": {
-      "title": "Batch Convert PDFs to Tagged PDF/A with Auto‑Tagging",
-      "filename": "batch-convert-pdfs-to-tagged-pdfa.cs",
-      "description": "Demonstrates how to process a folder of untagged PDFs, enable Aspose.Pdf auto‑tagging, convert each document to a tagged PDF/A format, and save the results to a separate output directory.",
+    "set-figure-title-in-tagged-pdf": {
+      "title": "Set Figure Title in Tagged PDF",
+      "filename": "set-figure-title-in-tagged-pdf.cs",
+      "description": "Shows how to create a figure element in a tagged PDF, assign a Title and AlternativeText for accessibility, and append it to the structure tree before saving.",
       "tags": [
-        "pdf",
-        "auto-tagging",
-        "batch",
+        "tagged-pdf",
+        "figure",
         "accessibility",
-        "pdfa"
+        "title",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.AutoTaggingSettings",
-        "Aspose.Pdf.PdfFormatConversionOptions",
-        "Aspose.Pdf.PdfFormat",
-        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.FigureElement",
+        "Aspose.Pdf.Tagged.StructureElement",
         "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "batch-validate-pdfs-summary-csv": {
-      "title": "Batch Validate PDFs and Generate Summary CSV",
-      "filename": "batch-validate-pdfs-summary-csv.cs",
-      "description": "Demonstrates how to iterate through a folder of PDF files, validate each against PDF/A‑1B using Aspose.Pdf, write individual XML logs, and produce a consolidated CSV summary of the compliance results.",
-      "tags": [
-        "pdf-validation",
-        "batch-processing",
-        "csv-report",
-        "xml-log",
-        "accessibility"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.PdfFormat",
-        "Aspose.Pdf.Document.Validate"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T07:11:50Z",
-      "status": "verified"
-    },
-    "batch-pdfa1b-validation-xml-logs-dashboard": {
-      "title": "Batch PDF/A-1B Validation with XML Logs and Compliance Dashboard",
-      "filename": "batch-pdfa1b-validation-xml-logs-dashboard.cs",
-      "description": "The example loads all PDF files in a folder, validates each against the PDF/A‑1B standard using Aspose.Pdf, writes XML validation logs, and displays a console dashboard with overall and per‑file compliance percentages.",
-      "tags": [
-        "pdf-validation",
-        "pdfa",
-        "xml-logging",
-        "batch",
-        "compliance-dashboard"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Validate",
-        "Aspose.Pdf.PdfFormat",
-        "Aspose.Pdf.PdfFormat.PDF_A_1B",
-        "Aspose.Pdf.Document.Dispose"
-      ],
-      "difficulty": "intermediate",
+      "difficulty": "beginner",
       "generated_at": "2026-08-20T07:11:50Z",
       "status": "verified"
     },
@@ -1025,6 +1067,214 @@
       ],
       "difficulty": "intermediate",
       "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "set-paragraph-title-accessibility": {
+      "title": "Set Paragraph Title Accessibility",
+      "filename": "set-paragraph-title-accessibility.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "set-paragraph-title-in-tagged-pdf": {
+      "title": "Set Paragraph Title in Tagged PDF for Accessibility",
+      "filename": "set-paragraph-title-in-tagged-pdf.cs",
+      "description": "Shows how to use Aspose.Pdf's TaggedContent API to create a paragraph element, assign a Title property for accessibility, and save the updated PDF.",
+      "tags": [
+        "tagged-pdf",
+        "accessibility",
+        "paragraph",
+        "title",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.StructureElement",
+        "Aspose.Pdf.Tagged.ParagraphElement",
+        "Aspose.Pdf.Tagged.TaggedContent.CreateParagraphElement",
+        "Aspose.Pdf.Tagged.ParagraphElement.SetText",
+        "Aspose.Pdf.Tagged.ParagraphElement.Title"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "set-primary-language-for-tagged-pdf": {
+      "title": "Set Primary Language for a Tagged PDF",
+      "filename": "set-primary-language-for-tagged-pdf.cs",
+      "description": "Demonstrates how to add a language attribute to the structure tree of a tagged PDF using Aspose.Pdf, ensuring the document is marked with its primary content language.",
+      "tags": [
+        "pdf",
+        "accessibility",
+        "language",
+        "tagged-pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.ITaggedContent.SetLanguage",
+        "Aspose.Pdf.LogicalStructure.StructureElement",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "set-root-structure-element-title": {
+      "title": "Set Root Structure Element Title in Tagged PDF",
+      "filename": "set-root-structure-element-title.cs",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf, access its tagged content, retrieve the root structure element, assign a document title, and save the updated file.",
+      "tags": [
+        "accessibility",
+        "tagged-pdf",
+        "metadata",
+        "title",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.LogicalStructure.StructureElement",
+        "Aspose.Pdf.StructureElement.Title",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "style-table-cells-background-border-padding": {
+      "title": "Style Table Cells with Background Color, Border, and Padding",
+      "filename": "style-table-cells-background-border-padding.cs",
+      "description": "Shows how to apply background colors, border thickness/color, and padding to individual table cells in a PDF using Aspose.Pdf.",
+      "tags": [
+        "table",
+        "cell-styling",
+        "background",
+        "border",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.BorderInfo",
+        "Aspose.Pdf.MarginInfo",
+        "Aspose.Pdf.Text.TextFragment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "summarize-pdf-validation-errors": {
+      "title": "Summarize PDF Validation Report Errors",
+      "filename": "summarize-pdf-validation-errors.cs",
+      "description": "Loads an Aspose.Pdf validation XML report, aggregates error codes and messages, and outputs a summary of error frequencies and the top error messages.",
+      "tags": [
+        "pdf",
+        "validation",
+        "xml",
+        "error-summary",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document.Validate"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "update-paragraph-actualtext-in-tagged-pdf": {
+      "title": "Update Paragraph ActualText in Tagged PDF",
+      "filename": "update-paragraph-actualtext-in-tagged-pdf.cs",
+      "description": "Demonstrates loading a PDF, locating a paragraph element by its title via the structure tree, and modifying its ActualText property for accessibility corrections.",
+      "tags": [
+        "tagged-pdf",
+        "actualtext",
+        "paragraph",
+        "accessibility",
+        "structure-tree"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.LogicalStructure.StructureElement",
+        "Aspose.Pdf.LogicalStructure.ParagraphElement",
+        "Aspose.Pdf.LogicalStructure.StructureElement.FindElements<T>",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "update-structure-element-language-french": {
+      "title": "Update Structure Element Language French",
+      "filename": "update-structure-element-language-french.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
+      "status": "verified"
+    },
+    "update-tagged-element-language-french": {
+      "title": "Update Language of a Tagged PDF Structure Element to French",
+      "filename": "update-tagged-element-language-french.cs",
+      "description": "Shows how to set the document's default language and modify the language property of a specific tagged structure element in a PDF using Aspose.Pdf.",
+      "tags": [
+        "tagged-pdf",
+        "language",
+        "accessibility",
+        "structure",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.ITaggedContent.SetLanguage",
+        "Aspose.Pdf.LogicalStructure.StructureElement",
+        "Aspose.Pdf.LogicalStructure.StructureElement.FindElements",
+        "Aspose.Pdf.LogicalStructure.StructureElement.Language"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "validate-pdf-ua-compliance-export-xml": {
+      "title": "Validate PDF/UA Compliance and Export XML Structure",
+      "filename": "validate-pdf-ua-compliance-export-xml.cs",
+      "description": "Demonstrates how to validate a tagged PDF against PDF/UA standards using Aspose.Pdf, write a validation log, and export the document's logical structure as an XML report.",
+      "tags": [
+        "pdf-ua",
+        "validation",
+        "xml-report",
+        "tagged-pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Validate",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.Document.SaveXml"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-08-20T07:11:50Z",
+      "status": "verified"
+    },
+    "validate-pdf-ua-compliance-xml-report": {
+      "title": "Validate Pdf Ua Compliance Xml Report",
+      "filename": "validate-pdf-ua-compliance-xml-report.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-09-10T12:45:08Z",
       "status": "verified"
     }
   }
