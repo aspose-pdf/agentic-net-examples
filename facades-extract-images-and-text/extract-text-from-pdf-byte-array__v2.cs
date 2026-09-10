@@ -8,10 +8,10 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Simple console‑based "endpoint": the first argument is the path to the PDF file.
+        // Expect a single argument: the path to the PDF file.
         if (args.Length == 0)
         {
-            Console.Error.WriteLine("Usage: PdfExtractionApp <pdf-file-path>");
+            Console.Error.WriteLine("Usage: <exe> <pdfFilePath>");
             return;
         }
 
@@ -22,26 +22,32 @@ class Program
             return;
         }
 
-        byte[] pdfData = File.ReadAllBytes(pdfPath);
-        string extractedText = ExtractText(pdfData);
+        // Read the PDF into a byte array.
+        byte[] pdfBytes = File.ReadAllBytes(pdfPath);
 
-        // Return the extracted text as a JSON string on stdout.
-        var result = new { text = extractedText };
-        string json = JsonSerializer.Serialize(result);
+        // Extract text from the PDF.
+        string extractedText = ExtractTextFromPdf(pdfBytes);
+
+        // Serialize the result as JSON and write to stdout.
+        string json = JsonSerializer.Serialize(new { text = extractedText });
         Console.WriteLine(json);
     }
 
-    private static string ExtractText(byte[] pdfBytes)
+    private static string ExtractTextFromPdf(byte[] pdfBytes)
     {
-        // Use Aspose.Pdf.Facades.PdfExtractor to pull text from the PDF.
+        // Load the PDF bytes into a memory stream.
         using var pdfStream = new MemoryStream(pdfBytes);
+
+        // Use Aspose.Pdf.Facades.PdfExtractor to pull out the text.
         using var extractor = new PdfExtractor();
         extractor.BindPdf(pdfStream);
         extractor.ExtractText();
 
+        // Retrieve the extracted text into another memory stream.
         using var textStream = new MemoryStream();
         extractor.GetText(textStream);
-        // Aspose returns Unicode text by default; decode accordingly.
+
+        // Aspose returns Unicode text by default.
         return Encoding.Unicode.GetString(textStream.ToArray());
     }
 }

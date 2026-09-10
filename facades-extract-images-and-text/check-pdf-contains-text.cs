@@ -14,31 +14,27 @@ class Program
             return;
         }
 
-        // Use PdfExtractor (facade) to extract text.
-        // The facade implements IDisposable, so wrap it in a using block.
+        // Initialize the extractor facade
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF file to the extractor.
+            // Bind the PDF file to the extractor
             extractor.BindPdf(inputPdf);
 
-            // Extract text from the whole document using Unicode encoding.
-            extractor.ExtractText(); // default is Unicode
+            // Extract all text using Unicode encoding (default)
+            extractor.ExtractText();
 
-            // Save the extracted text into a memory stream.
+            // Retrieve the extracted text into a memory stream
             using (MemoryStream textStream = new MemoryStream())
             {
                 extractor.GetText(textStream);
 
-                // Determine if any text was extracted.
+                // Determine if any text was extracted
                 bool containsText = textStream.Length > 0;
 
                 Console.WriteLine(containsText
                     ? "The PDF contains text."
                     : "The PDF does not contain any text.");
             }
-
-            // Close the extractor (optional, as using will dispose it).
-            extractor.Close();
         }
     }
 }

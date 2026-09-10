@@ -15,19 +15,20 @@ class Program
             return;
         }
 
-        // Initialize the PdfExtractor facade
+        // Use PdfExtractor facade to work with attachments
         using (PdfExtractor extractor = new PdfExtractor())
         {
             // Bind the PDF document
             extractor.BindPdf(inputPdf);
 
-            // Extract attachment information (required before GetAttachNames)
+            // Extract attachments (required before retrieving names)
             extractor.ExtractAttachment();
 
-            // Retrieve the list of attachment names
+            // Get the list of attachment names
             IList<string> attachmentNames = extractor.GetAttachNames();
 
-            // Output each attachment name
+            // List the attachment names
+            Console.WriteLine("Embedded attachments:");
             foreach (string name in attachmentNames)
             {
                 Console.WriteLine(name);

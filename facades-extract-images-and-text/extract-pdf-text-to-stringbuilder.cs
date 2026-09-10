@@ -7,50 +7,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputTxtPath = "extracted.txt";
 
-        if (!File.Exists(inputPath))
+        // Ensure the input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // StringBuilder will hold the extracted text for further manipulation
-        StringBuilder sb = new StringBuilder();
+        // StringBuilder to hold the extracted text for further manipulation
+        StringBuilder extractedTextBuilder = new StringBuilder();
 
-        // PdfExtractor is a Facade class that implements IDisposable
+        // Use PdfExtractor (Facade) to bind the PDF and extract its text
         using (PdfExtractor extractor = new PdfExtractor())
         {
             // Load the PDF document
-            extractor.BindPdf(inputPath);
+            extractor.BindPdf(inputPdfPath);
 
-            // Perform text extraction (Unicode encoding is the default)
+            // Perform text extraction (Unicode encoding is default)
             extractor.ExtractText();
 
-            // Iterate through each page's extracted text
-            while (extractor.HasNextPageText())
+            // Save the extracted text into a memory stream
+            using (MemoryStream textStream = new MemoryStream())
             {
-                // Use a memory stream to capture the page text
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    extractor.GetNextPageText(ms);
+                extractor.GetText(textStream);
 
-                    // Convert the Unicode bytes to a string
-                    string pageText = Encoding.Unicode.GetString(ms.ToArray());
+                // Reset stream position before reading
+                textStream.Position = 0;
 
-                    // Append the page text to the StringBuilder
-                    sb.AppendLine(pageText);
-                }
+                // Convert the stream bytes to a string (Unicode encoding)
+                string pageText = Encoding.Unicode.GetString(textStream.ToArray());
+
+                // Append the text to the StringBuilder
+                extractedTextBuilder.Append(pageText);
             }
         }
 
-        // The StringBuilder now contains the full document text
-        Console.WriteLine("Extracted text:");
-        Console.WriteLine(sb.ToString());
+        // At this point you can manipulate the text in the StringBuilder as needed
+        // For demonstration, we simply write it to a file
+        File.WriteAllText(outputTxtPath, extractedTextBuilder.ToString(), Encoding.Unicode);
 
-        // Optionally, write the accumulated text to a file
-        const string outputPath = "extracted.txt";
-        File.WriteAllText(outputPath, sb.ToString(), Encoding.Unicode);
-        Console.WriteLine($"Text saved to {outputPath}");
+        Console.WriteLine($"Text extracted and saved to '{outputTxtPath}'.");
     }
 }

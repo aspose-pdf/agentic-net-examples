@@ -1,51 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
-using System.Drawing.Imaging;
+// URL-STABILITY STUB
+//
+// extract images to unc share__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/facades-extract-images-and-text
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdfPath = @"C:\Docs\sample.pdf";               // Local PDF file
-        const string outputUncDir = @"\\SERVER\Share\ExtractedImages";   // UNC folder
-
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-
-        try
-        {
-            // Ensure the UNC output directory exists
-            Directory.CreateDirectory(outputUncDir);
-
-            // Use PdfExtractor (Facade) to extract images
-            using (PdfExtractor extractor = new PdfExtractor())
-            {
-                extractor.BindPdf(inputPdfPath);          // Load the PDF
-                extractor.ExtractImage();                 // Prepare image extraction
-
-                int imageIndex = 1;
-                while (extractor.HasNextImage())
-                {
-                    string outputFile = Path.Combine(outputUncDir, $"image-{imageIndex}.png");
-                    // Save each image as PNG; returns true if successful
-                    bool saved = extractor.GetNextImage(outputFile, ImageFormat.Png);
-                    if (!saved)
-                    {
-                        Console.Error.WriteLine($"Failed to extract image {imageIndex}");
-                    }
-                    imageIndex++;
-                }
-            }
-
-            Console.WriteLine("Image extraction completed.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
-}
+class Program { static void Main() { } }

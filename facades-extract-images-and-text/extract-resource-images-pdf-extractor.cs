@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf; // for ExtractImageMode enum
 
 class Program
 {
@@ -12,31 +12,31 @@ class Program
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Use PdfExtractor (Facade) inside a using block for deterministic disposal
+        // Use PdfExtractor (facade) inside a using block for deterministic disposal
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the source PDF file
+            // Bind the PDF file to the extractor
             extractor.BindPdf(inputPdf);
 
-            // Set the extraction mode to DefinedInResources (default, but set explicitly as requested)
-            extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
+            // Set the extraction mode to retrieve images defined in resources
+            extractor.ExtractImageMode = Aspose.Pdf.ExtractImageMode.DefinedInResources;
 
-            // Perform the image extraction
+            // Start the extraction process
             extractor.ExtractImage();
 
             int imageIndex = 1;
             // Retrieve each extracted image and save it to the output folder
             while (extractor.HasNextImage())
             {
-                string outputPath = Path.Combine(outputFolder, $"image-{imageIndex}.png");
-                extractor.GetNextImage(outputPath);
+                string imagePath = Path.Combine(outputFolder, $"image-{imageIndex}.png");
+                extractor.GetNextImage(imagePath);
                 imageIndex++;
             }
         }

@@ -1,36 +1,40 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf.Facades;
 
 class BatchPdfTextExtractor
 {
     static void Main()
     {
-        // Folder containing PDF files
+        // Folder containing PDF files to process
         const string inputFolder = @"C:\PdfInput";
         // Folder where extracted text files will be saved
-        const string outputFolder = @"C:\PdfOutput";
+        const string outputFolder = @"C:\PdfTextOutput";
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Get all PDF files in the input folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        foreach (string pdfPath in pdfFiles)
         {
+            // Build the output text file path (same name, .txt extension)
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            string txtPath = Path.Combine(outputFolder, fileNameWithoutExt + ".txt");
+
             try
             {
-                // Build the output text file path (same base name as the PDF)
-                string txtPath = Path.Combine(
-                    outputFolder,
-                    Path.GetFileNameWithoutExtension(pdfPath) + ".txt");
-
-                // Use PdfExtractor to extract text
+                // Use PdfExtractor facade to extract text
                 using (PdfExtractor extractor = new PdfExtractor())
                 {
                     // Bind the PDF file to the extractor
                     extractor.BindPdf(pdfPath);
-                    // Extract all text using Unicode encoding (default)
-                    extractor.ExtractText();
+
+                    // Extract text using Unicode encoding (covers most languages)
+                    extractor.ExtractText(Encoding.Unicode);
+
                     // Save the extracted text to the .txt file
                     extractor.GetText(txtPath);
                 }
@@ -39,8 +43,11 @@ class BatchPdfTextExtractor
             }
             catch (Exception ex)
             {
+                // Log any errors but continue processing other files
                 Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch extraction completed.");
     }
 }
