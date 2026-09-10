@@ -1,6 +1,6 @@
 using System;
-using System.Diagnostics;
 using System.IO;
+using System.Diagnostics;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -9,48 +9,55 @@ class Program
     static void Main()
     {
         // Input PDF files to encrypt
-        string[] inputFiles = { "input1.pdf", "input2.pdf", "input3.pdf" };
+        string[] inputFiles = { "input1.pdf", "input2.pdf" };
+        // Directory for encrypted output files
+        string outputDir = "Encrypted";
+        Directory.CreateDirectory(outputDir);
 
-        // Passwords for encryption
-        const string userPassword = "user123";
-        const string ownerPassword = "owner123";
-
-        foreach (string inputPath in inputFiles)
+        foreach (string inFile in inputFiles)
         {
-            if (!File.Exists(inputPath))
+            if (!File.Exists(inFile))
             {
-                Console.Error.WriteLine($"File not found: {inputPath}");
+                Console.Error.WriteLine($"File not found: {inFile}");
                 continue;
             }
 
-            // Determine output path
-            string outputPath = Path.Combine(
-                Path.GetDirectoryName(inputPath) ?? string.Empty,
-                Path.GetFileNameWithoutExtension(inputPath) + "_encrypted.pdf");
+            string outFile = Path.Combine(outputDir,
+                Path.GetFileNameWithoutExtension(inFile) + "_encrypted.pdf");
 
-            // Measure encryption time
-            Stopwatch timer = Stopwatch.StartNew();
+            // Start timing
+            Stopwatch sw = Stopwatch.StartNew();
 
-            // Use PdfFileSecurity facade to encrypt the PDF
-            using (PdfFileSecurity security = new PdfFileSecurity())
+            // Initialize the facade and bind the source PDF
+            PdfFileSecurity fileSecurity = new PdfFileSecurity();
+            fileSecurity.BindPdf(inFile);
+
+            // Set desired privileges (e.g., allow printing) and encryption strength
+            DocumentPrivilege privilege = DocumentPrivilege.Print;
+            // Encrypt using 256‑bit AES (KeySize.x256)
+            bool success = fileSecurity.EncryptFile(
+                userPassword: "user123",
+                ownerPassword: "owner123",
+                privilege: privilege,
+                keySize: KeySize.x256);
+
+            // Save the encrypted PDF to the output path
+            if (success)
             {
-                // Bind the source PDF file
-                security.BindPdf(inputPath);
-
-                // Encrypt with desired privileges and key size (AES 256-bit)
-                security.EncryptFile(
-                    userPassword,
-                    ownerPassword,
-                    DocumentPrivilege.Print,
-                    KeySize.x256);
-
-                // Save the encrypted PDF
-                security.Save(outputPath);
+                fileSecurity.Save(outFile);
             }
 
-            timer.Stop();
+            // Stop timing
+            sw.Stop();
 
-            Console.WriteLine($"Encrypted '{inputPath}' to '{outputPath}' in {timer.ElapsedMilliseconds} ms.");
+            if (success)
+            {
+                Console.WriteLine($"Encrypted '{inFile}' to '{outFile}' in {sw.ElapsedMilliseconds} ms.");
+            }
+            else
+            {
+                Console.Error.WriteLine($"Encryption failed for '{inFile}'.");
+            }
         }
     }
 }

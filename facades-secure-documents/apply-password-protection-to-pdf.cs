@@ -1,15 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;               // DocumentPrivilege, KeySize enums
+using Aspose.Pdf.Facades;      // PdfFileSecurity facade
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";      // source PDF
-        const string outputPath = "protected.pdf";  // destination PDF
-        const string userPassword  = "user123";    // password required to open the file
+        const string outputPath = "protected.pdf";  // encrypted PDF
+        const string userPassword  = "user123";    // password required to open
         const string ownerPassword = "owner123";   // password required to change permissions
 
         if (!File.Exists(inputPath))
@@ -18,22 +18,24 @@ class Program
             return;
         }
 
-        // PdfFileSecurity works directly on files, no Document object is created.
-        // The constructor (inputFile, outputFile) initializes the facade.
-        PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
+        // PdfFileSecurity works directly on file paths; no Document object is created.
+        // Wrap it in a using block because it implements IDisposable.
+        using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
+        {
+            // Encrypt the PDF: allow only printing, use 256‑bit AES encryption.
+            bool encrypted = security.EncryptFile(
+                userPassword,
+                ownerPassword,
+                DocumentPrivilege.Print,   // allowed operation
+                KeySize.x256);             // 256‑bit key size
 
-        // Encrypt the PDF:
-        //   - DocumentPrivilege.Print allows printing.
-        //   - KeySize.x256 selects 256‑bit AES encryption.
-        bool encrypted = fileSecurity.EncryptFile(
-            userPassword,
-            ownerPassword,
-            DocumentPrivilege.Print,
-            KeySize.x256);
+            if (!encrypted)
+            {
+                Console.Error.WriteLine("Failed to encrypt the PDF.");
+                return;
+            }
+        }
 
-        if (encrypted)
-            Console.WriteLine($"PDF encrypted successfully: {outputPath}");
-        else
-            Console.Error.WriteLine("Failed to encrypt the PDF.");
+        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
     }
 }

@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,22 +15,21 @@ class Program
             return;
         }
 
-        // PdfFileSecurity works as a facade for setting security on a PDF file.
-        // The constructor receives the source PDF and the destination path.
-        using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
+        // Initialize the facade with source and destination files
+        using (PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath))
         {
-            // DocumentPrivilege.Print allows printing only; copying is not permitted.
-            bool ok = security.SetPrivilege(DocumentPrivilege.Print);
-            if (!ok)
+            // Set privilege to allow printing only (copying is disallowed)
+            bool result = fileSecurity.SetPrivilege(DocumentPrivilege.Print);
+            if (!result)
             {
-                Console.Error.WriteLine("Failed to apply privileges.");
+                Console.Error.WriteLine("Failed to set document privileges.");
                 return;
             }
 
-            // Save the modified PDF. The Save method writes the output file.
-            security.Save(outputPath);
+            // Save the modified PDF (explicit call, though SetPrivilege already writes the output)
+            fileSecurity.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with printing allowed and copying disabled: {outputPath}");
+        Console.WriteLine($"Document privileges updated and saved to '{outputPath}'.");
     }
 }

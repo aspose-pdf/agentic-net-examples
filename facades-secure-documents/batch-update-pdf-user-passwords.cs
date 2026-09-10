@@ -6,54 +6,35 @@ class Program
 {
     static void Main()
     {
-        // Folder containing the PDF files
-        const string folderPath = @"C:\PdfFolder";
+        // Folder containing PDF files
+        const string inputFolder = @"C:\PdfFolder";
+        // Standardized user password to apply to every PDF
+        const string newUserPassword = "StandardUserPass";
+        // Owner password of the source PDFs (assumed known)
+        const string ownerPassword = "owner";
 
-        // The standardized user password to apply to every PDF
-        const string newUserPassword = "StandardPassword";
-
-        // Assume the PDFs have no owner password (empty string). Adjust if needed.
-        const string ownerPassword = "";
-
-        if (!Directory.Exists(folderPath))
+        if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Folder not found: {folderPath}");
+            Console.Error.WriteLine($"Folder not found: {inputFolder}");
             return;
         }
 
-        // Iterate over all PDF files in the folder
-        foreach (string inputFile in Directory.GetFiles(folderPath, "*.pdf"))
+        // Process each PDF file in the folder
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Create an output file name (you can overwrite the original if desired)
-            string outputFile = Path.Combine(
-                folderPath,
-                Path.GetFileNameWithoutExtension(inputFile) + "_updated.pdf");
+            // Build output path (overwrite the original file)
+            string outputPath = inputPath; // same file, will be overwritten
 
-            try
-            {
-                // Initialize the PdfFileSecurity facade with input and output paths
-                PdfFileSecurity security = new PdfFileSecurity(inputFile, outputFile);
+            // Initialize PdfFileSecurity with input and output file names
+            PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
 
-                // Change the user password; keep the owner password unchanged (empty),
-                // let Aspose generate a random owner password by passing null.
-                bool changed = security.ChangePassword(ownerPassword, newUserPassword, null);
+            // Change the user password; new owner password is null (randomly generated)
+            bool success = fileSecurity.TryChangePassword(ownerPassword, newUserPassword, null);
 
-                if (!changed)
-                {
-                    Console.Error.WriteLine($"Failed to change password for: {inputFile}");
-                }
-                else
-                {
-                    Console.WriteLine($"Password updated successfully: {outputFile}");
-                }
-
-                // Close the facade to release resources
-                security.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{inputFile}': {ex.Message}");
-            }
+            if (success)
+                Console.WriteLine($"Password updated for: {Path.GetFileName(inputPath)}");
+            else
+                Console.Error.WriteLine($"Failed to update password for: {Path.GetFileName(inputPath)}");
         }
     }
 }

@@ -16,24 +16,26 @@ class Program
             return;
         }
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPath))
+        // Load the PDF, encrypt it, and save the encrypted version to a memory stream.
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
-            // Define the permissions you want to grant. Use only members that exist in the Permissions enum.
-            // Example: allow printing and content extraction (you can add other valid flags as needed).
-            Permissions permissions = Permissions.PrintDocument | Permissions.ExtractContent;
+            // Define permissions (e.g., allow printing and content extraction).
+            Aspose.Pdf.Permissions perms = Aspose.Pdf.Permissions.PrintDocument |
+                                          Aspose.Pdf.Permissions.ExtractContent;
 
-            // Encrypt the PDF using AES‑128 (CryptoAlgorithm.AESx128) and the supplied passwords.
-            doc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.AESx128);
+            // Encrypt using AES-256 (preferred algorithm).
+            doc.Encrypt(userPassword, ownerPassword, perms, Aspose.Pdf.CryptoAlgorithm.AESx256);
 
-            // Save the encrypted PDF into a memory stream for network transmission.
+            // Save the encrypted PDF into a MemoryStream for network transmission.
             using (MemoryStream encryptedStream = new MemoryStream())
             {
                 doc.Save(encryptedStream);
-                encryptedStream.Position = 0; // Reset for reading later.
+                encryptedStream.Position = 0; // Reset for reading elsewhere.
 
+                // Example output: size of the encrypted PDF.
                 Console.WriteLine($"Encrypted PDF size: {encryptedStream.Length} bytes");
-                // The stream can now be sent over a network connection.
+
+                // The 'encryptedStream' now contains the encrypted PDF and can be sent over the network.
             }
         }
     }

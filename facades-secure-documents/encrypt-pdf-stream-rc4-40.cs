@@ -1,53 +1,61 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Document, Permissions, CryptoAlgorithm
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
-public static class PdfEncryptionHelper
+namespace AsposePdfApi
 {
     /// <summary>
-    /// Encrypts a PDF provided as a stream using RC4‑40 encryption.
-    /// The method returns a new stream containing the encrypted PDF.
+    /// Provides PDF encryption utilities.
     /// </summary>
-    /// <param name="inputPdfStream">Stream with the original PDF (must be readable).</param>
-    /// <param name="userPassword">Password required to open the PDF (can be empty).</param>
-    /// <param name="ownerPassword">Owner password (can be empty; a random one will be generated if empty).</param>
-    /// <returns>A MemoryStream containing the encrypted PDF. Caller is responsible for disposing it.</returns>
-    public static Stream EncryptPdfStream(Stream inputPdfStream, string userPassword, string ownerPassword)
+    public static class PdfEncryptionHelper
     {
-        if (inputPdfStream == null) throw new ArgumentNullException(nameof(inputPdfStream));
-        if (!inputPdfStream.CanRead) throw new ArgumentException("Input stream must be readable.", nameof(inputPdfStream));
-
-        // Ensure the input stream is positioned at the beginning.
-        if (inputPdfStream.CanSeek)
-            inputPdfStream.Position = 0;
-
-        // Output stream that will hold the encrypted PDF.
-        MemoryStream encryptedStream = new MemoryStream();
-
-        // Load the PDF from the input stream, apply encryption, and save to the output stream.
-        using (Document doc = new Document(inputPdfStream))
+        /// <summary>
+        /// Encrypts a PDF provided as a stream using RC4‑40 encryption and returns the encrypted PDF as a new stream.
+        /// No user or owner passwords are set (empty strings), and the document privilege is set to allow printing.
+        /// </summary>
+        /// <param name="inputPdf">Stream containing the source PDF. The stream must remain open for the duration of the call.</param>
+        /// <returns>A MemoryStream containing the encrypted PDF. The caller is responsible for disposing the returned stream.</returns>
+        public static Stream EncryptPdfStreamRc440(Stream inputPdf)
         {
-            // Define desired permissions (example: allow printing only).
-            Permissions perms = Permissions.PrintDocument;
+            if (inputPdf == null) throw new ArgumentNullException(nameof(inputPdf));
 
-            // Apply RC4‑40 encryption.
-            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.RC4x40);
+            // Output stream that will hold the encrypted PDF
+            MemoryStream encryptedStream = new MemoryStream();
 
-            // Save the encrypted document to the memory stream.
-            doc.Save(encryptedStream);
+            // PdfFileSecurity implements IDisposable via SaveableFacade, so use a using block
+            using (PdfFileSecurity securityFacade = new PdfFileSecurity())
+            {
+                // Bind the source PDF stream to the facade
+                securityFacade.BindPdf(inputPdf);
+
+                // Apply RC4‑40 encryption.
+                // No passwords are set (empty strings). Privilege is set to allow printing.
+                // KeySize.x40 selects 40‑bit key, Algorithm.RC4 selects the RC4 cipher.
+                securityFacade.EncryptFile(
+                    userPassword: string.Empty,
+                    ownerPassword: string.Empty,
+                    privilege: DocumentPrivilege.Print,
+                    keySize: KeySize.x40,
+                    cipher: Algorithm.RC4);
+
+                // Save the encrypted document into the output stream
+                securityFacade.Save(encryptedStream);
+            }
+
+            // Reset position so the caller can read from the beginning
+            encryptedStream.Position = 0;
+            return encryptedStream;
         }
-
-        // Reset the position of the output stream so it can be read from the start.
-        encryptedStream.Position = 0;
-        return encryptedStream;
     }
-}
 
-// Dummy entry point to satisfy the compiler when the project is built as an executable.
-public class Program
-{
-    public static void Main(string[] args)
+    // Minimal entry point required for a console‑type project.
+    internal class Program
     {
-        // No operation – the library functionality is exposed via PdfEncryptionHelper.
+        private static void Main(string[] args)
+        {
+            // Placeholder Main – the project builds as an executable.
+            // Real usage can be added here or the assembly can be referenced from another project.
+        }
     }
 }
