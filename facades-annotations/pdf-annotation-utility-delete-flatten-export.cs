@@ -10,9 +10,9 @@ class PdfUtility
         if (args.Length < 3)
         {
             Console.Error.WriteLine("Usage:");
-            Console.Error.WriteLine("  delete <inputPdf> <outputPdf> <pagesCommaSeparated>");
-            Console.Error.WriteLine("  flatten <inputPdf> <outputPdf>");
-            Console.Error.WriteLine("  export <inputPdf> <outputXfdf>");
+            Console.Error.WriteLine("  delete <input.pdf> <output.pdf> <pages(comma separated)>");
+            Console.Error.WriteLine("  flatten <input.pdf> <output.pdf>");
+            Console.Error.WriteLine("  export <input.pdf> <output.xfdf>");
             return;
         }
 
@@ -31,49 +31,42 @@ class PdfUtility
             switch (operation)
             {
                 case "delete":
+                    // Expect pages list as fourth argument
                     if (args.Length < 4)
                     {
-                        Console.Error.WriteLine("Delete operation requires a pages list.");
+                        Console.Error.WriteLine("Missing pages argument for delete operation.");
                         return;
                     }
-                    // Parse pages (1‑based) from comma‑separated string
                     int[] pagesToDelete = args[3]
                         .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                         .Select(p => int.Parse(p.Trim()))
                         .ToArray();
 
-                    // Use PdfFileEditor to delete specified pages – use stream overloads
-                    PdfFileEditor editor = new PdfFileEditor();
-                    using (FileStream inputStream = File.OpenRead(inputPath))
-                    using (FileStream outputStream = File.Create(outputPath))
-                    {
-                        editor.Delete(inputStream, pagesToDelete, outputStream);
-                    }
+                    // PdfFileEditor does NOT implement IDisposable – instantiate directly
+                    var editor = new PdfFileEditor();
+                    editor.Delete(inputPath, pagesToDelete, outputPath);
                     Console.WriteLine($"Pages deleted. Output saved to '{outputPath}'.");
                     break;
 
                 case "flatten":
-                    // Use PdfAnnotationEditor to flatten all annotations – use stream overloads for saving
-                    using (PdfAnnotationEditor annotEditor = new PdfAnnotationEditor())
+                    // Flatten all annotations using PdfAnnotationEditor (implements IDisposable)
+                    using (PdfAnnotationEditor annotationEditor = new PdfAnnotationEditor())
                     {
-                        annotEditor.BindPdf(inputPath);
-                        annotEditor.FlatteningAnnotations(); // flatten all annotations
-                        using (FileStream outStream = File.Create(outputPath))
-                        {
-                            annotEditor.Save(outStream);
-                        }
+                        annotationEditor.BindPdf(inputPath);
+                        annotationEditor.FlatteningAnnotations(); // flatten all annotations
+                        annotationEditor.Save(outputPath);
                     }
                     Console.WriteLine($"Annotations flattened. Output saved to '{outputPath}'.");
                     break;
 
                 case "export":
-                    // Export all annotations to XFDF – use stream overload
-                    using (PdfAnnotationEditor exportEditor = new PdfAnnotationEditor())
+                    // Export all annotations to XFDF
+                    using (PdfAnnotationEditor annotationEditor = new PdfAnnotationEditor())
                     {
-                        exportEditor.BindPdf(inputPath);
-                        using (FileStream outStream = File.Create(outputPath))
+                        annotationEditor.BindPdf(inputPath);
+                        using (FileStream xfdfStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                         {
-                            exportEditor.ExportAnnotationsToXfdf(outStream);
+                            annotationEditor.ExportAnnotationsToXfdf(xfdfStream);
                         }
                     }
                     Console.WriteLine($"Annotations exported to XFDF file '{outputPath}'.");

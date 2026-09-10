@@ -1,33 +1,12 @@
-using System;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// resize pdf page contents 10 percent margins
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-pages/resize-pdf-pages-content-10-percent-margin.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        // Ensure the source file exists
-        if (!System.IO.File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
-            return;
-        }
-
-        // Create the facade for PDF file editing
-        PdfFileEditor fileEditor = new PdfFileEditor();
-
-        // Define resize parameters: 10% margins on all sides
-        PdfFileEditor.ContentsResizeParameters parameters =
-            PdfFileEditor.ContentsResizeParameters.MarginsPercent(10, 10, 10, 10);
-
-        // Resize contents of all pages (pages = null means all pages)
-        bool success = fileEditor.ResizeContents(inputPath, outputPath, null, parameters);
-
-        if (success)
-            Console.WriteLine($"Pages resized successfully. Output saved to '{outputPath}'.");
-        else
-            Console.Error.WriteLine("Failed to resize pages.");
-    }
-}
+class Program { static void Main() { } }

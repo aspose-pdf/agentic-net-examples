@@ -1,78 +1,87 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string pdfPath = "input.pdf";
+        // Input PDF file
+        const string inputPdfPath = "input.pdf";
 
-        // Ensure an input PDF exists for the demo (sandbox has no files initially)
-        CreateSamplePdf(pdfPath);
+        // Directory where the split HTML pages and the index will be placed
+        const string outputDirectory = "output_html";
 
-        // Folder where individual HTML pages and the index will be placed
-        const string outputFolder = "HtmlPages";
-        Directory.CreateDirectory(outputFolder);
+        // Base name for the generated HTML files (Aspose.Pdf will append page numbers)
+        const string baseHtmlFileName = "page.html";
 
-        // Base name for the generated HTML files (Aspose will append "_pageN.html")
-        string baseHtmlPath = Path.Combine(outputFolder, "document.html");
-
-        // Configure HTML conversion: one HTML file per PDF page
-        HtmlSaveOptions htmlOptions = new HtmlSaveOptions
+        if (!File.Exists(inputPdfPath))
         {
-            SplitIntoPages = true
-        };
-
-        // Convert PDF to HTML (Windows only; wrap in try‑catch for cross‑platform safety)
-        try
-        {
-            using (Document pdfDoc = new Document(pdfPath))
-            {
-                pdfDoc.Save(baseHtmlPath, htmlOptions);
-            }
-        }
-        catch (TypeInitializationException)
-        {
-            Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped.");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // After conversion Aspose creates files named "document_page1.html", "document_page2.html", …
-        string[] pageFiles = Directory.GetFiles(outputFolder, "document_page*.html");
-        Array.Sort(pageFiles); // Ensure pages are in numeric order
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDirectory);
 
-        // Build an index.html that links to each page file
-        string indexPath = Path.Combine(outputFolder, "index.html");
-        using (StreamWriter writer = new StreamWriter(indexPath))
+        // Full path for the base HTML file (used only as a naming seed)
+        string baseHtmlPath = Path.Combine(outputDirectory, baseHtmlFileName);
+
+        // Load the PDF and convert it to HTML with one file per page
+        using (Document pdfDocument = new Document(inputPdfPath))
+        {
+            HtmlSaveOptions htmlOptions = new HtmlSaveOptions
+            {
+                SplitIntoPages = true               // one HTML file per PDF page
+                // Other options can be set here if needed
+            };
+
+            // Save – this creates multiple HTML files in the same folder as baseHtmlPath
+            pdfDocument.Save(baseHtmlPath, htmlOptions);
+        }
+
+        // After conversion, collect all generated HTML page files (excluding the index if it already exists)
+        var pageFiles = Directory.GetFiles(outputDirectory, "*_page*.html")
+                                 .OrderBy(f => f)
+                                 .ToList();
+
+        // Fallback: if the naming pattern differs, take all .html files except index.html
+        if (!pageFiles.Any())
+        {
+            pageFiles = Directory.GetFiles(outputDirectory, "*.html")
+                                 .Where(f => !Path.GetFileName(f).Equals("index.html", StringComparison.OrdinalIgnoreCase))
+                                 .OrderBy(f => f)
+                                 .ToList();
+        }
+
+        // Create an index.html that links to each page file
+        string indexPath = Path.Combine(outputDirectory, "index.html");
+        using (StreamWriter writer = new StreamWriter(indexPath, false))
         {
             writer.WriteLine("<!DOCTYPE html>");
-            writer.WriteLine("<html><head><meta charset=\"UTF-8\"><title>PDF Pages Index</title></head><body>");
-            writer.WriteLine("<h1>Index of PDF Pages</h1>");
-            writer.WriteLine("<ul>");
+            writer.WriteLine("<html lang=\"en\">");
+            writer.WriteLine("<head>");
+            writer.WriteLine("    <meta charset=\"UTF-8\">");
+            writer.WriteLine("    <title>PDF Pages Index</title>");
+            writer.WriteLine("</head>");
+            writer.WriteLine("<body>");
+            writer.WriteLine("    <h1>PDF Pages</h1>");
+            writer.WriteLine("    <ul>");
 
-            for (int i = 0; i < pageFiles.Length; i++)
+            int pageNumber = 1;
+            foreach (string filePath in pageFiles)
             {
-                string fileName = Path.GetFileName(pageFiles[i]);
-                writer.WriteLine($"<li><a href=\"{fileName}\">Page {i + 1}</a></li>");
+                string fileName = Path.GetFileName(filePath);
+                writer.WriteLine($"        <li><a href=\"{fileName}\">Page {pageNumber}</a></li>");
+                pageNumber++;
             }
 
-            writer.WriteLine("</ul>");
-            writer.WriteLine("</body></html>");
+            writer.WriteLine("    </ul>");
+            writer.WriteLine("</body>");
+            writer.WriteLine("</html>");
         }
 
-        Console.WriteLine($"Conversion completed. Index file created at: {indexPath}");
-    }
-
-    // Helper method to create a minimal PDF so the example can run in an empty sandbox
-    private static void CreateSamplePdf(string path)
-    {
-        using (Document doc = new Document())
-        {
-            // Add a single blank page (you could add content if desired)
-            doc.Pages.Add();
-            doc.Save(path);
-        }
+        Console.WriteLine($"Conversion complete. HTML pages and index.html are located in '{outputDirectory}'.");
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
-using Aspose.Pdf.Devices;      // For device‑related classes (if needed)
+using Aspose.Pdf;
 
 class Program
 {
@@ -10,29 +9,27 @@ class Program
         // Input PDF file path
         const string inputPdfPath = "input.pdf";
 
-        // Output SVG file path (first page). Additional pages will be saved as
-        // input_2.svg, input_3.svg, etc. automatically.
+        // Output SVG file path (first page will be saved as this name,
+        // subsequent pages will be saved as input_2.svg, input_3.svg, etc.)
         const string outputSvgPath = "output.svg";
 
-        // Verify that the source file exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Initialize default SVG save options
+            // Create default SVG save options
             SvgSaveOptions svgOptions = new SvgSaveOptions();
 
-            // Save the PDF as SVG images using the default options.
-            // Because the target format is not PDF, we must pass the SaveOptions
-            // explicitly (see the "save-to-non-pdf-always-use-save-options" rule).
+            // Save the document as SVG. The Save method with a SaveOptions
+            // instance writes SVG files according to the options.
             pdfDocument.Save(outputSvgPath, svgOptions);
         }
 
-        Console.WriteLine($"PDF has been converted to SVG images at '{outputSvgPath}'.");
+        Console.WriteLine($"PDF has been converted to SVG: {outputSvgPath}");
     }
 }

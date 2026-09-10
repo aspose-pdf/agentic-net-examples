@@ -3,12 +3,13 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class Program
+class RotateFormFieldLabel
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
         const string outputPath = "rotated_label.pdf";
+        const string fieldName = "MyLabel"; // name of the form field to rotate
 
         if (!File.Exists(inputPath))
         {
@@ -16,31 +17,28 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (wrapped in using for proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (1‑based indexing)
-            Page page = doc.Pages[1];
+            // Retrieve the form field – the Form indexer returns a WidgetAnnotation,
+            // so we must cast it to Aspose.Pdf.Forms.Field before accessing field members.
+            Field? field = doc.Form[fieldName] as Field;
+            if (field == null)
+            {
+                Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a standard field.");
+                return;
+            }
 
-            // Define the rectangle for the form field label
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
-            // Rotate the rectangle by 45 degrees
-            rect.Rotate(45);
-
-            // Create a text box field (used as a label) with the rotated rectangle
-            TextBoxField labelField = new TextBoxField(page, rect);
-            labelField.PartialName = "LabelField";
-            labelField.Value = "Rotated Label";
-            // Make the field read‑only so it behaves like a static label
-            labelField.ReadOnly = true;
-
-            // Add the field to the document's form collection
-            doc.Form.Add(labelField);
+            // Rotate the field's rectangle by 45 degrees. The rotation affects the visual
+            // representation of the field, including its label.
+            Aspose.Pdf.Rectangle rect = field.Rect;
+            rect.Rotate(45); // 45‑degree rotation
+            field.Rect = rect; // apply the rotated rectangle back to the field
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved rotated label PDF to '{outputPath}'.");
+        Console.WriteLine($"Form field '{fieldName}' rotated and saved to '{outputPath}'.");
     }
 }

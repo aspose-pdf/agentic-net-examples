@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_custom_font.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,21 +16,19 @@ class Program
             return;
         }
 
-        // Load the PDF document (ensures proper disposal)
-        using (Document doc = new Document(inputPath))
+        // FormEditor handles loading and saving of the PDF.
+        using (FormEditor editor = new FormEditor(inputPath, outputPath))
         {
-            // FormEditor works with file paths; it will apply changes to the output file.
-            using (FormEditor editor = new FormEditor(inputPath, outputPath))
-            {
-                // Use FormFieldFacade to specify a non‑standard font.
-                editor.Facade = new FormFieldFacade();
-                editor.Facade.CustomFont = "Arial Bold";
+            // Use FormFieldFacade to modify visual attributes of form fields.
+            editor.Facade = new FormFieldFacade();
 
-                // Apply the facade settings to all text fields in the document.
-                editor.DecorateField(FieldType.Text);
-            }
+            // Set the custom font name (must be installed on the system or embedded later).
+            editor.Facade.CustomFont = "Arial Bold";
+
+            // Apply the font to all text fields in the document.
+            editor.DecorateField(FieldType.Text);
         }
 
-        Console.WriteLine($"PDF saved with custom font to '{outputPath}'.");
+        Console.WriteLine($"All text fields have been updated with 'Arial Bold' and saved to '{outputPath}'.");
     }
 }

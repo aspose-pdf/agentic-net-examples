@@ -1,27 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// load pdf document from file
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/facades-documents
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF using the Document class (PdfFileEditor does not support BindPdf or expose a Document).
-        Document pdfDoc = new Document(inputPath);
-
-        // Example usage: read information from the loaded document.
-        int pageCount = pdfDoc.Pages.Count;
-        Console.WriteLine($"Loaded PDF has {pageCount} pages.");
-
-        // If you need to save (potentially modified) PDF, you can call:
-        // pdfDoc.Save("output.pdf");
-    }
-}
+class Program { static void Main() { } }

@@ -1,29 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// read pdf version using aspose pdf facade
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/facades-metadata
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "sample.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Initialize the PdfFileInfo facade with the PDF file
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
-        {
-            // Get the PDF version string
-            string pdfVersion = pdfInfo.GetPdfVersion();
-
-            // Example usage: display the version
-            Console.WriteLine($"PDF version: {pdfVersion}");
-
-            // The variable pdfVersion can be used later in the program as needed
-        }
-    }
-}
+class Program { static void Main() { } }

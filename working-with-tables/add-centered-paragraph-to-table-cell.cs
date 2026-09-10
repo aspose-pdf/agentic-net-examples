@@ -2,43 +2,38 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Input/Output paths
         const string outputPath = "table_with_centered_paragraph.pdf";
 
         // Create a new PDF document
-        using (Document doc = new Document())
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
         {
             // Add a page to the document
-            Page page = doc.Pages.Add();
+            Aspose.Pdf.Page page = doc.Pages.Add();
 
-            // Create a table and set its position on the page
-            Table table = new Table
+            // Create a table and set its column widths
+            Aspose.Pdf.Table table = new Aspose.Pdf.Table
             {
-                // Position the table (left, top)
+                // Position the table on the page
                 Left = 50,
                 Top = 700,
-                // Define column widths (two equal columns)
+                // Define two equal-width columns
                 ColumnWidths = "200 200"
             };
 
             // Add a row to the table
-            var row = table.Rows.Add();
+            Aspose.Pdf.Row row = table.Rows.Add();
 
             // Add a cell to the row
-            var cell = row.Cells.Add();
+            Aspose.Pdf.Cell cell = row.Cells.Add();
 
-            // Create a text fragment that will be placed inside the cell
-            TextFragment paragraph = new TextFragment("Centered paragraph inside cell")
-            {
-                // Center the text horizontally within the cell
-                HorizontalAlignment = HorizontalAlignment.Center
-            };
+            // Create a text fragment (paragraph) with centered alignment
+            Aspose.Pdf.Text.TextFragment paragraph = new Aspose.Pdf.Text.TextFragment("Centered text");
+            paragraph.HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center;
 
             // Add the paragraph to the cell's paragraph collection
             cell.Paragraphs.Add(paragraph);

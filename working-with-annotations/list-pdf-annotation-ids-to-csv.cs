@@ -7,47 +7,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "annotations.csv";
+        const string inputPdf = "input.pdf";
+        const string outputCsv = "annotations.csv";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF document (lifecycle: using for deterministic disposal)
+        using (Document doc = new Document(inputPdf))
+        // Create a CSV writer (standard .NET I/O)
+        using (StreamWriter writer = new StreamWriter(outputCsv, false))
         {
-            // Prepare the CSV file (overwrite if it exists)
-            using (StreamWriter writer = new StreamWriter(outputCsvPath, false, System.Text.Encoding.UTF8))
+            // CSV header
+            writer.WriteLine("PageNumber,AnnotationIndex,AnnotationName,FullName");
+
+            // Pages are 1‑based (Aspose.Pdf rule)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                // Write CSV header
-                writer.WriteLine("PageNumber,AnnotationName");
+                Page page = doc.Pages[pageNum];
 
-                // Iterate pages (Aspose.Pdf uses 1‑based indexing)
-                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                // Annotation collection is also 1‑based
+                for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
                 {
-                    Page page = doc.Pages[pageIndex];
-                    AnnotationCollection annotations = page.Annotations;
+                    Annotation ann = page.Annotations[annIdx];
 
-                    // Iterate all annotations on the current page
-                    foreach (Annotation annotation in annotations)
-                    {
-                        // Use the Name property as the annotation identifier.
-                        // If Name is null or empty, fall back to FullName.
-                        string id = !string.IsNullOrEmpty(annotation.Name) ? annotation.Name : annotation.FullName ?? string.Empty;
+                    // Prefer the Name property; fall back to FullName if Name is null/empty
+                    string name = ann.Name ?? string.Empty;
+                    string fullName = ann.FullName ?? string.Empty;
 
-                        // Escape commas in the identifier if necessary
-                        if (id.Contains(","))
-                            id = $"\"{id}\"";
+                    // Simple CSV escaping for commas
+                    name = name.Replace(",", ";");
+                    fullName = fullName.Replace(",", ";");
 
-                        writer.WriteLine($"{pageIndex},{id}");
-                    }
+                    writer.WriteLine($"{pageNum},{annIdx},\"{name}\",\"{fullName}\"");
                 }
             }
         }
 
-        Console.WriteLine($"Annotation list saved to '{outputCsvPath}'.");
+        Console.WriteLine($"Annotation list saved to '{outputCsv}'.");
     }
 }

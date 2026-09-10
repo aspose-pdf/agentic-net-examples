@@ -1,49 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;                     // PdfExtractor
-using System.Drawing.Imaging;                // ImageFormat (BMP)
+// URL-STABILITY STUB
+//
+// extract pdf images as bmp
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-extract-images-and-text/extract-images-to-bmp.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "ExtractedImages";
-
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
-            return;
-        }
-
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Use PdfExtractor to pull out embedded images
-        using (PdfExtractor extractor = new PdfExtractor())
-        {
-            // Bind the source PDF
-            extractor.BindPdf(inputPdfPath);
-
-            // Preserve the original image resolution and color depth.
-            // Setting Resolution to 0 tells the extractor not to resample the image.
-            extractor.Resolution = 0;
-
-            // Extract images from the document
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-            while (extractor.HasNextImage())
-            {
-                string outputPath = Path.Combine(outputFolder, $"image_{imageIndex}.bmp");
-
-                // Save the next image as BMP, keeping its native properties.
-                extractor.GetNextImage(outputPath, ImageFormat.Bmp);
-
-                imageIndex++;
-            }
-        }
-
-        Console.WriteLine("All images have been extracted as BMP files.");
-    }
-}
+class Program { static void Main() { } }

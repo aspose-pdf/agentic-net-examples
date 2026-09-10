@@ -1,59 +1,60 @@
 using System;
 using System.IO;
-using System.Text.Json;
 using Aspose.Pdf.Facades;
 
-namespace FormJsonImportExample
+class Program
 {
-    // Sample data class to be serialized to JSON
-    public class Person
+    static void Main()
     {
-        public string Name { get; set; }
-        public int Age { get; set; }
-    }
+        // Paths for source PDF, JSON data to import and the resulting PDF
+        const string srcPdfPath = "input.pdf";
+        const string jsonDataPath = "data.json";
+        const string outPdfPath = "output.pdf";
 
-    class Program
-    {
-        static void Main()
+        // Verify that source files exist
+        if (!File.Exists(srcPdfPath))
         {
-            // Paths to the source PDF form and the output PDF after import
-            const string sourcePdfPath = "inputForm.pdf";
-            const string outputPdfPath = "outputForm.pdf";
+            Console.Error.WriteLine($"Source PDF not found: {srcPdfPath}");
+            return;
+        }
+        if (!File.Exists(jsonDataPath))
+        {
+            Console.Error.WriteLine($"JSON data file not found: {jsonDataPath}");
+            return;
+        }
 
-            // Ensure the source PDF form exists
-            if (!File.Exists(sourcePdfPath))
+        // Use the Form facade with the constructor that only takes the source PDF.
+        // The Form class implements IDisposable, so we wrap it in a using block.
+        using (Form form = new Form(srcPdfPath))
+        {
+            try
             {
-                Console.Error.WriteLine($"Source PDF form not found: {sourcePdfPath}");
-                return;
-            }
-
-            // Create an instance of the data to be imported
-            var personData = new Person
-            {
-                Name = "John Doe",
-                Age = 42
-            };
-
-            // Serialize the object to JSON and write it into a memory stream
-            using (var jsonStream = new MemoryStream())
-            {
-                // Serialize directly into the stream
-                JsonSerializer.Serialize(jsonStream, personData);
-                // Reset stream position for reading
-                jsonStream.Position = 0;
-
-                // Initialize the Form facade with source and destination files
-                using (var form = new Form(sourcePdfPath, outputPdfPath))
+                // Import field values from a JSON stream.
+                using (FileStream jsonStream = File.OpenRead(jsonDataPath))
                 {
-                    // Import the JSON data into the PDF form fields
                     form.ImportJson(jsonStream);
-
-                    // Save the modified PDF to the output path
-                    form.Save();
                 }
             }
+            // FormException no longer exists; catch generic Exception and extract the missing field name via reflection.
+            catch (Exception ex)
+            {
+                var fieldProp = ex.GetType().GetProperty("FieldName");
+                if (fieldProp != null)
+                {
+                    var missingField = fieldProp.GetValue(ex) as string;
+                    Console.Error.WriteLine($"Missing form field: {missingField}");
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Error during import: {ex.Message}");
+                }
+                return; // stop processing on error
+            }
 
-            Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
+            // Save the updated PDF using the overload that accepts the destination path.
+            form.Save(outPdfPath);
         }
+
+        Console.WriteLine($"Form fields imported successfully. Output saved to '{outPdfPath}'.");
     }
 }

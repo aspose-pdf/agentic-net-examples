@@ -6,35 +6,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
         const string bookmarkTitle = "Draft Outline";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Initialize the bookmark editor facade
+        // Initialize the bookmark editor and bind the PDF file
         PdfBookmarkEditor editor = new PdfBookmarkEditor();
-        try
-        {
-            // Bind the PDF document to the editor
-            editor.BindPdf(inputPath);
+        editor.BindPdf(inputPath);
 
-            // Delete the bookmark with the specified title
-            editor.DeleteBookmarks(bookmarkTitle);
+        // Delete the bookmark with the specified title
+        editor.DeleteBookmarks(bookmarkTitle);
 
-            // Save the modified PDF to a new file
-            editor.Save(outputPath);
-        }
-        finally
-        {
-            // Release resources held by the editor
-            editor.Close();
-        }
+        // Save the modified PDF
+        editor.Save(outputPath);
 
-        Console.WriteLine($"Bookmark '{bookmarkTitle}' removed. Saved to '{outputPath}'.");
+        // Release resources held by the editor
+        editor.Close();
+
+        Console.WriteLine($"Bookmark \"{bookmarkTitle}\" removed. Saved to '{outputPath}'.");
     }
 }

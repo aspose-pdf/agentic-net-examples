@@ -1,38 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// extract text ignoring images
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-extract-images-and-text/extract-text-only-ignore-images.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf = "sample.pdf";
-        const string outputTxt = "extracted.txt";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-
-        // Create the PdfExtractor facade
-        PdfExtractor extractor = new PdfExtractor();
-
-        // Bind the PDF document to the extractor
-        extractor.BindPdf(inputPdf);
-
-        // Do NOT call ExtractImage() – this ensures images are ignored.
-        // The extractor will only process text extraction.
-
-        // Extract text from the PDF
-        extractor.ExtractText();
-
-        // Save the extracted text to a file
-        extractor.GetText(outputTxt);
-
-        // Release resources
-        extractor.Close();
-
-        Console.WriteLine($"Text extraction completed. Output saved to '{outputTxt}'. Images were ignored.");
-    }
-}
+class Program { static void Main() { } }

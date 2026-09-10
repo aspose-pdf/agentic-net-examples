@@ -1,66 +1,74 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-namespace PdfConcatService
+namespace PdfConcatenationService
 {
     class Program
     {
-        /// <summary>
-        /// Concatenates multiple PDF files into a single PDF.
-        /// Usage: PdfConcatService <output.pdf> <input1.pdf> [<input2.pdf> ...]
-        /// </summary>
         static void Main(string[] args)
         {
-            // Validate arguments – at least one output path and one input PDF are required.
-            if (args.Length < 2)
+            // Simple validation – at least one input PDF is required.
+            if (args.Length == 0)
             {
-                Console.WriteLine("Usage: PdfConcatService <output.pdf> <input1.pdf> [<input2.pdf> ...]");
+                Console.WriteLine("Usage: PdfConcatenationService <pdf1> <pdf2> ... [output]");
                 return;
             }
 
-            string outputPath = args[0];
-            var inputPaths = new List<string>(args).GetRange(1, args.Length - 1);
+            // Determine the output file name.
+            // If the last argument ends with .pdf and there is more than one argument, treat it as the output path.
+            // Otherwise default to "merged.pdf".
+            string outputPath;
+            int inputCount;
+            if (args.Length > 1 && args[^1].EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+            {
+                outputPath = args[^1];
+                inputCount = args.Length - 1;
+            }
+            else
+            {
+                outputPath = "merged.pdf";
+                inputCount = args.Length;
+            }
 
-            // Prepare a list to hold the opened file streams for each input PDF.
-            var inputStreams = new List<Stream>();
+            // Prepare an array of input streams.
+            Stream[] inputStreams = new Stream[inputCount];
             try
             {
-                foreach (var path in inputPaths)
+                for (int i = 0; i < inputCount; i++)
                 {
+                    string path = args[i];
                     if (!File.Exists(path))
                     {
                         Console.WriteLine($"File not found: {path}");
                         return;
                     }
-                    // Open each PDF as a read‑only FileStream.
-                    var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
-                    inputStreams.Add(fs);
+                    // Open each PDF as a read‑only stream.
+                    inputStreams[i] = File.OpenRead(path);
                 }
 
                 // Concatenate the PDFs using Aspose.Pdf.Facades.PdfFileEditor.
-                using (var outputStream = new MemoryStream())
+                using (MemoryStream outputStream = new MemoryStream())
                 {
                     var editor = new PdfFileEditor
                     {
-                        // Instruct the editor to close the input streams after concatenation.
+                        // Close the input streams automatically after concatenation.
                         CloseConcatenatedStreams = true
                     };
 
-                    editor.Concatenate(inputStreams.ToArray(), outputStream);
+                    editor.Concatenate(inputStreams, outputStream);
 
-                    // Write the resulting PDF to the requested output file.
+                    // Write the merged PDF to the desired output file.
                     File.WriteAllBytes(outputPath, outputStream.ToArray());
-                    Console.WriteLine($"Concatenated PDF saved to {outputPath}");
+                    Console.WriteLine($"Merged PDF saved to {outputPath}");
                 }
             }
             finally
             {
-                // Ensure every opened stream is disposed, even if an exception occurs.
+                // Ensure all input streams are disposed in case of an exception or if CloseConcatenatedStreams is false.
                 foreach (var s in inputStreams)
                 {
-                    s.Dispose();
+                    s?.Dispose();
                 }
             }
         }

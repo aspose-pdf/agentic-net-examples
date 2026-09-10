@@ -1,25 +1,21 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input XFDF file containing the reviewer comments
-        const string xfdfPath = "reviewer_comments.xfdf";
+        // Path to the XFDF file containing reviewer comments
+        const string xfdfPath = "comments.xfdf";
 
         // List of PDF files to which the comments will be applied
-        string[] pdfFiles = {
-            "Document1.pdf",
-            "Document2.pdf",
-            "Document3.pdf"
-        };
+        string[] pdfFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
 
-        // Directory where the annotated PDFs will be saved
-        const string outputDir = "AnnotatedOutputs";
+        // Directory where annotated PDFs will be saved
+        const string outputDir = "Output";
 
-        // Validate inputs
         if (!File.Exists(xfdfPath))
         {
             Console.Error.WriteLine($"XFDF file not found: {xfdfPath}");
@@ -36,25 +32,34 @@ class Program
                 continue;
             }
 
-            // Build output file name (original name with "_annotated" suffix)
-            string outputPath = Path.Combine(
-                outputDir,
+            string outputPath = Path.Combine(outputDir,
                 Path.GetFileNameWithoutExtension(pdfPath) + "_annotated.pdf");
 
-            // Use PdfAnnotationEditor to bind the PDF, import XFDF annotations, and save
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            try
             {
-                // Load the target PDF
-                editor.BindPdf(pdfPath);
+                // Load the PDF document
+                using (Document doc = new Document(pdfPath))
+                {
+                    // Initialize the annotation editor facade
+                    using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                    {
+                        // Bind the PDF document to the editor
+                        editor.BindPdf(doc);
 
-                // Import all annotations from the XFDF file
-                editor.ImportAnnotationsFromXfdf(xfdfPath);
+                        // Import all annotations from the XFDF file
+                        editor.ImportAnnotationsFromXfdf(xfdfPath);
 
-                // Save the modified PDF
-                editor.Save(outputPath);
+                        // Save the annotated PDF
+                        editor.Save(outputPath);
+                    }
+                }
+
+                Console.WriteLine($"Annotated PDF saved: {outputPath}");
             }
-
-            Console.WriteLine($"Annotated PDF saved: {outputPath}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+            }
         }
     }
 }

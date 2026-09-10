@@ -1,53 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using System.Xml;
+// URL-STABILITY STUB
+//
+// export pdf barcode fields to xml
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/working-with-forms/export-barcode-fields-to-xml.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-        const string outputPath = "barcode_values.xml";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Prepare an XML document to hold barcode field data
-            XmlDocument xmlDoc = new XmlDocument();
-            XmlElement root = xmlDoc.CreateElement("BarcodeFields");
-            xmlDoc.AppendChild(root);
-
-            // Iterate over all form fields in the PDF
-            foreach (Field field in doc.Form.Fields)
-            {
-                // Process only barcode fields
-                if (field is BarcodeField barcodeField)
-                {
-                    // Retrieve field identifier and its value
-                    string fieldName = barcodeField.FullName ?? barcodeField.Name ?? "Unnamed";
-                    string fieldValue = barcodeField.Value?.ToString() ?? string.Empty;
-
-                    // Create an XML element for this barcode field
-                    XmlElement fieldElement = xmlDoc.CreateElement("BarcodeField");
-                    fieldElement.SetAttribute("Name", fieldName);
-                    fieldElement.InnerText = fieldValue;
-
-                    root.AppendChild(fieldElement);
-                }
-            }
-
-            // Save the XML file
-            xmlDoc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Barcode field values exported to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

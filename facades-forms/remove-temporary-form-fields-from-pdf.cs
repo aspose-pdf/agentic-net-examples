@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_clean.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,29 +17,40 @@ class Program
             return;
         }
 
-        // Load the PDF document (Aspose.Pdf.Document, not the Facades Form)
-        Document pdfDocument = new Document(inputPath);
-
-        // Collect names of fields that start with "Temp_"
+        // First, collect the names of all fields that start with "Temp_"
         List<string> fieldsToRemove = new List<string>();
-        foreach (Field field in pdfDocument.Form.Fields)
+        using (Form formFacade = new Form(inputPath))
         {
-            // In Aspose.Pdf the field name is accessed via PartialName
-            if (field.PartialName.StartsWith("Temp_", StringComparison.Ordinal))
+            foreach (string fieldName in formFacade.FieldNames)
             {
-                fieldsToRemove.Add(field.PartialName);
+                if (fieldName.StartsWith("Temp_", StringComparison.Ordinal))
+                {
+                    fieldsToRemove.Add(fieldName);
+                }
             }
         }
 
-        // Delete the collected fields
-        foreach (string fieldName in fieldsToRemove)
+        // If there are no matching fields, just copy the file
+        if (fieldsToRemove.Count == 0)
         {
-            pdfDocument.Form.Delete(fieldName);
+            File.Copy(inputPath, outputPath, true);
+            Console.WriteLine("No temporary fields found. File copied unchanged.");
+            return;
         }
 
-        // Save the cleaned PDF
-        pdfDocument.Save(outputPath);
+        // Load the document and remove the collected fields using FormEditor
+        using (Document doc = new Document(inputPath))
+        using (FormEditor editor = new FormEditor(doc))
+        {
+            foreach (string fieldName in fieldsToRemove)
+            {
+                editor.RemoveField(fieldName);
+            }
 
-        Console.WriteLine($"Temporary fields removed. Saved to '{outputPath}'.");
+            // Save the cleaned PDF
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Temporary fields removed. Clean PDF saved to '{outputPath}'.");
     }
 }

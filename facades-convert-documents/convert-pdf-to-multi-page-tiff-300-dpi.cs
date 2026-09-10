@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // required for Resolution
+using Aspose.Pdf.Devices;
 
 class Program
 {
@@ -17,25 +16,29 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Initialize the PdfConverter facade
-            PdfConverter converter = new PdfConverter();
+            // PdfConverter handles the conversion; it implements IDisposable.
+            using (PdfConverter converter = new PdfConverter())
+            {
+                // Bind the source PDF file.
+                converter.BindPdf(inputPdf);
 
-            // Bind the loaded document to the converter
-            converter.BindPdf(doc);
+                // Set resolution to 300 DPI (default coordinate type is CropBox, no change needed).
+                converter.Resolution = new Resolution(300);
 
-            // Set the desired resolution (300 DPI) using a Resolution object
-            converter.Resolution = new Resolution(300);
+                // Prepare the converter.
+                converter.DoConvert();
 
-            // Perform any necessary initialization before conversion
-            converter.DoConvert();
+                // Convert all pages to a single multi‑page TIFF file.
+                converter.SaveAsTIFF(outputTiff);
+            }
 
-            // Save all pages as a single multi‑page TIFF file
-            converter.SaveAsTIFF(outputTiff);
+            Console.WriteLine($"PDF successfully converted to TIFF: {outputTiff}");
         }
-
-        Console.WriteLine($"PDF has been converted to TIFF: {outputTiff}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+        }
     }
 }

@@ -22,27 +22,21 @@ class Program
             return;
         }
 
-        try
+        // Open the PDF form using Aspose.Pdf.Facades.Form
+        // The Form class implements IDisposable, so we wrap it in a using block
+        using (Form form = new Form(pdfPath))
         {
-            // Initialize the Form facade with the PDF file
-            using (Form form = new Form(pdfPath))
+            // Retrieve all field names from the form
+            string[] fieldNames = form.FieldNames;
+
+            // Serialize the field names array to JSON (indented for readability)
+            string json = JsonSerializer.Serialize(fieldNames, new JsonSerializerOptions
             {
-                // Retrieve all field names
-                string[] fieldNames = form.FieldNames;
+                WriteIndented = true
+            });
 
-                // Serialize the array to JSON (indented for readability)
-                string json = JsonSerializer.Serialize(fieldNames, new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
-
-                // Output JSON to console
-                Console.WriteLine(json);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+            // Output the JSON to standard output
+            Console.WriteLine(json);
         }
     }
 }

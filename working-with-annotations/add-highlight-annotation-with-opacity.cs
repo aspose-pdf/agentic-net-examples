@@ -16,13 +16,13 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Select the page to annotate (first page in this example)
-            Page page = doc.Pages[1]; // 1‑based indexing
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
 
-            // Define the rectangle area to be highlighted
+            // Define the rectangle area to be highlighted (coordinates are in points)
             // Fully qualify to avoid ambiguity with System.Drawing.Rectangle
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
 
@@ -34,7 +34,7 @@ class Program
                 // Set custom opacity (0.0 = fully transparent, 1.0 = fully opaque)
                 Opacity = 0.5,
                 // Optional: add a comment that appears in the annotation popup
-                Contents = "Important text highlighted"
+                Contents = "Important text"
             };
 
             // Add the annotation to the page's annotation collection

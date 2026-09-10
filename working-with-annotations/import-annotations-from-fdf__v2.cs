@@ -1,43 +1,44 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // FdfReader resides here
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";   // PDF to receive annotations
-        const string fdfPath   = "annotations.fdf"; // FDF containing annotations
-        const string outputPdf = "output.pdf";   // Resulting PDF
+        // Paths to the source PDF and the FDF file containing annotations
+        const string pdfPath = "input.pdf";
+        const string fdfPath = "annotations.fdf";
+        const string outputPath = "output_with_annotations.pdf";
 
+        // Verify that the input files exist
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
-
         if (!File.Exists(fdfPath))
         {
-            Console.Error.WriteLine($"FDF not found: {fdfPath}");
+            Console.Error.WriteLine($"FDF file not found: {fdfPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(pdfPath))
         {
-            // Open the FDF stream and import annotations
+            // Open the FDF stream (read‑only) and import its annotations into the document
             using (FileStream fdfStream = File.OpenRead(fdfPath))
             {
-                // This method reads the annotation definitions (including page numbers)
-                // and adds them to the appropriate pages in the document.
+                // The FdfReader reads page numbers from the FDF and places each annotation
+                // on the corresponding page of the PDF automatically.
                 FdfReader.ReadAnnotations(fdfStream, doc);
             }
 
-            // Save the updated PDF with imported annotations
-            doc.Save(outputPdf);
+            // Save the updated PDF with the imported annotations
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotations imported and saved to '{outputPdf}'.");
+        Console.WriteLine($"Annotations imported and saved to '{outputPath}'.");
     }
 }

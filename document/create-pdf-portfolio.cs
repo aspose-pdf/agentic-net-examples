@@ -6,12 +6,12 @@ class Program
 {
     static void Main()
     {
-        // Paths to the PDFs that will be bundled into the portfolio
-        string[] pdfFiles = { "report1.pdf", "report2.pdf", "appendix.pdf" };
-        const string portfolioPath = "portfolio.pdf";
+        // Input PDF files to be bundled into the portfolio
+        string[] pdfFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
+        const string outputPath = "portfolio.pdf";
 
-        // Verify that all source files exist before creating the portfolio
-        foreach (string file in pdfFiles)
+        // Verify that all source files exist
+        foreach (var file in pdfFiles)
         {
             if (!File.Exists(file))
             {
@@ -21,27 +21,24 @@ class Program
         }
 
         // Create an empty PDF document that will act as the portfolio container
-        using (Document portfolioDoc = new Document())
+        Document portfolioDoc = new Document();
+        // A portfolio must contain at least one page; add a blank page
+        portfolioDoc.Pages.Add();
+
+        // Add each source PDF as an embedded file (portfolio entry)
+        foreach (var file in pdfFiles)
         {
-            // Ensure a collection exists for embedded files (portfolio)
-            if (portfolioDoc.Collection == null)
-                portfolioDoc.Collection = new Collection();
-
-            // Add each PDF file to the portfolio using FileSpecification
-            foreach (string file in pdfFiles)
-            {
-                var fileSpec = new FileSpecification(file, Path.GetFileName(file));
-                fileSpec.Contents = new MemoryStream(File.ReadAllBytes(file));
-                portfolioDoc.Collection.Add(fileSpec);
-            }
-
-            // Optional: set document metadata (title/description)
-            portfolioDoc.Info.Title = "PDF Portfolio";
-
-            // Save the resulting PDF portfolio
-            portfolioDoc.Save(portfolioPath);
+            // Create a file specification for the embedded file using the overload that accepts a file path
+            var fileSpec = new FileSpecification(file, Path.GetFileName(file));
+            // Populate the file contents via a stream (required for embedding)
+            fileSpec.Contents = new MemoryStream(File.ReadAllBytes(file));
+            // Add the specification to the document's EmbeddedFiles collection
+            portfolioDoc.EmbeddedFiles.Add(fileSpec);
         }
 
-        Console.WriteLine($"PDF portfolio created at '{portfolioPath}'.");
+        // Save the resulting PDF portfolio
+        portfolioDoc.Save(outputPath);
+
+        Console.WriteLine($"PDF portfolio created at '{outputPath}'.");
     }
 }

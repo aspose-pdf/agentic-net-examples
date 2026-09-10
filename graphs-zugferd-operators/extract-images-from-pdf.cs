@@ -1,91 +1,84 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                       // Core PDF classes
-using Aspose.Pdf.Vector;                // ImagePlacementAbsorber and ImagePlacement
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "ExtractedImages";
+        const string inputPath = "input.pdf";
+        const string outputDir = "ExtractedImages";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document (lifecycle rule: use using)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Open the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            int imageCounter = 1;
+
+            // Iterate over all pages
+            foreach (Page page in doc.Pages)
             {
-                Page page = pdfDoc.Pages[pageNum];
-
-                // Absorb image placements on the current page
-                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-                page.Accept(absorber);
-
-                int imageIndex = 1;
-                foreach (ImagePlacement imgPlacement in absorber.ImagePlacements)
+                // Iterate over all image resources on the page
+                foreach (XImage img in page.Resources.Images)
                 {
                     // Save the image to a memory stream first
-                    using (MemoryStream ms = new MemoryStream())
+                    using (var ms = new MemoryStream())
                     {
-                        imgPlacement.Image.Save(ms); // XImage.Save(Stream) keeps original format
+                        img.Save(ms); // XImage.Save accepts a Stream, not a file path
                         ms.Position = 0;
 
-                        // Determine file extension by inspecting the header bytes
+                        // Determine the original format by inspecting the header bytes
                         byte[] header = new byte[8];
                         ms.Read(header, 0, header.Length);
-                        string extension = GetExtensionFromHeader(header);
+                        string ext = DetectImageExtension(header);
 
-                        // Build a file name that reflects page and image order
-                        string fileName = $"page{pageNum}_img{imageIndex}{extension}";
-                        string outPath = Path.Combine(outputFolder, fileName);
+                        // Build the output file path with the detected extension
+                        string outPath = Path.Combine(outputDir, $"image_{imageCounter}{ext}");
 
-                        // Write the image bytes to disk
-                        File.WriteAllBytes(outPath, ms.ToArray());
+                        // Write the stream to the file system
+                        ms.Position = 0;
+                        using (var fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                        {
+                            ms.CopyTo(fs);
+                        }
 
-                        Console.WriteLine($"Saved: {outPath}");
+                        Console.WriteLine($"Saved image {imageCounter} to {outPath}");
+                        imageCounter++;
                     }
-                    imageIndex++;
                 }
             }
         }
     }
 
-    // Helper: infer image file extension from the first bytes of the file
-    static string GetExtensionFromHeader(byte[] header)
+    // Helper method to infer image file extension from the first bytes of the file.
+    static string DetectImageExtension(byte[] header)
     {
-        if (header.Length < 4)
-            return ".bin"; // unknown
+        if (header.Length >= 3 && header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
+            return ".jpg"; // JPEG
+        if (header.Length >= 8 && header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
+            return ".png"; // PNG
+        if (header.Length >= 4 && header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
+            return ".gif"; // GIF
+        if (header.Length >= 2 && header[0] == 0x42 && header[1] == 0x4D)
+            return ".bmp"; // BMP
+        if (header.Length >= 4 && (
+                (header[0] == 0x49 && header[1] == 0x49 && header[2] == 0x2A && header[3] == 0x00) ||
+                (header[0] == 0x4D && header[1] == 0x4D && header[2] == 0x00 && header[3] == 0x2A)))
+            return ".tiff"; // TIFF
+        // Simple heuristic for SVG – it starts with "<svg"
+        string headerStr = System.Text.Encoding.ASCII.GetString(header);
+        if (headerStr.TrimStart().StartsWith("<svg", StringComparison.OrdinalIgnoreCase))
+            return ".svg";
 
-        // JPEG: FF D8 FF
-        if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
-            return ".jpg";
-        // PNG: 89 50 4E 47 0D 0A 1A 0A
-        if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
-            return ".png";
-        // GIF: 47 49 46 38
-        if (header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
-            return ".gif";
-        // BMP: 42 4D
-        if (header[0] == 0x42 && header[1] == 0x4D)
-            return ".bmp";
-        // TIFF (little endian): 49 49 2A 00
-        if (header[0] == 0x49 && header[1] == 0x49 && header[2] == 0x2A && header[3] == 0x00)
-            return ".tiff";
-        // TIFF (big endian): 4D 4D 00 2A
-        if (header[0] == 0x4D && header[1] == 0x4D && header[2] == 0x00 && header[3] == 0x2A)
-            return ".tiff";
-
-        // Fallback to PNG if format cannot be determined
+        // Default fallback
         return ".png";
     }
 }

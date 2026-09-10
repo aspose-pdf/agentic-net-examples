@@ -1,33 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// convert pdf to html png page background__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/conversion/convert-pdf-to-html-png-background__v2.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf = "input.pdf";
-        const string outputHtml = "output.html";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
-
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdf))
-        {
-            // Configure HTML save options
-            HtmlSaveOptions htmlOptions = new HtmlSaveOptions();
-
-            // Render each page background as a single PNG image embedded in the HTML
-            htmlOptions.RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsEmbeddedPartsOfPngPageBackground;
-
-            // Save the PDF as HTML using the configured options
-            pdfDoc.Save(outputHtml, htmlOptions);
-        }
-
-        Console.WriteLine($"Conversion completed: {outputHtml}");
-    }
-}
+class Program { static void Main() { } }

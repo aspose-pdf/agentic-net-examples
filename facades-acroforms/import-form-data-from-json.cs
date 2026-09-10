@@ -6,52 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string jsonPath      = "data.json";
+        const string inputPdf  = "template.pdf";   // PDF with form fields
+        const string outputPdf = "filled.pdf";     // Resulting PDF after import
+        const string jsonPath  = "data.json";      // JSON containing field values
 
-        // Verify that the source PDF and JSON files exist.
-        if (!File.Exists(inputPdfPath))
+        // Verify that required files exist
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
         if (!File.Exists(jsonPath))
         {
-            Console.Error.WriteLine($"Error: JSON file not found – {jsonPath}");
+            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
             return;
         }
 
-        // Use the Form facade to work with AcroForm fields.
-        // The Form class implements IDisposable, so wrap it in a using block.
-        using (Form form = new Form())
+        // Create the Form facade, specifying input and output PDFs
+        using (Form form = new Form(inputPdf, outputPdf))
         {
-            // Bind the existing PDF document.
-            form.BindPdf(inputPdfPath);
-
-            // Import field values from the JSON stream.
+            // Open the JSON stream and import the data.
             // Missing fields in the PDF are ignored automatically.
             using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Open, FileAccess.Read))
             {
                 form.ImportJson(jsonStream);
             }
 
-            // Optional: inspect the import result for each field.
-            // This can be useful for logging which fields were updated or skipped.
-            var importResults = form.ImportResult;
-            if (importResults != null)
-            {
-                foreach (var result in importResults)
-                {
-                    // result is of type FormImportResult (contains FieldName and Status).
-                    Console.WriteLine($"{result.FieldName}: {result.Status}");
-                }
-            }
-
-            // Save the updated PDF to the specified output path.
-            form.Save(outputPdfPath);
+            // Persist the changes to the output PDF.
+            form.Save();
         }
 
-        Console.WriteLine($"Form data imported successfully. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Form data imported successfully. Output saved to '{outputPdf}'.");
     }
 }

@@ -10,10 +10,9 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
@@ -24,14 +23,13 @@ class Program
             PdfContentEditor editor = new PdfContentEditor();
             editor.BindPdf(doc);
 
-            // Replace every occurrence of the word "Draft" with "Final" on all pages
-            // (the overload without a page number operates on the whole document)
+            // Replace every occurrence of the word "Draft" with "Final" in the whole document
             editor.ReplaceText("Draft", "Final");
 
-            // Save the modified PDF to the desired output file
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All occurrences of 'Draft' have been replaced with 'Final'. Output saved to '{outputPath}'.");
+        Console.WriteLine($"All occurrences of \"Draft\" have been replaced with \"Final\" and saved to '{outputPath}'.");
     }
 }

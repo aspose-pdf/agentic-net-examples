@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "sanitized.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -21,8 +21,8 @@ class Program
             // Remove all annotations from every page
             foreach (Page page in doc.Pages)
             {
-                // The AnnotationCollection provides a Delete method that removes all annotations on the page
-                page.Annotations.Delete();
+                // The Annotations collection may be null for pages without annotations
+                page.Annotations?.Clear();
             }
 
             // Save the sanitized PDF

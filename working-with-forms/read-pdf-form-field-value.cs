@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";   // path to the PDF containing the form
-        const string fieldName = "MyField";     // name of the field whose value we want
+        const string pdfPath = "input.pdf";
+        const string fieldName = "myField";
 
         if (!File.Exists(pdfPath))
         {
@@ -16,31 +16,21 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
+        // Load the PDF document (wrapped in using for proper disposal)
         using (Document doc = new Document(pdfPath))
         {
-            // Ensure the document actually contains a form and the requested field exists
-            if (doc.Form != null && doc.Form.HasField(fieldName))
-            {
-                // Retrieve the field via the form indexer (returns a WidgetAnnotation)
-                var widget = doc.Form[fieldName];
+            // The Form indexer returns a WidgetAnnotation; cast it to Field.
+            Field? field = doc.Form[fieldName] as Field;
 
-                // Cast to the concrete Field type to access the Value property
-                if (widget is Field field)
-                {
-                    // The Value property holds the field's current content
-                    string value = field.Value?.ToString() ?? string.Empty;
-                    Console.WriteLine($"Field \"{fieldName}\" value: {value}");
-                }
-                else
-                {
-                    Console.WriteLine($"Field \"{fieldName}\" is not a standard form field.");
-                }
-            }
-            else
+            if (field == null)
             {
                 Console.WriteLine($"Field \"{fieldName}\" not found in the document.");
+                return;
             }
+
+            // Get the field's value and write it to the console.
+            string value = field.Value?.ToString() ?? string.Empty;
+            Console.WriteLine($"Field \"{fieldName}\" value: {value}");
         }
     }
 }

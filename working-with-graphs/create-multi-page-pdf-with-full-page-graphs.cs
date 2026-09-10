@@ -6,38 +6,43 @@ class Program
 {
     static void Main()
     {
-        // Output PDF path
-        const string outputPath = "MultiPageGraph.pdf";
+        const string outputPath = "multi_page_graph.pdf";
 
-        // Number of pages to create
-        int pageCount = 3;
-
-        // Create a new PDF document
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            for (int i = 0; i < pageCount; i++)
+            // Number of pages to generate
+            int pageCount = 3;
+
+            for (int i = 1; i <= pageCount; i++)
             {
-                // Add a new blank page (default size is A4)
+                // Add a new page (default size is A4)
                 Page page = doc.Pages.Add();
 
-                // Retrieve the page dimensions (width & height in points)
-                double pageWidth = page.Rect.Width;
-                double pageHeight = page.Rect.Height;
+                // Retrieve the page rectangle to calculate width and height
+                Aspose.Pdf.Rectangle pageRect = page.Rect;
+                double pageWidth  = pageRect.URX - pageRect.LLX;
+                double pageHeight = pageRect.URY - pageRect.LLY;
 
-                // Create a Graph sized exactly to the page dimensions
+                // Create a Graph that matches the page dimensions
                 Graph graph = new Graph(pageWidth, pageHeight);
 
-                // Set a visible border using the BorderInfo constructor (no settable Width/Color properties)
-                graph.Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black);
+                // Optional visual styling for the graph (fills the page with a light gray background)
+                graph.GraphInfo = new GraphInfo
+                {
+                    FillColor = Aspose.Pdf.Color.LightGray,
+                    Color     = Aspose.Pdf.Color.Black,
+                    LineWidth = 1
+                };
 
                 // Add the graph to the page's paragraph collection
                 page.Paragraphs.Add(graph);
             }
 
-            // Save the resulting PDF
+            // Save the document as a PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with {pageCount} pages saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

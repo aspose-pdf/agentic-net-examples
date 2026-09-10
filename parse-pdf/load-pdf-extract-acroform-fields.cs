@@ -8,34 +8,38 @@ class Program
 {
     static void Main()
     {
-        // Path to the PDF file containing an AcroForm
         const string pdfPath = "input.pdf";
 
+        // Verify the file exists before attempting to load it
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF into a Document instance.
+        // The using statement ensures the Document is disposed properly.
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Access the AcroForm of the document
-            Form acroForm = doc.Form;
+            // Access the AcroForm associated with the document.
+            var acroForm = pdfDoc.Form;
 
-            // If the document has no form or no fields, inform the user
-            if (acroForm == null || acroForm.Fields == null || !acroForm.Fields.Any())
+            // Form.Fields is a property (collection), not a method.
+            var fields = acroForm?.Fields;
+
+            if (fields != null && fields.Count() > 0)
             {
-                Console.WriteLine("No AcroForm fields found in the document.");
-                return;
+                Console.WriteLine($"AcroForm contains {fields.Count()} field(s).");
+
+                // Iterate over each form field and output its name and current value.
+                foreach (Field field in fields)
+                {
+                    Console.WriteLine($"Field: {field.FullName}, Value: {field.Value}");
+                }
             }
-
-            // Iterate over all form fields and output their names and values
-            foreach (Field field in acroForm.Fields)
+            else
             {
-                // Some field types expose a Value property; use ToString() for safety
-                string value = field?.Value?.ToString() ?? "(null)";
-                Console.WriteLine($"Field: {field.FullName}, Value: {value}");
+                Console.WriteLine("The document does not contain an AcroForm or has no fields.");
             }
         }
     }

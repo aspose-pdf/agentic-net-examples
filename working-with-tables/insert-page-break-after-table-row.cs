@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,33 +7,47 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document inside a using block for deterministic disposal
+        const string outputPath = "output.pdf";
+
+        // Ensure deterministic disposal of the Document
         using (Document doc = new Document())
         {
-            // Add the first page where the table will be placed
-            Page firstPage = doc.Pages.Add();
+            // Add a new page to the document
+            Page page = doc.Pages.Add();
 
-            // Create a table and add it to the page
-            Table table = new Table();
-            firstPage.Paragraphs.Add(table);
+            // Create a table with three equal-width columns
+            Table table = new Table
+            {
+                ColumnWidths = "100 100 100",
+                Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
+            };
+            page.Paragraphs.Add(table);
 
-            // ----- Row 1 (appears on the first page) -----
-            Row row1 = table.Rows.Add();               // Add a new row to the table
-            row1.Cells.Add("Row 1 – stays on the first page.");
+            // Populate the table with five rows
+            for (int i = 1; i <= 5; i++)
+            {
+                Row row = table.Rows.Add();
 
-            // ----- Row 2 (should start on a new page) -----
-            Row row2 = table.Rows.Add();               // Add the next row
-            row2.IsInNewPage = true;                   // Force this row onto a new page
-            row2.Cells.Add("Row 2 – begins on a new page.");
+                // Add three cells to each row with sample text
+                for (int j = 1; j <= 3; j++)
+                {
+                    Cell cell = row.Cells.Add();
+                    cell.Paragraphs.Add(new TextFragment($"R{i}C{j}"));
+                }
 
-            // ----- Row 3 (continues on the new page) -----
-            Row row3 = table.Rows.Add();
-            row3.Cells.Add("Row 3 – follows Row 2 on the same new page.");
+                // After the third row, insert a page break
+                if (i == 3)
+                {
+                    // Add a placeholder row that will start on a new page
+                    Row breakRow = table.Rows.Add();
+                    breakRow.IsInNewPage = true; // forces this row onto the next page
+                }
+            }
 
             // Save the resulting PDF
-            doc.Save("NewPageFragmentAfterRow.pdf");
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF created with a page break after the specified row.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

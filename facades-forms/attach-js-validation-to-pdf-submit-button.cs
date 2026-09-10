@@ -1,54 +1,54 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string submitButtonName = "btnSubmit"; // change to the actual button name
+        const string inputPdf  = "input.pdf";      // PDF containing a submit button
+        const string outputPdf = "output_with_js.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Open the PDF and edit its form using FormEditor (facade API)
-        using (FormEditor editor = new FormEditor())
-        {
-            // Bind the existing PDF file
-            editor.BindPdf(inputPath);
-
-            // JavaScript that checks all required fields before allowing submission
-            string validationJs = @"
-var f = this;
-for (var i = 0; i < f.numFields; i++) {
-    var field = f.getField(f.getFieldName(i));
-    if (field.required && (field.value == null || field.value == '')) {
-        app.alert('Please fill the required field: ' + field.name);
-        // Cancel the submit action
-        event.rc = false;
-        break;
+        // JavaScript that checks required fields before submitting the form
+        string validationScript = @"
+var required = ['FirstName', 'LastName', 'Email'];
+for (var i = 0; i < required.length; i++) {
+    var f = this.getField(required[i]);
+    if (f == null || f.value == '') {
+        app.alert('Please fill the required field: ' + required[i]);
+        return false; // cancel submission
     }
 }
-// If no required fields are empty, the submit proceeds automatically
+this.submitForm(); // all required fields are filled, submit the form
 ";
 
-            // Attach the script to the submit button
-            bool scriptAdded = editor.AddFieldScript(submitButtonName, validationJs);
-            if (!scriptAdded)
+        // Use FormEditor (a SaveableFacade) to attach the script to the submit button
+        using (FormEditor formEditor = new FormEditor())
+        {
+            // Load the existing PDF
+            formEditor.BindPdf(inputPdf);
+
+            // Name of the submit button field (adjust if different in your PDF)
+            const string submitButtonName = "btnSubmit";
+
+            // Add the JavaScript to the button; if a script already exists it will be appended
+            bool added = formEditor.AddFieldScript(submitButtonName, validationScript);
+            if (!added)
             {
-                Console.Error.WriteLine($"Failed to add JavaScript to button '{submitButtonName}'.");
+                Console.Error.WriteLine($"Failed to add script to button '{submitButtonName}'.");
+                return;
             }
 
             // Save the modified PDF
-            editor.Save(outputPath);
+            formEditor.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with validation script saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with validation script: {outputPdf}");
     }
 }

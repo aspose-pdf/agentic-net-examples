@@ -18,13 +18,14 @@ class Program
         // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Rotate each page 180 degrees using the correct enum value
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over all pages (1‑based collection) and set rotation to 180°
+            foreach (Page page in doc.Pages)
             {
-                doc.Pages[i].Rotate = Rotation.on180;
+                // Correct enum value uses the 'on' prefix
+                page.Rotate = Rotation.on180;
             }
 
-            // Save the rotated document
+            // Save the modified document
             doc.Save(outputPath);
         }
 

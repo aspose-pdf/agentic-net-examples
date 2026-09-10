@@ -15,13 +15,14 @@ class Program
             return;
         }
 
-        // Load the existing PDF
+        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Insert an empty page at the very beginning (position 1, 1‑based indexing)
+            // Insert an empty page at the very beginning.
+            // PageCollection uses 1‑based indexing, so position 1 inserts before the current first page.
             doc.Pages.Insert(1);
 
-            // Save the updated document
+            // Save the updated PDF with the new cover page.
             doc.Save(outputPath);
         }
 

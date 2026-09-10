@@ -1,52 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;                     // Core API namespace
-using Aspose.Pdf.Facades;            // For stamp-related classes (if needed)
+// URL-STABILITY STUB
+//
+// add fully opaque image watermark
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/stamping/add-full-page-image-watermark-to-pdf.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class AddImageWatermark
-{
-    static void Main()
-    {
-        // Input PDF and watermark image paths
-        const string inputPdfPath   = "input.pdf";
-        const string watermarkPath  = "watermark.png";
-        const string outputPdfPath  = "watermarked.pdf";
-
-        // Verify files exist
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(watermarkPath))
-        {
-            Console.Error.WriteLine($"Watermark image not found: {watermarkPath}");
-            return;
-        }
-
-        // Load the PDF document (using statement ensures deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            // Create an ImageStamp from the image file
-            ImageStamp imgStamp = new ImageStamp(watermarkPath);
-
-            // Ensure the stamp is fully opaque (default is 1.0, set explicitly for clarity)
-            imgStamp.Opacity = 1.0f;
-
-            // Optional: place the stamp at the center of each page
-            imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            imgStamp.VerticalAlignment   = VerticalAlignment.Center;
-
-            // Add the stamp to every page in the document
-            foreach (Page page in pdfDoc.Pages)
-            {
-                page.AddStamp(imgStamp);
-            }
-
-            // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
-        }
-
-        Console.WriteLine($"Watermarked PDF saved to '{outputPdfPath}'.");
-    }
-}
+class Program { static void Main() { } }

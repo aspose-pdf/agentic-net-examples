@@ -7,12 +7,12 @@ class Program
 {
     static void Main()
     {
-        const string firstPdfPath  = "input1.pdf";
-        const string secondPdfPath = "input2.pdf";
-        const string resultPdfPath = "visual_diff.pdf";
+        const string firstPdf  = "document1.pdf";
+        const string secondPdf = "document2.pdf";
+        const string resultPdf = "visual_diff.pdf";
 
-        // Verify that both source files exist
-        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
+        // Verify input files exist
+        if (!File.Exists(firstPdf) || !File.Exists(secondPdf))
         {
             Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
@@ -20,23 +20,16 @@ class Program
 
         try
         {
-            // Load the two documents inside using blocks for deterministic disposal
-            using (Document doc1 = new Document(firstPdfPath))
-            using (Document doc2 = new Document(secondPdfPath))
+            // Load both PDFs inside using blocks for deterministic disposal
+            using (Document doc1 = new Document(firstPdf))
+            using (Document doc2 = new Document(secondPdf))
             {
-                // Create the comparer instance
+                // Create the comparer and generate a visual diff PDF
                 GraphicalPdfComparer comparer = new GraphicalPdfComparer();
-
-                // Optional: customize comparer settings
-                // comparer.Color = Aspose.Pdf.Color.Red;
-                // comparer.Resolution = 200; // DPI
-                // comparer.Threshold = 5;    // percent
-
-                // Perform the visual comparison and save the result as a PDF
-                comparer.CompareDocumentsToPdf(doc1, doc2, resultPdfPath);
+                comparer.CompareDocumentsToPdf(doc1, doc2, resultPdf);
             }
 
-            Console.WriteLine($"Visual diff PDF generated at '{resultPdfPath}'.");
+            Console.WriteLine($"Visual diff PDF created at '{resultPdf}'.");
         }
         catch (Exception ex)
         {

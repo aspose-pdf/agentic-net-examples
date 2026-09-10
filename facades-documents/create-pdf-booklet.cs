@@ -6,9 +6,12 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        // Input PDF file path
+        const string inputPath = "input.pdf";
+        // Output PDF file path for the booklet
         const string outputPath = "booklet.pdf";
 
+        // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
@@ -17,18 +20,21 @@ class Program
 
         try
         {
-            // Create the facade object
+            // Create an instance of PdfFileEditor (does not implement IDisposable)
             PdfFileEditor editor = new PdfFileEditor();
 
-            // Generate a booklet using default settings
+            // Create a booklet using default settings
             bool result = editor.MakeBooklet(inputPath, outputPath);
 
-            Console.WriteLine(result
-                ? $"Booklet successfully created at '{outputPath}'."
-                : "Failed to create booklet.");
+            // Report the outcome
+            if (result)
+                Console.WriteLine($"Booklet created successfully: {outputPath}");
+            else
+                Console.Error.WriteLine("Failed to create booklet.");
         }
         catch (Exception ex)
         {
+            // Handle any unexpected errors
             Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }

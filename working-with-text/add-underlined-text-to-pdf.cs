@@ -6,34 +6,36 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document inside a using block for proper disposal
+        const string outputPath = "underlined.pdf";
+
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a blank page (pages are 1‑based)
+            // Add a blank page to the document
             Page page = doc.Pages.Add();
 
             // Create a text fragment with the desired content
-            TextFragment fragment = new TextFragment("Underlined text example");
-
-            // Set the position where the text will appear on the page
-            fragment.Position = new Position(100, 700); // X=100, Y=700
+            TextFragment tf = new TextFragment("This text is underlined");
 
             // Enable underlining via the TextState property
-            fragment.TextState.Underline = true;
+            tf.TextState.Underline = true;
 
-            // Optionally set other visual properties (font, size, color)
-            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            fragment.TextState.FontSize = 12;
-            fragment.TextState.ForegroundColor = Color.Black;
+            // Optional styling
+            tf.TextState.FontSize = 12;
+            tf.TextState.Font = FontRepository.FindFont("Helvetica");
+            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Append the fragment to the page using TextBuilder (or page.Paragraphs.Add)
+            // Set the position of the text fragment on the page
+            tf.Position = new Position(100, 700);
+
+            // Append the fragment to the page using TextBuilder
             TextBuilder builder = new TextBuilder(page);
-            builder.AppendText(fragment);
+            builder.AppendText(tf);
 
-            // Save the PDF to a file
-            doc.Save("underlined_text.pdf");
+            // Save the PDF document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with underlined text created successfully.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

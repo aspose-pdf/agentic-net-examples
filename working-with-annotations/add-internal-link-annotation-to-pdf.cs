@@ -9,7 +9,6 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_with_link.pdf";
-        const int targetPageNumber = 3; // page to navigate to (1‑based)
 
         if (!File.Exists(inputPath))
         {
@@ -17,24 +16,26 @@ class Program
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page where the link annotation will be placed
-            Page sourcePage = doc.Pages[1]; // first page (1‑based index)
+            // Choose the page where the link annotation will be placed (1‑based index)
+            Page sourcePage = doc.Pages[1];
 
-            // Define the clickable rectangle (llx, lly, urx, ury) in user space units
+            // Define the rectangle area of the link annotation (llx, lly, urx, ury)
+            // Fully qualify Rectangle to avoid ambiguity with System.Drawing
             Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
             // Create the link annotation on the chosen page
             LinkAnnotation link = new LinkAnnotation(sourcePage, linkRect);
+            // Optional visual styling – set after the object is instantiated
             link.Color = Aspose.Pdf.Color.Blue;
-            // Border must be created after the annotation instance exists because it requires the parent annotation
             link.Border = new Border(link) { Width = 1 };
 
-            // Set the action to navigate to the target page within the same document
-            Page targetPage = doc.Pages[targetPageNumber];
-            link.Action = new GoToAction(targetPage);
+            // Destination page number (1‑based). Here we navigate to page 2.
+            int targetPageNumber = 2;
+            // Use an explicit destination (Fit the whole page) as recommended by the rule set
+            link.Destination = new FitExplicitDestination(doc.Pages[targetPageNumber]);
 
             // Add the annotation to the page's annotation collection
             sourcePage.Annotations.Add(link);
@@ -43,6 +44,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Link annotation added. Saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with internal link saved to '{outputPath}'.");
     }
 }

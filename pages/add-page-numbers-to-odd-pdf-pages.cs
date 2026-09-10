@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // not required but safe for other facades if needed
 
 class Program
 {
@@ -16,34 +15,32 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Apply page number stamp only on odd pages
-                if (pageNumber % 2 == 1)
+                // Apply numbering only to odd pages
+                if (i % 2 == 1)
                 {
-                    Page page = doc.Pages[pageNumber];
-
-                    // Create a PageNumberStamp; default format "#" will be replaced by the page number
+                    // Create a page number stamp; default format "#" will be replaced by the page number
                     PageNumberStamp stamp = new PageNumberStamp();
 
-                    // Optional: configure appearance and position
+                    // Optional visual settings
                     stamp.HorizontalAlignment = HorizontalAlignment.Center;
                     stamp.VerticalAlignment   = VerticalAlignment.Bottom;
-                    stamp.BottomMargin        = 20; // distance from bottom edge
+                    stamp.BottomMargin        = 20; // distance from the bottom edge
 
                     // Add the stamp to the current page
-                    page.AddStamp(stamp);
+                    stamp.Put(doc.Pages[i]);
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Odd page numbers added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with page numbers on odd pages: '{outputPath}'.");
     }
 }

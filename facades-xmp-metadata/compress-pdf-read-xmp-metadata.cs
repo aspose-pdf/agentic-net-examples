@@ -2,51 +2,57 @@ using System;
 using System.IO;
 using System.Text;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Optimization;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string compressedPdf = "compressed.pdf";
+        const string inputPath = "input.pdf";
+        const string compressedPath = "compressed.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF and apply high compression using the current OptimizationOptions API.
-        using (Document doc = new Document(inputPdf))
+        // Load the source PDF
+        using (Document doc = new Document(inputPath))
         {
-            // Create a base set of optimization options (all recommended defaults).
-            OptimizationOptions opt = OptimizationOptions.All();
+            // Configure high compression options
+            OptimizationOptions opt = new OptimizationOptions
+            {
+                // Compress PDF objects (streams) into object streams
+                CompressObjects = true,
+                // Reuse identical page content when possible
+                AllowReusePageContent = true,
+                // Remove unused objects to reduce size
+                RemoveUnusedObjects = true,
+                // Subset fonts to keep only used glyphs
+                SubsetFonts = true,
+                // Unembed fonts if you prefer smaller size (optional)
+                UnembedFonts = false,
+                // Set maximum image resolution (typo in API: MaxResoultion)
+                MaxResoultion = 72 // low resolution to shrink images further
+            };
 
-            // Image compression is now configured via the existing ImageCompressionOptions instance.
-            opt.ImageCompressionOptions.CompressImages = true;
-            opt.ImageCompressionOptions.ImageQuality = 30; // lower quality = higher compression
-
-            // Keep the most common clean‑up flags that are still available.
-            opt.RemoveUnusedObjects = true;
-            opt.RemoveUnusedStreams = true;
-
-            // Apply the optimization settings.
+            // Apply optimization (compression)
             doc.OptimizeResources(opt);
 
-            // Save the compressed PDF.
-            doc.Save(compressedPdf);
+            // Save the compressed PDF
+            doc.Save(compressedPath);
         }
 
-        // Read XMP metadata from the compressed PDF using the Facades API.
+        // Read XMP metadata from the compressed PDF
         PdfXmpMetadata xmp = new PdfXmpMetadata();
-        xmp.BindPdf(compressedPdf);
-        byte[] xmpData = xmp.GetXmpMetadata();
+        xmp.BindPdf(compressedPath);
+        byte[] rawMetadata = xmp.GetXmpMetadata();
 
-        // Convert the XML bytes to a string for display.
-        string xmpXml = Encoding.UTF8.GetString(xmpData);
+        // Convert the metadata bytes to a readable string (UTF-8)
+        string metadataXml = Encoding.UTF8.GetString(rawMetadata);
         Console.WriteLine("XMP Metadata (XML):");
-        Console.WriteLine(xmpXml);
+        Console.WriteLine(metadataXml);
     }
 }

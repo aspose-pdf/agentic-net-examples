@@ -7,50 +7,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Ensure the source PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Extract text from the PDF into a MemoryStream
-        using (PdfExtractor extractor = new PdfExtractor())
+        // MemoryStream that will hold the extracted text
+        using (MemoryStream textStream = new MemoryStream())
         {
-            // Initialize the facade with the source PDF file
-            extractor.BindPdf(inputPdf);
-
-            // Extract text using Unicode encoding
-            extractor.ExtractText(Encoding.Unicode);
-
-            // Store the extracted text in a memory stream
-            using (MemoryStream textStream = new MemoryStream())
+            // Use PdfExtractor (facade) to extract text from the PDF
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                extractor.GetText(textStream);
-                // Reset the stream position so it can be read by the next component
-                textStream.Position = 0;
+                // Bind the PDF file to the extractor
+                extractor.BindPdf(pdfPath);
 
-                // Pass the stream to another library that generates a PDF from text
-                GeneratePdfFromTextStream(textStream);
+                // Extract text using Unicode encoding (default)
+                extractor.ExtractText();
+
+                // Save the extracted text into the MemoryStream
+                extractor.GetText(textStream);
             }
 
-            // Close the facade (optional because of using)
-            extractor.Close();
-        }
-    }
+            // Reset stream position for reading by the next component
+            textStream.Position = 0;
 
-    // Placeholder method representing the downstream PDF generation library.
-    // It receives a stream containing the extracted text.
-    static void GeneratePdfFromTextStream(Stream textStream)
-    {
-        // Example: read the text from the stream (the actual library would consume the stream directly)
-        using (StreamReader reader = new StreamReader(textStream, Encoding.Unicode, true, 1024, leaveOpen: true))
-        {
-            string extractedText = reader.ReadToEnd();
-            // Call to the external PDF generator would go here, e.g.:
-            // ExternalPdfGenerator.CreatePdfFromText(extractedText);
-            Console.WriteLine($"Extracted text length: {extractedText.Length}");
+            // Example: read the text as a string (optional, for verification)
+            string extractedText = new StreamReader(textStream, Encoding.Unicode).ReadToEnd();
+            Console.WriteLine("Extracted text length: " + extractedText.Length);
+
+            // Reset again before passing to another library
+            textStream.Position = 0;
+
+            // ------------------------------------------------------------
+            // Pass the MemoryStream (textStream) to another library that
+            // generates a PDF from the extracted text.
+            // The receiving library should read from the provided stream.
+            // Example placeholder:
+            // OtherPdfGenerator.GeneratePdfFromTextStream(textStream, "output.pdf");
+            // ------------------------------------------------------------
         }
     }
 }

@@ -2,21 +2,21 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "form.pdf";
+        const string pdfPath = "input.pdf";
         const string compressedJsonPath = "data.json.gz";
-        const string outputPath = "filled_form.pdf";
+        const string outputPdfPath = "output.pdf";
 
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
+
         if (!File.Exists(compressedJsonPath))
         {
             Console.Error.WriteLine($"Compressed JSON not found: {compressedJsonPath}");
@@ -28,18 +28,19 @@ class Program
             // Load the PDF document
             using (Document doc = new Document(pdfPath))
             {
-                // Decompress JSON and import form data
+                // Open the compressed JSON file and decompress it on the fly
                 using (FileStream fileStream = new FileStream(compressedJsonPath, FileMode.Open, FileAccess.Read))
-                using (GZipStream gzip = new GZipStream(fileStream, CompressionMode.Decompress))
+                using (GZipStream gzipStream = new GZipStream(fileStream, CompressionMode.Decompress))
                 {
-                    doc.Form.ImportFromJson(gzip);
+                    // Import form fields from the JSON stream
+                    doc.Form.ImportFromJson(gzipStream);
                 }
 
                 // Save the updated PDF
-                doc.Save(outputPath);
+                doc.Save(outputPdfPath);
             }
 
-            Console.WriteLine($"Form data imported and saved to '{outputPath}'.");
+            Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
         }
         catch (Exception ex)
         {

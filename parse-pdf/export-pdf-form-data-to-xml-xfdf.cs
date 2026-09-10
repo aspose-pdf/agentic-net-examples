@@ -1,45 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Text;
+// URL-STABILITY STUB
+//
+// export pdf form data to xml xfdf
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/parse-pdf/export-pdf-form-data-to-xml.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        // Path to the source PDF containing a form.
-        const string inputPdfPath = "form.pdf";
-
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
-            return;
-        }
-
-        // Load the PDF document.
-        using (Document pdfDocument = new Document(inputPdfPath))
-        {
-            // Create a memory stream to hold the exported XML (XFDF) data.
-            using (MemoryStream xmlStream = new MemoryStream())
-            {
-                // Export annotations (including form fields) to XFDF format.
-                // XFDF is an XML representation of form data and annotations.
-                pdfDocument.ExportAnnotationsToXfdf(xmlStream);
-
-                // Reset the stream position to the beginning for reading.
-                xmlStream.Position = 0;
-
-                // Example: read the XML content as a string (optional).
-                using (StreamReader reader = new StreamReader(xmlStream))
-                {
-                    string xmlContent = reader.ReadToEnd();
-                    Console.WriteLine("Exported XML (XFDF) content:");
-                    Console.WriteLine(xmlContent);
-                }
-
-                // At this point, xmlStream contains the XML representation of the form data.
-                // It can be returned, saved, or processed further as needed.
-            }
-        }
-    }
-}
+class Program { static void Main() { } }

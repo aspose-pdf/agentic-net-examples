@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Aspose.Pdf namespace contains Document, Page, Rectangle
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf.Drawing;      // For Rectangle type (if needed, but fully qualified used)
 
 class Program
 {
@@ -9,24 +10,23 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Open the PDF inside a using block (ensures proper disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least 12 pages (1‑based indexing)
+            // Ensure the document has at least 12 pages
             if (doc.Pages.Count < 12)
             {
-                Console.Error.WriteLine("The document must contain at least 12 pages.");
+                Console.Error.WriteLine("Document does not contain 12 pages.");
                 return;
             }
 
-            // Retrieve the MediaBox rectangle from page 8
+            // Get the MediaBox rectangle from page 8 (1‑based indexing)
             Aspose.Pdf.Rectangle sourceMediaBox = doc.Pages[8].MediaBox;
 
             // Apply the same MediaBox to page 12
@@ -36,6 +36,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"MediaBox copied from page 8 to page 12. Saved as '{outputPath}'.");
     }
 }

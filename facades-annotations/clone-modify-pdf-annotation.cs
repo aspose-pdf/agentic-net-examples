@@ -1,105 +1,86 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Drawing;   // for Aspose.Pdf.Color
 
-public class AnnotationCloner
+public static class AnnotationHelper
 {
     /// <summary>
-    /// Clones the first annotation on the first page, modifies some of its properties,
-    /// adds the cloned annotation back to the same page and saves the result.
+    /// Clones an existing annotation on a page, modifies some of its properties,
+    /// and adds the cloned annotation back to the same page.
+    /// Uses Aspose.Pdf.Facades for loading and saving the PDF.
     /// </summary>
-    /// <param name="inputPdfPath">Path to the source PDF.</param>
-    /// <param name="outputPdfPath">Path where the modified PDF will be saved.</param>
-    public static void CloneModifyAndAdd(string inputPdfPath, string outputPdfPath)
+    /// <param name="inputPdf">Path to the source PDF.</param>
+    /// <param name="outputPdf">Path where the modified PDF will be saved.</param>
+    /// <param name="pageNumber">1‑based page number containing the annotation.</param>
+    /// <param name="annotationIndex">1‑based index of the annotation to clone.</param>
+    public static void CloneModifyAddAnnotation(string inputPdf, string outputPdf, int pageNumber, int annotationIndex)
     {
-        // Load the PDF document (creation & loading rule)
-        using (Document doc = new Document(inputPdfPath))
+        // Bind the PDF using the Facade (load rule)
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Ensure the document has at least one page and one annotation
-            if (doc.Pages.Count == 0 || doc.Pages[1].Annotations.Count == 0)
-                throw new InvalidOperationException("Document must contain at least one annotation on page 1.");
+            editor.BindPdf(inputPdf);
 
-            // Get the first page and its first annotation (annotation collections are 1‑based)
-            Page page = doc.Pages[1];
-            Annotation original = page.Annotations[1];
+            // Access the underlying Document (core API)
+            Document doc = editor.Document;
 
-            // Clone the annotation based on its concrete type.
-            // Annotation.Clone() always returns null, so we create a new instance manually.
-            Annotation cloned;
+            // Retrieve the target page (1‑based indexing rule)
+            Page page = doc.Pages[pageNumber];
 
-            // Example for TextAnnotation – similar blocks can be added for other types if needed.
-            if (original is TextAnnotation textAnno)
+            // Get the original annotation (1‑based indexing rule)
+            Annotation original = page.Annotations[annotationIndex];
+
+            // Prepare a variable for the cloned annotation
+            Annotation cloned = null;
+
+            // Clone based on the concrete annotation type.
+            // TextAnnotation example (has Open property)
+            if (original is TextAnnotation textOrig)
             {
-                // Create a new TextAnnotation on the same page with the same rectangle.
-                var clonedText = new TextAnnotation(page, textAnno.Rect);
-
-                // Copy common properties that belong to MarkupAnnotation / TextAnnotation.
-                clonedText.Title    = textAnno.Title;
-                clonedText.Contents = textAnno.Contents;
-                clonedText.Color    = textAnno.Color;
-                clonedText.Modified = textAnno.Modified;
-                clonedText.Subject  = textAnno.Subject;
-                clonedText.Open     = textAnno.Open;
-
-                // Modify properties as required.
-                clonedText.Title    = "Cloned Title";
-                clonedText.Contents = "This is a cloned and modified annotation.";
-                clonedText.Color    = Color.Green;   // Use Aspose.Pdf.Color (cross‑platform)
-
-                cloned = clonedText; // assign to base variable for collection add
+                cloned = new TextAnnotation(page, textOrig.Rect)
+                {
+                    Title    = textOrig.Title + " (Clone)",
+                    Contents = textOrig.Contents + " (modified)",
+                    Color    = Aspose.Pdf.Color.Red,
+                    Modified = DateTime.Now,
+                    Subject  = textOrig.Subject,
+                    Open     = textOrig.Open // TextAnnotation supports Open
+                };
             }
-            else if (original is StampAnnotation stampAnno)
+            // StampAnnotation example (does NOT have Open property)
+            else if (original is StampAnnotation stampOrig)
             {
-                // Create a new StampAnnotation on the same page.
-                var clonedStamp = new StampAnnotation(page, stampAnno.Rect);
-
-                // StampAnnotation does not expose Title/Subject/Open – set only supported members.
-                clonedStamp.Contents = "Cloned stamp annotation.";
-                clonedStamp.Color    = Color.Blue;
-                clonedStamp.Modified = DateTime.Now;
-
-                cloned = clonedStamp;
+                cloned = new StampAnnotation(page, stampOrig.Rect)
+                {
+                    Title    = stampOrig.Title + " (Clone)",
+                    Contents = stampOrig.Contents + " (modified)",
+                    Color    = Aspose.Pdf.Color.Blue,
+                    Modified = DateTime.Now,
+                    Subject  = stampOrig.Subject,
+                    // Open property removed – not supported by StampAnnotation
+                    Icon     = stampOrig.Icon
+                };
             }
-            else
+            // Add more annotation types as needed...
+
+            // If a clone was created, add it back to the page's annotation collection
+            if (cloned != null)
             {
-                // For unsupported annotation types, throw an informative exception.
-                throw new NotSupportedException($"Cloning of annotation type '{original.GetType().Name}' is not implemented.");
+                page.Annotations.Add(cloned);
             }
 
-            // Add the cloned annotation back to the page.
-            page.Annotations.Add(cloned);
-
-            // Save the modified document using the Facades API (save rule).
-            PdfAnnotationEditor editor = new PdfAnnotationEditor();
-            editor.BindPdf(doc);               // Initialize the facade with the document.
-            editor.Save(outputPdfPath);        // Persist changes.
-            editor.Close();                    // Release resources (PdfAnnotationEditor does not implement IDisposable).
+            // Save the modified document (save rule)
+            editor.Save(outputPdf);
         }
     }
+}
 
-    // Example usage
-    public static void Main()
+// Dummy entry point to satisfy the compiler when building as an executable.
+public class Program
+{
+    public static void Main(string[] args)
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_cloned.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
-
-        try
-        {
-            CloneModifyAndAdd(inputPath, outputPath);
-            Console.WriteLine($"Cloned annotation saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        // Example usage (can be removed or replaced in real scenarios)
+        // AnnotationHelper.CloneModifyAddAnnotation("input.pdf", "output.pdf", 1, 1);
     }
 }

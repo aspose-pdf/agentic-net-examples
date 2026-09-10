@@ -7,29 +7,29 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "branded_output.pdf";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (using ensures proper disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing) and set the background color
+            // Iterate over all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                page.Background = Aspose.Pdf.Color.LightGray; // LightGray branding background
+                // Set a LightGray background for branding consistency
+                page.Background = Aspose.Pdf.Color.LightGray;
             }
 
-            // Save the modified document
+            // Save the modified document as PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with LightGray background to '{outputPath}'.");
+        Console.WriteLine($"Branded PDF saved to '{outputPath}'.");
     }
 }

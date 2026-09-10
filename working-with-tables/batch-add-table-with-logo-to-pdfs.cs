@@ -2,78 +2,74 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text; // needed for TextFragment and FontRepository
 
 class BatchAddTableWithLogo
 {
     static void Main()
     {
         // Folder containing source PDFs
-        const string inputFolder = @"C:\InputPdfs";
+        const string inputFolder = @"C:\PdfInput";
         // Folder where processed PDFs will be saved
-        const string outputFolder = @"C:\OutputPdfs";
+        const string outputFolder = @"C:\PdfOutput";
         // Path to the company logo image (PNG, JPG, etc.)
         const string logoPath = @"C:\Assets\company_logo.png";
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
         // Process each PDF file in the input folder
         foreach (string pdfFile in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Build the output file path (same file name, different folder)
-            string outputPath = System.IO.Path.Combine(outputFolder, System.IO.Path.GetFileName(pdfFile));
-
-            // Load the PDF document inside a using block for deterministic disposal
+            // Load the PDF document (using the standard load constructor)
             using (Document doc = new Document(pdfFile))
             {
-                // Use the first page – adjust as needed (e.g., add to every page)
-                Page page = doc.Pages[1];
-
-                // ------------------------------------------------------------
-                // Create a table that will hold the logo (and optional text)
-                // ------------------------------------------------------------
-                Table table = new Table();
-
-                // Optional: set table width to 100% of the page width
-                // ColumnWidths can be a string with comma‑separated percentages or absolute values
-                table.ColumnWidths = "100";
-
-                // Add a single row
-                Row row = table.Rows.Add();
-
-                // Add a single cell to the row
-                Cell cell = row.Cells.Add();
-
-                // ------------------------------------------------------------
-                // Insert the company logo image into the cell
-                // ------------------------------------------------------------
-                Image logo = new Image
+                // Create a table with two columns (logo + description)
+                Table table = new Table
                 {
-                    // The Image class does not have a constructor that takes a path,
-                    // so set the File property after creation.
-                    File = logoPath
+                    // Optional: set table position on the page
+                    Left = 50,
+                    Top = 700,
+                    // Optional: set column widths (percentage of page width)
+                    ColumnWidths = "100 300"
                 };
 
+                // Add a row to the table
+                var row = table.Rows.Add();
+
+                // First cell: company logo
+                var logoCell = row.Cells.Add();
+                // Create the image object and set its source file
+                var logoImage = new Image
+                {
+                    File = logoPath
+                };
+                // Scale the image to fit the cell (optional)
+                logoImage.FixWidth = 80;
+                logoImage.FixHeight = 80;
                 // Add the image to the cell's paragraph collection
-                cell.Paragraphs.Add(logo);
+                logoCell.Paragraphs.Add(logoImage);
 
-                // (Optional) Add a text paragraph next to the logo
-                // Uncomment the following lines if you want a caption or title
-                // TextFragment txt = new TextFragment("Company Name");
-                // txt.TextState.FontSize = 12;
-                // txt.TextState.Font = FontRepository.FindFont("Helvetica");
-                // cell.Paragraphs.Add(txt);
+                // Second cell: descriptive text
+                var textCell = row.Cells.Add();
+                var tf = new TextFragment("Company Name\nAddress Line 1\nAddress Line 2")
+                {
+                    TextState = { FontSize = 12, Font = FontRepository.FindFont("Helvetica") }
+                };
+                textCell.Paragraphs.Add(tf);
 
-                // ------------------------------------------------------------
-                // Add the table to the page's content
-                // ------------------------------------------------------------
-                page.Paragraphs.Add(table);
+                // Add the table to the first page of the document
+                Page firstPage = doc.Pages[1];
+                firstPage.Paragraphs.Add(table);
 
-                // Save the modified document to the output folder
+                // Determine output file path (preserve original name)
+                string outputPath = System.IO.Path.Combine(outputFolder, System.IO.Path.GetFileName(pdfFile));
+
+                // Save the modified document (standard Save method)
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Processed: {System.IO.Path.GetFileName(pdfFile)} → {outputPath}");
+            Console.WriteLine($"Processed: {System.IO.Path.GetFileName(pdfFile)}");
         }
 
         Console.WriteLine("Batch processing completed.");

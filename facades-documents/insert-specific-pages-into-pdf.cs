@@ -1,59 +1,54 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // PdfFileEditor resides here
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the PDFs
-        const string destinationPdf = "destination.pdf"; // PDF into which pages will be inserted
-        const string sourcePdf      = "source.pdf";      // PDF providing pages to insert
-        const string outputPdf      = "merged.pdf";      // Resulting PDF after insertion
+        // Paths to the existing PDFs
+        const string destinationPdfPath = "destination.pdf";
+        const string sourcePdfPath      = "source.pdf";
+        const string outputPdfPath      = "merged.pdf";
 
-        // Position (1‑based) in the destination PDF where pages will be inserted.
-        // For example, 1 inserts before the first page, 3 inserts after page 2, etc.
-        int insertPosition = 3;
+        // Pages to take from the source PDF (1‑based indexing)
+        int[] pagesToInsert = new int[] { 2, 4, 5 };
 
-        // Specific pages from the source PDF to insert (1‑based page numbers).
-        int[] pagesToInsert = new int[] { 2, 5, 7 };
+        // Position in the destination PDF where the pages will be inserted (1‑based)
+        int insertLocation = 3;
 
-        // Validate that the files exist before proceeding.
-        if (!File.Exists(destinationPdf))
+        // Verify that the input files exist
+        if (!File.Exists(destinationPdfPath))
         {
-            Console.Error.WriteLine($"Destination file not found: {destinationPdf}");
+            Console.Error.WriteLine($"Error: Destination file not found – {destinationPdfPath}");
             return;
         }
-        if (!File.Exists(sourcePdf))
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
+            Console.Error.WriteLine($"Error: Source file not found – {sourcePdfPath}");
             return;
         }
 
-        try
+        // Open the streams for reading the source/destination PDFs and writing the result
+        using (FileStream destStream = new FileStream(destinationPdfPath, FileMode.Open, FileAccess.Read))
+        using (FileStream srcStream  = new FileStream(sourcePdfPath,   FileMode.Open, FileAccess.Read))
+        using (FileStream outStream  = new FileStream(outputPdfPath,  FileMode.Create, FileAccess.Write))
         {
-            // PdfFileEditor does NOT implement IDisposable, so no using block is required.
-            PdfFileEditor editor = new PdfFileEditor();
+            // PdfFileEditor does not implement IDisposable, so it is instantiated directly
+            Aspose.Pdf.Facades.PdfFileEditor editor = new Aspose.Pdf.Facades.PdfFileEditor();
 
-            // Insert the selected pages from sourcePdf into destinationPdf at the specified position.
-            // This uses the overload: Insert(string inputFile, int insertLocation,
-            //                               string portFile, int[] pageNumber, string outputFile)
-            bool success = editor.Insert(
-                destinationPdf,          // inputFile – the PDF that will receive the pages
-                insertPosition,         // insertLocation – where to insert (1‑based)
-                sourcePdf,              // portFile – the PDF providing pages
-                pagesToInsert,          // pageNumber – array of pages to take from sourcePdf
-                outputPdf);             // outputFile – resulting PDF
+            // Perform the insertion
+            bool result = editor.Insert(
+                destStream,          // inputStream – the original destination PDF
+                insertLocation,      // insertLocation – where to insert in the destination
+                srcStream,           // portStream – PDF containing pages to insert
+                pagesToInsert,       // pageNumber – specific pages from the source PDF
+                outStream);          // outputStream – resulting PDF
 
-            if (success)
-                Console.WriteLine($"Pages inserted successfully. Output saved to '{outputPdf}'.");
+            if (result)
+                Console.WriteLine($"Pages inserted successfully. Output saved to '{outputPdfPath}'.");
             else
-                Console.Error.WriteLine("Insertion failed. The operation returned false.");
-        }
-        catch (Exception ex)
-        {
-            // Catch any unexpected errors (e.g., file access issues, invalid page numbers).
-            Console.Error.WriteLine($"Error during insertion: {ex.Message}");
+                Console.Error.WriteLine("Failed to insert pages.");
         }
     }
 }

@@ -9,9 +9,9 @@ class Program
         // Input PDF files to be concatenated
         string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
         // Path for the intermediate concatenated PDF
-        string combinedPath = "combined.pdf";
-        // Path for the final PDF with page numbers
-        string outputPath = "final.pdf";
+        string concatenatedPath = "combined_temp.pdf";
+        // Final output PDF with page numbers
+        string outputPath = "combined_with_page_numbers.pdf";
 
         // Verify that all input files exist
         foreach (string file in inputFiles)
@@ -24,49 +24,43 @@ class Program
         }
 
         // ---------- Concatenate PDFs ----------
-        // PdfFileEditor does NOT implement IDisposable; do NOT wrap in using
+        // PdfFileEditor does NOT implement IDisposable, so no using block is required.
         PdfFileEditor editor = new PdfFileEditor();
-        try
+
+        // Concatenate the input files into a single PDF.
+        // The Concatenate(string[], string) overload writes directly to a file.
+        bool concatSuccess = editor.Concatenate(inputFiles, concatenatedPath);
+        if (!concatSuccess)
         {
-            // Concatenate all input files into a single PDF
-            bool concatResult = editor.Concatenate(inputFiles, combinedPath);
-            if (!concatResult)
-            {
-                Console.Error.WriteLine("Concatenation failed.");
-                return;
-            }
-        }
-        finally
-        {
-            // No resources to dispose for PdfFileEditor, but ensure any streams are closed if used
-            // (none were opened explicitly here)
+            Console.Error.WriteLine("Failed to concatenate PDF files.");
+            return;
         }
 
         // ---------- Add page numbers ----------
-        // PdfFileStamp implements SaveableFacade and can be used with using for deterministic disposal
-        using (PdfFileStamp stamp = new PdfFileStamp(combinedPath, outputPath))
+        // PdfFileStamp implements SaveableFacade (IDisposable), so wrap it in a using block.
+        // The constructor takes the source PDF and the destination PDF.
+        using (PdfFileStamp stamp = new PdfFileStamp(concatenatedPath, outputPath))
         {
-            // Optional: set starting page number (default is 1)
-            // stamp.StartingNumber = 1;
+            // Optional: start numbering from 1 (default) or any other number.
+            stamp.StartingNumber = 1;
 
-            // Add page numbers; "#" will be replaced by the actual page number
-            stamp.AddPageNumber("Page #");
-
-            // Close finalizes the output file
+            // Add page numbers. The format string may contain '#' which will be replaced
+            // by the actual page number. Position constants are defined in PdfFileStamp.
+            stamp.AddPageNumber("Page #", PdfFileStamp.PosBottomMiddle);
+            // Close() finalizes the stamping operation and writes the output file.
             stamp.Close();
         }
 
-        // Clean up intermediate file if desired
+        // Clean up the intermediate file if desired
         try
         {
-            if (File.Exists(combinedPath))
-                File.Delete(combinedPath);
+            File.Delete(concatenatedPath);
         }
-        catch (Exception ex)
+        catch
         {
-            Console.Error.WriteLine($"Could not delete intermediate file: {ex.Message}");
+            // Ignored – the file may be in use or deletion may fail; not critical.
         }
 
-        Console.WriteLine($"PDFs concatenated and numbered successfully: {outputPath}");
+        Console.WriteLine($"PDFs concatenated and page numbers added: {outputPath}");
     }
 }

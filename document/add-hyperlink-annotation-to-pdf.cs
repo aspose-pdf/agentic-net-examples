@@ -7,11 +7,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string url = "https://www.example.com";
+        const string url        = "https://www.example.com";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
@@ -21,20 +20,20 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Use the first page (pages are 1‑based)
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the clickable area (left, bottom, right, top)
+            // Define the clickable rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
             // Create a link annotation and assign a URI action to open the external website
             LinkAnnotation link = new LinkAnnotation(page, rect)
             {
-                Color = Aspose.Pdf.Color.Blue,               // Optional visual cue
-                Action = new GoToURIAction(url)               // Open external URL when clicked
+                Color  = Aspose.Pdf.Color.Blue,          // optional visual cue
+                Action = new GoToURIAction(url)          // opens the URL when clicked
             };
 
-            // Add the annotation to the page's annotation collection
+            // Add the annotation to the page
             page.Annotations.Add(link);
 
             // Save the modified PDF

@@ -16,35 +16,32 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (disposal handled by using)
         using (Document doc = new Document(inputPath))
         {
             // Get the last page (1‑based indexing)
             Page lastPage = doc.Pages[doc.Pages.Count];
 
-            // Define a rectangle positioned at the bottom‑right corner
-            // Adjust margins and rectangle size as needed
-            double margin      = 20;               // distance from page edges
-            double rectWidth   = 200;              // width of the text box
-            double rectHeight  = 50;               // height of the text box
-            double llx = lastPage.PageInfo.Width - rectWidth - margin; // lower‑left X
-            double lly = margin;                                 // lower‑left Y
-            double urx = llx + rectWidth;                        // upper‑right X
-            double ury = lly + rectHeight;                       // upper‑right Y
+            // Margin from the page edges
+            double margin = 20;
 
-            // Create a text paragraph and set its rectangle and rotation
-            TextParagraph paragraph = new TextParagraph
-            {
-                Rectangle = new Aspose.Pdf.Rectangle(llx, lly, urx, ury),
-                Rotation  = 45 // rotate 45 degrees (any angle is allowed)
-            };
+            // Create a text fragment
+            TextFragment fragment = new TextFragment("Rotated Text");
 
-            // Add the desired text line
-            paragraph.AppendLine("Rotated Text");
+            // Position the fragment at the bottom‑right corner (baseline point)
+            fragment.Position = new Position(lastPage.PageInfo.Width - margin, margin);
 
-            // Append the paragraph to the page using TextBuilder
+            // Rotate the text (angle in degrees)
+            fragment.TextState.Rotation = 45;
+
+            // Set text appearance via TextState
+            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
+            fragment.TextState.FontSize = 12;
+            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+
+            // Append the fragment to the page using TextBuilder
             TextBuilder builder = new TextBuilder(lastPage);
-            builder.AppendParagraph(paragraph);
+            builder.AppendText(fragment);
 
             // Save the modified PDF
             doc.Save(outputPath);

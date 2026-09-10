@@ -1,39 +1,12 @@
-using System;
-using System.Diagnostics;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// benchmark xmp metadata extraction
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/facades-xmp-metadata
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf = "large_input.pdf";
-
-        if (!System.IO.File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
-
-        // Warm‑up: bind once to avoid first‑time overhead affecting the measurement
-        using (PdfXmpMetadata warmup = new PdfXmpMetadata())
-        {
-            warmup.BindPdf(inputPdf);
-            warmup.GetXmpMetadata();
-        }
-
-        // Benchmark the XMP metadata extraction
-        Stopwatch sw = Stopwatch.StartNew();
-
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-        {
-            xmp.BindPdf(inputPdf);
-            byte[] metadataBytes = xmp.GetXmpMetadata(); // read full XMP metadata
-            // Optionally, you could process the bytes here (e.g., convert to string)
-            // string xml = System.Text.Encoding.UTF8.GetString(metadataBytes);
-        }
-
-        sw.Stop();
-
-        Console.WriteLine($"XMP metadata extraction time: {sw.ElapsedMilliseconds} ms");
-    }
-}
+class Program { static void Main() { } }

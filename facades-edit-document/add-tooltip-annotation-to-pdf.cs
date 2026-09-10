@@ -1,13 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "tooltip_output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,25 +15,38 @@ class Program
             return;
         }
 
-        // Initialize the facade and bind the source PDF
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPath);
+        // PdfContentEditor implements IDisposable, so wrap it in a using block.
+        using (PdfContentEditor editor = new PdfContentEditor())
+        {
+            // Bind the existing PDF document.
+            editor.BindPdf(inputPath);
 
-        // Define the annotation rectangle (System.Drawing.Rectangle is required by PdfContentEditor)
-        System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 500, 20, 20); // x, y, width, height
+            // Define the annotation rectangle (x, y, width, height) in points.
+            // Use System.Drawing.Rectangle as required by the API.
+            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 500, 20, 20);
 
-        // Title appears in the annotation window; Contents is shown as a tooltip on hover
-        string title = "Info";
-        string tooltip = "Additional information displayed when the mouse hovers over this area.";
-        bool openInitially = false; // annotation window closed by default
-        string icon = "Note"; // supported icons: Comment, Key, Note, Help, NewParagraph, Paragraph, Insert
+            // Title appears in the annotation window title bar (optional).
+            string title = "Info";
 
-        // Create a text (sticky‑note) annotation on page 1
-        editor.CreateText(rect, title, tooltip, openInitially, icon, 1);
+            // Contents is the tooltip text shown when the mouse hovers over the annotation.
+            string contents = "Additional information displayed as a tooltip.";
 
-        // Save the modified document
-        editor.Save(outputPath);
-        editor.Close(); // release resources held by the facade
+            // Open = false ensures the annotation is not displayed open by default;
+            // the tooltip appears on hover.
+            bool open = false;
+
+            // Choose an icon style; "Note" is a common choice.
+            string icon = "Note";
+
+            // Page numbers are 1‑based in Aspose.Pdf.
+            int page = 1;
+
+            // Create the text (sticky‑note) annotation which acts as a tooltip.
+            editor.CreateText(rect, title, contents, open, icon, page);
+
+            // Save the modified PDF.
+            editor.Save(outputPath);
+        }
 
         Console.WriteLine($"Tooltip annotation added. Saved to '{outputPath}'.");
     }

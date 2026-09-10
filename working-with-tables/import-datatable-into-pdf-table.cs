@@ -6,37 +6,32 @@ class Program
 {
     static void Main()
     {
-        // Prepare in‑memory data
-        DataTable dt = new DataTable();
-        dt.Columns.Add("Product", typeof(string));
-        dt.Columns.Add("Quantity", typeof(int));
-        dt.Columns.Add("Price", typeof(decimal));
+        // Prepare an in‑memory DataTable
+        DataTable dt = new DataTable("Sample");
+        dt.Columns.Add("ID", typeof(int));
+        dt.Columns.Add("Name", typeof(string));
+        dt.Rows.Add(1, "Alice");
+        dt.Rows.Add(2, "Bob");
+        dt.Rows.Add(3, "Charlie");
 
-        dt.Rows.Add("Apple", 10, 0.5m);
-        dt.Rows.Add("Banana", 5, 0.3m);
-        dt.Rows.Add("Cherry", 20, 1.2m);
-
-        // Create a new PDF document
+        // Create a new PDF document (wrapped in using for proper disposal)
         using (Document doc = new Document())
         {
-            // Add a page to host the table
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table instance
+            // Create a table and optionally define column widths
             Table table = new Table();
-
-            // Optional: define column widths (three columns)
-            table.ColumnWidths = "150 100 100";
+            table.ColumnWidths = "100 200";
 
             // Import the DataTable into the Aspose.Pdf.Table
-            // - include column names as the first row
-            // - start importing at row 0, column 0 (zero‑based)
+            // Parameters: DataTable, import column names as first row, start at row 0, column 0
             table.ImportDataTable(dt, true, 0, 0);
 
             // Add the populated table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF
+            // Save the resulting PDF
             doc.Save("DataTableExport.pdf");
         }
     }

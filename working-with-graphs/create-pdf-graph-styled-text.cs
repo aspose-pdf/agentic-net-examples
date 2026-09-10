@@ -1,70 +1,91 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "graph_with_text.pdf";
+        const string outputPath = "graph_text.pdf";
 
-        // Ensure deterministic disposal of the Document
+        // Create a new PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document())
         {
-            // Add a new page to the document
+            // Add a page (page indexing is 1‑based)
             Page page = doc.Pages.Add();
 
-            // Create a Graph container (width: 400 points, height: 200 points)
-            Graph graph = new Graph(400, 200)
+            // Create a Graph (width, height) and position it on the page
+            // NOTE: use double constructor as the float overload is obsolete
+            Graph graph = new Graph(400.0, 300.0)
             {
-                // Position the graph on the page (left: 100, top: 500)
-                Left = 100,
-                Top = 500
+                Left = 50.0,   // distance from left edge of the page
+                Top  = 500.0   // distance from bottom edge of the page
             };
 
-            // Create a rectangle shape inside the graph
-            Aspose.Pdf.Drawing.Rectangle rectShape = new Aspose.Pdf.Drawing.Rectangle(0, 0, 300, 150);
+            // ----- Add shapes to the graph -----
+
+            // Rectangle shape (use Aspose.Pdf.Drawing.Rectangle, not Aspose.Pdf.Rectangle)
+            Aspose.Pdf.Drawing.Rectangle rectShape = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 200f, 100f);
             rectShape.GraphInfo = new GraphInfo
             {
-                FillColor = Aspose.Pdf.Color.LightGray,
-                Color = Aspose.Pdf.Color.Black,
-                LineWidth = 2
+                FillColor = Color.LightGray,
+                Color     = Color.Black,
+                LineWidth = 1f
             };
             graph.Shapes.Add(rectShape);
 
-            // Add the graph (with the rectangle) to the page
+            // Ellipse shape
+            Ellipse ellipseShape = new Ellipse(250f, 0f, 150f, 100f);
+            ellipseShape.GraphInfo = new GraphInfo
+            {
+                FillColor = Color.Yellow,
+                Color     = Color.Red,
+                LineWidth = 1.5f
+            };
+            graph.Shapes.Add(ellipseShape);
+
+            // Line shape
+            float[] linePoints = { 0f, 150f, 400f, 150f };
+            Line lineShape = new Line(linePoints);
+            lineShape.GraphInfo = new GraphInfo
+            {
+                Color     = Color.Blue,
+                LineWidth = 2f
+            };
+            graph.Shapes.Add(lineShape);
+
+            // Add the graph to the page
             page.Paragraphs.Add(graph);
 
-            // Prepare a TextBuilder to place text fragments on the page
+            // ----- Add text fragments with different fonts/sizes inside the shapes -----
             TextBuilder textBuilder = new TextBuilder(page);
 
-            // First text fragment – Helvetica, 24pt, blue
-            TextFragment tf1 = new TextFragment("Hello");
-            tf1.Position = new Position(150, 600);
-            tf1.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf1.TextState.FontSize = 24;
-            tf1.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
-            textBuilder.AppendText(tf1);
+            // Text inside the rectangle
+            TextFragment rectText = new TextFragment("Rect Text");
+            rectText.Position = new Position(70, 560); // adjust to fit inside rectangle
+            rectText.TextState.Font = FontRepository.FindFont("Helvetica");
+            rectText.TextState.FontSize = 14;
+            rectText.TextState.ForegroundColor = Color.DarkBlue;
+            textBuilder.AppendText(rectText);
 
-            // Second text fragment – Times New Roman, 18pt, dark red
-            TextFragment tf2 = new TextFragment("World");
-            tf2.Position = new Position(150, 560);
-            tf2.TextState.Font = FontRepository.FindFont("TimesNewRoman");
-            tf2.TextState.FontSize = 18;
-            tf2.TextState.ForegroundColor = Aspose.Pdf.Color.DarkRed;
-            textBuilder.AppendText(tf2);
+            // Text inside the ellipse
+            TextFragment ellipseText = new TextFragment("Ellipse Text");
+            ellipseText.Position = new Position(300, 560); // adjust to fit inside ellipse
+            ellipseText.TextState.Font = FontRepository.FindFont("TimesNewRoman");
+            ellipseText.TextState.FontSize = 12;
+            ellipseText.TextState.ForegroundColor = Color.DarkRed;
+            textBuilder.AppendText(ellipseText);
 
-            // Third text fragment – Courier, 14pt, green
-            TextFragment tf3 = new TextFragment("Aspose.Pdf");
-            tf3.Position = new Position(150, 520);
-            tf3.TextState.Font = FontRepository.FindFont("Courier");
-            tf3.TextState.FontSize = 14;
-            tf3.TextState.ForegroundColor = Aspose.Pdf.Color.Green;
-            textBuilder.AppendText(tf3);
+            // Text on the line
+            TextFragment lineText = new TextFragment("Line Text");
+            lineText.Position = new Position(200, 640); // position near the line
+            lineText.TextState.Font = FontRepository.FindFont("Courier");
+            lineText.TextState.FontSize = 10;
+            lineText.TextState.ForegroundColor = Color.Green;
+            textBuilder.AppendText(lineText);
 
-            // Save the resulting PDF
+            // Save the PDF (lifecycle rule: Document.Save)
             doc.Save(outputPath);
         }
 

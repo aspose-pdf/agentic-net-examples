@@ -7,37 +7,47 @@ class BatchReplace
 {
     static void Main()
     {
-        // Directory containing the PDF files to process
+        // Folder that contains the PDF files to process
         const string inputFolder = @"C:\PdfArchive";
+        // Optional: folder for the processed files (can be the same as inputFolder to overwrite)
+        const string outputFolder = @"C:\PdfArchive\Processed";
 
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        // Get all PDF files in the folder (non‑recursive)
+        // Ensure the output folder exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Get all PDF files in the input folder (non‑recursive)
         string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
 
         foreach (string pdfPath in pdfFiles)
         {
             try
             {
-                // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+                // Load the PDF document inside a using block for deterministic disposal
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Create a PdfContentEditor facade and bind the loaded document
+                    // Create a PdfContentEditor facade and bind it to the loaded document
                     PdfContentEditor editor = new PdfContentEditor();
                     editor.BindPdf(doc);
 
                     // Replace every occurrence of "Confidential" with "Public" on all pages
-                    editor.ReplaceText("Confidential", "Public");
+                    // thePage = 0 means "all pages"
+                    editor.ReplaceText("Confidential", 0, "Public");
 
-                    // Save the modified document back to the same file (lifecycle rule: use Document.Save)
-                    doc.Save(pdfPath);
+                    // Determine the output file path (overwrite in place or write to output folder)
+                    string fileName = Path.GetFileName(pdfPath);
+                    string outputPath = Path.Combine(outputFolder, fileName);
+
+                    // Save the modified document
+                    doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
+                Console.WriteLine($"Processed: {pdfPath}");
             }
             catch (Exception ex)
             {

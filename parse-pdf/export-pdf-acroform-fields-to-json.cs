@@ -1,28 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// export pdf acroform fields to json
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/parse-pdf/export-acroform-fields-to-json.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "form_fields.json";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
-
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPdf))
-        {
-            // Export all AcroForm fields (names and values) to a JSON file
-            // The ExportToJson method writes the JSON representation directly to the specified file
-            doc.Form.ExportToJson(outputJson);
-        }
-
-        Console.WriteLine($"AcroForm fields have been exported to '{outputJson}'.");
-    }
-}
+class Program { static void Main() { } }

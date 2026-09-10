@@ -5,49 +5,55 @@ using Aspose.Pdf;
 
 class Program
 {
+    // XML document that will collect progress events
+    private static readonly XmlDocument progressXml = new XmlDocument();
+
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputHtml = "output.html";
-        const string progressXml = "progress.xml";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.html";
+        const string progressXmlPath = "progress.xml";
 
-        // Ensure the input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Create an XML writer that will collect progress events
-        using (XmlWriter writer = XmlWriter.Create(progressXml, new XmlWriterSettings { Indent = true }))
+        // Initialise the XML document with a root element
+        XmlElement root = progressXml.CreateElement("ProgressEvents");
+        progressXml.AppendChild(root);
+
+        // Load the PDF document (using block ensures proper disposal)
+        using (Document doc = new Document(inputPdfPath))
         {
-            writer.WriteStartDocument();
-            writer.WriteStartElement("ProgressEvents");
-
             // Configure HTML save options with a custom progress handler
-            HtmlSaveOptions saveOptions = new HtmlSaveOptions();
-            saveOptions.CustomProgressHandler = new HtmlSaveOptions.ConversionProgressEventHandler(
-                (HtmlSaveOptions.ProgressEventHandlerInfo info) =>
-                {
-                    // Write each progress event as an XML element
-                    writer.WriteStartElement("Event");
-                    writer.WriteAttributeString("Type", info.EventType.ToString());
-                    writer.WriteAttributeString("Value", info.Value.ToString());
-                    writer.WriteAttributeString("MaxValue", info.MaxValue.ToString());
-                    writer.WriteEndElement();
-                    writer.Flush(); // Ensure data is written promptly
-                });
-
-            // Load the PDF and save it as HTML while tracking progress
-            using (Document doc = new Document(inputPdf))
+            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
             {
-                doc.Save(outputHtml, saveOptions);
-            }
+                // Assign the handler that records progress into the XML document
+                CustomProgressHandler = new HtmlSaveOptions.ConversionProgressEventHandler(RecordProgress)
+            };
 
-            writer.WriteEndElement(); // </ProgressEvents>
-            writer.WriteEndDocument();
+            // Save the document; the progress handler will be invoked during the conversion
+            doc.Save(outputPdfPath, htmlOpts);
         }
 
-        Console.WriteLine($"Conversion completed. Progress saved to '{progressXml}'.");
+        // After conversion, write the collected progress information to an XML file
+        progressXml.Save(progressXmlPath);
+        Console.WriteLine($"Conversion completed. Progress data saved to '{progressXmlPath}'.");
+    }
+
+    // Handler that receives progress events and appends them to the XML document
+    private static void RecordProgress(HtmlSaveOptions.ProgressEventHandlerInfo eventInfo)
+    {
+        // Create an <Event> element with relevant attributes
+        XmlElement eventElem = progressXml.CreateElement("Event");
+        eventElem.SetAttribute("Timestamp", DateTime.Now.ToString("o"));
+        eventElem.SetAttribute("EventType", eventInfo.EventType.ToString());
+        eventElem.SetAttribute("Value", eventInfo.Value.ToString());
+        eventElem.SetAttribute("MaxValue", eventInfo.MaxValue.ToString());
+
+        // Append the event to the root <ProgressEvents> element
+        progressXml.DocumentElement?.AppendChild(eventElem);
     }
 }

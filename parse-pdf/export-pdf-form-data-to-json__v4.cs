@@ -1,33 +1,72 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
-class Program
+class ExportFormData
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        const string inputPdf = "input.pdf";
-        const string jsonPath = "formData.json";
-
-        if (!File.Exists(inputPdf))
+        // Expect at least two arguments: input PDF path and output format flag.
+        if (args.Length < 2)
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine("Usage: ExportFormData <input.pdf> <format> [output]");
+            Console.Error.WriteLine("Supported formats: json");
             return;
         }
 
-        // Load the PDF document; using ensures proper disposal.
-        using (Document doc = new Document(inputPdf))
+        string inputPath = args[0];
+        string format    = args[1].ToLowerInvariant();
+        string outputPath;
+
+        // Determine output file name if not supplied.
+        if (args.Length >= 3)
         {
-            // Create a FileStream to write the JSON output.
-            using (FileStream fs = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
+            outputPath = args[2];
+        }
+        else
+        {
+            string baseName = Path.GetFileNameWithoutExtension(inputPath);
+            switch (format)
             {
-                // Export all form fields to JSON directly into the stream.
-                // No ExportFieldsToJsonOptions are required for default behavior.
-                doc.Form.ExportToJson(fs);
+                case "json":
+                    outputPath = $"{baseName}_form.json";
+                    break;
+                default:
+                    Console.Error.WriteLine($"Unsupported format '{format}'.");
+                    return;
             }
         }
 
-        Console.WriteLine($"Form data exported to '{jsonPath}'.");
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+
+        try
+        {
+            // Load the PDF document using the standard Aspose.Pdf constructor.
+            using (Document doc = new Document(inputPath))
+            {
+                // Export form fields according to the requested format.
+                switch (format)
+                {
+                    case "json":
+                        // Export all form fields to a JSON file.
+                        // The ExportToJson overload writes directly to the specified file.
+                        doc.Form.ExportToJson(outputPath);
+                        Console.WriteLine($"Form data exported to JSON: {outputPath}");
+                        break;
+
+                    default:
+                        Console.Error.WriteLine($"Format '{format}' is not implemented.");
+                        break;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
@@ -8,103 +8,112 @@ using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
-    // DTOs for JSON serialization – string properties are nullable to satisfy non‑nullable warnings
-    public class TableDto
-    {
-        public string? AlternativeText { get; set; }
-        public string? ActualText { get; set; }
-        public List<RowDto> Rows { get; set; } = new List<RowDto>();
-    }
-
-    public class RowDto
-    {
-        public string? AlternativeText { get; set; }
-        public string? ActualText { get; set; }
-        public List<CellDto> Cells { get; set; } = new List<CellDto>();
-    }
-
-    public class CellDto
-    {
-        public string? AlternativeText { get; set; }
-        public string? ActualText { get; set; }
-        public int RowSpan { get; set; }
-        public int ColSpan { get; set; }
-        public string? BackgroundColor { get; set; }
-        // BorderInfo does not expose a Color property – we expose its string representation instead
-        public string? BorderInfo { get; set; }
-    }
-
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "table_structure.json";
+        const string inputPath = "input.pdf";
+        const string jsonPath = "table_structure.json";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Access tagged content (must use ITaggedContent, not Document.IsTagged)
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Find all TableElement instances in the structure tree
-            List<TableDto> tables = new List<TableDto>();
-            var tableElements = doc.TaggedContent.RootElement.FindElements<TableElement>(true);
-            foreach (TableElement table in tableElements)
+            // Root of the logical structure tree
+            StructureElement root = tagged.RootElement;
+
+            // Find all table structure elements in the document
+            var tables = root.FindElements<TableElement>(true);
+
+            var tableInfos = new List<TableInfo>();
+
+            foreach (TableElement table in tables)
             {
-                TableDto tableDto = new TableDto
-                {
+                TableInfo tableInfo = new TableInfo {
                     AlternativeText = table.AlternativeText,
-                    ActualText = table.ActualText
+                    Title = table.Title,
+                    Language = table.Language,
+                    Rows = new List<RowInfo>()
                 };
 
-                // Iterate over child elements of the table (rows are TableTRElement)
-                foreach (Element rowElem in table.ChildElements)
+                // Iterate over child elements of the table (rows)
+                foreach (Element child in table.ChildElements)
                 {
-                    if (rowElem is TableTRElement row)
+                    if (child is TableTRElement row)
                     {
-                        RowDto rowDto = new RowDto
-                        {
+                        RowInfo rowInfo = new RowInfo {
                             AlternativeText = row.AlternativeText,
-                            ActualText = row.ActualText
+                            Title = row.Title,
+                            Language = row.Language,
+                            Cells = new List<CellInfo>()
                         };
 
-                        // Iterate over cells within the row (cells are TableTDElement)
+                        // Iterate over cells within the row
                         foreach (Element cellElem in row.ChildElements)
                         {
                             if (cellElem is TableTDElement cell)
                             {
-                                CellDto cellDto = new CellDto
-                                {
+                                CellInfo cellInfo = new CellInfo {
                                     AlternativeText = cell.AlternativeText,
+                                    Title = cell.Title,
+                                    Language = cell.Language,
                                     ActualText = cell.ActualText,
                                     RowSpan = cell.RowSpan,
                                     ColSpan = cell.ColSpan,
                                     BackgroundColor = cell.BackgroundColor?.ToString(),
-                                    // BorderInfo does not have a Color property; expose its string representation instead
-                                    BorderInfo = cell.Border?.ToString()
+                                    Border = cell.Border?.ToString()
                                 };
-                                rowDto.Cells.Add(cellDto);
+                                rowInfo.Cells.Add(cellInfo);
                             }
                         }
 
-                        tableDto.Rows.Add(rowDto);
+                        tableInfo.Rows.Add(rowInfo);
                     }
                 }
 
-                tables.Add(tableDto);
+                tableInfos.Add(tableInfo);
             }
 
-            // Serialize the collected table structures to JSON
+            // Serialize the collected structure to JSON with indentation
             JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(tables, jsonOptions);
-            File.WriteAllText(outputJson, json);
-
-            Console.WriteLine($"Table structure exported to '{outputJson}'.");
+            string json = JsonSerializer.Serialize(tableInfos, jsonOptions);
+            File.WriteAllText(jsonPath, json);
         }
+
+        Console.WriteLine($"Table structure exported to {jsonPath}");
+    }
+
+    // DTO classes used for JSON serialization
+    class TableInfo
+    {
+        public string AlternativeText { get; set; }
+        public string Title { get; set; }
+        public string Language { get; set; }
+        public List<RowInfo> Rows { get; set; }
+    }
+
+    class RowInfo
+    {
+        public string AlternativeText { get; set; }
+        public string Title { get; set; }
+        public string Language { get; set; }
+        public List<CellInfo> Cells { get; set; }
+    }
+
+    class CellInfo
+    {
+        public string AlternativeText { get; set; }
+        public string Title { get; set; }
+        public string Language { get; set; }
+        public string ActualText { get; set; }
+        public int RowSpan { get; set; }
+        public int ColSpan { get; set; }
+        public string BackgroundColor { get; set; }
+        public string Border { get; set; }
     }
 }

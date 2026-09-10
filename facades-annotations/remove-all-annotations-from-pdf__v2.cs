@@ -6,8 +6,8 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Expect two arguments: input PDF path and output PDF path
-        if (args.Length < 2)
+        // Expect exactly two arguments: input PDF path and output PDF path
+        if (args.Length != 2)
         {
             Console.Error.WriteLine("Usage: RemoveAnnotations <input.pdf> <output.pdf>");
             return;
@@ -16,19 +16,34 @@ class Program
         string inputPath = args[0];
         string outputPath = args[1];
 
-        // Verify that the input file exists
+        // Validate input file existence
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Error: Input file not found: {inputPath}");
             return;
         }
 
-        // Use PdfAnnotationEditor to bind the PDF, delete all annotations, and save the result
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        // Create the annotation editor, bind the PDF, delete all annotations, and save
+        PdfAnnotationEditor editor = new PdfAnnotationEditor();
+        try
         {
-            editor.BindPdf(inputPath);          // Load the PDF document
-            editor.DeleteAnnotations();         // Remove every annotation in the document
-            editor.Save(outputPath);            // Save the modified PDF to the specified output path
+            // Load the PDF document into the editor
+            editor.BindPdf(inputPath);
+
+            // Remove every annotation from the document
+            editor.DeleteAnnotations();
+
+            // Save the cleaned PDF to the specified output path
+            editor.Save(outputPath);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+        }
+        finally
+        {
+            // Ensure resources are released
+            editor.Close();
         }
 
         Console.WriteLine($"All annotations removed. Output saved to '{outputPath}'.");

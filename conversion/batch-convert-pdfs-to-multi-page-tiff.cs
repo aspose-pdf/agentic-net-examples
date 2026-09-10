@@ -1,43 +1,48 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Devices; // TiffDevice, Resolution
 
-class BatchPdfToTiff
+class Program
 {
     static void Main()
     {
-        // Directory containing source PDF files
-        const string inputDirectory = @"C:\PdfInput";
+        // List of PDF files to be combined
+        string[] pdfFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
+        // Output multi‑page TIFF file
+        const string outputTiff = "merged.tif";
 
-        // Directory where the resulting multi‑page TIFF files will be saved
-        const string outputDirectory = @"C:\TiffOutput";
-
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDirectory);
-
-        // Get all PDF files in the input directory
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf");
-
-        foreach (string pdfPath in pdfFiles)
+        // Verify that all source files exist
+        foreach (var file in pdfFiles)
         {
-            // Derive the output TIFF file name from the PDF file name
-            string tiffFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".tif";
-            string tiffPath = Path.Combine(outputDirectory, tiffFileName);
-
-            // Load the PDF document (using the standard Document constructor)
-            using (Document pdfDocument = new Document(pdfPath))
+            if (!File.Exists(file))
             {
-                // Create a TiffDevice with default settings (default compression is None)
-                TiffDevice tiffDevice = new TiffDevice();
-
-                // Convert the entire PDF to a multi‑page TIFF archive
-                tiffDevice.Process(pdfDocument, tiffPath);
+                Console.Error.WriteLine($"Source file not found: {file}");
+                return;
             }
-
-            Console.WriteLine($"Converted '{pdfPath}' to '{tiffPath}'.");
         }
 
-        Console.WriteLine("Batch conversion completed.");
+        // Create a new Document that will hold all pages
+        using (Document mergedDoc = new Document())
+        {
+            // Append pages from each PDF into the merged document
+            foreach (var file in pdfFiles)
+            {
+                using (Document srcDoc = new Document(file))
+                {
+                    mergedDoc.Pages.Add(srcDoc.Pages);
+                }
+            }
+
+            // Initialize TiffDevice with a default resolution (e.g., 300 DPI)
+            // No explicit TiffSettings are provided, so default compression is used
+            Resolution resolution = new Resolution(300);
+            TiffDevice tiffDevice = new TiffDevice(resolution);
+
+            // Convert the entire merged document to a multi‑page TIFF archive
+            tiffDevice.Process(mergedDoc, outputTiff);
+        }
+
+        Console.WriteLine($"Multi‑page TIFF created at: {outputTiff}");
     }
 }

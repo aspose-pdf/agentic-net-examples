@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // Added for TextFragment
 
 class Program
 {
@@ -8,34 +10,41 @@ class Program
     {
         const string inputPath = "input.pdf";
 
+        // -------------------------------------------------------------------
+        // Ensure the input file exists. In the sandbox there is no pre‑existing
+        // PDF, so we create a minimal one on‑the‑fly. This follows the
+        // "hardcoded-input-file-generate-inline-first" pattern.
+        // -------------------------------------------------------------------
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        try
-        {
-            // Load the PDF document inside a using block for proper disposal
-            using (Document doc = new Document(inputPath))
+            using (Document seed = new Document())
             {
-                // CryptoAlgorithm is a nullable enum; null means the document is not encrypted
-                CryptoAlgorithm? algorithm = doc.CryptoAlgorithm;
-
-                if (algorithm.HasValue)
-                {
-                    // Display the name of the encryption algorithm (e.g., AESx256, RC4x128)
-                    Console.WriteLine($"Encryption algorithm: {algorithm.Value}");
-                }
-                else
-                {
-                    Console.WriteLine("Document is not encrypted.");
-                }
+                // Add a single blank page (or add content if desired).
+                seed.Pages.Add();
+                // Optional: add a simple text fragment so the PDF is not empty.
+                seed.Pages[1].Paragraphs.Add(new TextFragment("Sample PDF"));
+                seed.Save(inputPath);
             }
         }
-        catch (Exception ex)
+
+        // Load PDF meta‑information using the Facades API.
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            bool isEncrypted = pdfInfo.IsEncrypted;
+            string algorithm = "None";
+
+            if (isEncrypted)
+            {
+                // The underlying Document is available via the PdfFileInfo object.
+                Document doc = pdfInfo.Document;
+                algorithm = doc.CryptoAlgorithm.HasValue
+                    ? doc.CryptoAlgorithm.Value.ToString()
+                    : "Unknown";
+            }
+
+            // Display the results (console used as UI placeholder).
+            Console.WriteLine($"Is Encrypted: {isEncrypted}");
+            Console.WriteLine($"Encryption Algorithm: {algorithm}");
         }
     }
 }

@@ -6,13 +6,13 @@ class Program
 {
     static void Main()
     {
-        const string sourcePdf = "source.pdf";
-        const string xfdfTemp   = "temp.xfdf";
-        const string outputPdf  = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string xfdfTemp = "temp.xfdf";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(sourcePdf))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
         if (!File.Exists(xfdfTemp))
@@ -23,22 +23,22 @@ class Program
 
         try
         {
-            // Initialize Form facade with source and destination PDF files
-            using (Form form = new Form(sourcePdf, outputPdf))
+            // Bind source PDF and specify output PDF using Form facade
+            using (Form form = new Form(inputPdf, outputPdf))
             {
-                // Import XFDF data from temporary file
+                // Open XFDF file as a stream and import its data
                 using (FileStream xfdfStream = new FileStream(xfdfTemp, FileMode.Open, FileAccess.Read))
                 {
                     form.ImportXfdf(xfdfStream);
                 }
 
-                // Save the updated PDF
+                // Save the PDF with imported XFDF data
                 form.Save();
             }
 
-            // Delete temporary XFDF file after successful import
+            // Delete the temporary XFDF file after successful import and save
             File.Delete(xfdfTemp);
-            Console.WriteLine("Import completed. Temporary XFDF file removed.");
+            Console.WriteLine("Import completed and temporary XFDF file deleted.");
         }
         catch (Exception ex)
         {

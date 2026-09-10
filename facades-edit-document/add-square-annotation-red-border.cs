@@ -19,29 +19,27 @@ class Program
         // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least five pages
-            if (doc.Pages.Count < 5)
-            {
-                Console.Error.WriteLine("The document does not contain page 5.");
-                return;
-            }
-
-            // Get page five (1‑based indexing)
+            // Page indexing in Aspose.Pdf is 1‑based; page 5 is the target page
             Page page = doc.Pages[5];
 
-            // Define the annotation rectangle (left, bottom, right, top)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+            // Define the rectangle for the square annotation (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
 
-            // Create a square annotation on the specified page and rectangle
+            // Create the square annotation on the specified page
             SquareAnnotation square = new SquareAnnotation(page, rect)
             {
-                // Red border
+                // Red border color
                 Color = Aspose.Pdf.Color.Red,
-                // Fill color (any color you prefer)
+
+                // Fill color (e.g., light gray)
                 InteriorColor = Aspose.Pdf.Color.LightGray,
-                // Semi‑transparent fill (0 = fully transparent, 1 = opaque)
+
+                // Semi‑transparent fill (0.0 = fully transparent, 1.0 = opaque)
                 Opacity = 0.5
             };
+
+            // Set the border width (Border requires the parent annotation in its constructor)
+            square.Border = new Border(square) { Width = 2 };
 
             // Add the annotation to the page's annotation collection
             page.Annotations.Add(square);

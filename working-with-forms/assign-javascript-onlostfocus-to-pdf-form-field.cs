@@ -10,7 +10,6 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "myField";
 
         if (!File.Exists(inputPath))
         {
@@ -18,29 +17,31 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document (standard load rule)
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the form field – the Form indexer returns a WidgetAnnotation,
-            // so we need to cast it to Aspose.Pdf.Forms.Field.
-            Field? field = doc.Form[fieldName] as Field;
+            // The Form indexer returns a WidgetAnnotation; cast it to Field to access form‑specific members
+            Field? field = doc.Form["myField"] as Field;
             if (field == null)
             {
-                Console.Error.WriteLine($"Field '{fieldName}' not found or is not a form field.");
+                Console.Error.WriteLine("Form field 'myField' not found or is not a form field.");
                 return;
             }
 
-            // JavaScript that runs when the field loses focus (OnLostFocus).
-            // Example: multiply the field's value by 2 and store the result back.
-            string js = $"event.value = this.getField('{fieldName}').value * 2;";
+            // JavaScript that runs when the field loses focus – doubles the numeric value
+            string jsCode = @"
+                var val = parseFloat(event.target.value);
+                if (!isNaN(val)) {
+                    event.target.value = (val * 2).toString();
+                }
+            ";
 
-            // Assign the JavaScript to the OnLostFocus action of the field
-            field.Actions.OnLostFocus = new JavascriptAction(js);
+            field.Actions.OnLostFocus = new JavascriptAction(jsCode);
 
-            // Save the modified PDF
+            // Save the modified PDF (standard save rule)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with JavaScript action to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with JavaScript action: {outputPath}");
     }
 }

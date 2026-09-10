@@ -8,45 +8,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputTxt = "hyperlinks.txt";     // plain‑text list
+        const string inputPath = "input.pdf";
+        const string outputPath = "hyperlinks.txt";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document (lifecycle rule: use Document constructor)
+        using (Document doc = new Document(inputPath))
         {
-            var links = new List<string>();
+            List<string> extractedLinks = new List<string>();
 
-            // Iterate over all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Pages are 1‑based (global rule)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // Annotations collection is also 1‑based
-                for (int idx = 1; idx <= page.Annotations.Count; idx++)
-                {
-                    Annotation ann = page.Annotations[idx];
+                Page page = doc.Pages[pageIndex];
 
-                    // We are interested only in LinkAnnotation objects
+                // Annotations collection is also 1‑based
+                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
+                {
+                    Annotation ann = page.Annotations[annIndex];
+
+                    // We're interested only in LinkAnnotation objects
                     if (ann is LinkAnnotation linkAnn)
                     {
-                        // External hyperlinks are represented by GoToURIAction
-                        if (linkAnn.Action is GoToURIAction uriAction)
+                        // Extract the URL from a GoToURIAction attached to the link
+                        if (linkAnn.Action is GoToURIAction uriAction && !string.IsNullOrEmpty(uriAction.URI))
                         {
-                            // The URI property holds the URL string
-                            links.Add(uriAction.URI);
+                            extractedLinks.Add(uriAction.URI);
                         }
                     }
                 }
             }
 
-            // Write the collected URLs to a plain‑text file (one per line)
-            File.WriteAllLines(outputTxt, links);
+            // Export the list of URLs to a plain‑text file (standard .NET I/O)
+            File.WriteAllLines(outputPath, extractedLinks);
         }
 
-        Console.WriteLine($"Extracted {File.ReadAllLines(outputTxt).Length} hyperlink(s) to '{outputTxt}'.");
+        Console.WriteLine($"Hyperlinks extracted to '{outputPath}'.");
     }
 }

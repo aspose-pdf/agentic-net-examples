@@ -15,45 +15,83 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document (using the standard Document constructor)
         using (Document doc = new Document(inputPath))
         {
-            // Access the form that contains all fields
+            // Ensure the document contains a form
             Form form = doc.Form;
-
-            // Iterate over every field in the form
-            foreach (Field field in form.Fields)
+            if (form == null || form.Count == 0)
             {
-                // Process only signature fields
+                Console.WriteLine("No form fields found in the document.");
+                return;
+            }
+
+            // Iterate over all form fields and process only signature fields
+            foreach (Field field in form)
+            {
                 if (field is SignatureField sigField)
                 {
                     Console.WriteLine("=== Signature Field ===");
-                    Console.WriteLine($"Name: {sigField.Name}");
-                    Console.WriteLine($"FullName: {sigField.FullName}");
-                    Console.WriteLine($"AlternateName: {sigField.AlternateName}");
-                    Console.WriteLine($"PartialName: {sigField.PartialName}");
-                    Console.WriteLine($"PageIndex: {sigField.PageIndex}");
-                    Console.WriteLine($"Rect: {sigField.Rect}");
-                    Console.WriteLine($"Modified: {sigField.Modified}");
-                    Console.WriteLine($"ReadOnly: {sigField.ReadOnly}");
-                    Console.WriteLine($"Required: {sigField.Required}");
-                    Console.WriteLine($"SignatureExists: {(sigField.Signature != null)}");
+                    // Basic field metadata
+                    Console.WriteLine($"Name          : {sigField.Name}");
+                    Console.WriteLine($"FullName      : {sigField.FullName}");
+                    Console.WriteLine($"PartialName   : {sigField.PartialName}");
+                    Console.WriteLine($"AlternateName : {sigField.AlternateName}");
+                    Console.WriteLine($"Modified      : {sigField.Modified}");
+                    Console.WriteLine($"ReadOnly      : {sigField.ReadOnly}");
+                    Console.WriteLine($"Required      : {sigField.Required}");
+                    Console.WriteLine($"Exportable    : {sigField.Exportable}");
+                    Console.WriteLine($"SignatureExist: {sigField.Signature != null}");
 
-                    // If the field already contains a digital signature, extract its details
+                    // Signature object details (if present)
                     if (sigField.Signature != null)
                     {
                         var signature = sigField.Signature;
                         Console.WriteLine("--- Signature Object ---");
-                        Console.WriteLine($"Authority: {signature.Authority}");
-                        Console.WriteLine($"Date: {signature.Date}");
-                        Console.WriteLine($"Location: {signature.Location}");
-                        Console.WriteLine($"Reason: {signature.Reason}");
-                        Console.WriteLine($"ContactInfo: {signature.ContactInfo}");
-                        Console.WriteLine($"ShowProperties: {signature.ShowProperties}");
-                        Console.WriteLine($"ByteRange length: {signature.ByteRange?.Length ?? 0}");
+                        Console.WriteLine($"Authority   : {signature.Authority}");
+                        Console.WriteLine($"Date        : {signature.Date}");
+                        Console.WriteLine($"Reason      : {signature.Reason}");
+                        Console.WriteLine($"Location    : {signature.Location}");
+                        Console.WriteLine($"ContactInfo : {signature.ContactInfo}");
+                        Console.WriteLine($"ShowProperties : {signature.ShowProperties}");
+                        Console.WriteLine($"DefaultSignatureLength : {signature.DefaultSignatureLength}");
+                        // ByteRange is an int array; display as comma‑separated list
+                        Console.WriteLine($"ByteRange   : {string.Join(", ", signature.ByteRange ?? new int[0])}");
                     }
 
-                    Console.WriteLine();
+                    // Extract certificate (if any) and write its size
+                    try
+                    {
+                        using (Stream certStream = sigField.ExtractCertificate())
+                        {
+                            if (certStream != null)
+                            {
+                                Console.WriteLine($"Certificate size: {certStream.Length} bytes");
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Certificate extraction failed: {ex.Message}");
+                    }
+
+                    // Extract signature image (if any) and write its size
+                    try
+                    {
+                        using (Stream imgStream = sigField.ExtractImage())
+                        {
+                            if (imgStream != null)
+                            {
+                                Console.WriteLine($"Signature image size: {imgStream.Length} bytes");
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Image extraction failed: {ex.Message}");
+                    }
+
+                    Console.WriteLine(); // blank line between fields
                 }
             }
         }

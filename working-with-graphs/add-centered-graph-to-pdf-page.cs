@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -7,45 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "graph_centered.pdf";
 
-        if (!File.Exists(inputPath))
+        // Use a using block to ensure the Document is disposed properly
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // A newly created Document is empty – add a page first
+            Page page = doc.Pages.Add();
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Access the first page (1‑based indexing)
-            Page page = doc.Pages[1];
+            // Use the double‑based constructor (the float overload is obsolete)
+            Graph graph = new Graph(200.0, 100.0);
 
-            // Create a graph with desired width and height (points)
-            Graph graph = new Graph(200, 100);
-
-            // Align the graph to the center of the page
+            // Center the graph horizontally and vertically on the page
             graph.HorizontalAlignment = HorizontalAlignment.Center;
             graph.VerticalAlignment   = VerticalAlignment.Center;
 
-            // Example shape: a rectangle inside the graph
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0, 0, 200, 100);
-            rect.GraphInfo = new GraphInfo
+            // Optional visual styling via GraphInfo
+            graph.GraphInfo = new GraphInfo
             {
-                FillColor = Aspose.Pdf.Color.LightGray,
-                Color     = Aspose.Pdf.Color.Black,
+                FillColor = Color.LightGray,
+                Color     = Color.Black,
                 LineWidth = 1
             };
-            graph.Shapes.Add(rect);
 
             // Add the graph to the page's Paragraphs collection
             page.Paragraphs.Add(graph);
 
-            // Save the modified PDF
+            // Save the PDF inside the using block
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Graph added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

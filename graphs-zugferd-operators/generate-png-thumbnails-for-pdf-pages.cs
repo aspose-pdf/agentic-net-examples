@@ -7,42 +7,39 @@ class Program
 {
     static void Main()
     {
-        // Path to the directory containing the PDF file
-        string dataDir = @"YOUR_DATA_DIRECTORY";
-        // Input PDF file name
-        string pdfFile = "input.pdf";
+        const string inputPath = "input.pdf";
+        const string outputDir = "Thumbnails";
 
-        // Combine directory and file name to get full path
-        string pdfPath = Path.Combine(dataDir, pdfFile);
-
-        // Ensure the PDF file exists before proceeding
-        if (!File.Exists(pdfPath))
+        // Verify input file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(pdfPath))
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Load the PDF document (wrapped in using for deterministic disposal)
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Create a ThumbnailDevice with custom width and height (e.g., 150x150 pixels)
-            ThumbnailDevice thumbnailDevice = new ThumbnailDevice(150, 150);
+            // Create a ThumbnailDevice with custom dimensions (e.g., 150x150 pixels)
+            ThumbnailDevice thumbDevice = new ThumbnailDevice(150, 150);
 
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+            // Iterate through pages using 1‑based indexing (Aspose.Pdf convention)
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
-                // Define the output PNG file name for the current page thumbnail
-                string thumbPath = Path.Combine(dataDir, $"thumb_page{pageNumber}.png");
+                string outPath = Path.Combine(outputDir, $"thumb_page{pageNum}.png");
 
-                // Create the output file stream inside a using block
-                using (FileStream outputStream = new FileStream(thumbPath, FileMode.Create))
+                // Create the output file stream
+                using (FileStream outStream = new FileStream(outPath, FileMode.Create))
                 {
-                    // Convert the current page to a PNG thumbnail and write it to the stream
-                    thumbnailDevice.Process(pdfDocument.Pages[pageNumber], outputStream);
+                    // Convert the current page to a PNG thumbnail and write to the stream
+                    thumbDevice.Process(pdfDoc.Pages[pageNum], outStream);
                 }
-
-                Console.WriteLine($"Thumbnail saved: {thumbPath}");
             }
         }
+
+        Console.WriteLine("Thumbnail images have been generated successfully.");
     }
 }

@@ -1,37 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF and bind it to FormEditor
-        using (Document doc = new Document(inputPath))
-        using (FormEditor formEditor = new FormEditor(doc))
+        try
         {
-            // Move the field "DateField" to the new rectangle on page 2
-            // Lower‑left corner (100, 200), upper‑right corner (250, 220)
-            bool moved = formEditor.MoveField("DateField", 100f, 200f, 250f, 220f);
-            if (!moved)
+            // FormEditor is a disposable facade; wrap it in a using block.
+            using (FormEditor formEditor = new FormEditor())
             {
-                Console.Error.WriteLine("Failed to move field 'DateField'.");
+                // Bind the source PDF.
+                formEditor.BindPdf(inputPath);
+
+                // Move the field named "DateField" to (100,200) with width 150 and height 20.
+                // llx = 100, lly = 200, urx = 250 (100 + 150), ury = 220 (200 + 20)
+                bool moved = formEditor.MoveField("DateField", 100f, 200f, 250f, 220f);
+
+                if (!moved)
+                {
+                    Console.Error.WriteLine("Failed to move the field 'DateField'.");
+                }
+
+                // Save the modified PDF.
+                formEditor.Save(outputPath);
             }
 
-            // Save the updated PDF
-            formEditor.Save(outputPath);
+            Console.WriteLine($"Field moved and PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Field moved and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

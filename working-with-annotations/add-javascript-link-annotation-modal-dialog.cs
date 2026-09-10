@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_js.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,39 +16,33 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule: document disposal with using)
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            // Choose the page where the annotation will be placed (first page in this example)
             Page page = doc.Pages[1];
 
-            // Define the clickable area for the link annotation
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            // Define the rectangle area for the link annotation (coordinates are in points)
+            // Fully qualify Rectangle to avoid ambiguity with System.Drawing.Rectangle
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
             // Create the link annotation on the specified page and rectangle
-            LinkAnnotation link = new LinkAnnotation(page, rect)
-            {
-                // Optional visual styling
-                Color = Aspose.Pdf.Color.Blue,
-                // Tooltip text shown when hovering over the link
-                Contents = "Show custom modal dialog"
-            };
+            LinkAnnotation link = new LinkAnnotation(page, rect);
+            // Optional visual styling
+            link.Color = Aspose.Pdf.Color.Blue;
+            link.Border = new Border(link) { Width = 1 };
 
-            // JavaScript code to display a modal dialog (using app.alert)
-            // JavascriptAction is the correct class for JavaScript actions
-            JavascriptAction jsAction = new JavascriptAction("app.alert('Custom modal dialog');");
-
-            // Assign the JavaScript action to the link annotation
-            link.Action = jsAction;
+            // Assign a JavaScript action that shows a modal dialog box
+            // The script uses the Acrobat JavaScript API: app.alert()
+            link.Action = new JavascriptAction("app.alert('This is a custom modal dialog box.');");
 
             // Add the annotation to the page's annotation collection
             page.Annotations.Add(link);
 
-            // Save the modified PDF (using rule: document disposal with using)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with JavaScript link annotation to '{outputPath}'.");
     }
 }

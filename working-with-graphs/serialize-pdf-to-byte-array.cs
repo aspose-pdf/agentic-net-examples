@@ -1,35 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// serialize pdf to byte array
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/working-with-graphs/serialize-pdf-graph-to-byte-array.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        // Path to the source PDF that already contains a graph.
-        const string inputPath = "graph.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Byte array that will hold the serialized PDF.
-        byte[] pdfBytes;
-
-        // Load the PDF document inside a using block for deterministic disposal.
-        using (Document doc = new Document(inputPath))
-        {
-            // Save the document to a memory stream.
-            using (MemoryStream ms = new MemoryStream())
-            {
-                doc.Save(ms);               // Saves PDF content to the stream.
-                pdfBytes = ms.ToArray();    // Extract the byte array for transmission.
-            }
-        }
-
-        // Example usage: display the size of the serialized PDF.
-        Console.WriteLine($"Serialized PDF size: {pdfBytes.Length} bytes");
-    }
-}
+class Program { static void Main() { } }

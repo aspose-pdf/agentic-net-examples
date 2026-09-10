@@ -1,33 +1,28 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // CompressionType enum resides here
+using Aspose.Pdf.Devices; // CompressionType enum for TIFF
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // Path to source PDF
-        const string outputTiff = "output.tiff"; // Desired TIFF output path
+        const string inputPdf  = "input.pdf";
+        const string outputTiff = "output.tiff";
 
-        // Verify the input file exists
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // PdfConverter implements Facade and supports IDisposable; use a using block for deterministic cleanup
+        // Create a PdfConverter, bind the PDF, perform conversion, and save as multi‑page TIFF with LZW compression
         using (PdfConverter converter = new PdfConverter())
         {
-            // Bind the PDF file to the converter
-            converter.BindPdf(inputPdf);
-
-            // Prepare the converter (required before saving)
-            converter.DoConvert();
-
-            // Save all pages as a single multi‑page TIFF using LZW compression
-            converter.SaveAsTIFF(outputTiff, CompressionType.LZW);
+            converter.BindPdf(inputPdf);   // Load PDF
+            converter.DoConvert();         // Prepare conversion
+            converter.SaveAsTIFF(outputTiff, CompressionType.LZW); // Save TIFF with LZW compression
         }
 
         Console.WriteLine($"PDF successfully converted to TIFF: {outputTiff}");

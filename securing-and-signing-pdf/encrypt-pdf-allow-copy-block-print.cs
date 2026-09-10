@@ -1,16 +1,22 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // CryptoAlgorithm, Permissions, Document
+using Aspose.Pdf; // Core Aspose.Pdf namespace (contains Document, Permissions, CryptoAlgorithm)
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        // Input PDF to encrypt
+        const string inputPath = "input.pdf";
+
+        // Output encrypted PDF
         const string outputPath = "encrypted.pdf";
+
+        // Passwords: user can open the file, owner can change permissions
         const string userPassword  = "user123";
         const string ownerPassword = "owner123";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
@@ -19,10 +25,10 @@ class Program
 
         try
         {
-            // Load the PDF document
+            // Load the PDF document inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Allow copying (ExtractContent) but do NOT include PrintDocument permission
+                // Set permissions: allow content extraction (copying) but do NOT include PrintDocument
                 Permissions perms = Permissions.ExtractContent;
 
                 // Encrypt with AES-256 algorithm
@@ -32,7 +38,7 @@ class Program
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+            Console.WriteLine($"PDF encrypted successfully. Saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

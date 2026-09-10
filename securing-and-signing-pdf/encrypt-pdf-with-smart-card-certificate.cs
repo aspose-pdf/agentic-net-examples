@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 
@@ -8,52 +8,51 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "encrypted.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "encrypted.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Retrieve the certificate from the hardware security module / smart card.
-        // Adjust the store name, location, and search criteria (e.g., thumbprint) as needed.
+        // Load the certificate from the smart card / hardware security module.
+        // Adjust the store name/location and search criteria as needed for your environment.
         X509Certificate2 certificate = null;
         using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
         {
             store.Open(OpenFlags.ReadOnly);
             foreach (var cert in store.Certificates)
             {
-                // Example: match by thumbprint (replace with actual thumbprint)
-                if (cert.Thumbprint != null && cert.Thumbprint.Equals("YOUR_CERT_THUMBPRINT", StringComparison.OrdinalIgnoreCase))
+                // Example: select by subject name; replace with appropriate logic.
+                if (cert.Subject.Contains("YourSmartCardSubject"))
                 {
                     certificate = cert;
                     break;
                 }
             }
-            store.Close();
         }
 
         if (certificate == null)
         {
-            Console.Error.WriteLine("Certificate not found in the smart card store.");
+            Console.Error.WriteLine("Certificate not found on the smart card.");
             return;
         }
 
-        // Prepare the list of public certificates (one per recipient).
-        IList<X509Certificate2> publicCertificates = new List<X509Certificate2> { certificate };
-
-        // Define permissions for the encrypted PDF.
-        Permissions permissions = Permissions.PrintDocument | Permissions.ExtractContent;
-
-        // Encrypt the PDF using the certificate and AES-256 algorithm.
-        using (Document doc = new Document(inputPdfPath))
+        // Encrypt the PDF for the holder of the selected certificate.
+        using (Document doc = new Document(inputPath))
         {
-            doc.Encrypt(permissions, CryptoAlgorithm.AESx256, publicCertificates);
-            doc.Save(outputPdfPath); // Saving as PDF (default format)
+            // Define desired permissions (example: allow printing and content extraction).
+            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+
+            // Use a strong algorithm; AESx256 is recommended.
+            doc.Encrypt(perms, CryptoAlgorithm.AESx256, new List<X509Certificate2> { certificate });
+
+            // Save the encrypted PDF.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF encrypted successfully and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
     }
 }

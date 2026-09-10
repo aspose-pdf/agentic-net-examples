@@ -6,49 +6,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "ExtractedImages";
+        // Path to the source PDF file
+        const string pdfPath = "input.pdf";
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPdf))
+        // Folder where extracted images will be saved
+        const string outputFolder = "ExtractedImages";
+
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        try
+        // Use a using block so the PdfExtractor is disposed automatically
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            // PdfExtractor implements IDisposable, so a using block ensures it is disposed automatically
-            using (PdfExtractor extractor = new PdfExtractor())
+            // Bind the PDF document to the extractor
+            extractor.BindPdf(pdfPath);
+
+            // Extract all images from the document
+            extractor.ExtractImage();
+
+            int imageIndex = 1;
+            // Retrieve each image while there are more available
+            while (extractor.HasNextImage())
             {
-                // Load the PDF file into the extractor
-                extractor.BindPdf(inputPdf);
-
-                // Perform the image extraction operation
-                extractor.ExtractImage();
-
-                int imageIndex = 1;
-                // Iterate over all extracted images
-                while (extractor.HasNextImage())
-                {
-                    // Build a file name for each image
-                    string imagePath = Path.Combine(outputDir, $"image-{imageIndex}.png");
-
-                    // Save the current image to the file system
-                    extractor.GetNextImage(imagePath);
-
-                    imageIndex++;
-                }
+                string imagePath = Path.Combine(outputFolder, $"image-{imageIndex}.png");
+                // Save the next image to the specified file (default format is JPEG;
+                // the file extension can be changed as needed)
+                extractor.GetNextImage(imagePath);
+                imageIndex++;
             }
+        }
 
-            Console.WriteLine($"All images have been extracted to '{outputDir}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
-        }
+        Console.WriteLine("Image extraction completed.");
     }
 }

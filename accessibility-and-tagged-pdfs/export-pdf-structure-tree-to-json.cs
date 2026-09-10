@@ -3,73 +3,73 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;                 // ITaggedContent
-using Aspose.Pdf.LogicalStructure;      // StructureElement, Element, StructTreeRootElement
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
-    // Simple DTO that mirrors the logical structure for JSON serialization
+    // DTO that mirrors the logical structure element for JSON serialization
     private class StructureNode
     {
         public string ElementType { get; set; }
+        public string ActualText { get; set; }
         public string AlternativeText { get; set; }
         public string Language { get; set; }
-        public string ActualText { get; set; }
         public List<StructureNode> Children { get; set; } = new List<StructureNode>();
     }
 
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputJsonPath = "structure.json";
+        const string inputPdf = "input.pdf";
+        const string outputJson = "structure.json";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (using the standard lifecycle rule)
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // Access tagged content – the document may or may not be tagged.
-            ITaggedContent taggedContent = doc.TaggedContent;
-            if (taggedContent == null)
-            {
-                Console.Error.WriteLine("Document does not contain tagged content.");
-                return;
-            }
+            // Access tagged content; if the document is not tagged, the root will be empty
+            ITaggedContent tagged = doc.TaggedContent;
+            StructureElement rootElement = tagged.RootElement;
 
-            // Get the root of the structure tree.
-            StructTreeRootElement structRoot = taggedContent.StructTreeRootElement;
+            // Convert the structure tree to a serializable object graph
+            StructureNode rootNode = ConvertElement(rootElement);
 
-            // Convert the structure tree to a serializable object graph.
-            StructureNode jsonRoot = ConvertElement(structRoot);
-
-            // Serialize to JSON with optional indentation.
+            // Serialize to JSON with indentation for readability
             JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string jsonString = JsonSerializer.Serialize(jsonRoot, jsonOptions);
+            string json = JsonSerializer.Serialize(rootNode, jsonOptions);
 
-            // Write the JSON to a file.
-            File.WriteAllText(outputJsonPath, jsonString);
-            Console.WriteLine($"Structure tree exported to '{outputJsonPath}'.");
+            // Write JSON to the output file
+            File.WriteAllText(outputJson, json);
         }
+
+        Console.WriteLine($"Structure tree exported to '{outputJson}'.");
     }
 
-    // Recursively converts an Aspose.Pdf.LogicalStructure.Element into a StructureNode.
+    // Recursively converts a StructureElement (or any Element) into a StructureNode DTO
     private static StructureNode ConvertElement(Element element)
     {
+        // Only process StructureElement instances; other element types are ignored
+        if (element is not StructureElement structElem)
+            return null;
+
         StructureNode node = new StructureNode {
-            ElementType = element.GetType().Name,
-            AlternativeText = (element as StructureElement)?.AlternativeText,
-            Language = (element as StructureElement)?.Language,
-            ActualText = (element as StructureElement)?.ActualText
+            ElementType = structElem.GetType().Name,
+            ActualText = structElem.ActualText,
+            AlternativeText = structElem.AlternativeText,
+            Language = structElem.Language
         };
 
-        // ChildElements returns an IList<Element>
-        foreach (Element child in element.ChildElements)
+        // Iterate over child elements
+        foreach (Element child in structElem.ChildElements)
         {
-            node.Children.Add(ConvertElement(child));
+            StructureNode childNode = ConvertElement(child);
+            if (childNode != null)
+                node.Children.Add(childNode);
         }
 
         return node;

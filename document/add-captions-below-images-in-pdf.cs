@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.Text; // required for TextBuilder, TextParagraph, FontRepository
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_captions.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,48 +17,58 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            int pageNumber = 1;
-
-            // Iterate through each page in the document
+            // Iterate through each page
             foreach (Page page in doc.Pages)
             {
-                int imageIndex = 0;
-
-                // Iterate over all images on the current page
+                // Iterate through each image resource on the page
                 foreach (XImage img in page.Resources.Images)
                 {
-                    // Build a simple caption text for the image
-                    string captionText = $"Image {imageIndex + 1} on page {pageNumber}";
+                    // Create a simple caption text (you can customize per image if needed)
+                    string captionText = "Figure: Image description";
 
-                    // Create a TextFragment and style it
-                    TextFragment captionFragment = new TextFragment(captionText);
-                    captionFragment.TextState.Font = FontRepository.FindFont("Helvetica");
-                    captionFragment.TextState.FontSize = 10;
-                    captionFragment.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
+                    // Define a rectangle for the caption.
+                    // Position it 10 points below the bottom of the page (adjust as needed).
+                    // Using fully qualified types to avoid ambiguity.
+                    Aspose.Pdf.Rectangle captionRect = new Aspose.Pdf.Rectangle(
+                        50,                                 // left
+                        20,                                 // bottom (10 points above page bottom)
+                        page.PageInfo.Width - 50,           // right
+                        40);                                // top
 
-                    // Position the caption below the previous one (stacked vertically)
-                    // Adjust X/Y as needed; here we start at (50,50) and offset each caption by 15 points
-                    double posX = 50;
-                    double posY = 50 + imageIndex * 15;
-                    captionFragment.Position = new Position(posX, posY);
+                    // Create a TextParagraph and style it
+                    TextParagraph paragraph = new TextParagraph
+                    {
+                        Rectangle = captionRect,
+                        // Enable word wrap
+                        FormattingOptions = { WrapMode = TextFormattingOptions.WordWrapMode.ByWords },
+                        // Center align the caption
+                        HorizontalAlignment = HorizontalAlignment.Center
+                    };
 
-                    // Append the caption to the page using TextBuilder
+                    // Set text style via TextState
+                    TextState ts = new TextState
+                    {
+                        Font = FontRepository.FindFont("Helvetica"),
+                        FontSize = 12,
+                        ForegroundColor = Aspose.Pdf.Color.Gray
+                    };
+
+                    // Append the caption line with the defined style
+                    paragraph.AppendLine(captionText, ts);
+
+                    // Append the paragraph to the page using TextBuilder
                     TextBuilder builder = new TextBuilder(page);
-                    builder.AppendText(captionFragment);
-
-                    imageIndex++;
+                    builder.AppendParagraph(paragraph);
                 }
-
-                pageNumber++;
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Captions added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with captions saved to '{outputPath}'.");
     }
 }

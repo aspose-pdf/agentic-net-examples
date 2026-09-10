@@ -1,66 +1,53 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_autofit_row.pdf";
-
-        if (!File.Exists(inputPath))
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a page to the document
+            Page page = doc.Pages.Add();
 
-        // Load the existing PDF
-        using (Document doc = new Document(inputPath))
-        {
-            // Access the tagged content API
-            ITaggedContent tagged = doc.TaggedContent;
+            // Create a table and set its position on the page
+            Table table = new Table
+            {
+                // Position the table (llx, lly, urx, ury)
+                // Adjust as needed for your layout
+                ColumnWidths = "100 200 150"
+            };
+            page.Paragraphs.Add(table);
 
-            // Set language and title (optional)
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+            // Add a row to the table
+            Row row = table.Rows.Add();
 
-            // Get the root element of the logical structure tree
-            StructureElement root = tagged.RootElement;
+            // *** Auto‑fit row height ***
+            // Do NOT set FixedRowHeight – leaving it unset (default 0) lets the row
+            // height be determined by its content (intrinsic height).
+            // Optionally, ensure MinRowHeight is zero so there is no minimum constraint.
+            row.MinRowHeight = 0; // Auto‑fit (no minimum height)
 
-            // Create a table element and attach it to the root
-            TableElement table = tagged.CreateTableElement();
-            table.AlternativeText = "Sample table with auto‑fit rows";
-            root.AppendChild(table);
+            // Add cells with content that may require multiple lines
+            Cell cell1 = row.Cells.Add();
+            cell1.Paragraphs.Add(new TextFragment("Short text"));
 
-            // Create a table row (TableTRElement) via the factory
-            TableTRElement row = tagged.CreateTableTRElement();
+            Cell cell2 = row.Cells.Add();
+            // This cell contains a longer paragraph; the row height will expand automatically.
+            cell2.Paragraphs.Add(new TextFragment(
+                "This is a longer piece of text that should cause the row to increase its height " +
+                "automatically to accommodate the wrapped content without any manual height settings."));
 
-            // Attach the row to the table
-            table.AppendChild(row);
+            Cell cell3 = row.Cells.Add();
+            cell3.Paragraphs.Add(new TextFragment("Another cell"));
 
-            // IMPORTANT: Enable automatic height adjustment for the row.
-            // Setting FixedRowHeight to 0 and MinRowHeight to 0 lets the row
-            // height be determined by its intrinsic content (auto‑fit).
-            row.FixedRowHeight = 0;   // No fixed height
-            row.MinRowHeight   = 0;   // No minimum height constraint
-
-            // Add a header cell
-            TableTHElement th = tagged.CreateTableTHElement();
-            th.SetText("Header");
-            row.AppendChild(th);
-
-            // Add a data cell with multi‑line content to demonstrate auto‑fit
-            TableTDElement td = tagged.CreateTableTDElement();
-            td.SetText("Line 1\nLine 2\nLine 3");
-            row.AppendChild(td);
-
-            // Save the modified PDF
+            // Save the PDF
+            string outputPath = "AutoFitRowHeight.pdf";
             doc.Save(outputPath);
+            Console.WriteLine($"PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF saved with auto‑fit row height: '{outputPath}'");
     }
 }

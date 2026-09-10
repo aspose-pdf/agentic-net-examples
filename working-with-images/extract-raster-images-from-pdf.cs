@@ -1,6 +1,13 @@
 using System;
 using System.IO;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Collections.Generic;
 using Aspose.Pdf;
+
+// Alias ambiguous types to avoid CS0104 errors
+using PdfImage = Aspose.Pdf.XImage; // XImage is the correct type for raster images
+using SysImage = System.Drawing.Image;
 
 class Program
 {
@@ -9,42 +16,45 @@ class Program
         const string inputPdfPath = "input.pdf";
         const string outputFolder = "ExtractedImages";
 
-        // Verify input file exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document (lifecycle: using for deterministic disposal)
+        // Load the PDF document using the core Document API (no Facades)
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            int imageIndex = 1;
+            int imageCounter = 1;
 
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            // Iterate through each page and its image resources
+            foreach (Page page in pdfDoc.Pages)
             {
-                Page page = pdfDoc.Pages[pageNum];
-
-                // Iterate over each image resource on the page
-                foreach (XImage img in page.Resources.Images)
+                // page.Resources.Images is an ImageCollection, iterate directly
+                foreach (PdfImage pdfImg in page.Resources.Images)
                 {
-                    // Build a unique file name for each extracted image
-                    string outputPath = Path.Combine(outputFolder, $"image_{imageIndex}.png");
-
-                    // Save the image using a FileStream (XImage.Save expects a Stream)
-                    using (FileStream fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                    // Save the Aspose.Pdf.XImage to a memory stream first
+                    using (MemoryStream ms = new MemoryStream())
                     {
-                        img.Save(fs);
+                        pdfImg.Save(ms);
+                        ms.Position = 0;
+
+                        // Load the stream into a System.Drawing.Image so we can export as PNG
+                        using (SysImage sysImg = SysImage.FromStream(ms))
+                        {
+                            string outputPath = Path.Combine(outputFolder, $"image_{imageCounter}.png");
+                            sysImg.Save(outputPath, ImageFormat.Png);
+                        }
                     }
 
-                    Console.WriteLine($"Extracted image saved to: {outputPath}");
-                    imageIndex++;
+                    imageCounter++;
                 }
             }
         }
+
+        Console.WriteLine("All raster images have been extracted and saved as PNG files.");
     }
 }

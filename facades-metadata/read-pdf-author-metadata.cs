@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -8,20 +7,20 @@ class Program
     {
         const string pdfPath = "input.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!System.IO.File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // PdfFileInfo implements IDisposable, so use a using block for deterministic cleanup
+        // Initialize the PdfFileInfo facade for the specified PDF file
         using (PdfFileInfo fileInfo = new PdfFileInfo(pdfPath))
         {
-            // Read the Author metadata property
+            // Read the Author metadata
             string author = fileInfo.Author;
 
-            // Output the author to the console (empty string if not set)
-            Console.WriteLine($"Author: {author}");
+            // Output the Author value (or indicate if it's missing)
+            Console.WriteLine($"Author: {author ?? "(none)"}");
         }
     }
 }

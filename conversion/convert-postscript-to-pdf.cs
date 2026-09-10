@@ -1,30 +1,31 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.ps";
-        const string outputPath = "output.pdf";
+        const string inputPsPath  = "input.ps";   // Source PostScript file
+        const string outputPdfPath = "output.pdf"; // Destination PDF file
 
-        if (!File.Exists(inputPath))
+        // Verify the source file exists
+        if (!File.Exists(inputPsPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPsPath}");
             return;
         }
 
-        // Load the PostScript file using the dedicated PsLoadOptions.
-        PsLoadOptions loadOptions = new PsLoadOptions();
+        // Initialize load options for PostScript files
+        PsLoadOptions psLoadOptions = new PsLoadOptions();
 
-        // Wrap the Document in a using block for deterministic disposal.
-        using (Document pdfDocument = new Document(inputPath, loadOptions))
+        // Load the PS file and convert it to PDF (default settings)
+        using (Document pdfDocument = new Document(inputPsPath, psLoadOptions))
         {
-            // Saving without explicit SaveOptions always produces a PDF.
-            pdfDocument.Save(outputPath);
+            // Save the document as PDF; Save(string) always writes PDF regardless of extension
+            pdfDocument.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PostScript file converted to PDF: '{outputPath}'.");
+        Console.WriteLine($"PostScript file successfully converted to PDF: '{outputPdfPath}'");
     }
 }

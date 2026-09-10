@@ -7,43 +7,39 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "filled.pdf";
+        const string inputPdf = "input.pdf";
+        const string jsonPath = "formData.json";
+        const string outputPdf = "output.pdf";
 
-        // JSON string containing form field names and their values
-        string jsonData = @"{
-            ""FirstName"": ""John"",
-            ""LastName"": ""Doe"",
-            ""Age"": ""30""
-        }";
-
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdfPath))
+        if (!File.Exists(jsonPath))
         {
-            // Convert the JSON string to a UTF‑8 memory stream
-            using (MemoryStream jsonStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(jsonData)))
-            {
-                // Import form field values from the JSON stream
-                var importResults = doc.Form.ImportFromJson(jsonStream);
-
-                // Optionally report how many fields were processed
-                int processed = 0;
-                foreach (var _ in importResults)
-                    processed++;
-
-                Console.WriteLine($"Imported data for {processed} form fields.");
-            }
-
-            // Save the updated PDF
-            doc.Save(outputPdfPath);
+            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
+            return;
         }
 
-        Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
+        try
+        {
+            // Load the PDF document
+            using (Document doc = new Document(inputPdf))
+            {
+                // Bulk import form fields from the JSON file
+                doc.Form.ImportFromJson(jsonPath);
+
+                // Save the updated PDF
+                doc.Save(outputPdf);
+            }
+
+            Console.WriteLine($"Form data imported successfully. Saved to '{outputPdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

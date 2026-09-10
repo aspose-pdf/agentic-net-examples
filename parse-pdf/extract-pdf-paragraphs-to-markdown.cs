@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -17,34 +16,37 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdf))
         {
-            // Absorb paragraphs from the whole document
-            ParagraphAbsorber absorber = new ParagraphAbsorber
-            {
-                // Allow detection of paragraphs that span multiple columns/pages
-                IsMulticolumnParagraphsAllowed = true
-            };
+            // Create a ParagraphAbsorber to extract paragraph structures from the document
+            ParagraphAbsorber absorber = new ParagraphAbsorber();
+
+            // Perform the absorption on the whole document
             absorber.Visit(doc);
 
-            StringBuilder markdown = new StringBuilder();
-
-            // Iterate over each page's markup and extract paragraph text
-            foreach (PageMarkup pageMarkup in absorber.PageMarkups)
+            // Open a StreamWriter for the markdown output file
+            using (StreamWriter writer = new StreamWriter(outputMd, false, System.Text.Encoding.UTF8))
             {
-                foreach (MarkupParagraph paragraph in pageMarkup.Paragraphs)
+                // Iterate over each page's markup information
+                foreach (PageMarkup pageMarkup in absorber.PageMarkups)
                 {
-                    // The Text property retains leading spaces (indentation) from the source PDF
-                    string text = paragraph.Text ?? string.Empty;
-                    markdown.AppendLine(text);
+                    // Iterate over each paragraph found on the page
+                    foreach (MarkupParagraph paragraph in pageMarkup.Paragraphs)
+                    {
+                        // The Text property contains the paragraph text including leading spaces,
+                        // which preserves the original indentation.
+                        string text = paragraph.Text;
+
+                        // Write the paragraph to the markdown file
+                        writer.WriteLine(text);
+                        // Add an empty line to separate markdown paragraphs
+                        writer.WriteLine();
+                    }
                 }
             }
 
-            // Write the collected text to a markdown file, preserving indentation
-            File.WriteAllText(outputMd, markdown.ToString());
+            Console.WriteLine($"Markdown file saved to '{outputMd}'.");
         }
-
-        Console.WriteLine($"Markdown file created at '{outputMd}'.");
     }
 }

@@ -1,38 +1,56 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
 
-        if (!File.Exists(pdfPath))
+        // ------------------------------------------------------------
+        // Ensure a PDF with at least one form field exists.
+        // If the file is missing, create a minimal PDF and add a
+        // TextBox form field named "SampleTextBox".
+        // ------------------------------------------------------------
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
-            return;
+            var doc = new Document();
+            var page = doc.Pages.Add();
+
+            // Define the rectangle for the form field (left, bottom, right, top).
+            var fieldRect = new Rectangle(100, 600, 200, 650);
+            var textBox = new TextBoxField(page, fieldRect)
+            {
+                PartialName = "SampleTextBox",
+                Value = "Default"
+            };
+            doc.Form.Add(textBox);
+            doc.Save(inputPdf);
         }
 
-        // Load the PDF document
-        Document doc = new Document(pdfPath);
-
-        // Initialize FormEditor using the BindPdf overload (no string ctor in this version)
-        using (FormEditor formEditor = new FormEditor())
+        // ------------------------------------------------------------
+        // Load the PDF with FormEditor and list all form field names.
+        // ------------------------------------------------------------
+        using (var formEditor = new FormEditor())
         {
-            formEditor.BindPdf(doc);
-            // No modifications are made, so we just let the using block dispose it.
-        }
+            formEditor.BindPdf(inputPdf);
 
-        // Retrieve all form field names
-        Form form = new Form(doc);
-        string[] fieldNames = form.FieldNames;
+            // Access the underlying Document.
+            var doc = formEditor.Document;
 
-        // Display each field name on the console
-        foreach (string name in fieldNames)
-        {
-            Console.WriteLine(name);
+            // Retrieve field names via the Form.Fields collection.
+            string[] fieldNames = doc?.Form?.Fields?
+                .Select(f => f.Name)
+                .ToArray() ?? Array.Empty<string>();
+
+            foreach (var name in fieldNames)
+            {
+                Console.WriteLine(name);
+            }
         }
     }
 }

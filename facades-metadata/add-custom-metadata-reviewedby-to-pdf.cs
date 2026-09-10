@@ -16,18 +16,15 @@ class Program
             return;
         }
 
-        // Load the PDF using PdfFileInfo facade, set custom metadata, and save safely
-        using (PdfFileInfo pdfInfo = new PdfFileInfo())
+        // Load the PDF using the PdfFileInfo facade
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            // Bind the existing PDF file
-            pdfInfo.BindPdf(inputPath);
-
-            // Add custom metadata field "ReviewedBy"
+            // Set the custom metadata field "ReviewedBy"
             pdfInfo.SetMetaInfo("ReviewedBy", reviewer);
 
-            // Persist changes to a new file
-            bool success = pdfInfo.SaveNewInfo(outputPath);
-            if (!success)
+            // Persist the changes to a new file
+            bool saved = pdfInfo.SaveNewInfo(outputPath);
+            if (!saved)
             {
                 Console.Error.WriteLine("Failed to save the updated PDF.");
                 return;

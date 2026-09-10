@@ -1,29 +1,40 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 
-class Program
+class ExportFormDataToJson
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";      // Source PDF containing form fields
-        const string outputJsonPath = "formdata.json"; // Destination text file for JSON
+        // Paths for input PDF and output JSON text file
+        const string pdfPath = "input.pdf";
+        const string jsonOutputPath = "formData.json";
 
-        // Verify that the input PDF exists
-        if (!File.Exists(inputPdfPath))
+        // Verify the PDF file exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        using (Document pdfDocument = new Document(pdfPath))
         {
-            // Export all form fields to JSON and write directly to the specified file.
-            // This uses the Form.ExportToJson(string) overload, which handles the stream internally.
-            pdfDocument.Form.ExportToJson(outputJsonPath);
-        }
+            // Export form fields to JSON using a memory stream
+            using (MemoryStream jsonStream = new MemoryStream())
+            {
+                // Export all form fields to the stream (default options)
+                pdfDocument.Form.ExportToJson(jsonStream);
 
-        Console.WriteLine($"Form data successfully exported to '{outputJsonPath}'.");
+                // Convert the stream contents to a UTF‑8 string
+                string jsonString = Encoding.UTF8.GetString(jsonStream.ToArray());
+
+                // Write the JSON string to a text file
+                File.WriteAllText(jsonOutputPath, jsonString, Encoding.UTF8);
+
+                Console.WriteLine($"Form data exported to JSON and saved at '{jsonOutputPath}'.");
+            }
+        }
     }
 }

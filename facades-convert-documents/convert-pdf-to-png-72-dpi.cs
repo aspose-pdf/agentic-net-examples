@@ -1,47 +1,55 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Devices; // for Resolution
 
-class PdfToPngConverter
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputDir = "PngPages";
+        const string inputPdf = "input.pdf";          // source PDF
+        const string outputDir = "output_images";    // folder for PNGs
 
-        if (!File.Exists(inputPdfPath))
+        // Verify source file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        using (Document pdfDoc = new Document(inputPdfPath))
-        using (PdfConverter converter = new PdfConverter())
+        try
         {
-            // Bind the PDF document to the converter
-            converter.BindPdf(pdfDoc);
-
-            // Set the desired resolution (72 DPI for quick preview)
-            converter.Resolution = new Resolution(72);
-
-            // Prepare the converter for image extraction
-            converter.DoConvert();
-
-            int pageIndex = 1;
-            // Iterate over all pages and save each as a PNG image
-            while (converter.HasNextImage())
+            // PdfConverter implements IDisposable – use using for deterministic cleanup
+            using (PdfConverter converter = new PdfConverter())
             {
-                string outputPath = Path.Combine(outputDir, $"page_{pageIndex}.png");
-                // The overload infers the image format from the file extension, avoiding System.Drawing dependencies
-                converter.GetNextImage(outputPath);
-                pageIndex++;
-            }
-        }
+                // Bind the PDF document to the converter
+                converter.BindPdf(inputPdf);
 
-        Console.WriteLine("PDF to PNG conversion completed.");
+                // Set low resolution (72 DPI) for quick preview images
+                converter.Resolution = new Resolution(72);
+
+                // Prepare internal structures for conversion
+                converter.DoConvert();
+
+                int pageNumber = 1;
+                // Iterate over all pages and save each as PNG
+                while (converter.HasNextImage())
+                {
+                    string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+                    // Format is inferred from the .png extension – no System.Drawing needed
+                    converter.GetNextImage(outputPath);
+                    pageNumber++;
+                }
+            }
+
+            Console.WriteLine("PDF to PNG conversion completed.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+        }
     }
 }

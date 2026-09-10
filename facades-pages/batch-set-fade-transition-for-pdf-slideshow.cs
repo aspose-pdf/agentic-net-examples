@@ -1,39 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// batch set fade transition for pdf slideshow
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-pages/batch-set-fade-transition-pdf-slideshow.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";   // source 200‑page PDF
-        const string outputPath = "output_fade.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF inside a using block to ensure proper disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Initialize the facade that edits page properties
-            PdfPageEditor editor = new PdfPageEditor();
-            editor.BindPdf(doc);
-
-            // Set the transition effect to "Fade" (DISSOLVE) and duration to 2 seconds
-            editor.TransitionType = PdfPageEditor.DISSOLVE;   // Fade/Dissolve effect
-            editor.TransitionDuration = 2;                    // Duration in seconds
-
-            // Apply the changes to all pages (default ProcessPages = all)
-            editor.ApplyChanges();
-
-            // Save the modified document
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"PDF with Fade transition saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

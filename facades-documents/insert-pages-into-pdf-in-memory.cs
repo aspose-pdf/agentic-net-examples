@@ -2,78 +2,81 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // Added for TextFragment
 
 class Program
 {
     static void Main()
     {
-        // ---------------------------------------------------------------------
-        // 1. Create a destination PDF in memory (at least two pages for demo).
-        // ---------------------------------------------------------------------
-        byte[] destinationPdf;
+        // ------------------------------------------------------------
+        // 1. Create a destination PDF in memory (the PDF that will receive pages).
+        // ------------------------------------------------------------
+        byte[] destinationBytes;
         using (var destDoc = new Document())
         {
-            // Add two blank pages.
-            destDoc.Pages.Add();
-            destDoc.Pages.Add();
+            // Add a single page with some sample content.
+            var destPage = destDoc.Pages.Add();
+            destPage.Paragraphs.Add(new TextFragment("Destination PDF – Page 1"));
 
             using (var ms = new MemoryStream())
             {
                 destDoc.Save(ms);
-                destinationPdf = ms.ToArray();
+                destinationBytes = ms.ToArray();
             }
         }
 
-        // ---------------------------------------------------------------------
-        // 2. Create a source PDF in memory (e.g., three pages).
-        // ---------------------------------------------------------------------
-        byte[] sourcePdf;
+        // ------------------------------------------------------------
+        // 2. Create a source PDF in memory (the PDF that provides pages to insert).
+        // ------------------------------------------------------------
+        byte[] sourceBytes;
         using (var srcDoc = new Document())
         {
-            srcDoc.Pages.Add(); // page 1
-            srcDoc.Pages.Add(); // page 2
-            srcDoc.Pages.Add(); // page 3
+            // Page 1 of source PDF.
+            var srcPage1 = srcDoc.Pages.Add();
+            srcPage1.Paragraphs.Add(new TextFragment("Source PDF – Page 1"));
+
+            // Page 2 of source PDF – this is the page we will insert.
+            var srcPage2 = srcDoc.Pages.Add();
+            srcPage2.Paragraphs.Add(new TextFragment("Source PDF – Page 2 (to be inserted)"));
 
             using (var ms = new MemoryStream())
             {
                 srcDoc.Save(ms);
-                sourcePdf = ms.ToArray();
+                sourceBytes = ms.ToArray();
             }
         }
 
-        // ---------------------------------------------------------------------
-        // 3. Wrap the byte arrays in MemoryStreams and perform the insertion.
-        // ---------------------------------------------------------------------
-        using (MemoryStream destStream = new MemoryStream(destinationPdf))
-        using (MemoryStream srcStream = new MemoryStream(sourcePdf))
-        using (MemoryStream outputStream = new MemoryStream())
+        // ------------------------------------------------------------
+        // 3. Perform the insertion using PdfFileEditor.Insert.
+        // ------------------------------------------------------------
+        using (MemoryStream destStream = new MemoryStream(destinationBytes))
+        using (MemoryStream srcStream = new MemoryStream(sourceBytes))
+        using (MemoryStream resultStream = new MemoryStream())
         {
-            // Ensure streams are positioned at the beginning.
+            // Ensure streams are positioned at the beginning before the operation.
             destStream.Position = 0;
             srcStream.Position = 0;
 
-            // PdfFileEditor does NOT implement IDisposable, so we do NOT wrap it in a using block.
+            int insertLocation = 1;                 // Insert after the first page of the destination.
+            int[] pagesToInsert = new int[] { 2 };   // Insert page 2 from the source PDF.
+
             PdfFileEditor editor = new PdfFileEditor();
+            bool success = editor.Insert(destStream, insertLocation, srcStream, pagesToInsert, resultStream);
 
-            // Insert after the first page of the destination (1‑based index).
-            int insertLocation = 1;
-
-            // Example: insert pages 2 and 3 from the source PDF.
-            int[] pagesToInsert = new int[] { 2, 3 };
-
-            bool result = editor.Insert(destStream, insertLocation, srcStream, pagesToInsert, outputStream);
-            if (!result)
+            if (!success)
             {
-                Console.Error.WriteLine("Failed to insert pages.");
+                Console.Error.WriteLine("Insert operation failed.");
                 return;
             }
 
-            // Reset the output stream so it can be read from the beginning.
-            outputStream.Position = 0;
+            // Reset the result stream so it can be read from the beginning.
+            resultStream.Position = 0;
 
-            // The merged PDF is now fully contained in outputStream.
-            // For demonstration, write it to a file (optional).
-            File.WriteAllBytes("merged.pdf", outputStream.ToArray());
+            // Optional: write the merged PDF to a file for verification.
+            using (FileStream file = new FileStream("merged.pdf", FileMode.Create, FileAccess.Write))
+            {
+                resultStream.CopyTo(file);
+            }
 
             Console.WriteLine("Pages inserted successfully.");
         }

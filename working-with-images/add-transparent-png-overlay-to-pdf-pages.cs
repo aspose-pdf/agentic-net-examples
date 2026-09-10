@@ -1,56 +1,50 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API (Document, Page, ImageStamp, etc.)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string overlayPng = "overlay.png";       // transparent PNG to overlay
-        const string outputPdf = "output.pdf";         // result PDF
+        const string inputPdf   = "input.pdf";      // source PDF
+        const string overlayPng = "overlay.png";    // transparent PNG to overlay
+        const string outputPdf  = "output.pdf";     // result PDF
 
+        // Validate input files
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
         if (!File.Exists(overlayPng))
         {
             Console.Error.WriteLine($"Overlay image not found: {overlayPng}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use Document constructor)
+        // Load the PDF (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPdf))
         {
-            // Iterate over each page and add the PNG as a stamp.
+            // Iterate through all pages (1‑based indexing)
             foreach (Page page in doc.Pages)
             {
-                // Create an ImageStamp from the PNG file.
-                ImageStamp stamp = new ImageStamp(overlayPng)
-                {
-                    // Ensure the stamp is placed above existing content.
-                    // Background = false (default) means top layer.
-                    Background = false,
+                // Determine page dimensions
+                double pageWidth  = page.Rect.Width;
+                double pageHeight = page.Rect.Height;
 
-                    // Optional: control opacity (0.0 = fully transparent, 1.0 = opaque).
-                    Opacity = 0.8f,
+                // Define a rectangle that covers the whole page.
+                // Fully qualified type avoids ambiguity with System.Drawing.Rectangle.
+                Aspose.Pdf.Rectangle fullPageRect = new Aspose.Pdf.Rectangle(0, 0, pageWidth, pageHeight);
 
-                    // Position the stamp – here we center it on the page.
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Center
-                };
-
-                // Add the stamp to the current page (rule: call AddStamp per page).
-                page.AddStamp(stamp);
+                // Add the transparent PNG on top of existing content.
+                // AddImage appends the image to the page content stream, giving it the highest Z‑order.
+                page.AddImage(overlayPng, fullPageRect);
             }
 
-            // Save the modified PDF (lifecycle rule: use Document.Save).
+            // Save the modified document (lifecycle rule: save inside using block)
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Overlay applied and saved to '{outputPdf}'.");
+        Console.WriteLine($"Transparent overlay applied to each page. Saved as '{outputPdf}'.");
     }
 }

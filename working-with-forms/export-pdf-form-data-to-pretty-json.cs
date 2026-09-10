@@ -1,45 +1,34 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core PDF API
-using Aspose.Pdf.Forms;        // Form handling
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
-class ExportFormDataToJson
+class Program
 {
     static void Main()
     {
-        // Input PDF containing form fields
-        const string inputPdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputJson = "formdata.json";
 
-        // Output JSON file path
-        const string outputJsonPath = "formData.json";
-
-        // Ensure the input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Set up export options to enable pretty‑printing (indented JSON)
+            ExportFieldsToJsonOptions jsonOptions = new ExportFieldsToJsonOptions
             {
-                // Configure JSON export options for pretty‑printing
-                ExportFieldsToJsonOptions jsonOptions = new ExportFieldsToJsonOptions
-                {
-                    WriteIndented = true   // Enable indentation for readability
-                };
+                WriteIndented = true
+            };
 
-                // Export all form fields to the specified JSON file
-                pdfDoc.Form.ExportToJson(outputJsonPath, jsonOptions);
-            }
+            // Export all form fields to a JSON file with the specified options
+            doc.Form.ExportToJson(outputJson, jsonOptions);
+        }
 
-            Console.WriteLine($"Form data exported to JSON file: {outputJsonPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during export: {ex.Message}");
-        }
+        Console.WriteLine($"Form data exported to '{outputJson}'.");
     }
 }

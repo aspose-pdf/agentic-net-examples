@@ -1,67 +1,83 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Xml.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades; // for BackgroundArtifact (inherits from Artifact)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";          // source PDF
-        const string xmlPath       = "backgrounds.xml";   // XML defining backgrounds
-        const string outputPdfPath = "output.pdf";        // result PDF
+        const string pdfPath   = "input.pdf";
+        const string xmlPath   = "backgrounds.xml";
+        const string outputPdf = "output_branded.pdf";
 
-        // Validate input files
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
+
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"Background XML not found: {xmlPath}");
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
             return;
         }
 
-        // Load XML. Expected format:
+        // Load XML that defines background images per page.
+        // Expected format:
         // <Backgrounds>
         //   <Page number="1" image="bg1.png" />
         //   <Page number="2" image="bg2.png" />
+        //   ...
         // </Backgrounds>
-        XDocument xDoc = XDocument.Load(xmlPath);
-        var backgroundMap = xDoc.Root?
-            .Elements("Page")
-            .Select(e => new
-            {
-                Number = (int?)e.Attribute("number") ?? 0,
-                ImagePath = (string)e.Attribute("image")
-            })
-            .Where(p => p.Number > 0 && !string.IsNullOrEmpty(p.ImagePath))
-            .ToDictionary(p => p.Number, p => p.ImagePath) ?? new System.Collections.Generic.Dictionary<int, string>();
+        XDocument xmlDoc = XDocument.Load(xmlPath);
 
-        // Open PDF inside a using block (deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Open the PDF document.
+        using (Document doc = new Document(pdfPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            foreach (Page page in pdfDoc.Pages)
+            // Iterate over all pages (1‑based indexing).
+            foreach (Page page in doc.Pages)
             {
-                int pageNumber = page.Number;
-                if (backgroundMap.TryGetValue(pageNumber, out string imgPath) && File.Exists(imgPath))
+                // Find a matching <Page> element in the XML.
+                XElement bgElement = null;
+                foreach (XElement el in xmlDoc.Root.Elements("Page"))
                 {
-                    // Create an Image object (parameterless ctor, then set File)
-                    Aspose.Pdf.Image bgImage = new Aspose.Pdf.Image();
-                    bgImage.File = imgPath;
-
-                    // Assign as page background (generator‑only property)
-                    page.BackgroundImage = bgImage;
+                    XAttribute numAttr = el.Attribute("number");
+                    if (numAttr != null && int.TryParse(numAttr.Value, out int num) && num == page.Number)
+                    {
+                        bgElement = el;
+                        break;
+                    }
                 }
+
+                // If no background defined for this page, continue.
+                if (bgElement == null) continue;
+
+                // Get the image file path.
+                XAttribute imgAttr = bgElement.Attribute("image");
+                if (imgAttr == null) continue;
+                string imagePath = imgAttr.Value;
+
+                if (!File.Exists(imagePath))
+                {
+                    Console.Error.WriteLine($"Background image not found: {imagePath} (page {page.Number})");
+                    continue;
+                }
+
+                // Create a background artifact, set the image, and mark it as background.
+                BackgroundArtifact bgArtifact = new BackgroundArtifact();
+                bgArtifact.IsBackground = true;          // place behind page content
+                bgArtifact.SetImage(imagePath);          // load image from file
+
+                // Add the artifact to the page.
+                page.Artifacts.Add(bgArtifact);
             }
 
-            // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF.
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with background images saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Branded PDF saved to '{outputPdf}'.");
     }
 }

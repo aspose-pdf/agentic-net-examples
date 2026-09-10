@@ -1,35 +1,31 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // for TextFragment
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document
+        const string outputPath = "cell_alignment.pdf";
+
+        // Document lifecycle must be wrapped in a using block (see document-disposal-with-using rule)
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a new page (page indexing is 1‑based)
             Page page = doc.Pages.Add();
 
-            // Create a table with one column
-            Table table = new Table
-            {
-                ColumnWidths = "200" // width of the single column
-            };
+            // Create a simple table with one column
+            Table table = new Table();
+            table.ColumnWidths = "200"; // width of the single column
 
             // Add a row to the table
             Row row = table.Rows.Add();
 
-            // Create a cell and set its vertical alignment to Middle (Center)
+            // Create a cell, add some text, and set vertical alignment to middle (center)
             Cell cell = new Cell();
+            cell.Paragraphs.Add(new TextFragment("Centered Text"));
             cell.VerticalAlignment = VerticalAlignment.Center; // Middle alignment
-
-            // Add some text to the cell
-            TextFragment tf = new TextFragment("Centered vertically");
-            tf.TextState.FontSize = 12;
-            cell.Paragraphs.Add(tf);
 
             // Add the cell to the row
             row.Cells.Add(cell);
@@ -37,10 +33,10 @@ class Program
             // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF
-            doc.Save("CellVerticalAlignment_Middle.pdf");
+            // Save the PDF (saving to a .pdf path writes PDF format)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF created with cell vertical alignment set to Middle.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

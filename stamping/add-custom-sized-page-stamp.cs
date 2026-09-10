@@ -1,56 +1,58 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core API (Document, Page, PdfPageStamp)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input and output file paths
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "stamped_output.pdf";
+        // Input PDF file path
+        const string inputPath = "input.pdf";
+        // Output PDF file path
+        const string outputPath = "output.pdf";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        using (Document doc = new Document(inputPath))
         {
-            // ------------------------------------------------------------
-            // Create a PdfPageStamp using an existing page as the stamp source.
-            // Here we use page 1 of the same document as the stamp content.
-            // ------------------------------------------------------------
-            Page stampSourcePage = doc.Pages[1]; // 1‑based indexing
-            PdfPageStamp pageStamp = new PdfPageStamp(stampSourcePage);
+            // Ensure the document has at least two pages (source and target)
+            if (doc.Pages.Count < 2)
+            {
+                Console.Error.WriteLine("The document must contain at least two pages.");
+                return;
+            }
 
-            // ------------------------------------------------------------
-            // Configure custom size (Width, Height) and position (XIndent, YIndent)
-            // These values are in points (1 point = 1/72 inch).
-            // ------------------------------------------------------------
-            pageStamp.Width   = 200; // Desired stamp width
-            pageStamp.Height  = 100; // Desired stamp height
-            pageStamp.XIndent = 50;  // Horizontal offset from the left edge of the target page
-            pageStamp.YIndent = 50;  // Vertical offset from the bottom edge of the target page
+            // Source page that will be used as the stamp content (first page)
+            Page sourcePage = doc.Pages[1];
 
-            // Optional: set other visual properties
-            pageStamp.Opacity = 0.8;          // Slightly transparent
-            pageStamp.Background = false;    // Stamp appears on top of page content
+            // Create a PdfPageStamp from the source page
+            PdfPageStamp stamp = new PdfPageStamp(sourcePage);
 
-            // ------------------------------------------------------------
-            // Apply the stamp to a specific target page.
-            // For example, stamp page 2 of the document.
-            // ------------------------------------------------------------
-            Page targetPage = doc.Pages[2]; // Ensure the document has at least 2 pages
-            targetPage.AddStamp(pageStamp);
+            // Set custom dimensions for the stamp (in points)
+            stamp.Width  = 200; // Desired width
+            stamp.Height = 150; // Desired height
 
-            // Save the modified document (PDF format)
-            doc.Save(outputPdf);
+            // Position the stamp on the target page (second page)
+            // XIndent and YIndent are measured from the left and bottom edges respectively
+            stamp.XIndent = 100; // Horizontal offset from the left edge
+            stamp.YIndent = 200; // Vertical offset from the bottom edge
+
+            // Optional: make the stamp appear behind the page content
+            stamp.Background = false; // true = background, false = foreground
+
+            // Apply the stamp to the target page (second page)
+            Page targetPage = doc.Pages[2];
+            targetPage.AddStamp(stamp);
+
+            // Save the modified document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

@@ -15,10 +15,10 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (using rule: document disposal with using)
         using (Document doc = new Document(inputPath))
         {
-            // Access the form (collection of fields)
+            // Access the form (may be null if no AcroForm present)
             Form form = doc.Form;
             if (form == null || form.Count == 0)
             {
@@ -26,16 +26,16 @@ class Program
                 return;
             }
 
-            Console.WriteLine("Signature fields found:");
-            // Iterate over all fields; filter for SignatureField instances
+            // Iterate over all fields and pick out signature fields
             foreach (Field field in form)
             {
                 if (field is SignatureField sigField)
                 {
-                    // FullName provides the field's name; PageIndex is 1‑based
+                    // FullName provides the field's name
                     string fieldName = sigField.FullName;
+                    // PageIndex returns the 1‑based page number containing the field
                     int pageNumber = sigField.PageIndex;
-                    Console.WriteLine($"- Name: {fieldName}, Page: {pageNumber}");
+                    Console.WriteLine($"Signature field \"{fieldName}\" is on page {pageNumber}.");
                 }
             }
         }

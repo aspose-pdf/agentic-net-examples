@@ -1,35 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
+// URL-STABILITY STUB
+//
+// export pdf annotations to xfdf__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/parse-pdf
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdfPath  = "input.pdf";
-        const string outputXfdfPath = "output.xfdf";
-
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
-            return;
-        }
-
-        // Load the PDF document
-        using (Document doc = new Document(inputPdfPath))
-        {
-            // Create a file stream for the XFDF output
-            using (FileStream xfdfStream = new FileStream(outputXfdfPath, FileMode.Create, FileAccess.Write))
-            {
-                // Export all annotations (including form field data) to XFDF
-                doc.ExportAnnotationsToXfdf(xfdfStream);
-                // Stream will be closed automatically by the using block
-            }
-
-            // Optionally save the document if further modifications were made
-            // doc.Save("modified.pdf");
-        }
-
-        Console.WriteLine($"XFDF data exported to '{outputXfdfPath}'.");
-    }
-}
+class Program { static void Main() { } }

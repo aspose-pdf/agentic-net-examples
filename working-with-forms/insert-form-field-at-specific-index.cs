@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_form.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,26 +16,31 @@ class Program
             return;
         }
 
-        // Load the existing PDF document (lifecycle rule: use using)
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Create a new text box form field on page 1
-            // Rectangle constructor: (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 250, 550);
-            TextBoxField textField = new TextBoxField(doc.Pages[1], rect)
+            // Define the page where the new field will be placed (1‑based index)
+            int targetPageNumber = 1;
+
+            // Define the rectangle (llx, lly, urx, ury) for the field on the target page
+            // Fully qualify to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+            // Create a new text box form field
+            TextBoxField textField = new TextBoxField(doc.Pages[targetPageNumber], fieldRect)
             {
-                PartialName = "MyTextBox",
-                Value = "Enter text here"
+                PartialName = "MyTextField",   // field name
+                Value       = "Default text"   // initial value
             };
 
-            // Insert the new field at a specific index (e.g., index 0) in the Form collection.
-            // The Form class provides an Add overload that accepts an index.
-            doc.Form.Add(textField, 0);
+            // Add the field to the form at the specified page.
+            // This respects the ordered layout of form fields on that page.
+            doc.Form.Add(textField, targetPageNumber);
 
-            // Save the modified PDF (lifecycle rule: use Save inside using)
+            // Save the modified document (lifecycle rule: save inside using block)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with new form field at '{outputPath}'.");
+        Console.WriteLine($"Form field inserted and document saved to '{outputPath}'.");
     }
 }

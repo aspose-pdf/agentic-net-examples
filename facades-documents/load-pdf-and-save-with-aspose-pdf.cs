@@ -6,30 +6,24 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";   // source PDF to load
-        const string outputPath = "output.pdf"; // where to save after loading
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
+        // Verify the source file exists.
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
-        try
-        {
-            // Load the PDF using the Document class (PdfFileEditor does not support BindPdf/Save/Close).
-            Document pdfDoc = new Document(inputPath);
+        // Load the PDF using the Document class (PdfFileEditor does not support BindPdf/Save/Close).
+        Document pdfDoc = new Document(inputPath);
 
-            // Optional: perform operations on pdfDoc here (e.g., add stamps, delete pages, etc.).
+        // Perform any desired editing here (e.g., add stamps, delete pages, etc.).
+        // For this example we simply save the loaded document unchanged.
 
-            // Save the (potentially modified) PDF to a new file.
-            pdfDoc.Save(outputPath);
+        pdfDoc.Save(outputPath);
 
-            Console.WriteLine($"PDF loaded and saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"PDF loaded from '{inputPath}' and saved to '{outputPath}'.");
     }
 }

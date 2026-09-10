@@ -1,55 +1,57 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades; // for Stamp if needed (optional)
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string imagePath  = "background.png";
-        const string outputPath = "output.pdf";
+        const string inputPdfPath  = "input.pdf";
+        const string backgroundImg = "background.png";
+        const string outputPdfPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(imagePath))
+        if (!File.Exists(backgroundImg))
         {
-            Console.Error.WriteLine($"Background image not found: {imagePath}");
+            Console.Error.WriteLine($"Background image not found: {backgroundImg}");
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the existing PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate over all pages and add the background image
-            foreach (Page page in doc.Pages)
+            // Iterate over all pages and add the background artifact
+            foreach (Page page in pdfDoc.Pages)
             {
                 // Create a background artifact
                 BackgroundArtifact bgArtifact = new BackgroundArtifact();
 
-                // Set the image for the artifact (using file path)
-                bgArtifact.SetImage(imagePath);
+                // Set the image for the artifact (the image will be tiled or stretched as needed)
+                bgArtifact.SetImage(backgroundImg);
 
-                // Mark the artifact as a background (placed behind page contents)
+                // Place the artifact behind page contents
                 bgArtifact.IsBackground = true;
 
-                // Adjust opacity to achieve a subtle shading effect.
-                // Blend mode "multiply" is not directly exposed in Aspose.Pdf;
-                // using a lower opacity approximates the desired effect.
-                bgArtifact.Opacity = 0.5; // 0 = fully transparent, 1 = fully opaque
+                // Optional: adjust opacity for a subtle effect (0.0 = fully transparent, 1.0 = opaque)
+                bgArtifact.Opacity = 0.5; // 50% opacity
 
-                // Add the artifact to the page
+                // NOTE: Aspose.Pdf does not expose a direct BlendMode property for artifacts.
+                // The visual effect can be approximated by adjusting opacity as shown above.
+
+                // Add the artifact to the page's artifact collection
                 page.Artifacts.Add(bgArtifact);
             }
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF with background image saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with background image saved to '{outputPdfPath}'.");
     }
 }

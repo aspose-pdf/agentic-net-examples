@@ -1,44 +1,42 @@
 using System;
 using System.IO;
-using System.Drawing; // for System.Drawing.Rectangle
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_popup.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_popup.pdf";
 
-        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfContentEditor to edit the PDF
+        // PdfContentEditor implements IDisposable, so use a using block for deterministic cleanup.
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Load the PDF document
+            // Bind the existing PDF file to the editor.
             editor.BindPdf(inputPath);
 
-            // Define the annotation rectangle (x, y, width, height)
-            // System.Drawing.Rectangle is required by CreatePopup.
-            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 700, 100, 200);
+            // Create a popup annotation.
+            // Rectangle(x, y, width, height) – coordinates are in points.
+            // Contents: text shown inside the popup.
+            // open: false – the popup is not displayed initially; it appears when the user hovers/clicks.
+            // page: 1‑based page number where the annotation will be placed.
+            editor.CreatePopup(
+                new System.Drawing.Rectangle(100, 500, 200, 100),
+                "This is a note that appears when you hover over the annotation.",
+                false,
+                1);
 
-            // Create a popup annotation that appears on hover/click.
-            //   rect      – location and size of the popup
-            //   "This is a hover note." – text displayed in the popup
-            //   false     – do not display the popup open initially (appears on hover/click)
-            //   1         – page number (1‑based indexing)
-            editor.CreatePopup(rect, "This is a hover note.", false, 1);
-
-            // Save the modified PDF
+            // Save the modified PDF.
             editor.Save(outputPath);
+            // editor.Close() is called automatically by Dispose().
         }
 
-        Console.WriteLine($"Popup annotation added. Saved to '{outputPath}'.");
+        Console.WriteLine($"Popup annotation added. Output saved to '{outputPath}'.");
     }
 }

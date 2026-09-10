@@ -1,6 +1,9 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // FormattedText, EncodingType
+using System.Drawing; // System.Drawing.Color
 
 class Program
 {
@@ -9,45 +12,54 @@ class Program
         const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
 
-        // Create a minimal PDF if it does not already exist in the sandbox.
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPdf))
         {
-            using (Document seed = new Document())
-            {
-                seed.Pages.Add(); // at least one blank page
-                seed.Save(inputPdf);
-            }
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
         }
 
-        // Load the source PDF document
+        // Load the document to obtain page dimensions (assumes all pages have same size)
         Document doc = new Document(inputPdf);
+        float pageWidth = (float)doc.Pages[1].PageInfo.Width;   // cast double → float
+        float pageHeight = (float)doc.Pages[1].PageInfo.Height; // cast double → float
 
-        // Define the header lines (text, color, vertical offset from the top)
-        var headerLines = new (string Text, Aspose.Pdf.Color Color, float YIndent)[]
-        {
-            ("First Header Line", Aspose.Pdf.Color.Blue, 20f),
-            ("Second Header Line", Aspose.Pdf.Color.Green, 40f),
-            ("Third Header Line", Aspose.Pdf.Color.Red, 60f)
-        };
+        // Initialize the PdfFileStamp facade using the recommended BindPdf method
+        PdfFileStamp fileStamp = new PdfFileStamp();
+        fileStamp.BindPdf(inputPdf);
 
-        // Apply the header lines to every page
-        foreach (Page page in doc.Pages)
-        {
-            foreach (var line in headerLines)
-            {
-                TextStamp stamp = new TextStamp(line.Text);
-                stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-                stamp.TextState.FontSize = 24;
-                stamp.TextState.ForegroundColor = line.Color;
-                stamp.HorizontalAlignment = HorizontalAlignment.Center;
-                stamp.VerticalAlignment = VerticalAlignment.Top;
-                stamp.YIndent = line.YIndent; // distance from the top edge
-                page.AddStamp(stamp);
-            }
-        }
+        // ---------- First header line (red) ----------
+        Aspose.Pdf.Facades.Stamp redStamp = new Aspose.Pdf.Facades.Stamp(); // fully‑qualified to avoid CS0104
+        FormattedText redText = new FormattedText(
+            "First Header Line",
+            System.Drawing.Color.Red,
+            "Helvetica",
+            EncodingType.Winansi,
+            false,
+            14);
+        redStamp.BindLogo(redText);
+        // Position near the top of the page (Y measured from bottom)
+        redStamp.SetOrigin(0, pageHeight - 40);
+        // Removed HorizontalAlignment – not supported on Facades.Stamp
+        fileStamp.AddStamp(redStamp);
 
-        // Save the stamped PDF
-        doc.Save(outputPdf);
+        // ---------- Second header line (blue) ----------
+        Aspose.Pdf.Facades.Stamp blueStamp = new Aspose.Pdf.Facades.Stamp(); // fully‑qualified
+        FormattedText blueText = new FormattedText(
+            "Second Header Line",
+            System.Drawing.Color.Blue,
+            "Helvetica",
+            EncodingType.Winansi,
+            false,
+            14);
+        blueStamp.BindLogo(blueText);
+        // Slightly lower than the first line
+        blueStamp.SetOrigin(0, pageHeight - 60);
+        // Removed HorizontalAlignment – not supported on Facades.Stamp
+        fileStamp.AddStamp(blueStamp);
+
+        // Save the modified PDF
+        fileStamp.Save(outputPdf);
+        fileStamp.Close();
 
         Console.WriteLine($"Multi‑line header stamp applied and saved to '{outputPdf}'.");
     }

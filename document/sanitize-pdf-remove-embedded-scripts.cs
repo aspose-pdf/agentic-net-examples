@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security.HiddenDataSanitization; // Updated namespace for hidden data sanitization
+using Aspose.Pdf.Security.HiddenDataSanitization;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "sanitized.pdf";
+        const string outputPath = "sanitized_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,17 +16,22 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Configure hidden data sanitization options to delete embedded scripts
-            var options = new HiddenDataSanitizationOptions();
-            options.RemoveJavaScriptsAndActions = true; // delete embedded JavaScript and actions
+            // Configure hidden data sanitization to remove JavaScript/actions
+            var options = new HiddenDataSanitizationOptions
+            {
+                RemoveJavaScriptsAndActions = true
+            };
 
-            // Optionally delete embedded files (if any) before sanitization
-            doc.EmbeddedFiles.Delete();
+            // Delete any embedded files (e.g., attachments) before sanitizing
+            if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+            {
+                doc.EmbeddedFiles.Delete();
+            }
 
-            // Create the sanitizer with the configured options and apply it
+            // Create the sanitizer with the configured options and run it
             var sanitizer = new HiddenDataSanitizer(options);
             sanitizer.Sanitize(doc);
 

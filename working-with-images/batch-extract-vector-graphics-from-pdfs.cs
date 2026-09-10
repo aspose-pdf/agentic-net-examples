@@ -7,47 +7,74 @@ class BatchVectorGraphicsExtractor
 {
     static void Main()
     {
-        // Directory containing the source PDF files
-        const string inputDirectory = @"C:\PdfInput";
+        // Base directory of the running application.
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-        // Base directory where extracted SVGs will be stored
-        const string outputBaseDirectory = @"C:\PdfVectorGraphics";
-
-        // Ensure the output base directory exists
-        Directory.CreateDirectory(outputBaseDirectory);
-
-        // Process each PDF file in the input directory
-        foreach (string pdfPath in Directory.GetFiles(inputDirectory, "*.pdf"))
+        // Folder containing the PDF files to process.
+        string inputFolder = Path.Combine(baseDir, "InputPdfs");
+        if (!Directory.Exists(inputFolder))
         {
-            // Folder name based on the PDF file name (without extension)
-            string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
-            string pdfOutputFolder = Path.Combine(outputBaseDirectory, pdfName);
-            Directory.CreateDirectory(pdfOutputFolder);
+            Console.Error.WriteLine($"Input folder not found: '{inputFolder}'. No PDFs will be processed.");
+            return;
+        }
 
-            // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-            using (Document doc = new Document(pdfPath))
+        // Root folder where extracted SVG files will be stored.
+        string outputRoot = Path.Combine(baseDir, "ExtractedVectors");
+        Directory.CreateDirectory(outputRoot);
+
+        // Get all PDF files in the input folder.
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        if (pdfFiles.Length == 0)
+        {
+            Console.WriteLine($"No PDF files found in '{inputFolder}'.");
+            return;
+        }
+
+        foreach (string pdfPath in pdfFiles)
+        {
+            if (!File.Exists(pdfPath))
             {
-                // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
-                {
-                    Page page = doc.Pages[pageIndex];
-
-                    // Check if the page contains vector graphics
-                    if (page.HasVectorGraphics())
-                    {
-                        // Create a sub‑folder for this page's SVG files
-                        string pageFolder = Path.Combine(pdfOutputFolder, $"Page_{pageIndex}");
-                        Directory.CreateDirectory(pageFolder);
-
-                        // Extract all vector graphics on the page to separate SVG files
-                        // SvgExtractor.Extract(Page, string) writes one SVG file per graphic element
-                        SvgExtractor extractor = new SvgExtractor();
-                        extractor.Extract(page, pageFolder);
-                    }
-                }
+                Console.Error.WriteLine($"File not found (skipping): {pdfPath}");
+                continue;
             }
 
-            Console.WriteLine($"Extracted vector graphics from '{pdfPath}' to '{pdfOutputFolder}'.");
+            try
+            {
+                // Create a dedicated sub‑folder for this PDF.
+                string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
+                string pdfOutputFolder = Path.Combine(outputRoot, pdfName);
+                Directory.CreateDirectory(pdfOutputFolder);
+
+                // Load the PDF document (wrapped in a using block for deterministic disposal).
+                using (Document doc = new Document(pdfPath))
+                {
+                    // Iterate through all pages (Aspose.Pdf uses 1‑based indexing).
+                    for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                    {
+                        Page page = doc.Pages[pageIndex];
+
+                        // Check if the page contains vector graphics.
+                        if (page.HasVectorGraphics())
+                        {
+                            // Create a folder for the current page's SVG files.
+                            string pageFolder = Path.Combine(pdfOutputFolder, $"Page_{pageIndex}");
+                            Directory.CreateDirectory(pageFolder);
+
+                            // Use SvgExtractor to extract all vector graphics from the page into the folder.
+                            SvgExtractor extractor = new SvgExtractor();
+                            extractor.Extract(page, pageFolder);
+                        }
+                    }
+                }
+
+                Console.WriteLine($"Extracted vectors from '{pdfPath}' to '{pdfOutputFolder}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+            }
         }
+
+        Console.WriteLine("Batch extraction completed.");
     }
 }

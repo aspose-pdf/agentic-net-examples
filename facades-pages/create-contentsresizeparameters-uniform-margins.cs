@@ -1,19 +1,12 @@
-using System;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// create contentsresizeparameters uniform margins
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-pages/create-contentsresizeparameters-with-uniform-margins.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        // Create a ContentsResizeParameters instance with absolute margins of 5 points
-        // on the left, right, top, and bottom sides.
-        var parameters = PdfFileEditor.ContentsResizeParameters.Margins(5, 5, 5, 5);
-
-        // Example usage: the parameters can now be passed to PdfFileEditor methods
-        // such as ResizeContents or AddMargins.
-        Console.WriteLine($"Left margin: {parameters.LeftMargin}");
-        Console.WriteLine($"Right margin: {parameters.RightMargin}");
-        Console.WriteLine($"Top margin: {parameters.TopMargin}");
-        Console.WriteLine($"Bottom margin: {parameters.BottomMargin}");
-    }
-}
+class Program { static void Main() { } }

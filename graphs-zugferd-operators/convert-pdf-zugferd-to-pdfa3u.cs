@@ -6,38 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // PDF with ZUGFeRD attachment
-        const string outputPath = "output_pdfa3u.pdf";  // Resulting PDF/A‑3U file
-        const string logPath    = "conversion_log.txt"; // Log for conversion errors
+        // Input PDF that contains a ZUGFeRD XML attachment
+        const string inputPdfPath = "input.pdf";
+        // Output PDF/A‑3U file – the XML attachment will be preserved
+        const string outputPdfPath = "output_pdfa3u.pdf";
+        // Optional log file for conversion details
+        const string logPath = "conversion_log.txt";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         try
         {
-            // Load the source PDF (ZUGFeRD attachment is part of the document)
-            using (Document doc = new Document(inputPath))
+            // Load the source PDF
+            using (Document doc = new Document(inputPdfPath))
             {
-                // Convert to PDF/A‑3U. The conversion keeps embedded files,
-                // so the ZUGFeRD XML remains intact.
-                bool ok = doc.Convert(logPath, PdfFormat.PDF_A_3U, ConvertErrorAction.Delete);
-                if (!ok)
-                {
-                    Console.Error.WriteLine("Conversion reported errors – see log for details.");
-                }
+                // Convert the document to PDF/A‑3U. Embedded files (e.g., ZUGFeRD XML) are kept by default.
+                doc.Convert(logPath, PdfFormat.PDF_A_3U, ConvertErrorAction.Delete);
 
-                // Save the converted document. Save() without options always writes PDF.
-                doc.Save(outputPath);
+                // Save the resulting PDF/A‑3U document
+                doc.Save(outputPdfPath);
             }
 
-            Console.WriteLine($"PDF/A‑3U file created: {outputPath}");
+            Console.WriteLine($"PDF/A‑3U file created successfully: {outputPdfPath}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

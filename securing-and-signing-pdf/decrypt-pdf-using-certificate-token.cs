@@ -1,49 +1,12 @@
-using System;
-using System.IO;
-using System.Security.Cryptography.X509Certificates;
-using Aspose.Pdf;
-using Aspose.Pdf.Security;
+// URL-STABILITY STUB
+//
+// decrypt pdf using certificate token
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/securing-and-signing-pdf/decrypt-pdf-with-certificate-token.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string encryptedPdfPath = "encrypted.pdf";
-        const string decryptedPdfPath = "decrypted.pdf";
-        const string publicCertificatePath = "public.cer";
-
-        // Verify that the required files exist before proceeding.
-        if (!File.Exists(encryptedPdfPath))
-        {
-            Console.Error.WriteLine($"Encrypted PDF not found: {encryptedPdfPath}");
-            return;
-        }
-
-        if (!File.Exists(publicCertificatePath))
-        {
-            Console.Error.WriteLine($"Certificate file not found: {publicCertificatePath}");
-            return;
-        }
-
-        // Load the public certificate from file. X509Certificate2 constructor accepts a path.
-        X509Certificate2 publicCert = new X509Certificate2(publicCertificatePath);
-
-        // Create encryption options that point to the store containing the private key
-        // (e.g., a hardware token). The store name and location must match where the
-        // token exposes the private key.
-        var certOptions = new CertificateEncryptionOptions(
-            publicCert,
-            StoreName.My,               // Store that holds the private key
-            StoreLocation.CurrentUser   // Store location
-        );
-
-        // Open the encrypted PDF with the certificate options, decrypt it, and save.
-        using (var pdfDoc = new Document(encryptedPdfPath, certOptions))
-        {
-            pdfDoc.Decrypt();
-            pdfDoc.Save(decryptedPdfPath);
-        }
-
-        Console.WriteLine($"Decrypted PDF saved to '{decryptedPdfPath}'.");
-    }
-}
+class Program { static void Main() { } }

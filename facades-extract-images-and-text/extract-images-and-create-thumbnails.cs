@@ -2,14 +2,15 @@ using System;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Drawing.Drawing2D;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";          // source PDF
-        const string outputDir = "Thumbnails";        // folder for thumbnails
+        const string inputPdf = "input.pdf";
+        const string outputDir = "Thumbnails";
 
         if (!File.Exists(inputPdf))
         {
@@ -20,65 +21,55 @@ class Program
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Use PdfExtractor (Facade) to extract images from the PDF
+        // Use PdfExtractor to extract images from the PDF
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF file
             extractor.BindPdf(inputPdf);
-
-            // Enable image extraction
-            extractor.ExtractImage();
+            extractor.ExtractImage(); // Prepare the extractor for image extraction
 
             int imageIndex = 1;
-            // Loop through all extracted images
             while (extractor.HasNextImage())
             {
-                // Extract the raw image into a memory stream
-                using (MemoryStream rawStream = new MemoryStream())
-                {
-                    extractor.GetNextImage(rawStream);
-                    rawStream.Position = 0;
+                // Temporary path for the extracted image (original format)
+                string tempPath = Path.Combine(outputDir, $"image_{imageIndex}_orig");
+                extractor.GetNextImage(tempPath); // overload with only the file path
 
-                    using (Image original = Image.FromStream(rawStream))
+                // Load the extracted image
+                using (Image original = Image.FromFile(tempPath))
+                {
+                    // Determine scaling factor to keep max dimension 200px
+                    const int maxDim = 200;
+                    double ratio = Math.Min((double)maxDim / original.Width, (double)maxDim / original.Height);
+                    // If the image is already smaller than the max dimension, keep original size
+                    if (ratio > 1) ratio = 1;
+
+                    int thumbWidth = (int)(original.Width * ratio);
+                    int thumbHeight = (int)(original.Height * ratio);
+
+                    using (Bitmap thumb = new Bitmap(thumbWidth, thumbHeight))
                     {
-                        // Create a thumbnail that fits within 200x200 while preserving aspect ratio
-                        using (Image thumb = ResizeImage(original, 200, 200))
+                        using (Graphics g = Graphics.FromImage(thumb))
                         {
-                            string thumbPath = Path.Combine(outputDir, $"thumb_{imageIndex}.png");
-                            thumb.Save(thumbPath, ImageFormat.Png);
-                            Console.WriteLine($"Created thumbnail: {thumbPath}");
+                            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                            g.SmoothingMode = SmoothingMode.HighQuality;
+                            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                            g.CompositingQuality = CompositingQuality.HighQuality;
+                            g.DrawImage(original, 0, 0, thumbWidth, thumbHeight);
                         }
+
+                        // Final thumbnail path (PNG)
+                        string thumbPath = Path.Combine(outputDir, $"image_{imageIndex}.png");
+                        thumb.Save(thumbPath, ImageFormat.Png);
                     }
                 }
+
+                // Delete the temporary original image file
+                File.Delete(tempPath);
+
                 imageIndex++;
             }
         }
 
-        Console.WriteLine("Image extraction and thumbnail generation completed.");
-    }
-
-    /// <summary>
-    /// Resizes an image so that it fits within the specified maximum width and height,
-    /// preserving the original aspect ratio.
-    /// </summary>
-    private static Image ResizeImage(Image image, int maxWidth, int maxHeight)
-    {
-        // Compute scaling factor while preserving aspect ratio
-        double ratioX = (double)maxWidth / image.Width;
-        double ratioY = (double)maxHeight / image.Height;
-        double ratio = Math.Min(ratioX, ratioY);
-
-        int newWidth = (int)(image.Width * ratio);
-        int newHeight = (int)(image.Height * ratio);
-
-        var thumbnail = new Bitmap(newWidth, newHeight);
-        using (var graphics = Graphics.FromImage(thumbnail))
-        {
-            graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-            graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            graphics.DrawImage(image, 0, 0, newWidth, newHeight);
-        }
-        return thumbnail;
+        Console.WriteLine("Thumbnail extraction completed.");
     }
 }

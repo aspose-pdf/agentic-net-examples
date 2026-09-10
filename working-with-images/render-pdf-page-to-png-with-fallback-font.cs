@@ -7,46 +7,54 @@ class Program
 {
     static void Main()
     {
-        // Input and output file names (place input.pdf in the same folder as the executable)
-        const string pdfFile = "input.pdf";
-        const string pngFile = "page1.png";
-        const string fallbackFont = "Arial";
+        // Use the current working directory as the data folder (guaranteed to exist)
+        string dataDir = Directory.GetCurrentDirectory();
+        // Ensure the directory exists (defensive, though it always does for the current directory)
+        Directory.CreateDirectory(dataDir);
 
-        // Resolve full paths based on the executable directory
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string pdfPath = Path.Combine(baseDir, pdfFile);
-        string pngPath = Path.Combine(baseDir, pngFile);
+        // Paths for the temporary PDF and the resulting PNG
+        string pdfPath = Path.Combine(dataDir, "input.pdf");
+        string pngPath = Path.Combine(dataDir, "page1.png");
+        string fallbackFont = "Arial"; // Font used when the original PDF fonts are missing
 
-        if (!File.Exists(pdfPath))
+        // ---------------------------------------------------------------------
+        // STEP 1: Create a minimal PDF file so the example can run in a clean sandbox.
+        // ---------------------------------------------------------------------
+        using (Document seed = new Document())
         {
-            Console.WriteLine($"PDF file not found: {pdfPath}");
-            return;
+            // Add a single blank page (you could add content here if desired)
+            seed.Pages.Add();
+            // Save the seed PDF to the expected location
+            seed.Save(pdfPath);
         }
 
-        // Load the PDF document
+        // ---------------------------------------------------------------------
+        // STEP 2: Load the PDF and render the first page to PNG with a fallback font.
+        // ---------------------------------------------------------------------
         using (Document pdfDocument = new Document(pdfPath))
         {
-            // Configure rendering options with a fallback font
-            RenderingOptions renderOpts = new RenderingOptions
+            if (pdfDocument.Pages.Count < 1)
             {
-                DefaultFontName = fallbackFont, // font used when original font is missing
-                AnalyzeFonts    = true          // enable font analysis/substitution
-            };
+                Console.Error.WriteLine("The PDF does not contain any pages.");
+                return;
+            }
 
-            // Create a PNG device (300 DPI resolution) and assign the rendering options
+            // Define the resolution for the PNG output (e.g., 300 DPI)
             Resolution resolution = new Resolution(300);
-            PngDevice pngDevice = new PngDevice(resolution)
-            {
-                RenderingOptions = renderOpts
-            };
+            // Initialise the PNG device with the chosen resolution
+            PngDevice pngDevice = new PngDevice(resolution);
 
-            // Render the first page (pages are 1‑based) to a PNG file
+            // Configure rendering options – set a default fallback font and enable font analysis
+            pngDevice.RenderingOptions.DefaultFontName = fallbackFont;
+            pngDevice.RenderingOptions.AnalyzeFonts = true;
+
+            // Render the first page to a PNG file
             using (FileStream pngStream = new FileStream(pngPath, FileMode.Create))
             {
                 pngDevice.Process(pdfDocument.Pages[1], pngStream);
             }
         }
 
-        Console.WriteLine($"Page rendered to PNG with fallback font: {pngPath}");
+        Console.WriteLine($"Page 1 rendered to PNG at: {pngPath}");
     }
 }

@@ -1,46 +1,43 @@
 using System;
 using System.IO;
-using System.Drawing; // For System.Drawing.Color
+using System.Drawing; // for System.Drawing.Color
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";   // Source PDF containing the form
-        const string outputPdf = "output.pdf"; // Destination PDF after decoration
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Ensure the source file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // FormEditor does not accept a file path in the constructor in recent versions.
-        // Use the parameter‑less constructor and bind the PDF explicitly.
-        using (FormEditor formEditor = new FormEditor())
+        // Load the PDF document first, then pass the Document instance to FormEditor.
+        Document pdfDoc = new Document(inputPath);
+
+        using (FormEditor editor = new FormEditor(pdfDoc))
         {
-            formEditor.BindPdf(inputPdf);
+            // Configure visual appearance for the field.
+            editor.Facade = new FormFieldFacade();
+            // The Facade properties expect System.Drawing.Color, so use fully‑qualified System.Drawing.Color values.
+            editor.Facade.BorderColor     = System.Drawing.Color.Green;        // custom border color
+            editor.Facade.BackgroundColor = System.Drawing.Color.LightYellow; // background shade
+            editor.Facade.TextColor       = System.Drawing.Color.DarkBlue;    // text color
+            editor.Facade.Font            = Aspose.Pdf.Facades.FontStyle.HelveticaBold; // font style
+            editor.Facade.FontSize        = 14;                                   // font size
 
-            // Create a facade to specify visual attributes
-            formEditor.Facade = new FormFieldFacade();
+            // Apply the appearance settings to the specific field.
+            editor.DecorateField("CustomerName");
 
-            // Custom appearance settings – fully qualify System.Drawing.Color to avoid
-            // ambiguity with Aspose.Pdf.Color, and fully qualify the FontStyle enum.
-            formEditor.Facade.BackgroundColor = System.Drawing.Color.LightGray;   // Background shade
-            formEditor.Facade.BorderColor     = System.Drawing.Color.DarkBlue;    // Border color
-            formEditor.Facade.TextColor       = System.Drawing.Color.Black;      // Text (font) color
-            formEditor.Facade.Font            = Aspose.Pdf.Facades.FontStyle.Helvetica; // Font enum value
-            formEditor.Facade.FontSize        = 12;                                 // Font size
-
-            // Apply the appearance to the specific field named "CustomerName"
-            formEditor.DecorateField("CustomerName");
-
-            // Persist changes to the output PDF
-            formEditor.Save(outputPdf);
+            // Save the result.
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Field \"CustomerName\" decorated and saved to '{outputPdf}'.");
+        Console.WriteLine($"Field 'CustomerName' decorated and saved to '{outputPath}'.");
     }
 }

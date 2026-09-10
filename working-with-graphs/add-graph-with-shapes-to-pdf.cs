@@ -16,17 +16,19 @@ class Program
             return;
         }
 
+        // Load the existing PDF (lifecycle: load)
         using (Document doc = new Document(inputPath))
         {
-            // Add a new blank page
+            // Add a new blank page (lifecycle: create)
             Page newPage = doc.Pages.Add();
 
-            // Graph constructor expects double values (width, height)
-            Graph graph = new Graph(400.0, 300.0);
+            // Create a Graph container (width: 400 points, height: 200 points)
+            // Use double parameters as the constructor with float is obsolete.
+            Graph graph = new Graph(400.0, 200.0);
 
-            // ----- Rectangle (drawing shape) -----
-            // Use Aspose.Pdf.Drawing.Rectangle, not Aspose.Pdf.Rectangle
-            var rect = new Aspose.Pdf.Drawing.Rectangle(50f, 150f, 200f, 100f);
+            // ----- Draw a rectangle -----
+            // Use Aspose.Pdf.Drawing.Rectangle (not Aspose.Pdf.Rectangle)
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 100f, 50f);
             rect.GraphInfo = new GraphInfo
             {
                 FillColor = Color.LightGray,
@@ -35,8 +37,9 @@ class Program
             };
             graph.Shapes.Add(rect);
 
-            // ----- Ellipse -----
-            var ellipse = new Ellipse(300f, 150f, 80f, 120f);
+            // ----- Draw an ellipse -----
+            // Ellipse constructor: (left, bottom, width, height)
+            Ellipse ellipse = new Ellipse(150f, 0f, 100f, 80f);
             ellipse.GraphInfo = new GraphInfo
             {
                 FillColor = Color.Yellow,
@@ -45,10 +48,10 @@ class Program
             };
             graph.Shapes.Add(ellipse);
 
-            // ----- Line -----
-            // Coordinates are {x1, y1, x2, y2}
-            float[] linePoints = { 100f, 200f, 350f, 200f };
-            var line = new Line(linePoints);
+            // ----- Draw a line -----
+            // Line constructor takes a float array: { x1, y1, x2, y2 }
+            float[] linePoints = { 0f, 100f, 300f, 150f };
+            Line line = new Line(linePoints);
             line.GraphInfo = new GraphInfo
             {
                 Color = Color.Blue,
@@ -56,10 +59,10 @@ class Program
             };
             graph.Shapes.Add(line);
 
-            // Add the Graph to the page's paragraph collection
+            // Add the Graph (which contains the shapes) to the page's paragraphs
             newPage.Paragraphs.Add(graph);
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle: save)
             doc.Save(outputPath);
         }
 

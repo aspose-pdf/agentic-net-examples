@@ -1,7 +1,8 @@
 using System;
-using System.IO;
-using System.Drawing;               // needed for Rectangle and Color
-using Aspose.Pdf.Facades;          // PdfContentEditor facade
+using System.Drawing;                     // System.Drawing is required for Rectangle and Color used by PdfContentEditor
+using System.IO;                         // For File.Exists
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;                // PdfContentEditor facade
 
 class Program
 {
@@ -10,37 +11,63 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Ensure the input PDF exists – create a minimal placeholder if it does not.
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            using var placeholder = new Document();
+            placeholder.Pages.Add();
+            placeholder.Save(inputPath);
         }
 
-        // Bind the PDF and add a line annotation with arrowheads at both ends
+        // Load the PDF using the facade, then add a line annotation with arrowheads at both ends.
         using (PdfContentEditor editor = new PdfContentEditor())
         {
+            // Bind the source PDF.
             editor.BindPdf(inputPath);
 
-            // Annotation rectangle (zero‑size is acceptable for line annotations)
-            Rectangle annotRect = new Rectangle(0, 0, 0, 0);
+            // Define the annotation rectangle (position on the page).
+            // The rectangle can be zero‑size because the line coordinates define the visual.
+            System.Drawing.Rectangle annotRect = new System.Drawing.Rectangle(0, 0, 0, 0);
 
-            // Arrowhead styles for start and end points
-            string[] leArray = new string[] { "OpenArrow", "OpenArrow" };
+            // Annotation contents (optional tooltip text).
+            string contents = "Line with arrows at both ends";
 
-            // Create the line annotation on page 1
+            // Line start and end coordinates (in points).
+            float x1 = 100f;   // start X
+            float y1 = 500f;   // start Y
+            float x2 = 300f;   // end X
+            float y2 = 500f;   // end Y
+
+            // Page number (1‑based indexing).
+            int pageNumber = 1;
+
+            // Border width (1 point).
+            int borderWidth = 1;
+
+            // Line color – use System.Drawing.Color as required by the CreateLine overload.
+            System.Drawing.Color lineColor = System.Drawing.Color.Red;
+
+            // Border style ("S" = solid). Not dashed, so dashArray can be null.
+            string borderStyle = "S";
+
+            // Arrowhead styles: first element for start, second for end.
+            // Use "ClosedArrow" for both ends.
+            string[] lineEndings = new string[] { "ClosedArrow", "ClosedArrow" };
+
+            // Create the line annotation.
             editor.CreateLine(
-                annotRect,               // annotation rectangle
-                "Line with arrows",      // contents (tooltip)
-                100f, 500f,              // start point (x1, y1)
-                300f, 500f,              // end point   (x2, y2)
-                1,                       // page number (1‑based)
-                1,                       // border width
-                Color.Red,               // line color (System.Drawing.Color)
-                "S",                     // border style: solid
-                null,                    // dash array (null for solid)
-                leArray);                // line ending styles (arrowheads)
+                annotRect,
+                contents,
+                x1, y1, x2, y2,
+                pageNumber,
+                borderWidth,
+                lineColor,
+                borderStyle,
+                null,          // dashArray not needed for solid line
+                lineEndings    // arrowheads at start and end
+            );
 
-            // Save the modified PDF
+            // Save the modified PDF.
             editor.Save(outputPath);
         }
 

@@ -1,41 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// reset page rotation
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-pages/reset-page-rotation-to-zero.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_reset_rotation.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Initialize the PdfPageEditor facade
-            using (PdfPageEditor editor = new PdfPageEditor())
-            {
-                editor.BindPdf(doc);
-
-                // Reset rotation of page 6 to 0 degrees
-                editor.Rotation = 0;                     // default rotation
-                editor.ProcessPages = new int[] { 6 };   // apply only to page 6
-
-                // Apply the changes
-                editor.ApplyChanges();
-
-                // Save the modified document
-                doc.Save(outputPath);
-            }
-        }
-
-        Console.WriteLine($"Page 6 rotation reset and saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

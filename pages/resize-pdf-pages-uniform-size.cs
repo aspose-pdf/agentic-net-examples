@@ -1,12 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text; // not strictly needed but safe for any text handling
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "uniform_pages.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,38 +16,36 @@ class Program
             return;
         }
 
-        // Variables must be declared outside the using block if they are needed after it.
-        double maxWidth = 0;
-        double maxHeight = 0;
-
-        // Load the PDF document (using rule: document must be wrapped in a using block)
+        // Load the PDF document (using rule: wrap Document in using)
         using (Document doc = new Document(inputPath))
         {
             // Determine the maximum width and height among all pages
-            // Pages are 1‑based (rule: page-indexing-one-based)
+            double maxWidth  = 0;
+            double maxHeight = 0;
+
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                // Rectangle coordinates: LLX, LLY, URX, URY
-                double width = page.Rect.URX - page.Rect.LLX;
-                double height = page.Rect.URY - page.Rect.LLY;
+                // Page.Rect is an Aspose.Pdf.Rectangle
+                double width  = page.Rect.Width;
+                double height = page.Rect.Height;
 
-                if (width > maxWidth) maxWidth = width;
+                if (width  > maxWidth)  maxWidth  = width;
                 if (height > maxHeight) maxHeight = height;
             }
 
-            // Resize every page to the largest dimensions
+            // Resize each page to the largest dimensions
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                // Use SetPageSize – the correct API for resizing a page (width, height as doubles).
-                page.SetPageSize(maxWidth, maxHeight);
+                // PageSize constructor expects float values
+                page.Resize(new PageSize((float)maxWidth, (float)maxHeight));
             }
 
-            // Save the modified document (rule: Document.Save writes PDF by default)
+            // Save the modified document (using rule: Document.Save)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All pages resized to {maxWidth}x{maxHeight} and saved to '{outputPath}'.");
+        Console.WriteLine($"Pages resized and saved to '{outputPath}'.");
     }
 }

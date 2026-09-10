@@ -4,57 +4,59 @@ using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Signatures;
 
-class VerifyPdfSignature
+class Program
 {
     static void Main()
     {
-        const string inputPath = "signed_document.pdf";
+        const string pdfPath = "signed.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(pdfPath))
         {
-            // -----------------------------------------------------------------
-            // 1. Check for compromised signatures using SignaturesCompromiseDetector
-            // -----------------------------------------------------------------
-            var detector = new SignaturesCompromiseDetector(doc);
-            bool signaturesNotCompromised = detector.Check(out CompromiseCheckResult compromiseResult);
+            // ------------------------------------------------------------
+            // 1. Check the document for compromised signatures
+            // ------------------------------------------------------------
+            SignaturesCompromiseDetector detector = new SignaturesCompromiseDetector(doc);
+            bool notCompromised = detector.Check(out CompromiseCheckResult compromiseResult);
 
-            Console.WriteLine($"Compromise check passed: {signaturesNotCompromised}");
+            Console.WriteLine($"Compromise check passed: {notCompromised}");
             Console.WriteLine($"Has compromised signatures: {compromiseResult.HasCompromisedSignatures}");
 
-            // -----------------------------------------------------------------
-            // 2. Iterate over all signature fields and verify each signature
-            // -----------------------------------------------------------------
+            // ------------------------------------------------------------
+            // 2. Iterate over all signature fields and retrieve signer info
+            // ------------------------------------------------------------
             foreach (Field field in doc.Form.Fields)
             {
-                if (field is SignatureField sigField && sigField.Signature != null)
+                if (field is SignatureField sigField)
                 {
-                    // The underlying Signature object (PKCS7, PKCS1, etc.)
+                    // The field may contain a signature object (PKCS7, etc.)
                     Signature signature = sigField.Signature;
 
-                    // Verify the signature (basic verification without external certificate)
+                    if (signature == null)
+                    {
+                        Console.WriteLine($"Signature field '{sigField.PartialName}' is empty.");
+                        continue;
+                    }
+
+                    // Basic verification of the signature
                     bool isValid = signature.Verify();
+                    Console.WriteLine($"Signature field '{sigField.PartialName}' verification result: {isValid}");
 
-                    // Retrieve signer details from the signature properties
-                    string authority = signature.Authority ?? "(unknown)";
-                    string date = signature.Date.ToString("u"); // Date is non‑nullable
-                    string reason = signature.Reason ?? "(none)";
-                    string location = signature.Location ?? "(unknown)";
-
-                    Console.WriteLine("----- Signature Details -----");
-                    Console.WriteLine($"Field name : {sigField.PartialName}");
-                    Console.WriteLine($"Valid      : {isValid}");
-                    Console.WriteLine($"Authority  : {authority}");
-                    Console.WriteLine($"Date       : {date}");
-                    Console.WriteLine($"Reason     : {reason}");
-                    Console.WriteLine($"Location   : {location}");
-                    Console.WriteLine();
+                    // Cast to PKCS7 to access common signer properties
+                    if (signature is PKCS7 pkcs7)
+                    {
+                        Console.WriteLine($"  Authority   : {pkcs7.Authority}");
+                        Console.WriteLine($"  Date        : {pkcs7.Date}");
+                        Console.WriteLine($"  Reason      : {pkcs7.Reason}");
+                        Console.WriteLine($"  Location    : {pkcs7.Location}");
+                        Console.WriteLine($"  ContactInfo : {pkcs7.ContactInfo}");
+                    }
                 }
             }
         }

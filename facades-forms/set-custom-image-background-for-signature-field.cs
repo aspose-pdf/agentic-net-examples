@@ -1,61 +1,71 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;          // PdfFileSignature
+using Aspose.Pdf.Forms;           // PKCS1, SignatureCustomAppearance
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string imagePath = "background.jpg";
+        // Paths – adjust as needed
+        const string inputPdf   = "input.pdf";          // PDF containing a signature field named "Signature"
+        const string outputPdf  = "output.pdf";
+        const string imagePath  = "signature_bg.jpg";   // Image to be used as background
+        const string certPath   = "certificate.pfx";    // Valid certificate file
+        const string certPass   = "password";           // Certificate password
 
-        if (!File.Exists(inputPath))
+        // Validate required files
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
         if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            Console.Error.WriteLine($"Signature background image not found: {imagePath}");
+            return;
+        }
+        if (!File.Exists(certPath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        // Bind the PDF for editing/signature operations
+        // Use PdfFileSignature facade to modify the signature field appearance
         using (PdfFileSignature pdfSign = new PdfFileSignature())
         {
-            pdfSign.BindPdf(inputPath);
+            // Bind the existing PDF document
+            pdfSign.BindPdf(inputPdf);
 
             // Set the image that will be used as the signature appearance background
-            pdfSign.SignatureAppearance = imagePath;
+            pdfSign.SignatureAppearance = imagePath;   // property expects a file name
 
-            // Locate the signature field named "Signature"
-            // The Form indexer returns a WidgetAnnotation, so we need an explicit cast to SignatureField
-            SignatureField sigField = pdfSign.Document.Form["Signature"] as SignatureField;
-            if (sigField != null)
+            // Create a signature object (PKCS1) – this holds the certificate and appearance settings
+            PKCS1 signature = new PKCS1(certPath, certPass);
+
+            // Configure a custom appearance object
+            SignatureCustomAppearance customAppearance = new SignatureCustomAppearance
             {
-                // Create a custom appearance object
-                SignatureCustomAppearance customAppearance = new SignatureCustomAppearance
-                {
-                    BackgroundColor = Aspose.Pdf.Color.Transparent, // transparent background
-                    IsForegroundImage = false // draw the image as background
-                };
+                // Image will be drawn as background (default), so keep IsForegroundImage = false
+                IsForegroundImage = false,
+                // Optional visual tweaks
+                BackgroundColor = Aspose.Pdf.Color.LightGray,
+                FontFamilyName = "Arial",
+                FontSize = 10,
+                ForegroundColor = Aspose.Pdf.Color.Blue
+            };
 
-                // Assign the custom appearance to the signature field
-                sigField.Signature.CustomAppearance = customAppearance;
-            }
-            else
-            {
-                Console.Error.WriteLine("Signature field named \"Signature\" not found.");
-            }
+            // Assign the custom appearance to the signature
+            signature.CustomAppearance = customAppearance;
 
-            // Save the modified PDF
-            pdfSign.Save(outputPath);
+            // Apply the signature (and its appearance) to the existing field named "Signature"
+            // The field must already exist in the PDF.
+            pdfSign.Sign("Signature", signature);
+
+            // Save the updated PDF
+            pdfSign.Save(outputPdf);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Signature field appearance updated and saved to '{outputPdf}'.");
     }
 }

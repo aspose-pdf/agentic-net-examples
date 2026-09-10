@@ -7,28 +7,37 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
-        // Output multi‑page TIFF file path
-        const string outputTiff = "output.tif";
-
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdf))
+        // Resolve a concrete data directory relative to the executable location.
+        // You can change this to any folder that contains the source PDF.
+        string dataDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data"));
+        if (!Directory.Exists(dataDir))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.WriteLine($"Data directory does not exist: {dataDir}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        // Name of the source PDF file placed inside the data directory.
+        const string pdfFileName = "sample.pdf"; // <-- replace with your actual PDF file name
+        string pdfPath = Path.Combine(dataDir, pdfFileName);
+        if (!File.Exists(pdfPath))
         {
-            // Create a TiffDevice with default settings (default compression)
-            TiffDevice tiffDevice = new TiffDevice();
-
-            // Convert the entire PDF (all pages) to a single multi‑page TIFF file
-            tiffDevice.Process(pdfDoc, outputTiff);
+            Console.WriteLine($"Source PDF not found: {pdfPath}");
+            return;
         }
 
-        Console.WriteLine($"Multi‑page TIFF saved to '{outputTiff}'.");
+        // Output TIFF file (multi‑page TIFF) will be created in the same data folder.
+        string outputTiff = Path.Combine(dataDir, "AllPages.tif");
+
+        // Load the PDF document inside a using block for deterministic disposal.
+        using (Document pdfDocument = new Document(pdfPath))
+        {
+            // Create a TiffDevice with default settings (default compression).
+            TiffDevice tiffDevice = new TiffDevice();
+
+            // Convert all pages of the PDF into a single multi‑page TIFF file.
+            tiffDevice.Process(pdfDocument, outputTiff);
+        }
+
+        Console.WriteLine($"Multi‑page TIFF created at: {outputTiff}");
     }
 }

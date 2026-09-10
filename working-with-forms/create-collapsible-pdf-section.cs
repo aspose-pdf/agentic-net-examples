@@ -1,36 +1,12 @@
-using System;
-using Aspose.Pdf;
-using Aspose.Pdf.Text;
+// URL-STABILITY STUB
+//
+// create collapsible pdf section
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/working-with-forms/create-collapsible-section-pdf-form.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string outputPath = "collapsible.pdf";
-
-        // Create a new PDF document and ensure proper disposal
-        using (Document doc = new Document())
-        {
-            // Add a page to host the section content
-            Page page = doc.Pages.Add();
-
-            // Simple text to illustrate the section
-            TextFragment tf = new TextFragment("Section content goes here.");
-            tf.Position = new Position(100, 700);
-            page.Paragraphs.Add(tf);
-
-            // Create an outline (bookmark) representing the collapsible section
-            OutlineItemCollection outline = new OutlineItemCollection(doc.Outlines)
-            {
-                Title = "My Section",
-                Open = false // start collapsed
-            };
-            doc.Outlines.Add(outline);
-
-            // Save the PDF
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

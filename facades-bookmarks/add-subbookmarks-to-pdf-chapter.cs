@@ -6,53 +6,59 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_subbookmarks.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_with_subbookmarks.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Bind the PDF to the bookmark editor
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        // Initialize the bookmark editor and bind the source PDF
+        PdfBookmarkEditor editor = new PdfBookmarkEditor();
+        editor.BindPdf(inputPdf);
+
+        // ----- Create parent bookmark (e.g., a chapter) -----
+        Bookmark parentBookmark = new Bookmark
         {
-            editor.BindPdf(inputPath);
+            Title      = "Chapter 1: Introduction",
+            PageNumber = 1,               // Destination page for the parent
+            Open       = true             // Expanded by default
+        };
 
-            // Create child bookmarks (sub‑sections)
-            Bookmark child1 = new Bookmark
-            {
-                Title      = "Section 1.1",
-                PageNumber = 6               // destination page for this child
-            };
+        // ----- Create child bookmarks (subsections) -----
+        Bookmark child1 = new Bookmark
+        {
+            Title      = "Section 1.1: Background",
+            PageNumber = 2,
+            Open       = false
+        };
 
-            Bookmark child2 = new Bookmark
-            {
-                Title      = "Section 1.2",
-                PageNumber = 8
-            };
+        Bookmark child2 = new Bookmark
+        {
+            Title      = "Section 1.2: Objectives",
+            PageNumber = 3,
+            Open       = false
+        };
 
-            // Collect the children in a Bookmarks collection
-            Bookmarks children = new Bookmarks();
-            children.Add(child1);
-            children.Add(child2);
+        // Assemble child bookmarks into a collection
+        Bookmarks childCollection = new Bookmarks();
+        childCollection.Add(child1);
+        childCollection.Add(child2);
 
-            // Create the parent bookmark (chapter) and attach the children
-            Bookmark parent = new Bookmark
-            {
-                Title      = "Chapter 1",
-                PageNumber = 5,               // destination page for the parent
-                ChildItems = children          // attach child bookmarks
-            };
+        // Attach the child collection to the parent
+        parentBookmark.ChildItems = childCollection;
 
-            // Add the whole hierarchy to the document
-            editor.CreateBookmarks(parent);
+        // Add the hierarchical bookmark structure to the PDF
+        editor.CreateBookmarks(parentBookmark);
 
-            // Save the updated PDF
-            editor.Save(outputPath);
-        }
+        // Save the modified PDF
+        editor.Save(outputPdf);
 
-        Console.WriteLine($"Bookmarks with children saved to '{outputPath}'.");
+        // Release resources held by the editor
+        editor.Close();
+
+        Console.WriteLine($"PDF saved with hierarchical bookmarks: {outputPdf}");
     }
 }

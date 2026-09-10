@@ -1,33 +1,40 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string baseUrl    = "https://www.example.com/";
+        // Input PDF file path
+        const string inputPdf = "input.pdf";
+        // Output PDF file path (will contain the updated XMP metadata)
+        const string outputPdf = "output_with_baseurl.pdf";
+        // Desired BaseURL value to be stored in the XMP metadata
+        const string baseUrl = "https://www.example.com/";
 
-        if (!File.Exists(inputPath))
+        // Verify that the source file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPdf}");
             return;
         }
 
-        // Bind the existing PDF to the XMP metadata facade
-        PdfXmpMetadata xmp = new PdfXmpMetadata();
-        xmp.BindPdf(inputPath);
+        // Use the PdfXmpMetadata facade to manipulate XMP metadata
+        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        {
+            // Bind the facade to the existing PDF document
+            xmp.BindPdf(inputPdf);
 
-        // Set the BaseURL property in the XMP metadata
-        xmp.Add(DefaultMetadataProperties.BaseURL, new XmpValue(baseUrl));
+            // Add or replace the BaseURL property.
+            // The string overload adds a key/value pair directly.
+            // The key must be the full XMP property name.
+            xmp.Add("xmp:BaseURL", baseUrl);
 
-        // Save the PDF with the updated metadata
-        xmp.Save(outputPath);
-        xmp.Close();
+            // Save the modified PDF (the original file is not altered)
+            xmp.Save(outputPdf);
+        }
 
-        Console.WriteLine($"BaseURL set to '{baseUrl}' and saved as '{outputPath}'.");
+        Console.WriteLine($"BaseURL metadata added. Output saved to '{outputPdf}'.");
     }
 }

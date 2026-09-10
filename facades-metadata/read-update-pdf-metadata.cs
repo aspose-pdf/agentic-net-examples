@@ -6,37 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Open the PDF and bind it to a PdfFileInfo instance
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+        // Create a PdfFileInfo instance and bind the PDF file
+        using (PdfFileInfo pdfInfo = new PdfFileInfo())
         {
+            pdfInfo.BindPdf(inputPath);
+
             // Read existing metadata
-            Console.WriteLine($"Title:          {pdfInfo.Title}");
-            Console.WriteLine($"Author:         {pdfInfo.Author}");
-            Console.WriteLine($"Subject:        {pdfInfo.Subject}");
-            Console.WriteLine($"Keywords:       {pdfInfo.Keywords}");
-            Console.WriteLine($"CreationDate:   {pdfInfo.CreationDate}");
-            Console.WriteLine($"ModDate:        {pdfInfo.ModDate}");
-            Console.WriteLine($"Producer:       {pdfInfo.Producer}");
-            Console.WriteLine($"Pages:          {pdfInfo.NumberOfPages}");
-            Console.WriteLine($"PDF Version:    {pdfInfo.GetPdfVersion()}");
+            Console.WriteLine($"Title   : {pdfInfo.Title}");
+            Console.WriteLine($"Author  : {pdfInfo.Author}");
+            Console.WriteLine($"Subject : {pdfInfo.Subject}");
+            Console.WriteLine($"Keywords: {pdfInfo.Keywords}");
+            Console.WriteLine($"Creator : {pdfInfo.Creator}");
+            Console.WriteLine($"Producer: {pdfInfo.Producer}");
+            Console.WriteLine($"Pages   : {pdfInfo.NumberOfPages}");
+            Console.WriteLine($"Version : {pdfInfo.GetPdfVersion()}");
 
-            // Modify metadata as needed
-            pdfInfo.Title    = "Updated Document Title";
-            pdfInfo.Author   = "Jane Doe";
-            pdfInfo.Subject  = "Demonstration of PdfFileInfo";
-            pdfInfo.Keywords = "Aspose.Pdf, metadata, example";
+            // Modify metadata
+            pdfInfo.Title = "New Document Title";
+            pdfInfo.Author = "Jane Doe";
+            pdfInfo.Subject = "Metadata manipulation example";
+            pdfInfo.Keywords = "Aspose.Pdf, Metadata";
 
-            // Persist the changes to a new file
+            // Save the updated metadata to a new file
             pdfInfo.SaveNewInfo(outputPath);
         }
 

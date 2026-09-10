@@ -7,20 +7,16 @@ class PdfToTiffConverter
 {
     static void Main(string[] args)
     {
-        // Expected arguments: input PDF path, output directory, DPI
-        if (args.Length < 3)
+        // Expected arguments: <inputPdfPath> <outputFolder> [dpi]
+        if (args.Length < 2)
         {
-            Console.Error.WriteLine("Usage: PdfToTiffConverter <input.pdf> <outputDir> <dpi>");
+            Console.Error.WriteLine("Usage: PdfToTiffConverter <input.pdf> <outputFolder> [dpi]");
             return;
         }
 
         string inputPath = args[0];
-        string outputDir = args[1];
-        if (!int.TryParse(args[2], out int dpi) || dpi <= 0)
-        {
-            Console.Error.WriteLine("Invalid DPI value.");
-            return;
-        }
+        string outputFolder = args[1];
+        int dpi = args.Length >= 3 ? int.Parse(args[2]) : 300; // Default to 300 DPI if not specified
 
         if (!File.Exists(inputPath))
         {
@@ -28,38 +24,45 @@ class PdfToTiffConverter
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document
-        using (Document pdfDocument = new Document(inputPath))
+        try
         {
-            // Define high‑resolution settings
-            Resolution resolution = new Resolution(dpi);
-
-            // Optional TIFF settings (no compression, default depth)
-            TiffSettings tiffSettings = new TiffSettings
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDocument = new Document(inputPath))
             {
-                Compression = CompressionType.None,
-                Depth = ColorDepth.Default,
-                Shape = ShapeType.Landscape,
-                SkipBlankPages = false
-            };
+                // Create a Resolution object with the desired DPI
+                Resolution resolution = new Resolution(dpi);
 
-            // Initialize the TIFF device with the resolution and settings
-            TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
-
-            // Process each page (1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
-            {
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.tif");
-                using (FileStream tiffStream = new FileStream(outputPath, FileMode.Create))
+                // Configure TiffSettings (optional: no compression for lossless output)
+                TiffSettings tiffSettings = new TiffSettings
                 {
-                    // Convert the current page to a TIFF image
-                    tiffDevice.Process(pdfDocument.Pages[pageNumber], tiffStream);
-                }
+                    Compression = CompressionType.None,
+                    Depth = ColorDepth.Default,
+                    Shape = ShapeType.Landscape,
+                    SkipBlankPages = false
+                };
 
-                Console.WriteLine($"Page {pageNumber} saved as TIFF: {outputPath}");
+                // Initialize the TiffDevice with the resolution and settings
+                TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
+
+                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+                for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+                {
+                    // Construct the output file name for each page
+                    string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.tif");
+
+                    // Convert the specific page to a TIFF image and save it
+                    tiffDevice.Process(pdfDocument.Pages[pageNumber], outputPath);
+                }
             }
+
+            Console.WriteLine("PDF pages successfully converted to high‑resolution TIFF images.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

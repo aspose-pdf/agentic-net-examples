@@ -8,83 +8,84 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "form.pdf";               // Path to the generated PDF containing the form
+        const string pdfPath = "form.pdf";               // Input PDF containing the form
         const string radioFieldName = "Color";           // Fully qualified name of the radio button group
 
-        // Expected export values for the radio button options
-        var expectedOptions = new HashSet<string> { "White", "Black", "Red" };
-
-        // ---------------------------------------------------------------------
-        // 1️⃣ Create a minimal PDF with a radio button group named "Color"
-        // ---------------------------------------------------------------------
-        // The sandbox does not contain any files, so we generate the input PDF
-        // program‑matically before we try to read it.
-        using (var doc = new Document())
+        // Expected radio button options (option name -> export value)
+        var expectedOptions = new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            // Add a single blank page – the field will be placed on this page.
-            var page = doc.Pages.Add();
+            { "White", "White" },
+            { "Black", "Black" }
+        };
 
-            // Define the rectangle where the radio button group will be rendered.
-            // (left, bottom, right, top) – values are in points.
-            var rect = new Aspose.Pdf.Rectangle(100, 600, 200, 650);
+        // ------------------------------------------------------------
+        // 1. Create a sample PDF with a radio button group named "Color"
+        // ------------------------------------------------------------
+        CreateSamplePdf(pdfPath);
 
-            // Create the radio button field. Use the constructor that only takes a Page.
-            var radio = new RadioButtonField(page)
-            {
-                PartialName = radioFieldName,
-                // Set the rectangle that defines the field's location on the page.
-                Rect = rect
-                // Optional: set the default selected option.
-                // Value = "White";
-            };
-
-            // Add the three options. The first argument is the *option name* (displayed
-            // in the UI), the second argument is the *export value* that GetButtonOptionValues
-            // returns.
-            radio.AddOption("White", "White");
-            radio.AddOption("Black", "Black");
-            radio.AddOption("Red", "Red");
-
-            // Add the field to the document's form collection.
-            doc.Form.Add(radio);
-
-            // Save the PDF so the Facade can open it later.
-            doc.Save(pdfPath);
-        }
-
-        // ---------------------------------------------------------------------
-        // 2️⃣ Open the PDF with the Form facade and verify the radio button options
-        // ---------------------------------------------------------------------
+        // ------------------------------------------------------------
+        // 2. Open the PDF with the Form facade and retrieve the options
+        // ------------------------------------------------------------
         using (Aspose.Pdf.Facades.Form form = new Aspose.Pdf.Facades.Form(pdfPath))
         {
-            // Retrieve the option dictionary: key = option name, value = export value
-            Dictionary<string, string> optionDict = form.GetButtonOptionValues(radioFieldName);
+            // Retrieve the actual options for the specified radio button field
+            Dictionary<string, string> actualOptions = form.GetButtonOptionValues(radioFieldName);
 
-            // Collect the actual export values from the dictionary
-            var actualValues = new HashSet<string>(optionDict.Values);
-
-            // Compare the actual set with the expected set
-            bool matches = expectedOptions.SetEquals(actualValues);
-
-            Console.WriteLine(matches
-                ? "Radio button options match the expected set."
-                : "Radio button options differ from the expected set.");
-
-            // If there is a mismatch, report missing and unexpected options
-            if (!matches)
+            // Compare counts first
+            if (actualOptions.Count != expectedOptions.Count)
             {
-                var missing = new HashSet<string>(expectedOptions);
-                missing.ExceptWith(actualValues);
+                Console.WriteLine($"Option count mismatch: expected {expectedOptions.Count}, found {actualOptions.Count}.");
+            }
+            else
+            {
+                bool allMatch = true;
+                foreach (var expected in expectedOptions)
+                {
+                    if (!actualOptions.TryGetValue(expected.Key, out string actualValue) ||
+                        actualValue != expected.Value)
+                    {
+                        Console.WriteLine($"Mismatch for option '{expected.Key}': expected '{expected.Value}', got '{actualValue ?? "null"}'.");
+                        allMatch = false;
+                    }
+                }
 
-                var unexpected = new HashSet<string>(actualValues);
-                unexpected.ExceptWith(expectedOptions);
-
-                if (missing.Count > 0)
-                    Console.WriteLine("Missing options: " + string.Join(", ", missing));
-
-                if (unexpected.Count > 0)
-                    Console.WriteLine("Unexpected options: " + string.Join(", ", unexpected));
+                if (allMatch)
+                {
+                    Console.WriteLine("Radio button options match the expected set.");
+                }
             }
         }
+    }
+
+    /// <summary>
+    /// Generates a minimal PDF containing a radio button field named "Color"
+    /// with two options: "White" and "Black".
+    /// </summary>
+    private static void CreateSamplePdf(string path)
+    {
+        // Create a new empty PDF document
+        Document doc = new Document();
+        Page page = doc.Pages.Add();
+
+        // Define the rectangle where the radio button group will be placed
+        // (left, bottom, right, top) – values are in points.
+        var rect = new Aspose.Pdf.Rectangle(100, 700, 200, 750);
+
+        // Create the radio button field – use the constructor that accepts only a Page
+        RadioButtonField radio = new RadioButtonField(page)
+        {
+            PartialName = "Color",
+            Rect = rect
+        };
+
+        // Add the two options (display name, export value)
+        radio.AddOption("White", "White");
+        radio.AddOption("Black", "Black");
+
+        // Add the field to the document's form collection
+        doc.Form.Add(radio);
+
+        // Save the PDF so the Form facade can later read it
+        doc.Save(path);
     }
 }

@@ -10,8 +10,8 @@ class Program
         // Input PDF containing attachments
         const string inputPdfPath = "input.pdf";
 
-        // Base folder where attachments will be organized by extension
-        const string outputBaseFolder = "Attachments";
+        // Base folder where attachments will be saved
+        const string outputBaseFolder = "ExtractedAttachments";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -22,7 +22,7 @@ class Program
         // Ensure the base output folder exists
         Directory.CreateDirectory(outputBaseFolder);
 
-        // Use PdfExtractor facade to extract attachments
+        // Use PdfExtractor (Facade) to extract attachments
         using (PdfExtractor extractor = new PdfExtractor())
         {
             // Bind the source PDF
@@ -34,45 +34,34 @@ class Program
             // Retrieve attachment names
             IList<string> attachmentNames = extractor.GetAttachNames();
 
-            // Retrieve attachment streams (in the same order as names)
+            // Retrieve attachment streams (one stream per attachment)
             MemoryStream[] attachmentStreams = extractor.GetAttachment();
 
             // Iterate over each attachment
             for (int i = 0; i < attachmentNames.Count; i++)
             {
                 string name = attachmentNames[i];
-                MemoryStream stream = attachmentStreams[i];
+                string extension = Path.GetExtension(name).TrimStart('.').ToLowerInvariant();
 
-                // Determine file extension (including the dot), fallback to empty string
-                string extension = Path.GetExtension(name);
-                if (string.IsNullOrEmpty(extension))
-                {
-                    extension = "no_extension";
-                }
-                else
-                {
-                    // Remove leading dot and normalize
-                    extension = extension.TrimStart('.').ToLowerInvariant();
-                }
-
-                // Create subfolder for this extension
-                string extFolder = Path.Combine(outputBaseFolder, extension);
-                Directory.CreateDirectory(extFolder);
+                // Create a subfolder for the current file extension
+                string extensionFolder = Path.Combine(outputBaseFolder, string.IsNullOrEmpty(extension) ? "no_ext" : extension);
+                Directory.CreateDirectory(extensionFolder);
 
                 // Full path for the extracted file
-                string outputPath = Path.Combine(extFolder, name);
+                string outputPath = Path.Combine(extensionFolder, name);
 
                 // Write the stream to disk
-                stream.Position = 0; // Ensure we start from the beginning
                 using (FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
-                    stream.CopyTo(fileStream);
+                    MemoryStream srcStream = attachmentStreams[i];
+                    srcStream.Position = 0; // Ensure we start from the beginning
+                    srcStream.CopyTo(fileStream);
                 }
 
                 Console.WriteLine($"Extracted: {outputPath}");
             }
         }
 
-        Console.WriteLine("Attachment extraction completed.");
+        Console.WriteLine("All attachments have been extracted and organized.");
     }
 }

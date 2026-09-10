@@ -1,30 +1,12 @@
-using System;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// retrieve reviewedby metadata
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/facades-metadata
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf = "input.pdf";
-
-        // Ensure the file exists before processing
-        if (!System.IO.File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
-
-        // PdfFileInfo implements IDisposable, so wrap it in a using block
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPdf))
-        {
-            // Retrieve the custom metadata property "ReviewedBy"
-            string reviewedBy = pdfInfo.GetMetaInfo("ReviewedBy");
-
-            // Log the result; empty string indicates the property is not present
-            if (string.IsNullOrEmpty(reviewedBy))
-                Console.WriteLine("Custom metadata 'ReviewedBy' not found.");
-            else
-                Console.WriteLine($"ReviewedBy: {reviewedBy}");
-        }
-    }
-}
+class Program { static void Main() { } }

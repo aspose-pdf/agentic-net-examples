@@ -1,30 +1,24 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
+using System.Xml;
 using Aspose.Pdf.Facades;
 
-class Program
+class XmpNamespaceDiagnostic
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Input PDF path – either first command‑line argument or a default file name
-        string inputPath = args.Length > 0 ? args[0] : "input.pdf";
+        const string inputPdf = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // PdfXmpMetadata implements IDisposable, so use a using block for deterministic cleanup
+        // Bind the PDF and retrieve its XMP metadata as XML bytes
         using (PdfXmpMetadata xmp = new PdfXmpMetadata())
         {
-            // Bind the PDF file to the facade
-            xmp.BindPdf(inputPath);
-
-            // Retrieve the raw XMP metadata as a byte array
+            xmp.BindPdf(inputPdf);
             byte[] rawData = xmp.GetXmpMetadata();
 
             if (rawData == null || rawData.Length == 0)
@@ -33,23 +27,38 @@ class Program
                 return;
             }
 
-            // Convert the byte array to a UTF‑8 string containing the XML
-            string xmlContent = Encoding.UTF8.GetString(rawData);
+            // Load the XML into an XmlDocument for parsing
+            XmlDocument xmlDoc = new XmlDocument();
+            using (MemoryStream ms = new MemoryStream(rawData))
+            {
+                xmlDoc.Load(ms);
+            }
 
-            // Parse the XML using LINQ to XML
-            XDocument xmpDoc = XDocument.Parse(xmlContent);
-
-            // Namespace declarations are represented by attributes where IsNamespaceDeclaration == true
-            var namespaceAttributes = xmpDoc.Root
-                                            .Attributes()
-                                            .Where(a => a.IsNamespaceDeclaration);
+            // The XMP metadata root element typically contains namespace declarations
+            XmlElement root = xmlDoc.DocumentElement;
+            if (root == null)
+            {
+                Console.WriteLine("Unable to parse XMP metadata XML.");
+                return;
+            }
 
             Console.WriteLine("XMP Namespaces present in the PDF:");
-            foreach (var nsAttr in namespaceAttributes)
+            // Iterate over all attributes of the root element to find xmlns declarations
+            foreach (XmlAttribute attr in root.Attributes)
             {
-                // The default namespace has the name "xmlns", otherwise it's "xmlns:prefix"
-                string prefix = nsAttr.Name.LocalName == "xmlns" ? "(default)" : nsAttr.Name.LocalName;
-                Console.WriteLine($"  Prefix: {prefix}, URI: {nsAttr.Value}");
+                if (attr.Prefix == "xmlns")
+                {
+                    // Attribute of form xmlns:prefix="uri"
+                    string prefix = attr.LocalName; // the prefix part after xmlns:
+                    string uri = attr.Value;
+                    Console.WriteLine($"Prefix: '{prefix}'  URI: '{uri}'");
+                }
+                else if (attr.Name == "xmlns")
+                {
+                    // Default namespace declaration xmlns="uri"
+                    string uri = attr.Value;
+                    Console.WriteLine($"Default namespace URI: '{uri}'");
+                }
             }
         }
     }

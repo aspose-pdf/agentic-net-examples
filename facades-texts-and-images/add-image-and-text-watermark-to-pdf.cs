@@ -1,66 +1,66 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "watermarked.pdf";
-        const string imagePath = "logo.png";
+        const string inputPdf   = "input.pdf";
+        const string outputPdf  = "watermarked.pdf";
+        const string imagePath  = "logo.png";
         const string watermarkText = "CONFIDENTIAL";
 
-        if (!File.Exists(inputPdf) || !File.Exists(imagePath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine("Missing input PDF or image file.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(imagePath))
         {
-            // Iterate through all pages and add the image + text watermark
-            foreach (Page page in doc.Pages)
-            {
-                // ------------------------------------------------------------
-                // 1. Add the image as a semi‑transparent background using ImageStamp
-                // ------------------------------------------------------------
-                ImageStamp imgStamp = new ImageStamp(imagePath)
-                {
-                    // Stretch the image to cover the whole page
-                    Width = page.PageInfo.Width,
-                    Height = page.PageInfo.Height,
-                    // Make the image semi‑transparent (0 = fully transparent, 1 = opaque)
-                    Opacity = 0.2f,
-                    // Place it behind the page content
-                    Background = true
-                };
-                page.AddStamp(imgStamp);
-
-                // ------------------------------------------------------------
-                // 2. Add the text watermark on top of the image
-                // ------------------------------------------------------------
-                TextFragment tf = new TextFragment(watermarkText)
-                {
-                    // Center the text on the page using alignment properties
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                tf.TextState.Font = FontRepository.FindFont("Arial");
-                tf.TextState.FontSize = 72;
-                tf.TextState.FontStyle = FontStyles.Bold;
-                // Gray with ~30% opacity (alpha = 77 out of 255)
-                tf.TextState.ForegroundColor = Color.FromArgb(77, 128, 128, 128);
-                // RenderingMode defaults to Fill, so no explicit setting needed
-                page.Paragraphs.Add(tf);
-            }
-
-            // Save the watermarked PDF
-            doc.Save(outputPdf);
-            Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
+            Console.Error.WriteLine($"Watermark image not found: {imagePath}");
+            return;
         }
+
+        // Initialize the facade and bind the source PDF
+        PdfFileStamp fileStamp = new PdfFileStamp();
+        fileStamp.BindPdf(inputPdf);
+
+        // Create a stamp that contains both an image and semi‑transparent text
+        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+
+        // Bind the image to the stamp
+        stamp.BindImage(imagePath);
+
+        // Create formatted text (System.Drawing.Color is required by FormattedText)
+        FormattedText ft = new FormattedText(
+            watermarkText,                     // text
+            System.Drawing.Color.Red,          // text color
+            "Helvetica",                       // font name
+            EncodingType.Winansi,              // encoding
+            false,                             // embed font
+            48);                               // font size
+
+        // Bind the text to the same stamp
+        stamp.BindLogo(ft);
+
+        // Position the stamp (center of the page, adjust as needed)
+        stamp.SetOrigin(200, 400); // X, Y coordinates
+
+        // Make the stamp appear behind existing content and set transparency
+        stamp.IsBackground = true;
+        stamp.Opacity = 0.5f; // 50 % transparent
+
+        // Add the stamp to all pages of the document
+        fileStamp.AddStamp(stamp);
+
+        // Save the result
+        fileStamp.Save(outputPdf);
+        fileStamp.Close();
+
+        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
     }
 }

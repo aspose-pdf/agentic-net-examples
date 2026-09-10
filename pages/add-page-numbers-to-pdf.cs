@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core API namespace
 
 class Program
 {
@@ -15,22 +15,23 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (lifecycle rule: use Document constructor)
         using (Document doc = new Document(inputPath))
         {
-            // Create a page number stamp
+            // Create a page number stamp.
+            // Default format is "#" which will be replaced by the page number.
             PageNumberStamp stamp = new PageNumberStamp();
-            stamp.StartingNumber      = 1;                         // start numbering at 1
-            stamp.HorizontalAlignment = HorizontalAlignment.Center; // center horizontally
-            stamp.VerticalAlignment   = VerticalAlignment.Bottom;   // place at bottom (optional)
+            stamp.StartingNumber = 1;                                 // start numbering at 1
+            stamp.HorizontalAlignment = HorizontalAlignment.Center;   // center horizontally
+            stamp.VerticalAlignment = VerticalAlignment.Bottom;       // place at bottom (optional)
 
-            // Apply the stamp to every page
+            // Apply the stamp to every page in the document.
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(stamp);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPath);
         }
 

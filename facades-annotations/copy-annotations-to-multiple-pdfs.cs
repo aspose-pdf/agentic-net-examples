@@ -1,102 +1,97 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         // ---------------------------------------------------------------------
-        // 1. Create the template PDF (if it does not already exist) and add a sample annotation.
+        // 1. Prepare a template PDF that contains at least one annotation.
         // ---------------------------------------------------------------------
-        const string templatePdf = "template.pdf";
-        if (!File.Exists(templatePdf))
+        const string templatePath = "template.pdf";
+        if (!File.Exists(templatePath))
         {
             using (Document templateDoc = new Document())
             {
                 // Add a single page.
-                templateDoc.Pages.Add();
+                Page tmplPage = templateDoc.Pages.Add();
 
                 // Create a simple text annotation.
-                TextAnnotation txtAnn = new TextAnnotation(templateDoc)
+                TextAnnotation txtAnno = new TextAnnotation(tmplPage, new Rectangle(100, 700, 200, 720))
                 {
-                    Rect = new Rectangle(100, 600, 300, 650), // left, bottom, right, top
                     Title = "Sample",
-                    Subject = "Demo",
-                    Contents = "This is a copied annotation."
+                    Contents = "This is a template annotation",
+                    Color = Color.Yellow,
+                    Open = true
                 };
-                templateDoc.Pages[1].Annotations.Add(txtAnn);
+                tmplPage.Annotations.Add(txtAnno);
 
-                // Save the template PDF.
-                templateDoc.Save(templatePdf);
+                // Save the template so that the annotation editor can bind to it.
+                templateDoc.Save(templatePath);
             }
         }
 
         // ---------------------------------------------------------------------
-        // 2. Create the target PDFs (if they do not already exist).
+        // 2. Prepare target PDFs (blank PDFs) that will receive the annotations.
         // ---------------------------------------------------------------------
-        string[] targetPdfs = new string[]
+        string[] targetPaths = { "target1.pdf", "target2.pdf", "target3.pdf" };
+        foreach (string target in targetPaths)
         {
-            "target1.pdf",
-            "target2.pdf",
-            "target3.pdf"
-        };
-
-        foreach (string targetPath in targetPdfs)
-        {
-            if (!File.Exists(targetPath))
+            if (!File.Exists(target))
             {
                 using (Document targetDoc = new Document())
                 {
-                    targetDoc.Pages.Add(); // simple one‑page document
-                    targetDoc.Save(targetPath);
+                    targetDoc.Pages.Add(); // one empty page
+                    targetDoc.Save(target);
                 }
             }
         }
 
-        // ---------------------------------------------------------------------
-        // 3. Directory where the annotated PDFs will be saved.
-        // ---------------------------------------------------------------------
-        const string outputDirectory = "AnnotatedOutputs";
-        Directory.CreateDirectory(outputDirectory);
+        // Output folder for the annotated PDFs.
+        const string outputFolder = "AnnotatedOutputs";
+        Directory.CreateDirectory(outputFolder);
 
         // ---------------------------------------------------------------------
-        // 4. Export annotations from the template PDF to an in‑memory XFDF stream.
+        // 3. Export annotations from the template PDF to an in‑memory XFDF stream.
         // ---------------------------------------------------------------------
         using (PdfAnnotationEditor templateEditor = new PdfAnnotationEditor())
         {
-            templateEditor.BindPdf(templatePdf);
+            templateEditor.BindPdf(templatePath);
 
             using (MemoryStream xfdfStream = new MemoryStream())
             {
-                // Export all annotations from the template PDF into the XFDF stream.
+                // Export all annotations to the XFDF stream.
                 templateEditor.ExportAnnotationsToXfdf(xfdfStream);
-
-                // Reset the stream position so it can be read for each target PDF.
+                // Reset the stream position so it can be read.
                 xfdfStream.Position = 0;
 
                 // -----------------------------------------------------------------
-                // 5. Iterate over each target PDF, import the exported annotations, and save.
+                // 4. Import the exported annotations into each target PDF and save.
                 // -----------------------------------------------------------------
-                foreach (string targetPdfPath in targetPdfs)
+                foreach (string targetPath in targetPaths)
                 {
-                    string outputPath = Path.Combine(outputDirectory, Path.GetFileName(targetPdfPath));
+                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(targetPath));
 
                     using (PdfAnnotationEditor targetEditor = new PdfAnnotationEditor())
                     {
-                        targetEditor.BindPdf(targetPdfPath);
+                        targetEditor.BindPdf(targetPath);
+
+                        // Import annotations from the XFDF stream.
                         targetEditor.ImportAnnotationsFromXfdf(xfdfStream);
+
+                        // Save the annotated PDF.
                         targetEditor.Save(outputPath);
                     }
 
-                    // Reset the stream position again for the next iteration.
+                    // Reset the stream for the next import.
                     xfdfStream.Position = 0;
                 }
             }
         }
 
-        Console.WriteLine("Annotation copying completed.");
+        Console.WriteLine("Annotations copied to target PDFs successfully.");
     }
 }

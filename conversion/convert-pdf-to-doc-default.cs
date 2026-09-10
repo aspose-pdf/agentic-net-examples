@@ -9,24 +9,26 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.doc";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPath))
         {
-            // Prepare DOC save options with default recognition settings
+            // Create save options for DOC format.
+            // The default settings provide basic text extraction.
             DocSaveOptions saveOptions = new DocSaveOptions
             {
-                // Explicitly set the output format to .doc
+                // Specify the output as the legacy .doc binary format.
                 Format = DocSaveOptions.DocFormat.Doc
-                // All other properties retain their defaults for basic text extraction
+                // No additional properties are set; defaults (e.g., Flow mode) are used.
             };
 
-            // Save the document as DOC using the explicit save options
+            // Save the document as DOC using the explicit save options.
             pdfDoc.Save(outputPath, saveOptions);
         }
 

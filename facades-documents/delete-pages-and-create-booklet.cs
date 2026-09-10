@@ -6,35 +6,37 @@ class Program
 {
     static void Main()
     {
-        // Paths for the original PDF, the temporary file after deletion, and the final booklet PDF
-        const string inputPdf      = "input.pdf";
-        const string tempPdf       = "temp_deleted.pdf";
-        const string bookletPdf    = "booklet_output.pdf";
+        // Input PDF, pages to remove, and final booklet output
+        const string inputPdf = "input.pdf";
+        const string tempPdf = "temp_deleted.pdf";
+        const string bookletPdf = "booklet_output.pdf";
 
-        // Pages to remove (1‑based indexing). Example: remove pages 2 and 5.
-        int[] pagesToDelete = new int[] { 2, 5 };
+        // Pages to delete (1‑based indexing). Adjust as needed.
+        int[] pagesToDelete = new int[] { 2, 3 };
 
-        // Verify the source file exists
+        // Ensure the input file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Create the PdfFileEditor instance (it does NOT implement IDisposable)
+        // ---------- Delete unwanted pages ----------
+        // PdfFileEditor does NOT implement IDisposable, so we instantiate normally.
         PdfFileEditor editor = new PdfFileEditor();
 
-        // 1. Delete the unwanted pages, writing the result to a temporary PDF file
-        bool deleteResult = editor.Delete(inputPdf, pagesToDelete, tempPdf);
-        if (!deleteResult)
+        // Delete the specified pages and save to a temporary file.
+        bool deleteSuccess = editor.Delete(inputPdf, pagesToDelete, tempPdf);
+        if (!deleteSuccess)
         {
             Console.Error.WriteLine("Failed to delete pages.");
             return;
         }
 
-        // 2. Create a booklet from the temporary PDF and save it to the final output file
-        bool bookletResult = editor.MakeBooklet(tempPdf, bookletPdf);
-        if (!bookletResult)
+        // ---------- Create booklet from the cleaned PDF ----------
+        // Re‑use the same PdfFileEditor instance (or create a new one).
+        bool bookletSuccess = editor.MakeBooklet(tempPdf, bookletPdf);
+        if (!bookletSuccess)
         {
             Console.Error.WriteLine("Failed to create booklet.");
             return;
@@ -45,9 +47,9 @@ class Program
         {
             File.Delete(tempPdf);
         }
-        catch (Exception ex)
+        catch
         {
-            Console.Error.WriteLine($"Could not delete temporary file: {ex.Message}");
+            // Ignore any errors during cleanup
         }
 
         Console.WriteLine($"Booklet created successfully: {bookletPdf}");

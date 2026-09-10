@@ -3,39 +3,38 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class PdfToTextExtractor
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputTxtPath = "output.txt";
+        const string inputPath = "input.pdf";
+        const string outputPath = "extracted.txt";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPath))
         {
-            // Create a TextAbsorber to extract visible text
+            // Create a TextAbsorber to collect visible text
             TextAbsorber absorber = new TextAbsorber();
 
-            // Configure extraction to use the default (Pure) formatting mode,
-            // which extracts only the visible text content.
+            // Configure extraction to use the Pure formatting mode (visible text only)
             absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
 
             // Apply the absorber to all pages of the document
-            pdfDoc.Pages.Accept(absorber);
+            doc.Pages.Accept(absorber);
 
             // Retrieve the extracted text
-            string extractedText = absorber.Text ?? string.Empty;
+            string extractedText = absorber.Text;
 
-            // Write the text to a .txt file
-            File.WriteAllText(outputTxtPath, extractedText);
+            // Write the result to a plain text file
+            File.WriteAllText(outputPath, extractedText);
         }
 
-        Console.WriteLine($"Text extracted to '{outputTxtPath}'.");
+        Console.WriteLine($"Visible text extracted to '{outputPath}'.");
     }
 }

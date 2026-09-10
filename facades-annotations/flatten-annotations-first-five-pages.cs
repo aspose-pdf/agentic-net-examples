@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
@@ -9,27 +8,27 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "flattened_first5_pages.pdf";
+        const string outputPath = "flattened_first5.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the annotation editor, bind the PDF, flatten annotations on pages 1‑5, and save.
+        // Use PdfAnnotationEditor (Facade) to manipulate annotations.
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Load the PDF document into the editor.
+            // Load the PDF document.
             editor.BindPdf(inputPath);
 
-            // Get all possible annotation types to flatten every annotation.
+            // Get all possible annotation types.
             AnnotationType[] allTypes = (AnnotationType[])Enum.GetValues(typeof(AnnotationType));
 
-            // Flatten annotations from page 1 to page 5 (inclusive).
+            // Flatten annotations on pages 1 through 5 for all annotation types.
             editor.FlatteningAnnotations(1, 5, allTypes);
 
-            // Save the modified PDF.
+            // Save the resulting PDF.
             editor.Save(outputPath);
         }
 

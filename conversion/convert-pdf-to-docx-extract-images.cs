@@ -6,58 +6,74 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputDocxPath = "output.docx";
-        const string imagesOutputDir = "ExtractedImages";
+        const string inputPdfPath   = "input.pdf";                 // source PDF
+        const string outputDocxPath = "output.docx";                // converted DOCX
+        const string imagesOutputDir = "ExtractedImages";           // folder for images
 
-        // Verify input file exists
+        // Validate input file
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the images directory exists
+        // Ensure the images output directory exists
         Directory.CreateDirectory(imagesOutputDir);
 
         try
         {
-            // Load the PDF document (wrapped in using for deterministic disposal)
-            using (Document pdfDocument = new Document(inputPdfPath))
+            // Load the PDF document (lifecycle rule: use Document constructor)
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
                 // ---------- Convert PDF to DOCX ----------
-                // DocSaveOptions must be passed explicitly for non‑PDF output
-                DocSaveOptions docOptions = new DocSaveOptions
+                // Configure DOCX save options
+                DocSaveOptions docxOptions = new DocSaveOptions
                 {
-                    // Specify DOCX output format
+                    // Use DOCX format
                     Format = DocSaveOptions.DocFormat.DocX,
-                    // Use Flow mode for better editability
-                    Mode = DocSaveOptions.RecognitionMode.Flow
+                    // Choose Flow mode for better editability
+                    Mode = DocSaveOptions.RecognitionMode.Flow,
+                    // Optional: improve bullet detection
+                    RecognizeBullets = true
                 };
-                pdfDocument.Save(outputDocxPath, docOptions);
+
+                // Save as DOCX (lifecycle rule: use Document.Save with SaveOptions)
+                pdfDoc.Save(outputDocxPath, docxOptions);
+                Console.WriteLine($"PDF converted to DOCX: {outputDocxPath}");
 
                 // ---------- Extract embedded images ----------
                 int imageCounter = 1;
-                foreach (Page page in pdfDocument.Pages)
+
+                // Iterate through all pages (1‑based indexing rule)
+                for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
                 {
-                    // XImageCollection is iterated directly (no dictionary semantics)
+                    Page page = pdfDoc.Pages[pageIndex];
+
+                    // Iterate over the XImage collection (foreach, not dictionary)
                     foreach (XImage img in page.Resources.Images)
                     {
-                        // Save each image as PNG using a FileStream (XImage.Save expects a Stream)
-                        string imageFileName = $"image_page{page.Number}_{imageCounter}.png";
+                        // Aspose.Pdf's XImage does not expose image format directly in all versions.
+                        // For simplicity, we save every extracted image as PNG. If needed, you can
+                        // inspect the raw image bytes to determine the format.
+                        string extension = ".png";
+
+                        // Build a unique file name
+                        string imageFileName = $"img_{pageIndex}_{imageCounter}{extension}";
                         string imagePath = Path.Combine(imagesOutputDir, imageFileName);
 
-                        using (FileStream fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
+                        // Save the image to disk using a FileStream (XImage.Save overload expects a Stream)
+                        using (var fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
                         {
                             img.Save(fs);
                         }
+                        Console.WriteLine($"Extracted image: {imagePath}");
 
                         imageCounter++;
                     }
                 }
-            }
 
-            Console.WriteLine("PDF successfully converted to DOCX and images extracted.");
+                Console.WriteLine($"All images extracted to: {imagesOutputDir}");
+            }
         }
         catch (Exception ex)
         {

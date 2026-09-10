@@ -1,40 +1,38 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core API namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdf  = "input.pdf";
         const string outputDocx = "output.docx";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF, convert to DOCX with enhanced flow mode to preserve footnotes
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDocument = new Document(inputPdf))
+            // Configure DOCX save options
+            DocSaveOptions saveOptions = new DocSaveOptions
             {
-                // Configure DOCX save options with enhanced flow recognition for footnotes
-                DocSaveOptions saveOptions = new DocSaveOptions
-                {
-                    Mode = DocSaveOptions.RecognitionMode.EnhancedFlow
-                };
+                // Output format: DOCX
+                Format = DocSaveOptions.DocFormat.DocX,
+                // Use the most accurate recognition mode (supports footnotes, tables, etc.)
+                Mode = DocSaveOptions.RecognitionMode.EnhancedFlow,
+                // Optional: improve bullet detection
+                RecognizeBullets = true
+            };
 
-                // Save the document as DOCX using the specified options
-                pdfDocument.Save(outputDocx, saveOptions);
-            }
+            // Save the document as DOCX
+            pdfDoc.Save(outputDocx, saveOptions);
+        }
 
-            Console.WriteLine($"PDF successfully converted to DOCX: {outputDocx}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
-        }
+        Console.WriteLine($"PDF successfully converted to DOCX: '{outputDocx}'");
     }
 }

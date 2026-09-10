@@ -6,61 +6,60 @@ class Program
 {
     static void Main()
     {
-        // UNC paths to the source PDFs, the stamp PDF, and the output folder
-        const string sourceFolder = @"\\NetworkShare\PdfFiles";
-        const string stampPdfPath = @"\\NetworkShare\Stamp\stamp.pdf";
-        const string outputFolder = @"\\NetworkShare\StampedPdfFiles";
+        // Network locations – adjust as needed
+        const string inputFolder  = @"\\Server\Share\PDFs";
+        const string outputFolder = @"\\Server\Share\StampedPDFs";
+        const string stampPdfPath = @"\\Server\Share\Stamp\stamp.pdf";
 
-        // Ensure the output directory exists
-        try
+        // Stamp configuration
+        const int    stampPageNumber = 1;      // page in the stamp PDF to use
+        const float  rotationDegrees = 45f;   // desired rotation angle
+
+        // Validate folders
+        if (!Directory.Exists(inputFolder))
         {
-            Directory.CreateDirectory(outputFolder);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to create output folder '{outputFolder}': {ex.Message}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
+        Directory.CreateDirectory(outputFolder);
 
-        // Retrieve all PDF files from the source folder
-        string[] pdfFiles;
-        try
+        // Process each PDF in the network share
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        foreach (string sourcePath in pdfFiles)
         {
-            pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to enumerate PDF files in '{sourceFolder}': {ex.Message}");
-            return;
-        }
-
-        foreach (string inputPath in pdfFiles)
-        {
-            string fileName = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(outputFolder, $"{fileName}_stamped.pdf");
+            string fileName   = Path.GetFileName(sourcePath);
+            string targetPath = Path.Combine(outputFolder, fileName);
 
             try
             {
                 // Initialise the facade for stamping
-                PdfFileStamp fileStamp = new PdfFileStamp();
-                fileStamp.InputFile = inputPath;      // source PDF
-                fileStamp.OutputFile = outputPath;    // destination PDF
+                Aspose.Pdf.Facades.PdfFileStamp fileStamp = new Aspose.Pdf.Facades.PdfFileStamp();
 
-                // Create a stamp that uses the first page of another PDF
-                Stamp stamp = new Stamp();
-                stamp.BindPdf(stampPdfPath, 1);       // bind page 1 of the stamp PDF
-                stamp.Rotation = 45f;                 // rotate the stamp (degrees)
-                stamp.IsBackground = true;           // place stamp behind page content
+                // Bind the source PDF document
+                fileStamp.BindPdf(sourcePath);
 
-                // Apply the stamp to all pages of the source document
+                // Create a stamp from a page of another PDF
+                Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+                stamp.BindPdf(stampPdfPath, stampPageNumber);
+                stamp.Rotation = rotationDegrees;   // rotate the stamp (degrees)
+
+                // Apply the stamp to all pages (null means every page)
+                stamp.Pages = null;
+
+                // Add the configured stamp to the document
                 fileStamp.AddStamp(stamp);
-                fileStamp.Close();                    // saves the output file
 
-                Console.WriteLine($"Stamped file saved: {outputPath}");
+                // Save the stamped PDF to the output location
+                fileStamp.Save(targetPath);
+
+                // Release resources held by the facade
+                fileStamp.Close();
+
+                Console.WriteLine($"Stamped PDF saved: {targetPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{sourcePath}': {ex.Message}");
             }
         }
     }

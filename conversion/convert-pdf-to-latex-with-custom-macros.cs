@@ -6,35 +6,52 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTex = "output.tex";
+        // Paths – adjust as needed
+        const string inputPdfPath  = "input.pdf";
+        const string outputTexPath = "output.tex";
 
-        if (!File.Exists(inputPdf))
+        // Custom LaTeX macro definitions (example)
+        // These lines will be inserted at the beginning of the generated .tex file.
+        string customMacros = @"
+% Custom macro definitions for special symbols
+\newcommand{\AlphaSym}{\ensuremath{\alpha}}
+\newcommand{\BetaSym}{\ensuremath{\beta}}
+";
+
+        // Verify input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdf))
+        try
         {
-            // Save as LaTeX using TeXSaveOptions
-            TeXSaveOptions texOptions = new TeXSaveOptions();
-            pdfDoc.Save(outputTex, texOptions);
+            // Load the PDF document
+            using (Document pdfDoc = new Document(inputPdfPath))
+            {
+                // Prepare TeX save options (default constructor is sufficient)
+                TeXSaveOptions texSaveOptions = new TeXSaveOptions();
+
+                // Save the PDF as a TeX file
+                pdfDoc.Save(outputTexPath, texSaveOptions);
+            }
+
+            // Insert custom macro definitions at the top of the generated .tex file
+            // Read the generated content
+            string texContent = File.ReadAllText(outputTexPath);
+
+            // Prepend the macro definitions
+            string finalTex = customMacros + Environment.NewLine + texContent;
+
+            // Write back to the same file (or to a new file if preferred)
+            File.WriteAllText(outputTexPath, finalTex);
+
+            Console.WriteLine($"PDF successfully converted to LaTeX: {outputTexPath}");
         }
-
-        // Custom LaTeX macro definitions for special symbols
-        string customMacros = @"% Custom macro definitions
-\newcommand{\alphaSym}{\alpha}
-\newcommand{\betaSym}{\beta}
-% Add additional macros here as needed
-
-";
-
-        // Prepend the custom macros to the generated .tex file
-        string originalContent = File.ReadAllText(outputTex);
-        File.WriteAllText(outputTex, customMacros + originalContent);
-
-        Console.WriteLine($"PDF successfully converted to LaTeX with custom macros: {outputTex}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

@@ -1,27 +1,15 @@
 using System;
 using System.IO;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Vector;
 
 class Program
 {
-    // Simple color transformation: replace any fill or stroke color with the brand color.
-    // This example replaces black (#000000) with brand red (#FF0000).
-    static string TransformColors(string svgContent)
-    {
-        // Replace hex color codes (case‑insensitive) for black with brand red.
-        // You can extend this method to handle more complex transformations.
-        return Regex.Replace(svgContent,
-                             @"#000000",
-                             "#FF0000",
-                             RegexOptions.IgnoreCase);
-    }
-
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputFolder  = "ExtractedSvg";
+        const string inputPdfPath = "input.pdf";
+        const string outputDir    = "ExtractedSvg";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -29,36 +17,43 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists.
-        Directory.CreateDirectory(outputFolder);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document inside a using block for deterministic disposal.
+        // Load the PDF document (wrapped in using for deterministic disposal)
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate over all pages (1‑based indexing).
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
             for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
             {
                 Page page = pdfDoc.Pages[pageIndex];
 
-                // Use SvgExtractor to obtain SVG strings for vector graphics on the page.
+                // Extract vector graphics as SVG strings using SvgExtractor
                 SvgExtractor extractor = new SvgExtractor();
-                var svgStrings = extractor.Extract(page); // Returns List<string>
+                List<string> svgContents = extractor.Extract(page);
 
-                // Save each extracted SVG after applying the color transformation.
-                for (int i = 0; i < svgStrings.Count; i++)
+                // Process each extracted SVG
+                for (int svgIndex = 0; svgIndex < svgContents.Count; svgIndex++)
                 {
-                    string originalSvg = svgStrings[i];
-                    string transformedSvg = TransformColors(originalSvg);
+                    string originalSvg = svgContents[svgIndex];
 
-                    string fileName = $"page_{pageIndex}_graphic_{i + 1}.svg";
-                    string outputPath = Path.Combine(outputFolder, fileName);
+                    // ---- Brand colour transformation ----
+                    // Example: replace black fill/stroke colours with a brand colour.
+                    // Adjust the search/replace patterns to match the actual SVG colour definitions.
+                    string transformedSvg = originalSvg
+                        .Replace("#000000", "#FF5733")   // black → brand orange
+                        .Replace("rgb(0,0,0)", "rgb(255,87,51)"); // alternative format
 
-                    File.WriteAllText(outputPath, transformedSvg);
-                    Console.WriteLine($"Saved transformed SVG: {outputPath}");
+                    // Determine a unique file name for the transformed SVG
+                    string svgFileName = $"page_{pageIndex}_graphic_{svgIndex + 1}.svg";
+                    string svgFilePath = Path.Combine(outputDir, svgFileName);
+
+                    // Save the transformed SVG to disk
+                    File.WriteAllText(svgFilePath, transformedSvg);
                 }
             }
         }
 
-        Console.WriteLine("Vector graphic extraction and color transformation completed.");
+        Console.WriteLine($"Vector graphics extracted and colour‑transformed SVGs saved to '{outputDir}'.");
     }
 }

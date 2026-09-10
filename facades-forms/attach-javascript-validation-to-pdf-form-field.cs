@@ -8,33 +8,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_with_js.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Bind the PDF, attach JavaScript to the "Age" field, and save.
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Initialize the FormEditor facade on the loaded document
-            FormEditor formEditor = new FormEditor(doc);
+            // Initialize the facade with the source PDF.
+            formEditor.BindPdf(inputPdf);
 
-            // JavaScript to display a warning if the entered age is less than 18
-            string jsCode = "if (event.value < 18) app.alert('Age must be at least 18 years old');";
+            // JavaScript that shows a warning if the entered value is less than 18.
+            string js = @"
+                if (event.value < 18) {
+                    app.alert('Age must be at least 18 years old.');
+                }
+            ";
 
-            // Attach the JavaScript to the field named "Age"
-            // Note: SetFieldScript works for push‑button fields, but it can also be used to
-            // attach a script to a generic field in this context.
-            formEditor.SetFieldScript("Age", jsCode);
+            // Attach the script to the field named "Age".
+            // SetFieldScript works for any field; the script will be executed on field validation.
+            formEditor.SetFieldScript("Age", js);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the modified PDF.
+            formEditor.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with JavaScript attached: {outputPath}");
+        Console.WriteLine($"PDF saved with JavaScript attached: {outputPdf}");
     }
 }

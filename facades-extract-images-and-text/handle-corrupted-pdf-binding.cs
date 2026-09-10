@@ -1,6 +1,7 @@
 using System;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using System.IO;
+using Aspose.Pdf;                 // For InvalidPdfFileFormatException and PdfException
+using Aspose.Pdf.Facades;        // For PdfExtractor
 
 class Program
 {
@@ -8,36 +9,46 @@ class Program
     {
         const string inputPath = "corrupted.pdf";
 
-        // PdfExtractor does not implement IDisposable, so no using block is needed.
-        PdfExtractor extractor = new PdfExtractor();
+        // Verify that the file exists before attempting to bind it.
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
         try
         {
-            // Attempt to bind the PDF file. This will throw if the file is corrupted.
+            // Create a PdfExtractor instance.
+            PdfExtractor extractor = new PdfExtractor();
+
+            // Attempt to bind the PDF file.
+            // This call throws InvalidPdfFileFormatException if the PDF is corrupted.
             extractor.BindPdf(inputPath);
 
-            // If binding succeeds, further extraction logic can be placed here.
-            // For demonstration, we simply indicate success.
+            // If binding succeeds, further extraction operations can be performed here.
             Console.WriteLine("PDF bound successfully.");
         }
-        // Specific exception for an invalid PDF file format.
+        // Specific exception for an invalid or corrupted PDF file.
         catch (InvalidPdfFileFormatException ex)
         {
-            Console.Error.WriteLine($"Invalid PDF format: {ex.Message}");
+            Console.Error.WriteLine("Invalid PDF file format:");
+            Console.Error.WriteLine(ex.Message);
         }
-        // General PDF-related exceptions.
+        // General PDF processing errors (e.g., other format issues).
         catch (PdfException ex)
         {
-            Console.Error.WriteLine($"PDF processing error: {ex.Message}");
+            Console.Error.WriteLine("PDF processing error:");
+            Console.Error.WriteLine(ex.Message);
             if (ex.InnerException != null)
             {
-                Console.Error.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                Console.Error.WriteLine("Inner exception: " + ex.InnerException.Message);
             }
         }
-        // Fallback for any other unexpected exceptions.
+        // Fallback for any unexpected exceptions.
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            Console.Error.WriteLine("Unexpected error:");
+            Console.Error.WriteLine(ex.Message);
         }
     }
 }

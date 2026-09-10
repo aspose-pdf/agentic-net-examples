@@ -1,35 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// detect xmp metadata in pdf
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-xmp-metadata/extract-xmp-metadata-from-pdf.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-
-        // Verify the file exists
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Use PdfXmpMetadata facade to work with XMP metadata
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-        {
-            // Load the PDF file into the facade
-            xmp.BindPdf(inputPath);
-
-            // Retrieve the XMP metadata as a byte array
-            byte[] data = xmp.GetXmpMetadata();
-
-            // Determine if metadata exists (non‑null and non‑empty)
-            bool hasXmp = data != null && data.Length > 0;
-
-            Console.WriteLine(hasXmp
-                ? "XMP metadata is present in the PDF."
-                : "No XMP metadata found in the PDF.");
-        }
-    }
-}
+class Program { static void Main() { } }

@@ -1,9 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices;      // Resolution struct
-using Aspose.Pdf.Text;         // SimpleFontSubstitution
+using Aspose.Pdf.Devices;
+using Aspose.Pdf.Text; // for FontRepository and SimpleFontSubstitution
 
 class Program
 {
@@ -12,45 +11,51 @@ class Program
         const string inputPdf = "input.pdf";
         const string outputDir = "output_images";
 
-        // Verify source file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Register a generic font substitution (any missing font -> Arial)
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("*", "Arial"));
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
 
-        // PdfConverter handles PDF‑to‑image conversion
-        using (PdfConverter converter = new PdfConverter())
+        // ------------------------------------------------------------
+        // Enable font substitution for any missing fonts.
+        // Using FontRepository.Substitutions we can map a missing font
+        // name to a fallback font (e.g., Arial). This substitution is
+        // applied automatically during rendering, so it must be set
+        // before any conversion or rendering operation.
+        // ------------------------------------------------------------
+        // Substitute any font that cannot be resolved with Arial.
+        // The "*" wildcard is not supported; instead we add a generic
+        // substitution that covers the most common missing fonts. You can
+        // add additional entries as needed.
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Arial"));
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Times New Roman", "Arial"));
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Courier", "Arial"));
+        // If you need a catch‑all fallback, you can also add a substitution
+        // for a font name that is unlikely to exist in the document.
+        // FontRepository.Substitutions.Add(new SimpleFontSubstitution("MissingFont", "Arial"));
+
+        // Define the resolution (DPI) for the PNG images
+        const int resolution = 150; // 150 DPI – you can change this as needed
+
+        // Iterate through each page and save it as a PNG image
+        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
         {
-            // Bind the PDF file to the converter
-            converter.BindPdf(inputPdf);
-
-            // Set desired resolution using the Resolution struct (DPI)
-            converter.Resolution = new Resolution(150);
-
-            // Prepare the converter for processing
-            converter.DoConvert();
-
-            // Iterate through all pages (1‑based indexing)
-            for (int page = 1; page <= converter.PageCount; page++)
+            string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+            using (FileStream imageStream = new FileStream(outPath, FileMode.Create))
             {
-                string outPath = Path.Combine(outputDir, $"page_{page}.png");
-
-                // Save the current page as a PNG image.
-                // The overload without ImageFormat infers the format from the file extension.
-                converter.GetNextImage(outPath);
+                // PngDevice renders a page to a PNG image with the specified resolution
+                PngDevice pngDevice = new PngDevice(resolution, resolution);
+                pngDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
             }
-
-            // Release resources held by the converter
-            converter.Close();
         }
 
-        Console.WriteLine("PDF successfully converted to PNG images.");
+        Console.WriteLine("PDF has been converted to PNG images successfully.");
     }
 }

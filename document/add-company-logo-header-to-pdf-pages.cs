@@ -1,53 +1,52 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;   // ImageStamp resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPdf  = "input.pdf";      // source PDF
+        const string logoImage = "logo.png";       // company logo file
         const string outputPdf = "output_with_header.pdf";
-        const string logoPath  = "company_logo.png";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(logoPath))
+        if (!File.Exists(logoImage))
         {
-            Console.Error.WriteLine($"Logo image not found: {logoPath}");
+            Console.Error.WriteLine($"Logo image not found: {logoImage}");
             return;
         }
 
-        // Load the existing PDF document inside a using block for proper disposal.
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdf))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing).
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over all pages (1‑based indexing)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
-
-                // Create an ImageStamp for the logo.
-                ImageStamp logoStamp = new ImageStamp(logoPath)
+                // Create an image stamp from the logo file
+                ImageStamp logoStamp = new ImageStamp(logoImage)
                 {
-                    // Place the stamp at the top center of the page.
+                    // Position the logo at the top‑center of the page
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment   = VerticalAlignment.Top,
-
-                    // Optional visual tweaks.
-                    Background = false,          // Draw over page content.
-                    Opacity    = 0.9f,           // Slightly transparent.
-                    TopMargin  = 10,             // Distance from the top edge.
+                    // Optional: set margins or explicit offsets
+                    TopMargin    = 20,   // distance from the top edge
+                    // Ensure the stamp is drawn over the page content
+                    Background   = false,
+                    Opacity      = 1.0f
                 };
 
-                // Add the stamp to the current page.
+                // Add the stamp to the current page
                 page.AddStamp(logoStamp);
             }
 
-            // Save the modified PDF.
+            // Save the modified document (PDF format)
             doc.Save(outputPdf);
         }
 

@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -18,37 +18,34 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Use the first page (1‑based indexing)
-            Page page = doc.Pages[1];
-
-            // Define the button rectangle (left, bottom, right, top)
+            // Define the button rectangle (lower‑left‑x, lower‑left‑y, upper‑right‑x, upper‑right‑y)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
 
-            // Create a push button field on the page
-            ButtonField button = new ButtonField(page, rect);
-            button.PartialName = "SubmitBtn";
-            button.NormalCaption = "Submit";
+            // Create a push button on the first page
+            ButtonField button = new ButtonField(doc.Pages[1], rect)
+            {
+                Name = "SubmitBtn",
+                Contents = "Submit"
+            };
 
-            // Create a SubmitFormAction and set its destination URL
-            SubmitFormAction submitAction = new SubmitFormAction();
-            // Url property expects a FileSpecification, not a plain string
-            submitAction.Url = new FileSpecification(submitUrl);
-            // Example: submit the form in HTML format
-            submitAction.Flags = SubmitFormAction.ExportFormat;
+            // Create a SubmitFormAction and set its URL using a FileSpecification instance
+            SubmitFormAction submitAction = new SubmitFormAction
+            {
+                Url = new FileSpecification(submitUrl, "Submit URL")
+            };
 
-            // Assign the action to the button's mouse‑press event (click)
-            button.Actions.OnPressMouseBtn = submitAction;
+            // Assign the action to a valid button event (e.g., mouse‑up)
+            button.Actions.OnReleaseMouseBtn = submitAction;
 
-            // Add the button annotation to the page
-            page.Annotations.Add(button);
+            // Add the button to the page annotations collection
+            doc.Pages[1].Annotations.Add(button);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with submit button to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with submit button at '{outputPath}'.");
     }
 }

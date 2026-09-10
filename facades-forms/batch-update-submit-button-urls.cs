@@ -1,63 +1,62 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing the PDFs to process
-        const string inputFolder = "InputPdfs";
+        // Folder containing the source PDFs
+        const string inputFolder = @"C:\PdfBatch\Input";
         // Folder where the updated PDFs will be saved
-        const string outputFolder = "OutputPdfs";
+        const string outputFolder = @"C:\PdfBatch\Output";
 
-        // Ensure the output folder exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Verify the input folder exists; if not, inform the user and exit gracefully
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.WriteLine($"Input folder '{inputFolder}' does not exist. No files to process.");
-            return;
-        }
-
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        // New URL to assign to all submit buttons
         const string newUrl = "https://new.example.com/submit";
 
-        foreach (string inputPath in pdfFiles)
+        // Process each PDF file in the input folder
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
             string fileName = Path.GetFileName(inputPath);
             string outputPath = Path.Combine(outputFolder, fileName);
 
-            // Retrieve all submit button names in the current PDF
-            Form form = new Form(inputPath);
-            string[] submitButtons = form.FormSubmitButtonNames;
-
-            if (submitButtons != null && submitButtons.Length > 0)
+            // Load the form to obtain the submit button names
+            using (Form form = new Form(inputPath))
             {
-                // Use the parameter‑less constructor (the overload with destination is obsolete)
-                using (FormEditor editor = new FormEditor())
+                string[] submitButtonNames = form.FormSubmitButtonNames;
+
+                // If the document contains submit buttons, update their URLs
+                if (submitButtonNames != null && submitButtonNames.Length > 0)
                 {
-                    // Bind the source PDF
-                    editor.BindPdf(inputPath);
-
-                    // Update each submit button URL
-                    foreach (string btnName in submitButtons)
+                    using (FormEditor editor = new FormEditor())
                     {
-                        editor.SetSubmitUrl(btnName, newUrl);
-                    }
+                        // Bind the source PDF
+                        editor.BindPdf(inputPath);
 
-                    // Save the modified PDF to the desired output location
-                    editor.Save(outputPath);
+                        // Update each submit button URL
+                        foreach (string btnName in submitButtonNames)
+                        {
+                            editor.SetSubmitUrl(btnName, newUrl);
+                        }
+
+                        // Save the modified PDF to the output location
+                        editor.Save(outputPath);
+                    }
+                }
+                else
+                {
+                    // No submit buttons found – copy the original file unchanged
+                    File.Copy(inputPath, outputPath, overwrite: true);
                 }
             }
-            else
-            {
-                // If there are no submit buttons, simply copy the original file
-                File.Copy(inputPath, outputPath, true);
-            }
+
+            Console.WriteLine($"Processed: {fileName}");
         }
 
-        Console.WriteLine("All submit button URLs have been updated.");
+        Console.WriteLine("Batch update completed.");
     }
 }

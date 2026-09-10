@@ -1,65 +1,50 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // needed for TextFragment, Position, TextBuilder, FontRepository
+using Aspose.Pdf.Text;
 
-class PdfMemoryProcessor
+public static class PdfMemoryProcessor
 {
     /// <summary>
-    /// Loads a PDF from the given input stream, adds a text fragment to the first page,
-    /// and returns the modified PDF as a new memory stream.
+    /// Loads a PDF from <paramref name="inputPdfStream"/>, adds the specified <paramref name="text"/>
+    /// to the first page, and writes the resulting PDF to <paramref name="outputPdfStream"/>.
     /// </summary>
-    /// <param name="inputPdfStream">Stream containing the source PDF (must be readable).</param>
-    /// <returns>MemoryStream with the updated PDF.</returns>
-    public static MemoryStream AddTextAndReturnStream(Stream inputPdfStream)
+    public static void AddTextToPdf(Stream inputPdfStream, string text, Stream outputPdfStream)
     {
-        // Ensure the input stream is at the beginning
-        if (inputPdfStream.CanSeek)
-            inputPdfStream.Position = 0;
+        if (inputPdfStream == null) throw new ArgumentNullException(nameof(inputPdfStream));
+        if (outputPdfStream == null) throw new ArgumentNullException(nameof(outputPdfStream));
+        if (text == null) throw new ArgumentNullException(nameof(text));
 
-        // Output stream will hold the result
-        var outputPdfStream = new MemoryStream();
-
-        // Use a using block for deterministic disposal of the Document
-        using (var doc = new Document(inputPdfStream))
+        // Load the PDF from the input stream. Document implements IDisposable, so wrap it in using.
+        using (Document doc = new Document(inputPdfStream))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            // Aspose.Pdf uses 1‑based page indexing.
             Page page = doc.Pages[1];
 
-            // Create a text fragment with the desired content
-            TextFragment tf = new TextFragment("Hello, Aspose.Pdf!");
-            // Position the text on the page (coordinates are in points)
+            // Create a text fragment with the desired content.
+            TextFragment tf = new TextFragment(text);
+            // Position the text on the page (coordinates are in points).
             tf.Position = new Position(100, 700);
-
-            // Optional: set font, size and colors
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
+            // Optional styling.
             tf.TextState.FontSize = 12;
-            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+            tf.TextState.Font = FontRepository.FindFont("Helvetica");
+            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Append the text fragment to the page using TextBuilder
+            // Append the text fragment to the page.
             TextBuilder builder = new TextBuilder(page);
             builder.AppendText(tf);
 
-            // Save the modified document into the output stream
+            // Save the modified document to the output stream.
             doc.Save(outputPdfStream);
         }
-
-        // Reset the output stream position so it can be read from the beginning
-        outputPdfStream.Position = 0;
-        return outputPdfStream;
     }
 }
 
-class Program
+public class Program
 {
-    // Entry point required for a console application
-    static void Main()
+    public static void Main(string[] args)
     {
-        // Example usage (commented out – replace with real paths if needed)
-        // using (var input = File.OpenRead("input.pdf"))
-        // {
-        //     var resultStream = PdfMemoryProcessor.AddTextAndReturnStream(input);
-        //     File.WriteAllBytes("output.pdf", resultStream.ToArray());
-        // }
+        // Entry point required for compilation. No operation performed here.
+        // Example usage can be added if needed.
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,43 +7,46 @@ class Program
 {
     static void Main()
     {
+        // Input and output PDF file paths
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Create a new PDF document and add a page
-        using (Document doc = new Document())
+        // Ensure the input file exists
+        if (!File.Exists(inputPath))
         {
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
 
-            // Create a multi‑line TextParagraph
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
+
+            // Create a new TextParagraph instance
             TextParagraph paragraph = new TextParagraph();
 
             // Define the rectangle where the paragraph will be placed
-            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 600, 400, 800);
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 600, 200, 700);
 
-            // Enable word wrapping by words
+            // Set word‑wrapping mode (optional, but demonstrates property usage)
             paragraph.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
 
-            // Optional visual settings
-            paragraph.HorizontalAlignment = HorizontalAlignment.Center;
-            paragraph.VerticalAlignment   = VerticalAlignment.Top;
-            // Use MarginInfo (not Margin) for paragraph margins
-            paragraph.Margin = new MarginInfo(5, 5, 5, 5);
-
-            // Populate the paragraph with lines
-            paragraph.BeginEdit();
+            // Append multiple lines of text
             paragraph.AppendLine("The quick brown fox jumps over the lazy dog.");
-            paragraph.AppendLine("Second line of the paragraph.");
-            paragraph.AppendLine("Third line with more text.");
-            paragraph.EndEdit();
+            paragraph.AppendLine("Line two of the paragraph.");
+            paragraph.AppendLine("Line three of the paragraph.");
 
-            // Append the paragraph to the page using TextBuilder
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendParagraph(paragraph);
+            // Use TextBuilder to add the paragraph to the page
+            TextBuilder textBuilder = new TextBuilder(page);
+            textBuilder.AppendParagraph(paragraph);
 
-            // Save the PDF
+            // Save the modified PDF (saving without SaveOptions writes PDF)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Multi‑line paragraph added and saved to '{outputPath}'.");
     }
 }

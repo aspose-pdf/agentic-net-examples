@@ -6,43 +6,52 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "encrypted_input.pdf";   // Encrypted PDF file
-        const string outputDir  = "ExtractedImages";      // Folder to store images
-        const string userPwd    = "userPassword";         // User password for the PDF
+        // Input encrypted PDF file and user password
+        const string inputPdf   = "encrypted_input.pdf";
+        const string userPwd    = "userPassword";
+        const string outputDir  = "ExtractedImages";
 
+        // Verify the input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Create output directory if it does not exist
         Directory.CreateDirectory(outputDir);
 
-        // PdfExtractor implements IDisposable – use a using block for deterministic cleanup
-        using (PdfExtractor extractor = new PdfExtractor())
+        try
         {
-            // Supply the password before binding the PDF
-            extractor.Password = userPwd;
-
-            // Bind the encrypted PDF file
-            extractor.BindPdf(inputPdf);
-
-            // Extract all images from the document
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-            // Iterate through all extracted images
-            while (extractor.HasNextImage())
+            // Create the PdfExtractor facade
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                string imagePath = Path.Combine(outputDir, $"image-{imageIndex}.png");
-                // Save each image to a file (default format is PNG when using GetNextImage(string))
-                extractor.GetNextImage(imagePath);
-                Console.WriteLine($"Saved image {imageIndex} to '{imagePath}'");
-                imageIndex++;
+                // Supply the password required to open the encrypted PDF
+                extractor.Password = userPwd;
+
+                // Bind the PDF file to the extractor
+                extractor.BindPdf(inputPdf);
+
+                // Perform the image extraction operation
+                extractor.ExtractImage();
+
+                // Retrieve each extracted image and save it to the output folder
+                int imageIndex = 1;
+                while (extractor.HasNextImage())
+                {
+                    string imagePath = Path.Combine(outputDir, $"image-{imageIndex}.jpg");
+                    // GetNextImage(string) saves the image using the default JPEG format
+                    extractor.GetNextImage(imagePath);
+                    Console.WriteLine($"Saved image {imageIndex} to '{imagePath}'");
+                    imageIndex++;
+                }
+
+                Console.WriteLine("Image extraction completed.");
             }
         }
-
-        Console.WriteLine("Image extraction completed.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+        }
     }
 }

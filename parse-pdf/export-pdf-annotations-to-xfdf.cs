@@ -6,27 +6,25 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFdfPath = "output.fdf";
+        const string pdfPath = "input.pdf";
+        const string xfdfPath = "output.xfdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document using the core Aspose.Pdf API
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document
+        using (Document doc = new Document(pdfPath))
         {
-            // The core API does not provide ExportFdf (which is a Facades feature).
-            // Instead, export annotations (including form fields) to XFDF using ExportAnnotationsToXfdf.
-            // This produces an XFDF file, which is the closest equivalent available without Facades.
-            using (FileStream fdfStream = new FileStream(outputFdfPath, FileMode.Create, FileAccess.Write))
+            // Export all annotations to XFDF using a FileStream
+            using (FileStream xfdfStream = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
             {
-                pdfDoc.ExportAnnotationsToXfdf(fdfStream);
+                doc.ExportAnnotationsToXfdf(xfdfStream);
             }
         }
 
-        Console.WriteLine($"Annotations exported to '{outputFdfPath}'.");
+        Console.WriteLine($"Annotations exported to '{xfdfPath}'.");
     }
 }

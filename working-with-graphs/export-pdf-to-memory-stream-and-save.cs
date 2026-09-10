@@ -1,37 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// export pdf to memory stream and save
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/working-with-graphs/export-pdf-to-memorystream-and-save-to-file.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdfPath  = "input.pdf";
-        const string outputFilePath = "output_from_memory.pdf";
-
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
-            return;
-        }
-
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            // Export the PDF to a memory stream
-            using (MemoryStream ms = new MemoryStream())
-            {
-                pdfDoc.Save(ms);               // Save document into the stream
-                ms.Position = 0;               // Reset stream position for reading
-
-                // Write the memory stream contents to a file on disk
-                using (FileStream file = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write))
-                {
-                    ms.CopyTo(file);
-                }
-            }
-        }
-
-        Console.WriteLine($"PDF exported to memory and saved as '{outputFilePath}'.");
-    }
-}
+class Program { static void Main() { } }

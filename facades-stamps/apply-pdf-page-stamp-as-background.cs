@@ -22,23 +22,25 @@ class Program
             return;
         }
 
-        // ---------- Lifecycle: create ----------
+        // ---------- Create ----------
+        // PdfFileStamp is the facade for stamping operations
         PdfFileStamp fileStamp = new PdfFileStamp();
 
-        // ---------- Lifecycle: load ----------
+        // ---------- Load ----------
         // Bind the source PDF that will receive the stamp
         fileStamp.BindPdf(inputPdf);
 
         // Create a stamp that uses the first page of the stamp PDF
-        Stamp stamp = new Stamp();
+        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
         stamp.BindPdf(stampPdf, 1);   // page number is 1‑based
-        stamp.IsBackground = true;   // place stamp behind page content
-        stamp.Pages = null;           // null means all pages are affected
+        stamp.IsBackground = true;    // place stamp behind page content
+        // By default stamp.Pages is null, meaning all pages are affected
 
-        // ---------- Apply stamp ----------
+        // ---------- Apply ----------
         fileStamp.AddStamp(stamp);
 
-        // ---------- Lifecycle: save ----------
+        // ---------- Save ----------
+        // Save the stamped document to the output path
         fileStamp.Save(outputPdf);
         fileStamp.Close();
 

@@ -3,12 +3,12 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-class ExportPopupAnnotations
+class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputXfdf = "popups.xfdf";
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string outputXfdf = "popups.xfdf";       // XFDF containing only popup annotations
 
         if (!File.Exists(inputPdf))
         {
@@ -16,52 +16,30 @@ class ExportPopupAnnotations
             return;
         }
 
-        // Load the source PDF
-        using (Document srcDoc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // Create a new empty PDF that will hold only popup annotations
-            using (Document tempDoc = new Document())
+            // Iterate through all pages
+            for (int pageIdx = 1; pageIdx <= doc.Pages.Count; pageIdx++)
             {
-                // Ensure the temporary document has the same number of pages as the source
-                for (int i = 1; i <= srcDoc.Pages.Count; i++)
-                {
-                    // Add a blank page (size will be taken from the source page)
-                    Page srcPage = srcDoc.Pages[i];
-                    Page newPage = tempDoc.Pages.Add();
-                    newPage.PageInfo = srcPage.PageInfo; // copy page size and rotation
-                }
+                Page page = doc.Pages[pageIdx];
 
-                // Iterate through each page and copy only PopupAnnotation objects
-                for (int i = 1; i <= srcDoc.Pages.Count; i++)
+                // Remove non‑popup annotations.
+                // Iterate backwards because Delete shifts the collection.
+                for (int annIdx = page.Annotations.Count; annIdx >= 1; annIdx--)
                 {
-                    Page srcPage = srcDoc.Pages[i];
-                    Page destPage = tempDoc.Pages[i];
+                    Annotation ann = page.Annotations[annIdx];
 
-                    for (int j = 1; j <= srcPage.Annotations.Count; j++)
+                    // Keep only PopupAnnotation instances
+                    if (!(ann is PopupAnnotation))
                     {
-                        Annotation ann = srcPage.Annotations[j];
-                        if (ann is PopupAnnotation popup)
-                        {
-                            // Create a new popup annotation on the corresponding page
-                            PopupAnnotation newPopup = new PopupAnnotation(destPage, popup.Rect)
-                            {
-                                Contents = popup.Contents,
-                                Color    = popup.Color,
-                                Open     = popup.Open,
-                                Name     = popup.Name,
-                                Modified = popup.Modified,
-                                // Copy any other needed properties here
-                            };
-
-                            // Add the new popup annotation to the destination page
-                            destPage.Annotations.Add(newPopup);
-                        }
+                        page.Annotations.Delete(annIdx);
                     }
                 }
-
-                // Export only the popup annotations to XFDF
-                tempDoc.ExportAnnotationsToXfdf(outputXfdf);
             }
+
+            // Export the remaining (popup) annotations to XFDF
+            doc.ExportAnnotationsToXfdf(outputXfdf);
         }
 
         Console.WriteLine($"Popup annotations exported to '{outputXfdf}'.");

@@ -6,38 +6,30 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfPageEditor facade to modify page properties
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            // Load the PDF document
-            editor.BindPdf(inputPath);
+        // Initialize the page editor and bind the source PDF
+        PdfPageEditor editor = new PdfPageEditor();
+        editor.BindPdf(inputPath);
 
-            // Restrict editing to page 7 (1‑based indexing)
-            editor.ProcessPages = new int[] { 7 };
+        // Specify that only page 7 should be edited
+        editor.ProcessPages = new int[] { 7 };
 
-            // Set zoom factor to 2.0 (200 % magnification)
-            editor.Zoom = 2.0f;
+        // Set zoom factor to 2.0 (200% magnification)
+        editor.Zoom = 2.0f;
 
-            // Apply the changes to the selected page(s)
-            editor.ApplyChanges();
+        // Apply the changes and save the result
+        editor.ApplyChanges();
+        editor.Save(outputPath);
+        editor.Close();
 
-            // Save the modified PDF
-            editor.Save(outputPath);
-
-            // Close the facade (optional, called automatically by using)
-            editor.Close();
-        }
-
-        Console.WriteLine($"Zoom set on page 7 and saved to '{outputPath}'.");
+        Console.WriteLine($"Page 7 zoom set to 2.0 and saved to '{outputPath}'.");
     }
 }

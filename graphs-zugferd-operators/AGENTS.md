@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - graphs-zugferd-operators
 
-> **Graphs ZUGFeRD operators** in PDF using C# / .NET -- **82** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Graphs ZUGFeRD operators** in PDF using C# / .NET -- **85** verified, compile-tested examples for **Aspose.PDF for .NET** 26.8.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,27 +23,26 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (82/82 files) ← category-specific
-- `using Aspose.Pdf.Annotations;` (22/82 files)
-- `using Aspose.Pdf.Text;` (11/82 files)
-- `using Aspose.Pdf.Forms;` (10/82 files)
-- `using Aspose.Pdf.Devices;` (6/82 files)
-- `using Aspose.Pdf.Operators;` (6/82 files)
-- `using Aspose.Pdf.Drawing;` (5/82 files)
-- `using Aspose.Pdf.Optimization;` (1/82 files)
-- `using Aspose.Pdf.Signatures;` (1/82 files)
-- `using Aspose.Pdf.Tagged;` (1/82 files)
-- `using Aspose.Pdf.Vector;` (1/82 files)
-- `using System;` (82/82 files)
-- `using System.IO;` (76/82 files)
-- `using System.Collections.Generic;` (4/82 files)
-- `using System.Drawing;` (1/82 files)
-- `using System.Drawing.Printing;` (1/82 files)
-- `using System.Linq;` (1/82 files)
-- `using System.Text.Json;` (1/82 files)
-- `using System.Xml;` (1/82 files)
-- `using System.Xml.Linq;` (1/82 files)
-- `using System.Xml.Schema;` (1/82 files)
+- `using Aspose.Pdf;` (84/85 files) ← category-specific
+- `using Aspose.Pdf.Annotations;` (24/85 files)
+- `using Aspose.Pdf.Text;` (12/85 files)
+- `using Aspose.Pdf.Forms;` (9/85 files)
+- `using Aspose.Pdf.Drawing;` (7/85 files)
+- `using Aspose.Pdf.Devices;` (6/85 files)
+- `using Aspose.Pdf.Operators;` (5/85 files)
+- `using Aspose.Pdf.Facades;` (3/85 files)
+- `using Aspose.Pdf.Tagged;` (2/85 files)
+- `using Aspose.Pdf.Optimization;` (1/85 files)
+- `using Aspose.Pdf.Signatures;` (1/85 files)
+- `using System;` (85/85 files)
+- `using System.IO;` (77/85 files)
+- `using System.Collections.Generic;` (7/85 files)
+- `using System.Drawing;` (1/85 files)
+- `using System.Drawing.Printing;` (1/85 files)
+- `using System.Reflection;` (1/85 files)
+- `using System.Text.Json;` (1/85 files)
+- `using System.Xml;` (1/85 files)
+- `using System.Xml.Schema;` (1/85 files)
 
 ## Common Code Pattern
 
@@ -61,40 +60,40 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-auto-close-javascript-to-pdf](./add-auto-close-javascript-to-pdf.cs) | Add Auto‑Close JavaScript to PDF | `Document`, `Load`, `Save` | Demonstrates how to embed a JavaScript action in a PDF that automatically closes the document aft... |
-| [add-auto-save-javascript-to-pdf](./add-auto-save-javascript-to-pdf.cs) | Add Auto‑Save JavaScript to PDF Document | `Document`, `JavascriptAction`, `OpenAction` | Shows how to embed a document‑level JavaScript action that automatically saves the PDF at defined... |
-| [add-custom-metadata-to-zugferd-pdf](./add-custom-metadata-to-zugferd-pdf.cs) | Add Custom Metadata to ZUGFeRD PDF | `Document`, `Metadata`, `Add` | Shows how to load a ZUGFeRD PDF with Aspose.Pdf, add custom metadata entries such as ProjectCode ... |
-| [add-expiry-javascript-action-to-pdf](./add-expiry-javascript-action-to-pdf.cs) | Add Expiry JavaScript Action to PDF | `Document`, `JavascriptAction`, `OpenAction` | Demonstrates how to embed a document‑level JavaScript open action that checks an expiry date and ... |
-| [add-file-attachment-annotation-to-pdf](./add-file-attachment-annotation-to-pdf.cs) | Add File Attachment Annotation to PDF | `Document`, `FileSpecification`, `FileAttachmentAnnotation` | Shows how to embed an external PDF as a file attachment annotation, set its description and icon,... |
-| [add-javascript-calculate-total-pdf](./add-javascript-calculate-total-pdf.cs) | Add JavaScript to Calculate Total from Line Items in PDF | `Document`, `Field`, `JavascriptAction` | Shows how to attach JavaScript to a PDF form field with Aspose.Pdf to sum line‑item fields and di... |
-| [add-javascript-open-action-jump-to-page-5](./add-javascript-open-action-jump-to-page-5.cs) | Add JavaScript Open Action to Jump to Page 5 | `Document`, `JavascriptAction`, `OpenAction` | Demonstrates how to assign a JavaScript open action to a PDF using Aspose.Pdf so that the documen... |
-| [add-javascript-password-prompt-to-pdf](./add-javascript-password-prompt-to-pdf.cs) | Add JavaScript Password Prompt to PDF | `Document`, `JavascriptAction`, `OpenAction` | Shows how to embed JavaScript in a PDF with Aspose.Pdf so that a password is requested when the d... |
-| [add-javascript-toggle-pdf-form-sections](./add-javascript-toggle-pdf-form-sections.cs) | Add JavaScript to Toggle PDF Form Sections | `Document`, `Field`, `JavascriptAction` | Shows how to embed JavaScript in a PDF with Aspose.Pdf to show or hide optional sections based on... |
-| [add-js-open-action-navigate-page-10](./add-js-open-action-navigate-page-10.cs) | Add JavaScript Open Action to Navigate to Page 10 | `Document`, `Document(string)`, `JavascriptAction` | Demonstrates loading a PDF with Aspose.Pdf, setting a JavaScript open action that jumps to page 1... |
-| [add-page-level-javascript-alert](./add-page-level-javascript-alert.cs) | Add Page-Level JavaScript Alert to PDF | `Document`, `Page`, `JavascriptAction` | Demonstrates how to embed a JavaScript action that shows an alert when a specific PDF page is ope... |
-| [add-semi-transparent-background-watermark](./add-semi-transparent-background-watermark.cs) | Add Semi-Transparent Background Watermark to PDF Pages | `Document`, `Page`, `TextState` | Demonstrates how to place a semi‑transparent text watermark behind existing content on every page... |
-| [add-xmp-metadata-pdfa-compliance](./add-xmp-metadata-pdfa-compliance.cs) | Add XMP Metadata for PDF/A Compliance | `Document`, `Info`, `Metadata` | Demonstrates how to embed required XMP metadata entries, including document ID and creator tool, ... |
-| [apply-form-filling-only-security](./apply-form-filling-only-security.cs) | Apply Form-Filling Only Security to PDF | `Document`, `Permissions`, `CryptoAlgorithm` | Demonstrates encrypting a PDF with Aspose.Pdf so that only form filling is permitted while editin... |
-| [attach-multiple-files-to-pdf](./attach-multiple-files-to-pdf.cs) | Attach Multiple Files to a PDF with Custom Descriptions | `Document`, `Page`, `FileSpecification` | Demonstrates how to add several file attachment annotations to a PDF, each with its own MIME type... |
-| [attach-zugferd-xml-to-pdf](./attach-zugferd-xml-to-pdf.cs) | Attach ZUGFeRD XML to PDF and Convert to PDF/A-3B | `Document`, `FileSpecification`, `EmbeddedFiles` | Shows how to embed a ZUGFeRD XML invoice into a PDF, set the AFRelationship to Data, and convert ... |
-| [auto-print-pdf-on-open](./auto-print-pdf-on-open.cs) | Auto‑Print PDF on Open with JavaScript Action | `Document`, `JavascriptAction`, `OpenAction` | Demonstrates how to embed a JavaScript action in a PDF using Aspose.Pdf so that the print dialog ... |
-| [batch-convert-pdfs-to-jpeg](./batch-convert-pdfs-to-jpeg.cs) | Batch Convert PDFs to JPEG Images | `Document`, `JpegDevice`, `Resolution` | Demonstrates how to iterate through all PDF files in a folder and convert each page to a high‑res... |
-| [batch-encrypt-pdfs-with-password](./batch-encrypt-pdfs-with-password.cs) | Batch Encrypt PDFs with Password Protection | `Document`, `Encrypt`, `CryptoAlgorithm` | Demonstrates how to encrypt all PDF files in a folder using Aspose.Pdf by applying the same user ... |
-| [batch-generate-zugferd-pdfs-from-csv](./batch-generate-zugferd-pdfs-from-csv.cs) | Batch Generate ZUGFeRD‑Compliant PDFs from CSV | `Document`, `BindXml`, `TextFragment` | Demonstrates how to read invoice data from a CSV file, create a PDF for each invoice with Aspose.... |
-| [calculate-total-order-amount-pdf-form](./calculate-total-order-amount-pdf-form.cs) | Calculate Total Order Amount with JavaScript in PDF Form | `Document`, `Form`, `JavascriptAction` | Demonstrates embedding and executing JavaScript in an Aspose.Pdf form to sum line‑item quantities... |
-| [combine-multiple-graphs-2x2-grid](./combine-multiple-graphs-2x2-grid.cs) | Combine Multiple Graphs on a Single PDF Page in a 2x2 Grid | `Document`, `Page`, `Graph` | Shows how to create several Aspose.Pdf Graph objects and arrange them on one PDF page using a two... |
-| [compress-pdf-and-optimize-images](./compress-pdf-and-optimize-images.cs) | Compress PDF and Optimize Images | `Document`, `OptimizationOptions`, `ImageCompressionOptions` | Demonstrates how to reduce a PDF file size by applying optimization options, including object com... |
-| [convert-pdf-pages-to-high-resolution-png](./convert-pdf-pages-to-high-resolution-png.cs) | Convert PDF Pages to High-Resolution PNG Images | `Document`, `Page`, `TextFragment` | Shows how to load a PDF with Aspose.Pdf, set a 300 DPI resolution, and convert each page to a PNG... |
-| [convert-pdf-to-docx-preserve-layout](./convert-pdf-to-docx-preserve-layout.cs) | Convert PDF to DOCX with Layout Preservation | `Document`, `Save`, `DocSaveOptions` | Shows how to load a PDF and save it as a DOCX file using Aspose.Pdf while preserving the original... |
-| [convert-pdf-to-html-embedded-images](./convert-pdf-to-html-embedded-images.cs) | Convert PDF to HTML with Embedded Images | `Document`, `HtmlSaveOptions`, `PartsEmbeddingModes` | Demonstrates converting a PDF file to a single HTML document while embedding all resources, inclu... |
-| [convert-pdf-to-multi-page-tiff](./convert-pdf-to-multi-page-tiff.cs) | Convert PDF to Multi-Page TIFF | `Document`, `Resolution`, `TiffSettings` | Demonstrates how to use Aspose.Pdf to convert a PDF document into a multi‑page TIFF file, preserv... |
-| [convert-pdf-to-pdfa-2b](./convert-pdf-to-pdfa-2b.cs) | Convert PDF to PDF/A‑2b Compliance | `Document`, `Convert`, `PdfFormat` | Demonstrates loading a PDF with Aspose.Pdf, converting it to PDF/A‑2b archival format, and saving... |
-| [convert-pdf-zugferd-to-pdfa3u](./convert-pdf-zugferd-to-pdfa3u.cs) | Convert PDF with ZUGFeRD to PDF/A‑3U preserving XML | `Document`, `Convert`, `PdfFormat` | Shows how to load a PDF that contains a ZUGFeRD XML attachment and convert it to PDF/A‑3U while k... |
-| [create-layered-graphics-with-transparency](./create-layered-graphics-with-transparency.cs) | Create Layered Graphics with Transparency in PDF | `Document`, `Page`, `Layer` | Demonstrates how to add optional‑content groups (layers) and draw semi‑transparent shapes such as... |
-| ... | | | *and 52 more files* |
+| [add-auto-close-javascript-to-pdf](./add-auto-close-javascript-to-pdf.cs) | Add Auto‑Close JavaScript to PDF | `Document`, `JavascriptAction`, `OpenAction` | Shows how to embed a document‑level JavaScript action that automatically closes a PDF after a spe... |
+| [add-auto-print-javascript-action-to-pdf](./add-auto-print-javascript-action-to-pdf.cs) | Add Auto‑Print JavaScript Action to PDF | `Document`, `JavascriptAction`, `OpenAction` | Demonstrates how to attach a JavaScript action that automatically opens the print dialog when the... |
+| [add-auto-save-javascript-to-pdf](./add-auto-save-javascript-to-pdf.cs) | Add Document-Level Auto‑Save JavaScript to PDF | `Document`, `JavascriptAction`, `ctor(string)` | Demonstrates how to embed a document‑level JavaScript action that automatically saves the PDF at ... |
+| [add-custom-metadata-to-zugferd-pdf](./add-custom-metadata-to-zugferd-pdf.cs) | Add Custom Metadata to ZUGFeRD PDF | `Document`, `DocumentInfo`, `Save` | Demonstrates loading an existing PDF with Aspose.Pdf, adding custom metadata entries such as proj... |
+| [add-encrypted-file-attachment-to-pdf](./add-encrypted-file-attachment-to-pdf.cs) | Add Encrypted File Attachment to PDF | `Document`, `Page`, `TextFragment` | Shows how to embed a file attachment using a stream and then encrypt the PDF so only authorized u... |
+| [add-expiry-javascript-action-to-pdf](./add-expiry-javascript-action-to-pdf.cs) | Add Expiry JavaScript Action to PDF | `Document`, `JavascriptAction`, `OpenAction` | Shows how to embed a document‑level JavaScript action that checks a predefined expiry date and cl... |
+| [add-file-attachment-to-pdf](./add-file-attachment-to-pdf.cs) | Add File Attachment to PDF with Description | `Document`, `Page`, `Rectangle` | Shows how to attach an external PDF file to a PDF document using Aspose.Pdf, including a descript... |
+| [add-javascript-calculation-to-pdf-total](./add-javascript-calculation-to-pdf-total.cs) | Add JavaScript Calculation to PDF Form Total Field | `Document`, `Form`, `Field` | Shows how to embed JavaScript in a PDF using Aspose.Pdf to sum line‑item fields and display the r... |
+| [add-javascript-open-action-jump-to-page-5](./add-javascript-open-action-jump-to-page-5.cs) | Add JavaScript Open Action to Jump to Page 5 | `Document`, `JavascriptAction`, `OpenAction` | Demonstrates how to attach a JavaScript open action to a PDF using Aspose.Pdf so that the documen... |
+| [add-javascript-toggle-optional-sections](./add-javascript-toggle-optional-sections.cs) | Add JavaScript to Toggle Optional Sections in PDF Form | `Document`, `CheckboxField`, `JavascriptAction` | Shows how to attach a JavaScript action to a checkbox field in an Aspose.Pdf form so that optiona... |
+| [add-page-level-javascript-alert-to-pdf](./add-page-level-javascript-alert-to-pdf.cs) | Add Page-Level JavaScript Alert to PDF | `Document`, `Page`, `JavascriptAction` | Demonstrates how to embed a JavaScript action that shows an alert when a specific PDF page is ope... |
+| [add-password-prompt-javascript-to-pdf](./add-password-prompt-javascript-to-pdf.cs) | Add Password Prompt JavaScript to PDF | `Document`, `JavascriptAction`, `OpenAction` | Demonstrates embedding JavaScript in a PDF with Aspose.Pdf to prompt for a password on document o... |
+| [add-semi-transparent-text-watermark](./add-semi-transparent-text-watermark.cs) | Add Semi-Transparent Text Watermark Behind PDF Content | `Document`, `Page`, `WatermarkArtifact` | Demonstrates how to place a semi‑transparent text watermark behind the existing content on every ... |
+| [add-signature-field-with-js-validation](./add-signature-field-with-js-validation.cs) | Add Digital Signature Field with JavaScript Validation to PD... | `Document`, `Page`, `Rectangle` | Shows how to create a PDF, insert a digital signature field, and attach a JavaScript action that ... |
+| [add-xmp-metadata-pdfa-compliance](./add-xmp-metadata-pdfa-compliance.cs) | Add XMP Metadata for PDF/A Compliance | `Document`, `DocumentInfo`, `Metadata` | Shows how to load a PDF, add required XMP metadata entries (creator tool, creation date, document... |
+| [attach-multiple-files-to-pdf](./attach-multiple-files-to-pdf.cs) | Attach Multiple Files with Descriptions to a PDF | `Document`, `Page`, `FileSpecification` | Demonstrates how to embed several external files into a PDF, each with its own MIME type, descrip... |
+| [attach-zugferd-xml-to-pdf](./attach-zugferd-xml-to-pdf.cs) | Attach ZUGFeRD XML to PDF and Convert to PDF/A‑3B | `Document`, `FileSpecification`, `EmbeddedFiles` | Shows how to load a PDF, embed a ZUGFeRD XML file as an attached file (AFRelationship.Data), conv... |
+| [batch-apply-pdf-password-protection](./batch-apply-pdf-password-protection.cs) | Batch Apply Password Protection to PDFs | `Document`, `Encrypt`, `Save` | Demonstrates how to iterate through a folder of PDF files and apply identical user and owner pass... |
+| [batch-convert-pdfs-to-jpeg](./batch-convert-pdfs-to-jpeg.cs) | Batch Convert PDFs to JPEG Images | `Document`, `Resolution`, `JpegDevice` | Demonstrates how to iterate through all PDF files in a folder, convert each page to a JPEG image ... |
+| [batch-generate-zugferd-pdfs-from-csv](./batch-generate-zugferd-pdfs-from-csv.cs) | Batch Generate ZUGFeRD‑Compliant PDFs from CSV | `Document`, `Page`, `TextFragment` | Reads invoice data from a CSV file, creates a PDF for each record, adds basic invoice text, and a... |
+| [calculate-total-order-amount](./calculate-total-order-amount.cs) | Calculate Total Order Amount from PDF Form Fields | `Document`, `Form`, `Field` | Shows how to read quantity and price fields from an Aspose.Pdf form, compute line totals, and wri... |
+| [change-pdf-line-width](./change-pdf-line-width.cs) | Change PDF Line Width from 1 to 3 Points | `Document`, `Page`, `Operator` | Shows how to iterate through each page's content operators and modify SetLineWidth operators to c... |
+| [combine-multiple-graphs-on-single-pdf-page](./combine-multiple-graphs-on-single-pdf-page.cs) | Combine Multiple Graphs on a Single PDF Page | `Document`, `Page`, `Graph` | Demonstrates how to place four separate graphs in a 2×2 grid on one PDF page using Aspose.Pdf, in... |
+| [compress-pdf-images-optimization](./compress-pdf-images-optimization.cs) | Compress PDF Images and Optimize Resources | `Document`, `OptimizationOptions`, `ImageCompressionOptions` | Demonstrates how to reduce a PDF file size by enabling image compression, resizing high‑resolutio... |
+| [convert-pdf-pages-to-high-resolution-png](./convert-pdf-pages-to-high-resolution-png.cs) | Convert PDF Pages to High-Resolution PNG Images | `Document`, `Resolution`, `PngDevice` | Demonstrates loading a PDF with Aspose.Pdf, setting a 300 DPI resolution, and converting each pag... |
+| [convert-pdf-to-docx-preserve-layout](./convert-pdf-to-docx-preserve-layout.cs) | Convert PDF to DOCX with Layout Preservation | `Document`, `DocSaveOptions`, `Save` | Shows how to convert a PDF file to DOCX using Aspose.Pdf while keeping the original layout, fonts... |
+| [convert-pdf-to-html-with-embedded-images](./convert-pdf-to-html-with-embedded-images.cs) | Convert PDF to HTML with Embedded Images | `Document`, `HtmlSaveOptions`, `PartsEmbeddingModes` | Demonstrates converting a PDF to HTML using Aspose.Pdf while embedding all resources and raster i... |
+| [convert-pdf-to-multi-page-tiff](./convert-pdf-to-multi-page-tiff.cs) | Convert PDF to Multi‑Page TIFF | `Document`, `Resolution`, `TiffSettings` | Demonstrates how to load a PDF with Aspose.Pdf, configure TIFF settings, and convert the entire d... |
+| [convert-pdf-to-pdfa-2b](./convert-pdf-to-pdfa-2b.cs) | Convert PDF to PDF/A‑2b Compliance | `Document`, `Convert`, `PdfFormat` | Loads a PDF, converts it to PDF/A‑2b archival format using Aspose.Pdf, logs any conversion errors... |
+| [convert-pdf-zugferd-to-pdfa3u](./convert-pdf-zugferd-to-pdfa3u.cs) | Convert PDF with ZUGFeRD to PDF/A‑3U preserving XML | `Document`, `Convert`, `Save` | Shows how to load a PDF containing a ZUGFeRD XML attachment and convert it to PDF/A‑3U while keep... |
+| ... | | | *and 55 more files* |
 
 ## Category Statistics
-- Total examples: 82
+- Total examples: 85
 
 ## Category-Specific Tips
 
@@ -138,5 +137,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for graphs-zugferd-operators patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-07-17 | Run: `20260717_171638_da3b3e`
+Updated: 2026-08-20 | Run: `20260820_001147_12d7b3`
 <!-- AUTOGENERATED:END -->

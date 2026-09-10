@@ -1,47 +1,58 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // Facade classes for PDF editing
 
 class Program
 {
     static void Main()
     {
+        // Input and output PDF file paths
         const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_zoomed.pdf";
+        const string outputPdf = "zoomed_output.pdf";
+
+        // Define a zoom factor for each page (1.0 = 100%)
+        // Example: page 1 -> 100%, page 2 -> 150%, page 3 -> 75%
+        float[] pageZooms = { 1.0f, 1.5f, 0.75f };
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // PdfPageEditor implements IDisposable, so wrap it in a using block.
+        // Ensure the number of zoom values matches the number of pages
+        // We'll determine the page count after binding the PDF.
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the source PDF.
+            // Bind the source PDF file to the editor facade
             editor.BindPdf(inputPdf);
 
-            // Get total number of pages (1‑based indexing).
+            // Get total page count (pages are 1‑based)
             int pageCount = editor.GetPages();
 
-            // Apply a different zoom factor to each page.
+            if (pageZooms.Length != pageCount)
+            {
+                Console.Error.WriteLine($"Zoom array length ({pageZooms.Length}) does not match page count ({pageCount}).");
+                return;
+            }
+
+            // Iterate over each page and apply its specific zoom factor
             for (int i = 1; i <= pageCount; i++)
             {
-                // Example: zoom starts at 0.5 and increases by 0.1 per page.
-                float zoomFactor = 0.5f + (i - 1) * 0.1f;
-
-                // Restrict editing to the current page only.
+                // Restrict editing to the current page only
                 editor.ProcessPages = new int[] { i };
 
-                // Set the zoom coefficient for this page.
-                editor.Zoom = zoomFactor;
+                // Set the zoom coefficient for this page
+                editor.Zoom = pageZooms[i - 1];
 
-                // Apply the changes to the page.
+                // Apply the change to the bound document
                 editor.ApplyChanges();
             }
 
-            // Save the modified document.
+            // Save the modified PDF to the output path
             editor.Save(outputPdf);
+            // Close the facade (optional, as using will dispose it)
+            editor.Close();
         }
 
         Console.WriteLine($"Zoomed PDF saved to '{outputPdf}'.");

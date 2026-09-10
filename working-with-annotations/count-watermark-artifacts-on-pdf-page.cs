@@ -1,13 +1,14 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const int pageNumber = 1; // 1‑based page index
 
         if (!File.Exists(inputPath))
         {
@@ -15,28 +16,24 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block (ensures proper disposal)
+        // Load the PDF document (lifecycle rule: wrap in using)
         using (Document doc = new Document(inputPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing; get the first page
-            Page page = doc.Pages[1];
-
-            // Count only WatermarkArtifact instances on this page
-            int watermarkCount = 0;
-            foreach (Artifact artifact in page.Artifacts)
+            // Validate page number (pages are 1‑based)
+            if (pageNumber < 1 || pageNumber > doc.Pages.Count)
             {
-                if (artifact is WatermarkArtifact)
-                {
-                    watermarkCount++;
-                }
+                Console.Error.WriteLine("Invalid page number.");
+                return;
             }
 
-            Console.WriteLine($"Watermark artifacts on page 1: {watermarkCount}");
+            Page page = doc.Pages[pageNumber];
 
-            // Save the (unchanged) document to a new file
-            doc.Save(outputPath);
+            // Count only WatermarkArtifact instances on the page
+            int watermarkCount = page.Artifacts
+                                      .OfType<WatermarkArtifact>()
+                                      .Count();
+
+            Console.WriteLine($"Page {pageNumber} contains {watermarkCount} watermark artifact(s).");
         }
-
-        Console.WriteLine($"Document saved to '{outputPath}'.");
     }
 }

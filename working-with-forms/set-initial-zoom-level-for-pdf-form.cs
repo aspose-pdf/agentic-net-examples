@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // For GoToAction and XYZExplicitDestination
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "form_input.pdf";
-        const string outputPdf = "form_with_zoom.pdf";
+        const string inputPdf  = "form_input.pdf";   // Path to the source PDF form
+        const string outputPdf = "form_with_zoom.pdf"; // Path for the output PDF
 
         if (!File.Exists(inputPdf))
         {
@@ -16,30 +16,37 @@ class Program
             return;
         }
 
-        // Open the PDF (which contains a form) inside a using block for deterministic disposal.
+        // Load the PDF document (which may contain a form)
         using (Document doc = new Document(inputPdf))
         {
-            // Ensure the document has at least one page.
+            // Ensure the document has at least one page
             if (doc.Pages.Count == 0)
             {
-                Console.Error.WriteLine("The PDF has no pages.");
+                Console.Error.WriteLine("The PDF does not contain any pages.");
                 return;
             }
 
-            // Choose the page that will be displayed when the document is opened.
-            // Here we use the first page (1‑based indexing).
+            // Choose the page that will be displayed when the PDF is opened.
+            // Typically the first page is used.
             Page firstPage = doc.Pages[1];
 
-            // Set the initial view zoom level.
-            // XYZExplicitDestination takes (page, left, top, zoomFactor).
-            // A zoom factor of 1.0 = 100%, 1.5 = 150%, etc.
-            double zoomFactor = 1.5; // 150% zoom for better readability
-            var destination = new XYZExplicitDestination(firstPage, 0, 0, zoomFactor);
+            // Desired initial zoom factor (e.g., 150% = 1.5)
+            double zoomFactor = 1.5;
 
-            // Assign the destination to the document's OpenAction.
-            // When the PDF is opened in a viewer, it will navigate to the specified page
-            // with the defined zoom level.
-            doc.OpenAction = new GoToAction(firstPage) { Destination = destination };
+            // Create an explicit XYZ destination:
+            // left = 0 (horizontal start), top = page height (vertical start from top),
+            // zoom = desired factor.
+            XYZExplicitDestination destination = new XYZExplicitDestination(
+                firstPage,
+                left: 0,
+                top: firstPage.PageInfo.Height,
+                zoom: zoomFactor);
+
+            // Set the document's OpenAction to navigate to the destination with the specified zoom.
+            doc.OpenAction = new GoToAction(destination);
+
+            // Optional: make the viewer window fit the page size.
+            doc.FitWindow = true;
 
             // Save the modified PDF.
             doc.Save(outputPdf);

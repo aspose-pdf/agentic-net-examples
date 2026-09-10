@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";          // PDF containing the 'LegalSignature' field
+        const string inputPdf  = "input.pdf";          // PDF containing the 'LegalSignature' field
         const string outputCer = "LegalSignature.cer"; // Destination for the extracted certificate
 
         if (!File.Exists(inputPdf))
@@ -15,7 +15,7 @@ class Program
             return;
         }
 
-        // Bind to the PDF and extract the certificate from the specified signature field
+        // Bind the PDF and extract the certificate from the specified signature field
         using (PdfFileSignature pdfSignature = new PdfFileSignature())
         {
             pdfSignature.BindPdf(inputPdf);
@@ -25,7 +25,7 @@ class Program
             {
                 if (certStream == null)
                 {
-                    Console.Error.WriteLine("Certificate not found in the 'LegalSignature' field.");
+                    Console.Error.WriteLine("No certificate found in the 'LegalSignature' field.");
                     return;
                 }
 

@@ -6,14 +6,13 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";   // source PDF
-        const string outputPdfPath = "output.pdf";  // destination PDF
-        const string imagePath     = "stamp.png";   // image to be used as stamp
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string imagePath = "image.png";
 
-        // Validate files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
         if (!File.Exists(imagePath))
@@ -22,36 +21,30 @@ class Program
             return;
         }
 
-        // Load the image into a memory stream
-        using (FileStream fs = File.OpenRead(imagePath))
-        using (MemoryStream imageStream = new MemoryStream())
+        // Load the PDF document (1‑based page indexing)
+        using (Document doc = new Document(inputPdf))
         {
-            fs.CopyTo(imageStream);
-            imageStream.Position = 0; // reset stream position for reading
-
-            // Load the PDF document
-            Document pdfDoc = new Document(inputPdfPath);
-
-            // Create an ImageStamp from the memory stream
-            ImageStamp stamp = new ImageStamp(imageStream);
-
-            // Scale the stamp to 50% of its original size (double precision)
-            stamp.Zoom = 0.5; // uniform scaling factor
-
-            // Position the stamp – XIndent/YIndent are the offsets from the lower‑left corner (points)
-            stamp.XIndent = 100; // X = 100 points
-            stamp.YIndent = 500; // Y = 500 points
-
-            // Add the stamp to every page of the document
-            foreach (Page page in pdfDoc.Pages)
+            // Load the image into a memory stream
+            using (MemoryStream imgStream = new MemoryStream(File.ReadAllBytes(imagePath)))
             {
-                page.AddStamp(stamp);
+                // Create an ImageStamp from the stream
+                Aspose.Pdf.ImageStamp imgStamp = new Aspose.Pdf.ImageStamp(imgStream);
+
+                // Scale the stamp to 50% (both axes)
+                imgStamp.Zoom = 0.5f;
+
+                // Optional: set the position of the stamp on the page
+                imgStamp.XIndent = 100; // distance from left edge
+                imgStamp.YIndent = 500; // distance from bottom edge
+
+                // Add the stamp to the first page
+                doc.Pages[1].AddStamp(imgStamp);
             }
 
             // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image stamp applied and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Image stamp added and saved to '{outputPdf}'.");
     }
 }

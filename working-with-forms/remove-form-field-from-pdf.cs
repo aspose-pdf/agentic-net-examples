@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName  = "MyTextField"; // name of the field to remove
+        const string fieldName = "myField";
 
         if (!File.Exists(inputPath))
         {
@@ -17,28 +17,25 @@ class Program
             return;
         }
 
-        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // The Form indexer returns a WidgetAnnotation.  Use it only to test existence
-            // and then delete the field by name (or cast to Field if you need field‑specific members).
-            var annotation = doc.Form[fieldName];
-
-            if (annotation != null)
+            // Verify the field exists
+            if (doc.Form.HasField(fieldName))
             {
-                // Remove the field from the form using its name
+                // Remove the field using the correct API method
                 doc.Form.Delete(fieldName);
-                Console.WriteLine($"Field '{fieldName}' removed.");
+                // Optionally you can check that the field was removed
+                // Console.WriteLine($"Deleted field: {fieldName}");
             }
             else
             {
                 Console.WriteLine($"Field '{fieldName}' not found.");
             }
 
-            // Save the modified PDF
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Field removed and saved to '{outputPath}'.");
     }
 }

@@ -8,73 +8,72 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_stamped.pdf";
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the source PDF
-        using (Document srcDoc = new Document(inputPath))
+        // Load the source PDF to obtain its unique identifier (using the document title as an example)
+        using (Document srcDoc = new Document(inputPdfPath))
         {
-            // Use the document title as a unique identifier; fallback to a GUID
-            string docId = !string.IsNullOrEmpty(srcDoc.Info.Title)
-                ? srcDoc.Info.Title
-                : Guid.NewGuid().ToString();
+            // Use the document title; fallback to a GUID if title is empty
+            string uniqueId = !string.IsNullOrEmpty(srcDoc.Info.Title)
+                              ? srcDoc.Info.Title
+                              : Guid.NewGuid().ToString();
 
-            // Create a temporary PDF that contains the barcode
+            // ------------------------------------------------------------
+            // Create a temporary PDF that contains only the barcode field
+            // ------------------------------------------------------------
             using (MemoryStream barcodePdfStream = new MemoryStream())
             {
                 using (Document barcodeDoc = new Document())
                 {
-                    // Add a single page to host the barcode
+                    // Add a single blank page
                     Page barcodePage = barcodeDoc.Pages.Add();
 
-                    // Define the rectangle where the barcode will be placed
-                    Aspose.Pdf.Rectangle barcodeRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+                    // Define the barcode rectangle (position and size)
+                    // Rectangle(left, bottom, width, height)
+                    Aspose.Pdf.Rectangle barcodeRect = new Aspose.Pdf.Rectangle(100, 500, 200, 100);
 
-                    // Create a barcode field and set its value to the document identifier
-                    BarcodeField barcodeField = new BarcodeField(barcodeDoc, barcodeRect)
-                    {
-                        Value = docId // Assign the barcode data
-                        // The default barcode type is Code128; explicit setting is unnecessary for older SDK versions
-                    };
+                    // Create the barcode field on the page
+                    BarcodeField barcodeField = new BarcodeField(barcodePage, barcodeRect);
+                    // Set the barcode value to the unique identifier
+                    barcodeField.Value = uniqueId;
+                    // Optionally set the barcode type (Code128 is default)
+                    // barcodeField.BarcodeType = BarcodeType.Code128;
 
-                    // Add the barcode field to the form of the temporary document
-                    barcodeDoc.Form.Add(barcodeField);
+                    // Add the barcode field to the page's annotations collection
+                    barcodePage.Annotations.Add(barcodeField);
 
-                    // Save the temporary PDF containing the barcode into the memory stream
+                    // Save the temporary PDF containing the barcode to a memory stream
                     barcodeDoc.Save(barcodePdfStream);
                 }
 
-                // Reset stream position before reading
+                // Reset stream position for reading
                 barcodePdfStream.Position = 0;
 
-                // Prepare the PdfFileStamp facade for stamping the original PDF
+                // ------------------------------------------------------------
+                // Aspose.Pdf.Facades.Stamp the original PDF with the barcode page
+                // ------------------------------------------------------------
                 PdfFileStamp fileStamp = new PdfFileStamp();
-                fileStamp.BindPdf(inputPath); // Bind the source PDF
+                fileStamp.InputFile  = inputPdfPath;
+                fileStamp.OutputFile = outputPdfPath;
 
-                // Create a stamp and bind the barcode PDF page as its content
+                // Create a stamp that uses the first page of the barcode PDF
                 Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-                stamp.BindPdf(barcodePdfStream, 1); // Use the first (and only) page as stamp
-                stamp.IsBackground = false;        // Place stamp on top of page content
+                stamp.BindPdf(barcodePdfStream, 1); // use page 1 as stamp content
+                stamp.IsBackground = false;        // place stamp on top of page content
 
-                // Position and size of the stamp on each page
-                stamp.SetOrigin(150, 400);          // X, Y coordinates (bottom‑left origin)
-                stamp.SetImageSize(200, 100);       // Width, Height of the stamp
-
-                // Add the stamp to the document
+                // Add the stamp to the document and finalize
                 fileStamp.AddStamp(stamp);
-
-                // Save the stamped PDF
-                fileStamp.Save(outputPath);
-                fileStamp.Close();
+                fileStamp.Close(); // writes the output file
             }
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPdfPath}'.");
     }
 }

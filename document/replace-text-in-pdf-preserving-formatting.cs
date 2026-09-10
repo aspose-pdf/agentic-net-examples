@@ -1,42 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Text;
+// URL-STABILITY STUB
+//
+// replace text in pdf preserving formatting
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/document
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string searchWord = "oldWord";
-        const string replaceWord = "newWord";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Create a TextFragmentAbsorber to find all occurrences of the target word
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchWord);
-
-            // Search the entire document (all pages)
-            doc.Pages.Accept(absorber);
-
-            // Replace each found fragment while keeping its original formatting
-            foreach (TextFragment fragment in absorber.TextFragments)
-            {
-                fragment.Text = replaceWord;
-            }
-
-            // Save the modified PDF (output format is PDF by default)
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Replaced \"{searchWord}\" with \"{replaceWord}\" and saved to \"{outputPath}\".");
-    }
-}
+class Program { static void Main() { } }

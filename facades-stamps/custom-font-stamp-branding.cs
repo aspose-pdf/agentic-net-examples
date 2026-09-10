@@ -2,8 +2,8 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // FontRepository, Font, FontTypes
-using System.Drawing; // Color
+using Aspose.Pdf.Text;
+using System.Drawing; // for System.Drawing.Color
 
 class Program
 {
@@ -11,44 +11,48 @@ class Program
     {
         const string inputPdfPath = "input.pdf";
         const string outputPdfPath = "output_branded.pdf";
-        const string fontName = "Arial"; // system‑installed TrueType font
-        const string stampText = "My Brand";
+        const string fontFilePath = "MyBrandFont.ttf";
+        const string stampText = "MyBrand";
 
-        // 1. Create a minimal source PDF because the sandbox has no files.
-        using (Document seed = new Document())
+        if (!File.Exists(inputPdfPath))
         {
-            seed.Pages.Add(); // add a blank page
-            seed.Save(inputPdfPath);
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(fontFilePath))
+        {
+            Console.Error.WriteLine($"Font file not found: {fontFilePath}");
+            return;
         }
 
-        // 2. Resolve the font name. FindFont returns a Font object; we only need the name.
-        //    This avoids the overload that expects a Stream.
-        Aspose.Pdf.Text.Font customFont = FontRepository.FindFont(fontName);
+        // Load the custom TrueType font so Aspose recognises it.
+        Aspose.Pdf.Text.Font customFont = FontRepository.OpenFont(fontFilePath);
+        // The font name used in the PDF – usually the file name without extension.
+        string fontName = Path.GetFileNameWithoutExtension(fontFilePath);
 
-        // 3. Prepare the stamp using the loaded font.
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(inputPdfPath);
-
-        // FormattedText expects the font name; the font is already resolved above.
+        // FormattedText expects System.Drawing.Color, not Aspose.Pdf.Color.
         Aspose.Pdf.Facades.FormattedText formattedText = new Aspose.Pdf.Facades.FormattedText(
             stampText,                     // text to display
-            System.Drawing.Color.Black,    // text color
-            fontName,                      // font name (must match the loaded font)
+            System.Drawing.Color.Black,    // text colour
+            fontName,                      // font name (must match the TTF family name)
             Aspose.Pdf.Facades.EncodingType.Winansi,
-            false,                         // do not embed via this flag (font already loaded)
-            48f);                          // font size
+            true,                          // embed the font in the PDF
+            48f);                          // font size (float)
 
+        // Create a stamp and bind the formatted text.
         Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
         stamp.BindLogo(formattedText);
-        stamp.SetOrigin(100, 500);   // position (bottom‑left corner)
-        stamp.Opacity = 0.5f;        // semi‑transparent
-        stamp.IsBackground = true;   // render behind page content
+        stamp.IsBackground = false;   // place on top of page content
+        stamp.Opacity = 0.7f;          // semi‑transparent
+        stamp.SetOrigin(100, 700);     // position (X, Y) in points
 
-        // 4. Apply the stamp and save the result.
-        fileStamp.AddStamp(stamp);
-        fileStamp.Save(outputPdfPath);
-        fileStamp.Close();
+        // Use the modern facade API (BindPdf / Save) instead of the obsolete properties.
+        Aspose.Pdf.Facades.PdfFileStamp pdfStamp = new Aspose.Pdf.Facades.PdfFileStamp();
+        pdfStamp.BindPdf(inputPdfPath);
+        pdfStamp.AddStamp(stamp);
+        pdfStamp.Save(outputPdfPath);
+        pdfStamp.Close();
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Branded PDF saved to '{outputPdfPath}'.");
     }
 }

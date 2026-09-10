@@ -1,39 +1,32 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // TeXLoadOptions and Document are in this namespace
+using Aspose.Pdf;               // Core API namespace
 
 class Program
 {
     static void Main()
     {
         // Paths – adjust as needed
-        const string dataDir = @"YOUR_DATA_DIRECTORY";
-        string texFile = Path.Combine(dataDir, "sample.tex");
-        string pdfFile = Path.Combine(dataDir, "sample.pdf");
+        const string texFilePath   = "input.tex";
+        const string pdfOutputPath = "output.pdf";
 
-        // Verify input file exists
-        if (!File.Exists(texFile))
+        // Verify source file exists
+        if (!File.Exists(texFilePath))
         {
-            Console.Error.WriteLine($"LaTeX source not found: {texFile}");
+            Console.Error.WriteLine($"LaTeX source not found: {texFilePath}");
             return;
         }
 
-        // Initialize TeXLoadOptions – you can tweak properties here if required
-        TeXLoadOptions texLoadOptions = new TeXLoadOptions
-        {
-            // Example: keep formulas as vectors (set false to rasterize)
-            RasterizeFormulas = false,
-            // Show LaTeX compiler output in console (optional)
-            ShowTerminalOutput = true
-        };
+        // Initialize TeX load options (default settings preserve equations as vector graphics)
+        TeXLoadOptions texLoadOptions = new TeXLoadOptions();
 
-        // Load the .tex file and convert to PDF
-        using (Document pdfDocument = new Document(texFile, texLoadOptions))
+        // Load the .tex file and convert it to a PDF document
+        using (Document pdfDocument = new Document(texFilePath, texLoadOptions))
         {
             // Save the resulting PDF
-            pdfDocument.Save(pdfFile);
+            pdfDocument.Save(pdfOutputPath);
         }
 
-        Console.WriteLine($"LaTeX file converted successfully: {pdfFile}");
+        Console.WriteLine($"LaTeX file converted successfully to '{pdfOutputPath}'.");
     }
 }

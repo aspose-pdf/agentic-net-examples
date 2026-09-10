@@ -1,20 +1,22 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input and output PDF files
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Define the page range to extract (inclusive) and the position where they will be re‑inserted
-        const int startPage = 3;   // first page of the range (1‑based)
-        const int endPage   = 5;   // last page of the range (1‑based)
-        const int insertAt  = 2;   // position in the remaining document where the extracted pages will be inserted
+        // Define the range of pages to extract (1‑based inclusive)
+        const int rangeStart = 2;
+        const int rangeEnd   = 4;
+
+        // Define the position where the extracted pages will be re‑inserted
+        // (1‑based). Adjust if the position is after the original range.
+        const int insertPosition = 6;
 
         if (!File.Exists(inputPath))
         {
@@ -22,74 +24,54 @@ class Program
             return;
         }
 
-        // Ensure the requested range is valid
-        if (startPage < 1 || endPage < startPage)
+        // Load the source PDF
+        using (Document srcDoc = new Document(inputPath))
         {
-            Console.Error.WriteLine("Invalid page range.");
-            return;
+            // -----------------------------------------------------------------
+            // 1. Copy the selected pages into a temporary document
+            // -----------------------------------------------------------------
+            Document tempDoc = new Document();
+            for (int i = rangeStart; i <= rangeEnd; i++)
+            {
+                // Add a reference to the page; this creates a new page in tempDoc
+                tempDoc.Pages.Add(srcDoc.Pages[i]);
+            }
+
+            // -----------------------------------------------------------------
+            // 2. Change the size of the copied pages to A4
+            // -----------------------------------------------------------------
+            foreach (Page p in tempDoc.Pages)
+            {
+                // SetPageSize expects width and height in points (1 point = 1/72 inch)
+                p.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
+            }
+
+            // -----------------------------------------------------------------
+            // 3. Remove the original pages from the source document
+            //    Deleting from the end prevents index shifting.
+            // -----------------------------------------------------------------
+            for (int i = rangeEnd; i >= rangeStart; i--)
+            {
+                srcDoc.Pages.Delete(i);
+            }
+
+            // -----------------------------------------------------------------
+            // 4. Insert the resized pages at the desired position
+            // -----------------------------------------------------------------
+            // If the insertion point was after the removed range, adjust it.
+            int adjustedInsertPos = insertPosition;
+            if (insertPosition > rangeEnd)
+                adjustedInsertPos -= (rangeEnd - rangeStart + 1);
+
+            // Insert the array of pages from the temporary document
+            srcDoc.Pages.Insert(adjustedInsertPos, tempDoc.Pages.ToArray());
+
+            // -----------------------------------------------------------------
+            // 5. Save the modified PDF
+            // -----------------------------------------------------------------
+            srcDoc.Save(outputPath);
         }
 
-        // Work with the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Verify that the document contains enough pages
-            if (endPage > doc.Pages.Count)
-            {
-                Console.Error.WriteLine("Requested page range exceeds document page count.");
-                return;
-            }
-
-            // -----------------------------------------------------------------
-            // 1. Extract the required pages and keep them in a list
-            // -----------------------------------------------------------------
-            List<Page> extractedPages = new List<Page>();
-            for (int i = startPage; i <= endPage; i++)
-            {
-                extractedPages.Add(doc.Pages[i]); // store reference to the page object
-            }
-
-            // -----------------------------------------------------------------
-            // 2. Remove the extracted pages from the original document
-            //    Deleting from the end towards the start preserves indices.
-            // -----------------------------------------------------------------
-            for (int i = endPage; i >= startPage; i--)
-            {
-                doc.Pages.Delete(i);
-            }
-
-            // -----------------------------------------------------------------
-            // 3. Change the size of each extracted page to A4 (595 x 842 points)
-            // -----------------------------------------------------------------
-            const double a4Width  = 595; // points
-            const double a4Height = 842; // points
-
-            foreach (Page pg in extractedPages)
-            {
-                pg.PageInfo.Width  = a4Width;
-                pg.PageInfo.Height = a4Height;
-            }
-
-            // -----------------------------------------------------------------
-            // 4. Re‑insert the pages at the desired position
-            //    Insert inserts before the specified index, so we use the
-            //    provided insertAt value directly.
-            // -----------------------------------------------------------------
-            // Convert the list to an array because Insert expects Page[]
-            Page[] pagesArray = extractedPages.ToArray();
-
-            // Validate the insertion index (it can be Count+1 to append at the end)
-            int maxInsertPos = doc.Pages.Count + 1;
-            int safeInsertPos = Math.Max(1, Math.Min(insertAt, maxInsertPos));
-
-            doc.Pages.Insert(safeInsertPos, pagesArray);
-
-            // -----------------------------------------------------------------
-            // 5. Save the modified document
-            // -----------------------------------------------------------------
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Pages {startPage}-{endPage} resized to A4 and re‑inserted at position {insertAt}.");
-        Console.WriteLine($"Result saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

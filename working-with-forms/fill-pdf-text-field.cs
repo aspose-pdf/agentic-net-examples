@@ -7,45 +7,38 @@ class Program
 {
     static void Main()
     {
-        // Paths and field information – adjust as needed
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "filled_output.pdf";
-        const string fieldName     = "MyTextField";   // Exact name of the text field in the PDF
-        const string fieldValue    = "Provided string value";
+        // Paths and field data
+        const string inputPath = "input.pdf";
+        const string outputPath = "filled.pdf";
+        const string fieldName = "myTextField";
+        const string fieldValue = "Hello World";
 
         // Verify input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document (wrapped in using for deterministic disposal)
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // The Form indexer returns a WidgetAnnotation; cast it to Field safely
+            Field? field = doc.Form[fieldName] as Field;
+            if (field != null)
             {
-                // Access the form field by name – the Form indexer returns a WidgetAnnotation,
-                // so we need to cast it to Aspose.Pdf.Forms.Field before using the Value property.
-                Field? field = pdfDoc.Form[fieldName] as Field;
-                if (field == null)
-                {
-                    Console.Error.WriteLine($"Field '{fieldName}' not found or is not a form field in the document.");
-                }
-                else
-                {
-                    // Set the field's value
-                    field.Value = fieldValue;
-                }
-
-                // Save the modified PDF
-                pdfDoc.Save(outputPdfPath);
-                Console.WriteLine($"PDF saved with filled field to '{outputPdfPath}'.");
+                // Set the field's value
+                field.Value = fieldValue;
             }
+            else
+            {
+                Console.Error.WriteLine($"Field '{fieldName}' not found or is not a text field.");
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
-        }
+
+        Console.WriteLine($"Filled PDF saved to '{outputPath}'.");
     }
 }

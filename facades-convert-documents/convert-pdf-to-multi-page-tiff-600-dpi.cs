@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Devices; // needed for Resolution
 
 class Program
 {
@@ -17,22 +17,30 @@ class Program
             return;
         }
 
-        // Convert PDF to a multi‑page TIFF with 600 DPI resolution
-        using (PdfConverter converter = new PdfConverter())
+        try
         {
-            // Bind the source PDF file
-            converter.BindPdf(inputPath);
+            // PdfConverter implements IDisposable, so wrap it in a using block
+            using (PdfConverter converter = new PdfConverter())
+            {
+                // Set the desired resolution (600 DPI) for detailed graphics extraction.
+                // PdfConverter.Resolution expects an Aspose.Pdf.Devices.Resolution object.
+                converter.Resolution = new Resolution(600);
 
-            // Set the desired resolution (600 DPI)
-            converter.Resolution = new Aspose.Pdf.Devices.Resolution(600);
+                // Bind the source PDF file to the converter
+                converter.BindPdf(inputPath);
 
-            // Initialize conversion
-            converter.DoConvert();
+                // Initialize conversion process
+                converter.DoConvert();
 
-            // Save all pages as a single TIFF file
-            converter.SaveAsTIFF(outputPath);
+                // Convert all pages to a single multi‑page TIFF file
+                converter.SaveAsTIFF(outputPath);
+            }
+
+            Console.WriteLine($"TIFF image saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"TIFF image saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

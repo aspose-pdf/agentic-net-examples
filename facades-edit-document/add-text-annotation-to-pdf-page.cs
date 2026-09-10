@@ -1,36 +1,40 @@
 using System;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using System.IO;
+using System.Drawing;               // Required for Rectangle
+using Aspose.Pdf.Facades;          // Facade API for editing PDFs
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
         const string annotationContent = "Custom annotation text";
 
-        // Create a minimal PDF so the file exists for the editor.
-        using (Document seed = new Document())
+        if (!File.Exists(inputPath))
         {
-            seed.Pages.Add();
-            seed.Save(inputPdf);
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Add a text (sticky‑note) annotation on page 1.
+        // PdfContentEditor implements IDisposable, so wrap in using for deterministic disposal
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            editor.BindPdf(inputPdf);
+            // Load the existing PDF
+            editor.BindPdf(inputPath);
 
-            // System.Drawing.Rectangle: x, y, width, height.
-            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 200, 150, 100);
+            // Define the annotation rectangle.
+            // Rectangle(x, y, width, height) where (x,y) is the lower‑left corner in PDF points.
+            Rectangle rect = new Rectangle(100, 200, 100, 100);
 
-            // Parameters: rectangle, title, contents, open flag, icon name, page number (1‑based).
-            editor.CreateText(rect, "Note", annotationContent, false, "Note", 1);
+            // Create a text (sticky‑note) annotation.
+            // Parameters: rect, title, contents, open flag, icon name, page number (1‑based)
+            editor.CreateText(rect, "Note", annotationContent, true, "Note", 1);
 
-            editor.Save(outputPdf);
+            // Save the modified PDF
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotation added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Text annotation added and saved to '{outputPath}'.");
     }
 }

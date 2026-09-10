@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using System.Collections.Generic;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
@@ -8,59 +8,49 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "annotations.csv";
+        const string inputPdf = "input.pdf";
+        const string outputCsv = "annotations.csv";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // PdfAnnotationEditor does NOT implement IDisposable; use explicit Close().
-        PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        try
+        // Bind the PDF to the annotation editor
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Bind the PDF document to the editor.
-            editor.BindPdf(inputPdfPath);
+            editor.BindPdf(inputPdf);
 
-            // Access the underlying Document.
-            Document doc = editor.Document;
+            // Extract all annotations from the whole document
+            int startPage = 1;
+            int endPage = editor.Document.Pages.Count;
+            IList<Annotation> annotations = editor.ExtractAnnotations(startPage, endPage, (AnnotationType[])null);
 
-            // Create CSV file and write header.
-            using (StreamWriter writer = new StreamWriter(outputCsvPath))
+            // Write annotation name and page number to CSV
+            using (StreamWriter writer = new StreamWriter(outputCsv))
             {
-                writer.WriteLine("AnnotationName,PageNumber");
+                writer.WriteLine("AnnotationName,PageNumber"); // header
 
-                // Iterate through all pages (1‑based indexing).
-                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                foreach (Annotation annot in annotations)
                 {
-                    Page page = doc.Pages[pageIndex];
-
-                    // Iterate through all annotations on the current page.
-                    foreach (Annotation annotation in page.Annotations)
-                    {
-                        string name = annotation.Name ?? string.Empty;
-                        // Escape CSV fields that may contain commas, quotes, or newlines.
-                        string escapedName = EscapeCsv(name);
-                        writer.WriteLine($"{escapedName},{pageIndex}");
-                    }
+                    string name = annot.Name ?? string.Empty;
+                    int pageNumber = annot.PageIndex; // 1‑based page index
+                    writer.WriteLine($"{EscapeCsv(name)},{pageNumber}");
                 }
             }
 
-            Console.WriteLine($"Annotation list saved to '{outputCsvPath}'.");
-        }
-        finally
-        {
-            // Ensure resources are released.
+            // Close the editor (optional, as using will dispose)
             editor.Close();
         }
+
+        Console.WriteLine($"Annotations list saved to '{outputCsv}'.");
     }
 
-    // Helper to escape CSV fields according to RFC 4180.
-    private static string EscapeCsv(string field)
+    // Helper to escape CSV fields containing commas, quotes or newlines
+    static string EscapeCsv(string field)
     {
-        if (field.Contains(",") || field.Contains("\"") || field.Contains("\n") || field.Contains("\r"))
+        if (field.Contains("\"") || field.Contains(",") || field.Contains("\n"))
         {
             field = field.Replace("\"", "\"\"");
             return $"\"{field}\"";

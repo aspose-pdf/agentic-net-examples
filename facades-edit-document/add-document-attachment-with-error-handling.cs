@@ -11,14 +11,14 @@ class Program
         const string description = "Sample attachment description";
         const string outputPath = "output.pdf";
 
-        // Verify source PDF exists
+        // Verify the source PDF exists
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"Error: PDF file not found – '{pdfPath}'.");
             return;
         }
 
-        // Verify attachment file exists before invoking AddDocumentAttachment
+        // Verify the attachment file exists before invoking AddDocumentAttachment
         if (!File.Exists(attachmentPath))
         {
             Console.Error.WriteLine($"Error: Attachment file not found – '{attachmentPath}'.");
@@ -27,7 +27,7 @@ class Program
 
         try
         {
-            // Initialize the facade, bind the PDF, add the attachment, and save
+            // Initialize the facade, bind the PDF, add the attachment, and save the result
             PdfContentEditor editor = new PdfContentEditor();
             editor.BindPdf(pdfPath);
             editor.AddDocumentAttachment(attachmentPath, description);
@@ -37,8 +37,8 @@ class Program
         }
         catch (Exception ex)
         {
-            // Generic error handling – logs any unexpected issues
-            Console.Error.WriteLine($"Exception: {ex.Message}");
+            // Catch any unexpected errors (e.g., I/O, permission issues)
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
         }
     }
 }

@@ -4,68 +4,88 @@ using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class SuperscriptSubscriptExtractor
+class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPath = "input.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputTxt = "extracted.txt";
 
-        // Verify the file exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        using (Document doc = new Document(inputPdf))
         {
-            // TextFragmentAbsorber extracts text fragments together with their formatting
+            // Create a TextFragmentAbsorber to capture all text fragments with positioning info
             TextFragmentAbsorber absorber = new TextFragmentAbsorber();
 
-            // Apply the absorber to all pages
+            // Use the Flatten mode to get coordinates for each fragment (required for superscript/subscript detection)
+            absorber.ExtractionOptions = new TextExtractionOptions(
+                Aspose.Pdf.Text.TextExtractionOptions.TextFormattingMode.Flatten);
+
+            // Extract text from all pages
             doc.Pages.Accept(absorber);
 
-            // StringBuilder to collect the output with Unicode markers
-            StringBuilder result = new StringBuilder();
+            // Build the output string with annotations
+            StringBuilder sb = new StringBuilder();
 
-            // Iterate over each extracted fragment
-            foreach (TextFragment fragment in absorber.TextFragments)
+            // Keep reference to the previous fragment for comparison
+            TextFragment prev = null;
+
+            foreach (TextFragment cur in absorber.TextFragments)
             {
-                // Determine the formatting flags
-                bool isSuperscript = fragment.TextState.Superscript;
-                bool isSubscript   = fragment.TextState.Subscript;
+                // If there is a previous fragment, try to detect superscript/subscript
+                if (prev != null)
+                {
+                    // Font size comparison (threshold 0.8)
+                    bool smallerFont = cur.TextState.FontSize < prev.TextState.FontSize * 0.8;
 
-                // Choose markers:
-                //   ^  for superscript
-                //   _  for subscript
-                // If both are false, output the text as‑is.
-                // If a fragment contains multiple characters, apply the same marker to the whole fragment.
-                if (isSuperscript)
-                {
-                    result.Append('^');
-                    result.Append(fragment.Text);
-                }
-                else if (isSubscript)
-                {
-                    result.Append('_');
-                    result.Append(fragment.Text);
+                    // Baseline Y position comparison (higher Y = lower on page because PDF origin is bottom‑left)
+                    // In PDF coordinates, larger Y means higher on the page.
+                    bool higherBaseline = cur.BaselinePosition.YIndent > prev.BaselinePosition.YIndent;
+                    bool lowerBaseline = cur.BaselinePosition.YIndent < prev.BaselinePosition.YIndent;
+
+                    if (smallerFont && higherBaseline)
+                    {
+                        // Superscript detected
+                        sb.Append("[sup]");
+                        sb.Append(cur.Text);
+                        sb.Append("[/sup]");
+                    }
+                    else if (smallerFont && lowerBaseline)
+                    {
+                        // Subscript detected
+                        sb.Append("[sub]");
+                        sb.Append(cur.Text);
+                        sb.Append("[/sub]");
+                    }
+                    else
+                    {
+                        // Normal text
+                        sb.Append(cur.Text);
+                    }
                 }
                 else
                 {
-                    result.Append(fragment.Text);
+                    // First fragment – just append its text
+                    sb.Append(cur.Text);
                 }
+
+                // Preserve spacing if the fragment ends with a space
+                if (cur.Text.EndsWith(" "))
+                    sb.Append(' ');
+
+                prev = cur;
             }
 
-            // Output the collected string to console
-            Console.WriteLine("Extracted text with markers:");
-            Console.WriteLine(result.ToString());
+            // Write the annotated text to a plain text file
+            File.WriteAllText(outputTxt, sb.ToString());
 
-            // Optionally, write the result to a text file
-            const string outputPath = "extracted_with_markers.txt";
-            File.WriteAllText(outputPath, result.ToString(), Encoding.UTF8);
-            Console.WriteLine($"Result written to '{outputPath}'.");
+            Console.WriteLine($"Extraction completed. Output written to '{outputTxt}'.");
         }
     }
 }

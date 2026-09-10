@@ -1,76 +1,66 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // PdfFileStamp, Stamp, FormattedText, EncodingType
+using System.Drawing;                     // System.Drawing.Color, System.Drawing.Rectangle
+using Aspose.Pdf;                         // Aspose.Pdf.Color, Aspose.Pdf.Rectangle, etc.
+using Aspose.Pdf.Facades;                // PdfFileStamp, Stamp, FormattedText, EncodingType
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Input folder (first argument) and output folder (second argument) – defaults if not supplied
-        string inputFolder  = args.Length > 0 ? args[0] : "InputPdfs";
-        string outputFolder = args.Length > 1 ? args[1] : "WatermarkedPdfs";
+        // Folder containing source PDFs
+        const string inputFolder = "input_pdfs";
+        // Folder where watermarked PDFs will be written
+        const string outputFolder = "output_pdfs";
 
-        // Ensure both directories exist (create if missing)
         if (!Directory.Exists(inputFolder))
         {
-            Console.WriteLine($"Input folder '{inputFolder}' does not exist. Creating it…");
-            Directory.CreateDirectory(inputFolder);
-            Console.WriteLine("Place PDF files into the input folder and re‑run the program.");
-            return; // nothing to process yet
-        }
-        Directory.CreateDirectory(outputFolder);
-
-        // Process every PDF file in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine($"No PDF files found in '{inputFolder}'." );
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        foreach (string sourcePath in pdfFiles)
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Multi‑line watermark text
+        string watermarkText = "CONFIDENTIAL\nDo Not Distribute";
+
+        // Create a FormattedText object that defines the watermark appearance
+        // NOTE: use System.Drawing.Color for the color argument and a float for the font size
+        Aspose.Pdf.Facades.FormattedText ft = new Aspose.Pdf.Facades.FormattedText(
+            watermarkText,                 // text (supports line breaks)
+            System.Drawing.Color.Red,     // text color (System.Drawing.Color)
+            "Helvetica",                 // font name
+            Aspose.Pdf.Facades.EncodingType.Winansi, // text encoding
+            false,                        // embed font flag
+            48f);                         // font size (float)
+
+        // Process each PDF file in the input folder
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = Path.GetFileNameWithoutExtension(sourcePath);
-            string destPath = Path.Combine(outputFolder, fileName + "_watermarked.pdf");
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputFolder, $"{fileNameWithoutExt}_watermarked.pdf");
 
-            AddMultiLineWatermark(sourcePath, destPath);
-        }
+            // Initialize the PdfFileStamp facade and bind the source PDF
+            PdfFileStamp fileStamp = new PdfFileStamp();
+            fileStamp.BindPdf(inputPath);   // loads the PDF to be stamped
 
-        Console.WriteLine("Batch watermarking completed.");
-    }
+            // Configure the stamp (watermark)
+            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+            stamp.BindLogo(ft);            // use the formatted text as the stamp content
+            stamp.IsBackground = true;    // place the watermark behind page content
+            stamp.Opacity = 0.5f;          // semi‑transparent appearance
+            // Optional: adjust position; (0,0) is bottom‑left of the page
+            stamp.SetOrigin(0, 0);
 
-    // Adds the same multi‑line text watermark to all pages of a PDF file
-    static void AddMultiLineWatermark(string sourcePdf, string outputPdf)
-    {
-        // Create multi‑line formatted text (uses System.Drawing.Color as required by FormattedText)
-        FormattedText watermarkText = new FormattedText(
-            "CONFIDENTIAL\nDo Not Distribute", // two lines separated by newline
-            System.Drawing.Color.Red,            // text color
-            "Helvetica",                         // font name
-            EncodingType.Winansi,                // encoding
-            false,                               // embed font flag
-            36);                                 // font size
+            // Add the stamp to the document (applies to all pages by default)
+            fileStamp.AddStamp(stamp);
 
-        // Configure the stamp that will carry the formatted text
-        Stamp stamp = new Stamp();
-        stamp.BindLogo(watermarkText);   // attach the text to the stamp
-        stamp.IsBackground = true;      // render behind page content
-        stamp.Opacity = 0.5f;            // semi‑transparent
-        stamp.SetOrigin(100, 400);       // position of the watermark on each page
-        stamp.Pages = null;              // apply to all pages (null means every page)
-
-        // Use PdfFileStamp facade to apply the stamp
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        try
-        {
-            fileStamp.BindPdf(sourcePdf);   // load source PDF
-            fileStamp.AddStamp(stamp);      // add the configured stamp
-            fileStamp.Save(outputPdf);      // write the watermarked PDF
-        }
-        finally
-        {
-            // Close releases resources; PdfFileStamp does not implement IDisposable
+            // Save the watermarked PDF and release resources
+            fileStamp.Save(outputPath);
             fileStamp.Close();
+
+            Console.WriteLine($"Watermarked: {inputPath} → {outputPath}");
         }
     }
 }

@@ -1,19 +1,15 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF containing bookmarks
-        const string inputPath = "input.pdf";
-        // Output PDF after unwanted bookmarks are removed
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        // Regular expression pattern to match bookmark titles to delete
-        const string pattern = @"^Unwanted.*$";
+        const string pattern    = @"^Unwanted.*$"; // adjust regex as needed
 
         if (!File.Exists(inputPath))
         {
@@ -21,31 +17,31 @@ class Program
             return;
         }
 
-        // Create the PdfBookmarkEditor facade
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        // Initialize the bookmark editor and bind the PDF
+        PdfBookmarkEditor editor = new PdfBookmarkEditor();
+        editor.BindPdf(inputPath);
+
+        // Extract all bookmarks
+        Bookmarks allBookmarks = editor.ExtractBookmarks();
+
+        // Collect titles that match the regex
+        var regex = new Regex(pattern, RegexOptions.Compiled);
+        var titlesToDelete = new System.Collections.Generic.List<string>();
+
+        foreach (Bookmark bm in allBookmarks)
         {
-            // Load the PDF document into the editor
-            editor.BindPdf(inputPath);
-
-            // Extract all bookmarks from the document
-            Bookmarks allBookmarks = editor.ExtractBookmarks();
-
-            // Iterate over each bookmark and delete those whose titles match the regex
-            foreach (Bookmark bm in allBookmarks)
-            {
-                if (bm != null && !string.IsNullOrEmpty(bm.Title) && Regex.IsMatch(bm.Title, pattern))
-                {
-                    // Delete the bookmark with the matching title
-                    editor.DeleteBookmarks(bm.Title);
-                }
-            }
-
-            // Save the modified PDF to the output path
-            editor.Save(outputPath);
-            // Release resources held by the facade
-            editor.Close();
+            if (bm.Title != null && regex.IsMatch(bm.Title))
+                titlesToDelete.Add(bm.Title);
         }
 
-        Console.WriteLine($"Bookmarks matching pattern \"{pattern}\" have been removed. Output saved to '{outputPath}'.");
+        // Delete each matching bookmark by title
+        foreach (string title in titlesToDelete)
+        {
+            editor.DeleteBookmarks(title);
+        }
+
+        // Save the modified PDF
+        editor.Save(outputPath);
+        Console.WriteLine($"Bookmarks matching pattern '{pattern}' have been removed. Saved to '{outputPath}'.");
     }
 }

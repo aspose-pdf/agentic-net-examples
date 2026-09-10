@@ -3,43 +3,33 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class ExportFormFieldsToJson
+class Program
 {
     static void Main()
     {
-        // Input PDF containing form fields
         const string inputPdfPath = "input.pdf";
-
-        // Output JSON file that will hold the exported schema
-        const string outputJsonPath = "form_fields.json";
+        const string outputJsonPath = "form_schema.json";
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: Input file not found – {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document (no special load options required for standard PDFs)
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Configure JSON export options
+            ExportFieldsToJsonOptions jsonOptions = new ExportFieldsToJsonOptions
             {
-                // Prepare export options – indent the JSON for readability
-                ExportFieldsToJsonOptions jsonOptions = new ExportFieldsToJsonOptions
-                {
-                    WriteIndented = true,
-                    ExportPasswordValue = false // do not expose password field values
-                };
+                WriteIndented = true,          // Produce readable JSON
+                ExportPasswordValue = false    // Do not export password field values
+            };
 
-                // Export all form fields to the specified JSON file
-                pdfDoc.Form.ExportToJson(outputJsonPath, jsonOptions);
+            // Export all form fields to a JSON file
+            pdfDoc.Form.ExportToJson(outputJsonPath, jsonOptions);
+        }
 
-                Console.WriteLine($"Form field definitions exported successfully to '{outputJsonPath}'.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"An error occurred: {ex.Message}");
-        }
+        Console.WriteLine($"Form fields exported to JSON: {outputJsonPath}");
     }
 }

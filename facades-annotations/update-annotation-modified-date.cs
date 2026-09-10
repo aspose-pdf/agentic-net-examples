@@ -1,48 +1,46 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_modified.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Bind the PDF document to the annotation editor
+        // Load the PDF and bind it to the annotation editor facade
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            editor.BindPdf(inputPath);
+            editor.BindPdf(inputPdf);
 
-            // Obtain a page reference (required for TextAnnotation constructor)
+            // TextAnnotation does not have a parameter‑less constructor.
+            // Use the (Page, Rectangle) constructor. A zero‑size rectangle is sufficient
+            // because we only need the object to carry the Modified value for ModifyAnnotations.
+            var dummyRect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
             Page firstPage = editor.Document.Pages[1];
-            // Define a rectangle – size can be zero if the annotation is only used for metadata update
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
-
-            // Create a TextAnnotation with the Modified date set to the current time
-            TextAnnotation annotation = new TextAnnotation(firstPage, rect)
+            TextAnnotation tempAnnot = new TextAnnotation(firstPage, dummyRect)
             {
                 Modified = DateTime.Now
-                // Additional properties (Title, Contents, etc.) can be set here if needed
             };
 
             // Apply the modification to all pages (1‑based indexing)
             int startPage = 1;
-            int endPage = editor.Document.Pages.Count;
-            editor.ModifyAnnotations(startPage, endPage, annotation);
+            int endPage   = editor.Document.Pages.Count;
+            editor.ModifyAnnotations(startPage, endPage, tempAnnot);
 
             // Save the updated PDF
-            editor.Save(outputPath);
+            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with updated annotation saved to '{outputPath}'.");
+        Console.WriteLine($"Annotation Modified date updated and saved to '{outputPdf}'.");
     }
 }

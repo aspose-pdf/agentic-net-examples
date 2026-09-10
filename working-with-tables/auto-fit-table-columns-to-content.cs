@@ -1,54 +1,50 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "table_autofit.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a table and enable column auto‑fit behavior
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Use the first page (or add a new page if needed)
+            Page page = doc.Pages[1];
+
+            // Create a table and set it to auto‑fit its columns to the content
             Table table = new Table
             {
-                ColumnAdjustment = ColumnAdjustment.AutoFitToContent
+                ColumnAdjustment = ColumnAdjustment.AutoFitToContent,
+                // Example: set a simple border for visual clarity
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
             };
 
-            // Optionally set a border around the whole table
-            table.Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black);
+            // Define column widths (optional; can be omitted for auto‑fit)
+            table.ColumnWidths = "100 150 200";
 
-            // Header row
-            Row headerRow = table.Rows.Add();
-            Cell headerCell1 = new Cell();
-            headerCell1.Paragraphs.Add(new TextFragment("Product"));
-            headerCell1.DefaultCellTextState = new TextState { FontSize = 12, Font = FontRepository.FindFont("Helvetica-Bold") };
-            headerRow.Cells.Add(headerCell1);
+            // Add a row with sample cells
+            Row row = table.Rows.Add();
+            row.Cells.Add("Short");
+            row.Cells.Add("A much longer piece of text that should cause the column to auto‑fit");
+            row.Cells.Add("Medium length");
 
-            Cell headerCell2 = new Cell();
-            headerCell2.Paragraphs.Add(new TextFragment("Description"));
-            headerCell2.DefaultCellTextState = new TextState { FontSize = 12, Font = FontRepository.FindFont("Helvetica-Bold") };
-            headerRow.Cells.Add(headerCell2);
-
-            // Data row with long content to demonstrate auto‑fit
-            Row dataRow = table.Rows.Add();
-            Cell dataCell1 = new Cell();
-            dataCell1.Paragraphs.Add(new TextFragment("Widget A"));
-            dataRow.Cells.Add(dataCell1);
-
-            Cell dataCell2 = new Cell();
-            dataCell2.Paragraphs.Add(new TextFragment(
-                "This is a very long description that should cause the column to adjust its width automatically to fit the content without truncation."));
-            dataRow.Cells.Add(dataCell2);
-
-            // Add the table to the page and save the document
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with AutoFitToContent table saved to '{outputPath}'.");
+        Console.WriteLine($"Saved PDF with auto‑fit table to '{outputPath}'.");
     }
 }

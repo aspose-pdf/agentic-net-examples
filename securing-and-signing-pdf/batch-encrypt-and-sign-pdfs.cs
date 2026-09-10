@@ -7,74 +7,75 @@ class BatchEncryptAndSign
 {
     static void Main()
     {
-        // Folder containing source PDF files
-        const string sourceFolder = @"C:\PdfBatch\Input";
-        // Folder where encrypted and signed PDFs will be written
-        const string outputFolder = @"C:\PdfBatch\Output";
+        // Input directory containing PDFs to process
+        const string inputDir = @"C:\InputPdfs";
+        // Output directory for encrypted and signed PDFs
+        const string outputDir = @"C:\OutputPdfs";
 
-        // Encryption passwords
+        // Passwords for encryption
         const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
-        // Digital signature certificate (PFX) and its password
-        const string certificatePath = @"C:\Certificates\mycert.pfx";
-        const string certificatePassword = "certPass";
+        // Path to the PFX file used for digital signing and its password
+        const string pfxPath = @"C:\Certificates\mycert.pfx";
+        const string pfxPassword = "pfxPass";
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // Process each PDF file in the source folder
-        foreach (string inputFile in Directory.GetFiles(sourceFolder, "*.pdf"))
+        // Process each PDF file in the input directory
+        foreach (string pdfFile in Directory.GetFiles(inputDir, "*.pdf"))
         {
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(inputFile);
-            string encryptedPath = Path.Combine(outputFolder, fileNameWithoutExt + "_encrypted.pdf");
-            string signedPath = Path.Combine(outputFolder, fileNameWithoutExt + "_signed.pdf");
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfFile);
+            string encryptedPath = Path.Combine(outputDir, $"{fileNameWithoutExt}_enc.pdf");
+            string signedPath = Path.Combine(outputDir, $"{fileNameWithoutExt}_signed.pdf");
 
             // ---------- Encrypt the PDF ----------
-            using (Document doc = new Document(inputFile))
+            using (Document doc = new Document(pdfFile))
             {
-                // Set desired permissions (example: allow printing and content extraction)
+                // Define permissions (example: allow printing and content extraction)
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                // Encrypt using AES-256
+                // Encrypt using AES-256 (preferred algorithm)
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF
                 doc.Save(encryptedPath);
             }
 
-            // ---------- Sign the encrypted PDF ----------
-            // Open the encrypted PDF with the user password
-            using (Document encDoc = new Document(encryptedPath, userPassword))
+            // ---------- Apply a digital signature ----------
+            // Open the encrypted PDF using the user password
+            using (Document signedDoc = new Document(encryptedPath, userPassword))
             {
-                // Add a signature field on the first page
-                Page firstPage = encDoc.Pages[1];
-                // Define the rectangle where the signature will appear (left, bottom, right, top)
-                Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
-                // Create the signature field
-                SignatureField sigField = new SignatureField(firstPage, sigRect)
+                // Define a rectangle where the signature appearance will be placed
+                // (left, bottom, right, top) in points
+                Rectangle sigRect = new Rectangle(100, 100, 300, 150);
+
+                // Create a signature field and add it to the document's form
+                SignatureField sigField = new SignatureField(signedDoc, sigRect);
+                sigField.PartialName = "Signature1"; // set field name
+                signedDoc.Form.Add(sigField, 0); // Insert at the beginning of the fields collection
+
+                // Create a PKCS7 signature using the PFX file
+                PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword)
                 {
-                    // Optional: set a name for the field
-                    PartialName = "Signature1"
+                    Reason = "Document approved",
+                    Location = "Office",
+                    ContactInfo = "signer@example.com"
                 };
-                // Add the field to the page annotations
-                firstPage.Annotations.Add(sigField);
 
-                // Create a concrete PKCS7 signature object using the certificate
-                PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePassword);
-                // (Optional) set additional signature properties
-                // pkcs7.Reason = "Document approved";
-                // pkcs7.Location = "Office";
-                // pkcs7.ContactInfo = "contact@example.com";
-
-                // Sign the field
+                // Sign the document using the signature field
                 sigField.Sign(pkcs7);
 
-                // Save the signed PDF (creates a new file)
-                encDoc.Save(signedPath);
+                // Save the signed PDF
+                signedDoc.Save(signedPath);
             }
 
-            Console.WriteLine($"Processed '{Path.GetFileName(inputFile)}' -> Encrypted: '{Path.GetFileName(encryptedPath)}', Signed: '{Path.GetFileName(signedPath)}'");
+            Console.WriteLine($"Processed: {pdfFile}");
+            Console.WriteLine($"  Encrypted -> {encryptedPath}");
+            Console.WriteLine($"  Signed     -> {signedPath}");
         }
+
+        Console.WriteLine("Batch encryption and signing completed.");
     }
 }

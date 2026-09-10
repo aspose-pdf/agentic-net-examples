@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // PdfFileInfo resides here
-using Aspose.Pdf;          // optional, for Document if needed later
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -9,24 +8,22 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string keywords   = "Aspose PDF, Metadata, Keywords";
 
-        // Ensure the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF, set the Keywords metadata, and save the updated file
+        // Set the Keywords metadata and save the updated PDF
         using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
         {
-            pdfInfo.Keywords = keywords;                     // set Keywords field
-            bool saved = pdfInfo.SaveNewInfo(outputPath);    // persist changes
-            Console.WriteLine(saved ? "Keywords saved successfully." : "Failed to save Keywords.");
+            pdfInfo.Keywords = "Sample, Aspose, PDF";
+            bool success = pdfInfo.SaveNewInfo(outputPath);
+            Console.WriteLine(success ? "Keywords set and PDF saved." : "Failed to save updated PDF.");
         }
 
-        // Verify that the Keywords were written by reading them back
+        // Verify that the Keywords were written correctly
         using (PdfFileInfo verifyInfo = new PdfFileInfo(outputPath))
         {
             Console.WriteLine($"Keywords after save: {verifyInfo.Keywords}");

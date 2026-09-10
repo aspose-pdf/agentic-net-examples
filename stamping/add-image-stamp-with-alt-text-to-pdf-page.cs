@@ -8,25 +8,25 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string stampImage = "logo.png";          // image to be used as stamp
+        const string stampPath  = "stamp.png";
         const string altText    = "Company logo for accessibility";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(stampImage))
+        if (!File.Exists(stampPath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImage}");
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
             return;
         }
 
-        // Load the PDF document (using block ensures proper disposal)
+        // Load the PDF document (lifecycle rule: using block)
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least three pages
+            // Verify that the document has at least three pages (1‑based indexing)
             if (doc.Pages.Count < 3)
             {
                 Console.Error.WriteLine("The document does not contain a third page.");
@@ -34,21 +34,22 @@ class Program
             }
 
             // Create an ImageStamp from the image file
-            ImageStamp imgStamp = new ImageStamp(stampImage);
+            ImageStamp imgStamp = new ImageStamp(stampPath);
 
             // Set alternative text for the stamp (accessibility)
             imgStamp.AlternativeText = altText;
 
-            // Optional: position the stamp (example: top‑right corner)
+            // Optional positioning – place stamp in the top‑right corner with margins
             imgStamp.HorizontalAlignment = HorizontalAlignment.Right;
             imgStamp.VerticalAlignment   = VerticalAlignment.Top;
-            imgStamp.Opacity = 0.8; // semi‑transparent
+            imgStamp.RightMargin = 20;
+            imgStamp.TopMargin   = 20;
 
-            // Add the stamp to page three (pages are 1‑based)
+            // Add the stamp to page three
             Page pageThree = doc.Pages[3];
             pageThree.AddStamp(imgStamp);
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule: using block)
             doc.Save(outputPath);
         }
 

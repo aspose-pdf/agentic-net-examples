@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "encrypted_output.pdf";
-        const string userPassword  = "user123";
+        const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
@@ -18,33 +18,24 @@ class Program
             return;
         }
 
-        try
+        // Define custom privileges: allow printing and copying, forbid modifications
+        DocumentPrivilege privilege = DocumentPrivilege.AllowAll;
+        privilege.AllowModifyContents = false;
+        privilege.AllowModifyAnnotations = false;
+
+        // Initialize the facade with source and destination files
+        PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
+
+        // Encrypt using AES‑256 (KeySize.x256) and the custom privilege
+        bool encrypted = fileSecurity.EncryptFile(userPassword, ownerPassword, privilege, KeySize.x256, Algorithm.AES);
+
+        if (encrypted)
         {
-            // Create a custom privilege set: allow printing, forbid copying and modifying contents
-            DocumentPrivilege privilege = DocumentPrivilege.ForbidAll;
-            privilege.AllowPrint = true;
-            privilege.AllowCopy = false;
-            privilege.AllowModifyContents = false;
-
-            // Initialize PdfFileSecurity with source and destination files
-            PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
-
-            // Encrypt using AES‑256 (KeySize.x256 + Algorithm.AES) and the custom privileges in one call
-            bool success = fileSecurity.EncryptFile(
-                userPassword,
-                ownerPassword,
-                privilege,
-                KeySize.x256,
-                Algorithm.AES);
-
-            if (success)
-                Console.WriteLine($"File encrypted successfully to '{outputPath}'.");
-            else
-                Console.Error.WriteLine("Encryption failed.");
+            Console.WriteLine($"Encryption succeeded. Output saved to '{outputPath}'.");
         }
-        catch (Exception ex)
+        else
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine("Encryption failed.");
         }
     }
 }

@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -19,21 +19,18 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate through all pages
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[pageIndex];
-
-                // Annotations collection is also 1‑based
-                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
+                // Iterate through all annotations on the page
+                foreach (Annotation ann in page.Annotations)
                 {
-                    Annotation annotation = page.Annotations[annIndex];
-
-                    // Figure annotations inherit from CommonFigureAnnotation
-                    if (annotation is CommonFigureAnnotation)
+                    // Check if the annotation is a figure annotation (Square, Circle, Polygon, Polyline, etc.)
+                    if (ann is CommonFigureAnnotation)
                     {
-                        // Set the border (annotation) color to dark gray
-                        annotation.Color = Aspose.Pdf.Color.DarkGray;
+                        // Set the border color to dark gray using the Characteristics.Border property
+                        // The Border property expects a System.Drawing.Color, so we use the fully qualified type.
+                        ann.Characteristics.Border = System.Drawing.Color.DarkGray;
                     }
                 }
             }
@@ -42,6 +39,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All figure annotation borders set to dark gray. Saved to '{outputPath}'.");
+        Console.WriteLine($"All figure annotation borders updated and saved to '{outputPath}'.");
     }
 }

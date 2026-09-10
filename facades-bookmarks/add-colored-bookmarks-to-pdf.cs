@@ -1,51 +1,58 @@
 using System;
-using System.Drawing; // required for System.Drawing.Color used by PdfContentEditor
-using Aspose.Pdf.Facades;
+using System.IO;
+using System.Drawing;                     // System.Drawing.Color is required by Bookmark.TitleColor
+using Aspose.Pdf.Facades;                // Facade API for bookmark manipulation
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_bookmarked.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_bookmarked.pdf";
 
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Sample data: titles, target pages and whether the section is a warning (red) or informational (green)
-        string[] titles   = { "Warning: Check Data", "Info: Overview", "Warning: Missing Signatures", "Info: Summary" };
-        int[]    pages    = { 2, 5, 8, 12 };
-        bool[]   isWarning = { true, false, true, false };
-
-        // Initialize the facade
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPdf);
-
-        for (int i = 0; i < titles.Length; i++)
+        // Define the sections that need bookmarks.
+        // Set IsWarning = true for warning sections (red), false for informational (green).
+        var sections = new[]
         {
-            // Choose color based on section type
-            Color bookmarkColor = isWarning[i] ? Color.Red : Color.Green;
+            new { Title = "Warning: Critical Issue", Page = 2, IsWarning = true },
+            new { Title = "Info: Overview",           Page = 3, IsWarning = false },
+            new { Title = "Warning: Compliance",    Page = 5, IsWarning = true },
+            new { Title = "Info: Details",          Page = 7, IsWarning = false }
+        };
 
-            // Create a bookmark that jumps to the specified page.
-            // Parameters: title, color, boldFlag, italicFlag, file (null), actionType ("GoTo"), destination (page number as string)
-            editor.CreateBookmarksAction(
-                titles[i],
-                bookmarkColor,
-                false,               // boldFlag
-                false,               // italicFlag
-                null,                // no external file needed
-                "GoTo",              // action type
-                pages[i].ToString() // destination page
-            );
+        // Use PdfBookmarkEditor to bind the PDF, add bookmarks, and save.
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        {
+            // Load the PDF document.
+            editor.BindPdf(inputPath);
+
+            // Create a bookmark for each section with the appropriate color.
+            foreach (var sec in sections)
+            {
+                Bookmark bm = new Bookmark
+                {
+                    Title      = sec.Title,
+                    PageNumber = sec.Page,
+                    // TitleColor expects System.Drawing.Color.
+                    TitleColor = sec.IsWarning ? Color.Red : Color.Green,
+                    BoldFlag   = true   // optional: make the title bold
+                };
+
+                // Add the bookmark to the document.
+                editor.CreateBookmarks(bm);
+            }
+
+            // Save the modified PDF.
+            editor.Save(outputPath);
+            editor.Close(); // optional, Dispose will also close
         }
 
-        // Save the modified PDF
-        editor.Save(outputPdf);
-        editor.Close();
-
-        Console.WriteLine($"Bookmarks added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Bookmarks added and saved to '{outputPath}'.");
     }
 }

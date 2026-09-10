@@ -13,43 +13,39 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (required by the lifecycle rule)
+        // Load the source PDF
         using (Document doc = new Document(inputPath))
         {
-            // Initialize PdfFileStamp with input and output files
-            // PdfFileStamp does not implement IDisposable, so we close it manually
-            PdfFileStamp fileStamp = new PdfFileStamp(inputPath, outputPath);
+            // Initialize the PdfFileStamp facade with the loaded document
+            PdfFileStamp fileStamp = new PdfFileStamp();
+            fileStamp.BindPdf(doc);
 
-            // Create a text stamp (acts as a text annotation)
+            // Create a text stamp
             Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
 
-            // Bind the text to the stamp using FormattedText.
-            // Note: FormattedText uses System.Drawing.Color for the text color.
+            // FormattedText requires System.Drawing.Color for the text color
             FormattedText ft = new FormattedText(
-                "Diagonal Text",                 // text
-                System.Drawing.Color.Black,      // text color
-                "Helvetica",                     // font name
-                EncodingType.Winansi,            // encoding
-                false,                           // embed font?
-                12);                             // font size
+                "Rotated Text",                 // text
+                System.Drawing.Color.Black,     // text color
+                "Helvetica",                    // font name
+                EncodingType.Winansi,           // encoding
+                false,                          // embed font?
+                12);                            // font size
 
             stamp.BindLogo(ft);
 
-            // Rotate the stamp 90 degrees to align with diagonal content
+            // Rotate the stamp 90 degrees
             stamp.Rotation = 90f;
 
-            // Optionally set the position of the stamp on the page
-            // (origin is the lower‑left corner of the page)
-            stamp.SetOrigin(100, 500);
-
-            // Add the stamp to the PDF
+            // Add the stamp to the document (default page is the first page)
             fileStamp.AddStamp(stamp);
 
-            // Finalize and save the output PDF
+            // Save the modified PDF
+            fileStamp.Save(outputPath);
             fileStamp.Close();
         }
 

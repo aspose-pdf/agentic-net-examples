@@ -1,33 +1,12 @@
-using System;
-using System.IO;
-using System.Text;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// load pdf retrieve xmp metadata
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-xmp-metadata/split-pdf-preserve-xmp-metadata.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string pdfPath = "input.pdf";
-
-        // Verify that the PDF file exists before proceeding
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
-            return;
-        }
-
-        // Create a PdfXmpMetadata facade instance
-        PdfXmpMetadata xmpMetadata = new PdfXmpMetadata();
-
-        // Bind the existing PDF file to the facade
-        xmpMetadata.BindPdf(pdfPath);
-
-        // Retrieve the entire XMP metadata as a byte array
-        byte[] xmpBytes = xmpMetadata.GetXmpMetadata();
-
-        // Convert the byte array to a UTF‑8 string for display (optional)
-        string xmpXml = Encoding.UTF8.GetString(xmpBytes);
-        Console.WriteLine("XMP Metadata:");
-        Console.WriteLine(xmpXml);
-    }
-}
+class Program { static void Main() { } }

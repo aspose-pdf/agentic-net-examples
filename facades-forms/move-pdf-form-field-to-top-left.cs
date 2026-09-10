@@ -7,12 +7,12 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Desired size of the field (in points; 1 inch = 72 points)
-        const float fieldWidth  = 150f;
-        const float fieldHeight = 50f;
+        // Desired field size (adjust as needed)
+        const double fieldWidth = 150.0; // use double for calculations
+        const double fieldHeight = 50.0;
 
         if (!File.Exists(inputPath))
         {
@@ -20,32 +20,34 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF to obtain the first page dimensions
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve dimensions of the first page
-            Page firstPage   = doc.Pages[1];
-            double pageWidth  = firstPage.PageInfo.Width;   // Width is double
-            double pageHeight = firstPage.PageInfo.Height;  // Height is double
+            double pageHeight = doc.Pages[1].PageInfo.Height; // Height is double
 
-            // Calculate rectangle coordinates for top‑left placement
-            // Origin is bottom‑left, so Y coordinate is pageHeight - fieldHeight
-            // MoveField expects float values, so cast accordingly
-            float llx = 0f;                                          // lower‑left X
-            float lly = (float)(pageHeight - fieldHeight);          // lower‑left Y
-            float urx = fieldWidth;                                 // upper‑right X
-            float ury = (float)pageHeight;                          // upper‑right Y
+            // Calculate coordinates for top‑left placement
+            double llx = 0.0;                         // left edge
+            double lly = pageHeight - fieldHeight;   // lower‑left Y (top of page minus field height)
+            double urx = fieldWidth;                 // right edge
+            double ury = pageHeight;                 // upper‑right Y (top of page)
 
-            // Use FormEditor (Facades API) to move the field
+            // FormEditor works with a Document instance, not a file path
             using (FormEditor formEditor = new FormEditor(doc))
             {
-                bool moved = formEditor.MoveField("Logo", llx, lly, urx, ury);
+                // MoveField expects float values for the rectangle coordinates
+                bool moved = formEditor.MoveField(
+                    "Logo",
+                    (float)llx,
+                    (float)lly,
+                    (float)urx,
+                    (float)ury);
+
                 if (!moved)
                 {
                     Console.Error.WriteLine("Failed to move field 'Logo'.");
                 }
 
-                // Save the modified document
+                // Persist changes to the desired output file
                 formEditor.Save(outputPath);
             }
         }

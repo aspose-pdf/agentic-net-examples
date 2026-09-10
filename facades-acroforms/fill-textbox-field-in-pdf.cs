@@ -6,10 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_filled.pdf";
-        const string fieldName = "TextBox1";
-        const string fieldValue = "Hello World";
+        const string inputPath  = "input.pdf";   // source PDF with a textbox field
+        const string outputPath = "filled.pdf";  // destination PDF after filling
+        const string fieldName  = "TextBox1";    // exact field name (case‑sensitive)
+        const string fieldValue = "Hello World"; // value to set
 
         if (!File.Exists(inputPath))
         {
@@ -17,20 +17,27 @@ class Program
             return;
         }
 
-        // Load the PDF into the Form facade
-        using (Form form = new Form(inputPath))
+        try
         {
-            // Fill the specified text box field
-            bool success = form.FillField(fieldName, fieldValue);
-            if (!success)
+            // Initialize the Form facade on the source PDF
+            using (Form form = new Form(inputPath))
             {
-                Console.Error.WriteLine($"Failed to fill field '{fieldName}'.");
+                // Fill the specified textbox field
+                bool success = form.FillField(fieldName, fieldValue);
+                if (!success)
+                {
+                    Console.Error.WriteLine($"Field '{fieldName}' not found or could not be filled.");
+                }
+
+                // Save the updated PDF to the output path
+                form.Save(outputPath);
             }
 
-            // Save the updated PDF
-            form.Save(outputPath);
+            Console.WriteLine($"PDF with filled field saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

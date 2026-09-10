@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -6,73 +7,79 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_bookmarked.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "bookmarked_output.pdf";
 
-        // ---------------------------------------------------------------------
-        // Create a minimal PDF so the example can run in an empty sandbox.
-        // ---------------------------------------------------------------------
-        using (Document seed = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a few blank pages – enough for the bookmark page numbers.
-            seed.Pages.Add(); // page 1
-            seed.Pages.Add(); // page 2
-            seed.Pages.Add(); // page 3
-            seed.Pages.Add(); // page 4
-            seed.Save(inputPdf);
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Bind the PDF to the bookmark editor and create hierarchical bookmarks
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        // Create the bookmark editor facade
+        PdfBookmarkEditor editor = new PdfBookmarkEditor();
+
+        // Load (bind) the existing PDF document
+        editor.BindPdf(inputPath);
+
+        // -------------------------------------------------
+        // Build a hierarchical bookmark structure
+        // Example:
+        //   Chapter 1 (page 1)
+        //       Section 1.1 (page 2)
+        //       Section 1.2 (page 3)
+        //   Chapter 2 (page 4)
+        //       Section 2.1 (page 5)
+        // -------------------------------------------------
+
+        // Child bookmarks for Chapter 1
+        Bookmark sec11 = new Bookmark
         {
-            // Initialize the facade with the source PDF
-            editor.BindPdf(inputPdf);
+            Title = "Section 1.1",
+            PageNumber = 2
+        };
+        Bookmark sec12 = new Bookmark
+        {
+            Title = "Section 1.2",
+            PageNumber = 3
+        };
+        Bookmarks chapter1Children = new Bookmarks();
+        chapter1Children.Add(sec11);
+        chapter1Children.Add(sec12);
 
-            // ----- Chapter 1 -----
-            Bookmark chapter1 = new Bookmark
-            {
-                Title      = "Chapter 1",
-                PageNumber = 1,
-                Action     = "GoTo"
-            };
+        Bookmark chapter1 = new Bookmark
+        {
+            Title = "Chapter 1",
+            PageNumber = 1,
+            ChildItem = chapter1Children
+        };
 
-            // Sections under Chapter 1
-            Bookmark sec11 = new Bookmark
-            {
-                Title      = "Section 1.1",
-                PageNumber = 2,
-                Action     = "GoTo"
-            };
-            Bookmark sec12 = new Bookmark
-            {
-                Title      = "Section 1.2",
-                PageNumber = 3,
-                Action     = "GoTo"
-            };
+        // Child bookmarks for Chapter 2
+        Bookmark sec21 = new Bookmark
+        {
+            Title = "Section 2.1",
+            PageNumber = 5
+        };
+        Bookmarks chapter2Children = new Bookmarks();
+        chapter2Children.Add(sec21);
 
-            // Attach sections to Chapter 1 using the non‑obsolete ChildItems property
-            Bookmarks chapter1Children = new Bookmarks();
-            chapter1Children.Add(sec11);
-            chapter1Children.Add(sec12);
-            chapter1.ChildItems = chapter1Children; // <-- fixed property
+        Bookmark chapter2 = new Bookmark
+        {
+            Title = "Chapter 2",
+            PageNumber = 4,
+            ChildItem = chapter2Children
+        };
 
-            // ----- Chapter 2 -----
-            Bookmark chapter2 = new Bookmark
-            {
-                Title      = "Chapter 2",
-                PageNumber = 4,
-                Action     = "GoTo"
-            };
+        // Add top‑level bookmarks to the document
+        editor.CreateBookmarks(chapter1);
+        editor.CreateBookmarks(chapter2);
 
-            // Add top‑level chapters to the document
-            editor.CreateBookmarks(chapter1);
-            editor.CreateBookmarks(chapter2);
+        // Save the modified PDF with the new bookmark hierarchy
+        editor.Save(outputPath);
 
-            // Save the modified PDF with the new bookmark hierarchy
-            editor.Save(outputPdf);
-            // editor.Close() is optional because the using‑statement disposes it
-        }
+        // Release resources held by the facade
+        editor.Close();
 
-        Console.WriteLine($"Bookmarks added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Bookmarks added and saved to '{outputPath}'.");
     }
 }

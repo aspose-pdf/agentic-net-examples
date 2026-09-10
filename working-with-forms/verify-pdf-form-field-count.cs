@@ -1,15 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const int expectedFieldCount = 5; // expected number of form fields
+        const int expectedFieldCount = 5; // adjust to the expected number of form fields
 
         if (!File.Exists(inputPath))
         {
@@ -19,7 +17,7 @@ class Program
 
         try
         {
-            // Load the PDF document (using statement ensures proper disposal)
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
                 // Verify the number of form fields
@@ -32,20 +30,10 @@ class Program
                     return;
                 }
 
-                // Example processing: set a value for a field named "Name" if it exists
-                if (doc.Form.HasField("Name"))
-                {
-                    // The Form indexer returns a WidgetAnnotation; cast it to Field to access the Value property.
-                    Field? field = doc.Form["Name"] as Field;
-                    if (field != null)
-                    {
-                        field.Value = "John Doe";
-                    }
-                }
-
-                // Save the processed document
-                doc.Save(outputPath);
-                Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+                // Proceed with further processing now that the count is verified
+                Console.WriteLine("Form field count verification passed.");
+                // Example processing could be added here
+                // doc.Save("processed.pdf"); // Save if needed
             }
         }
         catch (Exception ex)

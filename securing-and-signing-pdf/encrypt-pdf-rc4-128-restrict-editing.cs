@@ -1,47 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace (contains Document, Permissions, CryptoAlgorithm)
+// URL-STABILITY STUB
+//
+// encrypt pdf rc4 128 restrict editing
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/securing-and-signing-pdf/encrypt-pdf-rc4-128-bit-restrict-editing.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        // Input PDF to encrypt
-        const string inputPath  = "input.pdf";
-        // Output encrypted PDF
-        const string outputPath = "encrypted_rc4_128.pdf";
-
-        // Passwords (user password for opening, owner password for full permissions)
-        const string userPassword  = "user123";
-        const string ownerPassword = "owner123";
-
-        // Define permissions: allow printing only, deny editing (ModifyContent, FillForm, etc.)
-        Permissions permissions = Permissions.PrintDocument;
-
-        // Verify input file exists
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
-
-        try
-        {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // Apply RC4 128‑bit encryption with the specified permissions
-                doc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.RC4x128);
-
-                // Save the encrypted document
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"PDF encrypted successfully and saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during encryption: {ex.Message}");
-        }
-    }
-}
+class Program { static void Main() { } }

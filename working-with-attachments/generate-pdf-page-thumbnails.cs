@@ -1,56 +1,47 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // ThumbnailDevice resides here
+using Aspose.Pdf.Devices; // ThumbnailDevice resides in this namespace
 
-public class PortfolioThumbnailGenerator
+class Program
 {
-    public static void Main()
+    static void Main()
     {
-        const string inputPdf = "portfolio.pdf";
-        const string outputPdf = "portfolio_with_thumbnails.pdf";
+        const string inputPdf = "portfolio.pdf";          // source PDF containing portfolio items
+        const string outputFolder = "thumbnails";         // folder to store generated thumbnails
 
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the source PDF (portfolio)
-        using (Document srcDoc = new Document(inputPdf))
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Load the PDF document (lifecycle: create -> load -> save)
+        using (Document doc = new Document(inputPdf))
         {
-            // Create a new document that will contain the thumbnails
-            using (Document resultDoc = new Document())
+            // Create a thumbnail device with desired dimensions (e.g., 150x150 pixels)
+            ThumbnailDevice thumbDevice = new ThumbnailDevice(150, 150);
+
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Iterate over each page (each portfolio item)
-                for (int i = 1; i <= srcDoc.Pages.Count; i++)
+                Page page = doc.Pages[i];
+
+                // Define the output path for the thumbnail of the current page
+                string thumbPath = Path.Combine(outputFolder, $"thumb_page_{i}.png");
+
+                // Generate the thumbnail and write it to a PNG file
+                using (FileStream outStream = new FileStream(thumbPath, FileMode.Create))
                 {
-                    Page srcPage = srcDoc.Pages[i];
-
-                    // Generate a thumbnail (150x150 pixels) for the current page
-                    using (MemoryStream thumbStream = new MemoryStream())
-                    {
-                        ThumbnailDevice thumbDevice = new ThumbnailDevice(150, 150);
-                        thumbDevice.Process(srcPage, thumbStream);
-                        thumbStream.Position = 0; // Reset stream position for reading
-
-                        // Add a new page to the result document
-                        Page thumbPage = resultDoc.Pages.Add();
-
-                        // Define the rectangle where the thumbnail will be placed
-                        // (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
-                        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 150, 150);
-
-                        // Insert the thumbnail image onto the new page
-                        thumbPage.AddImage(thumbStream, rect);
-                    }
+                    thumbDevice.Process(page, outStream);
                 }
-
-                // Save the document containing all thumbnails
-                resultDoc.Save(outputPdf);
             }
         }
 
-        Console.WriteLine($"Thumbnails generated and saved to '{outputPdf}'.");
+        Console.WriteLine("Thumbnail images have been created for each portfolio item.");
     }
 }

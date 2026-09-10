@@ -18,19 +18,16 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Export all form fields to JSON using a memory stream
+            // Export form fields to a memory stream as JSON
             using (MemoryStream jsonStream = new MemoryStream())
             {
-                // Export form fields; default options are sufficient
                 doc.Form.ExportToJson(jsonStream);
+                jsonStream.Position = 0; // Reset stream position for reading
 
-                // Reset stream position to the beginning before reading
-                jsonStream.Position = 0;
-
-                // Read the JSON string from the memory stream
+                // Read the JSON string from the stream
                 string json = new StreamReader(jsonStream, Encoding.UTF8).ReadToEnd();
 
-                // Output the JSON string (or use it as needed)
+                // Output the JSON string
                 Console.WriteLine(json);
             }
         }

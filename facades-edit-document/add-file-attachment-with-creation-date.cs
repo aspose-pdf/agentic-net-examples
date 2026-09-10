@@ -1,6 +1,6 @@
 using System;
+using System.Drawing;
 using System.IO;
-using System.Drawing; // needed for System.Drawing.Rectangle
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
@@ -9,67 +9,56 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";               // source PDF
-        const string attachmentFile = "invoice2023.pdf";    // file to attach
-        const string description = "Invoice2023";          // attachment description
-        const string tempPdf = "temp_with_attachment.pdf"; // intermediate file
-        const string outputPdf = "output.pdf";             // final result
+        // Paths for the source PDF, the file to attach, and the resulting PDF
+        const string sourcePdfPath = "input.pdf";
+        const string attachmentFilePath = "invoice2023.pdf";
+        const string resultPdfPath = "output.pdf";
 
-        // ------------------------------------------------------------
-        // 1. Create a minimal source PDF (input.pdf) for the demo.
-        // ------------------------------------------------------------
-        using (Document seed = new Document())
+        // Verify that the required files exist
+        if (!File.Exists(sourcePdfPath))
         {
-            seed.Pages.Add(); // add a blank page
-            seed.Save(inputPdf);
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            return;
+        }
+        if (!File.Exists(attachmentFilePath))
+        {
+            Console.Error.WriteLine($"Attachment file not found: {attachmentFilePath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // 2. Create a dummy attachment file (invoice2023.pdf).
-        // ------------------------------------------------------------
-        using (Document attachDoc = new Document())
-        {
-            attachDoc.Pages.Add();
-            attachDoc.Save(attachmentFile);
-        }
-
-        // ---------- Add the attachment using the Facades API ----------
+        // Bind the existing PDF document
         PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPdf);
+        editor.BindPdf(sourcePdfPath);
 
-        // Define a small rectangle where the attachment icon will appear (page 1)
-        // The CreateFileAttachment overload expects a System.Drawing.Rectangle.
-        System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 20, 20);
+        // Create a file attachment annotation on page 1.
+        // The rectangle defines where the attachment icon will appear.
+        // PdfContentEditor.CreateFileAttachment expects a System.Drawing.Rectangle.
+        System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, 20, 20); // small icon at top‑left
+        editor.CreateFileAttachment(rect, "Invoice2023", attachmentFilePath, 1, "Graph");
 
-        // Create a file‑attachment annotation; the description is stored in the annotation's Contents
-        editor.CreateFileAttachment(rect, description, attachmentFile, 1, "Paperclip");
+        // Save the intermediate PDF (with the new annotation) to a temporary file
+        string tempPath = Path.GetTempFileName();
+        editor.Save(tempPath);
 
-        // Save the PDF that now contains the attachment annotation
-        editor.Save(tempPdf);
-        editor.Close();
+        // Load the temporary PDF to modify the annotation's creation date
+        Document tempDoc = new Document(tempPath);
+        Page page = tempDoc.Pages[1];
 
-        // ---------- Set the creation date on the attachment annotation ----------
-        using (Document doc = new Document(tempPdf))
+        // Annotations collection is 1‑based; get the last annotation added
+        if (page.Annotations.Count > 0)
         {
-            // The annotation was added to page 1
-            Page page = doc.Pages[1];
-
-            foreach (Annotation ann in page.Annotations)
+            Annotation ann = page.Annotations[page.Annotations.Count];
+            if (ann is FileAttachmentAnnotation fileAnn)
             {
-                if (ann is FileAttachmentAnnotation fileAnn)
-                {
-                    // Set the creation date to the current system time
-                    fileAnn.CreationDate = DateTime.Now;
-
-                    // Ensure the description is present (optional, already set via Contents)
-                    fileAnn.Contents = description;
-                }
+                // Set the creation date to the current system time
+                fileAnn.CreationDate = DateTime.Now;
             }
-
-            // Save the final PDF
-            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Attachment added with description '{description}' and current creation date. Output saved to '{outputPdf}'.");
+        // Save the final PDF with the updated creation date
+        tempDoc.Save(resultPdfPath);
+
+        // Clean up the temporary file
+        File.Delete(tempPath);
     }
 }

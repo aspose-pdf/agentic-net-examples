@@ -8,51 +8,56 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "bordered_output.pdf";
+        const string outputPath = "output_with_borders.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
+                // Page rectangle (media box) – defines the visible area
+                Aspose.Pdf.Rectangle pageRect = page.Rect;
 
-                // Create a Graph container sized to the page dimensions (Graph expects double values)
-                Graph graph = new Graph((double)page.Rect.Width, (double)page.Rect.Height);
-
-                // Define a rectangle that matches the page size – use the Drawing.Rectangle type
-                Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(
-                    0f,
-                    0f,
-                    (float)page.Rect.Width,
-                    (float)page.Rect.Height);
-
-                // Set visual properties via GraphInfo (available on Drawing.Rectangle)
-                rect.GraphInfo = new GraphInfo
+                // Create a Graph container that matches the page size.
+                // Width and height are set using float values.
+                Graph borderGraph = new Graph((float)pageRect.Width, (float)pageRect.Height)
                 {
-                    // No fill – keep transparent
-                    FillColor = Aspose.Pdf.Color.Transparent,
-                    // Border color
-                    Color = Aspose.Pdf.Color.Black,
-                    // Border thickness (float)
+                    // Position the graph at the lower‑left corner of the page.
+                    // The Bottom property does not exist; the default bottom is 0.
+                    Left = (float)pageRect.LLX
+                };
+
+                // Define a drawing rectangle that covers the whole graph.
+                // Use Aspose.Pdf.Drawing.Rectangle (not Aspose.Pdf.Rectangle).
+                Aspose.Pdf.Drawing.Rectangle borderRect = new Aspose.Pdf.Drawing.Rectangle(
+                    0f,
+                    0f,
+                    (float)pageRect.Width,
+                    (float)pageRect.Height);
+
+                // Set visual properties via GraphInfo (transparent fill, visible stroke).
+                borderRect.GraphInfo = new GraphInfo
+                {
+                    FillColor = Color.Transparent,
+                    Color = Color.Black,
                     LineWidth = 2f
                 };
 
-                // Add the rectangle shape to the graph
-                graph.Shapes.Add(rect);
+                // Add the rectangle shape to the graph.
+                borderGraph.Shapes.Add(borderRect);
 
-                // Add the graph to the page's paragraph collection
-                page.Paragraphs.Add(graph);
+                // Add the graph to the page's paragraph collection.
+                page.Paragraphs.Add(borderGraph);
             }
 
-            // Save the modified document (PDF format)
+            // Save the modified document as PDF.
             doc.Save(outputPath);
         }
 

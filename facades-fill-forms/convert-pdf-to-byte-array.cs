@@ -1,45 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// convert pdf to byte array
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-fill-forms/convert-in-memory-pdf-to-byte-array.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    // Loads a filled PDF and returns its content as a byte array without touching the file system.
-    static byte[] LoadPdfToByteArray(string pdfPath)
-    {
-        // Load the PDF with the high‑level Document class (supports in‑memory operations).
-        Document doc = new Document(pdfPath);
-        using (MemoryStream memory = new MemoryStream())
-        {
-            // Save the document directly into the memory stream.
-            doc.Save(memory);
-            // Return the underlying byte array.
-            return memory.ToArray();
-        }
-    }
-
-    static void Main()
-    {
-        const string inputPdf = "filled_form.pdf";
-
-        // -----------------------------------------------------------------
-        // Ensure the input PDF exists. In the sandbox there are no pre‑existing
-        // files, so we create a minimal PDF on‑the‑fly before reading it.
-        // -----------------------------------------------------------------
-        if (!File.Exists(inputPdf))
-        {
-            using (Document doc = new Document())
-            {
-                // Add a single blank page – enough for the viewer to work.
-                doc.Pages.Add();
-                doc.Save(inputPdf);
-            }
-        }
-
-        // Convert the PDF to a byte array for transmission.
-        byte[] pdfBytes = LoadPdfToByteArray(inputPdf);
-
-        Console.WriteLine($"PDF byte array length: {pdfBytes.Length}");
-        // The byte array can now be sent over a web API without writing to disk.
-    }
-}
+class Program { static void Main() { } }

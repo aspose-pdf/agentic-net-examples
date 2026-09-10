@@ -6,30 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPptxPath = "output.pptx";
-        const int imageDpi = 300; // high‑resolution DPI
+        // Input PDF file path
+        const string inputPdf = "input.pdf";
+        // Output PPTX file path
+        const string outputPptx = "output.pptx";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Configure PPTX save options: render each slide as an image and set DPI
+            // Configure PPTX save options
             PptxSaveOptions pptxOptions = new PptxSaveOptions
             {
+                // Render each slide as a raster image (one image per PDF page)
                 SlidesAsImages = true,
-                ImageResolution = imageDpi
+                // Set high‑resolution DPI for the generated images (e.g., 300 DPI)
+                ImageResolution = 300
             };
 
-            // Save as PPTX using the explicit save options (required for non‑PDF formats)
-            pdfDocument.Save(outputPptxPath, pptxOptions);
+            // Save the document as PPTX using the specified options
+            pdfDoc.Save(outputPptx, pptxOptions);
         }
 
-        Console.WriteLine($"Conversion completed: '{outputPptxPath}' (SlidesAsImages, {imageDpi} DPI)");
+        Console.WriteLine($"PDF successfully converted to PPTX: {outputPptx}");
     }
 }

@@ -1,15 +1,14 @@
 using System;
 using System.IO;
-using System.Drawing;               // needed for System.Drawing.Rectangle and System.Drawing.Color
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using System.Drawing;               // Required for Rectangle and Color (used by CreateMarkup)
+using Aspose.Pdf.Facades;          // Facade API for annotation creation
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "highlighted.pdf";
+        const string outputPath = "output_highlight.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,23 +16,36 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Initialize the PdfContentEditor facade
+        PdfContentEditor editor = new PdfContentEditor();
+        try
         {
-            // Initialize the PdfContentEditor facade and bind the loaded document
-            PdfContentEditor editor = new PdfContentEditor();
-            editor.BindPdf(doc);
+            // Load the PDF document
+            editor.BindPdf(inputPath);
 
-            // Define the rectangle (in points) that covers the text to be highlighted on page 3
-            // PdfContentEditor.CreateMarkup expects a System.Drawing.Rectangle and System.Drawing.Color
-            System.Drawing.Rectangle highlightRect = new System.Drawing.Rectangle(100, 500, 200, 20);
+            // Define the rectangle that covers the text to be highlighted on page 3
+            // (x, y, width, height) – coordinates are in points.
+            Rectangle highlightRect = new Rectangle(100, 500, 200, 20);
 
-            // Create a highlight markup annotation (type = 0) on page 3 with yellow color
-            editor.CreateMarkup(highlightRect, "Highlighted text", 0, 3, System.Drawing.Color.Yellow);
+            // Highlight color (yellow)
+            Color highlightColor = Color.Yellow;
 
-            // Save the modified PDF using the facade's Save method
+            // Markup type: 0 = Highlight
+            int markupType = 0;
+
+            // Page number (1‑based indexing)
+            int pageNumber = 3;
+
+            // Create the highlight annotation
+            editor.CreateMarkup(highlightRect, "Highlighted text", markupType, pageNumber, highlightColor);
+
+            // Save the modified PDF
             editor.Save(outputPath);
-            editor.Close(); // optional, releases resources held by the facade
+        }
+        finally
+        {
+            // Release resources held by the facade
+            editor.Close();
         }
 
         Console.WriteLine($"Highlight annotation added and saved to '{outputPath}'.");

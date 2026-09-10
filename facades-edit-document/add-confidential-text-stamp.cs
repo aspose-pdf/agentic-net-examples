@@ -1,55 +1,67 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using System.Drawing;                     // needed for System.Drawing.Color in FormattedText
+using Aspose.Pdf;                         // core PDF classes
+using Aspose.Pdf.Facades;                 // facades for stamping and formatted text
+using Aspose.Pdf.Text;                    // for TextStamp if needed (not used here)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        // Input and output PDF file paths
+        const string inputPdf  = "input.pdf";
         const string outputPdf = "output.pdf";
 
+        // Verify the input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the source PDF
-        Document doc = new Document(inputPdf);
+        // Create a formatted text object with the desired appearance:
+        // - Text: "Confidential"
+        // - Red font color (System.Drawing.Color)
+        // - Helvetica font, 48 pt size
+        // - Winansi encoding, not embedded
+        Aspose.Pdf.Facades.FormattedText formatted = new Aspose.Pdf.Facades.FormattedText(
+            "Confidential",
+            System.Drawing.Color.Red,               // text color (System.Drawing.Color)
+            "Helvetica",                           // font name
+            Aspose.Pdf.Facades.EncodingType.Winansi, // encoding
+            false,                                   // embed font?
+            48f);                                    // font size (float)
 
-        // Create a text stamp with the required appearance
-        TextStamp stamp = new TextStamp("Confidential")
+        // Create a stamp object and bind the formatted text to it
+        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+        stamp.BindLogo(formatted);
+
+        // Set the stamp to appear as a background element (behind page content)
+        stamp.IsBackground = true;
+
+        // Make the stamp semi‑transparent (opacity range 0.0 to 1.0)
+        stamp.Opacity = 0.5f;
+
+        // Position the stamp on the page (e.g., centered). Adjust as needed.
+        stamp.SetOrigin(100, 500);
+
+        // Use PdfFileStamp facade to apply the stamp to all pages
+        using (Aspose.Pdf.Facades.PdfFileStamp fileStamp = new Aspose.Pdf.Facades.PdfFileStamp())
         {
-            // 50 % opacity for a semi‑transparent effect
-            Opacity = 0.5f,
-            // Center the stamp on the page (optional – adjust as needed)
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center
-        };
+            // Bind the source PDF
+            fileStamp.BindPdf(inputPdf);
 
-        // NOTE: In recent versions of Aspose.PDF the TextStamp class no longer exposes an
-        //       IsBackground property. To place the stamp behind the existing page content
-        //       you can add the stamp to the page's Annotations collection instead of the
-        //       regular stamp collection, or simply add it first before any other content.
-        //       Here we add the stamp directly; it will appear on top. If a background
-        //       placement is required, use the Page.AddStamp method with the stamp's
-        //       IsBackground flag set via the base Stamp class (available in older SDKs).
+            // Add the prepared stamp; it will be applied to every page
+            fileStamp.AddStamp(stamp);
 
-        // Configure the visual style of the stamp text
-        stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-        stamp.TextState.FontSize = 36;
-        stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
+            // Save the result to the output file
+            fileStamp.Save(outputPdf);
 
-        // Apply the stamp to every page in the document
-        foreach (Page page in doc.Pages)
-        {
-            page.AddStamp(stamp);
+            // Close the facade (releases resources)
+            fileStamp.Close();
         }
 
-        // Save the stamped PDF
-        doc.Save(outputPdf);
         Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
     }
 }

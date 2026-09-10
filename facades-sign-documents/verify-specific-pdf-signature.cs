@@ -1,52 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// verify specific pdf signature
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-sign-documents/verify-absence-of-pdf-signature.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Use PdfFileSignature facade to work with signatures
-        using (PdfFileSignature pdfSign = new PdfFileSignature())
-        {
-            // Bind the PDF file
-            pdfSign.BindPdf(inputPath);
-
-            // Retrieve all non‑empty signature names
-            var signatureNames = pdfSign.GetSignatureNames();
-
-            bool signatureFound = false;
-            bool verificationResult = false;
-
-            // Look for the specific signature name
-            foreach (var sigName in signatureNames)
-            {
-                // SignatureName can be converted to string via ToString()
-                if (sigName.ToString().Equals("ContractSigner", StringComparison.Ordinal))
-                {
-                    signatureFound = true;
-                    // Verify the signature using VerifySigned method
-                    verificationResult = pdfSign.VerifySigned(sigName.ToString());
-                    break;
-                }
-            }
-
-            if (!signatureFound)
-            {
-                Console.WriteLine("Signature 'ContractSigner' not found in the document.");
-            }
-            else
-            {
-                Console.WriteLine($"Signature 'ContractSigner' verification result: {verificationResult}");
-            }
-        }
-    }
-}
+class Program { static void Main() { } }

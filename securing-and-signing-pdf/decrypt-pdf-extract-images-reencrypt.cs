@@ -1,69 +1,60 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Paths and passwords – adjust as needed
-        const string inputPdfPath      = "encrypted_input.pdf";
-        const string outputPdfPath     = "reencrypted_output.pdf";
-        const string originalPassword  = "oldOwnerPass";   // password to open the encrypted PDF
-        const string newOwnerPassword  = "newOwnerPass";   // password to set after re‑encryption
+        const string inputPath = "encrypted_input.pdf";
+        const string outputPath = "re_encrypted_output.pdf";
+        const string extractedImagesDir = "ExtractedImages";
+        const string existingPassword = "oldPassword"; // password of the source PDF
+        const string newOwnerPassword = "newOwner123"; // new owner password
+        const string userPassword = ""; // no user password after re‑encryption
 
-        // Ensure the input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
+        Directory.CreateDirectory(extractedImagesDir);
+
         try
         {
-            // Open the encrypted PDF using the existing password
-            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPdfPath, originalPassword))
+            // Open the encrypted PDF using the known password
+            using (Document doc = new Document(inputPath, existingPassword))
             {
-                // Decrypt the document (removes encryption in memory)
+                // Decrypt the document (no parameters)
                 doc.Decrypt();
 
-                // -----------------------------------------------------------------
-                // Extract all images from the PDF and save them as separate files
-                // -----------------------------------------------------------------
-                int imageIndex = 0;
-                foreach (Aspose.Pdf.Page page in doc.Pages)
+                // Extract all images from each page
+                int imageIndex = 1;
+                foreach (Page page in doc.Pages)
                 {
-                    // The Images collection yields XImage objects directly (no dictionary)
-                    foreach (Aspose.Pdf.XImage img in page.Resources.Images)
+                    foreach (XImage img in page.Resources.Images)
                     {
-                        // Build a unique filename for each extracted image
-                        string imageFileName = $"image_{imageIndex}.png";
-
-                        // Save the image to disk
-                        using (FileStream imgStream = new FileStream(imageFileName, FileMode.Create, FileAccess.Write))
+                        string imgPath = Path.Combine(extractedImagesDir, $"image_{imageIndex}.png");
+                        using (FileStream fs = new FileStream(imgPath, FileMode.Create, FileAccess.Write))
                         {
-                            img.Save(imgStream);
+                            img.Save(fs); // Save image to file
                         }
-
-                        Console.WriteLine($"Extracted image saved to: {imageFileName}");
                         imageIndex++;
                     }
                 }
 
-                // -----------------------------------------------------------------
-                // Re‑encrypt the PDF with a new owner password
-                // -----------------------------------------------------------------
-                // Define desired permissions (example: allow printing and content extraction)
+                // Re‑encrypt the document with a new owner password (no user password)
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-
-                // Encrypt with an empty user password and the new owner password
-                doc.Encrypt(userPassword: "", ownerPassword: newOwnerPassword, permissions: perms, cryptoAlgorithm: CryptoAlgorithm.AESx256);
+                doc.Encrypt(userPassword, newOwnerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the re‑encrypted PDF
-                doc.Save(outputPdfPath);
-                Console.WriteLine($"Re‑encrypted PDF saved to: {outputPdfPath}");
+                doc.Save(outputPath);
             }
+
+            Console.WriteLine($"Decryption, image extraction, and re‑encryption completed.");
+            Console.WriteLine($"Images saved to: {extractedImagesDir}");
+            Console.WriteLine($"Re‑encrypted PDF saved to: {outputPath}");
         }
         catch (Exception ex)
         {

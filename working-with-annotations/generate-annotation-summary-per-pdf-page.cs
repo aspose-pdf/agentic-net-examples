@@ -18,40 +18,43 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPdfPath))
         {
-            // Dictionary where key = page number, value = dictionary of annotation type counts
-            var summary = new Dictionary<int, Dictionary<AnnotationType, int>>();
+            var pagesSummary = new List<object>();
 
-            // Iterate over all pages (1‑based indexing)
+            // Pages are 1‑based (global rule)
             for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
                 Page page = doc.Pages[pageIndex];
-                var typeCounts = new Dictionary<AnnotationType, int>();
+                var typeCounts = new Dictionary<string, int>();
 
-                // Iterate over annotations on the current page
-                foreach (Annotation annotation in page.Annotations)
+                // Annotations collection is also 1‑based
+                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
                 {
-                    AnnotationType type = annotation.AnnotationType;
+                    Annotation annotation = page.Annotations[annIndex];
+                    string typeName = annotation.AnnotationType.ToString();
 
-                    if (typeCounts.ContainsKey(type))
-                        typeCounts[type]++;
+                    if (typeCounts.ContainsKey(typeName))
+                        typeCounts[typeName]++;
                     else
-                        typeCounts[type] = 1;
+                        typeCounts[typeName] = 1;
                 }
 
-                summary[pageIndex] = typeCounts;
+                pagesSummary.Add(new
+                {
+                    pageNumber = pageIndex,
+                    annotations = typeCounts
+                });
             }
 
-            // Serialize the summary dictionary to pretty‑printed JSON
-            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(summary, jsonOptions);
+            // Serialize the summary to JSON (no Aspose.Pdf SaveOptions needed)
+            var summaryObject = new { pages = pagesSummary };
+            string json = JsonSerializer.Serialize(summaryObject, new JsonSerializerOptions { WriteIndented = true });
 
-            // Write JSON to the output file
+            // Write JSON to file
             File.WriteAllText(outputJsonPath, json);
+            Console.WriteLine($"Annotation summary saved to '{outputJsonPath}'.");
         }
-
-        Console.WriteLine($"Annotation summary saved to '{outputJsonPath}'.");
     }
 }

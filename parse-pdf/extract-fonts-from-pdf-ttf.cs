@@ -7,59 +7,58 @@ class Program
 {
     static void Main()
     {
-        // Input PDF path
-        const string inputPdf = "input.pdf";
+        const string inputPdfPath = "input.pdf";          // source PDF
+        const string outputFolder = "ExtractedFonts";     // folder to store .ttf files
 
-        // Directory where extracted TTF files will be saved
-        const string outputDir = "ExtractedFonts";
-
-        // Validate input file
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
         try
         {
-            // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-            using (Document doc = new Document(inputPdf))
+            // Load the PDF document
+            using (Document doc = new Document(inputPdfPath))
             {
-                // Retrieve all fonts used in the document via the IDocumentFontUtilities interface
-                Font[] fonts = doc.FontUtilities.GetAllFonts();
+                // Get all fonts used in the document
+                // IDocumentFontUtilities is exposed via the FontUtilities property
+                var fonts = doc.FontUtilities.GetAllFonts();
 
                 foreach (Font font in fonts)
                 {
-                    // Use the decoded font name for a readable file name; fallback to FontName if empty
-                    string fontName = string.IsNullOrWhiteSpace(font.DecodedFontName)
-                                      ? font.FontName
-                                      : font.DecodedFontName;
+                    // Build a safe file name for the font
+                    string safeFontName = MakeSafeFileName(font.FontName);
+                    string ttfPath = Path.Combine(outputFolder, $"{safeFontName}.ttf");
 
-                    // Sanitize file name (remove invalid characters)
-                    foreach (char c in Path.GetInvalidFileNameChars())
-                        fontName = fontName.Replace(c, '_');
-
-                    // Build full path for the .ttf file
-                    string ttfPath = Path.Combine(outputDir, $"{fontName}.ttf");
-
-                    // Save the font to the .ttf file using the Font.Save(Stream) method
+                    // Save the font to a TTF file
                     using (FileStream fs = new FileStream(ttfPath, FileMode.Create, FileAccess.Write))
                     {
                         font.Save(fs);
                     }
 
-                    Console.WriteLine($"Extracted font: {fontName} -> {ttfPath}");
+                    Console.WriteLine($"Exported font: {font.FontName} -> {ttfPath}");
                 }
             }
 
-            Console.WriteLine("Font extraction completed successfully.");
+            Console.WriteLine("Font extraction completed.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during font extraction: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
+    }
+
+    // Helper to replace invalid filename characters
+    private static string MakeSafeFileName(string name)
+    {
+        foreach (char c in Path.GetInvalidFileNameChars())
+        {
+            name = name.Replace(c, '_');
+        }
+        return name;
     }
 }

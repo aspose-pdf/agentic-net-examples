@@ -15,26 +15,24 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based; iterate through all pages
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate through all pages (1‑based indexing)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
-
-                // Get current MediaBox dimensions
-                double currentWidth  = page.MediaBox.Width;
-                double currentHeight = page.MediaBox.Height;
+                // Calculate current width and height from MediaBox
+                double width  = page.MediaBox.URX - page.MediaBox.LLX;
+                double height = page.MediaBox.URY - page.MediaBox.LLY;
 
                 // Swap width and height to make the page landscape
-                page.SetPageSize(currentHeight, currentWidth);
+                page.SetPageSize(height, width);
             }
 
-            // Save the modified document as PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Converted PDF saved to '{outputPath}'.");
+        Console.WriteLine($"All pages converted to landscape and saved as '{outputPath}'.");
     }
 }

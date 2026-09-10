@@ -6,44 +6,59 @@ class Program
 {
     static void Main()
     {
-        // Folder containing source PDFs
-        const string sourceFolder = @"C:\SourcePdfs";
-        // Folder where processed PDFs will be saved
-        const string destinationFolder = @"C:\ProcessedPdfs";
+        // Base directory of the running application
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-        // Verify that the source folder exists before attempting to enumerate files
+        // Resolve source and destination folders relative to the base directory
+        string sourceFolder = Path.Combine(baseDir, "SourcePdfs");
+        string destFolder   = Path.Combine(baseDir, "OutputPdfs");
+
+        // Ensure the source folder exists – if it does not, create it and inform the user.
         if (!Directory.Exists(sourceFolder))
         {
-            Console.Error.WriteLine($"Source folder does not exist: {sourceFolder}");
-            return; // Exit gracefully – nothing to process
+            Directory.CreateDirectory(sourceFolder);
+            Console.WriteLine($"Source folder not found. Created empty folder at: {sourceFolder}");
+            Console.WriteLine("Place PDF files in this folder and re‑run the program.");
+            return; // Nothing to process yet.
         }
 
         // Ensure the destination folder exists
-        Directory.CreateDirectory(destinationFolder);
+        Directory.CreateDirectory(destFolder);
 
-        // Get all PDF files in the source folder
-        string[] pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf");
-
-        // Page numbers to delete (1‑based indexing)
-        int[] pagesToDelete = new int[] { 3, 4 };
+        // Retrieve all PDF files from the source folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length == 0)
+        {
+            Console.WriteLine($"No PDF files found in '{sourceFolder}'." );
+            return;
+        }
 
         foreach (string inputPath in pdfFiles)
         {
-            // Build the output file path preserving the original file name
-            string outputPath = Path.Combine(destinationFolder, Path.GetFileName(inputPath));
-
             try
             {
-                // Use PdfFileEditor to delete the specified pages and save the result
-                PdfFileEditor editor = new PdfFileEditor();
-                // Delete returns void – no boolean result to capture
-                editor.Delete(inputPath, pagesToDelete, outputPath);
+                // Preserve the original file name for the output
+                string fileName   = Path.GetFileName(inputPath);
+                string outputPath = Path.Combine(destFolder, fileName);
 
-                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} -> {outputPath}");
+                // Use PdfFileEditor (Aspose.Pdf.Facades) to delete pages 3 and 4
+                var editor = new PdfFileEditor();
+
+                // Delete returns true on success; handle failure if needed
+                bool success = editor.Delete(inputPath, new int[] { 3, 4 }, outputPath);
+
+                if (success)
+                {
+                    Console.WriteLine($"Processed: {fileName} → {outputPath}");
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Failed to process: {fileName}");
+                }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Failed to delete pages from '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
     }

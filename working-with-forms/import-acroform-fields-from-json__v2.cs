@@ -1,31 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// import acroform fields from json__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/working-with-forms
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string jsonPath = "form_schema.json";
-        const string outputPdf = "generated_form.pdf";
-
-        // Verify that the JSON schema file exists
-        if (!File.Exists(jsonPath))
-        {
-            Console.Error.WriteLine($"JSON schema file not found: {jsonPath}");
-            return;
-        }
-
-        // Create a new PDF document and import AcroForm fields from the JSON schema
-        using (Document doc = new Document())
-        {
-            // Import form fields defined in the JSON file
-            doc.Form.ImportFromJson(jsonPath);
-
-            // Save the resulting PDF with the imported form fields
-            doc.Save(outputPdf);
-        }
-
-        Console.WriteLine($"PDF with imported AcroForm fields saved to '{outputPdf}'.");
-    }
-}
+class Program { static void Main() { } }

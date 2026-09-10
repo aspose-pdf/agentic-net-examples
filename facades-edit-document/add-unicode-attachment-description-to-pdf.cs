@@ -1,61 +1,61 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_with_attachment.pdf";
-        const string attachmentPath = "sample.txt";
-        // Unicode description containing Cyrillic characters and an emoji
-        const string attachmentDescription = "Описание 📄 – тест";
+        // Paths for source PDF, output PDF and the file to be attached
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output_with_attachment.pdf";
+        const string attachmentFilePath = "sample.txt";
 
-        // Verify required files exist
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(attachmentPath))
-        {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
-            return;
-        }
+        // Unicode description (Cyrillic characters and an emoji)
+        const string attachmentDescription = "Описание – тест 🚀";
 
         // -----------------------------------------------------------------
-        // Add the attachment with Unicode description using PdfContentEditor
+        // Ensure the source PDF exists – create a minimal placeholder if missing
         // -----------------------------------------------------------------
-        using (PdfContentEditor editor = new PdfContentEditor())
+        if (!File.Exists(inputPdfPath))
         {
-            // Bind the existing PDF document
-            editor.BindPdf(inputPdf);
-            // Add the attachment; the description is stored in Unicode
-            editor.AddDocumentAttachment(attachmentPath, attachmentDescription);
-            // Save the modified PDF
-            editor.Save(outputPdf);
+            using var placeholder = new Document();
+            placeholder.Pages.Add(); // add a single blank page
+            placeholder.Save(inputPdfPath);
         }
 
-        // ---------------------------------------------------------------
-        // Verify that the Unicode description was stored correctly
-        // ---------------------------------------------------------------
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Ensure the attachment file exists; create a simple text file if missing
+        if (!File.Exists(attachmentFilePath))
         {
-            // Bind the PDF that now contains the attachment
-            extractor.BindPdf(outputPdf);
-            // Extract attachment information (required before reading it)
-            extractor.ExtractAttachment();
+            File.WriteAllText(attachmentFilePath, "Sample attachment content");
+        }
 
-            // Get information about all attachments
+        // ------------------------------------------------------------
+        // Add the attachment to the PDF using PdfContentEditor (Facades API)
+        // ------------------------------------------------------------
+        using (var editor = new PdfContentEditor())
+        {
+            editor.BindPdf(inputPdfPath); // Load the source PDF
+            editor.AddDocumentAttachment(attachmentFilePath, attachmentDescription); // Add attachment with Unicode description
+            editor.Save(outputPdfPath); // Save the modified PDF
+        }
+
+        // ------------------------------------------------------------
+        // Verify that the attachment description is stored correctly
+        // ------------------------------------------------------------
+        using (var extractor = new PdfExtractor())
+        {
+            extractor.BindPdf(outputPdfPath); // Load the PDF that now contains the attachment
+            extractor.ExtractAttachment(); // Extract attachment information (required before GetAttachmentInfo)
+
+            // GetAttachmentInfo returns an array of AttachmentInfo objects
             var attachmentInfos = extractor.GetAttachmentInfo();
 
             foreach (var info in attachmentInfos)
             {
-                // The attachment name
                 Console.WriteLine($"Attachment Name: {info.Name}");
-                // The Unicode description that was set earlier
-                Console.WriteLine($"Description    : {info.Description}");
+                Console.WriteLine($"Attachment Description: {info.Description}");
             }
         }
     }

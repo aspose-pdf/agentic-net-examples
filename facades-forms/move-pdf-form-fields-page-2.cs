@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -8,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_moved_fields.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,16 +15,22 @@ class Program
             return;
         }
 
-        // PdfPageEditor can shift the origin of selected pages.
-        // Setting ProcessPages to page 2 (1‑based index) and moving X by 5 points.
+        // Use PdfPageEditor to shift the content (including form fields) on page 2
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            editor.BindPdf(inputPath);               // Load the PDF
-            editor.ProcessPages = new int[] { 2 };   // Target only page 2
-            editor.MovePosition(5f, 0f);             // Shift right by 5 points
-            editor.Save(outputPath);                 // Save the modified PDF
+            // Load the source PDF
+            editor.BindPdf(inputPath);
+
+            // Specify that only page 2 should be processed
+            editor.ProcessPages = new int[] { 2 };
+
+            // Move the origin 5 points to the right (X axis), Y stays unchanged
+            editor.MovePosition(5f, 0f);
+
+            // Save the modified PDF
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Fields on page 2 moved right by 5 points. Saved to '{outputPath}'.");
+        Console.WriteLine($"Fields on page 2 moved 5 points right. Saved to '{outputPath}'.");
     }
 }

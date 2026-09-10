@@ -1,46 +1,58 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core API and all SaveOptions are in this namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputHtml = "output.html";        // base name for HTML pages
+        const string inputPdfPath  = "input.pdf";
+        const string outputHtmlDir = "output_html";   // directory where split pages will be placed
 
-        if (!File.Exists(inputPdf))
+        // Verify input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Error: PDF file not found – {inputPdfPath}");
             return;
         }
 
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputHtmlDir);
+
         try
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdf))
+            // Load the PDF document (wrapped in using for deterministic disposal)
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Configure HTML save options – enable one HTML file per PDF page
+                // Configure HTML save options – enable multi‑page output
                 HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
-                    SplitIntoPages = true,
-                    // Optional: embed raster images as PNG inside SVG (Windows‑only GDI+ requirement)
-                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
+                    SplitIntoPages = true,                         // each PDF page → separate HTML file
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
+                    // Optional: embed all resources into HTML files
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml
                 };
 
-                // Save the document; multiple HTML files will be generated (output_1.html, output_2.html, …)
-                pdfDoc.Save(outputHtml, htmlOpts);
-                Console.WriteLine("PDF successfully converted to multi‑page HTML.");
+                // Save each page as a separate HTML file.
+                // The library will generate files named like "output_html_page_1.html", etc.
+                // Wrap in try‑catch because HTML conversion requires GDI+ (Windows only).
+                try
+                {
+                    // The output path can be a folder; the library will create files inside it.
+                    // Provide a dummy file name; actual files are created per page.
+                    string dummyOutputPath = Path.Combine(outputHtmlDir, "index.html");
+                    pdfDoc.Save(dummyOutputPath, htmlOpts);
+                    Console.WriteLine($"PDF successfully converted to multi‑page HTML in folder: {outputHtmlDir}");
+                }
+                catch (TypeInitializationException)
+                {
+                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipping on this platform.");
+                }
             }
-        }
-        catch (TypeInitializationException)
-        {
-            // HTML conversion uses GDI+ and is only supported on Windows.
-            Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped on this platform.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
         }
     }
 }

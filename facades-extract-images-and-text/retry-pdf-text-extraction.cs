@@ -19,32 +19,32 @@ class Program
         int attempt = 0;
         bool success = false;
 
-        // Retry loop – up to three attempts if an IOException occurs
         while (attempt < maxAttempts && !success)
         {
             attempt++;
             try
             {
-                // PdfExtractor implements IDisposable, so use a using block
+                // Create a new PdfExtractor for each attempt
                 using (PdfExtractor extractor = new PdfExtractor())
                 {
                     // Bind the source PDF file
                     extractor.BindPdf(inputPdf);
 
-                    // Extract all text (Unicode encoding is default)
+                    // Extract all text from the document
                     extractor.ExtractText();
 
-                    // Save extracted text to a file
+                    // Save the extracted text to a file
                     extractor.GetText(outputTxt);
                 }
 
-                Console.WriteLine($"Text extraction succeeded on attempt {attempt}.");
+                // If we reach this point, extraction succeeded
                 success = true;
+                Console.WriteLine($"Text extraction succeeded on attempt {attempt}.");
             }
             catch (IOException ioEx)
             {
                 // Log the I/O error and retry if attempts remain
-                Console.Error.WriteLine($"IOException on attempt {attempt}: {ioEx.Message}");
+                Console.Error.WriteLine($"I/O error on attempt {attempt}: {ioEx.Message}");
                 if (attempt >= maxAttempts)
                 {
                     Console.Error.WriteLine("Maximum retry attempts reached. Extraction failed.");
@@ -56,7 +56,7 @@ class Program
             }
             catch (Exception ex)
             {
-                // Any other exception is not retried
+                // Non‑IO exceptions are not retried; report and exit
                 Console.Error.WriteLine($"Unexpected error: {ex.Message}");
                 break;
             }

@@ -1,37 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// import form data from json__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/working-with-forms/import-form-data-from-json-via-rest-api.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string pdfPath = "input.pdf";
-        const string jsonPath = "formData.json";
-        const string outputPath = "output.pdf";
-
-        // Verify input files exist
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
-            return;
-        }
-        if (!File.Exists(jsonPath))
-        {
-            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
-            return;
-        }
-
-        // Load the PDF document
-        using (Document doc = new Document(pdfPath))
-        {
-            // Bulk import form field values from the JSON file
-            doc.Form.ImportFromJson(jsonPath);
-
-            // Save the updated PDF
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Form data imported and saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

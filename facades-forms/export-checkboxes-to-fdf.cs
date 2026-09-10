@@ -1,52 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
+// URL-STABILITY STUB
+//
+// export checkboxes to fdf
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-forms/export-checkbox-fields-to-fdf.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class ExportCheckboxesToFdf
-{
-    static void Main()
-    {
-        const string inputPdfPath = "input.pdf";
-        const string outputFdfPath = "checkboxes.fdf";
-
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
-            return;
-        }
-
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            // Initialize the Facades Form object with the loaded document
-            Aspose.Pdf.Facades.Form formFacade = new Aspose.Pdf.Facades.Form(pdfDoc);
-
-            // Iterate over all form fields in the document
-            foreach (Field field in pdfDoc.Form.Fields)
-            {
-                // If the field is a checkbox, keep it exportable (default is true)
-                // Otherwise, mark it as non‑exportable so it won't appear in the FDF
-                if (field is CheckboxField)
-                {
-                    // Ensure checkbox fields are exportable
-                    ((CheckboxField)field).Exportable = true;
-                }
-                else
-                {
-                    // Hide non‑checkbox fields from the export
-                    field.Exportable = false;
-                }
-            }
-
-            // Export only the checkbox field definitions to an FDF stream
-            using (FileStream fdfStream = new FileStream(outputFdfPath, FileMode.Create, FileAccess.Write))
-            {
-                formFacade.ExportFdf(fdfStream);
-            }
-
-            Console.WriteLine($"Checkbox field definitions exported to '{outputFdfPath}'.");
-        }
-    }
-}
+class Program { static void Main() { } }

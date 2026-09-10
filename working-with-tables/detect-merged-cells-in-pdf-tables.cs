@@ -9,64 +9,55 @@ class Program
     {
         const string inputPath = "input.pdf";
 
+        // Verify the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document (wrapped in using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber instance
-            TableAbsorber absorber = new TableAbsorber();
+            // Create a TableAbsorber and enable the FlowEngine to detect merged cells
+            TableAbsorber absorber = new TableAbsorber
+            {
+                UseFlowEngine = true
+            };
 
-            // Enable the FlowEngine to get accurate RowSpan/ColSpan information
-            absorber.UseFlowEngine = true;
-
-            // Extract tables from the whole document
+            // Extract tables from the entire document
             absorber.Visit(doc);
 
-            // Iterate over all detected tables
-            for (int t = 0; t < absorber.TableList.Count; t++)
+            int tableIndex = 0;
+
+            // Iterate over each detected table
+            foreach (var table in absorber.TableList)
             {
-                var table = absorber.TableList[t];
-                bool tableHasMergedCell = false;
+                bool hasMergedCells = false;
 
-                // Iterate rows
-                for (int r = 0; r < table.RowList.Count; r++)
+                // Examine each row and each cell within the row
+                foreach (var row in table.RowList)
                 {
-                    var row = table.RowList[r];
-
-                    // Iterate cells in the row
-                    for (int c = 0; c < row.CellList.Count; c++)
+                    foreach (var cell in row.CellList)
                     {
-                        var cell = row.CellList[c];
+                        // ColSpan > 1 indicates a column merge
+                        if (cell.ColSpan > 1)
+                            hasMergedCells = true;
 
-                        // Check for merged cells (RowSpan > 1 or ColSpan > 1)
-                        // AbsorbedCell provides ColSpan; RowSpan is also available when FlowEngine is used
-                        int colSpan = cell.ColSpan;
-                        int rowSpan = 0;
-                        // RowSpan property may not exist on AbsorbedCell in older versions;
-                        // use reflection as a safe fallback
+                        // RowSpan may not be present on AbsorbedCell; use reflection to check safely
                         var rowSpanProp = cell.GetType().GetProperty("RowSpan");
                         if (rowSpanProp != null)
                         {
-                            rowSpan = (int)rowSpanProp.GetValue(cell);
-                        }
-
-                        if (colSpan > 1 || rowSpan > 1)
-                        {
-                            tableHasMergedCell = true;
-                            Console.WriteLine($"Table {t + 1}, Row {r + 1}, Cell {c + 1} is merged (RowSpan={rowSpan}, ColSpan={colSpan})");
+                            int rowSpan = (int)rowSpanProp.GetValue(cell);
+                            if (rowSpan > 1)
+                                hasMergedCells = true;
                         }
                     }
                 }
 
-                if (!tableHasMergedCell)
-                {
-                    Console.WriteLine($"Table {t + 1} contains no merged cells.");
-                }
+                Console.WriteLine(
+                    $"Table {++tableIndex} on page {table.PageNum}: " +
+                    (hasMergedCells ? "contains merged cells" : "no merged cells"));
             }
         }
     }

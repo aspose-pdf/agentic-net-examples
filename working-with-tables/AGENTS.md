@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - working-with-tables
 
-> **Working with tables** in PDF using C# / .NET -- **96** verified, compile-tested examples for **Aspose.PDF for .NET** 26.7.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with tables** in PDF using C# / .NET -- **96** verified, compile-tested examples for **Aspose.PDF for .NET** 26.8.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -24,19 +24,19 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 ## Required Namespaces
 
 - `using Aspose.Pdf;` (96/96 files) ← category-specific
-- `using Aspose.Pdf.Text;` (66/96 files) ← category-specific
-- `using Aspose.Pdf.Drawing;` (10/96 files)
-- `using Aspose.Pdf.LogicalStructure;` (7/96 files)
-- `using Aspose.Pdf.Tagged;` (7/96 files)
-- `using Aspose.Pdf.Annotations;` (3/96 files)
+- `using Aspose.Pdf.Text;` (70/96 files) ← category-specific
+- `using Aspose.Pdf.Drawing;` (14/96 files)
+- `using Aspose.Pdf.LogicalStructure;` (4/96 files)
+- `using Aspose.Pdf.Tagged;` (4/96 files)
 - `using Aspose.Pdf.Forms;` (2/96 files)
-- `using Aspose.Pdf.Facades;` (1/96 files)
-- `using Aspose.Pdf.Operators;` (1/96 files)
+- `using Aspose.Pdf.Annotations;` (1/96 files)
+- `using Aspose.Pdf.Devices;` (1/96 files)
 - `using System;` (96/96 files)
-- `using System.IO;` (65/96 files)
-- `using System.Data;` (11/96 files)
+- `using System.IO;` (72/96 files)
+- `using System.Data;` (13/96 files)
+- `using System.Collections.Generic;` (8/96 files)
 - `using System.Linq;` (8/96 files)
-- `using System.Collections.Generic;` (5/96 files)
+- `using System.Xml.Linq;` (2/96 files)
 - `using System.Globalization;` (1/96 files)
 - `using System.Text;` (1/96 files)
 - `using System.Text.Json;` (1/96 files)
@@ -57,36 +57,36 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-auto-numbered-column-to-pdf-table](./add-auto-numbered-column-to-pdf-table.cs) | Add Auto‑Numbered Column to PDF Table | `Document`, `Page`, `Table` | Shows how to create a PDF table with Aspose.Pdf and insert sequential numbers into the first colu... |
-| [add-background-color-to-table-cell](./add-background-color-to-table-cell.cs) | Add Background Color to a Table Cell in PDF | `Document`, `Page`, `Table` | Shows how to set the BackgroundColor property of a table cell using Aspose.Pdf to color a cell wi... |
-| [add-centered-paragraph-to-table-cell](./add-centered-paragraph-to-table-cell.cs) | Add Centered Paragraph to Table Cell | `Document`, `Page`, `Table` | Creates a PDF document, adds a table, and places a horizontally centered paragraph inside a table... |
-| [add-checkbox-in-table-cell](./add-checkbox-in-table-cell.cs) | Add Checkbox Form Field Inside a Table Cell | `Document`, `Page`, `Table` | Shows how to create a CheckboxField, calculate its position within a table cell, and add it to th... |
-| [add-footer-row-to-pdf-table](./add-footer-row-to-pdf-table.cs) | Add Footer Row to PDF Table with Tagged Structure | `Document`, `Page`, `Table` | Shows how to create a table footer (TFoot) in a PDF using Aspose.Pdf, attach it to the tagged PDF... |
-| [add-footnote-references-in-pdf-table](./add-footnote-references-in-pdf-table.cs) | Add Footnote References with Links in PDF Table | `Document`, `Page`, `Table` | Demonstrates creating a table in a PDF, inserting superscript footnote markers in cells, adding f... |
-| [add-gradient-background-behind-table](./add-gradient-background-behind-table.cs) | Add Gradient Background Behind a Table | `Document`, `Page`, `Graph` | Demonstrates how to simulate a gradient background for a table by drawing a rectangle on a Graph ... |
-| [add-hyperlink-to-table-cell](./add-hyperlink-to-table-cell.cs) | Add Hyperlink to Table Cell in PDF | `Document`, `Page`, `Table` | Shows how to make a table cell clickable by calculating its rectangle and attaching a LinkAnnotat... |
-| [add-multiline-text-to-table-cell](./add-multiline-text-to-table-cell.cs) | Add Multiline Text to a Table Cell | `Document`, `Page`, `Table` | Shows how to create a PDF table cell containing multiline text by inserting several TextFragment ... |
-| [add-numbered-list-in-table-cell](./add-numbered-list-in-table-cell.cs) | Add Numbered List Inside Table Cell | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates how to create a table with a single cell and insert a numbered list into that cell u... |
-| [add-styled-text-to-table-cell](./add-styled-text-to-table-cell.cs) | Add Styled Text to Table Cell in PDF | `Document`, `Page`, `Table` | Shows how to insert text with a specific font and size into a PDF table cell using a TextFragment... |
-| [add-table-to-specific-pdf-page](./add-table-to-specific-pdf-page.cs) | Add Table to Specific PDF Page | `Document`, `Page`, `Table` | Demonstrates loading a PDF, accessing a target page, creating a formatted table, and inserting it... |
-| [adjust-table-column-widths](./adjust-table-column-widths.cs) | Adjust Table Column Widths Proportionally in PDF | `Document`, `Page`, `Table` | Loads a PDF, finds the first table, calculates each column's width as a percentage of the total w... |
-| [alternating-row-colors-pdf-table](./alternating-row-colors-pdf-table.cs) | Apply Alternating Row Colors to PDF Table | `Document`, `Page`, `Table` | Shows how to load a PDF with Aspose.Pdf, create a table, populate rows and cells, and set alterna... |
-| [apply-different-autofit-behavior-to-tables](./apply-different-autofit-behavior-to-tables.cs) | Apply Different AutoFitBehavior Settings to Tables in a PDF | `Document`, `Page`, `Table` | Demonstrates how to add multiple tables to a PDF and set distinct ColumnAdjustment (AutoFitToCont... |
-| [apply-solid-border-to-pdf-table](./apply-solid-border-to-pdf-table.cs) | Apply Solid Border to PDF Table | `Document`, `Page`, `Table` | Creates a PDF document containing a table and applies a solid black border around the entire tabl... |
-| [auto-fit-table-columns-to-content](./auto-fit-table-columns-to-content.cs) | AutoFit Table Columns to Content in PDF | `Document`, `Page`, `Table` | Demonstrates creating a PDF table, enabling ColumnAdjustment.AutoFitToContent, and saving the doc... |
-| [auto-fit-table-row-height](./auto-fit-table-row-height.cs) | Auto-Fit Table Row Height in PDF | `Document`, `ITaggedContent`, `StructureElement` | Demonstrates how to enable automatic height adjustment for a table row (auto‑fit) using Aspose.Pd... |
-| [auto-fit-table-to-page-width](./auto-fit-table-to-page-width.cs) | Auto‑Fit Table to Page Width in PDF | `Document`, `Page`, `Table` | Demonstrates how to create a PDF document with a table that automatically stretches to fill the p... |
-| [batch-add-table-with-logo-to-pdfs](./batch-add-table-with-logo-to-pdfs.cs) | Batch Add Table with Company Logo to PDFs | `Document`, `Page`, `Table` | Shows how to iterate through a folder of PDF files, insert a table containing a company logo imag... |
-| [batch-replace-tables-in-pdfs](./batch-replace-tables-in-pdfs.cs) | Batch Replace Tables in Multiple PDFs | `Document`, `TableAbsorber`, `Visit` | Demonstrates how to iterate over PDF files, locate each table with TableAbsorber, and replace the... |
-| [calculate-remaining-page-height-add-table](./calculate-remaining-page-height-add-table.cs) | Calculate Remaining Page Height and Insert Table | `Document`, `Page`, `PureHeight` | Demonstrates how to compute the usable vertical space on a PDF page by subtracting margins and ex... |
-| [center-align-table](./center-align-table.cs) | Center Align Table in PDF | `Document`, `Page`, `Table` | Demonstrates how to create a PDF with a table and set its HorizontalAlignment to Center using Asp... |
-| [conditional-formatting-table-cells](./conditional-formatting-table-cells.cs) | Conditional Formatting of PDF Table Cells | `Document`, `Page`, `Table` | Shows how to change the background color of table cells in a PDF based on numeric thresholds usin... |
-| [count-tables-in-pdf-using-tableabsorber](./count-tables-in-pdf-using-tableabsorber.cs) | Count Tables in PDF Using TableAbsorber | `Document`, `TableAbsorber`, `Visit` | Shows how to employ Aspose.Pdf's TableAbsorber to locate tables in a PDF and retrieve the total c... |
-| [create-fixed-width-table](./create-fixed-width-table.cs) | Create Fixed-Width Table in PDF | `Document`, `Page`, `Table` | Demonstrates how to generate a PDF with a table whose total width is fixed to 500 points and opti... |
-| [create-pdf-table-from-datatable](./create-pdf-table-from-datatable.cs) | Create PDF Table from a DataTable with Aspose.Pdf | `Document`, `Page`, `Table` | Demonstrates how to fill an in‑memory DataTable, import it into an Aspose.Pdf Table, and generate... |
-| [create-pdf-table-from-datatable__v2](./create-pdf-table-from-datatable__v2.cs) | Create PDF Table with Dynamic Row Count from DataTable | `Document`, `Page`, `Table` | Demonstrates how to generate a PDF, build a DataTable with a variable number of rows, import it i... |
-| [create-table-double-border](./create-table-double-border.cs) | Create Table with Double Border in PDF | `Document`, `Page`, `Table` | Shows how to generate a PDF document containing a table and apply a double‑style border by config... |
-| [create-table-on-new-pdf-page](./create-table-on-new-pdf-page.cs) | Create a Table on a New PDF Page | `Document`, `Page`, `Table` | Demonstrates how to add a new page to a PDF document and place a formatted table with header and ... |
+| [add-auto-numbered-column-to-pdf-table](./add-auto-numbered-column-to-pdf-table.cs) | Add Auto‑Numbered Column to PDF Table | `Document`, `Page`, `Table` | Shows how to create a PDF table with Aspose.Pdf and fill the first column with sequential numbers... |
+| [add-centered-paragraph-to-table-cell](./add-centered-paragraph-to-table-cell.cs) | Add Centered Paragraph to Table Cell | `Document`, `Page`, `Table` | Demonstrates how to create a PDF table with Aspose.Pdf and insert a paragraph into a cell with ho... |
+| [add-checkbox-form-field-in-table-cell](./add-checkbox-form-field-in-table-cell.cs) | Add Checkbox Form Field Inside Table Cell | `Document`, `Page`, `Table` | Shows how to create a PDF with a table and place a checkbox form field inside one of the table's ... |
+| [add-footnote-references-to-table-cells](./add-footnote-references-to-table-cells.cs) | Add Footnote References to Table Cells in PDF | `Document`, `Page`, `Table` | Shows how to insert superscript footnote markers inside table cells, attach Aspose.Pdf footnote n... |
+| [add-list-items-in-table-cell](./add-list-items-in-table-cell.cs) | Add List Items Inside a Table Cell | `Document`, `Page`, `Table` | Shows how to create a bullet list within a PDF table cell by adding TextFragment paragraphs with ... |
+| [add-multiline-text-to-table-cell](./add-multiline-text-to-table-cell.cs) | Add Multiline Text to Table Cell in PDF | `Document`, `Page`, `Table` | Demonstrates how to insert multiline text into a PDF table cell by adding separate TextFragment o... |
+| [add-radio-button-group-in-table-cell](./add-radio-button-group-in-table-cell.cs) | Add Radio Button Group Inside a Table Cell | `Document`, `Page`, `Table` | Demonstrates how to place a group of radio buttons inside a table cell by creating a RadioButtonF... |
+| [add-solid-border-to-pdf-table](./add-solid-border-to-pdf-table.cs) | Add Solid Border to PDF Table | `Document`, `Table`, `BorderInfo` | Demonstrates how to load an existing PDF, create a table, apply a solid black border to the entir... |
+| [add-table-footer-to-pdf](./add-table-footer-to-pdf.cs) | Add Table Footer Row Repeated on Each PDF Page | `Document`, `Table`, `ITaggedContent` | Demonstrates how to add a visual table with a footer row that repeats at the bottom of each page ... |
+| [add-table-to-specific-pdf-page](./add-table-to-specific-pdf-page.cs) | Add Table to Specific PDF Page | `Document`, `Page`, `Table` | Shows how to insert a formatted table onto a chosen page of a PDF document using Aspose.Pdf, incl... |
+| [add-table-with-background-color](./add-table-with-background-color.cs) | Add Table with Background Color to PDF | `Document`, `Page`, `Table` | Demonstrates creating a PDF, inserting a table, and applying a solid background color while notin... |
+| [add-table-with-semi-transparent-background](./add-table-with-semi-transparent-background.cs) | Add Table with Semi-Transparent Background to PDF | `Document`, `Page`, `Table` | Demonstrates how to create a PDF, add a table, and set the table's background color with opacity ... |
+| [add-text-fragment-to-table-cell](./add-text-fragment-to-table-cell.cs) | Add TextFragment with Font and Size to a PDF Table Cell | `Document`, `Table`, `Row` | Demonstrates how to insert text with a specific font and size into a table cell by creating a Tex... |
+| [adjust-table-column-widths-proportionally](./adjust-table-column-widths-proportionally.cs) | Adjust Table Column Widths Proportionally in PDF | `Document`, `Page`, `Table` | Shows how to compute the total width of a table's columns, convert each width to a percentage of ... |
+| [apply-different-autofit-behaviors-to-tables](./apply-different-autofit-behaviors-to-tables.cs) | Apply Different AutoFit Behaviors to Tables in a PDF | `Document`, `Page`, `Table` | Demonstrates how to add multiple tables to a PDF and set distinct ColumnAdjustment (AutoFitToCont... |
+| [apply-double-border-to-pdf-table](./apply-double-border-to-pdf-table.cs) | Apply Double Border to PDF Table | `Document`, `Page`, `Table` | Creates a PDF with a 3x3 table and sets a double‑border effect by configuring BorderInfo with wid... |
+| [auto-fit-table-columns-to-content](./auto-fit-table-columns-to-content.cs) | Auto‑Fit Table Columns to Content in PDF | `Document`, `Page`, `Table` | Loads an existing PDF, creates a table, sets ColumnAdjustment to AutoFitToContent so columns resi... |
+| [auto-fit-table-row-height](./auto-fit-table-row-height.cs) | Auto‑Fit Table Row Height in PDF | `Document`, `Page`, `Table` | Demonstrates how to let a table row automatically adjust its height to fit wrapped cell content b... |
+| [batch-add-table-with-logo-to-pdfs](./batch-add-table-with-logo-to-pdfs.cs) | Batch Add Table with Company Logo to PDFs | `Document`, `Table`, `Image` | Demonstrates how to iterate through a folder of PDF files, insert a two‑column table containing a... |
+| [batch-replace-tables-in-multiple-pdfs](./batch-replace-tables-in-multiple-pdfs.cs) | Batch Replace Tables in Multiple PDFs | `Document`, `TableAbsorber`, `Visit` | Demonstrates how to iterate over PDF files, locate each table with TableAbsorber, create a replac... |
+| [calculate-remaining-page-space-add-table](./calculate-remaining-page-space-add-table.cs) | Calculate Remaining Page Space and Add Table to PDF | `Document`, `Page`, `CalculateContentBBox` | Demonstrates how to compute the usable vertical space on a PDF page by subtracting margins and ex... |
+| [center-table-horizontally](./center-table-horizontally.cs) | Center Table Horizontally in PDF | `Document`, `Page`, `Table` | Shows how to create a table, set its HorizontalAlignment to Center, and add it to a PDF page usin... |
+| [check-table-break-across-pages](./check-table-break-across-pages.cs) | Check Table Break Across Pages | `Document`, `Page`, `Table` | Creates a PDF with a simple two‑column table, adds it to a page, and reads the Table.IsBroken pro... |
+| [conditional-formatting-table-cells](./conditional-formatting-table-cells.cs) | Conditional Formatting of Table Cells in PDF | `Document`, `Page`, `Table` | Demonstrates how to create a PDF table with Aspose.Pdf, add data rows, and apply background color... |
+| [count-tables-in-pdf](./count-tables-in-pdf.cs) | Count Tables in PDF using TableAbsorber | `Document`, `TableAbsorber`, `Visit` | Shows how to use Aspose.Pdf's TableAbsorber to locate and count tables in a PDF document. |
+| [create-fixed-width-table-pdf](./create-fixed-width-table-pdf.cs) | Create Fixed-Width Table in PDF | `Document`, `Page`, `Table` | Shows how to set a table's total width to 500 points, add content, and save it as a PDF using Asp... |
+| [create-pdf-report-multiple-tables](./create-pdf-report-multiple-tables.cs) | Create PDF Report with Multiple Tables | `Document`, `Page`, `TextFragment` | Demonstrates building a PDF document that contains several tables, each imported from a DataTable... |
+| [create-pdf-table-alternating-row-colors](./create-pdf-table-alternating-row-colors.cs) | Create PDF Table with Alternating Row Colors | `Document`, `Page`, `Table` | Shows how to generate a PDF table using Aspose.Pdf and apply alternating background colors to eac... |
+| [create-pdf-table-dynamic-row-count](./create-pdf-table-dynamic-row-count.cs) | Create PDF Table with Dynamic Row Count | `Document`, `Page`, `Table` | Demonstrates building a DataTable at runtime, importing it into an Aspose.Pdf.Table, and saving t... |
+| [create-pdf-table-from-datatable](./create-pdf-table-from-datatable.cs) | Create PDF Table from a DataTable with Aspose.Pdf | `Document`, `Page`, `Table` | Demonstrates how to fill an in‑memory DataTable, import it into an Aspose.Pdf Table, and save the... |
 | ... | | | *and 66 more files* |
 
 ## Category Statistics
@@ -134,5 +134,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for working-with-tables patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-07-17 | Run: `20260717_171638_da3b3e`
+Updated: 2026-08-20 | Run: `20260820_001147_12d7b3`
 <!-- AUTOGENERATED:END -->

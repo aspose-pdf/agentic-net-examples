@@ -1,6 +1,6 @@
 using System;
-using System.Diagnostics;
 using System.IO;
+using System.Diagnostics;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -13,37 +13,33 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Measure performance using the file‑path overload
-        Stopwatch swPath = Stopwatch.StartNew();
-        using (PdfPageEditor editorPath = new PdfPageEditor())
-        {
-            // Bind using file path
-            editorPath.BindPdf(inputPath);
-            // Example resize: shrink to 50%
-            editorPath.Zoom = 0.5f;
-            editorPath.ApplyChanges();
-            editorPath.Save(outputPathPath);
-        }
-        swPath.Stop();
-        Console.WriteLine($"File‑path overload elapsed: {swPath.ElapsedMilliseconds} ms");
+        // Resize all pages; null means all pages
+        int[] pages = null;
 
-        // Measure performance using the stream overload
+        // Example new dimensions (in default space units)
+        double newWidth = 500;
+        double newHeight = 700;
+
+        // Measure performance of the file‑path overload
+        Stopwatch swPath = Stopwatch.StartNew();
+        PdfFileEditor editorPath = new PdfFileEditor();
+        editorPath.ResizeContents(inputPath, outputPathPath, pages, newWidth, newHeight);
+        swPath.Stop();
+        Console.WriteLine($"Resize using file path overload: {swPath.ElapsedMilliseconds} ms");
+
+        // Measure performance of the stream overload
         Stopwatch swStream = Stopwatch.StartNew();
-        using (FileStream fs = File.OpenRead(inputPath))
-        using (PdfPageEditor editorStream = new PdfPageEditor())
+        using (FileStream inStream = File.OpenRead(inputPath))
+        using (FileStream outStream = File.Create(outputPathStream))
         {
-            // Bind using stream
-            editorStream.BindPdf(fs);
-            // Same resize operation
-            editorStream.Zoom = 0.5f;
-            editorStream.ApplyChanges();
-            editorStream.Save(outputPathStream);
+            PdfFileEditor editorStream = new PdfFileEditor();
+            editorStream.ResizeContents(inStream, outStream, pages, newWidth, newHeight);
         }
         swStream.Stop();
-        Console.WriteLine($"Stream overload elapsed: {swStream.ElapsedMilliseconds} ms");
+        Console.WriteLine($"Resize using stream overload: {swStream.ElapsedMilliseconds} ms");
     }
 }

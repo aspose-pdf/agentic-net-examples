@@ -1,9 +1,8 @@
 using System;
-using System.IO;
+using System.Drawing;                     // needed for DefaultAppearance color
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
-using System.Drawing; // Required for DefaultAppearance color
+using Aspose.Pdf.Facades;                // Facade API as requested
 
 class Program
 {
@@ -12,38 +11,43 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        // ---------------------------------------------------------------------
+        // Create a minimal input PDF so the example is self‑contained.
+        // ---------------------------------------------------------------------
+        using (Document seed = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            seed.Pages.Add();               // add a blank page
+            seed.Save(inputPath);            // persist it for the next step
         }
 
-        // Load the PDF and ensure deterministic disposal
+        // Load the PDF document (wrapped in using for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Bind the document to the Facades editor (required by the task)
-            PdfContentEditor editor = new PdfContentEditor();
-            editor.BindPdf(doc);
-
-            // Define the annotation rectangle (left, bottom, right, top) in points
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            // Create DefaultAppearance with Helvetica, size 12, blue color
-            // Note: DefaultAppearance constructor requires System.Drawing.Color
-            DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Blue);
-
-            // Create the free‑text annotation on the first page
-            Page page = doc.Pages[1];
-            FreeTextAnnotation freeText = new FreeTextAnnotation(page, rect, appearance)
+            // Initialize the Facades editor (required by the task)
+            using (PdfContentEditor editor = new PdfContentEditor(doc))
             {
-                Contents = "Sample free‑text annotation"
-            };
+                // Define the annotation rectangle (coordinates are in points)
+                // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Add the annotation to the page
-            page.Annotations.Add(freeText);
+                // Create DefaultAppearance with Helvetica, size 12, blue color.
+                // The constructor expects System.Drawing.Color for the text color.
+                DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Blue);
 
-            // Save the modified PDF via the Facades editor
-            editor.Save(outputPath);
+                // Create the FreeTextAnnotation on page 1 using the appearance.
+                FreeTextAnnotation freeText = new FreeTextAnnotation(doc.Pages[1], rect, appearance)
+                {
+                    Contents = "Sample free‑text annotation",
+                    // Optional: set border/color of the annotation box
+                    Color = Aspose.Pdf.Color.LightGray
+                };
+
+                // Add the annotation to the page's annotation collection.
+                doc.Pages[1].Annotations.Add(freeText);
+
+                // Save the modified PDF.
+                doc.Save(outputPath);
+            }
         }
 
         Console.WriteLine($"Free‑text annotation added and saved to '{outputPath}'.");

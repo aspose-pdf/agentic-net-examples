@@ -1,39 +1,37 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // for text handling if needed
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "table_with_margins.pdf";
+        const string outputPath = "cell_margin.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a page (first page is index 1)
+            // Add a blank page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table, set column widths and optional default cell padding
-            Table table = new Table
-            {
-                ColumnWidths = "150 150 150",
-                // Optional: set a default padding for all cells in the table
-                DefaultCellPadding = new MarginInfo(4, 4, 4, 4)
-            };
-            page.Paragraphs.Add(table);
+            // Create a table with a single column of width 200 points
+            Table table = new Table();
+            table.ColumnWidths = "200";
 
             // Add a row to the table
             Row row = table.Rows.Add();
 
-            // Add a cell to the row
+            // Add a cell with some sample text
             Cell cell = row.Cells.Add("Cell with custom margins");
 
-            // Configure the cell's margins using a MarginInfo instance
-            // Parameters: left, bottom, right, top
-            cell.Margin = new MarginInfo(12, 6, 12, 6);
+            // Configure the cell's margins (left, bottom, right, top) in points
+            cell.Margin = new MarginInfo(10, 5, 10, 5);
 
-            // Save the document as PDF
+            // Add the table to the page's paragraph collection
+            page.Paragraphs.Add(table);
+
+            // Save the PDF to the specified path
             doc.Save(outputPath);
         }
 

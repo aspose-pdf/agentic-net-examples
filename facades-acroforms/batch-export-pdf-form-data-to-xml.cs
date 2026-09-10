@@ -7,51 +7,45 @@ class Program
 {
     static void Main()
     {
-        // Input directory containing PDF forms
-        const string inputDir = "InputPdfs";
-        // Output directory for exported XML files
-        const string outputDir = "ExportedXml";
+        // Folder containing source PDF forms
+        const string inputFolder = "InputPdfs";
+        // Folder where exported XML files will be saved
+        const string outputFolder = "ExportedXml";
 
-        if (!Directory.Exists(inputDir))
+        if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDir}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // Get all PDF files in the input directory
-        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf");
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found to process.");
-            return;
-        }
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
 
         foreach (string pdfPath in pdfFiles)
         {
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            string xmlPath = Path.Combine(outputFolder, fileNameWithoutExt + ".xml");
+
             try
             {
-                // Determine output XML file path
-                string xmlFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".xml";
-                string xmlPath = Path.Combine(outputDir, xmlFileName);
-
-                // Initialize FormEditor and bind the PDF
-                using (FormEditor editor = new FormEditor())
+                // Load the PDF document
+                using (Document doc = new Document(pdfPath))
                 {
-                    editor.BindPdf(pdfPath);
-
-                    // Use Form facade to export form data to XML
-                    using (Form form = new Form(editor.Document))
+                    // Initialize a FormEditor instance (required by the task)
+                    using (FormEditor editor = new FormEditor(doc))
                     {
+                        // Export form data to XML using the Form facade
                         using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Create, FileAccess.Write))
                         {
+                            Aspose.Pdf.Facades.Form form = new Aspose.Pdf.Facades.Form(doc);
                             form.ExportXml(xmlStream);
                         }
                     }
                 }
 
-                Console.WriteLine($"Exported XML for '{pdfPath}' to '{xmlPath}'.");
+                Console.WriteLine($"Exported XML: {xmlPath}");
             }
             catch (Exception ex)
             {

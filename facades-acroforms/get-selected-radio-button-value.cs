@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";          // Path to the PDF form
-        const string fieldName = "RadioGroup1";      // Fully qualified name of the radio button group
+        const string pdfPath = "input.pdf";          // Path to the PDF containing the form
+        const string fieldName = "RadioGroup1";      // Full name of the radio button group
 
         if (!File.Exists(pdfPath))
         {
@@ -15,13 +15,13 @@ class Program
             return;
         }
 
-        // Open the PDF using the Form facade (wrapped in using for deterministic disposal)
+        // Open the PDF form using the Facades Form class (IDisposable, so wrap in using)
         using (Form form = new Form(pdfPath))
         {
-            // Retrieve the currently selected option value for the specified radio button group
-            string currentValue = form.GetButtonOptionCurrentValue(fieldName);
+            // Get the currently selected value of the specified radio button group
+            string selectedValue = form.GetButtonOptionCurrentValue(fieldName);
 
-            Console.WriteLine($"Current selected value for '{fieldName}': {currentValue}");
+            Console.WriteLine($"Current value of radio button '{fieldName}': {selectedValue}");
         }
     }
 }

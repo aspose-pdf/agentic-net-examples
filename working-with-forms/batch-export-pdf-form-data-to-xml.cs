@@ -1,39 +1,49 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace (contains Document, XmlSaveOptions)
 
-class Program
+class BatchFormExport
 {
     static void Main()
     {
-        // Folder containing the source PDF files
-        const string inputFolder = "InputPdfs";
-        // Folder where the XML files will be written
-        const string outputFolder = "OutputXml";
+        // Determine base directory (the folder where the executable runs)
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
-        }
+        // Build input and output folders relative to the base directory
+        string inputFolder = Path.Combine(baseDir, "PdfInputs");
+        string outputFolder = Path.Combine(baseDir, "PdfXmlOutputs");
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Validate the input directory – if it does not exist, fall back to the current working directory
+        if (!Directory.Exists(inputFolder))
         {
-            // Build the corresponding XML file name
-            string xmlFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".xml";
-            string xmlPath = Path.Combine(outputFolder, xmlFileName);
+            Console.WriteLine($"Input folder '{inputFolder}' not found. Using current directory as fallback.");
+            inputFolder = Directory.GetCurrentDirectory();
+        }
 
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length == 0)
+        {
+            Console.WriteLine($"No PDF files found in '{inputFolder}'. Batch export aborted.");
+            return;
+        }
+
+        foreach (string pdfPath in pdfFiles)
+        {
             try
             {
-                // Load the PDF document (lifecycle: create/load)
+                // Build the corresponding XML file name
+                string xmlFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".xml";
+                string xmlPath = Path.Combine(outputFolder, xmlFileName);
+
+                // Load the PDF and export its form data (and full structure) to XML
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Export the document (including form data) to XML (lifecycle: save)
-                    doc.SaveXml(xmlPath);
+                    // Save as XML using explicit XmlSaveOptions (required for non‑PDF formats)
+                    doc.Save(xmlPath, new XmlSaveOptions());
                 }
 
                 Console.WriteLine($"Exported '{pdfPath}' → '{xmlPath}'");
@@ -43,5 +53,7 @@ class Program
                 Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch export completed.");
     }
 }

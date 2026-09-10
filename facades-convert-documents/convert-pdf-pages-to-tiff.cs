@@ -1,46 +1,47 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging; // ImageFormat enum
-using Aspose.Pdf;
+using System.Drawing.Imaging;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";          // source PDF
-        const string outputFolder  = "TiffPages";          // folder for TIFF files
+        const string inputPdf  = "input.pdf";               // source PDF
+        const string outputDir = "PagesAsTiff";             // folder for page images
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Use PdfConverter (Facade) to extract each page as a TIFF image
+        using (PdfConverter converter = new PdfConverter())
         {
-            // Initialize the PdfConverter facade
-            PdfConverter converter = new PdfConverter();
-            converter.BindPdf(pdfDoc);   // bind the document
-            converter.DoConvert();       // prepare for conversion
+            // Bind the PDF file
+            converter.BindPdf(inputPdf);
+
+            // Prepare for conversion
+            converter.DoConvert();
 
             int pageIndex = 1;
-            // Iterate over each page image
+            // Loop while there are more pages to convert
             while (converter.HasNextImage())
             {
-                string tiffPath = Path.Combine(outputFolder, $"page_{pageIndex}.tiff");
-                // Save the current page as a TIFF image
-                converter.GetNextImage(tiffPath, ImageFormat.Tiff);
+                // Build output file name: e.g., PagesAsTiff/page_1.tiff
+                string outPath = Path.Combine(outputDir, $"page_{pageIndex}.tiff");
+
+                // Save current page as TIFF
+                converter.GetNextImage(outPath, ImageFormat.Tiff);
+
                 pageIndex++;
             }
-
-            // No explicit Save needed for the converter; images are written during GetNextImage
         }
 
-        Console.WriteLine($"PDF pages have been converted to TIFF images in '{outputFolder}'.");
+        Console.WriteLine("PDF pages have been saved as individual TIFF files.");
     }
 }

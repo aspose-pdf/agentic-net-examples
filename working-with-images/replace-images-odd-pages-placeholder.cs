@@ -1,58 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // ImagePlacementAbsorber and ImagePlacement are defined here
+// URL-STABILITY STUB
+//
+// replace images odd pages placeholder
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/working-with-images/replace-images-odd-pages-qr-placeholder.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string placeholderImgPath = "placeholder.png";
-
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-
-        if (!File.Exists(placeholderImgPath))
-        {
-            Console.Error.WriteLine($"Placeholder image not found: {placeholderImgPath}");
-            return;
-        }
-
-        // Load the PDF document (lifecycle rule: use Document constructor)
-        using (Document doc = new Document(inputPdfPath))
-        {
-            // Iterate over pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
-            {
-                // Process only odd‑numbered pages
-                if (pageNum % 2 == 0) continue;
-
-                Page page = doc.Pages[pageNum];
-
-                // Absorb image placements on the current page
-                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-                page.Accept(absorber);
-
-                // Replace each found image with the placeholder while keeping its rectangle
-                foreach (ImagePlacement imgPlacement in absorber.ImagePlacements)
-                {
-                    // Open a fresh stream for each replacement (Replace reads the stream)
-                    using (FileStream placeholderStream = File.OpenRead(placeholderImgPath))
-                    {
-                        imgPlacement.Replace(placeholderStream);
-                    }
-                }
-            }
-
-            // Save the modified PDF (lifecycle rule: use Document.Save)
-            doc.Save(outputPdfPath);
-        }
-
-        Console.WriteLine($"PDF saved with placeholders on odd pages: {outputPdfPath}");
-    }
-}
+class Program { static void Main() { } }

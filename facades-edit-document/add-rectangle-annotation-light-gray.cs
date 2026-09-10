@@ -1,7 +1,8 @@
 using System;
-using System.Drawing;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -10,41 +11,38 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Create a minimal PDF if it does not already exist.
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
-            using (Document seed = new Document())
-            {
-                seed.Pages.Add(); // add a blank page
-                seed.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Initialize the content editor and bind the source PDF
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Load the PDF document (lifecycle rule: use using for disposal)
+        using (Document doc = new Document(inputPath))
         {
-            editor.BindPdf(inputPath);
+            // Initialize the annotation editor facade with the loaded document
+            PdfAnnotationEditor annotEditor = new PdfAnnotationEditor(doc);
 
-            // Define the rectangle area for the annotation.
-            // System.Drawing.Rectangle expects (x, y, width, height).
-            // The desired PDF coordinates are lower‑left (100,500) and upper‑right (300,600).
-            // Hence width = 300‑100 = 200, height = 600‑500 = 100.
-            System.Drawing.Rectangle annotRect = new System.Drawing.Rectangle(100, 500, 200, 100);
+            // Define the rectangle area for the annotation using Aspose.Pdf.Rectangle
+            // Lower‑left (100, 500), width 200, height 100 => upper‑right (300, 600)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
 
-            // Add a rectangle (square‑circle) annotation with light‑gray fill and 1 pt border.
-            // Parameters: rectangle, contents, fill/border colour, true => square, page number (1‑based), border width.
-            editor.CreateSquareCircle(
-                annotRect,
-                string.Empty,
-                System.Drawing.Color.LightGray,
-                true,
-                1,
-                1);
+            // Create a square (rectangle) annotation on page 1
+            SquareAnnotation square = new SquareAnnotation(doc.Pages[1], rect);
 
-            // Save the modified PDF
-            editor.Save(outputPath);
+            // Set the interior (fill) color to light gray
+            square.InteriorColor = Aspose.Pdf.Color.LightGray;
+
+            // Set the border width to 1 pt
+            square.Border = new Border(square) { Width = 1 };
+
+            // Add the annotation to the page's annotation collection
+            doc.Pages[1].Annotations.Add(square);
+
+            // Save the modified PDF via the facade (lifecycle rule: use Save on the facade)
+            annotEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"Rectangle annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Rectangle annotation saved to '{outputPath}'.");
     }
 }

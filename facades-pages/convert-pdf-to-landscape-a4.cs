@@ -1,40 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// convert pdf to landscape a4
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-pages/convert-portrait-to-landscape.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_landscape.pdf";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-
-        // Initialize the PdfPageEditor facade
-        PdfPageEditor pageEditor = new PdfPageEditor();
-
-        // Bind the source PDF file
-        pageEditor.BindPdf(inputPdf);
-
-        // Set the output page size to A4 and switch to landscape orientation
-        pageEditor.PageSize = PageSize.A4;          // A4 portrait dimensions
-        pageEditor.PageSize.IsLandscape = true;    // Change orientation to landscape
-
-        // Apply the changes to the document
-        pageEditor.ApplyChanges();
-
-        // Save the modified PDF
-        pageEditor.Save(outputPdf);
-
-        // Release resources
-        pageEditor.Close();
-
-        Console.WriteLine($"Landscape PDF saved to '{outputPdf}'.");
-    }
-}
+class Program { static void Main() { } }

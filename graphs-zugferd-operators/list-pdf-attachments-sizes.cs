@@ -1,39 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// list pdf attachments sizes
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/graphs-zugferd-operators/list-pdf-attachments-names-sizes.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document doc = new Document(inputPath))
-        {
-            // The EmbeddedFiles collection holds all embedded files (attachments) in the PDF.
-            // Use reflection to access Name and Size properties, avoiding a direct dependency on the EmbeddedFile type.
-            foreach (var attachment in doc.EmbeddedFiles)
-            {
-                var type = attachment.GetType();
-                var nameProp = type.GetProperty("Name");
-                var sizeProp = type.GetProperty("Size");
-
-                string name = nameProp?.GetValue(attachment) as string ?? "<unknown>";
-                long size = 0;
-                if (sizeProp != null && long.TryParse(sizeProp.GetValue(attachment)?.ToString(), out var parsedSize))
-                {
-                    size = parsedSize;
-                }
-
-                Console.WriteLine($"Attachment: {name}, Size: {size} bytes");
-            }
-        }
-    }
-}
+class Program { static void Main() { } }

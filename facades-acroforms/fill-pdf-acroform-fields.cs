@@ -2,77 +2,82 @@ using System;
 using System.Collections.Generic;
 using Aspose.Pdf.Facades;
 
-public static class PdfFormFiller
+namespace PdfFormFillerApp
 {
     /// <summary>
-    /// Fills AcroForm fields in a PDF using Aspose.Pdf.Facades.Form and saves the result.
+    /// Provides a helper method that fills AcroForm fields in a PDF using Aspose.Pdf.Facades.Form.
     /// </summary>
-    /// <param name="inputPdfPath">Path to the source PDF containing form fields.</param>
-    /// <param name="fieldValues">Dictionary where key = fully qualified field name, value = field value.</param>
-    /// <param name="outputPdfPath">Path where the filled PDF will be saved.</param>
-    public static void FillPdfForm(string inputPdfPath, Dictionary<string, string> fieldValues, string outputPdfPath)
+    public static class PdfFormFiller
     {
-        if (string.IsNullOrEmpty(inputPdfPath))
-            throw new ArgumentException("Input PDF path must be provided.", nameof(inputPdfPath));
-
-        if (string.IsNullOrEmpty(outputPdfPath))
-            throw new ArgumentException("Output PDF path must be provided.", nameof(outputPdfPath));
-
-        if (fieldValues == null)
-            throw new ArgumentNullException(nameof(fieldValues));
-
-        // Form implements IDisposable via SaveableFacade, so wrap it in a using block.
-        using (Form form = new Form(inputPdfPath))
+        /// <summary>
+        /// Fills the specified fields and saves the result to a new PDF file.
+        /// </summary>
+        /// <param name="inputPdfPath">Path to the source PDF containing form fields.</param>
+        /// <param name="fieldValues">Dictionary where key = fully qualified field name, value = value to set.</param>
+        /// <param name="outputPdfPath">Path where the filled PDF will be saved.</param>
+        public static void FillAndSave(string inputPdfPath, Dictionary<string, string> fieldValues, string outputPdfPath)
         {
-            // Iterate over the supplied field/value pairs and fill each field.
-            foreach (KeyValuePair<string, string> kvp in fieldValues)
-            {
-                // FillField returns a bool indicating success; ignore it here or handle as needed.
-                form.FillField(kvp.Key, kvp.Value);
-            }
+            if (string.IsNullOrWhiteSpace(inputPdfPath))
+                throw new ArgumentException("Input PDF path must be provided.", nameof(inputPdfPath));
 
-            // Save the modified document to the specified output path.
-            form.Save(outputPdfPath);
+            if (string.IsNullOrWhiteSpace(outputPdfPath))
+                throw new ArgumentException("Output PDF path must be provided.", nameof(outputPdfPath));
+
+            if (fieldValues == null)
+                throw new ArgumentNullException(nameof(fieldValues));
+
+            // Form implements IDisposable via SaveableFacade, so wrap it in a using block.
+            using (Form form = new Form(inputPdfPath))
+            {
+                // Iterate over the supplied field/value pairs and fill each field.
+                foreach (KeyValuePair<string, string> kvp in fieldValues)
+                {
+                    // FillField returns true if the field exists and was filled successfully.
+                    // The return value is ignored here, but you could log failures if needed.
+                    form.FillField(kvp.Key, kvp.Value);
+                }
+
+                // Save the modified document to the specified output path.
+                form.Save(outputPdfPath);
+            }
         }
     }
-}
 
-// ---------------------------------------------------------------------------
-// Minimal console entry point so the project compiles as an executable.
-// This can be removed or replaced with a proper test harness when the code is
-// consumed as a library.
-// ---------------------------------------------------------------------------
-public class Program
-{
-    public static void Main(string[] args)
+    /// <summary>
+    /// Simple console entry point that demonstrates how to call PdfFormFiller.FillAndSave.
+    /// </summary>
+    internal class Program
     {
-        // Simple demonstration of usage:
-        //   dotnet run input.pdf output.pdf Name=John Age=30
-        if (args.Length < 2)
+        static void Main(string[] args)
         {
-            Console.WriteLine("Usage: <inputPdfPath> <outputPdfPath> [fieldName=fieldValue ...]");
-            return;
-        }
+            // Expected arguments: <inputPdfPath> <outputPdfPath> [fieldName=fieldValue ...]
+            if (args.Length < 2)
+            {
+                Console.WriteLine("Usage: PdfFormFillerApp <inputPdfPath> <outputPdfPath> [fieldName=fieldValue ...]");
+                return;
+            }
 
-        string inputPath = args[0];
-        string outputPath = args[1];
-        var values = new Dictionary<string, string>();
+            string inputPath = args[0];
+            string outputPath = args[1];
 
-        for (int i = 2; i < args.Length; i++)
-        {
-            var parts = args[i].Split(new[] { '=' }, 2);
-            if (parts.Length == 2)
-                values[parts[0]] = parts[1];
-        }
+            var fieldValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 2; i < args.Length; i++)
+            {
+                var parts = args[i].Split(new[] { '=' }, 2);
+                if (parts.Length == 2)
+                {
+                    fieldValues[parts[0]] = parts[1];
+                }
+            }
 
-        try
-        {
-            PdfFormFiller.FillPdfForm(inputPath, values, outputPath);
+            // If no field/value pairs were supplied, add a placeholder to avoid an empty dictionary.
+            if (fieldValues.Count == 0)
+            {
+                fieldValues["SampleField"] = "SampleValue";
+            }
+
+            PdfFormFiller.FillAndSave(inputPath, fieldValues, outputPath);
             Console.WriteLine($"PDF form filled and saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

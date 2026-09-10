@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "highlighted_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,23 +16,23 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
             // Iterate through all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageNum];
+                Page page = doc.Pages[i];
 
-                // Annotations collection also uses 1‑based indexing
-                for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
+                // Iterate through all annotations on the page (1‑based indexing)
+                for (int j = 1; j <= page.Annotations.Count; j++)
                 {
-                    Annotation ann = page.Annotations[annIdx];
+                    Annotation ann = page.Annotations[j];
 
-                    // Check if the annotation is a HighlightAnnotation
+                    // Process only HighlightAnnotation instances
                     if (ann is HighlightAnnotation highlight)
                     {
-                        // Set the annotation color to LightGreen
+                        // Change the annotation color to LightGreen
                         highlight.Color = Aspose.Pdf.Color.LightGreen;
                     }
                 }

@@ -1,30 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// retrieve custom pdf metadata projectcode
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-metadata/retrieve-custom-pdf-metadata.cs
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string pdfPath = "input.pdf";
-
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
-            return;
-        }
-
-        // Initialize the PdfFileInfo facade for the PDF document
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(pdfPath))
-        {
-            // Retrieve the custom metadata value for "ProjectCode"
-            string projectCode = pdfInfo.GetMetaInfo("ProjectCode");
-
-            // Display the result
-            if (string.IsNullOrEmpty(projectCode))
-                Console.WriteLine("ProjectCode metadata not found.");
-            else
-                Console.WriteLine($"ProjectCode: {projectCode}");
-        }
-    }
-}
+class Program { static void Main() { } }
