@@ -1,14 +1,14 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        const string inputPdfPath  = "input.pdf";
         const string outputTxtPath = "notes.txt";
 
         if (!File.Exists(inputPdfPath))
@@ -17,40 +17,32 @@ class Program
             return;
         }
 
-        try
+        // Use a using block for deterministic disposal of the Document.
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdfPath))
+            StringBuilder notesBuilder = new StringBuilder();
+
+            // Aspose.Pdf uses 1‑based page indexing.
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Access tagged content (if any)
-                ITaggedContent tagged = doc.TaggedContent;
+                Page page = doc.Pages[i];
 
-                // Get the root of the structure tree
-                StructureElement root = tagged.RootElement;
-
-                // Find all NoteElement objects recursively
-                var notes = root.FindElements<NoteElement>(true);
-
-                // Concatenate the ActualText of each note
-                string allNotes = string.Empty;
-                foreach (NoteElement note in notes)
+                // Iterate over all annotations on the page.
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    // Use ActualText (or AlternativeText) as the note's content
-                    string text = note.ActualText ?? string.Empty;
-                    if (!string.IsNullOrEmpty(text))
+                    // TextAnnotation represents a "note" (sticky‑note) annotation.
+                    if (annotation is TextAnnotation note)
                     {
-                        allNotes += text + Environment.NewLine;
+                        // Append the note's contents. Trim to remove extra whitespace.
+                        notesBuilder.AppendLine(note.Contents?.Trim());
                     }
                 }
-
-                // Write the concatenated notes to a plain text file
-                File.WriteAllText(outputTxtPath, allNotes);
-                Console.WriteLine($"Extracted notes saved to '{outputTxtPath}'.");
             }
+
+            // Write the concatenated notes to a plain text file.
+            File.WriteAllText(outputTxtPath, notesBuilder.ToString());
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"All note texts have been saved to '{outputTxtPath}'.");
     }
 }

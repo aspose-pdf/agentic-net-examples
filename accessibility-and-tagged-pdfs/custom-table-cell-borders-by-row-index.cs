@@ -7,78 +7,71 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "table_with_custom_borders.pdf";
+        const string outputPath = "table_with_borders.pdf";
 
-        // Create a new PDF document
+        // Ensure deterministic disposal of the Document
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a new page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table with three equal columns
+            // Create a table with 5 columns
             Table table = new Table
             {
-                ColumnWidths = "100 100 100"
+                // Define equal column widths
+                ColumnWidths = "100 100 100 100 100",
+                // Default border for cells (will be overridden per row)
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.LightGray),
+                // Default padding for better readability
+                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
             };
 
-            // Add 5 rows to the table
-            for (int rowIndex = 0; rowIndex < 5; rowIndex++)
+            // Add a header row
+            Row header = table.Rows.Add();
+            for (int c = 1; c <= 5; c++)
             {
-                Row row = new Row();
-
-                // Create three cells for each row
-                for (int colIndex = 0; colIndex < 3; colIndex++)
+                Cell cell = header.Cells.Add($"Header {c}");
+                cell.BackgroundColor = Aspose.Pdf.Color.LightBlue;
+                // Header uses a solid black border
+                cell.Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black);
+                // Set font styling for header cells via DefaultCellTextState
+                cell.DefaultCellTextState = new TextState
                 {
-                    Cell cell = new Cell();
+                    Font = FontRepository.FindFont("Helvetica"),
+                    FontSize = 12,
+                    FontStyle = FontStyles.Bold
+                };
+            }
 
-                    // Add some sample text to the cell
-                    cell.Paragraphs.Add(new TextFragment($"R{rowIndex + 1}C{colIndex + 1}"));
+            // Add data rows with custom borders based on row index
+            for (int r = 1; r <= 10; r++)
+            {
+                Row row = table.Rows.Add();
+                for (int c = 1; c <= 5; c++)
+                {
+                    Cell cell = row.Cells.Add($"R{r}C{c}");
 
-                    // Create a BorderInfo instance for the cell
-                    BorderInfo cellBorder = new BorderInfo();
-
-                    // Apply a different border color based on the row index
-                    // (Even rows: LightGray, Odd rows: DarkGray)
-                    if (rowIndex % 2 == 0)
+                    // Apply custom border style:
+                    // Even rows -> blue thin border
+                    // Odd rows  -> red thick border
+                    if (r % 2 == 0)
                     {
-                        // LightGray border for even rows
-                        cellBorder = new BorderInfo
-                        {
-                            // BorderInfo does not expose direct color properties;
-                            // the visual style is controlled via the GraphInfo of the cell.
-                            // Here we set the cell's background color to illustrate the distinction.
-                            // The border itself will inherit the default style.
-                        };
-                        cell.BackgroundColor = Color.LightGray;
+                        cell.Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Blue);
                     }
                     else
                     {
-                        // DarkGray border for odd rows
-                        cellBorder = new BorderInfo
-                        {
-                            // As above, we use background color to differentiate.
-                        };
-                        cell.BackgroundColor = Color.DarkGray;
+                        cell.Border = new BorderInfo(BorderSide.All, 2f, Aspose.Pdf.Color.Red);
                     }
-
-                    // Assign the border to the cell
-                    cell.Border = cellBorder;
-
-                    // Add the cell to the current row
-                    row.Cells.Add(cell);
                 }
-
-                // Add the completed row to the table
-                table.Rows.Add(row);
             }
 
-            // Add the table to the page
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
             // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with custom table borders saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

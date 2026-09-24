@@ -3,86 +3,60 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
 using Aspose.Pdf.LogicalStructure;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // for TextFragment and FontStyles
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "Tagged_TOC.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_toc.pdf";
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // -------------------------------------------------
-            // 1. Prepare tagged content (language, title, etc.)
-            // -------------------------------------------------
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Load the source PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Access the tagged content interface and set basic metadata
             ITaggedContent tagged = doc.TaggedContent;
             tagged.SetLanguage("en-US");
-            tagged.SetTitle("Document with Tagged Table of Contents");
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // -------------------------------------------------
-            // 2. Add a content page with headings
-            // -------------------------------------------------
-            Page contentPage = doc.Pages.Add();
-            // Visible title for the page
-            TextFragment title = new TextFragment("Chapter 1: Introduction");
-            title.Position = new Position(50, 750);
-            title.TextState.FontSize = 20;
-            contentPage.Paragraphs.Add(title);
+            // Insert a new page at the beginning to hold the Table of Contents
+            Page tocPage = doc.Pages.Insert(1);
 
-            // Create a heading structure element (H1) and attach it to the page
-            HeaderElement heading = tagged.CreateHeaderElement(1);
-            heading.SetText("Chapter 1: Introduction");
-            // Append the heading to the document root (visual association is implicit)
-            tagged.RootElement.AppendChild(heading);
-
-            // -------------------------------------------------
-            // 3. Add a dedicated TOC page
-            // -------------------------------------------------
-            Page tocPage = doc.Pages.Add();
-
-            // Configure TOC page info – this tells Aspose.Pdf that this page holds a TOC
-            tocPage.TocInfo = new TocInfo
-            {
-                Title = new TextFragment("Table of Contents"),
-                IsShowPageNumbers = true,
-                CopyToOutlines = true
-            };
-
-            // Visible heading for the TOC page
+            // Add a visual title on the TOC page
             TextFragment tocTitle = new TextFragment("Table of Contents");
-            tocTitle.Position = new Position(50, 750);
-            tocTitle.TextState.FontSize = 24;
+            tocTitle.TextState.FontSize = 20;
+            tocTitle.TextState.FontStyle = FontStyles.Bold;
             tocPage.Paragraphs.Add(tocTitle);
 
-            // -------------------------------------------------
-            // 4. Build the logical TOC structure
-            // -------------------------------------------------
-            // Create the TOC element (root of the TOC hierarchy)
-            TOCElement tocElement = tagged.CreateTOCElement();
-            tocElement.Title = "Table of Contents"; // set label for the TOC element
-            // Append TOC element to the document root
-            tagged.RootElement.AppendChild(tocElement);
+            // Build the logical structure for the TOC page
+            StructureElement root = tagged.RootElement; // no cast needed
 
-            // Create a TOCI (TOC item) for the heading we added earlier
-            TOCIElement tocItem = tagged.CreateTOCIElement();
-            // The label (e.g., chapter title)
-            tocItem.ActualText = "Chapter 1: Introduction";
-            // The reference (page number) – create a Reference element that points to the target page
-            ReferenceElement reference = tagged.CreateReferenceElement();
-            reference.ActualText = "1"; // page number where the heading resides
-            // Append the reference to the TOCI item
-            tocItem.AppendChild(reference);
-            // Append the TOCI item to the TOC element
-            tocElement.AppendChild(tocItem);
+            // Create a heading element for the TOC title and attach it to the root
+            HeaderElement tocHeader = tagged.CreateHeaderElement(1);
+            tocHeader.SetText("Table of Contents");
+            root.AppendChild(tocHeader);
 
-            // -------------------------------------------------
-            // 5. Save the document
-            // -------------------------------------------------
+            // Add heading entries as paragraph elements.
+            // In a real scenario these would be generated by scanning the document.
+            ParagraphElement entry1 = tagged.CreateParagraphElement();
+            entry1.SetText("1. Introduction ........................................ 2");
+            root.AppendChild(entry1);
+
+            ParagraphElement entry2 = tagged.CreateParagraphElement();
+            entry2.SetText("2. Conclusion ........................................ 10");
+            root.AppendChild(entry2);
+
+            // Save the modified PDF; no PreSave call is required
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Tagged PDF with TOC saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with Table of Contents saved to '{outputPath}'.");
     }
 }
