@@ -8,49 +8,52 @@ class Program
 {
     static void Main()
     {
-        // Input PDF files
-        const string pdfPath1 = "document1.pdf";
-        const string pdfPath2 = "document2.pdf";
+        const string firstPdf = "first.pdf";
+        const string secondPdf = "second.pdf";
 
-        // Verify that both source files exist
-        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
+        // Verify input files exist
+        if (!File.Exists(firstPdf) || !File.Exists(secondPdf))
         {
             Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
-        // Load the two PDFs inside using blocks for deterministic disposal
-        using (Document doc1 = new Document(pdfPath1))
-        using (Document doc2 = new Document(pdfPath2))
+        // Define the page range to compare (inclusive)
+        const int startPage = 2;
+        const int endPage   = 4;
+
+        bool rangeIsEqual = true;
+        var allDifferences = new List<DiffOperation>();
+
+        // Load the documents
+        using (var doc1 = new Document(firstPdf))
+        using (var doc2 = new Document(secondPdf))
         {
-            // Desired page range (1‑based indexing)
-            int startPage = 2;
-            int endPage   = 4;
-
-            // Clamp the range to the actual number of pages in both documents
+            // Ensure we do not exceed the smallest page count
             int maxPage = Math.Min(Math.Min(doc1.Pages.Count, doc2.Pages.Count), endPage);
-            startPage = Math.Max(1, startPage);
-            if (startPage > maxPage)
+
+            // Iterate over the selected page range and compare each page individually
+            for (int p = startPage; p <= maxPage; p++)
             {
-                Console.Error.WriteLine("Start page is beyond the number of pages in the documents.");
-                return;
+                IList<DiffOperation> diffs = TextPdfComparer.ComparePages(
+                    doc1.Pages[p],
+                    doc2.Pages[p],
+                    new ComparisonOptions()); // default options – no OutputPath, no StartPage/EndPage
+
+                if (diffs != null && diffs.Count > 0)
+                {
+                    rangeIsEqual = false;
+                    allDifferences.AddRange(diffs);
+                }
             }
+        }
 
-            // ComparisonOptions does not expose StartPage/EndPage in the current API.
-            // Use the default options and later filter the result list to the required range.
-            ComparisonOptions options = new ComparisonOptions();
-
-            // Perform the comparison for all pages; the method returns a list of diff operations per page.
-            // The concrete return type is List<List<DiffOperation>> which is compatible with IList<List<DiffOperation>>.
-            List<List<DiffOperation>> diffs = TextPdfComparer.CompareDocumentsPageByPage(doc1, doc2, options);
-
-            // Report only the pages that fall inside the requested range.
-            for (int i = startPage - 1; i < maxPage; i++)
-            {
-                int pageNumber = i + 1; // convert back to 1‑based page number
-                int diffCount = diffs[i]?.Count ?? 0;
-                Console.WriteLine($"Page {pageNumber}: {diffCount} differences found.");
-            }
+        // Output the result
+        Console.WriteLine($"Compared pages {startPage} to {endPage}.");
+        Console.WriteLine($"Documents are equal in the selected range: {rangeIsEqual}");
+        if (!rangeIsEqual)
+        {
+            Console.WriteLine($"Total differences found: {allDifferences.Count}");
         }
     }
 }

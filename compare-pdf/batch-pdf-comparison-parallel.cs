@@ -1,99 +1,93 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Threading;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Aspose.Pdf;
-using Aspose.Pdf.Comparison;
+using Aspose.Pdf.Text;
 
-class BatchPdfComparer
+class PdfBatchComparer
 {
-    static void Main()
+    // Compare two PDFs: page count and full text content
+    private static bool ComparePdf(string referencePath, string targetPath)
     {
-        // Base directory of the application (works for both console and VS debugging)
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // Ensure both files exist
+        if (!File.Exists(referencePath) || !File.Exists(targetPath))
+            return false;
 
-        // Path to the reference PDF against which all others will be compared
-        string referencePath = Path.Combine(baseDir, "reference.pdf");
-        if (!File.Exists(referencePath))
+        // Load reference PDF
+        using (Document refDoc = new Document(referencePath))
+        // Load target PDF
+        using (Document tgtDoc = new Document(targetPath))
         {
-            Console.Error.WriteLine($"Reference PDF not found at '{referencePath}'. Execution stopped.");
-            return;
+            // Compare page counts (1‑based indexing)
+            if (refDoc.Pages.Count != tgtDoc.Pages.Count)
+                return false;
+
+            // Extract full text from reference PDF
+            TextAbsorber refAbsorber = new TextAbsorber();
+            refDoc.Pages.Accept(refAbsorber);
+            string refText = refAbsorber.Text;
+
+            // Extract full text from target PDF
+            TextAbsorber tgtAbsorber = new TextAbsorber();
+            tgtDoc.Pages.Accept(tgtAbsorber);
+            string tgtText = tgtAbsorber.Text;
+
+            // Compare text content (exact match)
+            return string.Equals(refText, tgtText, StringComparison.Ordinal);
         }
-
-        // Directory containing the PDFs to be compared
-        string inputDir = Path.Combine(baseDir, "InputPdfs");
-        if (!Directory.Exists(inputDir))
-        {
-            Console.WriteLine($"Input directory '{inputDir}' not found. Falling back to current working directory.");
-            inputDir = Directory.GetCurrentDirectory();
-        }
-        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf");
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine($"No PDF files found in '{inputDir}'. Execution stopped.");
-            return;
-        }
-
-        // Directory where comparison result PDFs will be saved
-        string outputDir = Path.Combine(baseDir, "ComparisonResults");
-        Directory.CreateDirectory(outputDir);
-
-        // Maximum number of concurrent comparisons (adjust based on memory constraints)
-        const int maxConcurrency = 4;
-        SemaphoreSlim semaphore = new SemaphoreSlim(maxConcurrency);
-
-        var tasks = new List<Task>();
-
-        foreach (string file in pdfFiles)
-        {
-            // Skip the reference file itself if it appears in the list
-            if (string.Equals(Path.GetFullPath(file), Path.GetFullPath(referencePath), StringComparison.OrdinalIgnoreCase))
-                continue;
-
-            // Queue a comparison task
-            tasks.Add(Task.Run(async () =>
-            {
-                await semaphore.WaitAsync();
-                try
-                {
-                    try
-                    {
-                        CompareAndSave(referencePath, file, outputDir);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.Error.WriteLine($"Error comparing '{Path.GetFileName(file)}': {ex.Message}");
-                    }
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            }));
-        }
-
-        // Wait for all comparisons to finish
-        Task.WaitAll(tasks.ToArray());
-
-        Console.WriteLine("Batch PDF comparison completed.");
     }
 
-    static void CompareAndSave(string referencePath, string targetPath, string outputDir)
+    static void Main()
     {
-        // Load the reference and target PDFs using Aspose.Pdf's Document class
-        using (Document referenceDoc = new Document(referencePath))
-        using (Document targetDoc = new Document(targetPath))
+        // Path to the reference PDF against which all others are compared
+        const string referencePdfPath = "reference.pdf";
+
+        // Directory containing PDFs to compare
+        const string pdfDirectory = "PdfBatch";
+
+        if (!File.Exists(referencePdfPath))
         {
-            // Default comparison options; customize if needed
-            ComparisonOptions options = new ComparisonOptions();
+            Console.Error.WriteLine($"Reference PDF not found: {referencePdfPath}");
+            return;
+        }
 
-            // Construct a result file name that identifies the compared pair
-            string resultFileName = $"{Path.GetFileNameWithoutExtension(targetPath)}_vs_{Path.GetFileNameWithoutExtension(referencePath)}.pdf";
-            string resultPath = Path.Combine(outputDir, resultFileName);
+        if (!Directory.Exists(pdfDirectory))
+        {
+            Console.Error.WriteLine($"Directory not found: {pdfDirectory}");
+            return;
+        }
 
-            // Perform side‑by‑side comparison and let the API write the result PDF
-            SideBySidePdfComparer.Compare(referenceDoc, targetDoc, resultPath, new SideBySideComparisonOptions { });
+        // Gather all PDF files in the directory (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(pdfDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        // Thread‑safe collection for results
+        ConcurrentBag<string> results = new ConcurrentBag<string>();
+
+        // Limit concurrency to avoid excessive memory usage
+        ParallelOptions options = new ParallelOptions
+        {
+            MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2) // adjust as needed
+        };
+
+        // Compare each PDF to the reference in parallel
+        Parallel.ForEach(pdfFiles, options, pdfPath =>
+        {
+            bool isMatch = ComparePdf(referencePdfPath, pdfPath);
+            string fileName = Path.GetFileName(pdfPath);
+            string result = isMatch
+                ? $"{fileName}: MATCH"
+                : $"{fileName}: DIFFERENT";
+
+            results.Add(result);
+        });
+
+        // Output results
+        Console.WriteLine("Comparison results:");
+        foreach (string line in results)
+        {
+            Console.WriteLine(line);
         }
     }
 }

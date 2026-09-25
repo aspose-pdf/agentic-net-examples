@@ -8,56 +8,64 @@ class Program
 {
     static void Main()
     {
-        // Input PDF files
-        const string pdfPath1 = "document1.pdf";
-        const string pdfPath2 = "document2.pdf";
+        const string pdf1Path = "doc1.pdf";
+        const string pdf2Path = "doc2.pdf";
+        const string logPath = "comparison_log.txt";
 
-        // Output audit log file
-        const string auditLogPath = "diff_audit.txt";
-
-        // Verify that both source files exist
-        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
+        if (!File.Exists(pdf1Path) || !File.Exists(pdf2Path))
         {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
+            Console.Error.WriteLine("One or both PDF files not found.");
             return;
         }
 
-        // Load the two PDF documents inside using blocks for deterministic disposal
-        using (Document doc1 = new Document(pdfPath1))
-        using (Document doc2 = new Document(pdfPath2))
+        try
         {
-            // Create default comparison options (can be customized if needed)
-            ComparisonOptions options = new ComparisonOptions();
-
-            // Perform a page‑by‑page text comparison.
-            // The method returns a list where each element corresponds to a page
-            // and contains the DiffOperation objects for that page.
-            List<List<DiffOperation>> diffsByPage =
-                TextPdfComparer.CompareDocumentsPageByPage(doc1, doc2, options);
-
-            // Prepare lines to be written to the audit log
-            var logLines = new List<string>();
-
-            // Iterate over each page's diff list
-            for (int i = 0; i < diffsByPage.Count; i++)
+            // Load the two PDF documents inside using blocks for deterministic disposal
+            using (Document doc1 = new Document(pdf1Path))
+            using (Document doc2 = new Document(pdf2Path))
             {
-                int pageNumber = i + 1; // Aspose.Pdf uses 1‑based page indexing
-                List<DiffOperation> pageDiffs = diffsByPage[i];
+                // Perform page‑by‑page text comparison – returns a list per page
+                var pageDifferences = TextPdfComparer.CompareDocumentsPageByPage(
+                    doc1,
+                    doc2,
+                    new ComparisonOptions()
+                );
 
-                foreach (DiffOperation diff in pageDiffs)
+                bool anyDiff = false;
+                using (StreamWriter writer = new StreamWriter(logPath, false))
                 {
-                    // DiffOperation provides the type of change via the Operation property
-                    string operationType = diff.Operation.ToString();
+                    if (pageDifferences == null || pageDifferences.Count == 0)
+                    {
+                        writer.WriteLine("No differences found.");
+                    }
+                    else
+                    {
+                        for (int pageIndex = 0; pageIndex < pageDifferences.Count; pageIndex++)
+                        {
+                            List<DiffOperation> diffs = pageDifferences[pageIndex];
+                            if (diffs == null) continue;
 
-                    // Log format: "Page {pageNumber}: {operationType}"
-                    logLines.Add($"Page {pageNumber}: {operationType}");
+                            foreach (DiffOperation diff in diffs)
+                            {
+                                anyDiff = true;
+                                // DiffOperation.Operation holds the type of change (e.g., "Text", "Font", etc.)
+                                writer.WriteLine($"Page {pageIndex + 1}: {diff.Operation}");
+                            }
+                        }
+
+                        if (!anyDiff)
+                        {
+                            writer.WriteLine("No differences found.");
+                        }
+                    }
                 }
+
+                Console.WriteLine($"Comparison completed. Log saved to '{logPath}'.");
             }
-
-            // Write all log entries to the specified text file
-            File.WriteAllLines(auditLogPath, logLines);
         }
-
-        Console.WriteLine($"Diff audit completed. Log saved to '{auditLogPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

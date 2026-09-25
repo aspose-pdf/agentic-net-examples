@@ -1,48 +1,91 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Comparison;
+using Aspose.Pdf.Text; // Required for Font class
 
-class Program
+class FontComparison
 {
     static void Main()
     {
-        // Paths to the PDFs to compare
-        const string firstPdfPath  = "doc1.pdf";
-        const string secondPdfPath = "doc2.pdf";
+        const string pdfPathA = "documentA.pdf";
+        const string pdfPathB = "documentB.pdf";
 
-        // Verify that both files exist
-        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
+        if (!File.Exists(pdfPathA) || !File.Exists(pdfPathB))
         {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
+            Console.Error.WriteLine("One or both PDF files not found.");
             return;
         }
 
-        // Open the documents inside using blocks for deterministic disposal
-        using (Aspose.Pdf.Document firstDoc  = new Aspose.Pdf.Document(firstPdfPath))
-        using (Aspose.Pdf.Document secondDoc = new Aspose.Pdf.Document(secondPdfPath))
+        // Load both PDFs inside using blocks for deterministic disposal
+        using (Document docA = new Document(pdfPathA))
+        using (Document docB = new Document(pdfPathB))
         {
-            // Create default comparison options
-            Aspose.Pdf.Comparison.ComparisonOptions options = new Aspose.Pdf.Comparison.ComparisonOptions();
-
-            // Perform a flat document comparison – this returns a list of DiffOperation objects
-            List<Aspose.Pdf.Comparison.DiffOperation> diffOperations =
-                Aspose.Pdf.Comparison.TextPdfComparer.CompareFlatDocuments(firstDoc, secondDoc, options);
-
-            // Iterate through the diff operations and output information.
-            // Font differences are reported as separate operations (e.g., FontChange).
-            foreach (Aspose.Pdf.Comparison.DiffOperation diff in diffOperations)
+            // Compare page counts first
+            if (docA.Pages.Count != docB.Pages.Count)
             {
-                // The DiffOperation class exposes an 'Operation' property that indicates the type of change.
-                // Use the enum name for readability.
-                Console.WriteLine($"Operation: {diff.Operation}");
-                
-                // Additional details (such as the changed text or font name) can be obtained from the diff object.
-                // Here we simply output the whole diff object which includes its ToString() representation.
-                Console.WriteLine($"Details : {diff}");
-                Console.WriteLine(new string('-', 40));
+                Console.WriteLine($"Page count differs: A={docA.Pages.Count}, B={docB.Pages.Count}");
+            }
+
+            int maxPages = Math.Max(docA.Pages.Count, docB.Pages.Count);
+
+            // Iterate using 1‑based indexing (Aspose.Pdf uses 1‑based page indexes)
+            for (int pageIndex = 1; pageIndex <= maxPages; pageIndex++)
+            {
+                bool hasPageA = pageIndex <= docA.Pages.Count;
+                bool hasPageB = pageIndex <= docB.Pages.Count;
+
+                if (!hasPageA || !hasPageB)
+                {
+                    Console.WriteLine($"Page {pageIndex}: Exists only in {(hasPageA ? "A" : "B")}");
+                    continue;
+                }
+
+                // Build dictionaries of fonts for each page: key = font name, value = IsEmbedded flag
+                var fontsA = BuildFontDictionary(docA.Pages[pageIndex]);
+                var fontsB = BuildFontDictionary(docB.Pages[pageIndex]);
+
+                // Detect fonts present only in A
+                foreach (var kvp in fontsA)
+                {
+                    if (!fontsB.ContainsKey(kvp.Key))
+                    {
+                        Console.WriteLine($"Page {pageIndex}: Font '{kvp.Key}' present only in document A.");
+                    }
+                    else if (fontsB[kvp.Key] != kvp.Value)
+                    {
+                        Console.WriteLine($"Page {pageIndex}: Font '{kvp.Key}' embedding differs (A: {(kvp.Value ? "Embedded" : "Not Embedded")}, B: {(fontsB[kvp.Key] ? "Embedded" : "Not Embedded")}).");
+                    }
+                }
+
+                // Detect fonts present only in B
+                foreach (var kvp in fontsB)
+                {
+                    if (!fontsA.ContainsKey(kvp.Key))
+                    {
+                        Console.WriteLine($"Page {pageIndex}: Font '{kvp.Key}' present only in document B.");
+                    }
+                }
             }
         }
+    }
+
+    // Helper: extracts font information from a page into a dictionary
+    private static Dictionary<string, bool> BuildFontDictionary(Page page)
+    {
+        var dict = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        // Font collection may be empty; iterate safely
+        foreach (Font font in page.Resources.Fonts)
+        {
+            // Use FontName as identifier; store embedding status
+            string name = font.FontName ?? "UnnamedFont";
+            bool isEmbedded = font.IsEmbedded;
+            // If the same font appears multiple times, keep the first embedding status (they should be consistent)
+            if (!dict.ContainsKey(name))
+            {
+                dict[name] = isEmbedded;
+            }
+        }
+        return dict;
     }
 }

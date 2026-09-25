@@ -7,33 +7,28 @@ class Program
 {
     static void Main()
     {
-        const string firstPdf  = "document1.pdf";
-        const string secondPdf = "document2.pdf";
-        const string resultPdf = "visual_diff.pdf";
+        const string firstPdfPath  = "first.pdf";
+        const string secondPdfPath = "second.pdf";
+        const string diffPdfPath   = "visual_diff.pdf";
 
         // Verify input files exist
-        if (!File.Exists(firstPdf) || !File.Exists(secondPdf))
+        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
         {
             Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
-        try
+        // Load both PDFs inside using blocks for deterministic disposal
+        using (Document doc1 = new Document(firstPdfPath))
+        using (Document doc2 = new Document(secondPdfPath))
         {
-            // Load both PDFs inside using blocks for deterministic disposal
-            using (Document doc1 = new Document(firstPdf))
-            using (Document doc2 = new Document(secondPdf))
-            {
-                // Create the comparer and generate a visual diff PDF
-                GraphicalPdfComparer comparer = new GraphicalPdfComparer();
-                comparer.CompareDocumentsToPdf(doc1, doc2, resultPdf);
-            }
+            // Instantiate the visual comparer
+            GraphicalPdfComparer comparer = new GraphicalPdfComparer();
 
-            Console.WriteLine($"Visual diff PDF created at '{resultPdf}'.");
+            // Generate the visual diff PDF using the correct API method
+            comparer.CompareDocumentsToPdf(doc1, doc2, diffPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during comparison: {ex.Message}");
-        }
+
+        Console.WriteLine($"Visual diff PDF created at '{diffPdfPath}'.");
     }
 }

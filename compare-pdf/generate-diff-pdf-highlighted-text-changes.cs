@@ -1,62 +1,74 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Comparison;
+using Aspose.Pdf.Annotations;
 
-class DiffPdfGenerator
+class Program
 {
     static void Main()
     {
-        const string firstPdfPath  = "first.pdf";
-        const string secondPdfPath = "second.pdf";
-        const string diffPdfPath   = "diff_output.pdf";
+        const string originalPath = "original.pdf";
+        const string modifiedPath = "modified.pdf";
+        const string diffPath = "diff.pdf";
 
-        // Verify input files exist
-        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
+        if (!File.Exists(originalPath) || !File.Exists(modifiedPath))
         {
-            Console.Error.WriteLine("Input PDF files not found.");
+            Console.Error.WriteLine("Required input PDFs not found.");
             return;
         }
 
-        // Load source documents inside using blocks (lifecycle rule)
-        using (Document doc1 = new Document(firstPdfPath))
-        using (Document doc2 = new Document(secondPdfPath))
+        try
         {
-            // Comparison options – default settings are sufficient for text diff
-            ComparisonOptions options = new ComparisonOptions();
-
-            // Perform page‑by‑page text comparison (first page used as example)
-            // Returns a list of DiffOperation describing insertions, deletions, etc.
-            var diffOperations = TextPdfComparer.ComparePages(doc1.Pages[1], doc2.Pages[1], options);
-
-            // Generate a PDF that visualises the text differences.
-            // PdfOutputGenerator uses default highlight style (red) when no style is supplied.
-            PdfOutputGenerator generator = new PdfOutputGenerator();
-            generator.GenerateOutput(diffOperations, diffPdfPath);
-        }
-
-        // Load the generated diff PDF to verify the highlight colour matches the default (red)
-        using (Document diffDoc = new Document(diffPdfPath))
-        {
-            // Assume highlights are added as HighlightAnnotation on the first page
-            bool colorMatches = true;
-            foreach (Annotation ann in diffDoc.Pages[1].Annotations)
+            // Load the two PDFs to be compared
+            using (Document originalDoc = new Document(originalPath))
+            using (Document modifiedDoc = new Document(modifiedPath))
             {
-                if (ann is HighlightAnnotation highlight)
-                {
-                    // Default colour for highlights is red (Aspose.Pdf.Color.Red)
-                    if (highlight.Color != Aspose.Pdf.Color.Red)
-                    {
-                        colorMatches = false;
-                        Console.WriteLine($"Unexpected highlight colour: {highlight.Color}");
-                    }
-                }
+                // Create visual side‑by‑side comparison PDF using default highlight colors
+                var options = new SideBySideComparisonOptions(); // defaults: Added → Yellow, Deleted → Red
+                SideBySidePdfComparer.Compare(originalDoc, modifiedDoc, diffPath, options);
             }
 
-            Console.WriteLine(colorMatches
-                ? "All highlight colours match the default (red)."
-                : "One or more highlight colours do not match the default.");
+            // Verify that the highlight colors in the generated diff PDF match the defaults
+            using (Document diffDoc = new Document(diffPath))
+            {
+                bool allMatch = true;
+
+                foreach (Page page in diffDoc.Pages)
+                {
+                    foreach (Annotation annot in page.Annotations)
+                    {
+                        if (annot is HighlightAnnotation highlight)
+                        {
+                            // Title is defined on MarkupAnnotation, so we need to cast
+                            string title = string.Empty;
+                            if (highlight is MarkupAnnotation markup)
+                                title = markup.Title ?? string.Empty;
+
+                            Aspose.Pdf.Color expectedColor = null;
+
+                            if (title.Equals("Added", StringComparison.OrdinalIgnoreCase))
+                                expectedColor = Aspose.Pdf.Color.Yellow;
+                            else if (title.Equals("Deleted", StringComparison.OrdinalIgnoreCase))
+                                expectedColor = Aspose.Pdf.Color.Red;
+
+                            if (expectedColor != null && !highlight.Color.Equals(expectedColor))
+                            {
+                                allMatch = false;
+                                Console.WriteLine($"Page {page.Number}: Highlight '{title}' has unexpected color.");
+                            }
+                        }
+                    }
+                }
+
+                Console.WriteLine(allMatch
+                    ? "All highlight colors match documentation defaults."
+                    : "Some highlight colors do not match defaults.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }
