@@ -1,45 +1,85 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Comparison;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string firstPdfPath = "first.pdf";
-        const string secondPdfPath = "second.pdf";
-        const string outputPdfPath = "second_updated.pdf";
+        const string originalPath = "first.pdf";
+        const string targetPath = "second.pdf";
+        const string outputPath = "second_fixed.pdf";
 
-        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
+        // Ensure the source PDFs exist – create simple placeholders if they are missing.
+        if (!File.Exists(originalPath))
         {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
-            return;
+            CreateSamplePdf(originalPath, "This is the original PDF. Page 1.");
+        }
+        if (!File.Exists(targetPath))
+        {
+            CreateSamplePdf(targetPath, "This is the modified PDF. Page 1 with a typo.");
         }
 
-        // Load both documents inside using blocks for deterministic disposal
-        using (Document doc1 = new Document(firstPdfPath))
-        using (Document doc2 = new Document(secondPdfPath))
+        // Load the PDFs.
+        using (Document originalDoc = new Document(originalPath))
+        using (Document targetDoc = new Document(targetPath))
         {
-            // Compare the first pages of the two documents
-            ComparisonOptions compareOptions = new ComparisonOptions();
-            List<DiffOperation> diffs = TextPdfComparer.ComparePages(doc1.Pages[1], doc2.Pages[1], compareOptions);
+            int pageCount = Math.Min(originalDoc.Pages.Count, targetDoc.Pages.Count);
+            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
+            {
+                Page originalPage = originalDoc.Pages[pageNumber];
+                Page targetPage   = targetDoc.Pages[pageNumber];
 
-            // Reconstruct the original text from the first PDF using the diff list
-            string originalText = TextPdfComparer.AssemblySourcePageText(diffs);
+                // Extract the full text from both pages.
+                var originalAbsorber = new TextFragmentAbsorber();
+                originalAbsorber.Visit(originalPage);
+                var targetAbsorber   = new TextFragmentAbsorber();
+                targetAbsorber.Visit(targetPage);
 
-            // Replace the entire text content of the corresponding page in the second PDF
-            Page targetPage = doc2.Pages[1];
-            targetPage.Paragraphs.Clear();                     // Remove existing content
-            TextFragment fragment = new TextFragment(originalText);
-            targetPage.Paragraphs.Add(fragment);               // Insert restored text
+                string originalText = originalAbsorber.Text ?? string.Empty;
+                string targetText   = targetAbsorber.Text   ?? string.Empty;
 
-            // Save the modified second PDF
-            doc2.Save(outputPdfPath);
+                // If the texts differ, replace the target page content with the original text.
+                if (!originalText.Equals(targetText, StringComparison.Ordinal))
+                {
+                    // Remove existing content.
+                    targetPage.Paragraphs.Clear();
+
+                    // Create a new fragment using the original text.
+                    var fragment = new TextFragment(originalText);
+
+                    // Preserve basic style from the first fragment of the original page, if any.
+                    if (originalAbsorber.TextFragments.Count > 0)
+                    {
+                        // TextFragment collection is 1‑based.
+                        TextFragment sample = originalAbsorber.TextFragments[1];
+                        fragment.Position = sample.Position;
+                        fragment.TextState.Font = sample.TextState.Font;
+                        fragment.TextState.FontSize = sample.TextState.FontSize;
+                        fragment.TextState.ForegroundColor = sample.TextState.ForegroundColor;
+                    }
+
+                    targetPage.Paragraphs.Add(fragment);
+                }
+            }
+
+            // Save the corrected PDF.
+            targetDoc.Save(outputPath);
         }
+    }
 
-        Console.WriteLine($"Second PDF updated and saved to '{outputPdfPath}'.");
+    // Helper method to create a very simple PDF with a single line of text.
+    private static void CreateSamplePdf(string path, string text)
+    {
+        var doc = new Document();
+        var page = doc.Pages.Add();
+        var tf = new TextFragment(text)
+        {
+            Position = new Position(100, 700),
+            TextState = { FontSize = 12, Font = FontRepository.FindFont("Arial"), ForegroundColor = Color.Black }
+        };
+        page.Paragraphs.Add(tf);
+        doc.Save(path);
     }
 }

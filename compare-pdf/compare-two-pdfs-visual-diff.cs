@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Comparison;
 
@@ -8,38 +7,35 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath1 = "document1.pdf";
-        const string pdfPath2 = "document2.pdf";
-        const string resultPdfPath = "comparison_result.pdf";
+        // Paths to the PDFs to be compared and the output file
+        const string firstPdfPath  = "original.pdf";
+        const string secondPdfPath = "modified.pdf";
+        const string outputPath    = "comparison_result.pdf";
 
-        // Verify that both source PDFs exist
-        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
+        // Verify that both input files exist
+        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
         {
             Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
-        try
+        // Load the two documents inside using blocks for deterministic disposal
+        using (Document doc1 = new Document(firstPdfPath))
+        using (Document doc2 = new Document(secondPdfPath))
         {
-            // Load the two PDFs inside using blocks for deterministic disposal
-            using (Document doc1 = new Document(pdfPath1))
-            using (Document doc2 = new Document(pdfPath2))
+            // Configure side‑by‑side comparison options (default settings are sufficient for most cases)
+            SideBySideComparisonOptions compareOptions = new SideBySideComparisonOptions
             {
-                // Create default comparison options (can be customized as needed)
-                ComparisonOptions options = new ComparisonOptions();
+                // Example: show differences with a red overlay
+                // HighlightColor = Aspose.Pdf.Color.Red,
+                // ShowDifferences = true
+            };
 
-                // Perform a flat document comparison.
-                // The method returns a list of differences and also writes a PDF with visual diff.
-                List<DiffOperation> differences = TextPdfComparer.CompareFlatDocuments(
-                    doc1, doc2, options, resultPdfPath);
+            // Perform the visual side‑by‑side comparison.
+            // The Compare method is static, returns void and requires the output file path as the third argument.
+            SideBySidePdfComparer.Compare(doc1, doc2, outputPath, compareOptions);
+        }
 
-                Console.WriteLine($"Comparison finished. Total differences: {differences.Count}");
-                Console.WriteLine($"Result PDF saved to: {resultPdfPath}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"An error occurred during comparison: {ex.Message}");
-        }
+        Console.WriteLine($"Comparison completed. Result saved to '{outputPath}'.");
     }
 }

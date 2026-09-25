@@ -2,41 +2,37 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Comparison;
-using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
-        const string pdf1Path = "doc1.pdf";
-        const string pdf2Path = "doc2.pdf";
-        const string outputDir = "ComparisonResults";
-        const double customTolerance = 5.0; // percentage tolerance for image differences
+        const string pdfPath1 = "original.pdf";
+        const string pdfPath2 = "scanned.pdf";
+        const string outputPath = "comparison_result.pdf";
 
-        if (!File.Exists(pdf1Path) || !File.Exists(pdf2Path))
+        // Verify input files exist
+        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
         {
             Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        // Load the PDF documents
+        Document doc1 = new Document(pdfPath1);
+        Document doc2 = new Document(pdfPath2);
 
-        using (Document doc1 = new Document(pdf1Path))
-        using (Document doc2 = new Document(pdf2Path))
+        // Configure graphical comparer with a custom image similarity tolerance.
+        // Threshold is expressed as a percentage of allowed difference.
+        // For 85% similarity required, allow 15% difference.
+        GraphicalPdfComparer comparer = new GraphicalPdfComparer
         {
-            // Set up the graphical comparer with a custom threshold
-            GraphicalPdfComparer comparer = new GraphicalPdfComparer();
-            comparer.Threshold = customTolerance; // ignore changes below this percentage
+            Threshold = 15.0 // tolerance in percent
+        };
 
-            // Perform the comparison and save result images
-            comparer.CompareDocumentsToImages(
-                doc1,
-                doc2,
-                outputDir,
-                "diff",
-                ImageFormat.Png);
-        }
+        // Perform visual side‑by‑side comparison and save the result PDF.
+        comparer.CompareDocumentsToPdf(doc1, doc2, outputPath);
 
-        Console.WriteLine("PDF comparison completed.");
+        Console.WriteLine($"Comparison completed. Result saved to '{outputPath}'.");
     }
 }

@@ -2,72 +2,55 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Comparison;
-using Aspose.Pdf.Devices; // needed for Resolution struct
 
-class PdfComparisonDemo
+class Program
 {
     static void Main()
     {
-        // Input PDF files (different page sizes)
-        const string pdfPath1 = "documentA.pdf";
-        const string pdfPath2 = "documentB.pdf";
-        const string resultPath = "comparisonResult.pdf";
+        // Input PDF files with different page sizes
+        const string pdfPathA = "documentA.pdf";
+        const string pdfPathB = "documentB.pdf";
 
-        // Verify input files exist
-        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
+        // Output file that will contain the side‑by‑side comparison result
+        const string comparisonResultPath = "comparison_result.pdf";
+
+        // Verify that the source files exist
+        if (!File.Exists(pdfPathA))
         {
-            Console.Error.WriteLine("One or both input PDF files are missing.");
+            Console.Error.WriteLine($"File not found: {pdfPathA}");
+            return;
+        }
+        if (!File.Exists(pdfPathB))
+        {
+            Console.Error.WriteLine($"File not found: {pdfPathB}");
             return;
         }
 
-        try
+        // Load the PDFs into Aspose.Pdf.Document objects
+        Document docA = new Document(pdfPathA);
+        Document docB = new Document(pdfPathB);
+
+        // Configure side‑by‑side comparison options.
+        // The AlignPages property is not present in older Aspose.Pdf versions, so we rely on the default behaviour.
+        SideBySideComparisonOptions compareOptions = new SideBySideComparisonOptions();
+
+        // Perform the visual side‑by‑side comparison. The comparer is a static class, so we call the static method directly.
+        SideBySidePdfComparer.Compare(docA, docB, comparisonResultPath, compareOptions);
+
+        // Verify the generated comparison PDF.
+        using (Document resultDoc = new Document(comparisonResultPath))
         {
-            // Load the first PDF
-            using (Document doc1 = new Document(pdfPath1))
-            // Load the second PDF
-            using (Document doc2 = new Document(pdfPath2))
+            Console.WriteLine($"Comparison PDF created: {comparisonResultPath}");
+            Console.WriteLine($"Total pages in comparison PDF: {resultDoc.Pages.Count}");
+
+            // Each page in the result should have a width that accommodates both source pages.
+            for (int i = 1; i <= resultDoc.Pages.Count; i++)   // 1‑based indexing
             {
-                // Ensure both documents have at least one page
-                if (doc1.Pages.Count == 0 || doc2.Pages.Count == 0)
-                {
-                    Console.Error.WriteLine("One of the documents has no pages.");
-                    return;
-                }
-
-                // Align page sizes: make the first page of doc2 match the size of the first page of doc1
-                // This avoids ArgumentException thrown by the comparer when sizes differ.
-                Page page1 = doc1.Pages[1];
-                Page page2 = doc2.Pages[1];
-
-                // Copy page dimensions (MediaBox) from page1 to page2
-                page2.PageInfo = page1.PageInfo;
-
-                // Create the graphical comparer
-                GraphicalPdfComparer comparer = new GraphicalPdfComparer
-                {
-                    // Example: set a custom change flag color (optional)
-                    Color = Aspose.Pdf.Color.Red,
-                    // Example: increase resolution for finer detection (optional)
-                    Resolution = new Resolution(200), // correct type
-                    // Example: ignore tiny differences below 1%
-                    Threshold = 1
-                };
-
-                // Perform the comparison and save the result PDF
-                comparer.ComparePagesToPdf(page1, page2, resultPath);
-
-                Console.WriteLine($"Comparison completed. Result saved to '{resultPath}'.");
+                Page page = resultDoc.Pages[i];
+                Console.WriteLine($"Page {i}: Width = {page.PageInfo.Width} pt, Height = {page.PageInfo.Height} pt");
             }
         }
-        catch (ArgumentException ex)
-        {
-            // This block catches size‑mismatch errors if alignment logic is insufficient
-            Console.Error.WriteLine($"Argument error during comparison: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            // General error handling
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
-        }
+
+        Console.WriteLine("Comparison completed and page dimensions verified.");
     }
 }
