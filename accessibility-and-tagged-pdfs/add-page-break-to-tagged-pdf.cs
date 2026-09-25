@@ -17,35 +17,30 @@ class Program
             return;
         }
 
-        // Load the existing PDF
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged‑content API
+            // Access the tagged content interface
             ITaggedContent tagged = doc.TaggedContent;
 
             // Optional: set language and title for the tagged PDF
             tagged.SetLanguage("en-US");
             tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Root of the logical structure tree
+            // Get the root of the logical structure tree
             StructureElement root = tagged.RootElement;
 
-            // First section (example content)
-            ParagraphElement firstPara = tagged.CreateParagraphElement();
-            firstPara.SetText("First section content.");
-            root.AppendChild(firstPara);
-
-            // Page‑break element: use a DivElement with the "PageBreak" tag
+            // Insert a page‑break element by creating a DivElement with the "PageBreak" tag
             DivElement pageBreak = tagged.CreateDivElement();
             pageBreak.SetTag("PageBreak");
             root.AppendChild(pageBreak);
 
-            // Second section (example content)
-            ParagraphElement secondPara = tagged.CreateParagraphElement();
-            secondPara.SetText("Second section content starts on a new page.");
-            root.AppendChild(secondPara);
+            // Example: add a paragraph after the page break
+            ParagraphElement para = tagged.CreateParagraphElement();
+            para.SetText("Content that follows the page break.");
+            root.AppendChild(para);
 
-            // Save the modified PDF (no PreSave call required)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

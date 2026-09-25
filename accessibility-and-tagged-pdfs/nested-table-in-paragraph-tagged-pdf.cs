@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_tagged.pdf";
 
         if (!File.Exists(inputPath))
@@ -19,48 +19,48 @@ class Program
 
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content and set basic properties
+            // Set language and title for the tagged PDF
             ITaggedContent tagged = doc.TaggedContent;
             tagged.SetLanguage("en-US");
-            tagged.SetTitle("Nested Table Example");
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Root element of the logical structure
+            // Root of the structure tree
             StructureElement root = tagged.RootElement;
 
-            // Create a paragraph that will contain the outer table
+            // Paragraph that will contain the nested table
             ParagraphElement paragraph = tagged.CreateParagraphElement();
-            paragraph.SetText("Paragraph containing a nested table.");
+            paragraph.SetText("This paragraph contains a nested table:");
             root.AppendChild(paragraph);
 
-            // Create the outer table and attach it to the paragraph
+            // Outer table
             TableElement outerTable = tagged.CreateTableElement();
-            outerTable.AlternativeText = "Outer table";
-            paragraph.AppendChild(outerTable);
+            outerTable.AlternativeText = "Outer table with nested table inside first cell.";
+            paragraph.AppendChild(outerTable); // Attach table to paragraph
 
-            // Build outer table header
-            TableTHeadElement outerHead = tagged.CreateTableTHeadElement();
-            outerTable.AppendChild(outerHead);
-            TableTRElement outerHeaderRow = tagged.CreateTableTRElement();
-            outerHead.AppendChild(outerHeaderRow);
-            TableTHElement outerHeaderCell = tagged.CreateTableTHElement();
-            outerHeaderCell.SetText("Header");
-            outerHeaderRow.AppendChild(outerHeaderCell);
+            // Header for outer table
+            TableTHeadElement thead = tagged.CreateTableTHeadElement();
+            outerTable.AppendChild(thead);
+            TableTRElement headerRow = tagged.CreateTableTRElement();
+            thead.AppendChild(headerRow);
+            TableTHElement thHeader = tagged.CreateTableTHElement();
+            thHeader.SetText("Header");
+            headerRow.AppendChild(thHeader);
+            TableTHElement thData = tagged.CreateTableTHElement();
+            thData.SetText("Data");
+            headerRow.AppendChild(thData);
 
-            // Build outer table body with a cell that will hold the nested table
-            TableTBodyElement outerBody = tagged.CreateTableTBodyElement();
-            outerTable.AppendChild(outerBody);
-            TableTRElement outerBodyRow = tagged.CreateTableTRElement();
-            outerBody.AppendChild(outerBodyRow);
-            TableTDElement outerCell = tagged.CreateTableTDElement();
-            outerCell.SetText("Cell with nested table:");
-            outerBodyRow.AppendChild(outerCell);
+            // Body of outer table
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+            outerTable.AppendChild(tbody);
+            TableTRElement bodyRow = tagged.CreateTableTRElement();
+            tbody.AppendChild(bodyRow);
 
-            // Create the nested table and attach it to the outer cell
+            // First cell will hold a nested table
+            TableTDElement tdNested = tagged.CreateTableTDElement();
+
+            // Nested table
             TableElement nestedTable = tagged.CreateTableElement();
-            nestedTable.AlternativeText = "Nested table";
-            outerCell.AppendChild(nestedTable);
-
-            // Build nested table body with two cells
+            nestedTable.AlternativeText = "Nested table inside outer table cell.";
             TableTBodyElement nestedBody = tagged.CreateTableTBodyElement();
             nestedTable.AppendChild(nestedBody);
             TableTRElement nestedRow = tagged.CreateTableTRElement();
@@ -72,9 +72,18 @@ class Program
             nestedCell2.SetText("Nested 2");
             nestedRow.AppendChild(nestedCell2);
 
-            // Validate hierarchy by printing element types and their parents
+            // Attach nested table to the first cell
+            tdNested.AppendChild(nestedTable);
+            bodyRow.AppendChild(tdNested);
+
+            // Second cell with regular text
+            TableTDElement tdRegular = tagged.CreateTableTDElement();
+            tdRegular.SetText("Regular cell");
+            bodyRow.AppendChild(tdRegular);
+
+            // Validate hierarchy by walking the structure tree
             Console.WriteLine("Tagging hierarchy:");
-            PrintElement(paragraph, 0);
+            WalkStructure(root, 0);
 
             // Save the modified PDF
             doc.Save(outputPath);
@@ -83,16 +92,15 @@ class Program
         Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
     }
 
-    static void PrintElement(StructureElement element, int depth)
+    // Recursive walk to display element types and hierarchy depth
+    static void WalkStructure(StructureElement element, int depth)
     {
         string indent = new string(' ', depth * 2);
-        string parentName = element.ParentElement?.GetType().Name ?? "None";
-        Console.WriteLine($"{indent}{element.GetType().Name} (Parent: {parentName})");
-
+        Console.WriteLine($"{indent}{element.GetType().Name}");
         foreach (Element child in element.ChildElements)
         {
             if (child is StructureElement se)
-                PrintElement(se, depth + 1);
+                WalkStructure(se, depth + 1);
         }
     }
 }

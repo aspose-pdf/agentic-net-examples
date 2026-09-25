@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_with_table.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,46 +17,58 @@ class Program
             return;
         }
 
-        // Load the existing PDF
+        // Load the PDF and obtain its tagged content
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content API
             ITaggedContent tagged = doc.TaggedContent;
+            // Set language and title for accessibility (optional)
             tagged.SetLanguage("en-US");
-            tagged.SetTitle("Document with Table");
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Root of the structure tree
+            // Root element of the structure tree
             StructureElement root = tagged.RootElement;
 
             // Create a table element and attach it to the root
             TableElement table = tagged.CreateTableElement();
-            table.AlternativeText = "Sample 3x4 table";
+            table.AlternativeText = "Sample data table with three rows and four columns.";
             root.AppendChild(table);
 
-            // Create a table body (no header/footer needed for this example)
+            // ----- Header row (first row) -----
+            TableTHeadElement thead = tagged.CreateTableTHeadElement();
+            table.AppendChild(thead);
+
+            TableTRElement headerRow = tagged.CreateTableTRElement();
+            thead.AppendChild(headerRow);
+
+            // Four header cells
+            for (int col = 1; col <= 4; col++)
+            {
+                TableTHElement th = tagged.CreateTableTHElement();
+                th.SetText($"Header {col}");
+                headerRow.AppendChild(th);
+            }
+
+            // ----- Body rows (second and third rows) -----
             TableTBodyElement tbody = tagged.CreateTableTBodyElement();
             table.AppendChild(tbody);
 
-            // Add three rows
-            for (int r = 0; r < 3; r++)
+            for (int row = 1; row <= 2; row++) // two data rows = total 3 rows
             {
-                // Create a table row element
-                TableTRElement row = tagged.CreateTableTRElement();
-                tbody.AppendChild(row);
+                TableTRElement dataRow = tagged.CreateTableTRElement();
+                tbody.AppendChild(dataRow);
 
-                // Add four cells to the row
-                for (int c = 0; c < 4; c++)
+                for (int col = 1; col <= 4; col++)
                 {
-                    TableTDElement cell = tagged.CreateTableTDElement();
-                    cell.SetText($"R{r + 1}C{c + 1}"); // Set cell text
-                    row.AppendChild(cell);
+                    TableTDElement td = tagged.CreateTableTDElement();
+                    td.SetText($"R{row}C{col}");
+                    dataRow.AppendChild(td);
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (no PreSave required)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with table saved to '{outputPath}'.");
     }
 }

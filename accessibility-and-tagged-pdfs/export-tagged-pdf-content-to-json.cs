@@ -1,25 +1,16 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
 using Aspose.Pdf.LogicalStructure;
 
-class JsonStructureElement
-{
-    public string Type { get; set; }
-    public string Text { get; set; }
-    public string AlternativeText { get; set; }
-    public string Language { get; set; }
-    public List<JsonStructureElement> Children { get; set; } = new List<JsonStructureElement>();
-}
-
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "tagged_content.json";
 
         if (!File.Exists(inputPath))
@@ -28,48 +19,62 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content
-            ITaggedContent tagged = doc.TaggedContent;
+            // Verify that the PDF contains a tagged structure
+            if (doc.TaggedContent == null)
+            {
+                Console.WriteLine("Document is not tagged. No structure to export.");
+                return;
+            }
 
-            // Get the root structure element (no cast needed)
+            // Access tagged content via the proper API
+            ITaggedContent tagged = doc.TaggedContent;
             StructureElement root = tagged.RootElement;
 
-            // Build a hierarchical representation
-            JsonStructureElement jsonRoot = BuildElement(root);
+            // Build a hierarchical model representing the structure tree
+            Node jsonRoot = BuildNode(root);
 
-            // Serialize to JSON with indentation
+            // Serialize the model to formatted JSON
             JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
             string json = JsonSerializer.Serialize(jsonRoot, jsonOptions);
-
-            // Write JSON to file
             File.WriteAllText(outputPath, json);
-        }
 
-        Console.WriteLine($"Tagged content exported to '{outputPath}'.");
+            Console.WriteLine($"Tagged content exported to '{outputPath}'.");
+        }
     }
 
-    // Recursively converts a StructureElement into a JSON-friendly DTO
-    static JsonStructureElement BuildElement(StructureElement element)
+    // Simple POCO for JSON serialization
+    private class Node
     {
-        JsonStructureElement jsonElem = new JsonStructureElement {
-            Type            = element.GetType().Name,
-            Text            = element.ActualText,
-            AlternativeText = element.AlternativeText,
-            Language        = element.Language
+        public string Type { get; set; } = string.Empty;
+        public string Text { get; set; } = string.Empty;
+        public string AlternativeText { get; set; } = string.Empty;
+        public string Language { get; set; } = string.Empty;
+        public List<Node> Children { get; set; } = new List<Node>();
+    }
+
+    // Recursively convert a StructureElement into a Node
+    private static Node BuildNode(StructureElement element)
+    {
+        Node node = new Node
+        {
+            Type = element.GetType().Name,
+            Text = element.ActualText ?? string.Empty,
+            AlternativeText = element.AlternativeText ?? string.Empty,
+            Language = element.Language ?? string.Empty
         };
 
-        // Iterate over child elements using the correct property
+        // Iterate over child elements using the correct ChildElements property
         foreach (Element child in element.ChildElements)
         {
-            if (child is StructureElement childStruct)
+            if (child is StructureElement se)
             {
-                jsonElem.Children.Add(BuildElement(childStruct));
+                node.Children.Add(BuildNode(se));
             }
         }
 
-        return jsonElem;
+        return node;
     }
 }

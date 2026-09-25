@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_tagged.pdf";
         const string defaultLang = "en-US";
 
@@ -18,49 +18,41 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF
-            using (Document doc = new Document(inputPath))
+            // Determine whether the PDF is tagged by checking the TaggedContent property
+            ITaggedContent taggedContent = doc.TaggedContent;
+            if (taggedContent == null)
             {
-                // Access tagged content
-                ITaggedContent tagged = doc.TaggedContent;
-
-                // Set document language if not already set
-                tagged.SetLanguage(defaultLang);
-
-                // Get the root structure element (no cast needed)
-                StructureElement root = tagged.RootElement;
-
-                // Recursively set language on all elements that lack it
-                SetMissingLanguage(root, defaultLang);
-
-                // Save the modified PDF
+                Console.WriteLine("Document is not tagged. No structure elements to process.");
+                // Save the original document unchanged
                 doc.Save(outputPath);
+                return;
             }
 
-            Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
+            // Optionally set the document‑level language (used when elements inherit it)
+            taggedContent.SetLanguage(defaultLang);
 
-    // Recursively walk the structure tree and assign Language where missing
-    static void SetMissingLanguage(StructureElement element, string language)
-    {
-        if (string.IsNullOrEmpty(element.Language))
-        {
-            element.Language = language;
-        }
+            // Root of the logical structure tree
+            StructureElement root = taggedContent.RootElement;
 
-        foreach (Element child in element.ChildElements)
-        {
-            if (child is StructureElement se)
+            // Retrieve every structure element in the tree (recursive)
+            var allElements = root.FindElements<StructureElement>(true);
+
+            // Assign the default language to elements that lack an explicit setting
+            foreach (StructureElement element in allElements)
             {
-                SetMissingLanguage(se, language);
+                if (string.IsNullOrEmpty(element.Language))
+                {
+                    element.Language = defaultLang;
+                }
             }
+
+            // Persist the changes
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

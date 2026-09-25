@@ -1,8 +1,8 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -10,7 +10,11 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string newNoteText = "Updated note content";
+
+        // Identify the note to replace
+        const string oldTitle   = "Old Note";
+        const string newTitle   = "Updated Note";
+        const string newContent = "This is the updated note text.";
 
         if (!File.Exists(inputPath))
         {
@@ -18,32 +22,52 @@ class Program
             return;
         }
 
-        // Load the PDF document (wrapped in using for proper disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content API
-            ITaggedContent taggedContent = doc.TaggedContent;
-
-            // Get the root structure element (no cast needed)
-            StructureElement root = taggedContent.RootElement;
-
-            // Find any existing NoteElement(s) in the structure tree
-            var existingNotes = root.FindElements<NoteElement>(true);
-            if (existingNotes.Count > 0)
+            // Iterate through all pages
+            foreach (Page page in doc.Pages)
             {
-                // Remove the first found note (you could iterate if multiple need removal)
-                existingNotes[0].Remove();
-            }
+                // Gather annotations that match the old note
+                List<Annotation> toRemove = new List<Annotation>();
+                foreach (Annotation annot in page.Annotations)
+                {
+                    if (annot is TextAnnotation textAnnot && textAnnot.Title == oldTitle)
+                    {
+                        toRemove.Add(textAnnot);
+                    }
+                }
 
-            // Create a new NoteElement, set its text, and attach it to the root
-            NoteElement updatedNote = taggedContent.CreateNoteElement();
-            updatedNote.SetText(newNoteText);
-            root.AppendChild(updatedNote); // AppendChild with a single argument (bool defaults)
+                // Remove the old note annotations
+                foreach (Annotation rem in toRemove)
+                {
+                    page.Annotations.Remove(rem);
+                }
+
+                // If any note was removed, add the updated note
+                if (toRemove.Count > 0)
+                {
+                    // Define the rectangle where the note will appear
+                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+                    // Create a new TextAnnotation (note) with updated content
+                    TextAnnotation newAnnot = new TextAnnotation(page, rect)
+                    {
+                        Title    = newTitle,
+                        Contents = newContent,
+                        Open     = true,
+                        Icon     = TextIcon.Note
+                    };
+
+                    // Add the new annotation to the page
+                    page.Annotations.Add(newAnnot);
+                }
+            }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Note replaced and saved to '{outputPath}'.");
+        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
     }
 }
