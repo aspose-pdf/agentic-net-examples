@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "encrypted.pdf";
-        const string ownerPassword = "owner123";
-        const string userPassword  = ""; // no user password, owner only
+        const string ownerPassword = "ownerSecret";
 
         if (!File.Exists(inputPath))
         {
@@ -17,22 +17,22 @@ class Program
             return;
         }
 
+        // Empty user password – users can open the file but will be limited by permissions
+        string userPassword = "";
+
+        // No permissions for the user (equivalent to "none")
+        Permissions userPermissions = (Permissions)0;
+
         try
         {
-            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Restrict all user permissions (owner has full access)
-                Permissions perms = (Permissions)0; // no permissions for user
-
-                // Encrypt with owner password only, using strong AES-256 algorithm
-                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-
-                // Save the encrypted PDF
+                // Encrypt with owner password, empty user password, restrictive permissions, AES‑256
+                doc.Encrypt(userPassword, ownerPassword, userPermissions, CryptoAlgorithm.AESx256);
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+            Console.WriteLine($"PDF encrypted with owner password only. Saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

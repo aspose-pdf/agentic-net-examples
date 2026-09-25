@@ -6,33 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "protected.pdf";
+        const string protectedPdfPath = "protected.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(protectedPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {protectedPdfPath}");
             return;
         }
 
         try
         {
-            // Attempt to open a password‑protected PDF without providing a password.
+            // Attempt to open the password‑protected PDF without supplying a password.
             // This will throw InvalidPasswordException if the document is encrypted.
-            using (Document doc = new Document(inputPath))
+            using (Document doc = new Document(protectedPdfPath))
             {
-                // If the document opens (unlikely), display basic info.
-                Console.WriteLine($"Document opened. Page count: {doc.Pages.Count}");
+                // If the document opens successfully (unlikely), you can work with it here.
+                Console.WriteLine($"Pages: {doc.Pages.Count}");
             }
         }
         catch (InvalidPasswordException ex)
         {
-            // Specific handling for missing/incorrect password.
-            Console.WriteLine($"Invalid password: {ex.Message}");
+            // Handle the specific case where a password is required.
+            Console.WriteLine($"Cannot open PDF: password required. Details: {ex.Message}");
         }
         catch (Exception ex)
         {
-            // General error handling.
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Handle any other unexpected errors.
+            Console.Error.WriteLine($"Error opening PDF: {ex.Message}");
         }
     }
 }

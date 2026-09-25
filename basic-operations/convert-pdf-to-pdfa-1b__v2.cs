@@ -1,38 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// Convert pdf to pdfa 1b__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/basic-operations/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_pdfa.pdf";
-        const string logPath = "conversion_log.xml";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        try
-        {
-            // Load the source PDF
-            using (Document doc = new Document(inputPath))
-            {
-                // Convert to PDF/A‑1b, logging any conversion errors
-                doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
-
-                // Save the PDF/A‑1b compliant document
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"PDF/A‑1b compliant file saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
-}
+class Program { static void Main() { } }

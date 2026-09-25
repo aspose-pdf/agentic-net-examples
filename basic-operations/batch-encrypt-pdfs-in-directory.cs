@@ -1,51 +1,54 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace (contains Document, Permissions, CryptoAlgorithm)
+using Aspose.Pdf;
 
-class BatchEncryptPdf
+class Program
 {
     static void Main()
     {
         // Input directory containing PDFs to encrypt
-        const string inputDir = @"C:\Pdf\Input";
+        const string inputDir = @"C:\PdfInput";
         // Output directory where encrypted PDFs will be saved
-        const string outputDir = @"C:\Pdf\Encrypted";
+        const string outputDir = @"C:\PdfEncrypted";
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Define the password to be used for all files
+        // User password to apply to all PDFs
         const string userPassword = "UserPassword123";
+        // Owner password (can be same as user password or different)
         const string ownerPassword = "OwnerPassword123";
 
-        // Define permissions (adjust as needed)
+        // Permissions to allow (example: allow printing and content extraction)
         Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-        // Iterate over all PDF files in the input directory
-        foreach (string inputPath in Directory.GetFiles(inputDir, "*.pdf"))
+        // Iterate over all .pdf files in the input directory
+        foreach (string pdfPath in Directory.GetFiles(inputDir, "*.pdf"))
         {
+            // Determine output file name (same name, placed in output directory)
+            string fileName = Path.GetFileNameWithoutExtension(pdfPath);
+            string encryptedPath = Path.Combine(outputDir, $"{fileName}_encrypted.pdf");
+
             try
             {
-                // Build the output file path (preserve original file name)
-                string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                string outputPath = Path.Combine(outputDir, $"{fileName}_encrypted.pdf");
-
-                // Load the source PDF
-                using (Document doc = new Document(inputPath))
+                // Load the source PDF and encrypt it inside a using block
+                using (Document doc = new Document(pdfPath))
                 {
-                    // Apply encryption using AES-256
+                    // Apply encryption using AES-256 (recommended)
                     doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-
-                    // Save the encrypted PDF
-                    doc.Save(outputPath);
+                    // Save the encrypted PDF to the target location
+                    doc.Save(encryptedPath);
                 }
 
-                Console.WriteLine($"Encrypted: {Path.GetFileName(inputPath)} → {Path.GetFileName(outputPath)}");
+                Console.WriteLine($"Encrypted: {pdfPath} → {encryptedPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Failed to encrypt '{inputPath}': {ex.Message}");
+                // Log any errors but continue processing remaining files
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch encryption completed.");
     }
 }

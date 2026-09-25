@@ -1,98 +1,61 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
 using Aspose.Pdf;
 
-namespace BatchPdfEncryption
+class Program
 {
-    // Simple POCO to represent each entry in the configuration file
-    public class EncryptionEntry
+    // Configuration file format:
+    // Each line: <pdfPath>|<userPassword>
+    // Example:
+    // C:\Docs\file1.pdf|userPass1
+    // C:\Docs\file2.pdf|userPass2
+    static void Main()
     {
-        public string InputPath { get; set; }
-        public string UserPassword { get; set; }
-    }
+        const string configPath = "config.txt";
 
-    class Program
-    {
-        // Owner password used for all PDFs (can be changed as needed)
-        private const string OwnerPassword = "owner123";
-
-        // Permissions granted after encryption (adjust as required)
-        private static readonly Permissions AllowedPermissions =
-            Permissions.PrintDocument | Permissions.ExtractContent;
-
-        static void Main()
+        if (!File.Exists(configPath))
         {
-            const string configFile = "encryptionConfig.json";   // JSON config file path
-            const string outputFolder = "Encrypted";            // Folder for encrypted PDFs
-            const string logFile = "encryptionLog.txt";        // Simple log file
+            Console.Error.WriteLine($"Configuration file not found: {configPath}");
+            return;
+        }
 
-            // Ensure output directory exists
-            Directory.CreateDirectory(outputFolder);
+        string[] lines = File.ReadAllLines(configPath);
+        foreach (string line in lines)
+        {
+            if (string.IsNullOrWhiteSpace(line) || !line.Contains("|"))
+                continue; // skip malformed lines
 
-            // Prepare log writer
-            using StreamWriter logWriter = new StreamWriter(logFile, append: true);
+            string[] parts = line.Split(new[] { '|' }, 2);
+            string pdfPath = parts[0].Trim();
+            string userPassword = parts[1].Trim();
+            string ownerPassword = "owner123"; // fixed owner password; adjust as needed
 
-            // Load configuration
-            List<EncryptionEntry> entries;
+            if (!File.Exists(pdfPath))
+            {
+                Console.Error.WriteLine($"PDF not found: {pdfPath}");
+                continue;
+            }
+
             try
             {
-                string json = File.ReadAllText(configFile);
-                entries = JsonSerializer.Deserialize<List<EncryptionEntry>>(json);
-                if (entries == null)
+                // Load the PDF, encrypt it, and save the encrypted version
+                using (Document doc = new Document(pdfPath))
                 {
-                    Console.Error.WriteLine("Configuration file is empty or malformed.");
-                    return;
+                    Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+                    doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
+                    string encryptedPath = Path.Combine(
+                        Path.GetDirectoryName(pdfPath) ?? "",
+                        Path.GetFileNameWithoutExtension(pdfPath) + "_encrypted.pdf");
+
+                    doc.Save(encryptedPath);
+                    Console.WriteLine($"Encrypted: '{pdfPath}' -> '{encryptedPath}' (UserPassword: '{userPassword}')");
                 }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
-                return;
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
-
-            // Process each PDF
-            foreach (var entry in entries)
-            {
-                string inputPath = entry.InputPath;
-                string userPassword = entry.UserPassword;
-
-                if (!File.Exists(inputPath))
-                {
-                    string msg = $"File not found: {inputPath}";
-                    Console.Error.WriteLine(msg);
-                    logWriter.WriteLine($"{DateTime.Now:u} - ERROR - {msg}");
-                    continue;
-                }
-
-                // Determine output path (same file name with .enc.pdf suffix)
-                string outputPath = Path.Combine(
-                    outputFolder,
-                    Path.GetFileNameWithoutExtension(inputPath) + ".enc.pdf");
-
-                try
-                {
-                    // Load the PDF, encrypt, and save
-                    using (Document doc = new Document(inputPath))
-                    {
-                        doc.Encrypt(userPassword, OwnerPassword, AllowedPermissions, CryptoAlgorithm.AESx256);
-                        doc.Save(outputPath);
-                    }
-
-                    string successMsg = $"Encrypted '{inputPath}' -> '{outputPath}'";
-                    Console.WriteLine(successMsg);
-                    logWriter.WriteLine($"{DateTime.Now:u} - SUCCESS - {successMsg}");
-                }
-                catch (Exception ex)
-                {
-                    string errorMsg = $"Failed to encrypt '{inputPath}': {ex.Message}";
-                    Console.Error.WriteLine(errorMsg);
-                    logWriter.WriteLine($"{DateTime.Now:u} - ERROR - {errorMsg}");
-                }
-            }
-
-            Console.WriteLine("Batch encryption completed. See log for details.");
         }
     }
 }

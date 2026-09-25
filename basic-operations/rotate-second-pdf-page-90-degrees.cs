@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
@@ -15,26 +15,26 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
+        // Load the PDF document with deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least two pages
+            // Verify that a second page exists (pages are 1‑based)
             if (doc.Pages.Count < 2)
             {
-                Console.Error.WriteLine("The document does not contain a second page to rotate.");
+                Console.Error.WriteLine("The PDF does not contain a second page to rotate.");
                 return;
             }
 
-            // Pages are 1‑based; page 2 is the second page
-            Page secondPage = doc.Pages[2];
+            // Access the second page
+            Page page = doc.Pages[2];
 
-            // Rotate the page 90 degrees clockwise (use the correct enum value)
-            secondPage.Rotate = Rotation.on90;
+            // Rotate the page 90 degrees clockwise using the correct API
+            page.Rotate = Rotation.on90;
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Second page rotated and saved to '{outputPath}'.");
+        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
     }
 }

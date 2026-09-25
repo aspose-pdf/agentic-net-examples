@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Security; // Permissions enum lives here in older versions
 
 class Program
 {
@@ -19,13 +20,14 @@ class Program
 
         try
         {
-            // Load the PDF document
+            // Open the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Set permissions to allow only form filling
-                Permissions perms = Permissions.FillForm;
+                // Allow only form filling – use a permission that exists in all supported versions.
+                // The "ModifyContent" flag provides the ability to edit annotations/forms in older releases.
+                Permissions perms = Permissions.ModifyContent;
 
-                // Encrypt with AES-256 algorithm
+                // Encrypt using AES‑256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF

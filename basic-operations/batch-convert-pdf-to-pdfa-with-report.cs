@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
+using System.Text;
 using Aspose.Pdf;
 
 class BatchPdfAConverter
@@ -8,80 +8,76 @@ class BatchPdfAConverter
     static void Main()
     {
         // Input folder containing source PDFs
-        const string inputFolder = @"C:\InputPdfs";
-        // Output folder for PDF/A‑1b files
-        const string outputFolder = @"C:\OutputPdfA";
-        // Path for the summary report (CSV format)
-        const string reportPath = @"C:\ConversionReport.csv";
+        const string inputFolder = @"InputPdfs";
+        // Output folder for converted PDF/A‑1b files
+        const string outputFolder = @"OutputPdfA";
+        // Path for the summary report
+        const string reportPath = @"ConversionReport.txt";
+
+        // Verify input folder exists
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
 
         // Ensure output folder exists
         Directory.CreateDirectory(outputFolder);
 
-        // Prepare report header
-        var reportLines = new List<string>
+        // StringBuilder to accumulate report lines
+        StringBuilder reportBuilder = new StringBuilder();
+        reportBuilder.AppendLine("FileName\tStatus\tOriginalSize(Bytes)\tConvertedSize(Bytes)\tSizeReduction(%)\tMessage");
+
+        // Process each PDF file in the input folder
+        foreach (string sourcePath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            "SourceFile,OutputFile,OriginalSizeBytes,ConvertedSizeBytes,Success,Message"
-        };
-
-        // Get all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string sourcePath in pdfFiles)
-        {
-            string fileName = Path.GetFileNameWithoutExtension(sourcePath);
-            string outputPath = Path.Combine(outputFolder, fileName + "_PDF_A_1b.pdf");
-
-            bool success = false;
-            string message = string.Empty;
-            long originalSize = 0;
-            long convertedSize = 0;
-
+            string fileName = Path.GetFileName(sourcePath);
             try
             {
-                originalSize = new FileInfo(sourcePath).Length;
-
-                // Load the source PDF (lifecycle rule: use constructor with path)
+                // Open source PDF inside a using block for deterministic disposal
                 using (Document doc = new Document(sourcePath))
                 {
-                    // Configure conversion options for PDF/A‑1b with high compression
-                    PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B);
-                    options.OptimizeFileSize = true;                     // high compression
-                    options.ErrorAction = ConvertErrorAction.Delete;     // skip objects that cannot be converted
+                    // Record original file size
+                    long originalSize = new FileInfo(sourcePath).Length;
 
-                    // Perform the conversion (PDF/A‑1b)
-                    bool conversionResult = doc.Convert(options);
-                    if (!conversionResult)
+                    // Set conversion options: PDF/A‑1b with high compression
+                    PdfFormatConversionOptions convOptions = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B)
                     {
-                        throw new InvalidOperationException("Conversion returned false.");
-                    }
+                        OptimizeFileSize = true
+                    };
 
-                    // Save the converted document (still a PDF, so no SaveOptions needed)
+                    // Perform the conversion
+                    doc.Convert(convOptions);
+
+                    // Determine output file path
+                    string outputPath = Path.Combine(outputFolder,
+                        Path.GetFileNameWithoutExtension(sourcePath) + "_pdfa.pdf");
+
+                    // Save the converted PDF/A‑1b document
                     doc.Save(outputPath);
-                }
 
-                convertedSize = new FileInfo(outputPath).Length;
-                success = true;
-                message = "Converted successfully";
+                    // Record new file size
+                    long newSize = new FileInfo(outputPath).Length;
+
+                    // Calculate size reduction percentage
+                    double reduction = (originalSize - newSize) / (double)originalSize * 100.0;
+
+                    // Append success line to report
+                    reportBuilder.AppendLine($"{fileName}\tSuccess\t{originalSize}\t{newSize}\t{reduction:F2}%\t");
+                }
             }
             catch (Exception ex)
             {
-                // In case of any error, capture the message
-                success = false;
-                message = ex.Message;
+                // Append failure line to report with error message
+                reportBuilder.AppendLine($"{fileName}\tFailed\t0\t0\t0%\t{ex.Message}");
             }
-
-            // Write per‑file result to console
-            Console.WriteLine($"{fileName}: {(success ? "OK" : "FAIL")} - {message}");
-
-            // Append line to the report
-            reportLines.Add($"{sourcePath},{outputPath},{originalSize},{convertedSize},{success},{message}");
         }
 
         // Write the summary report to disk
         try
         {
-            File.WriteAllLines(reportPath, reportLines);
-            Console.WriteLine($"Summary report written to: {reportPath}");
+            File.WriteAllText(reportPath, reportBuilder.ToString());
+            Console.WriteLine($"Conversion completed. Report saved to '{reportPath}'.");
         }
         catch (Exception ex)
         {

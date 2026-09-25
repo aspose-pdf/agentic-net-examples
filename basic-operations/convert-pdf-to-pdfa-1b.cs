@@ -8,6 +8,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output_pdfa1b.pdf";
+        const string logPath    = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -17,28 +18,18 @@ class Program
 
         try
         {
-            // Load the source PDF
+            // Load the PDF document inside a using block for deterministic disposal.
             using (Document doc = new Document(inputPath))
             {
-                // Set up conversion options for PDF/A‑1b
-                // - Format: PDF_A_1B (PDF/A‑1b)
-                // - ErrorAction: Delete objects that cannot be converted
-                // - Keep default settings to preserve structure and embedded fonts
-                PdfFormatConversionOptions options = new PdfFormatConversionOptions(
-                    PdfFormat.PDF_A_1B,               // target PDF/A format
-                    ConvertErrorAction.Delete);       // remove unconvertible objects
+                // Convert the document to PDF/A‑1B compliance.
+                // The conversion log is written to logPath.
+                doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
 
-                // Perform the conversion
-                bool success = doc.Convert(options);
-                if (!success)
-                {
-                    Console.Error.WriteLine("Conversion reported failures. Check the log if needed.");
-                }
-
-                // Save the converted document
+                // Save the PDF/A‑1B compliant document.
                 doc.Save(outputPath);
-                Console.WriteLine($"PDF/A‑1b file saved to '{outputPath}'.");
             }
+
+            Console.WriteLine($"PDF/A‑1B compliant file saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

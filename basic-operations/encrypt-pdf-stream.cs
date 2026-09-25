@@ -1,63 +1,75 @@
 using System;
 using System.IO;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Aspose.Pdf;
 
-namespace PdfEncryptionExample
+public class PdfEncryptionExample
 {
-    public static class PdfEncryptionHelper
+    // Reads a PDF from a URL, encrypts it, and writes the secured PDF to the provided stream.
+    public static async Task EncryptPdfFromUrlAsync(string pdfUrl, string userPassword, string ownerPassword, Stream outputStream)
     {
-        /// <summary>
-        /// Reads a PDF from <paramref name="inputStream"/>, encrypts it, and writes the secured PDF to <paramref name="outputStream"/>.
-        /// </summary>
-        /// <param name="inputStream">Stream containing the original PDF (e.g., a network stream).</param>
-        /// <param name="outputStream">Stream where the encrypted PDF will be written.</param>
-        /// <param name="userPassword">Password required to open the encrypted PDF.</param>
-        /// <param name="ownerPassword">Owner password that grants full permissions.</param>
-        public static void EncryptPdfStream(Stream inputStream, Stream outputStream, string userPassword, string ownerPassword)
+        // Download the PDF into a memory buffer.
+        using (HttpClient client = new HttpClient())
         {
-            // Ensure the input and output streams are not null.
-            if (inputStream == null) throw new ArgumentNullException(nameof(inputStream));
-            if (outputStream == null) throw new ArgumentNullException(nameof(outputStream));
-            if (userPassword == null) throw new ArgumentNullException(nameof(userPassword));
-            if (ownerPassword == null) throw new ArgumentNullException(nameof(ownerPassword));
-
-            // Load the PDF from the input stream.
-            // Document implements IDisposable, so wrap it in a using block (document-disposal-with-using rule).
-            using (Document pdfDoc = new Document(inputStream))
+            // Get the response and ensure the request succeeded (e.g., 200 OK).
+            using (HttpResponseMessage response = await client.GetAsync(pdfUrl))
             {
-                // Define the permissions you want to allow after encryption.
-                // Example: allow printing and content extraction.
-                Permissions permissions = Permissions.PrintDocument | Permissions.ExtractContent;
+                if (!response.IsSuccessStatusCode)
+                {
+                    // Throw a more descriptive exception so callers know why it failed.
+                    throw new HttpRequestException($"Failed to download PDF. Status code: {response.StatusCode}");
+                }
 
-                // Encrypt the document using the recommended AESx256 algorithm (encryption-always-use-CryptoAlgorithm rule).
-                pdfDoc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.AESx256);
+                using (Stream downloadStream = await response.Content.ReadAsStreamAsync())
+                using (MemoryStream inputMemory = new MemoryStream())
+                {
+                    await downloadStream.CopyToAsync(inputMemory);
+                    inputMemory.Position = 0; // Reset for reading.
 
-                // Save the encrypted PDF directly to the output stream.
-                pdfDoc.Save(outputStream);
+                    // Load the PDF from the memory stream.
+                    using (Document doc = new Document(inputMemory))
+                    {
+                        // Define permissions (example: allow printing and content extraction).
+                        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+
+                        // Apply encryption with AES‑256.
+                        doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
+                        // Save the encrypted PDF to the output stream.
+                        doc.Save(outputStream);
+
+                        // Rewind the stream so callers can read from the beginning.
+                        if (outputStream.CanSeek)
+                        {
+                            outputStream.Position = 0;
+                        }
+                    }
+                }
             }
         }
     }
 
-    // Minimal entry point required for a console application.
-    internal class Program
+    // Sample console entry point demonstrating usage.
+    public static async Task Main()
     {
-        private static void Main(string[] args)
-        {
-            // Example usage (optional). In real scenarios the streams would come from a network source.
-            // Here we simply demonstrate that the program compiles.
-            // No operation is performed if the required arguments are not supplied.
-            if (args.Length == 4)
-            {
-                string inputPath = args[0];
-                string outputPath = args[1];
-                string userPwd = args[2];
-                string ownerPwd = args[3];
+        string pdfUrl   = "https://example.com/sample.pdf";
+        string userPwd  = "user123";
+        string ownerPwd = "owner123";
 
-                using (FileStream input = File.OpenRead(inputPath))
-                using (FileStream output = File.Create(outputPath))
-                {
-                    PdfEncryptionHelper.EncryptPdfStream(input, output, userPwd, ownerPwd);
-                }
+        using (MemoryStream encryptedPdf = new MemoryStream())
+        {
+            try
+            {
+                await EncryptPdfFromUrlAsync(pdfUrl, userPwd, ownerPwd, encryptedPdf);
+
+                // For demonstration, write the encrypted PDF to a file.
+                File.WriteAllBytes("secured.pdf", encryptedPdf.ToArray());
+                Console.WriteLine("Encrypted PDF saved as secured.pdf");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
             }
         }
     }
