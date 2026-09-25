@@ -1,52 +1,43 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string encryptedPath = "encrypted.pdf";
+        const string encryptedPath = "encrypted_aes128.pdf";
         const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Encrypt the PDF with AES‑128 and high‑quality printing permission
+        using (Document doc = new Document(inputPath))
         {
-            // Load the source PDF
-            using (Document doc = new Document(inputPath))
-            {
-                // Set permissions: allow printing and high‑quality printing
-                Permissions perms = (Permissions)(Permissions.PrintDocument | Permissions.PrintingQuality);
-
-                // Encrypt using AES‑128
-                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx128);
-
-                // Save the encrypted PDF
-                doc.Save(encryptedPath);
-            }
-
-            // Verify the encryption settings
-            using (Document encDoc = new Document(encryptedPath, ownerPassword))
-            {
-                // Retrieve the permissions stored in the encryption dictionary (cast to Permissions)
-                Permissions actualPerms = (Permissions)encDoc.Permissions;
-
-                bool canPrint = (actualPerms & Permissions.PrintDocument) == Permissions.PrintDocument;
-                bool highQuality = (actualPerms & Permissions.PrintingQuality) == Permissions.PrintingQuality;
-
-                Console.WriteLine($"Encryption verified. PrintDocument: {canPrint}, PrintingQuality: {highQuality}");
-            }
+            Permissions perms = Permissions.PrintDocument;
+            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx128);
+            doc.Save(encryptedPath);
         }
-        catch (Exception ex)
+
+        // Verify the encryption settings by reopening the file with the user password
+        using (Document encDoc = new Document(encryptedPath, userPassword))
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Decrypt the document (no parameters needed)
+            encDoc.Decrypt();
+
+            // Cast the integer permissions to the enum before using bitwise operators
+            Permissions currentPerms = (Permissions)encDoc.Permissions;
+            bool hasPrintPermission = (currentPerms & Permissions.PrintDocument) == Permissions.PrintDocument;
+
+            Console.WriteLine($"Encryption algorithm: AES‑128");
+            Console.WriteLine($"Print permission set: {hasPrintPermission}");
         }
     }
 }

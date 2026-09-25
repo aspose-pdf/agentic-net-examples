@@ -1,48 +1,41 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the encrypted input PDF and the decrypted output PDF
         const string encryptedPath = "encrypted.pdf";
         const string decryptedPath = "decrypted.pdf";
+        const string userPassword  = "user123";
 
-        // The user password required to open the encrypted PDF
-        const string userPassword = "user123";
-
-        // Verify that the input file exists
         if (!File.Exists(encryptedPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {encryptedPath}");
+            Console.Error.WriteLine($"File not found: {encryptedPath}");
             return;
         }
 
         try
         {
-            // Open the encrypted document using the user password.
-            // Document(string, string) constructor handles encrypted PDFs.
+            // Load the encrypted PDF, supplying the user password
             using (Document doc = new Document(encryptedPath, userPassword))
             {
-                // Decrypt the document. No parameters are required.
+                // Remove encryption; Decrypt takes no arguments
                 doc.Decrypt();
 
-                // Save the now-unprotected PDF to the desired output path.
+                // Save the unprotected PDF
                 doc.Save(decryptedPath);
             }
 
-            Console.WriteLine($"Decryption successful. Unprotected file saved as '{decryptedPath}'.");
+            Console.WriteLine($"Decrypted PDF saved to '{decryptedPath}'.");
         }
         catch (InvalidPasswordException ex)
         {
-            // Thrown when the supplied password is incorrect.
             Console.Error.WriteLine($"Invalid password: {ex.Message}");
         }
         catch (Exception ex)
         {
-            // General exception handling for any other errors.
             Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }

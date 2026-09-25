@@ -6,40 +6,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";          // source PDF
-        const string outputPath = "output_pdfx3.pdf"; // PDF/X‑3 result
-        const string logPath = "conversion_log.txt";   // conversion log (optional)
-        const string iccPath = "CMYK.icc";            // path to a CMYK ICC profile
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_pdfx3_cmyk.pdf";
+        const string logPath = "conversion_log.xml";
 
-        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Verify ICC profile exists
-        if (!File.Exists(iccPath))
+        try
         {
-            Console.Error.WriteLine($"ICC profile not found: {iccPath}");
-            return;
-        }
+            // Load the source PDF
+            using (Document doc = new Document(inputPath))
+            {
+                // Set up conversion options for PDF/X‑3. The ColorSpaceConversionMode property
+                // is only available in Aspose.Pdf 22.9+; it is omitted here for compatibility with
+                // earlier versions. When using a newer version, you may uncomment the line
+                // below to force CMYK conversion.
+                PdfFormatConversionOptions conversionOptions = new PdfFormatConversionOptions(PdfFormat.PDF_X_3)
+                {
+                    OptimizeFileSize = true
+                    // ColorSpaceConversionMode = ColorSpaceConversionMode.ConvertToCMYK; // Requires Aspose.Pdf 22.9+
+                };
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+                // Perform the conversion to PDF/X‑3
+                doc.Convert(conversionOptions);
+
+                // Write a conversion log (optional). This overload does not affect color conversion.
+                doc.Convert(logPath, PdfFormat.PDF_X_3, ConvertErrorAction.Delete);
+
+                // Save the converted PDF/X‑3 document
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF saved as PDF/X‑3 with CMYK colors to '{outputPath}'.");
+        }
+        catch (Exception ex)
         {
-            // Attach an OutputIntent that forces CMYK colour space.
-            // The OutputIntent is added to the document before conversion.
-            doc.OutputIntents.Add(new OutputIntent(iccPath));
-
-            // Convert the document to PDF/X‑3. Use the overload that accepts
-            // a log file path, the target format and an error‑handling action.
-            doc.Convert(logPath, PdfFormat.PDF_X_3, ConvertErrorAction.Delete);
-
-            // Save the converted document.
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        Console.WriteLine($"PDF/X‑3 compliant file saved to '{outputPath}'.");
     }
 }

@@ -1,30 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// Update pdf author metadata__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/basic-operations/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF, modify metadata, and save.
-        using (Document doc = new Document(inputPath))
-        {
-            // Replace the Author metadata with the current user name.
-            doc.Info.Author = Environment.UserName;
-
-            // Save the updated document.
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

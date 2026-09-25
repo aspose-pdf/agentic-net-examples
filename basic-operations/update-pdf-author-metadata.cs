@@ -6,29 +6,25 @@ class Program
 {
     static void Main()
     {
-        // Path to the PDF file
-        string pdfPath = "sample.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Ensure the file exists before proceeding
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Wrap the FileInfo in a variable for convenience
-        FileInfo fileInfo = new FileInfo(pdfPath);
-
-        // Open the PDF, modify metadata, and save back to the same location
-        using (Document doc = new Document(fileInfo.FullName))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Update the Author metadata
-            doc.Info.Author = "New Author";
+            // Replace the Author metadata with the current user name
+            doc.Info.Author = Environment.UserName;
 
-            // Save the changes back to the original file
-            doc.Save(fileInfo.FullName);
+            // Save the updated document (PDF format)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("Author metadata updated successfully.");
+        Console.WriteLine($"Author metadata updated and saved to '{outputPath}'.");
     }
 }

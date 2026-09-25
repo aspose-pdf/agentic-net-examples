@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_pdfx3.pdf";
-        const string logPath = "conversion_log.txt";
+        const string logPath    = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -21,23 +21,15 @@ class Program
             // Load the source PDF
             using (Document doc = new Document(inputPath))
             {
-                // Configure conversion to PDF/X‑3.
-                // Do not set IccProfileFileName so the existing ICC profile is preserved.
-                PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_X_3);
-                options.LogFileName = logPath; // optional log file
+                // Convert to PDF/X‑3. The conversion retains any embedded ICC color profiles,
+                // ensuring accurate color reproduction for printing.
+                doc.Convert(logPath, PdfFormat.PDF_X_3, ConvertErrorAction.Delete);
 
-                // Perform the conversion
-                bool converted = doc.Convert(options);
-                if (!converted)
-                {
-                    Console.Error.WriteLine("Conversion reported failure.");
-                }
-
-                // Save the converted document
+                // Save the converted PDF/X‑3 document
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF successfully converted to PDF/X‑3 and saved as '{outputPath}'.");
+            Console.WriteLine($"PDF/X‑3 file saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

@@ -1,13 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "encrypted.pdf";
+        const string outputPath = "encrypted_formfill.pdf";
         const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
@@ -19,16 +20,11 @@ class Program
 
         try
         {
-            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Allow only form filling; do not include ExtractContent permission
+                // Allow only form filling; all other actions (including content extraction) are disabled
                 Permissions perms = Permissions.FillForm;
-
-                // Encrypt with AES-256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-
-                // Save the encrypted PDF
                 doc.Save(outputPath);
             }
 

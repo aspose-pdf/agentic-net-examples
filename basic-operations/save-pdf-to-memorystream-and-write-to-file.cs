@@ -15,24 +15,23 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document; Document is disposed automatically.
         using (Document doc = new Document(inputPath))
         {
-            // Save the document into a memory stream (Document.Save(Stream) is the correct overload)
-            using (MemoryStream memory = new MemoryStream())
+            // Save the document into a memory stream.
+            using (MemoryStream ms = new MemoryStream())
             {
-                doc.Save(memory);
-                // Reset stream position before reading
-                memory.Position = 0;
+                doc.Save(ms); // PDF is written to the stream.
+                ms.Position = 0; // Reset stream position before reading.
 
-                // Write the memory stream contents to a physical file
+                // Write the memory stream contents to a physical file.
                 using (FileStream file = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
-                    memory.CopyTo(file);
+                    ms.CopyTo(file);
                 }
             }
         }
 
-        Console.WriteLine($"PDF successfully saved to '{outputPath}' via MemoryStream.");
+        Console.WriteLine($"PDF saved to '{outputPath}' via MemoryStream.");
     }
 }
