@@ -1,48 +1,42 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace (no Facades)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF and output DOCX paths
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputDocx = "output.docx";
 
-        // Verify the input file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Convert PDF to DOCX with language‑aware hyphenation settings
-        // (Hyphenation options are applied automatically based on the language
-        //  of the source content; explicit HyphenationOptions are not exposed
-        //  in the current DocSaveOptions API.)
-        using (Document pdfDocument = new Document(inputPdf))
+        try
         {
-            // Configure DOC/DOCX save options
-            DocSaveOptions saveOptions = new DocSaveOptions
+            // Load the source PDF inside a using block for deterministic disposal.
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                // Output format – DOCX
-                Format = DocSaveOptions.DocFormat.DocX,
+                // Configure DOCX save options. Only the Format property is supported for DOCX conversion.
+                // Hyphenation settings are not available on DocSaveOptions; they must be handled after conversion
+                // (e.g., with Aspose.Words) or are applied automatically based on language metadata.
+                var docOptions = new DocSaveOptions
+                {
+                    Format = DocSaveOptions.DocFormat.DocX
+                };
 
-                // Use flow‑based content recognition for better text flow
-                Mode = DocSaveOptions.RecognitionMode.Flow,
+                // Save the PDF as DOCX using the configured options.
+                pdfDoc.Save(outputDocx, docOptions);
+            }
 
-                // Adjust horizontal proximity (tune paragraph detection)
-                RelativeHorizontalProximity = 2.5f,
-
-                // Enable bullet detection (helps list structures)
-                RecognizeBullets = true
-            };
-
-            // Save the converted document
-            pdfDocument.Save(outputDocx, saveOptions);
+            Console.WriteLine($"PDF successfully converted to DOCX: {outputDocx}");
         }
-
-        Console.WriteLine($"Conversion completed: '{outputDocx}'");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

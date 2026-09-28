@@ -7,37 +7,31 @@ class Program
 {
     static void Main()
     {
-        // Resolve a concrete data directory relative to the executable location.
-        // You can change this to any folder that contains the source PDF.
-        string dataDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data"));
-        if (!Directory.Exists(dataDir))
+        const string inputPdf = "input.pdf";
+        const string outputTiff = "output.tif";
+
+        if (!File.Exists(inputPdf))
         {
-            Console.WriteLine($"Data directory does not exist: {dataDir}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Name of the source PDF file placed inside the data directory.
-        const string pdfFileName = "sample.pdf"; // <-- replace with your actual PDF file name
-        string pdfPath = Path.Combine(dataDir, pdfFileName);
-        if (!File.Exists(pdfPath))
+        // Load the PDF document; using ensures deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            Console.WriteLine($"Source PDF not found: {pdfPath}");
-            return;
+            // Define the resolution (default 300 DPI). The TiffDevice constructor expects a Resolution object.
+            Resolution resolution = new Resolution(300);
+
+            // Create a TiffDevice with default compression (LZW) using the resolution.
+            TiffDevice tiffDevice = new TiffDevice(resolution);
+
+            // Create a file stream for the TIFF output and render all pages into a multi‑page TIFF.
+            using (FileStream tiffStream = new FileStream(outputTiff, FileMode.Create, FileAccess.Write))
+            {
+                tiffDevice.Process(pdfDoc, tiffStream);
+            }
         }
 
-        // Output TIFF file (multi‑page TIFF) will be created in the same data folder.
-        string outputTiff = Path.Combine(dataDir, "AllPages.tif");
-
-        // Load the PDF document inside a using block for deterministic disposal.
-        using (Document pdfDocument = new Document(pdfPath))
-        {
-            // Create a TiffDevice with default settings (default compression).
-            TiffDevice tiffDevice = new TiffDevice();
-
-            // Convert all pages of the PDF into a single multi‑page TIFF file.
-            tiffDevice.Process(pdfDocument, outputTiff);
-        }
-
-        Console.WriteLine($"Multi‑page TIFF created at: {outputTiff}");
+        Console.WriteLine($"Multi‑page TIFF created at '{outputTiff}'.");
     }
 }

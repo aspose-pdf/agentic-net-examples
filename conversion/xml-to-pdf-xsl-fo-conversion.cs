@@ -6,33 +6,30 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source XML, the XSL‑FO stylesheet and the output PDF.
-        const string xmlFile   = "input.xml";
-        const string xslFile   = "template.xslfo";
-        const string pdfFile   = "output.pdf";
+        const string xmlPath = "input.xml";
+        const string pdfPath = "output.pdf";
 
-        // Verify that the input files exist.
-        if (!File.Exists(xmlFile))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlFile}");
-            return;
-        }
-        if (!File.Exists(xslFile))
-        {
-            Console.Error.WriteLine($"XSL‑FO file not found: {xslFile}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Create load options that reference the XSL‑FO stylesheet.
-        // The XmlLoadOptions constructor that accepts a string sets the XSL stream.
-        XmlLoadOptions loadOptions = new XmlLoadOptions(xslFile);
-
-        // Load the XML file with the XSL‑FO transformation applied and save as PDF.
-        using (Document pdfDocument = new Document(xmlFile, loadOptions))
+        try
         {
-            pdfDocument.Save(pdfFile);
-        }
+            // Load the XML file using XSL‑FO load options
+            XslFoLoadOptions loadOptions = new XslFoLoadOptions();
+            using (Document doc = new Document(xmlPath, loadOptions))
+            {
+                // Save the resulting document as PDF
+                doc.Save(pdfPath);
+            }
 
-        Console.WriteLine($"PDF generated successfully: {pdfFile}");
+            Console.WriteLine($"XML successfully converted to PDF: '{pdfPath}'");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

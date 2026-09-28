@@ -7,56 +7,54 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
-        // Output PNG file path
-        const string outputPng = "region.png";
-        // Page number to extract (1‑based indexing)
-        const int pageNumber = 1;
+        // Input PDF, page number and output PNG file
+        const string inputPdfPath = "input.pdf";
+        const string outputPngPath = "region.png";
+        const int pageNumber = 1;               // 1‑based page index
+        // Rectangle coordinates (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+        const double llx = 100;                 // left
+        const double lly = 200;                 // bottom
+        const double urx = 400;                 // right
+        const double ury = 600;                 // top
 
-        // Ensure the input PDF exists – create a minimal placeholder if it does not.
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            using (var placeholder = new Document())
-            {
-                placeholder.Pages.Add(); // add a blank page
-                placeholder.Save(inputPdf);
-            }
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            return;
         }
 
-        // Define the rectangle region (llx, lly, urx, ury) in points
-        // Adjust these values to the desired area on the page
-        Aspose.Pdf.Rectangle regionRect = new Aspose.Pdf.Rectangle(100, 200, 300, 400);
-
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        using (Aspose.Pdf.Document pdfDocument = new Aspose.Pdf.Document(inputPdfPath))
         {
-            // Get the target page
-            Page page = pdfDoc.Pages[pageNumber];
-
-            // Preserve the original CropBox so we can restore it later
-            Aspose.Pdf.Rectangle originalCropBox = page.CropBox;
-
-            // Set the CropBox to the region we want to render
-            page.CropBox = regionRect;
-
-            // Create a PNG device with desired resolution (e.g., 300 DPI)
-            Resolution resolution = new Resolution(300);
-            PngDevice pngDevice = new PngDevice(resolution);
-
-            // Ensure the device uses the CropBox coordinates
-            pngDevice.CoordinateType = PageCoordinateType.CropBox;
-
-            // Render the page region to a PNG file
-            using (FileStream outStream = new FileStream(outputPng, FileMode.Create))
+            // Ensure the requested page exists
+            if (pageNumber < 1 || pageNumber > pdfDocument.Pages.Count)
             {
-                pngDevice.Process(page, outStream);
+                Console.Error.WriteLine($"Page {pageNumber} is out of range. Document has {pdfDocument.Pages.Count} pages.");
+                return;
             }
 
-            // Restore the original CropBox (optional, in case the document is used later)
+            // Define the resolution (DPI) for the raster image
+            Resolution resolution = new Resolution(300);
+
+            // Create a PNG device with the specified resolution
+            PngDevice pngDevice = new PngDevice(resolution);
+
+            // Get the target page
+            Page page = pdfDocument.Pages[pageNumber];
+
+            // Preserve the original CropBox so we can restore it after rendering
+            var originalCropBox = page.CropBox;
+
+            // Set the CropBox to the desired region (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+            page.CropBox = new Rectangle(llx, lly, urx, ury);
+
+            // Render the selected page region to a PNG file
+            pngDevice.Process(page, outputPngPath);
+
+            // Restore the original CropBox (optional, good practice if the document is used later)
             page.CropBox = originalCropBox;
         }
 
-        Console.WriteLine($"Region extracted to PNG: {outputPng}");
+        Console.WriteLine($"Region of page {pageNumber} saved as PNG to '{outputPngPath}'.");
     }
 }

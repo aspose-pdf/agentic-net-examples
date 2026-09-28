@@ -1,56 +1,48 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
-using Aspose.Pdf;               // SvgSaveOptions is also in this namespace
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
+        // Input PDF file
         const string inputPdfPath = "input.pdf";
 
-        // Desired output folder for SVG files
+        // Desired output folder for the SVG file
         const string outputFolder = "SvgOutput";
 
-        // Base name for the SVG files (first page will be output.svg, others output_2.svg, etc.)
-        const string baseSvgName = "output.svg";
+        // Combine folder and file name for the final SVG path
+        string outputSvgPath = Path.Combine(outputFolder, "output.svg");
 
-        // Ensure the output directory exists
-        if (!Directory.Exists(outputFolder))
-        {
-            Directory.CreateDirectory(outputFolder);
-        }
-
-        // Combine folder and base file name to create the full output path
-        string outputSvgPath = Path.Combine(outputFolder, baseSvgName);
-
-        // Verify the input file exists
+        // Verify input file exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
         try
         {
-            // Load the PDF document
-            using (Document pdfDocument = new Document(inputPdfPath))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Initialize SVG save options
-                SvgSaveOptions svgOptions = new SvgSaveOptions();
-
-                // Optional: treat the target file name as a directory.
-                // When false (default), multiple pages are saved as:
-                // output.svg, output_2.svg, output_3.svg, etc. in the same folder.
-                // Set to true only if you want a dedicated folder named after the file.
-                svgOptions.TreatTargetFileNameAsDirectory = false;
+                // Configure SVG save options (all options are in Aspose.Pdf namespace)
+                SvgSaveOptions svgOptions = new SvgSaveOptions
+                {
+                    // Example option: save each page as a separate SVG file inside the folder
+                    // Uncomment the following line if per‑page SVGs are desired
+                    // PageSavingMode = SvgSaveOptions.PageSavingModes.SinglePage
+                };
 
                 // Save the PDF as SVG using the specified options
-                pdfDocument.Save(outputSvgPath, svgOptions);
+                pdfDoc.Save(outputSvgPath, svgOptions);
             }
 
-            Console.WriteLine($"PDF successfully converted to SVG files in '{outputFolder}'.");
+            Console.WriteLine($"PDF successfully converted to SVG: {outputSvgPath}");
         }
         catch (Exception ex)
         {

@@ -6,31 +6,35 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string pdfPath = "input.pdf";
-        // Output PPTX file path
-        const string pptxPath = "output.pptx";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pptx";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document and convert to PPTX with each slide rendered as an image
-        using (Document pdfDocument = new Document(pdfPath))
+        try
         {
-            // Initialize PPTX save options
-            PptxSaveOptions saveOptions = new PptxSaveOptions
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Render each page as a raster image on a separate slide
-                SlidesAsImages = true
-            };
+                // Set up PPTX save options to render each slide as a raster image
+                PptxSaveOptions pptxOptions = new PptxSaveOptions
+                {
+                    SlidesAsImages = true
+                };
 
-            // Save the document as PPTX using the configured options
-            pdfDocument.Save(pptxPath, saveOptions);
+                // Save the PDF as a PPTX file using the explicit save options
+                doc.Save(outputPath, pptxOptions);
+            }
+
+            Console.WriteLine($"PDF successfully converted to PPTX: {outputPath}");
         }
-
-        Console.WriteLine($"PDF successfully converted to PPTX: {pptxPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+        }
     }
 }

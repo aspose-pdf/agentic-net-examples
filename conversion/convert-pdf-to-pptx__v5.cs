@@ -1,33 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace provides Document, SaveFormat, etc.
+// URL-STABILITY STUB
+//
+// Convert pdf to pptx__v5
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/conversion/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPptxPath = "output.pptx";
-
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-
-        // ---------- Convert PDF to PPTX ----------
-        // Aspose.Pdf can directly save a PDF document as a PPTX file using SaveFormat.Pptx.
-        // No separate SaveOptions class is required for this conversion.
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            pdfDoc.Save(outputPptxPath, SaveFormat.Pptx);
-        }
-
-        // NOTE: Adding speaker notes to the generated PPTX requires the Aspose.Slides library.
-        // Since the current project does not reference Aspose.Slides, that step is omitted.
-        // If speaker‑note functionality is needed, add a reference to the Aspose.Slides NuGet package
-        // and use its Presentation API to open the PPTX, create notes slides, and save again.
-
-        Console.WriteLine($"PDF successfully converted to PPTX: {outputPptxPath}");
-    }
-}
+class Program { static void Main() { } }

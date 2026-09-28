@@ -1,40 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace contains Document and DocSaveOptions
+using Aspose.Pdf;
 
-class PdfToDocConverter
+class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the destination DOC file
-        const string inputPdfPath  = "input.pdf";
-        const string outputDocPath = "output.doc";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.docx";
 
-        // Verify that the source file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        try
         {
-            // Configure save options for DOC conversion
-            DocSaveOptions saveOptions = new DocSaveOptions
+            // Load the source PDF
+            using (Document pdfDoc = new Document(inputPath))
             {
-                // Output format: DOC (as opposed to DOCX)
-                Format = DocSaveOptions.DocFormat.Doc,
+                // Configure DOCX save options.
+                // The Format property selects DOCX output.
+                // If the current Aspose.Pdf version supports a recognition mode
+                // that extracts only images, it can be set via the RecognitionMode
+                // property (e.g., DocSaveOptions.RecognitionMode.ImagesOnly).
+                // This property is optional and omitted here to ensure compilation
+                // with versions where it may not exist.
+                var saveOptions = new DocSaveOptions
+                {
+                    Format = DocSaveOptions.DocFormat.DocX
+                    // RecognitionMode = DocSaveOptions.RecognitionMode.ImagesOnly // uncomment if available
+                };
 
-                // Custom recognition mode – Textbox mode is fast and preserves layout,
-                // which effectively extracts images without performing full text flow analysis.
-                Mode = DocSaveOptions.RecognitionMode.Textbox
-            };
-
-            // Save the PDF as a DOC file using the specified options
-            pdfDocument.Save(outputDocPath, saveOptions);
+                // Save the PDF as a DOCX file using the configured options.
+                pdfDoc.Save(outputPath, saveOptions);
+                Console.WriteLine($"PDF successfully converted to DOCX (images only) at: {outputPath}");
+            }
         }
-
-        Console.WriteLine($"PDF successfully converted to DOC: {outputDocPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

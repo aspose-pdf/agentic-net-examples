@@ -7,46 +7,30 @@ class Program
 {
     static void Main()
     {
-        // Use the directory where the executable runs as the base folder.
-        // In a real project replace this with the actual folder that contains the PDF.
-        string dataDir = AppDomain.CurrentDomain.BaseDirectory;
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.tiff";
 
-        // Name of the PDF file to convert. Ensure the file exists in the folder above.
-        string pdfFile = "sample.pdf"; // <-- change to your file name
-
-        // Full path to the source PDF.
-        string pdfPath = Path.Combine(dataDir, pdfFile);
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Output TIFF file path (all pages merged into one multi‑page TIFF).
-        string outputTiff = Path.Combine(dataDir, "AllPagesToTIFF_out.tif");
-
-        // Load the PDF document inside a using block for deterministic disposal.
-        using (Document pdfDocument = new Document(pdfPath))
+        // Load the PDF document; using ensures deterministic disposal of the Document.
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Define the resolution for the output image (300 DPI is common).
-            Resolution resolution = new Resolution(300);
+            // TiffDevice does not implement IDisposable, so instantiate it without a using block.
+            // The parameter‑less constructor uses the default resolution (300 DPI) and default compression.
+            TiffDevice tiffDevice = new TiffDevice();
 
-            // Configure TIFF conversion settings.
-            TiffSettings tiffSettings = new TiffSettings
+            // Create a FileStream for the output TIFF; the stream is disposable and therefore wrapped in a using block.
+            using (FileStream tiffStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
-                Compression = CompressionType.None,   // No compression
-                Depth = ColorDepth.Default,           // Default color depth
-                Shape = ShapeType.Landscape,          // Landscape orientation
-                SkipBlankPages = false                // Include blank pages
-            };
-
-            // Create the TIFF device with the resolution and settings.
-            TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
-
-            // Convert the entire PDF (all pages) to a single multi‑page TIFF file.
-            tiffDevice.Process(pdfDocument, outputTiff);
+                // Convert all pages of the PDF (from page 1 to the last page) into a multi‑page TIFF.
+                tiffDevice.Process(pdfDoc, 1, pdfDoc.Pages.Count, tiffStream);
+            }
         }
 
-        Console.WriteLine($"TIFF file created at: {outputTiff}");
+        Console.WriteLine($"PDF pages have been converted to a multi‑page TIFF: {outputPath}");
     }
 }

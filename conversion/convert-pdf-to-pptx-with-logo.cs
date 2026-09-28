@@ -1,58 +1,86 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string logoImagePath = "logo.png";
-        const string outputPptxPath = "output.pptx";
+        // Input PDF, temporary PPTX (after conversion), final PPTX (with logo), and logo image paths
+        const string inputPdfPath   = "input.pdf";
+        const string tempPptxPath   = "temp_output.pptx";
+        const string finalPptxPath  = "output_with_logo.pptx";
+        const string logoImagePath  = "company_logo.png";
 
+        // Verify required files exist
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(logoImagePath))
         {
             Console.Error.WriteLine($"Logo image not found: {logoImagePath}");
             return;
         }
 
-        // Load the source PDF (lifecycle rule: use using for disposal)
+        // -------------------------------------------------
+        // 1. Load PDF and stamp the logo on every page
+        // -------------------------------------------------
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Insert the logo onto each page before conversion
+            // Logo dimensions (points) and margins
+            const float logoWidth   = 100f; // width of logo
+            const float logoHeight  = 50f;  // height of logo
+            const float marginRight = 20f; // distance from right edge
+            const float marginTop   = 20f; // distance from top edge
+
             foreach (Page page in pdfDoc.Pages)
             {
-                // Define the rectangle where the logo will be placed (bottom‑right corner)
-                double logoWidth = 100;   // desired logo width
-                double logoHeight = 50;   // desired logo height
-                double margin = 10;       // margin from page edges
-
-                double llx = page.PageInfo.Width - logoWidth - margin; // left
-                double lly = margin;                                   // bottom
-                double urx = page.PageInfo.Width - margin;             // right
-                double ury = lly + logoHeight;                         // top
-
-                // Fully qualified rectangle to avoid ambiguity
-                Aspose.Pdf.Rectangle logoRect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
-
-                // Add the image to the page using a stream (rule: use stream overload)
-                using (FileStream imgStream = File.OpenRead(logoImagePath))
+                // Create an image stamp for the logo
+                ImageStamp logoStamp = new ImageStamp(logoImagePath)
                 {
-                    page.AddImage(imgStream, logoRect);
-                }
+                    Width  = logoWidth,
+                    Height = logoHeight,
+                    // Align to the top‑right corner
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment   = VerticalAlignment.Top,
+                    // Offsets from the chosen edges
+                    XIndent = marginRight,
+                    YIndent = marginTop,
+                    // Ensure the stamp is placed over page content
+                    Background = false
+                };
+
+                // Add the stamp to the current page
+                page.AddStamp(logoStamp);
             }
 
-            // Convert the PDF (now with logos) to PPTX using PptxSaveOptions (rule: explicit save options)
-            PptxSaveOptions pptxOptions = new PptxSaveOptions();
-            pdfDoc.Save(outputPptxPath, pptxOptions);
+            // -------------------------------------------------
+            // 2. Convert the stamped PDF to PPTX
+            // -------------------------------------------------
+            var pptxOptions = new PptxSaveOptions();
+            pdfDoc.Save(tempPptxPath, pptxOptions);
         }
 
-        Console.WriteLine($"PDF converted to PPTX with logo on each slide: {outputPptxPath}");
+        // -------------------------------------------------
+        // 3. The PPTX already contains the logo (added before conversion).
+        //    If you still need to rename or move the file, do it here.
+        // -------------------------------------------------
+        try
+        {
+            // Move the temporary PPTX to the final destination name
+            if (File.Exists(finalPptxPath))
+                File.Delete(finalPptxPath);
+            File.Move(tempPptxPath, finalPptxPath);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error finalising PPTX: {ex.Message}");
+            // If moving fails, keep the temporary file for debugging
+        }
+
+        Console.WriteLine($"Conversion complete. PPTX with logo saved to '{finalPptxPath}'.");
     }
 }

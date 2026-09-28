@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for FontEmbeddingOptions
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa3b.pdf";
+        const string conversionLog = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -16,27 +17,26 @@ class Program
             return;
         }
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Configure conversion options for PDF/A‑3b
-            PdfFormatConversionOptions convOptions = new PdfFormatConversionOptions(PdfFormat.PDF_A_3B);
+            // Register a fallback font for any missing font in the source PDF.
+            // The wildcard "*" matches all missing fonts.
+            FontRepository.Substitutions.Add(new SimpleFontSubstitution("*", "Arial Unicode MS"));
 
-            // Enable default font substitution for fonts that cannot be embedded
-            convOptions.FontEmbeddingOptions.UseDefaultSubstitution = true;
-
-            // Perform the conversion
-            bool success = doc.Convert(convOptions);
-            if (!success)
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine("Conversion to PDF/A‑3b failed.");
-                return;
+                // Convert the document to PDF/A‑3b. Errors are handled by deleting the offending objects.
+                doc.Convert(conversionLog, PdfFormat.PDF_A_3B, ConvertErrorAction.Delete);
+
+                // Save the converted PDF/A‑3b file.
+                doc.Save(outputPath);
             }
 
-            // Save the resulting PDF/A‑3b document
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF/A‑3b file saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF successfully converted to PDF/A‑3b and saved as '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

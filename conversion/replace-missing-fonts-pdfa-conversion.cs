@@ -1,41 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // Required for SimpleFontSubstitution
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa.pdf";
-        const string logPath    = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Register fallback font substitution: replace any missing font with Arial
-        FontRepository.Substitutions.Add(
-            new SimpleFontSubstitution("MissingFont", "Arial", false));
+        // Map missing fonts to fallback fonts using FontRepository.
+        // Example mappings; add as needed for your documents.
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("TimesNewRomanPSMT", "Arial"));
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Arial"));
+        // If you want a generic fallback for any other missing font, you can add a wildcard substitution.
+        // FontRepository.Substitutions.Add(new SimpleFontSubstitution("*", "Arial"));
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Configure conversion options for PDF/A
-            PdfFormatConversionOptions convOpts = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B);
-            // Enable default substitution when a font cannot be embedded
-            convOpts.FontEmbeddingOptions.UseDefaultSubstitution = true;
+            using (Document doc = new Document(inputPath))
+            {
+                // Configure PDF/A conversion options (PDF/A-1b in this example).
+                PdfFormatConversionOptions opts = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B)
+                {
+                    OptimizeFileSize = true
+                    // Font substitution is already configured via FontRepository above.
+                };
 
-            // Perform PDF/A conversion with the configured options
-            doc.Convert(convOpts);
+                // Perform the conversion.
+                doc.Convert(opts);
 
-            // Save the converted PDF/A document
-            doc.Save(outputPath);
+                // Save the converted PDF/A document.
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF/A saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF/A conversion completed. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

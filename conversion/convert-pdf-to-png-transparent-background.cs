@@ -3,52 +3,44 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
-class PdfToPngConverter
+class Program
 {
     static void Main()
     {
-        // Base directory – the folder where the executable resides.
-        // This avoids hard‑coded placeholders and works regardless of where the program is run.
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        const string inputPdf = "input.pdf";
+        const string outputDir = "PngPages";
 
-        // Name of the PDF file that must be present in the base directory.
-        // Change this value to match your actual file name.
-        const string pdfFileName = "sample.pdf";
-
-        string pdfPath = Path.Combine(baseDir, pdfFileName);
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Create an output folder ("output") next to the executable.
-        string outputDir = Path.Combine(baseDir, "output");
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document – the using statement guarantees proper disposal.
-        using (Document pdfDocument = new Document(pdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Desired resolution (e.g., 300 DPI).
-            Resolution resolution = new Resolution(300);
-
-            // PNG device with transparent background enabled.
-            PngDevice pngDevice = new PngDevice(resolution)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                TransparentBackground = true
-            };
-
-            // Iterate through all pages (1‑based indexing).
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
-            {
-                string outputPath = Path.Combine(outputDir, $"image{pageNumber}_out.png");
-                using (FileStream pngStream = new FileStream(outputPath, FileMode.Create))
+                // Instantiate PngDevice directly (it does not implement IDisposable)
+                var pngDevice = new PngDevice(new Resolution(300))
                 {
-                    pngDevice.Process(pdfDocument.Pages[pageNumber], pngStream);
+                    TransparentBackground = true
+                };
+
+                string outputPath = Path.Combine(outputDir, $"Page_{pageNumber}.png");
+
+                // Dispose only the stream; the device does not need disposal
+                using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                {
+                    pngDevice.Process(pdfDoc.Pages[pageNumber], outStream);
                 }
+
+                Console.WriteLine($"Page {pageNumber} saved as PNG with transparent background.");
             }
         }
-
-        Console.WriteLine("PDF conversion to PNG with transparent background completed.");
     }
 }
