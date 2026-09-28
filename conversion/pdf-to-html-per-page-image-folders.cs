@@ -6,61 +6,49 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string outputFolder = "HtmlOutput";
+        const string inputPdfPath = "input.pdf";
+        const string outputHtmlPath = "output.html";
 
-        // Ensure the input PDF exists – create a minimal placeholder if it does not.
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            using var placeholder = new Document();
-            placeholder.Pages.Add();
-            placeholder.Save(pdfPath);
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            return;
         }
 
-        // Make sure the output directory exists.
-        Directory.CreateDirectory(outputFolder);
-        string htmlPath = Path.Combine(outputFolder, "document.html");
-
-        // Load the PDF document.
-        using (Document pdfDoc = new Document(pdfPath))
+        try
         {
-            // Configure HTML conversion options.
-            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                SplitIntoPages = true,
-                RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsExternalPngFilesReferencedViaSvg,
-                PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.NoEmbedding
-            };
-
-            // Store each page's images in its own sub‑folder.
-            htmlOpts.CustomResourceSavingStrategy = resourceInfo =>
-            {
-                var imgInfo = resourceInfo as HtmlSaveOptions.HtmlImageSavingInfo;
-                if (imgInfo == null)
-                    return null; // Not an image – let the default handler take over.
-
-                string pageFolder = Path.Combine(outputFolder, $"Page_{imgInfo.HtmlHostPageNumber}");
-                Directory.CreateDirectory(pageFolder);
-
-                string fileName = imgInfo.SupposedFileName;
-                if (string.IsNullOrEmpty(fileName))
-                    fileName = $"image_{Guid.NewGuid():N}.png";
-
-                string filePath = Path.Combine(pageFolder, fileName);
-
-                using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                // Configure HTML conversion options
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
-                    imgInfo.ContentStream.CopyTo(fs);
-                }
+                    // Generate a separate HTML file per page; each page gets its own *_files folder
+                    SplitIntoPages = true,
+                    // Keep images as external PNG files referenced via SVG (default folder handling)
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsExternalPngFilesReferencedViaSvg,
+                    // Do not embed images into the HTML; they will be written to the folder created above
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.NoEmbedding
+                };
 
-                // Return the full path so Aspose.Pdf knows where the resource was saved.
-                return filePath;
-            };
-
-            // Perform the conversion.
-            pdfDoc.Save(htmlPath, htmlOpts);
+                // Save as HTML with explicit options (required to actually produce HTML)
+                pdfDoc.Save(outputHtmlPath, htmlOpts);
+                Console.WriteLine($"Conversion completed. HTML saved to '{outputHtmlPath}'.");
+            }
         }
-
-        Console.WriteLine($"PDF converted to HTML. Files are located in '{outputFolder}'.");
+        catch (TypeInitializationException)
+        {
+            // HTML conversion relies on GDI+ and is Windows‑only
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+        }
+        catch (DllNotFoundException)
+        {
+            // GDI+ library missing on non‑Windows platforms
+            Console.WriteLine("GDI+ library not found. HTML conversion is unavailable on this platform.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

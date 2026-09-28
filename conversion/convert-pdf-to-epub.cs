@@ -1,31 +1,38 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // All SaveOptions subclasses are in this namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputEpub = "output.epub";
+        const string inputPdfPath  = "input.pdf";
+        const string outputEpubPath = "output.epub";
 
         // Verify the source PDF exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle: create and load)
-        using (Document pdfDoc = new Document(inputPdf))
+        try
         {
-            // Initialize default EPUB save options (default conversion settings)
-            EpubSaveOptions epubOptions = new EpubSaveOptions();
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
+            {
+                // Create default EPUB save options (no custom settings required)
+                EpubSaveOptions epubOptions = new EpubSaveOptions();
 
-            // Save the document as EPUB using the options (lifecycle: save)
-            pdfDoc.Save(outputEpub, epubOptions);
+                // Save the document as EPUB; explicit options ensure non‑PDF output
+                pdfDoc.Save(outputEpubPath, epubOptions);
+            }
+
+            Console.WriteLine($"PDF successfully converted to EPUB: {outputEpubPath}");
         }
-
-        Console.WriteLine($"PDF successfully converted to EPUB: {outputEpub}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+        }
     }
 }

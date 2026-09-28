@@ -15,22 +15,27 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDoc = new Document(inputPath))
+        try
         {
-            // Configure save options for DOCX conversion
-            DocSaveOptions saveOptions = new DocSaveOptions
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPath))
             {
-                // Specify DOCX output format
-                Format = DocSaveOptions.DocFormat.DocX,
-                // Use automatic content detection (Flow mode)
-                Mode = DocSaveOptions.RecognitionMode.Flow
-            };
+                // Set up DOCX save options – automatic content detection is the default behavior.
+                // Specify the output format via the Format property.
+                DocSaveOptions docOptions = new DocSaveOptions
+                {
+                    Format = DocSaveOptions.DocFormat.DocX
+                };
 
-            // Save the document as DOCX using the specified options
-            pdfDoc.Save(outputPath, saveOptions);
+                // Save the PDF as DOCX using the specified options
+                pdfDoc.Save(outputPath, docOptions);
+            }
+
+            Console.WriteLine($"PDF successfully converted to DOCX: {outputPath}");
         }
-
-        Console.WriteLine($"PDF successfully converted to DOCX: {outputPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+        }
     }
 }

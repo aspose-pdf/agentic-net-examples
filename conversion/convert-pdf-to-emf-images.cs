@@ -7,14 +7,8 @@ class Program
 {
     static void Main()
     {
-        // Directory containing the PDF file
-        string dataDir = @"YOUR_DATA_DIRECTORY";
-
-        // PDF file name (include extension)
-        string pdfFile = "YOUR_PDF_FILE.pdf";
-
-        // Full path to the source PDF
-        string inputPath = Path.Combine(dataDir, pdfFile);
+        const string inputPath = "input.pdf";
+        const string outputDir = "EMF_Output";
 
         if (!File.Exists(inputPath))
         {
@@ -22,29 +16,34 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPath))
+        Directory.CreateDirectory(outputDir);
+
+        try
         {
-            // Define the resolution (DPI) for the EMF output
-            Resolution resolution = new Resolution(300);
-
-            // Create an EMF device with the specified resolution
-            EmfDevice emfDevice = new EmfDevice(resolution);
-
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+            // Load PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPath))
             {
-                // Output EMF file path for the current page
-                string outPath = Path.Combine(dataDir, $"image{pageNumber}_out.emf");
+                // EmfDevice does NOT implement IDisposable – instantiate once and reuse
+                Resolution resolution = new Resolution(300);
+                EmfDevice emfDevice = new EmfDevice(resolution);
 
-                // Write the EMF image to a file stream
-                using (FileStream emfStream = new FileStream(outPath, FileMode.Create))
+                // Aspose.Pdf uses 1‑based page indexing
+                for (int i = 1; i <= pdfDoc.Pages.Count; i++)
                 {
-                    emfDevice.Process(pdfDocument.Pages[pageNumber], emfStream);
+                    string outPath = Path.Combine(outputDir, $"Page_{i}.emf");
+                    // Process each page into a stream; the stream is disposed via using
+                    using (FileStream outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                    {
+                        emfDevice.Process(pdfDoc.Pages[i], outStream);
+                    }
                 }
             }
-        }
 
-        Console.WriteLine("PDF successfully converted to EMF images.");
+            Console.WriteLine($"PDF successfully converted to EMF images in '{outputDir}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

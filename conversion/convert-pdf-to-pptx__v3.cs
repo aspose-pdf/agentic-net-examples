@@ -1,37 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// Convert pdf to pptx__v3
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/conversion/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        // Paths for source PDF and destination PPTX
-        const string pdfPath = "input.pdf";
-        const string pptxPath = "output.pptx";
-
-        // Verify that the source PDF exists
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
-            return;
-        }
-
-        // ---------- Convert PDF to PPTX ----------
-        // Aspose.Pdf can directly save a PDF document as PPTX using SaveFormat.Pptx
-        using (Document pdfDoc = new Document(pdfPath))
-        {
-            pdfDoc.Save(pptxPath, SaveFormat.Pptx);
-        }
-
-        // Verify that the PPTX was created
-        if (File.Exists(pptxPath))
-        {
-            Console.WriteLine($"PDF successfully converted to PPTX: {pptxPath}");
-        }
-        else
-        {
-            Console.Error.WriteLine($"Failed to create PPTX file: {pptxPath}");
-        }
-    }
-}
+class Program { static void Main() { } }

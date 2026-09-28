@@ -6,45 +6,48 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file
         const string inputPdf = "input.pdf";
+        const string outputHtmlBase = "page.html"; // base name for split pages
 
-        // Directory where individual HTML pages will be written
-        const string outputDir = "HtmlPages";
-
-        // Base file name for the generated HTML files.
-        // When SplitIntoPages is true, Aspose.Pdf will create files like:
-        // page.html, page_page1.html, page_page2.html, ...
-        const string baseHtmlFile = "page.html";
-
-        // Verify that the source PDF exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
-
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        try
         {
-            // Configure HTML save options to split each PDF page into a separate HTML file
-            HtmlSaveOptions htmlOptions = new HtmlSaveOptions
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                SplitIntoPages = true
-                // Additional options can be set here, e.g.:
-                // SpecialFolderForAllImages = outputDir
-            };
+                // Configure HTML conversion with split‑into‑pages enabled
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+                {
+                    SplitIntoPages = true,
+                    // Embed raster images as PNGs inside SVG to keep output self‑contained
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
+                };
 
-            // Full path to the base HTML file (the converter will create additional files as needed)
-            string outputPath = Path.Combine(outputDir, baseHtmlFile);
-
-            // Save the document as HTML with the configured options
-            pdfDoc.Save(outputPath, htmlOptions);
+                // HTML conversion relies on GDI+ (Windows only); handle platform limitations
+                try
+                {
+                    // Save generates multiple files: page.html, page_1.html, page_2.html, ...
+                    doc.Save(outputHtmlBase, htmlOpts);
+                    Console.WriteLine("PDF pages have been saved as individual HTML files.");
+                }
+                catch (TypeInitializationException)
+                {
+                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+                }
+                catch (DllNotFoundException)
+                {
+                    Console.WriteLine("GDI+ library not found. HTML conversion is Windows‑only.");
+                }
+            }
         }
-
-        Console.WriteLine("PDF pages have been converted to individual HTML files.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

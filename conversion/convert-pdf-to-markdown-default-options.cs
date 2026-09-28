@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.md";
 
         if (!File.Exists(inputPath))
@@ -15,16 +15,23 @@ class Program
             return;
         }
 
-        // Load the source PDF document.
-        using (Document pdfDoc = new Document(inputPath))
+        try
         {
-            // Create default Markdown save options.
-            MarkdownSaveOptions mdOptions = new MarkdownSaveOptions();
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
+            {
+                // Create MarkdownSaveOptions with default settings
+                MarkdownSaveOptions mdOptions = new MarkdownSaveOptions();
 
-            // Save the document as Markdown using the options.
-            pdfDoc.Save(outputPath, mdOptions);
+                // Save the document as Markdown
+                doc.Save(outputPath, mdOptions);
+            }
+
+            Console.WriteLine($"PDF successfully converted to Markdown: {outputPath}");
         }
-
-        Console.WriteLine($"PDF successfully converted to Markdown: '{outputPath}'");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

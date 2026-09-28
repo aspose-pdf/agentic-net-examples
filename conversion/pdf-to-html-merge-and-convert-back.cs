@@ -1,105 +1,113 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file
-        const string inputPdfPath = "input.pdf";
+        const string inputPdfPath      = "input.pdf";
+        const string htmlFolderPath    = "HtmlPages";
+        const string combinedHtmlPath  = "combined.html";
+        const string outputPdfPath     = "output.pdf";
 
-        // Directory where intermediate HTML pages will be saved
-        const string htmlOutputDir = "HtmlPages";
-
-        // Base name for the generated HTML files (page.html, page_2.html, …)
-        const string htmlBaseName = "page.html";
-
-        // Path for the combined HTML file
-        string combinedHtmlPath = Path.Combine(htmlOutputDir, "combined.html");
-
-        // Final PDF file generated from the combined HTML
-        const string finalPdfPath = "output.pdf";
-
-        // Validate input
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(htmlOutputDir);
+        // Ensure the folder for split HTML pages exists
+        Directory.CreateDirectory(htmlFolderPath);
 
+        // 1. Convert PDF to HTML pages (one HTML file per PDF page)
         try
         {
-            // ------------------------------------------------------------
-            // 1. Convert PDF to HTML – one HTML file per PDF page
-            // ------------------------------------------------------------
-            using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(inputPdfPath))
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Configure HTML conversion options
-                Aspose.Pdf.HtmlSaveOptions htmlSaveOpts = new Aspose.Pdf.HtmlSaveOptions
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
-                    // Generate a separate HTML file for each PDF page
-                    SplitIntoPages = true,
-
-                    // Embed raster images as PNG inside SVG (cross‑platform friendly)
-                    RasterImagesSavingMode = Aspose.Pdf.HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
+                    SplitIntoPages        = true, // generate separate HTML files
+                    PartsEmbeddingMode    = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
                 };
 
-                // Build the full path for the first HTML file; subsequent pages will be
-                // created automatically with suffixes (_2, _3, …)
-                string firstHtmlPath = Path.Combine(htmlOutputDir, htmlBaseName);
-
-                // Perform the conversion
-                pdfDoc.Save(firstHtmlPath, htmlSaveOpts);
+                // The base file name; Aspose will create page.html, page_1.html, page_2.html, ...
+                string baseHtmlPath = Path.Combine(htmlFolderPath, "page.html");
+                pdfDoc.Save(baseHtmlPath, htmlOpts);
             }
+        }
+        catch (TypeInitializationException)
+        {
+            // HTML conversion requires GDI+ (Windows only). Skip on unsupported platforms.
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipping HTML generation.");
+            return;
+        }
 
-            // ------------------------------------------------------------
-            // 2. Combine the generated HTML pages into a single file
-            // ------------------------------------------------------------
-            // Find all HTML files that match the naming pattern (page.html, page_2.html, …)
-            var htmlFiles = Directory.GetFiles(htmlOutputDir, "page*.html")
-                                     .OrderBy(f => f) // Ensure correct page order
-                                     .ToList();
+        // 2. Combine the generated HTML pages into a single HTML file
+        var htmlFiles = Directory.GetFiles(htmlFolderPath, "page*.html")
+                                 .OrderBy(f => f) // ensures correct page order
+                                 .ToArray();
 
-            if (htmlFiles.Count == 0)
+        if (htmlFiles.Length == 0)
+        {
+            Console.Error.WriteLine("No HTML pages were generated.");
+            return;
+        }
+
+        using (StreamWriter writer = new StreamWriter(combinedHtmlPath, false))
+        {
+            bool firstFile = true;
+            foreach (string file in htmlFiles)
             {
-                Console.Error.WriteLine("No HTML files were generated.");
-                return;
-            }
+                string content = File.ReadAllText(file);
 
-            // Concatenate the contents of all HTML files
-            StringBuilder combinedBuilder = new StringBuilder();
-            foreach (string htmlFile in htmlFiles)
+                if (firstFile)
+                {
+                    // Write the full content of the first file (includes <html>, <head>, etc.)
+                    writer.Write(content);
+                    firstFile = false;
+                }
+                else
+                {
+                    // For subsequent files, strip the outer <html>/<head>/<body> tags to avoid nesting
+                    // Simple approach: remove everything up to the first <body> tag and after </body>
+                    int bodyStart = content.IndexOf("<body", StringComparison.OrdinalIgnoreCase);
+                    if (bodyStart >= 0)
+                    {
+                        bodyStart = content.IndexOf('>', bodyStart) + 1;
+                        int bodyEnd = content.LastIndexOf("</body>", StringComparison.OrdinalIgnoreCase);
+                        if (bodyEnd > bodyStart)
+                        {
+                            string bodyContent = content.Substring(bodyStart, bodyEnd - bodyStart);
+                            writer.WriteLine(bodyContent);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 3. Convert the combined HTML back to PDF
+        try
+        {
+            using (Document htmlDoc = new Document(combinedHtmlPath, new HtmlLoadOptions()))
             {
-                combinedBuilder.AppendLine(File.ReadAllText(htmlFile));
+                // Save as PDF (default format)
+                htmlDoc.Save(outputPdfPath);
             }
 
-            // Write the combined HTML to disk
-            File.WriteAllText(combinedHtmlPath, combinedBuilder.ToString());
-
-            // ------------------------------------------------------------
-            // 3. Convert the combined HTML back to PDF
-            // ------------------------------------------------------------
-            Aspose.Pdf.HtmlLoadOptions htmlLoadOpts = new Aspose.Pdf.HtmlLoadOptions();
-
-            using (Aspose.Pdf.Document htmlDoc = new Aspose.Pdf.Document(combinedHtmlPath, htmlLoadOpts))
-            {
-                // Save the resulting PDF
-                htmlDoc.Save(finalPdfPath);
-            }
-
-            Console.WriteLine($"Conversion completed successfully.");
-            Console.WriteLine($"Combined HTML saved to: {combinedHtmlPath}");
-            Console.WriteLine($"Final PDF saved to: {finalPdfPath}");
+            Console.WriteLine($"Successfully created PDF: {outputPdfPath}");
+        }
+        catch (TypeInitializationException)
+        {
+            // Loading HTML may also require GDI+ on non‑Windows platforms
+            Console.WriteLine("HTML to PDF conversion requires Windows (GDI+). Skipping PDF generation.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            Console.Error.WriteLine($"Error during HTML to PDF conversion: {ex.Message}");
         }
     }
 }

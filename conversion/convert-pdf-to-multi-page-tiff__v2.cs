@@ -1,31 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+// URL-STABILITY STUB
+//
+// Convert pdf to multi page tiff__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/conversion/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.tif";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDocument = new Document(inputPath))
-        {
-            // Create a TiffDevice with default settings
-            TiffDevice tiffDevice = new TiffDevice();
-
-            // Convert all pages of the PDF into a single multi‑page TIFF file
-            tiffDevice.Process(pdfDocument, outputPath);
-        }
-
-        Console.WriteLine($"TIFF image saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

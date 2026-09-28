@@ -6,31 +6,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPptxPath = "output.pptx";
+        const string pdfPath = "input.pdf";
+        const string pptxPath = "output.pptx";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF, set standard and custom properties, then save as PPTX
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF, set metadata, then convert to PPTX.
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Standard property
-            pdfDoc.Info.Subject = "Presentation Subject";
+            // ---- Standard PDF properties ----
+            pdfDoc.Info.Subject = "Quarterly Report"; // existing property
 
-            // Custom property – use the DocumentInfo indexer (CustomProperties collection does not exist)
-            pdfDoc.Info["Company"] = "Acme Corporation";
+            // ---- Custom metadata (Company, Project, etc.) ----
+            // DocumentInfo exposes an indexer for arbitrary key/value pairs.
+            pdfDoc.Info["Company"] = "Acme Corp";
+            pdfDoc.Info["Project"] = "Apollo";
 
-            // PPTX save options (available directly under Aspose.Pdf namespace)
+            // Convert the PDF to PPTX.
             var pptxOptions = new PptxSaveOptions();
-
-            // Convert and save as PPTX
-            pdfDoc.Save(outputPptxPath, pptxOptions);
+            pdfDoc.Save(pptxPath, pptxOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to PPTX: {outputPptxPath}");
+        Console.WriteLine($"PDF converted to PPTX with properties saved at '{pptxPath}'.");
     }
 }

@@ -1,66 +1,48 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";      // source PDF
-        const string xmlAttachmentPath = "attachment.xml"; // XML file to attach
-        const string outputPdfPath = "output_pdfa.pdf";
+        const string sourcePdfPath   = "source.pdf";
+        const string xmlAttachmentPath = "metadata.xml";
+        const string logPath        = "conversion_log.xml";
+        const string outputPdfPath  = "output_pdfa1b.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify input files exist
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
             return;
         }
-
         if (!File.Exists(xmlAttachmentPath))
         {
             Console.Error.WriteLine($"XML attachment not found: {xmlAttachmentPath}");
             return;
         }
 
-        try
+        // Load the source PDF and convert it to PDF/A‑1b
+        using (Document doc = new Document(sourcePdfPath))
         {
-            // Load the source PDF
-            using (Document doc = new Document(inputPdfPath))
+            // Convert to PDF/A‑1b; errors are logged to logPath and problematic objects are removed
+            doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+
+            // Add the external XML file as an embedded file (attachment)
+            var fileSpec = new FileSpecification(Path.GetFileName(xmlAttachmentPath))
             {
-                // Convert to PDF/A‑1b (PDF/A-1b is represented by PdfFormat.PDF_A_1B)
-                // Errors during conversion are deleted (ConvertErrorAction.Delete)
-                doc.Convert("conversion_log.txt", PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+                // The file content must be supplied as a stream
+                Contents = new MemoryStream(File.ReadAllBytes(xmlAttachmentPath)),
+                // Optional but helpful metadata
+                MIMEType = "application/xml"
+            };
+            doc.EmbeddedFiles.Add(fileSpec);
 
-                // Create a FileSpecification using the constructor (filePath, description)
-                FileSpecification fileSpec = new FileSpecification(xmlAttachmentPath, "XML attachment");
-                fileSpec.Description = "External XML attachment"; // optional description
-
-                // Define a rectangle for the attachment annotation (position on the page)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
-
-                // Create the FileAttachment annotation on the first page
-                Page firstPage = doc.Pages[1];
-                FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(firstPage, rect, fileSpec)
-                {
-                    // Optional visual settings
-                    Icon = FileIcon.Graph,               // use FileIcon enum (Graph, Paperclip, PushPin, Tag)
-                    Color = Color.Blue,
-                    Contents = "External XML attachment"
-                };
-
-                // Add the annotation to the page
-                firstPage.Annotations.Add(attachment);
-
-                // Save the resulting PDF/A‑1b document with the attachment
-                doc.Save(outputPdfPath);
-            }
-
-            Console.WriteLine($"PDF/A‑1b document with XML attachment saved to '{outputPdfPath}'.");
+            // Save the resulting PDF/A‑1b document
+            doc.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF/A‑1b document with XML attachment saved to '{outputPdfPath}'.");
     }
 }

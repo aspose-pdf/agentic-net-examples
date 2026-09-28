@@ -10,33 +10,30 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.txt";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Error: File not found – {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Load the PDF document and create an output stream for the text file
-            using (Document doc = new Document(inputPath))
+            // TextDevice extracts plain text from each page.
+            TextDevice textDevice = new TextDevice();
+
+            // Create/overwrite the output text file.
             using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
-                // TextDevice extracts plain text from each page
-                TextDevice textDevice = new TextDevice();
-
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                // Process each page sequentially.
+                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
                 {
-                    // Process each page and write its text to the output stream
-                    textDevice.Process(doc.Pages[pageNum], outStream);
+                    textDevice.Process(pdfDoc.Pages[pageNum], outStream);
                 }
             }
+        }
 
-            Console.WriteLine($"PDF successfully converted to text: '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
-        }
+        Console.WriteLine($"PDF successfully converted to text: {outputPath}");
     }
 }

@@ -6,40 +6,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputHtml = "output.html";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.html";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdf))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Configure HTML save options with SVG compression enabled
+                // Configure HTML conversion options
                 HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
-                    CompressSvgGraphicsIfAny = true
+                    // Embed all resources (CSS, images, etc.) directly into the HTML file
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                    // Optional: embed raster images as PNG inside the SVG
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
                 };
 
-                // Save as HTML; explicit SaveOptions ensure non‑PDF output
-                pdfDoc.Save(outputHtml, htmlOpts);
+                // HTML conversion uses GDI+ and is Windows‑only; handle possible platform issues
+                try
+                {
+                    doc.Save(outputPath, htmlOpts);
+                    Console.WriteLine($"HTML saved to '{outputPath}'.");
+                }
+                catch (TypeInitializationException)
+                {
+                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+                }
+                catch (DllNotFoundException)
+                {
+                    Console.WriteLine("GDI+ library not found. HTML conversion is Windows‑only.");
+                }
             }
-
-            Console.WriteLine($"PDF successfully converted to HTML: '{outputHtml}'");
-        }
-        catch (TypeInitializationException)
-        {
-            // HTML conversion relies on GDI+ and is Windows‑only
-            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

@@ -1,34 +1,30 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Aspose.Pdf namespace contains Document, MobiXmlSaveOptions, etc.
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.mobi";
 
-        // Output MobiXml file path
-        const string outputMobiXmlPath = "output.mobixml";
-
-        // Verify that the input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document and save it as MobiXml using default options
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF document within a using block for deterministic disposal.
+        using (Document doc = new Document(inputPath))
         {
-            // Initialize default MobiXml save options
-            MobiXmlSaveOptions mobiOptions = new MobiXmlSaveOptions();
+            // Create default MobiXmlSaveOptions (all SaveOptions are in Aspose.Pdf namespace).
+            MobiXmlSaveOptions mobiOpts = new MobiXmlSaveOptions();
 
-            // Save the document in MobiXml format
-            pdfDocument.Save(outputMobiXmlPath, mobiOptions);
+            // Save the document as MobiXml using the options.
+            doc.Save(outputPath, mobiOpts);
         }
 
-        Console.WriteLine($"PDF successfully converted to MobiXml: '{outputMobiXmlPath}'");
+        Console.WriteLine($"PDF successfully converted to MobiXml: {outputPath}");
     }
 }

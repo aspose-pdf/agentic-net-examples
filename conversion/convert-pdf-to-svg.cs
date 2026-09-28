@@ -6,30 +6,28 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.svg";
 
-        // Output SVG file path (first page will be saved as this name,
-        // subsequent pages will be saved as input_2.svg, input_3.svg, etc.)
-        const string outputSvgPath = "output.svg";
-
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF document inside a using block (lifecycle rule)
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Create default SVG save options
-            SvgSaveOptions svgOptions = new SvgSaveOptions();
+            // Configure SVG output options – enable CSS style embedding by scaling to pixels
+            var svgOptions = new SvgSaveOptions
+            {
+                ScaleToPixels = true // embeds CSS styles into the generated SVG
+            };
 
-            // Save the document as SVG. The Save method with a SaveOptions
-            // instance writes SVG files according to the options.
-            pdfDocument.Save(outputSvgPath, svgOptions);
+            // Save the PDF directly to SVG using the configured options
+            pdfDoc.Save(outputPath, svgOptions);
         }
 
-        Console.WriteLine($"PDF has been converted to SVG: {outputSvgPath}");
+        Console.WriteLine($"PDF successfully converted to SVG: {outputPath}");
     }
 }

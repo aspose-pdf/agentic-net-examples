@@ -6,33 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDoc = "output.doc";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.doc";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdf))
+        try
         {
-            // Configure DOC save options
-            DocSaveOptions saveOptions = new DocSaveOptions
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPath))
             {
-                // Output format: DOC
-                Format = DocSaveOptions.DocFormat.Doc,
-                // Recognition mode – Textbox is the closest to plain‑text extraction
-                Mode = DocSaveOptions.RecognitionMode.Textbox,
-                // Insert line breaks to improve readability
-                AddReturnToLineEnd = true
-            };
+                // Set up DocSaveOptions to save as plain‑text DOC.
+                // The SaveMode property was removed; specifying the format is sufficient.
+                var docOptions = new DocSaveOptions
+                {
+                    Format = DocSaveOptions.DocFormat.Doc // Save as .doc (plain‑text representation)
+                };
 
-            // Save the document as DOC using the specified options
-            pdfDoc.Save(outputDoc, saveOptions);
+                // Save the document as DOC using the specified options
+                pdfDoc.Save(outputPath, docOptions);
+            }
+
+            Console.WriteLine($"PDF successfully converted to plain‑text DOC at '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF successfully converted to DOC: {outputDoc}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

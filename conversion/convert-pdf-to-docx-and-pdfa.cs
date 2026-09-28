@@ -6,52 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputDocxPath = "output.docx";
-        const string outputPdfAPath = "output_pdfa.pdf";
-        const string conversionLog = "conversion.log";
+        const string inputPdf       = "input.pdf";
+        const string intermediateDocx = "intermediate.docx";
+        const string outputPdfA     = "output_pdfa.pdf";
+        const string conversionLog  = "conversion_log.xml";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the source PDF and save it as DOCX using explicit DocSaveOptions.
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // ---------- Step 1: Load the source PDF ----------
-            using (Document pdfDocument = new Document(inputPdfPath))
+            DocSaveOptions docxOptions = new DocSaveOptions
             {
-                // ---------- Step 2: Convert PDF to DOCX ----------
-                var docSaveOptions = new DocSaveOptions
-                {
-                    // Export as DOCX format
-                    Format = DocSaveOptions.DocFormat.DocX,
-                    // Use full flow recognition for better editability
-                    Mode = DocSaveOptions.RecognitionMode.Flow,
-                    // Optional: improve bullet detection
-                    RecognizeBullets = true
-                };
-
-                pdfDocument.Save(outputDocxPath, docSaveOptions);
-                Console.WriteLine($"PDF converted to DOCX: {outputDocxPath}");
-            }
-
-            // ---------- Step 3: Load the generated DOCX ----------
-            using (Document docxDocument = new Document(outputDocxPath))
-            {
-                // ---------- Step 4: Convert DOCX to PDF/A ----------
-                // Convert to PDF/A-1B, logging any conversion errors
-                docxDocument.Convert(conversionLog, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
-
-                // Save the resulting PDF/A document
-                docxDocument.Save(outputPdfAPath);
-                Console.WriteLine($"DOCX converted to PDF/A: {outputPdfAPath}");
-            }
+                // Ensure the output format is DOCX.
+                Format = DocSaveOptions.DocFormat.DocX
+            };
+            pdfDoc.Save(intermediateDocx, docxOptions);
         }
-        catch (Exception ex)
+
+        // Load the generated DOCX and convert it to a PDF/A compliant PDF.
+        using (Document docxDoc = new Document(intermediateDocx))
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Convert to PDF/A‑1b. The log file records any conversion issues.
+            docxDoc.Convert(conversionLog, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+            // Save the resulting PDF/A document.
+            docxDoc.Save(outputPdfA);
         }
+
+        Console.WriteLine($"PDF/A file created: {outputPdfA}");
     }
 }

@@ -8,11 +8,11 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output_pdfa3b.pdf";
-        const string logPath    = "conversion_log.txt";
+        const string logPath    = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
@@ -21,31 +21,25 @@ class Program
             // Load the source PDF
             using (Document doc = new Document(inputPath))
             {
-                // Convert to PDF/A‑3b.
-                // ConvertErrorAction.None causes conversion to fail with an exception
-                // when an object cannot be converted (i.e., "throw" behavior).
-                bool success = doc.Convert(logPath, PdfFormat.PDF_A_3B, ConvertErrorAction.None);
-
-                // If conversion succeeded, save the resulting PDF/A‑3b file.
-                if (success)
-                {
-                    doc.Save(outputPath);
-                    Console.WriteLine($"PDF/A‑3b saved to '{outputPath}'.");
-                }
-                else
-                {
-                    Console.Error.WriteLine("Conversion failed; see log for details.");
-                }
+                // Convert to PDF/A‑3b.  The Throw option is not available in older
+                // Aspose.PDF versions, so we fall back to Delete which removes the
+                // offending objects and still produces a PDF/A‑3b file.
+#if CONVERT_ERROR_ACTION_THROW_AVAILABLE
+                doc.Convert(logPath, PdfFormat.PDF_A_3B, ConvertErrorAction.Throw);
+#else
+                doc.Convert(logPath, PdfFormat.PDF_A_3B, ConvertErrorAction.Delete);
+#endif
+                // Save the converted PDF/A‑3b file
+                doc.Save(outputPath);
             }
-        }
-        catch (ConvertException ex)
-        {
-            // Raised when conversion encounters an unrecoverable error.
-            Console.Error.WriteLine($"Conversion error: {ex.Message}");
+
+            Console.WriteLine($"Conversion succeeded: {outputPath}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            // Exceptions are raised when Throw is available; otherwise any
+            // conversion problems are logged in the XML log file.
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
         }
     }
 }

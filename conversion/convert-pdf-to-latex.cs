@@ -6,42 +6,48 @@ class Program
 {
     static void Main()
     {
-        // Directory containing the source PDF.
-        string dataDir = "YOUR_DATA_DIRECTORY";
+        const string inputPath = "input.pdf";
+        const string outputDir = "LatexOutput";
+        // Path.Combine cannot be used in a const declaration because it is evaluated at runtime.
+        string outputPath = Path.Combine(outputDir, "output.tex");
 
-        // Path to the source PDF file.
-        string pdfPath = Path.Combine(dataDir, "input.pdf");
-
-        // Directory where LaTeX files will be written.
-        string outDir = Path.Combine(dataDir, "LatexOutput");
-
-        // Full path for the generated .tex file.
-        string texPath = Path.Combine(outDir, "output.tex");
-
-        // Verify the source PDF exists.
-        if (!File.Exists(pdfPath))
+        // Verify input file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Ensure the output directory exists.
-        Directory.CreateDirectory(outDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF and convert it to LaTeX using TeXSaveOptions.
-        using (Document pdfDoc = new Document(pdfPath))
+        try
         {
-            // Initialize save options for TeX (LaTeX) export.
-            TeXSaveOptions saveOptions = new TeXSaveOptions
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Specify the directory where auxiliary files will be placed.
-                OutDirectoryPath = outDir
-            };
+                // Use TeXSaveOptions for LaTeX conversion. The OutputDirectory property does not exist on this class,
+                // so auxiliary files will be written to the same folder as the output .tex file by default.
+                TeXSaveOptions texOpts = new TeXSaveOptions();
 
-            // Save the document as a .tex file using the specified options.
-            pdfDoc.Save(texPath, saveOptions);
+                // Save the document as LaTeX (TeX) source
+                doc.Save(outputPath, texOpts);
+            }
+
+            Console.WriteLine($"LaTeX conversion completed: {outputPath}");
         }
+        catch (Exception ex)
+        {
+            // Generate a detailed crash report using the recommended constructor pattern.
+            var crashOptions = new CrashReportOptions(ex)
+            {
+                CrashReportDirectory = Path.GetDirectoryName(outputPath) ?? Directory.GetCurrentDirectory(),
+                CrashReportFilename = "crash_report.html",
+                CustomMessage = "Unexpected error during PDF to LaTeX conversion."
+            };
+            PdfException.GenerateCrashReport(crashOptions);
 
-        Console.WriteLine($"LaTeX file successfully saved to: {texPath}");
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

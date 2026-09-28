@@ -6,58 +6,43 @@ class Program
 {
     static void Main()
     {
-        // Base directory of the application (portable across environments)
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // Folder containing source PDFs
+        const string inputFolder = "InputPdfs";
+        // Folder where PPTX files will be saved
+        const string outputFolder = "OutputPptx";
 
-        // Resolve input and output directories – fall back to the current working directory if they do not exist
-        string inputDirectory = Path.Combine(baseDir, "InputPdfs");
-        if (!Directory.Exists(inputDirectory))
+        if (!Directory.Exists(inputFolder))
         {
-            Console.WriteLine($"Input directory '{inputDirectory}' not found. Using current directory as fallback.");
-            inputDirectory = Directory.GetCurrentDirectory();
-        }
-
-        string outputDirectory = Path.Combine(baseDir, "OutputPptx");
-        // Ensure the output directory exists (creates it if missing)
-        Directory.CreateDirectory(outputDirectory);
-
-        // Retrieve PDF files – if none are found, inform the user and exit gracefully
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine($"No PDF files found in '{inputDirectory}'. Nothing to convert.");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
+        Directory.CreateDirectory(outputFolder);
+
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+
         foreach (string pdfPath in pdfFiles)
         {
-            // Verify the file still exists before processing (defensive check)
-            if (!File.Exists(pdfPath))
-            {
-                Console.Error.WriteLine($"File not found: {pdfPath}. Skipping.");
-                continue;
-            }
-
-            // Derive the output PPTX file path (same file name, .pptx extension)
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-            string pptxPath = Path.Combine(outputDirectory, fileNameWithoutExt + ".pptx");
+            string baseName = Path.GetFileNameWithoutExtension(pdfPath);
+            string pptxPath = Path.Combine(outputFolder, baseName + ".pptx");
 
             try
             {
-                // Load the PDF document (wrapped in using for deterministic disposal)
-                using (Document pdfDocument = new Document(pdfPath))
+                // Load each PDF inside a using block for deterministic disposal
+                using (Document doc = new Document(pdfPath))
                 {
-                    // Configure PPTX save options with SlidesAsImages enabled
-                    PptxSaveOptions saveOptions = new PptxSaveOptions
+                    // Configure PPTX save options to rasterize each slide as an image
+                    PptxSaveOptions pptxOptions = new PptxSaveOptions
                     {
                         SlidesAsImages = true
                     };
 
-                    // Save the document as PPTX using the explicit save options
-                    pdfDocument.Save(pptxPath, saveOptions);
+                    // Save as PPTX using the explicit save options (required for non‑PDF formats)
+                    doc.Save(pptxPath, pptxOptions);
                 }
 
-                Console.WriteLine($"Converted '{pdfPath}' to '{pptxPath}'.");
+                Console.WriteLine($"Converted: {pdfPath} → {pptxPath}");
             }
             catch (Exception ex)
             {
