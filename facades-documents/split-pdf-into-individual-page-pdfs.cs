@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
@@ -9,44 +9,42 @@ class Program
         const string inputPath = "input.pdf";
         const string outputDir = "SplitPages";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Open the source PDF as a read‑only stream
-        using (FileStream inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
+        // Load the source PDF
+        Document pdfDoc = new Document(inputPath);
+        int pageCount = pdfDoc.Pages.Count;
+
+        // Iterate over each page and write it to a separate MemoryStream
+        for (int page = 1; page <= pageCount; page++)
         {
-            // PdfFileEditor does NOT implement IDisposable, so no using block
-            PdfFileEditor editor = new PdfFileEditor();
-
-            // Split the PDF into individual pages; each page is returned as a MemoryStream
-            MemoryStream[] pageStreams = editor.SplitToPages(inputStream);
-
-            // Write each page stream to a separate PDF file
-            for (int i = 0; i < pageStreams.Length; i++)
+            using (MemoryStream pageStream = new MemoryStream())
             {
-                // Reset stream position before reading
-                pageStreams[i].Position = 0;
-
-                string outPath = Path.Combine(outputDir, $"Page_{i + 1}.pdf");
-
-                // Write the MemoryStream to a file stream
-                using (FileStream outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                // Create a temporary document that contains only the current page
+                using (Document singlePageDoc = new Document())
                 {
-                    pageStreams[i].CopyTo(outStream);
+                    // Add (clone) the required page – this does not modify the original document
+                    singlePageDoc.Pages.Add(pdfDoc.Pages[page]);
+                    // Save the single‑page document into the memory stream
+                    singlePageDoc.Save(pageStream);
                 }
 
-                // Dispose the MemoryStream after use
-                pageStreams[i].Dispose();
+                // Reset the stream position before reading its bytes
+                pageStream.Position = 0;
+
+                // Write the stream contents to a physical PDF file
+                string outPath = Path.Combine(outputDir, $"Page_{page}.pdf");
+                File.WriteAllBytes(outPath, pageStream.ToArray());
+
+                Console.WriteLine($"Saved page {page} → {outPath}");
             }
         }
-
-        Console.WriteLine("PDF successfully split into individual page files.");
     }
 }

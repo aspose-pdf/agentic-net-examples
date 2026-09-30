@@ -1,35 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// Create booklet pdf custom page order__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/facades-documents/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        // Input PDF file path
-        const string inputPath = "input.pdf";
-        // Output PDF file path (booklet)
-        const string outputPath = "booklet.pdf";
-
-        // Define left and right page sequences for the booklet
-        int[] leftPages  = new int[] { 1, 2, 3, 4, 5 };
-        int[] rightPages = new int[] { 6, 7, 8, 9, 10 };
-
-        // Verify that the source file exists
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
-
-        // Create the PdfFileEditor facade and generate the booklet
-        PdfFileEditor editor = new PdfFileEditor();
-        bool result = editor.MakeBooklet(inputPath, outputPath, leftPages, rightPages);
-
-        // Report the outcome
-        if (result)
-            Console.WriteLine($"Booklet created successfully: {outputPath}");
-        else
-            Console.Error.WriteLine("Failed to create booklet.");
-    }
-}
+class Program { static void Main() { } }

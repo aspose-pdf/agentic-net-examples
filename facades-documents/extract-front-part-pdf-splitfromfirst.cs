@@ -6,37 +6,23 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPath = "input.pdf";
-        // Output PDF file path (front part of the document)
-        const string outputPath = "front_part.pdf";
-        // Page number up to which the document will be split (inclusive)
-        const int endPage = 5;
+        const string sourcePath = "input.pdf";
+        const string outputPath = "extracted_pages.pdf";
+        const int endPage = 5; // extract pages from the start up to this page (inclusive)
 
-        // Verify that the source file exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePath}");
             return;
         }
 
-        try
-        {
-            // PdfFileEditor does NOT implement IDisposable, so do NOT use a using block
-            PdfFileEditor editor = new PdfFileEditor();
+        // PdfFileEditor does NOT implement IDisposable, so we do NOT wrap it in a using block.
+        PdfFileEditor editor = new PdfFileEditor();
 
-            // Split from the first page to the specified location and save the front part
-            bool success = editor.SplitFromFirst(inputPath, endPage, outputPath);
+        // Use SplitFromFirst to extract pages from the beginning up to endPage.
+        // Signature: SplitFromFirst(string sourceFile, int endPage, string outputFile)
+        editor.SplitFromFirst(sourcePath, endPage, outputPath);
 
-            if (success)
-                Console.WriteLine($"Successfully extracted pages 1-{endPage} to '{outputPath}'.");
-            else
-                Console.WriteLine("SplitFromFirst returned false – operation may have failed.");
-        }
-        catch (Exception ex)
-        {
-            // Handle any unexpected errors
-            Console.Error.WriteLine($"Error during split operation: {ex.Message}");
-        }
+        Console.WriteLine($"Pages 1 to {endPage} have been saved to '{outputPath}'.");
     }
 }

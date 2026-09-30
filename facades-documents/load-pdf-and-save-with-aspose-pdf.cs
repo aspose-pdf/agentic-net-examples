@@ -1,29 +1,31 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string sourcePath = "source.pdf";
 
-        // Verify the source file exists.
-        if (!File.Exists(inputPath))
+        // Verify the source PDF exists
+        if (!File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {sourcePath}");
             return;
         }
 
-        // Load the PDF using the Document class (PdfFileEditor does not support BindPdf/Save/Close).
-        Document pdfDoc = new Document(inputPath);
+        // Load the PDF with Document to obtain information such as page count
+        Document pdfDoc = new Document(sourcePath);
+        int pageCount = pdfDoc.Pages.Count;
+        Console.WriteLine($"Source PDF page count: {pageCount}");
 
-        // Perform any desired editing here (e.g., add stamps, delete pages, etc.).
-        // For this example we simply save the loaded document unchanged.
-
-        pdfDoc.Save(outputPath);
-
-        Console.WriteLine($"PDF loaded from '{inputPath}' and saved to '{outputPath}'.");
+        // Use PdfFileEditor for operations that modify or extract pages
+        PdfFileEditor editor = new PdfFileEditor();
+        string extractedPath = "extracted_page1.pdf";
+        // Correct signature: Extract(sourceFile, pageNumbers, outputFile)
+        editor.Extract(sourcePath, new int[] { 1 }, extractedPath);
+        Console.WriteLine($"Extracted first page to: {extractedPath}");
     }
 }

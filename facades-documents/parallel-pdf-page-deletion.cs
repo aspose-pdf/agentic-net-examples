@@ -1,73 +1,52 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
-class ParallelPdfPageDeletion
+class Program
 {
-    // Represents a single deletion job
-    private class DeletionJob
-    {
-        public string InputPath { get; }
-        public int[] PagesToDelete { get; }
-        public string OutputPath { get; }
-
-        public DeletionJob(string inputPath, int[] pagesToDelete, string outputPath)
-        {
-            InputPath = inputPath;
-            PagesToDelete = pagesToDelete;
-            OutputPath = outputPath;
-        }
-    }
-
     static void Main()
     {
-        // Example list of jobs – replace with real data as needed
-        var jobs = new List<DeletionJob>
-        {
-            new DeletionJob("doc1.pdf", new[] { 2, 3 }, "doc1_clean.pdf"),
-            new DeletionJob("doc2.pdf", new[] { 1 }, "doc2_clean.pdf"),
-            new DeletionJob("doc3.pdf", new[] { 5, 6, 7 }, "doc3_clean.pdf")
-        };
+        // Folder containing source PDFs
+        const string inputFolder = @"C:\Pdf\Input";
+        // Folder where processed PDFs will be written
+        const string outputFolder = @"C:\Pdf\Output";
 
-        // Process all jobs in parallel
-        Parallel.ForEach(jobs, job =>
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Example: delete page number 2 from each PDF
+        const int pageToDelete = 2;
+
+        // Gather all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+
+        // Process files in parallel to improve throughput
+        Parallel.ForEach(pdfFiles, pdfPath =>
         {
-            try
+            string outputPath = Path.Combine(outputFolder,
+                Path.GetFileNameWithoutExtension(pdfPath) + "_modified.pdf");
+
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                // Verify input file exists before attempting deletion
-                if (!File.Exists(job.InputPath))
+                // If the requested page exists, delete it; otherwise just copy the file
+                if (pageToDelete >= 1 && pageToDelete <= doc.Pages.Count)
                 {
-                    Console.Error.WriteLine($"Input file not found: {job.InputPath}");
-                    return;
-                }
-
-                // Each parallel iteration creates its own PdfFileEditor instance
-                // (PdfFileEditor is not thread‑safe, so we must not share it)
-                PdfFileEditor editor = new PdfFileEditor();
-
-                // Delete the specified pages and write the result to the output file
-                bool success = editor.Delete(job.InputPath, job.PagesToDelete, job.OutputPath);
-
-                if (success)
-                {
-                    Console.WriteLine($"Deleted pages {string.Join(",", job.PagesToDelete)} from '{job.InputPath}' → '{job.OutputPath}'");
+                    // Delete the page and save the modified document
+                    doc.Pages.Delete(pageToDelete);
+                    doc.Save(outputPath);
                 }
                 else
                 {
-                    Console.Error.WriteLine($"Failed to delete pages from '{job.InputPath}'");
+                    // No deletion needed – copy original PDF to the output location
+                    File.Copy(pdfPath, outputPath, true);
                 }
+            }
 
-                // No need to call Close() – PdfFileEditor does not implement IDisposable
-                // and does not hold unmanaged resources that require explicit release.
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{job.InputPath}': {ex.Message}");
-            }
+            Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)} → {Path.GetFileName(outputPath)}");
         });
 
-        Console.WriteLine("Parallel deletion completed.");
+        Console.WriteLine("All files have been processed.");
     }
 }

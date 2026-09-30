@@ -1,78 +1,82 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfBookletDemo
+namespace BookletApp
 {
     public static class BookletGenerator
     {
         /// <summary>
-        /// Generates a booklet PDF using only the left (even‑numbered) pages from the first half of the source PDF.
-        /// Returns true if the operation succeeds.
+        /// Generates a booklet PDF that contains only the left (even‑numbered) pages
+        /// from the first half of the source document.
         /// </summary>
-        /// <param name="inputFile">Path to the source PDF file.</param>
-        /// <param name="outputFile">Path where the booklet PDF will be saved.</param>
-        /// <returns>True on success, false otherwise.</returns>
-        public static bool CreateLeftHalfBooklet(string inputFile, string outputFile)
+        /// <param name="sourcePdfPath">Path to the source PDF.</param>
+        /// <param name="outputPdfPath">Path where the booklet PDF will be saved.</param>
+        public static void GenerateLeftPageBooklet(string sourcePdfPath, string outputPdfPath)
         {
-            // Validate input file existence
-            if (!File.Exists(inputFile))
-                throw new FileNotFoundException($"Source file not found: {inputFile}");
+            if (!File.Exists(sourcePdfPath))
+                throw new FileNotFoundException($"Source file not found: {sourcePdfPath}");
 
-            // Load the source PDF to determine page count (using Aspose.Pdf.Document)
-            using (Document srcDoc = new Document(inputFile))
+            // Load the source PDF to determine page count.
+            using (Document srcDoc = new Document(sourcePdfPath))
             {
-                int totalPages = srcDoc.Pages.Count;               // 1‑based page count
-                int halfPages = totalPages / 2;                    // First half (floor if odd)
+                int totalPages = srcDoc.Pages.Count;
+                int halfPages = totalPages / 2; // integer division – first half of the document
 
-                // Collect even (left) and odd (right) page numbers from the first half
-                List<int> leftPagesList = new List<int>();
-                List<int> rightPagesList = new List<int>();
-
-                for (int i = 1; i <= halfPages; i++)
+                // Create a temporary PDF that will hold the selected left pages.
+                using (Document tempDoc = new Document())
                 {
-                    if (i % 2 == 0)      // Even page numbers are left pages
-                        leftPagesList.Add(i);
-                    else                 // Odd page numbers are right pages
-                        rightPagesList.Add(i);
+                    // Left pages are even‑numbered (2,4,6,…). Page indexing is 1‑based.
+                    for (int pageNum = 2; pageNum <= halfPages; pageNum += 2)
+                    {
+                        // Add the page from the source document to the temporary document.
+                        tempDoc.Pages.Add(srcDoc.Pages[pageNum]);
+                    }
+
+                    // Save the temporary PDF to a uniquely named file.
+                    string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
+                    tempDoc.Save(tempPath);
+
+                    try
+                    {
+                        // Use the Facades API to create a booklet from the temporary PDF.
+                        // PdfFileEditor does NOT implement IDisposable, so we do NOT wrap it in a using block.
+                        PdfFileEditor editor = new PdfFileEditor();
+
+                        // Use the overload that does not require a PageSize argument.
+                        editor.MakeBooklet(tempPath, outputPdfPath);
+                    }
+                    finally
+                    {
+                        // Clean up the temporary file.
+                        if (File.Exists(tempPath))
+                            File.Delete(tempPath);
+                    }
                 }
-
-                int[] leftPages = leftPagesList.ToArray();
-                int[] rightPages = rightPagesList.ToArray();
-
-                // Use PdfFileEditor (Facades API) to create the customized booklet
-                PdfFileEditor editor = new PdfFileEditor();
-                bool success = editor.MakeBooklet(inputFile, outputFile, leftPages, rightPages);
-                return success;
             }
         }
     }
 
-    // Entry point required for a console application
-    internal class Program
+    class Program
     {
-        private static void Main(string[] args)
+        static void Main(string[] args)
         {
-            // Simple argument handling – if arguments are missing, show usage.
+            // Expect exactly two arguments: source PDF path and output PDF path.
             if (args.Length != 2)
             {
-                Console.WriteLine("Usage: AsposePdfBookletDemo <input-pdf> <output-pdf>");
+                Console.WriteLine("Usage: BookletApp <sourcePdfPath> <outputPdfPath>");
                 return;
             }
 
-            string inputPath = args[0];
-            string outputPath = args[1];
-
             try
             {
-                bool result = BookletGenerator.CreateLeftHalfBooklet(inputPath, outputPath);
-                Console.WriteLine(result ? "Booklet created successfully." : "Booklet creation failed.");
+                BookletGenerator.GenerateLeftPageBooklet(args[0], args[1]);
+                Console.WriteLine("Booklet created successfully.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                Console.Error.WriteLine($"Error: {ex.Message}");
             }
         }
     }

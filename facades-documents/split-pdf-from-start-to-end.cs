@@ -1,59 +1,44 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-namespace PdfUtilities
+public static class PdfSplitter
 {
-    public static class PdfSplitter
+    /// <summary>
+    /// Splits the input PDF stream from the specified start page to the last page
+    /// and returns the resulting PDF as a MemoryStream.
+    /// </summary>
+    /// <param name="inputPdf">Stream containing the source PDF (must be readable and seekable).</param>
+    /// <param name="startPage">1‑based page number to start the split (inclusive).</param>
+    /// <returns>MemoryStream with the extracted pages.</returns>
+    public static MemoryStream SplitFromStartToEnd(Stream inputPdf, int startPage)
     {
-        /// <summary>
-        /// Splits the PDF contained in <paramref name="inputPdfStream"/> starting from <paramref name="startPage"/>
-        /// to the last page and returns the resulting PDF as a <see cref="MemoryStream"/>.
-        /// </summary>
-        /// <param name="inputPdfStream">Stream that holds the source PDF. The stream must be readable.</param>
-        /// <param name="startPage">1‑based page number from which the split should begin.</param>
-        /// <returns>A MemoryStream containing the split PDF. The caller is responsible for disposing it.</returns>
-        public static MemoryStream SplitFromStartToEnd(Stream inputPdfStream, int startPage)
-        {
-            if (inputPdfStream == null) throw new ArgumentNullException(nameof(inputPdfStream));
-            if (startPage < 1) throw new ArgumentOutOfRangeException(nameof(startPage), "Page numbers are 1‑based.");
+        if (inputPdf == null) throw new ArgumentNullException(nameof(inputPdf));
+        if (!inputPdf.CanSeek) throw new ArgumentException("Input stream must support seeking.", nameof(inputPdf));
+        if (startPage < 1) throw new ArgumentOutOfRangeException(nameof(startPage), "Start page must be >= 1.");
 
-            // PdfFileEditor does NOT implement IDisposable, so we do NOT wrap it in a using block.
-            PdfFileEditor editor = new PdfFileEditor();
+        // Output stream that will hold the split PDF
+        var output = new MemoryStream();
+        var editor = new PdfFileEditor();
 
-            // Output will be written to a MemoryStream. The editor does NOT close the stream,
-            // so we can safely return it after the operation.
-            MemoryStream outputStream = new MemoryStream();
+        // SplitToEnd returns true on success; it writes the result into the output stream
+        bool success = editor.SplitToEnd(inputPdf, startPage, output);
+        if (!success)
+            throw new InvalidOperationException("Split operation failed.");
 
-            // SplitToEnd extracts the rear part of the document starting at the specified page.
-            // The method returns true on success; we can optionally check the result.
-            bool success = editor.SplitToEnd(inputPdfStream, startPage, outputStream);
-            if (!success)
-            {
-                // If the operation failed, dispose the created stream and throw.
-                outputStream.Dispose();
-                throw new InvalidOperationException("Failed to split the PDF document.");
-            }
-
-            // Reset the position to the beginning so that callers can read from the start.
-            outputStream.Position = 0;
-            return outputStream;
-        }
+        // Rewind the stream so the caller can read from the beginning
+        output.Position = 0;
+        return output;
     }
+}
 
-    // ---------------------------------------------------------------------
-    // A minimal entry point is required because the project is built as an
-    // executable (Console Application).  The method above is a library‑style
-    // helper, so the Main method simply demonstrates a no‑op usage to satisfy
-    // the compiler.
-    // ---------------------------------------------------------------------
-    internal class Program
+// Minimal entry point to satisfy the console‑app project configuration.
+public class Program
+{
+    public static void Main(string[] args)
     {
-        private static void Main(string[] args)
-        {
-            // Example placeholder – real usage would pass a PDF stream and a start page.
-            // This stub exists solely to provide a valid entry point for the build.
-            Console.WriteLine("PdfSplitter library loaded. No operation performed.");
-        }
+        // No implementation required for the library functionality.
+        // This stub exists solely to provide a valid Main method.
     }
 }

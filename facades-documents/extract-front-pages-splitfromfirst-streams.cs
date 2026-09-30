@@ -6,45 +6,50 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";   // source PDF file
-        const int endPage = 5;                  // split up to this page (inclusive)
+        // Path to the source PDF file
+        const string sourcePath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        // Desired end page (inclusive) for the extracted range starting from page 1
+        const int endPage = 5;
+
+        // Verify source file exists
+        if (!File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePath}");
             return;
         }
 
-        // Open the source PDF as a read‑only stream
-        using (FileStream inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
+        // Prepare input and output streams
+        using (FileStream inputStream = File.OpenRead(sourcePath))
+        using (MemoryStream outputStream = new MemoryStream())
         {
-            // MemoryStream will receive the front part of the PDF (pages 1..endPage)
-            using (MemoryStream outputStream = new MemoryStream())
+            // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly
+            PdfFileEditor editor = new PdfFileEditor();
+
+            // Extract pages from the first page up to 'endPage' into the output stream
+            // This overload works entirely in memory, no temporary files are created
+            editor.SplitFromFirst(inputStream, endPage, outputStream);
+        }
+
+        // At this point 'outputStream' contains the extracted PDF.
+        // To demonstrate usage, write the in‑memory PDF to a file.
+        // (Re‑open the source and output streams to avoid disposing them above.)
+        using (FileStream inputStream = File.OpenRead(sourcePath))
+        using (MemoryStream tempOutput = new MemoryStream())
+        {
+            PdfFileEditor editor = new PdfFileEditor();
+            editor.SplitFromFirst(inputStream, endPage, tempOutput);
+
+            // Reset position before reading/writing
+            tempOutput.Position = 0;
+
+            const string resultPath = "extracted_pages.pdf";
+            using (FileStream fileOut = File.Create(resultPath))
             {
-                // PdfFileEditor is a Facades class; it does NOT implement IDisposable
-                PdfFileEditor editor = new PdfFileEditor();
-
-                // Perform the split operation in‑memory
-                bool success = editor.SplitFromFirst(inputStream, endPage, outputStream);
-
-                if (!success)
-                {
-                    Console.Error.WriteLine("SplitFromFirst operation failed.");
-                    return;
-                }
-
-                // Reset the output stream position before reading from it
-                outputStream.Position = 0;
-
-                // Example: persist the in‑memory result to a file for verification
-                const string outPath = "front_part.pdf";
-                using (FileStream fileOut = new FileStream(outPath, FileMode.Create, FileAccess.Write))
-                {
-                    outputStream.CopyTo(fileOut);
-                }
-
-                Console.WriteLine($"Pages 1‑{endPage} saved to '{outPath}'.");
+                tempOutput.CopyTo(fileOut);
             }
+
+            Console.WriteLine($"Pages 1‑{endPage} extracted to '{resultPath}'.");
         }
     }
 }

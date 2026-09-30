@@ -1,12 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using System.Linq;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Base directory of the application (portable across environments)
+        // Base directory of the application (works for both Windows and Linux)
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
         // Resolve input and output folders relative to the base directory
@@ -16,53 +17,60 @@ class Program
         // If the input folder does not exist, fall back to the current working directory
         if (!Directory.Exists(inputDirectory))
         {
-            Console.WriteLine($"Input folder not found at '{inputDirectory}'. Using current directory as fallback.");
+            Console.WriteLine($"Input folder '{inputDirectory}' not found. Falling back to current directory.");
             inputDirectory = Directory.GetCurrentDirectory();
         }
 
-        // Ensure the output directory exists
-        if (!Directory.Exists(outputDirectory))
+        // Ensure the output folder exists
+        Directory.CreateDirectory(outputDirectory);
+
+        // Define the pages to delete (1‑based indexing)
+        int[] pagesToDelete = new int[] { 2, 4 };
+
+        // Retrieve all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf");
+        if (pdfFiles.Length == 0)
         {
-            Directory.CreateDirectory(outputDirectory);
+            Console.WriteLine($"No PDF files found in '{inputDirectory}'." );
+            return;
         }
 
-        // Pages to delete (1‑based indexing as required by PdfFileEditor)
-        int[] pagesToDelete = new int[] { 2, 3 }; // example: delete pages 2 and 3
-
-        // Process each PDF file in the input directory
-        try
+        foreach (string inputPath in pdfFiles)
         {
-            string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf");
-            if (pdfFiles.Length == 0)
+            string fileName = Path.GetFileName(inputPath);
+            string outputPath = Path.Combine(outputDirectory, fileName);
+
+            // Verify the source file exists before trying to load it
+            if (!File.Exists(inputPath))
             {
-                Console.WriteLine($"No PDF files found in '{inputDirectory}'.");
-                return;
+                Console.Error.WriteLine($"File not found: {inputPath}");
+                continue;
             }
 
-            foreach (string inputFilePath in pdfFiles)
+            try
             {
-                string fileName = Path.GetFileName(inputFilePath);
-                string outputFilePath = Path.Combine(outputDirectory, fileName);
-
-                // PdfFileEditor does NOT implement IDisposable, so no using block is needed
-                PdfFileEditor editor = new PdfFileEditor();
-
-                // Delete the specified pages and save the result to the output path
-                bool success = editor.Delete(inputFilePath, pagesToDelete, outputFilePath);
-
-                if (success)
+                // Load the PDF document inside a using block to ensure proper disposal
+                using (Document pdfDoc = new Document(inputPath))
                 {
-                    Console.WriteLine($"Successfully processed: {fileName}");
+                    // Delete the specified pages in descending order to avoid index shifting
+                    foreach (int pageNum in pagesToDelete.OrderByDescending(p => p))
+                    {
+                        if (pageNum >= 1 && pageNum <= pdfDoc.Pages.Count)
+                        {
+                            pdfDoc.Pages.Delete(pageNum);
+                        }
+                    }
+
+                    // Save the modified document
+                    pdfDoc.Save(outputPath);
                 }
-                else
-                {
-                    Console.Error.WriteLine($"Failed to process: {fileName}");
-                }
+
+                Console.WriteLine($"Processed: {fileName}");
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"An unexpected error occurred: {ex.Message}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
+            }
         }
     }
 }

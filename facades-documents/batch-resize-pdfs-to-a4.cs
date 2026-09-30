@@ -1,56 +1,68 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // Facade classes such as PdfPageEditor
-using Aspose.Pdf;          // PageSize enum
+using Aspose.Pdf;
 
-class BatchResizeToA4
+class BatchResizePdf
 {
     static void Main()
     {
-        // Define source and target directories
-        const string sourceFolder = @"C:\SourcePdfs";
-        const string targetFolder = @"C:\ResizedPdfs";
+        // Use the application's base directory to build input/output paths.
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string sourceFolder = Path.Combine(baseDir, "SourcePdfs");
+        string targetFolder = Path.Combine(baseDir, "ResizedPdfs");
 
-        // Verify source folder exists
+        // Validate source folder – if it does not exist, create it and inform the user.
         if (!Directory.Exists(sourceFolder))
         {
-            Console.Error.WriteLine($"Source folder not found: {sourceFolder}");
+            Console.WriteLine($"Source folder not found: '{sourceFolder}'. Creating an empty folder.");
+            Directory.CreateDirectory(sourceFolder);
+            Console.WriteLine("Place PDF files into the source folder and re‑run the program.");
             return;
         }
 
-        // Create target folder if it does not exist
+        // Ensure the target directory exists.
         Directory.CreateDirectory(targetFolder);
 
-        // Process each PDF file in the source folder
-        string[] pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf");
-        foreach (string sourcePath in pdfFiles)
+        // Get all PDF files in the source folder.
+        string[] pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length == 0)
+        {
+            Console.WriteLine($"No PDF files found in '{sourceFolder}'." );
+            return;
+        }
+
+        foreach (string pdfPath in pdfFiles)
         {
             try
             {
-                string fileName = Path.GetFileName(sourcePath);
-                string destinationPath = Path.Combine(targetFolder, fileName);
-
-                // PdfPageEditor implements IDisposable via SaveableFacade, so use a using block
-                using (PdfPageEditor editor = new PdfPageEditor())
+                // Verify the file still exists before loading.
+                if (!File.Exists(pdfPath))
                 {
-                    // Bind the source PDF file
-                    editor.BindPdf(sourcePath);
-
-                    // Set the desired page size (A4)
-                    editor.PageSize = PageSize.A4;
-
-                    // Apply the changes to all pages (default behavior)
-                    editor.ApplyChanges();
-
-                    // Save the resized PDF to the target location
-                    editor.Save(destinationPath);
+                    Console.Error.WriteLine($"File not found: {pdfPath}");
+                    continue;
                 }
 
-                Console.WriteLine($"Resized: {fileName} → {destinationPath}");
+                // Load the PDF document inside a using block to ensure proper disposal.
+                using (Document pdfDoc = new Document(pdfPath))
+                {
+                    // Resize each page to A4 size.
+                    foreach (Page page in pdfDoc.Pages)
+                    {
+                        page.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
+                    }
+
+                    // Build the output file path.
+                    string outputPath = Path.Combine(targetFolder, Path.GetFileName(pdfPath));
+
+                    // Save the resized PDF.
+                    pdfDoc.Save(outputPath);
+                }
+
+                Console.WriteLine($"Resized: {Path.GetFileName(pdfPath)} → {targetFolder}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{sourcePath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
 

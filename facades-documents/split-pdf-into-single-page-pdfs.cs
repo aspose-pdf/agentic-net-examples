@@ -7,59 +7,60 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPdf  = "input.pdf";
         const string outputDir = "SplitPages";
 
-        // Verify input file exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Create PdfFileEditor instance (does not implement IDisposable)
-        PdfFileEditor editor = new PdfFileEditor();
-
-        // Use Document to determine the number of pages (required to build split ranges)
-        using (Document doc = new Document(inputPath))
+        try
         {
+            // PdfFileEditor does NOT implement IDisposable – do NOT wrap in using
+            PdfFileEditor editor = new PdfFileEditor();
+
+            // Load the document to determine the total number of pages
+            Document doc = new Document(inputPdf);
             int pageCount = doc.Pages.Count;
 
-            // Build an array of page ranges, each range contains a single page (start, end)
-            int[][] ranges = new int[pageCount][];
+            // Build page‑range array where each range contains a single page (1‑based)
+            int[][] pageRanges = new int[pageCount][];
             for (int i = 0; i < pageCount; i++)
             {
-                // Pages are 1‑based in Aspose.Pdf
-                ranges[i] = new int[] { i + 1, i + 1 };
+                pageRanges[i] = new int[] { i + 1 };
             }
 
-            // Perform bulk split; each MemoryStream contains a separate PDF document
-            MemoryStream[] splitStreams = editor.SplitToBulks(inputPath, ranges);
+            // Split the PDF into individual pages and obtain them as MemoryStream objects.
+            // SplitToBulks returns an array of MemoryStream, one per defined range.
+            MemoryStream[] pageStreams = editor.SplitToBulks(inputPdf, pageRanges);
 
-            // Iterate over the resulting streams and write each to a uniquely named file
-            for (int i = 0; i < splitStreams.Length; i++)
+            // Write each MemoryStream to a uniquely named PDF file
+            for (int i = 0; i < pageStreams.Length; i++)
             {
+                // Ensure the stream is positioned at the beginning
+                MemoryStream ms = pageStreams[i];
+                ms.Position = 0;
+
                 string outPath = Path.Combine(outputDir, $"page_{i + 1}.pdf");
-
-                // Reset stream position before reading
-                splitStreams[i].Position = 0;
-
-                // Write the stream content to a file
-                using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                using (FileStream file = new FileStream(outPath, FileMode.Create, FileAccess.Write))
                 {
-                    splitStreams[i].CopyTo(fs);
+                    ms.CopyTo(file);
                 }
 
-                // Dispose the individual MemoryStream
-                splitStreams[i].Dispose();
+                // Dispose the stream after writing
+                ms.Dispose();
 
-                Console.WriteLine($"Saved split PDF: {outPath}");
+                Console.WriteLine($"Saved page {i + 1} to '{outPath}'");
             }
         }
-
-        // No explicit disposal needed for PdfFileEditor
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during split: {ex.Message}");
+        }
     }
 }

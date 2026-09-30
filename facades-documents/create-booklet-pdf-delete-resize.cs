@@ -1,66 +1,79 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfApi
+public static class PdfBookletHelper
 {
-    public static class PdfProcessor
+    /// <summary>
+    /// Accepts a PDF stream, deletes a page range, resizes all pages, and returns a booklet PDF stream.
+    /// </summary>
+    /// <param name="pdfInput">Input PDF as a readable stream.</param>
+    /// <param name="deleteStart">First page to delete (1‑based inclusive).</param>
+    /// <param name="deleteEnd">Last page to delete (1‑based inclusive).</param>
+    /// <param name="newWidth">New page width in points.</param>
+    /// <param name="newHeight">New page height in points.</param>
+    /// <returns>MemoryStream containing the booklet PDF.</returns>
+    public static Stream CreateBooklet(Stream pdfInput, int deleteStart, int deleteEnd, double newWidth, double newHeight)
     {
-        /// <summary>
-        /// Accepts a PDF stream, deletes the specified pages, resizes all pages,
-        /// and returns a booklet version of the resulting document as a stream.
-        /// </summary>
-        /// <param name="inputPdf">Input PDF stream (must be readable and seekable).</param>
-        /// <param name="pagesToDelete">Array of page numbers (1‑based) to remove.</param>
-        /// <param name="newWidth">New width of page contents in default space units.</param>
-        /// <param name="newHeight">New height of page contents in default space units.</param>
-        /// <returns>A MemoryStream containing the booklet PDF.</returns>
-        public static Stream CreateBooklet(Stream inputPdf, int[] pagesToDelete, double newWidth, double newHeight)
+        // Load the PDF from the incoming stream using Document (PdfFileEditor has no BindPdf).
+        Document pdfDoc = new Document(pdfInput);
+
+        // ---------------------------------------------------------------------
+        // 1. Delete the requested page range (if the range is valid).
+        //    Deleting from the highest index downwards prevents re‑indexing issues.
+        // ---------------------------------------------------------------------
+        if (deleteStart > 0 && deleteEnd >= deleteStart && deleteEnd <= pdfDoc.Pages.Count)
         {
-            if (inputPdf == null) throw new ArgumentNullException(nameof(inputPdf));
-            if (pagesToDelete == null) throw new ArgumentNullException(nameof(pagesToDelete));
-
-            // Ensure the input stream is positioned at the beginning.
-            inputPdf.Position = 0;
-
-            // Intermediate stream after page deletion.
-            using var afterDelete = new MemoryStream();
-
-            // Intermediate stream after resizing.
-            using var afterResize = new MemoryStream();
-
-            // Final booklet stream to be returned.
-            var bookletStream = new MemoryStream();
-
-            // PdfFileEditor provides Delete, ResizeContents, and MakeBooklet operations.
-            // NOTE: PdfFileEditor does NOT implement IDisposable, so we instantiate it directly.
-            var editor = new PdfFileEditor();
-
-            // 1. Delete the unwanted pages.
-            // The Delete method writes the result into afterDelete.
-            editor.Delete(inputPdf, pagesToDelete, afterDelete);
-            afterDelete.Position = 0; // Reset for the next operation.
-
-            // 2. Resize all pages (null pages array means all pages).
-            // This shrinks the content to the specified width/height and adds margins.
-            editor.ResizeContents(afterDelete, afterResize, null, newWidth, newHeight);
-            afterResize.Position = 0; // Reset for the next operation.
-
-            // 3. Create a booklet from the resized document.
-            editor.MakeBooklet(afterResize, bookletStream);
-            bookletStream.Position = 0; // Prepare the stream for the caller.
-
-            // No need to dispose editor (it has no unmanaged resources).
-            return bookletStream;
+            for (int i = deleteEnd; i >= deleteStart; i--)
+            {
+                pdfDoc.Pages.Delete(i);
+            }
         }
+
+        // ---------------------------------------------------------------------
+        // 2. Resize every remaining page to the new dimensions.
+        //    Page.SetPageSize(width, height) works with points.
+        // ---------------------------------------------------------------------
+        foreach (Page page in pdfDoc.Pages)
+        {
+            page.SetPageSize(newWidth, newHeight);
+        }
+
+        // ---------------------------------------------------------------------
+        // 3. Save the modified document to a temporary file – PdfFileEditor works
+        //    with file paths, not streams.
+        // ---------------------------------------------------------------------
+        string tempInputPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
+        string tempOutputPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
+        pdfDoc.Save(tempInputPath);
+
+        // ---------------------------------------------------------------------
+        // 4. Create the booklet using the overload that only requires input and
+        //    output file paths (no PageSize enum).
+        // ---------------------------------------------------------------------
+        PdfFileEditor editor = new PdfFileEditor();
+        editor.MakeBooklet(tempInputPath, tempOutputPath);
+
+        // ---------------------------------------------------------------------
+        // 5. Load the resulting booklet PDF into a MemoryStream for the caller.
+        // ---------------------------------------------------------------------
+        MemoryStream outputStream = new MemoryStream();
+        using (FileStream fs = new FileStream(tempOutputPath, FileMode.Open, FileAccess.Read))
+        {
+            fs.CopyTo(outputStream);
+        }
+        outputStream.Position = 0;
+
+        // ---------------------------------------------------------------------
+        // 6. Clean up temporary files.
+        // ---------------------------------------------------------------------
+        try { File.Delete(tempInputPath); } catch { /* ignore */ }
+        try { File.Delete(tempOutputPath); } catch { /* ignore */ }
+
+        return outputStream;
     }
 
     // Dummy entry point to satisfy the compiler when building as an executable.
-    public static class Program
-    {
-        public static void Main(string[] args)
-        {
-            // Intentionally left blank – the library functionality is exposed via PdfProcessor.
-        }
-    }
+    public static void Main() { }
 }

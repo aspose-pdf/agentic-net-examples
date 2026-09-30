@@ -6,12 +6,16 @@ class Program
 {
     static void Main()
     {
-        // Define input PDF files and the output file
-        string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
-        string outputFile = "merged.pdf";
+        // Input PDF files to be merged (order matters)
+        string[] inputFiles = new string[]
+        {
+            "doc1.pdf",
+            "doc2.pdf",
+            "doc3.pdf"
+        };
 
-        // Verify that all input files exist before proceeding
-        foreach (var file in inputFiles)
+        // Verify that all input files exist
+        foreach (string file in inputFiles)
         {
             if (!File.Exists(file))
             {
@@ -20,32 +24,51 @@ class Program
             }
         }
 
-        // Log the files that will be processed
-        Console.WriteLine("Starting PDF concatenation:");
-        foreach (var file in inputFiles)
+        // Directory for intermediate and final merged PDFs
+        string outputDir = "MergedOutputs";
+        Directory.CreateDirectory(outputDir);
+
+        // Initial source is the first file
+        string currentMerged = Path.Combine(outputDir, "merged_step_0.pdf");
+        File.Copy(inputFiles[0], currentMerged, true);
+        Console.WriteLine($"[Step 0] Initialized with: {inputFiles[0]} -> {currentMerged}");
+
+        // PdfFileEditor does NOT implement IDisposable – do NOT wrap in using
+        PdfFileEditor editor = new PdfFileEditor();
+
+        // Sequentially concatenate each subsequent file
+        for (int i = 1; i < inputFiles.Length; i++)
         {
-            Console.WriteLine($"Input: {file}");
+            string nextInput = inputFiles[i];
+            string nextMerged = Path.Combine(outputDir, $"merged_step_{i}.pdf");
+
+            // Perform concatenation of the current merged file with the next input file
+            try
+            {
+                editor.Concatenate(new string[] { currentMerged, nextInput }, nextMerged);
+                Console.WriteLine($"[Step {i}] Concatenated: {currentMerged} + {nextInput} -> {nextMerged}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error during concatenation at step {i}: {ex.Message}");
+                return;
+            }
+
+            // Prepare for the next iteration
+            currentMerged = nextMerged;
         }
-        Console.WriteLine($"Output: {outputFile}");
 
-        // Perform the concatenation using PdfFileEditor
-        PdfFileEditor editor = new PdfFileEditor
+        // Final merged PDF path
+        string finalOutput = Path.Combine(outputDir, "final_merged.pdf");
+        try
         {
-            // Example setting: preserve logical structure during concatenation
-            CopyLogicalStructure = true
-        };
-
-        bool success = editor.Concatenate(inputFiles, outputFile);
-
-        // Report the result
-        if (success)
-        {
-            Console.WriteLine("Concatenation completed successfully.");
+            // Rename the last intermediate file to the final output name
+            File.Move(currentMerged, finalOutput, true);
+            Console.WriteLine($"Final merged PDF: {finalOutput}");
         }
-        else
+        catch (Exception ex)
         {
-            Console.Error.WriteLine("Concatenation failed.");
-            Console.Error.WriteLine(editor.ConversionLog);
+            Console.Error.WriteLine($"Error moving final file: {ex.Message}");
         }
     }
 }

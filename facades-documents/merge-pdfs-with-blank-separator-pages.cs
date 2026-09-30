@@ -8,12 +8,12 @@ class Program
 {
     static void Main()
     {
-        // Input PDF files to be merged
-        string[] inputFiles = { "first.pdf", "second.pdf", "third.pdf" };
+        // Input PDF files to be concatenated
+        string[] inputFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
         string outputFile = "merged_with_separators.pdf";
 
-        // Verify that all input files exist
-        foreach (var file in inputFiles)
+        // Validate input files
+        foreach (string file in inputFiles)
         {
             if (!File.Exists(file))
             {
@@ -22,41 +22,49 @@ class Program
             }
         }
 
-        // Create a temporary PDF that contains a single blank page.
-        // This file will be inserted between each pair of input PDFs.
+        // Path for the temporary blank separator page
         string blankPagePath = Path.Combine(Path.GetTempPath(), "blank_separator.pdf");
-        CreateBlankPdf(blankPagePath);
 
-        // Build the concatenation order: pdf, blank, pdf, blank, …, last pdf (no trailing blank)
-        var filesInOrder = new List<string>();
-        for (int i = 0; i < inputFiles.Length; i++)
+        try
         {
-            filesInOrder.Add(inputFiles[i]);
-            if (i < inputFiles.Length - 1)
-                filesInOrder.Add(blankPagePath);
+            // Create a single blank page PDF using Document (lifecycle rule)
+            using (Document blankDoc = new Document())
+            {
+                // Add an empty page
+                blankDoc.Pages.Add();
+                // Save the blank PDF
+                blankDoc.Save(blankPagePath);
+            }
+
+            // Build the list of files to concatenate, inserting the blank page between PDFs
+            List<string> filesToConcat = new List<string>();
+            for (int i = 0; i < inputFiles.Length; i++)
+            {
+                filesToConcat.Add(inputFiles[i]);
+                // Add separator after each file except the last one
+                if (i < inputFiles.Length - 1)
+                {
+                    filesToConcat.Add(blankPagePath);
+                }
+            }
+
+            // Use PdfFileEditor (Facades) to concatenate the PDFs
+            PdfFileEditor editor = new PdfFileEditor();
+            editor.Concatenate(filesToConcat.ToArray(), outputFile);
+
+            Console.WriteLine($"Merged PDF with separators saved to '{outputFile}'.");
         }
-
-        // Use PdfFileEditor (Aspose.Pdf.Facades) to concatenate the sequence into one document.
-        PdfFileEditor editor = new PdfFileEditor();
-        bool result = editor.Concatenate(filesInOrder.ToArray(), outputFile);
-
-        if (result)
-            Console.WriteLine($"Successfully created merged PDF: {outputFile}");
-        else
-            Console.Error.WriteLine("Failed to concatenate PDFs.");
-
-        // Clean up the temporary blank page file.
-        try { File.Delete(blankPagePath); } catch { }
-    }
-
-    // Helper method that creates a PDF containing a single blank page.
-    static void CreateBlankPdf(string path)
-    {
-        using (Document doc = new Document())
+        catch (Exception ex)
         {
-            // Add an empty page (default size is A4).
-            doc.Pages.Add();
-            doc.Save(path);
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            // Clean up the temporary blank page file
+            if (File.Exists(blankPagePath))
+            {
+                try { File.Delete(blankPagePath); } catch { /* ignore cleanup errors */ }
+            }
         }
     }
 }
