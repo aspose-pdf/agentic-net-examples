@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_8_5x11.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "resized.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,27 +15,29 @@ class Program
             return;
         }
 
-        // 1 inch = 72 points. 8.5 x 11 inches => 612 x 792 points
-        const double widthPoints  = 8.5 * 72; // 612
-        const double heightPoints = 11  * 72; // 792
+        // 1 inch = 72 points
+        const double inchToPoint = 72.0;
+        double width = 8.5 * inchToPoint;   // 612 points
+        double height = 11.0 * inchToPoint; // 792 points
 
-        // Create resize parameters that set the new page size
-        PdfFileEditor.ContentsResizeParameters resizeParams =
-            PdfFileEditor.ContentsResizeParameters.PageResize(widthPoints, heightPoints);
-
-        // Use stream overload to apply the new page size to all pages (pages = null)
-        using (FileStream srcStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
-        using (FileStream destStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+        // Load the PDF from a stream (stream overload)
+        using (FileStream inputStream = File.OpenRead(inputPath))
+        using (Document pdf = new Document(inputStream))
         {
-            PdfFileEditor editor = new PdfFileEditor();
-            bool success = editor.ResizeContents(srcStream, destStream, null, resizeParams);
-            if (!success)
+            // Resize each page to 8.5 x 11 inches using PageInfo
+            foreach (Page page in pdf.Pages)
             {
-                Console.Error.WriteLine("Failed to resize page dimensions.");
-                return;
+                page.PageInfo.Width = width;
+                page.PageInfo.Height = height;
+            }
+
+            // Save the modified PDF to an output stream
+            using (FileStream outputStream = File.Create(outputPath))
+            {
+                pdf.Save(outputStream);
             }
         }
 
-        Console.WriteLine($"PDF resized to 8.5x11 inches and saved as '{outputPath}'.");
+        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
     }
 }

@@ -1,39 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// Split pdf into individual pages__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/facades-documents/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        // Input PDF file to be split
-        const string inputPdf = "input.pdf";
-
-        // Template for output files – %NUM% will be replaced by the page number (1‑based)
-        // Example: "output/page_%NUM%.pdf" will produce page_1.pdf, page_2.pdf, etc.
-        const string outputTemplate = "output/page_%NUM%.pdf";
-
-        // Verify that the input file exists
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-
-        // Ensure the output directory exists
-        string outputDir = Path.GetDirectoryName(outputTemplate);
-        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
-        {
-            Directory.CreateDirectory(outputDir);
-        }
-
-        // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly
-        PdfFileEditor editor = new PdfFileEditor();
-
-        // Split the PDF into individual pages; each page is saved to a separate file
-        // according to the template provided.
-        editor.SplitToPages(inputPdf, outputTemplate);
-
-        Console.WriteLine("PDF split into individual pages successfully.");
-    }
-}
+class Program { static void Main() { } }

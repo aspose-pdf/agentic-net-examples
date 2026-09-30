@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf.Facades;
 
@@ -8,43 +9,47 @@ class Program
     {
         const string inputPath = "input.pdf";
 
+        // Define bulk page counts (e.g., first bulk 2 pages, second bulk 3 pages, etc.)
+        int[] bulkCounts = new int[] { 2, 3 };
+
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Define bulk page ranges (1‑based inclusive)
-        int[][] bulkRanges = new int[][]
+        // Convert the page‑count array into an array of page‑range arrays required by SplitToBulks
+        List<int[]> rangeList = new List<int[]>();
+        int startPage = 1;
+        foreach (int count in bulkCounts)
         {
-            new int[] { 1, 3 }, // pages 1 to 3
-            new int[] { 4, 5 }  // pages 4 to 5
-        };
+            int endPage = startPage + count - 1;
+            rangeList.Add(new int[] { startPage, endPage });
+            startPage = endPage + 1;
+        }
+        int[][] bulkRanges = rangeList.ToArray();
 
-        // Open source PDF as a read‑only stream
-        using (FileStream sourceStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
+        // Split the PDF into bulks; each bulk is returned as a MemoryStream
+        PdfFileEditor editor = new PdfFileEditor();
+        MemoryStream[] bulks = editor.SplitToBulks(inputPath, bulkRanges);
+
+        // Save each bulk to a separate file and dispose the streams
+        for (int i = 0; i < bulks.Length; i++)
         {
-            // Split the PDF into the defined bulks; each bulk is returned as a MemoryStream
-            PdfFileEditor editor = new PdfFileEditor();
-            MemoryStream[] bulkStreams = editor.SplitToBulks(sourceStream, bulkRanges);
+            string outPath = $"bulk_{i + 1}.pdf";
 
-            // Save each bulk stream to a separate file
-            for (int i = 0; i < bulkStreams.Length; i++)
+            // Ensure the MemoryStream is positioned at the beginning before copying
+            bulks[i].Position = 0;
+
+            using (FileStream outStream = File.Create(outPath))
             {
-                // Reset position to the beginning before reading
-                bulkStreams[i].Position = 0;
-
-                string outPath = $"bulk_{i + 1}.pdf";
-                using (FileStream outFile = new FileStream(outPath, FileMode.Create, FileAccess.Write))
-                {
-                    bulkStreams[i].CopyTo(outFile);
-                }
-
-                // Dispose the memory stream after it has been written
-                bulkStreams[i].Dispose();
-
-                Console.WriteLine($"Bulk {i + 1} saved to '{outPath}'.");
+                bulks[i].CopyTo(outStream);
             }
+
+            Console.WriteLine($"Saved bulk {i + 1} to {outPath}");
+
+            // Release the MemoryStream resources
+            bulks[i].Dispose();
         }
     }
 }

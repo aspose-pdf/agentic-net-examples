@@ -1,81 +1,76 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+public static class PdfSplitter
 {
-    static void Main()
+    /// <summary>
+    /// Splits the input PDF stream into multiple bulk page sets.
+    /// Each set contains up to <paramref name="bulkSize"/> pages.
+    /// Returns an array of MemoryStream objects, each representing a subset PDF.
+    /// </summary>
+    /// <param name="pdfStream">Input PDF as a seekable stream.</param>
+    /// <param name="bulkSize">Maximum number of pages per output set.</param>
+    /// <returns>Array of MemoryStream, each containing a PDF fragment.</returns>
+    public static MemoryStream[] SplitPdfIntoBulkSets(Stream pdfStream, int bulkSize)
     {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
+        if (pdfStream == null) throw new ArgumentNullException(nameof(pdfStream));
+        if (!pdfStream.CanSeek) throw new ArgumentException("Stream must support seeking.", nameof(pdfStream));
+        if (bulkSize <= 0) throw new ArgumentOutOfRangeException(nameof(bulkSize), "Bulk size must be greater than zero.");
 
-        // Directory where the split PDFs will be saved
-        const string outputDirectory = "BulkSplits";
-
-        // Define start‑end page pairs (1‑based indexing)
-        // Example: split into pages 1‑3, 4‑6, and 7‑10
-        // NOTE: In Aspose.PDF evaluation mode a document can contain at most 4 pages.
-        // Therefore we limit the ranges to the first 4 pages only.
-        int[][] pageRanges = new int[][]
+        // Read the entire PDF into a byte array so it can be reused for each extraction.
+        byte[] pdfBytes;
+        using (MemoryStream temp = new MemoryStream())
         {
-            new int[] { 1, 3 },
-            new int[] { 4, 4 } // trimmed to stay within the 4‑page limit
-        };
+            pdfStream.CopyTo(temp);
+            pdfBytes = temp.ToArray();
+        }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDirectory);
-
-        // ---------------------------------------------------------------------
-        // Create a placeholder PDF if the expected input file does not exist.
-        // The placeholder must contain at least as many pages as the highest
-        // page number referenced in the (potentially trimmed) pageRanges array.
-        // Evaluation mode caps the page count at 4, so we enforce that limit.
-        // ---------------------------------------------------------------------
-        if (!File.Exists(inputPdf))
+        // Determine total page count using Document (wrapped in using for proper disposal).
+        int pageCount;
+        using (Document doc = new Document(new MemoryStream(pdfBytes)))
         {
-            // Determine the maximum page number required, but cap it at 4.
-            int maxPage = pageRanges.Max(r => r.Length >= 2 ? r[1] : 0);
-            int maxAllowed = Math.Min(maxPage, 4); // evaluation‑mode limit
+            pageCount = doc.Pages.Count;
+        }
 
-            // Create a minimal PDF with the required number of blank pages.
-            using (var placeholder = new Document())
+        // Calculate how many bulk sets are needed.
+        int setCount = (pageCount + bulkSize - 1) / bulkSize;
+        var result = new MemoryStream[setCount];
+
+        for (int i = 0; i < setCount; i++)
+        {
+            // Aspose.Pdf uses 1‑based page indexing.
+            int startPage = i * bulkSize + 1;
+            int endPage   = Math.Min(startPage + bulkSize - 1, pageCount);
+
+            // Create a fresh source stream for each extraction.
+            using (MemoryStream srcStream = new MemoryStream(pdfBytes))
+            using (Document srcDoc = new Document(srcStream))
             {
-                for (int i = 0; i < maxAllowed; i++)
+                // Create a new document that will hold the selected page range.
+                Document subsetDoc = new Document();
+
+                for (int p = startPage; p <= endPage; p++)
                 {
-                    placeholder.Pages.Add();
+                    // Add a copy of each required page to the subset document.
+                    subsetDoc.Pages.Add(srcDoc.Pages[p]);
                 }
-                placeholder.Save(inputPdf);
+
+                MemoryStream destStream = new MemoryStream();
+                subsetDoc.Save(destStream);
+                destStream.Position = 0; // Reset for consumer reading.
+                result[i] = destStream; // Store the resulting MemoryStream.
             }
         }
 
-        // Create the PdfFileEditor facade
-        PdfFileEditor editor = new PdfFileEditor();
+        return result;
+    }
 
-        // Split the PDF into the defined bulk page sets
-        // Returns an array of MemoryStream, each containing a PDF document
-        MemoryStream[] bulkStreams = editor.SplitToBulks(inputPdf, pageRanges);
-
-        // Save each resulting MemoryStream to a separate file
-        for (int i = 0; i < bulkStreams.Length; i++)
-        {
-            // Reset stream position before reading
-            bulkStreams[i].Position = 0;
-
-            // Build the output file name (e.g., bulk_1.pdf, bulk_2.pdf, ...)
-            string outputPath = Path.Combine(outputDirectory, $"bulk_{i + 1}.pdf");
-
-            // Write the stream content to the file
-            using (FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-            {
-                bulkStreams[i].CopyTo(fileStream);
-            }
-
-            // Dispose the individual MemoryStream
-            bulkStreams[i].Dispose();
-        }
-
-        Console.WriteLine("PDF split into bulk page sets completed.");
+    // Minimal entry point to satisfy the compiler when the project is built as an executable.
+    public static void Main(string[] args)
+    {
+        // The method is intentionally left empty – the library functionality is exercised
+        // via the SplitPdfIntoBulkSets method from user code or unit tests.
     }
 }

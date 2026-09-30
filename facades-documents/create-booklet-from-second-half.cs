@@ -1,71 +1,85 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        // Simple demonstration of the booklet generator.
-        // Expected arguments: <inputPdfPath> <outputPdfPath>
-        if (args.Length >= 2)
-        {
-            try
-            {
-                bool success = BookletGenerator.CreateBookletFromSecondHalf(args[0], args[1]);
-                Console.WriteLine(success ? "Booklet created successfully." : "Failed to create booklet.");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error: {ex.Message}");
-            }
-        }
-        else
-        {
-            Console.WriteLine("Usage: <inputPdfPath> <outputPdfPath>");
-        }
-    }
-}
-
-public static class BookletGenerator
+public class BookletGenerator
 {
     /// <summary>
-    /// Creates a booklet PDF where the left pages come from the first half of the source
-    /// and the right pages come from the second half of the source PDF.
+    /// Generates a booklet PDF that contains only the right‑hand (odd‑numbered) pages
+    /// from the second half of the source PDF.
     /// </summary>
-    /// <param name="inputFile">Path to the source PDF.</param>
-    /// <param name="outputFile">Path where the booklet PDF will be saved.</param>
-    /// <returns>True if the operation succeeded; otherwise false.</returns>
-    public static bool CreateBookletFromSecondHalf(string inputFile, string outputFile)
+    /// <param name="sourcePath">Full path to the source PDF.</param>
+    /// <param name="outputPath">Full path where the booklet PDF will be saved.</param>
+    public static void GenerateBooklet(string sourcePath, string outputPath)
     {
-        if (string.IsNullOrWhiteSpace(inputFile) || string.IsNullOrWhiteSpace(outputFile))
-            throw new ArgumentException("Input and output file paths must be provided.");
+        if (!File.Exists(sourcePath))
+            throw new FileNotFoundException("Source PDF not found.", sourcePath);
 
-        // Determine the total number of pages in the source PDF.
+        // Determine the page range that represents the second half of the document.
         int totalPages;
-        using (Document srcDoc = new Document(inputFile))
+        using (Document srcDoc = new Document(sourcePath))
         {
             totalPages = srcDoc.Pages.Count;
         }
 
-        if (totalPages == 0)
-            throw new InvalidOperationException("Source PDF contains no pages.");
+        if (totalPages < 2)
+            throw new InvalidOperationException("Source PDF must contain at least two pages.");
 
-        // Split the document into two halves.
-        int half = totalPages / 2; // integer division; if odd, the extra page goes to the right side.
+        int halfStart = (totalPages / 2) + 1; // first page of the second half (1‑based)
 
-        // Left pages: 1 .. half
-        int[] leftPages = Enumerable.Range(1, half).ToArray();
+        // Extract the second half into a temporary PDF using the Facades API.
+        string tempHalfPath = Path.Combine(Path.GetTempPath(),
+                                           Guid.NewGuid().ToString("N") + "_secondHalf.pdf");
 
-        // Right pages: (half + 1) .. totalPages
-        int[] rightPages = Enumerable.Range(half + 1, totalPages - half).ToArray();
-
-        // Use PdfFileEditor (Facades) to create the booklet with the specified page arrays.
         PdfFileEditor editor = new PdfFileEditor();
-        bool result = editor.MakeBooklet(inputFile, outputFile, leftPages, rightPages);
+        // NOTE: In older Aspose.Pdf versions the Extract method signature is
+        // Extract(string sourceFile, int startPage, int endPage, string outputFile).
+        // The parameters are therefore reordered to match that signature.
+        editor.Extract(sourcePath, halfStart, totalPages, tempHalfPath);
 
-        return result;
+        // Build the booklet by selecting only the right‑hand (odd) pages from the extracted half.
+        using (Document halfDoc = new Document(tempHalfPath))
+        using (Document booklet = new Document())
+        {
+            // Pages collection is 1‑based.
+            for (int i = 1; i <= halfDoc.Pages.Count; i++)
+            {
+                // Right pages are odd‑numbered.
+                if (i % 2 == 1)
+                {
+                    // Add the page to the booklet.
+                    booklet.Pages.Add(halfDoc.Pages[i]);
+                }
+            }
+
+            // Save the resulting booklet.
+            booklet.Save(outputPath);
+        }
+
+        // Clean up the temporary file.
+        try { File.Delete(tempHalfPath); } catch { /* ignore cleanup errors */ }
+    }
+
+    // ---------------------------------------------------------------------
+    // Entry point required for a console application (CS5001 fix).
+    // ---------------------------------------------------------------------
+    public static void Main(string[] args)
+    {
+        if (args.Length < 2)
+        {
+            Console.WriteLine("Usage: BookletGenerator <sourcePdfPath> <outputPdfPath>");
+            return;
+        }
+
+        try
+        {
+            GenerateBooklet(args[0], args[1]);
+            Console.WriteLine($"Booklet created successfully at '{args[1]}'");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

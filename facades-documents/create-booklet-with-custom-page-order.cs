@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
@@ -7,26 +8,50 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "booklet.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "booklet.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPdf}");
             return;
         }
 
-        // Define custom page order: left (odd‑hand) pages and right (even‑hand) pages.
-        // Example arrangement – left pages are even numbers, right pages are odd numbers.
-        int[] leftPages = new int[] { 2, 4, 6, 8 };
-        int[] rightPages = new int[] { 1, 3, 5, 7, 9, 10 };
+        try
+        {
+            // Load the source document to determine the total number of pages.
+            Document srcDoc = new Document(inputPdf);
+            int pageCount = srcDoc.Pages.Count;
 
-        // PdfFileEditor does NOT implement IDisposable, so do NOT wrap it in a using statement.
-        PdfFileEditor editor = new PdfFileEditor();
-        bool result = editor.MakeBooklet(inputPath, outputPath, PageSize.A4, leftPages, rightPages);
+            // Build page‑number arrays: odd pages on the left, even pages on the right.
+            List<int> leftHandOddPages = new List<int>();
+            List<int> rightHandEvenPages = new List<int>();
 
-        Console.WriteLine(result
-            ? $"Booklet created successfully: {outputPath}"
-            : "Failed to create booklet.");
+            for (int i = 1; i <= pageCount; i++)
+            {
+                if (i % 2 == 1)
+                    leftHandOddPages.Add(i);   // odd page → left side
+                else
+                    rightHandEvenPages.Add(i); // even page → right side
+            }
+
+            PdfFileEditor editor = new PdfFileEditor();
+            // The overload expects int[] for left‑hand odd pages and right‑hand even pages.
+            bool success = editor.MakeBooklet(
+                inputPdf,
+                outputPdf,
+                leftHandOddPages.ToArray(),
+                rightHandEvenPages.ToArray()
+            );
+
+            if (success)
+                Console.WriteLine($"Booklet created successfully: {outputPdf}");
+            else
+                Console.Error.WriteLine("Booklet creation failed.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during booklet creation: {ex.Message}");
+        }
     }
 }

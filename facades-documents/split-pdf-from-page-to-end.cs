@@ -1,38 +1,44 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPath = "input.pdf";
-        // Output PDF file path (the split part from startPage to the end)
-        const string outputPath = "output_split.pdf";
-        // Page number from which to start the split (1‑based indexing)
-        const int startPage = 3;
+        const string inputPath  = "input.pdf";   // source PDF
+        const string outputPath = "output.pdf";  // result PDF
+        const int startPage = 5;                 // first page to keep (1‑based)
 
-        // Validate input file existence
+        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Create the PdfFileEditor instance (does NOT implement IDisposable)
+        // Determine total page count using a Document (must be disposed)
+        int totalPages;
+        using (Document srcDoc = new Document(inputPath))
+        {
+            totalPages = srcDoc.Pages.Count;
+        }
+
+        // Validate start page
+        if (startPage < 1 || startPage > totalPages)
+        {
+            Console.Error.WriteLine($"Start page {startPage} is out of range (1‑{totalPages}).");
+            return;
+        }
+
+        // PdfFileEditor does NOT implement IDisposable – do NOT wrap in using
         PdfFileEditor editor = new PdfFileEditor();
 
-        // Split the document from startPage to the end and save to outputPath
-        bool success = editor.SplitToEnd(inputPath, startPage, outputPath);
+        // Extract pages from startPage to the end of the document
+        // Correct overload: Extract(string sourceFile, int startPage, int endPage, string outputFile)
+        editor.Extract(inputPath, startPage, totalPages, outputPath);
 
-        if (success)
-        {
-            Console.WriteLine($"PDF successfully split. Pages {startPage}‑end saved to '{outputPath}'.");
-        }
-        else
-        {
-            Console.Error.WriteLine("Failed to split the PDF file.");
-        }
+        Console.WriteLine($"Pages {startPage}-{totalPages} saved to '{outputPath}'.");
     }
 }

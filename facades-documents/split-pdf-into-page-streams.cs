@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -14,34 +15,52 @@ class Program
             return;
         }
 
-        // Open the source PDF as a read‑only stream.
-        using (FileStream sourceStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
+        // Determine the number of pages in the source PDF
+        int pageCount;
+        using (Document doc = new Document(inputPath))
         {
-            // PdfFileEditor does not implement IDisposable, so a plain instance is sufficient.
-            PdfFileEditor editor = new PdfFileEditor();
+            pageCount = doc.Pages.Count;
+        }
 
-            // Split the PDF into individual pages.
-            // Each element of the returned array is a MemoryStream that contains a single‑page PDF.
-            MemoryStream[] pageStreams = editor.SplitToPages(sourceStream);
+        // Prepare an array of MemoryStream objects – one per page
+        MemoryStream[] pageStreams = new MemoryStream[pageCount];
 
-            // Optional: write each page to a separate file and dispose the streams.
-            for (int i = 0; i < pageStreams.Length; i++)
+        // Split the PDF into individual pages, each written to its corresponding MemoryStream
+        for (int i = 0; i < pageCount; i++)
+        {
+            // Load the source document once per iteration (could be optimized by re‑using the original Document)
+            using (Document srcDoc = new Document(inputPath))
             {
-                string outPath = $"page_{i + 1}.pdf";
+                // Create a new document that will contain only the current page
+                Document singlePageDoc = new Document();
+                // Pages are 1‑based in Aspose.Pdf
+                singlePageDoc.Pages.Add(srcDoc.Pages[i + 1]);
 
-                // Reset position before copying.
-                pageStreams[i].Position = 0;
-
-                using (FileStream outFile = new FileStream(outPath, FileMode.Create, FileAccess.Write))
-                {
-                    pageStreams[i].CopyTo(outFile);
-                }
-
-                Console.WriteLine($"Saved page {i + 1} to {outPath}");
-
-                // Release the memory used by the stream.
-                pageStreams[i].Dispose();
+                MemoryStream ms = new MemoryStream();
+                // Save the single‑page document into the memory stream
+                singlePageDoc.Save(ms, SaveFormat.Pdf);
+                // Reset position so callers can read from the beginning
+                ms.Position = 0;
+                pageStreams[i] = ms;
             }
         }
+
+        // Optional: save each MemoryStream to a separate file for verification
+        for (int i = 0; i < pageCount; i++)
+        {
+            string outPath = $"page_{i + 1}.pdf";
+            using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+            {
+                pageStreams[i].CopyTo(fs);
+            }
+        }
+
+        // Clean up the MemoryStream instances
+        foreach (var ms in pageStreams)
+        {
+            ms.Dispose();
+        }
+
+        Console.WriteLine("PDF split into individual page MemoryStreams successfully.");
     }
 }

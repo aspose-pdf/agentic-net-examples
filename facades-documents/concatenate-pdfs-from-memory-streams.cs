@@ -1,63 +1,54 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Create two sample PDFs completely in memory.
-        byte[] pdfBytes1 = CreateSamplePdf("First PDF", "This is the first document.");
-        byte[] pdfBytes2 = CreateSamplePdf("Second PDF", "This is the second document.");
+        // Input PDF file paths (replace with your actual sources)
+        string[] inputPaths = { "first.pdf", "second.pdf", "third.pdf" };
+        string outputPath = "merged.pdf";
 
-        // Wrap the byte arrays in memory streams – these are the source streams.
-        using (MemoryStream sourceStream1 = new MemoryStream(pdfBytes1))
-        using (MemoryStream sourceStream2 = new MemoryStream(pdfBytes2))
-        // Destination stream writes directly to the output file without intermediate storage.
-        using (FileStream outputStream = new FileStream("merged_output.pdf", FileMode.Create, FileAccess.Write))
+        // Verify that all input files exist
+        foreach (var path in inputPaths)
         {
-            // PdfFileEditor implements the concatenation functionality.
-            PdfFileEditor editor = new PdfFileEditor
+            if (!File.Exists(path))
             {
-                // Close the source streams automatically after concatenation.
-                CloseConcatenatedStreams = true
-            };
-
-            // Concatenate the two input streams into the output stream.
-            editor.Concatenate(new Stream[] { sourceStream1, sourceStream2 }, outputStream);
+                Console.Error.WriteLine($"Input file not found: {path}");
+                return;
+            }
         }
 
-        Console.WriteLine("PDF files have been concatenated to 'merged_output.pdf'.");
-    }
-
-    // Helper that creates a minimal PDF, writes it to a MemoryStream and returns the byte array.
-    private static byte[] CreateSamplePdf(string title, string body)
-    {
-        using (var doc = new Document())
+        // Load each PDF into a memory stream
+        MemoryStream[] sourceStreams = new MemoryStream[inputPaths.Length];
+        try
         {
-            var page = doc.Pages.Add();
-
-            // Title paragraph
-            var titleFragment = new TextFragment(title)
+            for (int i = 0; i < inputPaths.Length; i++)
             {
-                TextState = { FontSize = 20, FontStyle = FontStyles.Bold, ForegroundColor = Color.Blue }
-            };
-            page.Paragraphs.Add(titleFragment);
+                byte[] data = File.ReadAllBytes(inputPaths[i]);
+                sourceStreams[i] = new MemoryStream(data);
+                sourceStreams[i].Position = 0; // Ensure stream is at the beginning
+            }
 
-            // Body paragraph
-            var bodyFragment = new TextFragment(body)
+            // Create the output file stream (no intermediate storage)
+            using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
-                TextState = { FontSize = 12, ForegroundColor = Color.Black }
-            };
-            page.Paragraphs.Add(bodyFragment);
+                // PdfFileEditor does NOT implement IDisposable; instantiate directly
+                PdfFileEditor editor = new PdfFileEditor();
 
-            using (var ms = new MemoryStream())
+                // Concatenate the PDFs from memory streams into the output stream
+                editor.Concatenate(sourceStreams, outputStream);
+            }
+
+            Console.WriteLine($"Successfully concatenated PDFs to '{outputPath}'.");
+        }
+        finally
+        {
+            // Dispose all memory streams
+            foreach (var ms in sourceStreams)
             {
-                doc.Save(ms);
-                return ms.ToArray();
+                ms?.Dispose();
             }
         }
     }

@@ -12,31 +12,30 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Determine total number of pages using Document (which implements IDisposable)
-        int totalPages;
+        // Determine the first and last page numbers using a Document (must be disposed)
+        int firstPage;
+        int lastPage;
         using (Document doc = new Document(inputPath))
         {
-            totalPages = doc.Pages.Count;
+            // Aspose.Pdf uses 1‑based page indexing
+            firstPage = 1;
+            lastPage  = doc.Pages.Count;
         }
 
-        // Prepare array with first and last page numbers (1‑based indexing)
-        int[] pagesToDelete = new int[] { 1, totalPages };
+        // Prepare the array of pages to delete (first and last)
+        int[] pagesToDelete = new int[] { firstPage, lastPage };
 
-        // PdfFileEditor does NOT implement IDisposable, so do NOT wrap it in a using block
+        // PdfFileEditor does NOT implement IDisposable; do NOT wrap in using
         PdfFileEditor editor = new PdfFileEditor();
 
-        bool success = editor.Delete(inputPath, pagesToDelete, outputPath);
-        if (success)
-        {
-            Console.WriteLine($"First and last pages removed. Result saved to '{outputPath}'.");
-        }
-        else
-        {
-            Console.Error.WriteLine("Failed to delete pages.");
-        }
+        // Delete the specified pages and write the result to outputPath
+        // Correct parameter order: input file, pages to delete, output file
+        editor.Delete(inputPath, pagesToDelete, outputPath);
+
+        Console.WriteLine($"First and last pages removed. Result saved to '{outputPath}'.");
     }
 }

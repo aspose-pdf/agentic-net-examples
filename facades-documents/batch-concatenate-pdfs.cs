@@ -7,37 +7,40 @@ class Program
 {
     static void Main()
     {
-        // Folder that contains the PDF files to be merged
-        const string folderPath = "pdfs";
-        // Path for the resulting merged PDF
+        // Folder containing PDF files to concatenate
+        const string sourceFolder = "PdfFolder";
+        // Output file for the merged PDF
         const string outputPath = "merged.pdf";
 
-        if (!Directory.Exists(folderPath))
+        // Verify the source folder exists
+        if (!Directory.Exists(sourceFolder))
         {
-            Console.Error.WriteLine($"Folder not found: {folderPath}");
+            Console.Error.WriteLine($"Source folder not found: {sourceFolder}");
             return;
         }
 
-        // Gather all PDF files in the folder using a foreach loop
+        // Collect all PDF files in the folder (non‑recursive)
         List<string> pdfFiles = new List<string>();
-        foreach (string file in Directory.GetFiles(folderPath, "*.pdf"))
+        foreach (string file in Directory.GetFiles(sourceFolder, "*.pdf"))
         {
             pdfFiles.Add(file);
         }
 
+        // Ensure there is at least one PDF to process
         if (pdfFiles.Count == 0)
         {
-            Console.WriteLine("No PDF files found to concatenate.");
+            Console.Error.WriteLine("No PDF files found to concatenate.");
             return;
         }
 
-        // Concatenate the collected PDF files into a single document
+        // Use PdfFileEditor (Facades API) to concatenate the PDFs
+        // PdfFileEditor does NOT implement IDisposable, so no using block is required
         PdfFileEditor editor = new PdfFileEditor();
-        bool success = editor.Concatenate(pdfFiles.ToArray(), outputPath);
 
-        if (success)
-            Console.WriteLine($"Successfully concatenated {pdfFiles.Count} files into '{outputPath}'.");
-        else
-            Console.Error.WriteLine("Concatenation failed.");
+        // Concatenate all collected PDFs into a single output file
+        // The Concatenate method accepts an array of source file paths
+        editor.Concatenate(pdfFiles.ToArray(), outputPath);
+
+        Console.WriteLine($"Successfully concatenated {pdfFiles.Count} PDFs into '{outputPath}'.");
     }
 }

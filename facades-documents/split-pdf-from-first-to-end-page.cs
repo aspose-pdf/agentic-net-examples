@@ -1,41 +1,60 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPath = "input.pdf";
-        // Page number up to which the PDF will be split (inclusive)
-        const int endPage = 5;
-        // Output PDF file path for the front part
-        const string outputPath = "output.pdf";
+        // Input PDF path, output PDF path and the last page to extract
+        const string inputPath  = "input.pdf";
+        const string outputPath = "extracted.pdf";
+        const string endPageStr = "5"; // change as needed
 
-        // Verify that the source file exists
+        // Validate input file
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+
+        // Parse the end page number
+        if (!int.TryParse(endPageStr, out int endPage) || endPage < 1)
+        {
+            Console.Error.WriteLine($"Invalid end page number: {endPageStr}");
             return;
         }
 
         try
         {
-            // PdfFileEditor provides file‑level operations; it does NOT implement IDisposable
-            PdfFileEditor editor = new PdfFileEditor();
+            // Load the source PDF using Document (PdfFileEditor does not expose ExtractPages in this version)
+            Document sourceDoc = new Document(inputPath);
 
-            // Split from the first page to the specified end page and save the result
-            bool success = editor.SplitFromFirst(inputPath, endPage, outputPath);
+            // Ensure the requested end page does not exceed the source document page count
+            if (endPage > sourceDoc.Pages.Count)
+            {
+                Console.Error.WriteLine($"Requested end page ({endPage}) exceeds source page count ({sourceDoc.Pages.Count}).");
+                return;
+            }
 
-            if (success)
-                Console.WriteLine($"PDF successfully split. Front part saved to '{outputPath}'.");
-            else
-                Console.Error.WriteLine("PDF split operation failed.");
+            // Create a new document to hold the extracted pages
+            Document extractedDoc = new Document();
+
+            // Copy pages 1 through endPage from the source document
+            for (int pageNumber = 1; pageNumber <= endPage; pageNumber++)
+            {
+                // Import the page into the new document (preserves resources)
+                extractedDoc.Pages.Add(sourceDoc.Pages[pageNumber]);
+            }
+
+            // Save the extracted pages to the output file
+            extractedDoc.Save(outputPath);
+
+            Console.WriteLine($"Pages 1-{endPage} extracted to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during split: {ex.Message}");
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
         }
     }
 }

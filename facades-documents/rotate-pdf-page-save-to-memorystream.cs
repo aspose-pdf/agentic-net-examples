@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -14,24 +15,42 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document pdfDoc = new Document(inputPath);
-
-        // Rotate the first page 90 degrees clockwise (if a page exists)
-        if (pdfDoc.Pages.Count >= 1)
+        // Load the source PDF into a MemoryStream
+        using (FileStream fileStream = File.OpenRead(inputPath))
+        using (MemoryStream sourceStream = new MemoryStream())
         {
-            // Use the Rotation enum; integer literals are not allowed.
-            pdfDoc.Pages[1].Rotate = Rotation.on90;
-        }
+            fileStream.CopyTo(sourceStream);
+            sourceStream.Position = 0; // reset for reading
 
-        // Save the modified PDF into a MemoryStream (no disk I/O)
-        using (MemoryStream ms = new MemoryStream())
-        {
-            pdfDoc.Save(ms);
-            ms.Position = 0; // reset for downstream consumers
+            // Load the PDF document from the stream
+            using (Document pdfDocument = new Document(sourceStream))
+            {
+                // Create a text stamp (example modification)
+                TextStamp stamp = new TextStamp("CONFIDENTIAL")
+                {
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Center,
+                    Opacity             = 0.5,
+                    TextState = {
+                        FontSize      = 72,
+                        FontStyle     = FontStyles.Bold,
+                        ForegroundColor = Color.FromRgb(1, 0, 0) // cross‑platform color
+                    }
+                };
 
-            Console.WriteLine($"Modified PDF saved to MemoryStream, length = {ms.Length} bytes");
-            // The MemoryStream can now be returned, sent over a network, etc.
+                // Add the stamp to the first page (pages are 1‑based)
+                pdfDocument.Pages[1].AddStamp(stamp);
+
+                // Save the modified PDF to a MemoryStream without touching the file system
+                using (MemoryStream outputStream = new MemoryStream())
+                {
+                    pdfDocument.Save(outputStream);
+                    outputStream.Position = 0; // ready for further consumption
+
+                    Console.WriteLine($"Modified PDF size: {outputStream.Length} bytes");
+                    // At this point 'outputStream' contains the PDF data.
+                }
+            }
         }
     }
 }

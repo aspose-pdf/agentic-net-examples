@@ -1,35 +1,55 @@
 using System;
-using Aspose.Pdf.Facades;
+using System.IO;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, the PDF whose pages will be inserted, and the output PDF
-        const string sourcePdfPath = "source.pdf";
-        const string insertPdfPath = "insert.pdf";
-        const string outputPdfPath = "output.pdf";
+        // Paths – adjust as needed
+        const string sourcePdfPath      = "source.pdf";      // PDF whose page will be inserted
+        const string destinationPdfPath = "destination.pdf"; // Original PDF to receive the page
+        const string outputPdfPath      = "output.pdf";      // Resulting PDF after insertion
 
-        // Position (1‑based) in the source PDF where the new pages will be inserted
-        int insertLocation = 2; // after the first page
+        // Verify that input files exist
+        if (!File.Exists(sourcePdfPath))
+        {
+            Console.Error.WriteLine($"Source file not found: {sourcePdfPath}");
+            return;
+        }
+        if (!File.Exists(destinationPdfPath))
+        {
+            Console.Error.WriteLine($"Destination file not found: {destinationPdfPath}");
+            return;
+        }
 
-        // Page numbers (1‑based) from the insert PDF that should be inserted
-        int[] pagesToInsert = new int[] { 1, 3 };
+        try
+        {
+            // Load both PDFs using the Document class (recommended over PdfFileEditor for page manipulation)
+            Document srcDoc = new Document(sourcePdfPath);
+            Document destDoc = new Document(destinationPdfPath);
 
-        // Create the facade that handles page insertion
-        PdfFileEditor editor = new PdfFileEditor();
+            // Ensure the source PDF actually has the requested page
+            if (srcDoc.Pages.Count < 1)
+            {
+                Console.Error.WriteLine("Source PDF does not contain page 1.");
+                return;
+            }
 
-        // TryInsert performs the insertion and writes the result directly to the output file
-        bool result = editor.TryInsert(
-            sourcePdfPath,      // input PDF
-            insertLocation,     // insertion point
-            insertPdfPath,      // PDF providing pages to insert
-            pagesToInsert,      // pages to take from the insert PDF
-            outputPdfPath);     // destination file
+            // Insert page 1 from the source PDF after page 2 of the destination PDF.
+            // Pages.Insert takes the position where the new page will appear (1‑based index).
+            // After page 2 means the new page should be placed at position 3.
+            Page pageToInsert = srcDoc.Pages[1];
+            destDoc.Pages.Insert(3, pageToInsert);
 
-        // Report the outcome
-        Console.WriteLine(result
-            ? $"Insertion succeeded. Modified PDF saved to '{outputPdfPath}'."
-            : "Insertion failed.");
+            // Save the modified document to the desired output path.
+            destDoc.Save(outputPdfPath);
+
+            Console.WriteLine($"Page inserted successfully. Output saved to '{outputPdfPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during insertion: {ex.Message}");
+        }
     }
 }

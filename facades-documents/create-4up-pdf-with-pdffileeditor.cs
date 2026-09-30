@@ -6,42 +6,37 @@ class Program
 {
     static void Main()
     {
-        // Path to the source PDF file
         const string inputPath = "input.pdf";
 
-        // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
-        // Open the input PDF as a read‑only stream and prepare an output memory stream
-        using (FileStream inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
+        // Prepare a memory stream that will receive the 4‑up PDF
         using (MemoryStream outputStream = new MemoryStream())
         {
-            // Instantiate the PdfFileEditor facade (does not implement IDisposable)
-            PdfFileEditor editor = new PdfFileEditor();
-
-            // Apply a 4‑up layout: 2 columns (x) and 2 rows (y)
-            bool result = editor.TryMakeNUp(inputStream, outputStream, 2, 2);
-
-            if (!result)
+            // Open the source PDF as a read‑only stream
+            using (FileStream inputFileStream = File.OpenRead(inputPath))
             {
-                Console.Error.WriteLine("Failed to create the 4‑up PDF.");
-                return;
+                // PdfFileEditor does not implement IDisposable – instantiate directly
+                PdfFileEditor editor = new PdfFileEditor();
+
+                // 4‑up layout = N‑up with n = 4.
+                // In the Aspose.Pdf version used, the stream overload expects an int for orientation (0 = portrait, 1 = landscape).
+                // Parameters: (inputStream, outputStream, nUp, orientation)
+                editor.MakeNUp(inputFileStream, outputStream, 4, 0); // 0 = portrait
             }
 
-            // Reset the output stream position for any subsequent reads
+            // Reset the position so the stream can be read from the beginning
             outputStream.Position = 0;
 
-            // Example: persist the memory stream to a physical file (optional)
-            using (FileStream fileOut = new FileStream("output_4up.pdf", FileMode.Create, FileAccess.Write))
-            {
-                outputStream.CopyTo(fileOut);
-            }
+            // Optional: write the memory stream to a physical file for verification
+            const string outputPath = "output_4up.pdf";
+            File.WriteAllBytes(outputPath, outputStream.ToArray());
 
-            Console.WriteLine("4‑up PDF created in memory and saved to 'output_4up.pdf'.");
+            Console.WriteLine($"4‑up PDF generated and saved to '{outputPath}'.");
         }
     }
 }

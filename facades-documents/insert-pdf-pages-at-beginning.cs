@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,42 +8,46 @@ class Program
 {
     static void Main()
     {
-        const string destinationPdf = "destination.pdf";   // PDF that will receive pages
-        const string sourcePdf      = "source.pdf";        // PDF whose pages will be inserted
-        const string outputPdf      = "merged_beginning.pdf";
+        const string sourcePath      = "source.pdf";      // PDF whose pages will be inserted
+        const string destinationPath = "destination.pdf"; // PDF into which pages will be inserted
+        const string outputPath      = "merged.pdf";      // Resulting PDF (optional separate file)
 
-        // Validate input files
-        if (!File.Exists(destinationPdf))
+        // Verify that input files exist
+        if (!File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"Destination file not found: {destinationPdf}");
+            Console.Error.WriteLine($"Source file not found: {sourcePath}");
             return;
         }
-        if (!File.Exists(sourcePdf))
+        if (!File.Exists(destinationPath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
+            Console.Error.WriteLine($"Destination file not found: {destinationPath}");
             return;
         }
 
-        // Determine the last page number of the source PDF (pages to insert)
-        int sourceLastPage;
-        using (Document srcDoc = new Document(sourcePdf))
+        try
         {
-            sourceLastPage = srcDoc.Pages.Count; // Page indexing is 1‑based
+            // Load both documents
+            Document srcDoc = new Document(sourcePath);
+            Document destDoc = new Document(destinationPath);
+
+            // Insert all pages from the source document at the beginning (page number 1) of the destination document.
+            // The Pages.Insert overload expects the target page number and a PageCollection from the source document.
+            destDoc.Pages.Insert(1, srcDoc.Pages);
+
+            // Save the modified destination document. If a separate output file is required, copy it afterwards.
+            destDoc.Save(destinationPath);
+
+            if (!string.Equals(outputPath, destinationPath, StringComparison.OrdinalIgnoreCase))
+            {
+                File.Copy(destinationPath, outputPath, true);
+            }
+
+            Console.WriteLine($"Pages from '{sourcePath}' inserted at the beginning of '{destinationPath}'.");
+            Console.WriteLine($"Result saved to '{outputPath}'.");
         }
-
-        // Insert all pages of sourcePdf at the beginning (position 1) of destinationPdf
-        PdfFileEditor editor = new PdfFileEditor();
-        bool success = editor.Insert(
-            inputFile: destinationPdf,   // target PDF
-            insertLocation: 1,          // insert at the very start
-            portFile: sourcePdf,        // PDF providing pages to insert
-            startPage: 1,               // first page of source
-            endPage: sourceLastPage,    // last page of source
-            outputFile: outputPdf);     // result PDF
-
-        if (success)
-            Console.WriteLine($"Pages from '{sourcePdf}' inserted at the beginning of '{destinationPdf}'. Result saved as '{outputPdf}'.");
-        else
-            Console.Error.WriteLine("Insert operation failed.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during insertion: {ex.Message}");
+        }
     }
 }

@@ -1,74 +1,64 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string basePdfPath   = "base.pdf";      // Existing destination PDF
-        const string resultPdfPath = "result.pdf";    // Final output PDF
+        // Destination PDF path
+        const string destPath = "merged_output.pdf";
 
-        // Ensure the result file starts as a copy of the base PDF
-        if (!File.Exists(basePdfPath))
-        {
-            Console.Error.WriteLine($"Base PDF not found: {basePdfPath}");
-            return;
-        }
-        File.Copy(basePdfPath, resultPdfPath, true);
+        // Create an empty destination PDF document (in memory)
+        Document destDoc = new Document();
 
-        // Define source PDFs and the page numbers to insert from each
-        // Example data – replace with real file names and page arrays
-        var sources = new (string filePath, int[] pages)[]
+        // Position where the next page will be inserted (1‑based indexing)
+        int insertPos = 1;
+
+        // Define source PDFs and the page ranges to insert (inclusive)
+        var sources = new[]
         {
-            ("source1.pdf", new int[] { 2, 4, 5 }),   // insert pages 2,4,5 from source1.pdf
-            ("source2.pdf", new int[] { 1, 3 }),      // insert pages 1,3 from source2.pdf
-            ("source3.pdf", new int[] { 6 })          // insert page 6 from source3.pdf
+            new { Path = "source1.pdf", Start = 1, End = 3 },
+            new { Path = "source2.pdf", Start = 2, End = 5 },
+            // Add additional sources as needed
         };
-
-        // PdfFileEditor does NOT implement IDisposable – do NOT wrap in using
-        PdfFileEditor editor = new PdfFileEditor();
-
-        // Insert position is 1‑based. Start after the first page of the current result PDF.
-        int insertPosition = 2; // insert after page 1
 
         foreach (var src in sources)
         {
-            if (!File.Exists(src.filePath))
+            if (!File.Exists(src.Path))
             {
-                Console.Error.WriteLine($"Source PDF not found: {src.filePath}");
+                Console.Error.WriteLine($"Source file not found: {src.Path}");
                 continue;
             }
 
-            // Temporary file to hold the intermediate result
-            string tempPath = Path.GetTempFileName();
-
-            // TryInsert returns false instead of throwing if the operation fails
-            bool success = editor.TryInsert(
-                resultPdfPath,          // current destination PDF
-                insertPosition,         // where to insert pages (1‑based)
-                src.filePath,           // source PDF
-                src.pages,              // page numbers to insert
-                tempPath);              // output PDF
-
-            if (!success)
+            // Open source PDF to validate page range
+            using (Document srcDoc = new Document(src.Path))
             {
-                Console.Error.WriteLine($"Failed to insert pages from {src.filePath}");
-                // Clean up temporary file and abort the batch
-                File.Delete(tempPath);
-                break;
+                int srcPageCount = srcDoc.Pages.Count;
+
+                // Clamp the requested range to the actual page count
+                int startPage = Math.Max(1, src.Start);
+                int endPage   = Math.Min(srcPageCount, src.End);
+
+                // Insert each page from the range into the destination PDF
+                for (int pageNum = startPage; pageNum <= endPage; pageNum++)
+                {
+                    // Insert the page at the current insertion position.
+                    // The Insert method automatically imports the page into the destination document.
+                    destDoc.Pages.Insert(insertPos, srcDoc.Pages[pageNum]);
+                    insertPos++; // Move insertion point forward
+                }
             }
-
-            // Replace the previous result with the new intermediate file
-            File.Delete(resultPdfPath);
-            File.Move(tempPath, resultPdfPath);
-
-            // Update the insert position for the next iteration:
-            // inserted pages occupy the range we just added
-            insertPosition += src.pages.Length;
         }
 
-        Console.WriteLine($"Batch insertion completed. Output saved to '{resultPdfPath}'.");
+        // Save the merged document to disk
+        destDoc.Save(destPath);
+
+        // Verify the final document
+        using (Document finalDoc = new Document(destPath))
+        {
+            Console.WriteLine($"Merged PDF created: {destPath}");
+            Console.WriteLine($"Total pages: {finalDoc.Pages.Count}");
+        }
     }
 }
