@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // for HorizontalAlignment enum
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_footer.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,30 +16,33 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use Document constructor)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Footer text with current date
+            string footer = $"Generated on {DateTime.Now:yyyy-MM-dd}";
+
+            // Pages are 1‑based in Aspose.Pdf
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Create a footer artifact for the current page
-                FooterArtifact footer = new FooterArtifact();
+                Page page = doc.Pages[i];
 
-                // Set the footer text to the current generation date
-                footer.Text = DateTime.Now.ToString("yyyy-MM-dd");
+                // Create a text fragment for the footer
+                TextFragment tf = new TextFragment(footer);
+                tf.TextState.FontSize = 9;
+                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
 
-                // Center the footer horizontally and place it near the bottom
-                footer.ArtifactHorizontalAlignment = HorizontalAlignment.Center;
-                footer.BottomMargin = 20; // optional margin from the bottom edge
+                // Position the footer near the bottom of the page (20 points from bottom, 50 points from left)
+                tf.Position = new Position(50, 20);
 
-                // Add the footer artifact to the page
-                page.Artifacts.Add(footer);
+                // Add the fragment to the page's paragraph collection
+                page.Paragraphs.Add(tf);
             }
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with date footer: {outputPath}");
+        Console.WriteLine($"Footer added and saved to '{outputPath}'.");
     }
 }

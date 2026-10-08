@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Text;                // Required for text-related types (if needed)
 
 class Program
 {
@@ -15,25 +16,31 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Wrap Document in a using block for deterministic disposal (rule: document-disposal-with-using)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (pages are 1‑based, but foreach abstracts that)
-            foreach (Page page in doc.Pages)
+            // Pages are 1‑based (rule: page-indexing-one-based)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Calculate current width and height from the MediaBox
-                double width  = page.MediaBox.URX - page.MediaBox.LLX;
-                double height = page.MediaBox.URY - page.MediaBox.LLY;
+                Page page = doc.Pages[i];
+
+                // Get current MediaBox dimensions
+                Aspose.Pdf.Rectangle mediaBox = page.MediaBox;
+                double width  = mediaBox.URX - mediaBox.LLX;
+                double height = mediaBox.URY - mediaBox.LLY;
 
                 // If the page is landscape (width > height), swap dimensions to make it portrait
                 if (width > height)
                 {
-                    // Set new page size with height as width and width as height
-                    page.SetPageSize(height, width);
+                    // Create a new rectangle with swapped width/height while keeping the lower‑left corner unchanged
+                    double newURX = mediaBox.LLX + height; // new width = old height
+                    double newURY = mediaBox.LLY + width;  // new height = old width
+                    page.MediaBox = new Aspose.Pdf.Rectangle(mediaBox.LLX, mediaBox.LLY, newURX, newURY);
                 }
+                // If already portrait, no change needed
             }
 
-            // Save the modified document (lifecycle rule: use Document.Save)
+            // Save the modified document (rule: document-disposal-with-using ensures target stays alive until Save)
             doc.Save(outputPath);
         }
 

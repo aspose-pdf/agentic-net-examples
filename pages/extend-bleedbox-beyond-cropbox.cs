@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_bleed.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_bleed.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,33 +15,31 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load PDF with deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Pages are 1‑based in Aspose.Pdf
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Get the current CropBox
-                Aspose.Pdf.Rectangle cropBox = page.CropBox;
+                // Current CropBox
+                Aspose.Pdf.Rectangle crop = page.CropBox;
 
-                // Extend the box by 5 points on each side for bleed
-                Aspose.Pdf.Rectangle bleedBox = new Aspose.Pdf.Rectangle(
-                    cropBox.LLX - 5,   // left
-                    cropBox.LLY - 5,   // bottom
-                    cropBox.URX + 5,   // right
-                    cropBox.URY + 5    // top
-                );
+                // BleedBox extends 5 points beyond each side of CropBox
+                Aspose.Pdf.Rectangle bleed = new Aspose.Pdf.Rectangle(
+                    crop.LLX - 5,
+                    crop.LLY - 5,
+                    crop.URX + 5,
+                    crop.URY + 5);
 
-                // Assign the new BleedBox
-                page.BleedBox = bleedBox;
+                page.BleedBox = bleed;
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"BleedBox extended and saved to '{outputPath}'.");
+        Console.WriteLine($"BleedBox set and saved to '{outputPath}'.");
     }
 }

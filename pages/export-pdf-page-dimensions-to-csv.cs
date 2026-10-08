@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 
 class Program
@@ -7,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "pages_dimensions.csv";
+        const string outputCsvPath = "page_dimensions.csv";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -15,33 +16,27 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Load the PDF document (using the recommended lifecycle pattern)
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Prepare CSV content with a header row
+            StringBuilder csvBuilder = new StringBuilder();
+            csvBuilder.AppendLine("PageNumber,Width,Height");
+
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Create a CSV file and write header
-                using (StreamWriter csvWriter = new StreamWriter(outputCsvPath, false))
-                {
-                    csvWriter.WriteLine("PageNumber,Width,Height");
+                Page page = doc.Pages[i];
+                // Width and Height are measured in points (1 point = 1/72 inch)
+                double width = page.PageInfo.Width;
+                double height = page.PageInfo.Height;
 
-                    // Pages are 1‑based in Aspose.Pdf
-                    for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
-                    {
-                        Page page = pdfDoc.Pages[pageIndex];
-                        double width = page.PageInfo.Width;   // page width in points
-                        double height = page.PageInfo.Height; // page height in points
-
-                        csvWriter.WriteLine($"{pageIndex},{width},{height}");
-                    }
-                }
+                csvBuilder.AppendLine($"{i},{width},{height}");
             }
 
+            // Write the CSV data to the output file
+            File.WriteAllText(outputCsvPath, csvBuilder.ToString(), Encoding.UTF8);
             Console.WriteLine($"Page dimensions exported to '{outputCsvPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

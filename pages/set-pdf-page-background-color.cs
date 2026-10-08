@@ -1,37 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// Set pdf page background color
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/pages/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF document (document-disposal-with-using rule)
-        using (Document doc = new Document(inputPath))
-        {
-            // Define the corporate brand color using RGB values
-            // Example RGB: 30 (R), 144 (G), 255 (B)
-            Aspose.Pdf.Color brandColor = Aspose.Pdf.Color.FromArgb(30, 144, 255);
-
-            // Apply the background color to each page
-            foreach (Page page in doc.Pages)
-            {
-                page.Background = brandColor;
-            }
-
-            // Save the updated PDF
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"PDF saved with background color to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

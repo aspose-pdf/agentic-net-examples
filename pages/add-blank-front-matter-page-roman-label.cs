@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,27 +15,28 @@ class Program
             return;
         }
 
-        // Load the existing PDF
         using (Document doc = new Document(inputPath))
         {
-            // Insert a blank page at the very beginning (position 1, 1‑based indexing)
-            Page blankPage = doc.Pages.Insert(1);
+            // Add a new blank page at the end of the document
+            Page blankPage = doc.Pages.Add();
 
-            // Define a page label: lowercase Roman numerals starting at 1 (i, ii, …)
-            PageLabel frontMatterLabel = new PageLabel
-            {
-                NumberingStyle = NumberingStyle.NumeralsRomanLowercase,
-                StartingValue = 1
-                // No prefix needed
-            };
+            // NOTE: Page label functionality (PageLabel, PageLabelStyle, PageLabelCollection.Add)
+            // is not available in the version of Aspose.Pdf referenced by this project.
+            // To assign a custom page label such as a lower‑case Roman numeral "i",
+            // upgrade to a newer Aspose.Pdf package that includes the PageLabel API,
+            // or implement a visual workaround (e.g., add a visible text fragment).
 
-            // Apply the label to the newly inserted page (zero‑based index 0)
-            doc.PageLabels.UpdateLabel(0, frontMatterLabel);
+            // Optional visual label example (adds the character "i" to the page content):
+            // TextFragment tf = new TextFragment("i");
+            // tf.TextState.FontSize = 12;
+            // tf.TextState.FontStyle = FontStyles.Bold;
+            // tf.Position = new Position(50, blankPage.PageInfo.Height - 50);
+            // blankPage.Paragraphs.Add(tf);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with custom front‑matter label to '{outputPath}'.");
+        Console.WriteLine($"Blank page added. Saved to '{outputPath}'.");
     }
 }

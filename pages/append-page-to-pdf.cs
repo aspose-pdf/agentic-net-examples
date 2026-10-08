@@ -1,63 +1,40 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API
-using Aspose.Pdf.Facades;      // For PdfPageStamp if needed (not used here)
+using Aspose.Pdf;
 
-class AppendPageExample
+class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string targetPdfPath   = "target.pdf";   // PDF to which the page will be appended
-        const string sourcePdfPath   = "source.pdf";   // PDF containing the page to copy
-        const string outputPdfPath   = "merged.pdf";   // Resulting PDF
+        // Paths to the PDFs
+        const string targetPath = "target.pdf";   // PDF to which a page will be appended
+        const string sourcePath = "source.pdf";   // PDF containing the page to append
+        const string outputPath = "appended.pdf"; // Resulting PDF
 
-        // Verify files exist
-        if (!File.Exists(targetPdfPath))
+        // Verify that input files exist
+        if (!File.Exists(targetPath))
         {
-            Console.Error.WriteLine($"Target file not found: {targetPdfPath}");
+            Console.Error.WriteLine($"Target file not found: {targetPath}");
             return;
         }
-        if (!File.Exists(sourcePdfPath))
+        if (!File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePath}");
             return;
         }
 
-        try
+        // Use nested using blocks for deterministic disposal (rule: document-disposal-with-using)
+        using (Document targetDoc = new Document(targetPath))
+        using (Document sourceDoc = new Document(sourcePath))
         {
-            // Load the target document (the one we will modify)
-            using (Document targetDoc = new Document(targetPdfPath))
-            // Load the source document (the one providing the page)
-            using (Document sourceDoc = new Document(sourcePdfPath))
-            {
-                // Choose the page to copy from the source document.
-                // Aspose.Pdf uses 1‑based indexing, so page 1 is the first page.
-                // Adjust the index if a different page is required.
-                const int sourcePageIndex = 1;
-                if (sourcePageIndex < 1 || sourcePageIndex > sourceDoc.Pages.Count)
-                {
-                    Console.Error.WriteLine("Invalid source page index.");
-                    return;
-                }
+            // Aspose.Pdf uses 1‑based page indexing (rule: page-indexing-one-based)
+            // Append the first page of the source PDF to the end of the target PDF
+            targetDoc.Pages.Add(sourceDoc.Pages[1]);
 
-                // Retrieve the page from the source document.
-                Page pageToAppend = sourceDoc.Pages[sourcePageIndex];
-
-                // Append the page to the end of the target document.
-                // The Add method copies the page content; the original source page remains unchanged.
-                targetDoc.Pages.Add(pageToAppend);
-
-                // Save the modified target document.
-                targetDoc.Save(outputPdfPath);
-            }
-
-            Console.WriteLine($"Page {1} from '{sourcePdfPath}' appended to '{targetPdfPath}'.");
-            Console.WriteLine($"Result saved as '{outputPdfPath}'.");
+            // Save the combined document
+            targetDoc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Page appended successfully. Output saved to '{outputPath}'.");
     }
 }

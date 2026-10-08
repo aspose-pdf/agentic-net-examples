@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
-using Aspose.Pdf.Drawing;      // For Rectangle type (if needed, but fully qualified used)
+using Aspose.Pdf;
+using Aspose.Pdf.Drawing; // for Rectangle type (if needed)
 
 class Program
 {
@@ -16,9 +16,10 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
+            // Aspose.Pdf uses 1‑based page indexing
             // Ensure the document has at least 12 pages
             if (doc.Pages.Count < 12)
             {
@@ -26,13 +27,19 @@ class Program
                 return;
             }
 
-            // Get the MediaBox rectangle from page 8 (1‑based indexing)
-            Aspose.Pdf.Rectangle sourceMediaBox = doc.Pages[8].MediaBox;
+            // Get the MediaBox of page 8
+            // MediaBox is an Aspose.Pdf.Rectangle; clone it to avoid reference issues
+            Aspose.Pdf.Rectangle sourceBox = doc.Pages[8].MediaBox;
+            Aspose.Pdf.Rectangle clonedBox = new Aspose.Pdf.Rectangle(
+                sourceBox.LLX,
+                sourceBox.LLY,
+                sourceBox.URX,
+                sourceBox.URY);
 
-            // Apply the same MediaBox to page 12
-            doc.Pages[12].MediaBox = sourceMediaBox;
+            // Apply the cloned MediaBox to page 12
+            doc.Pages[12].MediaBox = clonedBox;
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

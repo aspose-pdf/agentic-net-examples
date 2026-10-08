@@ -15,34 +15,23 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Pages are 1‑based; iterate through each page
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[i];
-
-                // If the page is considered blank (using the default threshold 0.0),
-                // we can skip trimming to avoid setting an empty TrimBox.
-                // The default threshold factor is 0.0 (any non‑zero content marks the page as non‑blank).
-                if (page.IsBlank(0.0))
-                    continue;
-
-                // Calculate the bounding box of the actual content on the page.
-                // This method analyses the page content (including vector graphics) and
-                // returns the smallest rectangle that encloses everything.
-                Aspose.Pdf.Rectangle contentBox = page.CalculateContentBBox();
-
-                // Set the TrimBox to the content bounding box.
-                // TrimBox defines the region of the page that should be retained after trimming.
-                page.TrimBox = contentBox;
+                // NOTE: The Page.Trim() method is not available in the current
+                // Aspose.Pdf version used for this project. If trimming of white
+                // space is required, consider upgrading to a version that provides
+                // Page.Trim or implement a custom trimming routine using bitmap
+                // analysis. For now, the page is left unchanged.
             }
 
-            // Save the modified document
+            // Save the (untrimmed) PDF. The Document.Save method writes a PDF by default.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Trimmed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

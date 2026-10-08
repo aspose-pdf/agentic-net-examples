@@ -6,39 +6,40 @@ class Program
 {
     static void Main()
     {
-        // Input: list where each value represents how many empty pages to add in that step
+        // List of page counts to add sequentially (example values)
         List<int> pageCounts = new List<int> { 2, 3, 1 };
 
+        // Output PDF file path
         const string outputPath = "output.pdf";
 
-        // Evaluation (unlicensed) mode of Aspose.PDF can hold at most 4 elements in any collection
-        // (Pages, Annotations, Bookmarks, etc.). To avoid the IndexOutOfRangeException we cap the
-        // total number of pages added to 4. A full license removes this limitation.
-        const int maxPagesInEvaluation = 4;
+        // Aspose.Pdf evaluation version allows a maximum of 4 pages to be added.
+        // This constant protects the code from throwing an IndexOutOfRangeException
+        // when the limit is exceeded.
+        const int evaluationPageLimit = 4;
         int pagesAdded = 0;
 
-        // Document creation and disposal must be wrapped in a using block (document-disposal-with-using rule)
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Iterate over the list and add the specified number of empty pages each time
+            // Iterate over each count and add that many empty pages, respecting the limit
             foreach (int count in pageCounts)
             {
-                for (int i = 0; i < count && pagesAdded < maxPagesInEvaluation; i++)
+                for (int i = 0; i < count && pagesAdded < evaluationPageLimit; i++)
                 {
-                    // PageCollection.Add() adds an empty page (adds the most common size if sizes vary)
                     doc.Pages.Add();
                     pagesAdded++;
                 }
 
-                // Stop adding pages once the evaluation limit is reached
-                if (pagesAdded >= maxPagesInEvaluation)
+                // Stop adding pages once the limit is reached
+                if (pagesAdded >= evaluationPageLimit)
                     break;
             }
 
-            // Save the resulting PDF (Document.Save(string) writes PDF regardless of extension)
+            // Save the document to the specified path
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with added pages saved to '{outputPath}'. Total pages added: {pagesAdded} (capped at {maxPagesInEvaluation} for evaluation mode).");
+        // Report the result
+        Console.WriteLine($"Created PDF with {pagesAdded} pages at '{outputPath}'.");
     }
 }

@@ -6,14 +6,12 @@ class Program
 {
     static void Main()
     {
-        // Input PDF path
+        // Paths to the source PDF and the reordered output PDF
         const string inputPath = "input.pdf";
-        // Output PDF path
         const string outputPath = "reordered.pdf";
 
-        // Define the new page order (1‑based indexes)
-        // Example: {3,1,2} will place page 3 first, then page 1, then page 2
-        int[] newOrder = { 3, 1, 2 };
+        // Define the new page order using 1‑based indices (e.g., {3,1,2})
+        int[] newSequence = new int[] { 3, 1, 2 };
 
         if (!File.Exists(inputPath))
         {
@@ -21,31 +19,33 @@ class Program
             return;
         }
 
-        // Load source document and create target document inside using blocks
-        using (Document srcDoc = new Document(inputPath))
-        using (Document dstDoc = new Document())
+        // Load the source document and create an empty target document.
+        // Both documents are wrapped in using blocks for deterministic disposal.
+        using (Document src = new Document(inputPath))
+        using (Document target = new Document())
         {
-            // Validate that the requested indexes are within the source page count
-            foreach (int idx in newOrder)
+            // Validate that each index in the new sequence is within the valid range.
+            foreach (int idx in newSequence)
             {
-                if (idx < 1 || idx > srcDoc.Pages.Count)
+                if (idx < 1 || idx > src.Pages.Count)
                 {
-                    Console.Error.WriteLine($"Invalid page index {idx}. Document has {srcDoc.Pages.Count} pages.");
+                    Console.Error.WriteLine($"Invalid page index {idx}. Must be between 1 and {src.Pages.Count}.");
                     return;
                 }
             }
 
-            // Copy pages to the target document in the specified order
-            foreach (int idx in newOrder)
+            // Copy pages from the source to the target in the specified order.
+            // Aspose.Pdf uses 1‑based page indexing.
+            foreach (int idx in newSequence)
             {
-                // Pages collection is 1‑based, so we can use the index directly
-                dstDoc.Pages.Add(srcDoc.Pages[idx]);
+                // Add a copy of the source page to the target document.
+                target.Pages.Add(src.Pages[idx]);
             }
 
-            // Save the reordered PDF
-            dstDoc.Save(outputPath);
+            // Save the reordered document while the target is still alive.
+            target.Save(outputPath);
         }
 
-        Console.WriteLine($"Reordered PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Pages reordered and saved to '{outputPath}'.");
     }
 }

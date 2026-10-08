@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_a5.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_A5.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,17 +15,18 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule: wrap Document in using for deterministic disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Loop through all pages (PageCollection is 1‑based)
-            foreach (Page page in doc.Pages)
+            // Pages are 1‑based; iterate through all pages
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Resize each page to A5 size
-                page.Resize(PageSize.A5);
+                Page page = doc.Pages[i];
+                // Resize each page to A5 dimensions using width/height doubles
+                page.SetPageSize(PageSize.A5.Width, PageSize.A5.Height);
             }
 
-            // Save the modified document (PDF format)
+            // Save the modified PDF (PDF format, no special SaveOptions needed)
             doc.Save(outputPath);
         }
 

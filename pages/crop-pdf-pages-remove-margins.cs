@@ -9,40 +9,34 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "cropped_output.pdf";
 
-        // Margins to remove (in points). Adjust as needed.
-        const double leftMargin   = 36;   // 0.5 inch
-        const double rightMargin  = 36;
-        const double topMargin    = 36;
-        const double bottomMargin = 36;
-
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal.
+        // Margin to trim from each side (in points). Adjust as needed.
+        const double margin = 50.0;
+
+        // Load the PDF inside a using block for deterministic disposal.
         using (Document doc = new Document(inputPath))
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf rule).
+            // Pages are 1‑based in Aspose.Pdf.
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Original page size (MediaBox).
-                Aspose.Pdf.Rectangle mediaBox = page.MediaBox;
+                // Calculate new CropBox coordinates based on page size and desired margin.
+                double left   = margin;
+                double bottom = margin;
+                double right  = page.PageInfo.Width  - margin;
+                double top    = page.PageInfo.Height - margin;
 
-                // Compute new CropBox coordinates by applying margins.
-                double llx = mediaBox.LLX + leftMargin;
-                double lly = mediaBox.LLY + bottomMargin;
-                double urx = mediaBox.URX - rightMargin;
-                double ury = mediaBox.URY - topMargin;
-
-                // Set the CropBox. Fully qualified Rectangle avoids ambiguity.
-                page.CropBox = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+                // Set the CropBox using a fully qualified Rectangle to avoid ambiguity.
+                page.CropBox = new Aspose.Pdf.Rectangle(left, bottom, right, top);
             }
 
-            // Save the modified PDF.
+            // Save the modified document as PDF.
             doc.Save(outputPath);
         }
 

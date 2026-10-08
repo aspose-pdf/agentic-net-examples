@@ -15,29 +15,26 @@ class Program
             return;
         }
 
-        // Load the PDF document (wrapped in using for proper disposal)
+        // Load the PDF document with deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Verify that the document contains at least seven pages (1‑based indexing)
+            // Verify the document has at least seven pages (1‑based indexing)
             if (doc.Pages.Count < 7)
             {
-                Console.Error.WriteLine("The document has fewer than 7 pages.");
+                Console.Error.WriteLine("The document contains fewer than 7 pages.");
                 return;
             }
 
-            // Retrieve page 7
+            // Access page 7
             Page page7 = doc.Pages[7];
 
-            // Obtain the predefined Letter page size
-            PageSize letterSize = PageSize.PageLetter;
+            // Set the page size to Letter (8.5 x 11 inches) using point dimensions (1 inch = 72 points)
+            page7.SetPageSize(612, 792); // 8.5*72 = 612, 11*72 = 792
 
-            // Change the page size using SetPageSize(width, height)
-            page7.SetPageSize(letterSize.Width, letterSize.Height);
-
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page 7 resized to Letter format and saved as '{outputPath}'.");
+        Console.WriteLine($"Page 7 resized to Letter and saved as '{outputPath}'.");
     }
 }
