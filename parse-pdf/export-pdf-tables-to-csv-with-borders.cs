@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,112 +8,54 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "output.csv";
+        const string inputPath = "input.pdf";
+        const string csvPath   = "output.csv";
 
-        // ------------------------------------------------------------
-        // Ensure a sample PDF exists – the sandbox does not contain any files.
-        // Create a one‑page PDF with a simple table so that TableAbsorber has
-        // something to extract.
-        // ------------------------------------------------------------
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            using (Document placeholder = new Document())
-            {
-                Page page = placeholder.Pages.Add();
-
-                // Create a table with two columns and two rows.
-                Table sampleTable = new Table
-                {
-                    // Define column widths (in points). Adjust as needed.
-                    ColumnWidths = "150 150"
-                };
-
-                // Header row
-                Row header = sampleTable.Rows.Add();
-                header.Cells.Add("Header 1");
-                header.Cells.Add("Header 2");
-
-                // Data row
-                Row data = sampleTable.Rows.Add();
-                data.Cells.Add("Cell 1");
-                data.Cells.Add("Cell 2");
-
-                // Add the table to the page.
-                page.Paragraphs.Add(sampleTable);
-
-                // Save the placeholder PDF.
-                placeholder.Save(inputPdfPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // Load the PDF document (lifecycle rule: use Document constructor)
-        // ------------------------------------------------------------
-        using (Document pdfDocument = new Document(inputPdfPath))
+        try
         {
-            // Prepare a writer for the CSV output
-            using (StreamWriter csvWriter = new StreamWriter(outputCsvPath))
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                // Aspose.Pdf evaluation mode allows a maximum of 4 pages.
-                // Limit the loop to 4 pages to avoid IndexOutOfRangeException in eval mode.
-                int maxPages = Math.Min(pdfDocument.Pages.Count, 4);
-                for (int pageIndex = 1; pageIndex <= maxPages; pageIndex++)
+                // Extract raw text preserving layout (pure formatting)
+                TextAbsorber absorber = new TextAbsorber();
+                absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+                doc.Pages.Accept(absorber);
+                string rawText = absorber.Text;
+
+                // Write CSV with delimiter markers around each cell
+                using (StreamWriter writer = new StreamWriter(csvPath))
                 {
-                    Page page = pdfDocument.Pages[pageIndex];
-
-                    // TableAbsorber extracts tables from a page.
-                    // Setting UseFlowEngine = true makes BorderInfo available for each cell.
-                    TableAbsorber tableAbsorber = new TableAbsorber
+                    // Split the extracted text into lines
+                    string[] lines = rawText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string line in lines)
                     {
-                        UseFlowEngine = true
-                    };
-                    tableAbsorber.Visit(page);
+                        // Assume table columns are separated by two or more spaces
+                        string[] cells = Regex.Split(line.Trim(), @"\s{2,}");
 
-                    // Process each extracted table
-                    foreach (var table in tableAbsorber.TableList)
-                    {
-                        // TableAbsorber.Table.RowList is a collection of rows.
-                        // Each row contains a CellList collection.
-                        foreach (var row in table.RowList)
+                        // Add visual delimiter markers (e.g., |cell|) to each cell
+                        for (int i = 0; i < cells.Length; i++)
                         {
-                            // Start each CSV line with a visual border marker.
-                            csvWriter.Write("|");
-
-                            // Process each cell in the current row.
-                            foreach (var cell in row.CellList)
-                            {
-                                // Retrieve the textual content of the cell.
-                                string cellText = string.Empty;
-                                if (cell.TextFragments != null && cell.TextFragments.Count > 0)
-                                {
-                                    // TextFragmentCollection is 1‑based indexed.
-                                    cellText = cell.TextFragments[1].Text;
-                                }
-
-                                // Escape any existing delimiters (commas) in the text.
-                                if (cellText.Contains(","))
-                                    cellText = $"\"{cellText}\"";
-
-                                // Write the cell content.
-                                csvWriter.Write(cellText);
-
-                                // Add a delimiter marker that represents the right border of the cell.
-                                // The pipe character is used as a visual border indicator.
-                                csvWriter.Write("|");
-                            }
-
-                            // End of the CSV line.
-                            csvWriter.WriteLine();
+                            cells[i] = $"|{cells[i].Trim()}|";
                         }
 
-                        // Add an empty line between tables for readability.
-                        csvWriter.WriteLine();
+                        // Join cells with commas to form a CSV line
+                        string csvLine = string.Join(",", cells);
+                        writer.WriteLine(csvLine);
                     }
                 }
             }
-        }
 
-        Console.WriteLine($"CSV export completed: {outputCsvPath}");
+            Console.WriteLine($"CSV exported to '{csvPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

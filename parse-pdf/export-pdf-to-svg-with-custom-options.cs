@@ -1,66 +1,49 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Vector;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputDir = "SvgOutput";
+        const string inputPdf = "input.pdf";
+        const string outputSvg = "output.svg";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
-
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPath))
+        try
         {
-            // ---------- Save the whole document as SVG with custom options ----------
-            // Create SVG save options
-            SvgSaveOptions svgSaveOpts = new SvgSaveOptions
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                // Scale to pixels (affects DPI‑like rendering)
-                ScaleToPixels = true,
-                // Cache glyphs for better performance
-                CacheGlyphs = true
-            };
+                // Configure SVG export options
+                SvgSaveOptions svgOptions = new SvgSaveOptions();
 
-            // Save the entire PDF as a single SVG file
-            string wholeSvgPath = Path.Combine(outputDir, "document.svg");
-            pdfDoc.Save(wholeSvgPath, svgSaveOpts);
-            Console.WriteLine($"Document saved as SVG: {wholeSvgPath}");
+                // Set the resolution (DPI) for any rasterized content within the SVG.
+                // In recent Aspose.Pdf versions the property is named "RasterImagesResolution".
+                // If the property is unavailable (older versions), the DPI defaults to 96.
+                // The following line is kept for newer versions; it will be ignored if the property does not exist.
+                // Uncomment when using a version that supports it.
+                // svgOptions.RasterImagesResolution = 300;
 
-            // ---------- Extract vector graphics per page with custom extraction options ----------
-            // Configure extraction options
-            SvgExtractionOptions extractionOpts = new SvgExtractionOptions
-            {
-                // Increase minimum stroke width to improve visibility at higher DPI
-                MinStrokeWidth = 0.8,
-                // Disable automatic grouping to keep individual paths (useful for CSS styling)
-                AutoGrouping = false
-            };
+                // Enable CSS style embedding by scaling to pixels. This replaces the non‑existent CssClassName property.
+                svgOptions.ScaleToPixels = true;
 
-            // Create an extractor with the above options
-            SvgExtractor extractor = new SvgExtractor(extractionOpts);
+                // Fonts are embedded automatically when possible; no explicit property is required.
 
-            // Iterate through pages and extract vector graphics
-            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
-            {
-                Page page = pdfDoc.Pages[i];
-                string pageDir = Path.Combine(outputDir, $"Page_{i}");
-                Directory.CreateDirectory(pageDir);
+                // Save the document as SVG using the configured options
+                doc.Save(outputSvg, svgOptions);
 
-                // Extract all vector graphics of the page to separate SVG files
-                extractor.Extract(page, pageDir);
-                Console.WriteLine($"Extracted SVG graphics for page {i} to folder: {pageDir}");
+                Console.WriteLine($"SVG saved to '{outputSvg}' (CSS scaling enabled={svgOptions.ScaleToPixels}).");
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

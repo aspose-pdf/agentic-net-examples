@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using System.Xml;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -16,67 +14,29 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPath))
         {
-            // Verify that the document contains a form with fields.
-            if (pdfDoc.Form == null || pdfDoc.Form.Count == 0)
-            {
-                Console.WriteLine("The PDF does not contain any form fields.");
-                return;
-            }
+            // Access the AcroForm of the document
+            var form = pdfDoc.Form;
 
-            // Export the form data directly to a MemoryStream as XML.
-            using (MemoryStream xmlStream = new MemoryStream())
+            // Export the form fields to JSON directly into a MemoryStream
+            using (MemoryStream ms = new MemoryStream())
             {
-                ExportFormDataToXml(pdfDoc.Form, xmlStream);
-                xmlStream.Position = 0; // Reset position for reading.
+                // ExportToJson writes the JSON representation of the form fields into the stream
+                form.ExportToJson(ms);
 
-                // Optional: read the XML content from the stream for demonstration purposes.
-                using (StreamReader reader = new StreamReader(xmlStream))
+                // Reset the stream position to the beginning for reading
+                ms.Position = 0;
+
+                // Example: read and display the exported JSON
+                using (StreamReader reader = new StreamReader(ms))
                 {
-                    string xmlContent = reader.ReadToEnd();
-                    Console.WriteLine("Exported XML:");
-                    Console.WriteLine(xmlContent);
+                    string json = reader.ReadToEnd();
+                    Console.WriteLine("Form fields exported as JSON:");
+                    Console.WriteLine(json);
                 }
             }
         }
-    }
-
-    /// <summary>
-    /// Serialises the fields of an Aspose.Pdf.Forms.Form into a simple XML representation.
-    /// The XML format mimics the structure produced by the Facades Form.ExportXml method
-    /// (field name/value pairs wrapped in a root <FormData> element).
-    /// </summary>
-    private static void ExportFormDataToXml(Form form, Stream outputStream)
-    {
-        using (XmlWriter writer = XmlWriter.Create(outputStream, new XmlWriterSettings { Indent = true, Encoding = System.Text.Encoding.UTF8 }))
-        {
-            writer.WriteStartDocument();
-            writer.WriteStartElement("FormData");
-
-            foreach (Field field in form.Fields)
-            {
-                writer.WriteStartElement("Field");
-                writer.WriteAttributeString("Name", field.PartialName ?? string.Empty);
-                writer.WriteAttributeString("Type", field.GetType().Name);
-                writer.WriteString(GetFieldValue(field));
-                writer.WriteEndElement(); // Field
-            }
-
-            writer.WriteEndElement(); // FormData
-            writer.WriteEndDocument();
-        }
-    }
-
-    // Helper method to extract a string representation of a field's value.
-    private static string GetFieldValue(Field field)
-    {
-        // Most field types expose the generic Value property. Checkbox needs a special case.
-        return field switch
-        {
-            CheckboxField cb => cb.Checked ? "true" : "false",
-            _ => field.Value?.ToString() ?? string.Empty
-        };
     }
 }

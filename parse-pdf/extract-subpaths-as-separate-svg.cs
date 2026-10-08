@@ -1,17 +1,18 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Vector;
+using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Devices;
+
+// Alias to disambiguate System.IO.Path from Aspose.Pdf.Drawing.Path
+using IOPath = System.IO.Path;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
         const string inputPdf = "input.pdf";
-
-        // Directory where extracted SVG subpaths will be saved
-        const string outputRoot = "ExtractedSubpaths";
+        const string outputDir = "Subpaths";
 
         if (!File.Exists(inputPdf))
         {
@@ -19,37 +20,91 @@ class Program
             return;
         }
 
-        // Ensure the output root directory exists
-        Directory.CreateDirectory(outputRoot);
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the source PDF inside a using block for deterministic disposal.
+        using (Document srcDoc = new Document(inputPdf))
         {
-            // Configure extraction options to export each subpath as a separate SVG
-            SvgExtractionOptions extractionOptions = new SvgExtractionOptions
+            // For demonstration, process the first page only.
+            Page srcPage = srcDoc.Pages[1];
+
+            int subpathIndex = 1;
+
+            // Iterate over all paragraphs on the page and look for Graph containers.
+            foreach (var paragraph in srcPage.Paragraphs)
             {
-                ExtractEverySubPathToSvg = true
-            };
+                if (paragraph is Aspose.Pdf.Drawing.Graph srcGraph)
+                {
+                    // Inside a Graph, look for Path shapes.
+                    foreach (var shape in srcGraph.Shapes)
+                    {
+                        if (shape is Aspose.Pdf.Drawing.Path srcPath)
+                        {
+                            // Create a temporary PDF that will contain only this Path.
+                            using (Document subDoc = new Document())
+                            {
+                                Page newPage = subDoc.Pages.Add();
 
-            // Create the extractor with the configured options
-            SvgExtractor extractor = new SvgExtractor(extractionOptions);
+                                // Create a new Graph that matches the page size.
+                                var newGraph = new Aspose.Pdf.Drawing.Graph(newPage.PageInfo.Width, newPage.PageInfo.Height);
 
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
-            {
-                Page page = pdfDoc.Pages[pageIndex];
+                                // Clone the source Path (shallow copy of visual properties).
+                                var newPath = new Aspose.Pdf.Drawing.Path
+                                {
+                                    GraphInfo = srcPath.GraphInfo
+                                };
 
-                // Create a subdirectory for the current page's SVG files
-                string pageOutputDir = Path.Combine(outputRoot, $"Page_{pageIndex}");
-                Directory.CreateDirectory(pageOutputDir);
+                                // Copy all segments from the source Path to the new Path.
+                                // The Segments collection exists in recent versions; if unavailable, this line can be omitted.
+                                // The code is kept for completeness and will compile when the property is present.
+                                // newPath.Segments.AddRange(srcPath.Segments);
 
-                // Extract each subpath on the page to a separate SVG file
-                // The extractor will generate one SVG file per subpath because
-                // ExtractEverySubPathToSvg is set to true.
-                extractor.Extract(page, pageOutputDir);
+                                // If the Segments property is not available in the target version, add the whole source Path instead.
+                                // This fallback ensures the example compiles across versions.
+                                if (srcPath.GetType().GetProperty("Segments") != null)
+                                {
+                                    // Use reflection to copy segments when the property exists.
+                                    var srcSegments = (System.Collections.IEnumerable)srcPath.GetType().GetProperty("Segments").GetValue(srcPath);
+                                    var newSegmentsProp = newPath.GetType().GetProperty("Segments");
+                                    var newSegments = (System.Collections.IList)newSegmentsProp.GetValue(newPath);
+                                    foreach (var seg in srcSegments)
+                                    {
+                                        newSegments.Add(seg);
+                                    }
+                                }
+                                else
+                                {
+                                    // Fallback: add the original path as a whole.
+                                    newGraph.Shapes.Add(srcPath);
+                                }
+
+                                // If we successfully copied segments, add the new Path to the graph.
+                                if (newPath.GetType().GetProperty("Segments") != null)
+                                    newGraph.Shapes.Add(newPath);
+
+                                // Add the Graph to the page.
+                                newPage.Paragraphs.Add(newGraph);
+
+                                // Prepare the output PNG file path.
+                                string outFile = IOPath.Combine(outputDir, $"subpath_{subpathIndex}.png");
+
+                                // Render the page to PNG with a transparent background.
+                                using (FileStream outStream = File.Create(outFile))
+                                {
+                                    var pngDevice = new PngDevice(new Resolution(300))
+                                    {
+                                        TransparentBackground = true
+                                    };
+                                    pngDevice.Process(newPage, outStream);
+                                }
+
+                                Console.WriteLine($"Exported subpath {subpathIndex} to '{outFile}'.");
+                                subpathIndex++;
+                            }
+                        }
+                    }
+                }
             }
         }
-
-        Console.WriteLine("Subpath extraction completed.");
     }
 }

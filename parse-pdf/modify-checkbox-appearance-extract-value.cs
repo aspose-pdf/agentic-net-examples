@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -10,6 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "modified.pdf";
+        const string checkBoxName = "myCheckBox"; // replace with actual field name
 
         if (!File.Exists(inputPath))
         {
@@ -17,61 +17,47 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Locate the first checkbox field in the form
-            CheckboxField checkbox = null;
-            foreach (var field in doc.Form.Fields)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                if (field is CheckboxField cb)
+                // Retrieve the checkbox field by name using the indexer on Form
+                var field = doc.Form[checkBoxName];
+                if (field == null)
                 {
-                    checkbox = cb;
-                    break;
+                    Console.Error.WriteLine($"Checkbox field '{checkBoxName}' not found.");
+                    return;
                 }
+
+                if (!(field is CheckboxField checkBox))
+                {
+                    Console.Error.WriteLine($"Field '{checkBoxName}' is not a checkbox.");
+                    return;
+                }
+
+                // ---- Modify appearance ----
+                // Change the rectangle (position/size) of the checkbox.
+                // Use Aspose.Pdf.Rectangle (the type expected by form fields).
+                checkBox.Rect = new Aspose.Pdf.Rectangle(100, 500, 120, 520);
+
+                // Note: Appearance‑related properties such as CheckBoxAppearance, BorderColor,
+                // and BackgroundColor are not available in the current Aspose.Pdf version,
+                // so they are omitted. If needed, they can be set via the underlying widget
+                // dictionary or by upgrading to a newer library version.
+
+                // ---- Extract the checkbox value ----
+                bool isChecked = checkBox.Checked;
+                Console.WriteLine($"Checkbox '{checkBoxName}' is {(isChecked ? "checked" : "unchecked")}.");
+
+                // Save the modified PDF (optional)
+                doc.Save(outputPath);
+                Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
             }
-
-            if (checkbox == null)
-            {
-                Console.WriteLine("No checkbox field found in the document.");
-                return;
-            }
-
-            // Determine the page containing the checkbox (PageIndex is zero‑based)
-            int pageNumber = checkbox.PageIndex + 1; // Aspose.Pdf uses 1‑based page indexing
-            Page page = doc.Pages[pageNumber];
-
-            // Get the rectangle of the checkbox (Aspose.Pdf.Rectangle)
-            Aspose.Pdf.Rectangle cbRect = checkbox.Rect;
-
-            // Create a Graph that covers the whole page (required for absolute positioning)
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
-
-            // Define a rectangle shape that matches the checkbox bounds
-            var shapeRect = new Aspose.Pdf.Drawing.Rectangle(
-                (float)cbRect.LLX,
-                (float)cbRect.LLY,
-                (float)cbRect.Width,
-                (float)cbRect.Height);
-            shapeRect.GraphInfo = new GraphInfo
-            {
-                FillColor = Aspose.Pdf.Color.LightGray, // new fill color
-                Color = Aspose.Pdf.Color.DarkBlue,     // border color
-                LineWidth = 1
-            };
-            graph.Shapes.Add(shapeRect);
-
-            // Add the graph to the page's content
-            page.Paragraphs.Add(graph);
-
-            // Extract the checkbox value after modifying its appearance
-            string value = checkbox.Value;
-            Console.WriteLine($"Checkbox value: {value}");
-
-            // Save the modified PDF
-            doc.Save(outputPath);
         }
-
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

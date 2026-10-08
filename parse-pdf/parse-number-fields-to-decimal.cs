@@ -1,6 +1,7 @@
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,7 +9,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "form.pdf";
+        const string inputPath = "input.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,33 +17,45 @@ class Program
             return;
         }
 
-        // Load the PDF document containing form fields
+        // Store parsed decimal values keyed by field name
+        var numericValues = new Dictionary<string, decimal>();
+
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all form fields in the document
-            foreach (var field in doc.Form)
+            // Iterate over all form fields in the PDF
+            foreach (Field field in doc.Form.Fields)
             {
-                // Process only NumberField instances
-                if (field is NumberField numberField)
+                // Process only text box fields (numeric input expected)
+                if (field is TextBoxField textBox)
                 {
-                    // Retrieve the raw value (may be null)
-                    string rawValue = numberField.Value?.ToString() ?? string.Empty;
+                    string rawValue = textBox.Value?.Trim() ?? string.Empty;
 
-                    // Attempt to parse the value to a decimal using invariant culture
-                    if (decimal.TryParse(rawValue, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal numericValue))
+                    // Try to parse the text as a decimal using invariant culture
+                    if (decimal.TryParse(
+                            rawValue,
+                            NumberStyles.Number,
+                            CultureInfo.InvariantCulture,
+                            out decimal parsed))
                     {
-                        Console.WriteLine($"Field '{numberField.PartialName}' parsed value: {numericValue}");
-
-                        // Example calculation: double the numeric value
-                        decimal result = numericValue * 2;
-                        Console.WriteLine($"Calculated result (value * 2): {result}");
+                        numericValues[textBox.PartialName] = parsed;
+                        Console.WriteLine($"Field '{textBox.PartialName}' parsed as {parsed}");
                     }
                     else
                     {
-                        Console.WriteLine($"Field '{numberField.PartialName}' contains non-numeric data: '{rawValue}'");
+                        Console.WriteLine($"Field '{textBox.PartialName}' contains non-numeric value: '{rawValue}'");
                     }
                 }
             }
         }
+
+        // Example calculation: sum of all parsed numeric fields
+        decimal total = 0m;
+        foreach (decimal value in numericValues.Values)
+        {
+            total += value;
+        }
+
+        Console.WriteLine($"Total of numeric fields: {total}");
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms; // Provides access to AcroForm field types
 
 class Program
 {
@@ -15,23 +15,20 @@ class Program
             return;
         }
 
-        // Load the PDF document; using ensures proper disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the AcroForm associated with the document
+            // Access the AcroForm object
             Form acroForm = doc.Form;
 
-            // Retrieve all fields at the lowest hierarchy level
-            Field[] fields = acroForm.Fields;
-
-            Console.WriteLine($"Total AcroForm fields: {fields.Length}");
-
-            // Enumerate each field and output basic information
-            foreach (Field field in fields)
+            // Iterate over all fields in the form
+            foreach (Field field in acroForm.Fields)
             {
-                // FullName provides the qualified field name
-                // Value holds the current field value (if any)
-                Console.WriteLine($"Field Name: {field.FullName}, Type: {field.GetType().Name}, Value: {field.Value}");
+                // Output basic information about each field
+                Console.WriteLine($"Field Name: {field.FullName}");
+                Console.WriteLine($"Field Type: {field.GetType().Name}");
+                Console.WriteLine($"Partial Name: {field.PartialName}");
+                Console.WriteLine($"---");
             }
         }
     }

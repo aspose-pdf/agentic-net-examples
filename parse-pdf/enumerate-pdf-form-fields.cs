@@ -1,14 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const int pageNumber = 1; // 1‑based page index
+        const int targetPage = 1; // 1‑based page index
 
         if (!File.Exists(inputPath))
         {
@@ -16,33 +19,86 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Verify the requested page exists (pages are 1‑based)
-            if (doc.Pages.Count < pageNumber)
+            // Ensure the document contains a form
+            var form = doc.Form;
+            if (form == null || form.Fields == null || !form.Fields.Any())
             {
-                Console.Error.WriteLine($"Page {pageNumber} does not exist in the document.");
+                Console.WriteLine("No form fields found in the document.");
                 return;
             }
 
-            // Get the specific page
-            Page page = doc.Pages[pageNumber];
-
-            // Retrieve all form fields on this page in tab order
-            IList<Field> fields = page.FieldsInTabOrder;
-
-            Console.WriteLine($"Page {pageNumber} contains {fields.Count} form field(s).");
-
-            // Enumerate each field and log its name, type, and current value
-            foreach (Field field in fields)
+            // Build a set of field names that belong to the requested page
+            var page = doc.Pages[targetPage];
+            var fieldNamesOnPage = new HashSet<string>();
+            foreach (Annotation annot in page.Annotations)
             {
-                string name = field.Name ?? "(unnamed)";
-                string type = field.GetType().Name;
-                string value = field.Value?.ToString() ?? "(null)";
-
-                Console.WriteLine($"Name: {name}, Type: {type}, Value: {value}");
+                if (annot is WidgetAnnotation widget)
+                {
+                    if (!string.IsNullOrEmpty(widget.FullName))
+                        fieldNamesOnPage.Add(widget.FullName);
+                }
             }
+
+            // Enumerate fields and output those that are on the target page
+            foreach (Field field in form.Fields)
+            {
+                if (fieldNamesOnPage.Contains(field.FullName))
+                {
+                    string name  = field.FullName;
+                    string type  = field.GetType().Name;
+                    string value = GetFieldValue(field);
+                    Console.WriteLine($"Name: {name}, Type: {type}, Value: {value}");
+                }
+            }
+        }
+    }
+
+    // Helper method to obtain a string representation of a field's value
+    static string GetFieldValue(Field field)
+    {
+        // Use the runtime type name to avoid compile‑time dependencies on specific field classes
+        string typeName = field.GetType().Name;
+        switch (typeName)
+        {
+            case "TextBoxField":
+                dynamic txt = field;
+                return txt.Value ?? string.Empty;
+
+            case "CheckboxField":
+                dynamic chk = field;
+                // CheckboxField exposes a Boolean "Checked" property in supported versions
+                try { return chk.Checked ? "Checked" : "Unchecked"; }
+                catch { return "(unsupported checkbox)"; }
+
+            case "RadioButtonOptionField":
+                dynamic rdo = field;
+                // Some versions expose "Checked", others expose "Selected" – try both safely
+                try { return rdo.Checked ? "Checked" : "Unchecked"; }
+                catch
+                {
+                    try { return rdo.Selected ? "Checked" : "Unchecked"; }
+                    catch { return "(unsupported radio)"; }
+                }
+
+            case "ListBoxField":
+                dynamic lst = field;
+                if (lst.SelectedItems != null && lst.SelectedItems.Length > 0)
+                    return string.Join(", ", lst.SelectedItems);
+                return string.Empty;
+
+            case "ComboBoxField":
+                dynamic cmb = field;
+                return cmb.Selected ?? string.Empty;
+
+            case "SignatureField":
+                dynamic sig = field;
+                return sig.Signature != null ? "Signed" : "Unsigned";
+
+            default:
+                return "(unsupported field type)";
         }
     }
 }

@@ -1,55 +1,68 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Text.Json;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
-public static class FormDataSerializer
+namespace PdfFormExtractorApp
 {
-    /// <summary>
-    /// Loads a PDF, extracts all form fields to JSON, writes the JSON into a memory stream,
-    /// and returns the resulting byte array.
-    /// </summary>
-    /// <param name="pdfPath">Path to the source PDF file containing form fields.</param>
-    /// <returns>Byte array with the JSON representation of the form data.</returns>
-    public static byte[] SerializeFormDataToJsonBytes(string pdfPath)
+    public class FormDataExtractor
     {
-        // Ensure the PDF file exists before attempting to load it.
-        if (!File.Exists(pdfPath))
-            throw new FileNotFoundException($"PDF file not found: {pdfPath}");
-
-        // Load the PDF document inside a using block for deterministic disposal.
-        using (Document doc = new Document(pdfPath))
-        using (MemoryStream jsonStream = new MemoryStream())
+        /// <summary>
+        /// Loads a PDF, extracts all form fields (name/value) and returns the data
+        /// serialized as a JSON byte array suitable for API responses.
+        /// </summary>
+        /// <param name="pdfPath">Path to the source PDF file.</param>
+        /// <returns>Byte array containing JSON representation of the form data.</returns>
+        public static byte[] ExtractFormData(string pdfPath)
         {
-            // Export all form fields to JSON and write directly into the memory stream.
-            // ExportToJson writes UTF‑8 JSON by default.
-            doc.Form.ExportToJson(jsonStream);
+            if (!File.Exists(pdfPath))
+                throw new FileNotFoundException($"PDF not found: {pdfPath}");
 
-            // Reset the stream position to the beginning before reading.
-            jsonStream.Position = 0;
+            // Load the PDF document inside a using block for deterministic disposal.
+            using (Document doc = new Document(pdfPath))
+            {
+                // Collect form field names and their values.
+                var formData = new Dictionary<string, string>();
 
-            // Convert the memory stream contents to a byte array.
-            return jsonStream.ToArray();
+                // The Form object may be null if the PDF has no interactive forms.
+                if (doc.Form != null && doc.Form.Fields != null)
+                {
+                    foreach (var field in doc.Form.Fields)
+                    {
+                        // Most field types expose a 'Value' property as string.
+                        // Use ToString() as a fallback for non‑string values.
+                        string value = field.Value?.ToString() ?? string.Empty;
+                        formData[field.FullName] = value;
+                    }
+                }
+
+                // Serialize the dictionary to JSON using System.Text.Json.
+                // The serializer writes directly into a MemoryStream.
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    // Write UTF‑8 JSON bytes to the stream.
+                    JsonSerializer.Serialize(memoryStream, formData);
+                    // Ensure all data is flushed.
+                    memoryStream.Flush();
+
+                    // Return the underlying byte array.
+                    return memoryStream.ToArray();
+                }
+            }
         }
     }
-}
 
-// Minimal entry point required for a console‑application project.
-public static class Program
-{
-    public static void Main(string[] args)
+    // Minimal entry point required by the compiler.
+    internal class Program
     {
-        // Optional demonstration: if a PDF path is supplied, serialize its form data.
-        if (args.Length > 0)
+        private static void Main(string[] args)
         {
-            try
+            // Optional demonstration: if a PDF path is supplied, output the JSON.
+            if (args.Length > 0 && File.Exists(args[0]))
             {
-                byte[] jsonBytes = FormDataSerializer.SerializeFormDataToJsonBytes(args[0]);
-                Console.WriteLine($"Serialized {jsonBytes.Length} bytes of JSON.");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error: {ex.Message}");
+                byte[] jsonBytes = FormDataExtractor.ExtractFormData(args[0]);
+                Console.WriteLine(System.Text.Encoding.UTF8.GetString(jsonBytes));
             }
         }
     }

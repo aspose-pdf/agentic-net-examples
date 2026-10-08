@@ -6,67 +6,58 @@ using Aspose.Pdf.Forms;
 
 public static class PdfFormUtility
 {
-    /// <summary>
-    /// Reads all form fields from a PDF file and returns a dictionary where the key is the field's full name
-    /// and the value is the field's current value as a string.
-    /// </summary>
-    /// <param name="pdfPath">Full path to the PDF document.</param>
-    /// <returns>Dictionary of field names and their string values.</returns>
-    public static Dictionary<string, string> GetPdfFormFields(string pdfPath)
+    // Returns a dictionary mapping each form field's full name to its string value.
+    public static Dictionary<string, string> GetFormFields(string pdfPath)
     {
-        // Validate input
-        if (string.IsNullOrWhiteSpace(pdfPath))
+        if (string.IsNullOrEmpty(pdfPath))
             throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
 
         if (!File.Exists(pdfPath))
             throw new FileNotFoundException("PDF file not found.", pdfPath);
 
-        // Result container
-        var fieldValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Ensure deterministic disposal of the Document.
         using (Document doc = new Document(pdfPath))
         {
-            // The Form property gives access to the collection of form fields
+            // Iterate over all fields in the PDF form.
             foreach (Field field in doc.Form.Fields)
             {
-                // FullName uniquely identifies the field; Value may be null, so handle gracefully
-                string name = field.FullName;
+                // Convert the field value to string; treat null as empty.
                 string value = field.Value?.ToString() ?? string.Empty;
-
-                // Add or update the entry in the dictionary
-                fieldValues[name] = value;
+                result[field.FullName] = value;
             }
         }
 
-        return fieldValues;
+        return result;
     }
 }
 
+// Minimal entry point to satisfy the compiler when building as an executable.
 public class Program
 {
-    // Required entry point for a console‑application build
     public static void Main(string[] args)
     {
-        // Simple demo: first argument is the PDF file path
-        if (args.Length == 0)
+        // Optional demonstration (does not affect library functionality).
+        // Example: if a PDF path is supplied, print its form fields.
+        if (args.Length > 0)
         {
-            Console.WriteLine("Usage: <executable> <pdfPath>");
-            return;
-        }
-
-        string pdfPath = args[0];
-        try
-        {
-            var fields = PdfFormUtility.GetPdfFormFields(pdfPath);
-            foreach (var kvp in fields)
+            try
             {
-                Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                var fields = PdfFormUtility.GetFormFields(args[0]);
+                foreach (var kvp in fields)
+                {
+                    Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
             }
         }
-        catch (Exception ex)
+        else
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine("No PDF path supplied. Provide a file path as the first argument to list form fields.");
         }
     }
 }

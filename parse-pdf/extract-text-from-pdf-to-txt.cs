@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -8,31 +7,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputTxtPath = "output.txt";
+        const string inputPdf = "input.pdf";
+        const string outputTxt = "output.txt";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Create a TextAbsorber to extract text from all pages
-            TextAbsorber absorber = new TextAbsorber();
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdf))
+            {
+                // TextAbsorber extracts text from the document
+                TextAbsorber absorber = new TextAbsorber
+                {
+                    // Extract plain text without formatting tags
+                    ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
+                };
 
-            // Accept the absorber for the entire page collection (1‑based indexing is handled internally)
-            pdfDoc.Pages.Accept(absorber);
+                // Apply the absorber to all pages
+                pdfDoc.Pages.Accept(absorber);
 
-            // Retrieve the concatenated text from all pages
-            string extractedText = absorber.Text ?? string.Empty;
+                // Concatenated text from all pages
+                string allText = absorber.Text ?? string.Empty;
 
-            // Write the extracted text directly to a .txt file using UTF‑8 encoding
-            File.WriteAllText(outputTxtPath, extractedText, Encoding.UTF8);
+                // Write the result to a .txt file
+                File.WriteAllText(outputTxt, allText);
+            }
 
-            Console.WriteLine($"Text extracted and saved to '{outputTxtPath}'.");
+            Console.WriteLine($"Text extracted to '{outputTxt}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }
