@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text;   // TextState, needed for styling the stamp
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string stampText  = "CONFIDENTIAL";
+        const string outputPath = "stamped_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,31 +16,35 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a text stamp with the desired value
-            TextStamp stamp = new TextStamp(stampText);
+            // Create a text stamp that will be placed on every page
+            TextStamp txtStamp = new TextStamp("CONFIDENTIAL")
+            {
+                // Draw a background rectangle behind the text for readability
+                Background = true,
 
-            // Place the stamp on top of page content (default) and make it semi‑transparent
-            stamp.Background = false;               // draw on top
-            stamp.Opacity    = 0.6;                 // 60 % opacity
+                // Position the stamp (centered both horizontally and vertically)
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
 
-            // Define a background color for the text (e.g., black box) and foreground color (e.g., white text)
-            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.White;
-            stamp.TextState.BackgroundColor = Aspose.Pdf.Color.Black;
+                // Optional offsets (in points) from the alignment position
+                XIndent = 0,
+                YIndent = 0
+            };
 
-            // Center the stamp horizontally and vertically on each page
-            stamp.HorizontalAlignment = HorizontalAlignment.Center;
-            stamp.VerticalAlignment   = VerticalAlignment.Center;
+            // Style the text and its background
+            txtStamp.TextState.FontSize = 36;
+            txtStamp.TextState.FontStyle = FontStyles.Bold;
+            txtStamp.TextState.ForegroundColor = Aspose.Pdf.Color.White;          // text color
+            txtStamp.TextState.BackgroundColor = Aspose.Pdf.Color.Black;          // box color
+            txtStamp.Opacity = 0.5;                                                // semi‑transparent
 
-            // Optionally let the stamp auto‑adjust its font size to fit the rectangle
-            stamp.AutoAdjustFontSizeToFitStampRectangle = true;
-
-            // Apply the stamp to every page in the document
+            // Apply the stamp to each page individually
             foreach (Page page in doc.Pages)
             {
-                page.AddStamp(stamp);
+                page.AddStamp(txtStamp);
             }
 
             // Save the modified PDF

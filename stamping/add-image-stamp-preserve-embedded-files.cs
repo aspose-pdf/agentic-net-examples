@@ -6,47 +6,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdfPath  = "input.pdf";
         const string stampImagePath = "stamp.png";
+        const string outputPdfPath = "output_stamped.pdf";
 
-        if (!File.Exists(inputPath))
+        // Verify required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(stampImagePath))
         {
             Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        // Load the source PDF (embedded files are kept automatically)
-        using (Document doc = new Document(inputPath))
+        // Load the original PDF. Embedded files are kept in the Document.EmbeddedFiles collection
+        // and will be preserved when we save after stamping.
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Iterate through all pages and add the image stamp
-            foreach (Page page in doc.Pages)
+            // Create an ImageStamp instance and configure its appearance.
+            ImageStamp imgStamp = new ImageStamp(stampImagePath)
             {
-                // Create a fresh ImageStamp for each page to avoid side‑effects
-                ImageStamp stamp = new ImageStamp(stampImagePath)
-                {
-                    // Optional visual settings
-                    Background          = false,                     // stamp on top of content
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Bottom,
-                    Opacity             = 0.5f,                      // 50% transparent
-                    // Position can be fine‑tuned via margins or indents if needed
-                };
+                // Place the stamp on top of page content (Background = false)
+                Background = false,
+                // Semi‑transparent stamp (optional)
+                Opacity = 0.7,
+                // Center the stamp horizontally and vertically on each page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center
+            };
 
-                // Add the stamp to the current page
-                page.AddStamp(stamp);
+            // Apply the stamp to every page individually.
+            foreach (Page page in pdfDocument.Pages)
+            {
+                page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF; embedded files remain intact
-            doc.Save(outputPath);
+            // Save the modified PDF. All original embedded files remain intact.
+            pdfDocument.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Image stamp added and saved to '{outputPath}'.");
+        Console.WriteLine($"Image stamp added and saved to '{outputPdfPath}'. Embedded files preserved.");
     }
 }
