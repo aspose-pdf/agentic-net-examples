@@ -1,42 +1,43 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfFileInfo implements IDisposable, so use a using block.
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Access the underlying Document to obtain all metadata keys.
-            Document doc = pdfInfo.Document;
+            // Access the document's information (metadata)
+            DocumentInfo info = doc.Info;
 
-            // Get all metadata keys from the document.
-            ICollection<string> allKeys = doc.Metadata.Keys;
+            // DocumentInfo implements IDictionary<string,string> – use its Keys collection
+            // to obtain all metadata entries (standard and custom). If you need only custom
+            // entries you can filter out the known standard keys.
+            IEnumerable<string> allKeys = info.Keys;
 
-            // Filter out predefined keys (Title, Author, etc.) to keep only custom ones.
-            List<string> customKeys = allKeys
-                .Where(k => !DocumentInfo.IsPredefinedKey(k))
-                .ToList();
+            // Sort the keys alphabetically (case‑insensitive)
+            string[] sortedKeys = allKeys
+                .OrderBy(k => k, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
 
-            // Sort the custom keys alphabetically.
-            customKeys.Sort(StringComparer.OrdinalIgnoreCase);
-
-            // Display each custom key with its corresponding value using GetMetaInfo.
-            foreach (string key in customKeys)
+            // Display the sorted keys and their values
+            Console.WriteLine("Metadata keys (alphabetical order):");
+            foreach (string key in sortedKeys)
             {
-                string value = pdfInfo.GetMetaInfo(key);
+                // Retrieve the value via the indexer
+                string value = info[key];
                 Console.WriteLine($"{key}: {value}");
             }
         }

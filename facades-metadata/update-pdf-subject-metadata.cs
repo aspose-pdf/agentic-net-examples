@@ -1,14 +1,15 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string newSubject = "Report for Q3 2026";
+        const string newSubject = "This PDF contains the quarterly financial report";
 
         if (!File.Exists(inputPath))
         {
@@ -16,17 +17,16 @@ class Program
             return;
         }
 
-        // Load the PDF metadata using PdfFileInfo facade
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+        // Load PDF metadata using the Facades API
+        using (PdfFileInfo info = new PdfFileInfo(inputPath))
         {
             // Update the Subject field
-            pdfInfo.Subject = newSubject;
+            info.Subject = newSubject;
 
-            // Save the updated PDF to a new file
-            bool saved = pdfInfo.SaveNewInfo(outputPath);
-            Console.WriteLine(saved
-                ? $"Subject updated and saved to '{outputPath}'."
-                : "Failed to save the updated PDF.");
+            // Save the modified PDF
+            info.Save(outputPath);
         }
+
+        Console.WriteLine($"Subject updated and saved to '{outputPath}'.");
     }
 }

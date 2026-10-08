@@ -6,29 +6,28 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string newKeywords = "Accessible; Example";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Open the PDF file as a read‑only stream
-        using (FileStream pdfStream = File.OpenRead(inputPdfPath))
+        // Open the PDF file as a stream and initialize PdfFileInfo with it
+        using (FileStream pdfStream = File.OpenRead(inputPath))
         {
-            // Initialize PdfFileInfo with the PDF stream
-            using (PdfFileInfo pdfInfo = new PdfFileInfo(pdfStream))
-            {
-                // Update the Keywords metadata
-                pdfInfo.Keywords = "Updated, Keywords, Example";
+            PdfFileInfo pdfInfo = new PdfFileInfo(pdfStream);
 
-                // Save the PDF with the new metadata to a new file
-                pdfInfo.SaveNewInfo(outputPdfPath);
-            }
+            // Update the Keywords metadata
+            pdfInfo.Keywords = newKeywords;
+
+            // Save the PDF with the updated metadata
+            pdfInfo.Save(outputPath);
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Keywords updated and saved to '{outputPath}'.");
     }
 }

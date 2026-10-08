@@ -8,25 +8,38 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string keywords   = "Aspose.Pdf, Metadata, Keywords";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Set the Keywords metadata and save the updated PDF
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
-        {
-            pdfInfo.Keywords = "Sample, Aspose, PDF";
-            bool success = pdfInfo.SaveNewInfo(outputPath);
-            Console.WriteLine(success ? "Keywords set and PDF saved." : "Failed to save updated PDF.");
-        }
+        // -----------------------------------------------------------------
+        // Set the Keywords metadata using PdfFileInfo (Facades API)
+        // -----------------------------------------------------------------
+        PdfFileInfo pdfInfo = new PdfFileInfo(inputPath);
+        pdfInfo.Keywords = keywords;          // set the Keywords field
+        pdfInfo.Save(outputPath);             // save to a new PDF file
 
-        // Verify that the Keywords were written correctly
-        using (PdfFileInfo verifyInfo = new PdfFileInfo(outputPath))
+        // -----------------------------------------------------------------
+        // Verify that the Keywords were saved correctly
+        // -----------------------------------------------------------------
+        PdfFileInfo verifyInfo = new PdfFileInfo(outputPath);
+        string savedKeywords = verifyInfo.Keywords ?? string.Empty;
+
+        Console.WriteLine($"Keywords set:    \"{keywords}\"");
+        Console.WriteLine($"Keywords saved: \"{savedKeywords}\"");
+
+        if (string.Equals(keywords, savedKeywords, StringComparison.Ordinal))
         {
-            Console.WriteLine($"Keywords after save: {verifyInfo.Keywords}");
+            Console.WriteLine("Verification succeeded: Keywords match.");
+        }
+        else
+        {
+            Console.WriteLine("Verification failed: Keywords do not match.");
         }
     }
 }
