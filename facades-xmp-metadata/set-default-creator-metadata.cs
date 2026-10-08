@@ -1,59 +1,63 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // Facades API for metadata manipulation
 
+// Configuration class to hold the default Creator value
+public static class PdfConfiguration
+{
+    // Set this to the desired default Creator string
+    public static string DefaultCreator { get; set; } = "MyApp PDF Generator";
+}
+
+// Helper class that updates the Creator metadata using the Facades API
+public static class PdfCreatorHelper
+{
+    /// <summary>
+    /// Sets the Creator metadata of a PDF file.
+    /// If <paramref name="creator"/> is null or empty, the default value from <see cref="PdfConfiguration.DefaultCreator"/> is used.
+    /// </summary>
+    /// <param name="pdfPath">Path to the PDF file to modify.</param>
+    /// <param name="creator">Optional Creator value; when omitted the default is applied.</param>
+    public static void SetCreator(string pdfPath, string? creator = null)
+    {
+        if (string.IsNullOrWhiteSpace(pdfPath))
+            throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
+
+        if (!File.Exists(pdfPath))
+            throw new FileNotFoundException($"PDF file not found: {pdfPath}");
+
+        // Determine the value to write
+        string valueToSet = string.IsNullOrWhiteSpace(creator)
+            ? PdfConfiguration.DefaultCreator
+            : creator;
+
+        // Use PdfFileInfo (Facades) to modify document info without loading the full Document
+        PdfFileInfo info = new PdfFileInfo(pdfPath);
+        info.Creator = valueToSet;   // Set the Creator metadata (CreatorTool does not exist)
+        info.Save(pdfPath);          // Persist changes back to the same file
+    }
+}
+
+// Example usage
 class Program
 {
-    // Default creator tool name used when no creator is supplied.
-    private const string DefaultCreatorTool = "MyDefaultCreatorTool";
-
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPdf = "sample.pdf";
 
-        // Optional creator value; set to null or empty to trigger default.
-        string creator = null; // or set to "CustomCreator"
-
-        try
+        // Ensure the file exists for the demo
+        if (!File.Exists(inputPdf))
         {
-            SetCreatorIfMissing(inputPdf, outputPdf, creator);
-            Console.WriteLine($"PDF saved with creator info to '{outputPdf}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
-
-    /// <summary>
-    /// Copies a PDF file and ensures the Creator metadata is set.
-    /// If the source PDF already has a Creator value, it is preserved.
-    /// If the Creator is missing or empty, the provided creator (or a default) is applied.
-    /// </summary>
-    /// <param name="inputPath">Path to the source PDF.</param>
-    /// <param name="outputPath">Path where the resulting PDF will be saved.</param>
-    /// <param name="creator">Optional creator string; if null or empty, a default is used.</param>
-    private static void SetCreatorIfMissing(string inputPath, string outputPath, string creator)
-    {
-        if (!File.Exists(inputPath))
-            throw new FileNotFoundException($"Input file not found: {inputPath}");
-
-        // PdfFileInfo works with the Facades API to edit document metadata.
-        PdfFileInfo fileInfo = new PdfFileInfo();
-
-        // Bind the existing PDF file.
-        fileInfo.BindPdf(inputPath);
-
-        // Determine the creator to apply.
-        string currentCreator = fileInfo.Creator;
-        if (string.IsNullOrWhiteSpace(currentCreator))
-        {
-            // Use the supplied creator if provided; otherwise fall back to the default.
-            fileInfo.Creator = string.IsNullOrWhiteSpace(creator) ? DefaultCreatorTool : creator;
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
         }
 
-        // Save the updated PDF to the output location.
-        fileInfo.Save(outputPath);
+        // Option 1: Use an explicit Creator value
+        PdfCreatorHelper.SetCreator(inputPdf, "CustomTool v1.2");
+
+        // Option 2: Omit the value to apply the configured default
+        PdfCreatorHelper.SetCreator(inputPdf);
+        
+        Console.WriteLine("Creator metadata updated successfully.");
     }
 }

@@ -1,65 +1,69 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Linq;
+using System.Text;
+using System.Xml.Linq;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class XmpNamespaceDiagnostic
+class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        const string inputPdf = "input.pdf";
+        // Path to the PDF file (first argument or default)
+        string pdfPath = args.Length > 0 ? args[0] : "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Bind the PDF and retrieve its XMP metadata as XML bytes
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        try
         {
-            xmp.BindPdf(inputPdf);
-            byte[] rawData = xmp.GetXmpMetadata();
-
-            if (rawData == null || rawData.Length == 0)
+            // Load the PDF document first – PdfXmpMetadata expects a Document instance
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                Console.WriteLine("No XMP metadata found in the PDF.");
-                return;
-            }
-
-            // Load the XML into an XmlDocument for parsing
-            XmlDocument xmlDoc = new XmlDocument();
-            using (MemoryStream ms = new MemoryStream(rawData))
-            {
-                xmlDoc.Load(ms);
-            }
-
-            // The XMP metadata root element typically contains namespace declarations
-            XmlElement root = xmlDoc.DocumentElement;
-            if (root == null)
-            {
-                Console.WriteLine("Unable to parse XMP metadata XML.");
-                return;
-            }
-
-            Console.WriteLine("XMP Namespaces present in the PDF:");
-            // Iterate over all attributes of the root element to find xmlns declarations
-            foreach (XmlAttribute attr in root.Attributes)
-            {
-                if (attr.Prefix == "xmlns")
+                // Use the PdfXmpMetadata facade to retrieve the raw XMP packet
+                using (PdfXmpMetadata xmpFacade = new PdfXmpMetadata(pdfDoc))
                 {
-                    // Attribute of form xmlns:prefix="uri"
-                    string prefix = attr.LocalName; // the prefix part after xmlns:
-                    string uri = attr.Value;
-                    Console.WriteLine($"Prefix: '{prefix}'  URI: '{uri}'");
-                }
-                else if (attr.Name == "xmlns")
-                {
-                    // Default namespace declaration xmlns="uri"
-                    string uri = attr.Value;
-                    Console.WriteLine($"Default namespace URI: '{uri}'");
+                    // GetXmpMetadata returns a byte[]; convert it to a UTF‑8 string
+                    byte[] xmpBytes = xmpFacade.GetXmpMetadata();
+                    if (xmpBytes == null || xmpBytes.Length == 0)
+                    {
+                        Console.WriteLine("No XMP metadata found in the PDF.");
+                        return;
+                    }
+
+                    string xmpXml = Encoding.UTF8.GetString(xmpBytes);
+
+                    // Parse the XMP XML and collect declared namespaces
+                    XDocument doc = XDocument.Parse(xmpXml);
+                    var namespaces = doc.Root?
+                                       .Attributes()
+                                       .Where(a => a.IsNamespaceDeclaration)
+                                       .Select(a => a.Value)
+                                       .Distinct()
+                                       .ToArray();
+
+                    if (namespaces == null || namespaces.Length == 0)
+                    {
+                        Console.WriteLine("No XMP namespaces found in the PDF.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("XMP namespaces present in the PDF:");
+                        foreach (var ns in namespaces)
+                        {
+                            Console.WriteLine(ns);
+                        }
+                    }
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

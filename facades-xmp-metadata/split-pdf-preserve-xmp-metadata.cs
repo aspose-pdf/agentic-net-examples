@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
@@ -7,48 +8,60 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPattern = "output_page{0}.pdf";
+        const string inputPath = "input.pdf";
+        const string outputDir = "SplitPages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Extract XMP metadata from the source PDF
-        PdfXmpMetadata xmpMeta = new PdfXmpMetadata();
-        xmpMeta.BindPdf(inputPdf);
-        byte[] xmpBytes = xmpMeta.GetXmpMetadata();
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Split the source PDF into individual page streams
-        PdfFileEditor editor = new PdfFileEditor();
-        MemoryStream[] pageStreams = editor.SplitToPages(inputPdf);
-
-        // Process each page stream: attach original XMP metadata and save to file
-        for (int i = 0; i < pageStreams.Length; i++)
+        // Load the source PDF once to retrieve its XMP metadata (if any) and page count
+        int pageCount;
+        // Store the XMP values directly; they are of type Aspose.Pdf.XmpValue
+        var sourceMetadata = new Dictionary<string, XmpValue>();
+        using (Document srcDoc = new Document(inputPath))
         {
-            // Ensure the stream is positioned at the beginning
-            pageStreams[i].Position = 0;
+            pageCount = srcDoc.Pages.Count; // Aspose.Pdf uses 1‑based indexing
 
-            string outputPath = string.Format(outputPattern, i + 1);
-
-            using (Document pageDoc = new Document(pageStreams[i]))
+            // Copy all existing XMP metadata entries into a dictionary for later reuse
+            foreach (string key in srcDoc.Metadata.Keys)
             {
-                // Attach the original XMP metadata
-                using (MemoryStream xmpStream = new MemoryStream(xmpBytes))
-                {
-                    pageDoc.SetXmpMetadata(xmpStream);
-                }
-
-                // Save the single‑page PDF
-                pageDoc.Save(outputPath);
+                sourceMetadata[key] = srcDoc.Metadata[key];
             }
-
-            // Dispose the page stream after use
-            pageStreams[i].Dispose();
         }
 
-        Console.WriteLine("Splitting completed. Individual pages saved with original XMP metadata.");
+        // PdfFileEditor is a Facades class used for page extraction; it does NOT implement IDisposable
+        PdfFileEditor editor = new PdfFileEditor();
+
+        // Extract each page into a separate PDF file
+        for (int i = 1; i <= pageCount; i++)
+        {
+            string outPath = Path.Combine(outputDir, $"Page_{i}.pdf");
+
+            // Correct overload: Extract(sourceFile, startPage, endPage, outputFile)
+            editor.Extract(inputPath, i, i, outPath);
+
+            // If the original PDF contained XMP metadata, copy it to the split file
+            if (sourceMetadata.Count > 0)
+            {
+                using (Document splitDoc = new Document(outPath))
+                {
+                    foreach (var kvp in sourceMetadata)
+                    {
+                        splitDoc.Metadata[kvp.Key] = kvp.Value;
+                    }
+                    splitDoc.Save(outPath); // Save with the updated metadata
+                }
+            }
+
+            Console.WriteLine($"Saved page {i} → {outPath}");
+        }
+
+        Console.WriteLine("Splitting completed with XMP metadata preserved.");
     }
 }

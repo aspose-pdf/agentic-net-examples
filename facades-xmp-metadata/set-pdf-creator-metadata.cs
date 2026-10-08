@@ -1,6 +1,5 @@
 using System;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 namespace PdfExtensions
 {
@@ -10,41 +9,34 @@ namespace PdfExtensions
     public static class PdfDocumentExtensions
     {
         /// <summary>
-        /// Sets the Creator metadata of the PDF document using the Facades PdfFileInfo class.
+        /// Adds or updates the CreatorTool metadata entry of the PDF document.
         /// </summary>
-        /// <param name="doc">The Aspose.Pdf.Document instance to modify.</param>
-        /// <param name="creator">The creator string to assign.</param>
-        public static void SetCreator(this Document doc, string creator)
+        /// <param name="pdfDoc">The Document instance to modify.</param>
+        /// <param name="creatorTool">The value to set for the Creator field.</param>
+        public static void AddCreatorTool(this Document pdfDoc, string creatorTool)
         {
-            if (doc == null) throw new ArgumentNullException(nameof(doc));
-            if (creator == null) throw new ArgumentNullException(nameof(creator));
+            if (pdfDoc == null) throw new ArgumentNullException(nameof(pdfDoc));
+            if (creatorTool == null) throw new ArgumentNullException(nameof(creatorTool));
 
-            // Bind the Facade to the existing Document instance.
-            var fileInfo = new PdfFileInfo();
-            fileInfo.BindPdf(doc);
-
-            // Set the Creator property.
-            fileInfo.Creator = creator;
-
-            // No explicit save is performed here; the caller should save the Document
-            // using the standard Document.Save(...) pattern.
+            // The Info property holds document metadata. Setting the Creator
+            // property writes the /Creator entry in the PDF catalog.
+            pdfDoc.Info.Creator = creatorTool;
         }
     }
 
     // ---------------------------------------------------------------------
-    // A minimal entry point is required because the project is built as a
-    // console application.  The Program class does not interfere with the
-    // reusable extension method – it merely satisfies the compiler.
+    // Minimal entry point required for a console‑style project.
+    // The method does not perform any work; it only satisfies the compiler
+    // that expects a static Main method.
     // ---------------------------------------------------------------------
     internal class Program
     {
         private static void Main(string[] args)
         {
-            // Example usage (optional, can be removed in production libraries).
-            var doc = new Document();
-            doc.Pages.Add();
-            doc.SetCreator("MyApp Creator");
-            // doc.Save("output.pdf"); // Uncomment to persist the file.
+            // Example (optional) – demonstrates that the extension works.
+            // var doc = new Document();
+            // doc.AddCreatorTool("MyApp");
+            // Console.WriteLine($"Creator set to: {doc.Info.Creator}");
         }
     }
 }

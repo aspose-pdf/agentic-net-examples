@@ -1,44 +1,47 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Xml.Linq;
+using System.Text.Json;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Newtonsoft.Json;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string jsonOutput = "xmp_metadata.json";
+        const string inputPath = "input.pdf";
+        const string jsonOutputPath = "metadata.json";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Bind the PDF to the XMP metadata facade
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        // Load the PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
-            xmp.BindPdf(inputPdf);
+            // Use the PdfXmpMetadata facade to obtain XMP metadata as an XML string
+            using (Aspose.Pdf.Facades.PdfXmpMetadata xmpFacade = new Aspose.Pdf.Facades.PdfXmpMetadata(doc))
+            {
+                // GetXmpMetadata returns a byte[]; convert it to a UTF‑8 string
+                byte[] xmpBytes = xmpFacade.GetXmpMetadata();
+                string xmpXml = Encoding.UTF8.GetString(xmpBytes);
 
-            // Retrieve XMP metadata as XML bytes
-            byte[] xmlBytes = xmp.GetXmpMetadata();
+                if (string.IsNullOrEmpty(xmpXml))
+                {
+                    Console.WriteLine("No XMP metadata found in the document.");
+                    return;
+                }
 
-            // Convert bytes to a UTF‑8 string
-            string xmlString = Encoding.UTF8.GetString(xmlBytes);
+                // Wrap the raw XML string into a JSON object for non‑XML systems
+                // The XML is stored as a JSON string value to preserve its structure
+                string json = $"{{\"XmpMetadata\": {JsonSerializer.Serialize(xmpXml)}}}";
 
-            // Parse the XML
-            XDocument xdoc = XDocument.Parse(xmlString);
-
-            // Convert XML to JSON (indented for readability)
-            string json = JsonConvert.SerializeXNode(xdoc, Formatting.Indented, true);
-
-            // Write JSON to the output file
-            File.WriteAllText(jsonOutput, json);
+                // Write the JSON to the output file
+                File.WriteAllText(jsonOutputPath, json);
+                Console.WriteLine($"XMP metadata exported to JSON file: {jsonOutputPath}");
+            }
         }
-
-        Console.WriteLine($"XMP metadata exported to JSON: {jsonOutput}");
     }
 }

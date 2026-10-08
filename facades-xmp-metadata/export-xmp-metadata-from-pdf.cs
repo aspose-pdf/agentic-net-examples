@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -15,16 +16,31 @@ class Program
             return;
         }
 
-        // Bind the PDF file and extract its XMP metadata
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        try
         {
-            xmp.BindPdf(inputPdf);
-            byte[] data = xmp.GetXmpMetadata();
+            // Load the PDF document
+            Document doc = new Document(inputPdf);
 
-            // Save the metadata to a side‑car .xmp file
-            File.WriteAllBytes(outputXmp, data);
+            // Use the PdfXmpMetadata facade to retrieve the raw XMP packet
+            using (PdfXmpMetadata xmpFacade = new PdfXmpMetadata(doc))
+            {
+                byte[] xmpData = xmpFacade.GetXmpMetadata();
+
+                if (xmpData == null || xmpData.Length == 0)
+                {
+                    Console.WriteLine("No XMP metadata found in the PDF.");
+                }
+                else
+                {
+                    // Write the XMP side‑car file
+                    File.WriteAllBytes(outputXmp, xmpData);
+                    Console.WriteLine($"XMP metadata exported to '{outputXmp}'.");
+                }
+            }
         }
-
-        Console.WriteLine($"XMP metadata exported to '{outputXmp}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

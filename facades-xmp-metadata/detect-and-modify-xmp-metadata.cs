@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_modified.pdf";
+        const string outputPath = "modified.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,31 +15,26 @@ class Program
             return;
         }
 
-        // Create the XMP metadata facade and bind the PDF (load)
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        // Load the PDF to inspect its XMP metadata. The Metadata dictionary is populated only when XMP is present.
+        using (Document doc = new Document(inputPath))
         {
-            xmp.BindPdf(inputPath);
+            bool hasXmp = doc.Metadata != null && doc.Metadata.Count > 0;
 
-            // Retrieve the XMP metadata as a byte array
-            byte[] data = xmp.GetXmpMetadata();
-
-            // Determine if XMP metadata exists (non‑empty byte array)
-            bool hasXmp = data != null && data.Length > 0;
-            Console.WriteLine($"XMP metadata present: {hasXmp}");
-
-            if (hasXmp)
+            if (!hasXmp)
             {
-                // Example modification: add a custom XMP property
-                xmp.Add("xmp:Nickname", "MyDocument");
+                Console.WriteLine("No XMP metadata found. Skipping modifications.");
+                return;
+            }
 
-                // Save the modified PDF (save)
-                xmp.Save(outputPath);
-                Console.WriteLine($"Modified PDF saved to {outputPath}");
-            }
-            else
-            {
-                Console.WriteLine("No XMP metadata; no modifications performed.");
-            }
+            Console.WriteLine("XMP metadata detected. Proceeding with modifications.");
+
+            // Add a custom document property using the DocumentInfo indexer (the correct way to store custom metadata).
+            doc.Info["ProcessedOn"] = DateTime.UtcNow.ToString("o");
+
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"Modifications saved to '{outputPath}'.");
     }
 }

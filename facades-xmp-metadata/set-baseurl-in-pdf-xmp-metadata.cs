@@ -1,40 +1,39 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
-        // Output PDF file path (will contain the updated XMP metadata)
-        const string outputPdf = "output_with_baseurl.pdf";
-        // Desired BaseURL value to be stored in the XMP metadata
-        const string baseUrl = "https://www.example.com/";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string baseUrl = "https://www.example.com";
 
-        // Verify that the source file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use the PdfXmpMetadata facade to manipulate XMP metadata
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        try
         {
-            // Bind the facade to the existing PDF document
-            xmp.BindPdf(inputPdf);
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Set the BaseURL property in the XMP metadata via the Metadata dictionary
+                // The key follows the XMP namespace prefix "xmp".
+                doc.Metadata["xmp:BaseURL"] = baseUrl;
 
-            // Add or replace the BaseURL property.
-            // The string overload adds a key/value pair directly.
-            // The key must be the full XMP property name.
-            xmp.Add("xmp:BaseURL", baseUrl);
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
 
-            // Save the modified PDF (the original file is not altered)
-            xmp.Save(outputPdf);
+            Console.WriteLine($"BaseUrl set and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"BaseURL metadata added. Output saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

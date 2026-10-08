@@ -1,58 +1,52 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Optimization;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string compressedPath = "compressed.pdf";
+        // Paths for the original and the compressed PDF
+        const string inputPdfPath = "input.pdf";
+        const string compressedPdfPath = "compressed.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPath))
+        // Load the original PDF
+        Document doc = new Document(inputPdfPath);
+
+        // Set high compression options using OptimizationOptions
+        OptimizationOptions opt = OptimizationOptions.All();
+        opt.CompressImages = true;          // compress image streams
+        opt.ImageQuality = 30;              // reduce image quality (0‑100)
+        opt.RemoveUnusedObjects = true;    // clean up unused objects
+        opt.RemoveUnusedStreams = true;    // clean up unused streams
+
+        // Apply the optimization and save the compressed PDF
+        doc.OptimizeResources(opt);
+        doc.Save(compressedPdfPath);
+
+        // Load the compressed PDF and read its XMP metadata
+        using (Document compressedDoc = new Document(compressedPdfPath))
         {
-            // Configure high compression options
-            OptimizationOptions opt = new OptimizationOptions
+            // XMP metadata is exposed via the Metadata dictionary
+            if (compressedDoc.Metadata != null && compressedDoc.Metadata.Count > 0)
             {
-                // Compress PDF objects (streams) into object streams
-                CompressObjects = true,
-                // Reuse identical page content when possible
-                AllowReusePageContent = true,
-                // Remove unused objects to reduce size
-                RemoveUnusedObjects = true,
-                // Subset fonts to keep only used glyphs
-                SubsetFonts = true,
-                // Unembed fonts if you prefer smaller size (optional)
-                UnembedFonts = false,
-                // Set maximum image resolution (typo in API: MaxResoultion)
-                MaxResoultion = 72 // low resolution to shrink images further
-            };
-
-            // Apply optimization (compression)
-            doc.OptimizeResources(opt);
-
-            // Save the compressed PDF
-            doc.Save(compressedPath);
+                Console.WriteLine("XMP Metadata after compression:");
+                foreach (var kvp in compressedDoc.Metadata)
+                {
+                    Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("(No XMP metadata present)");
+            }
         }
-
-        // Read XMP metadata from the compressed PDF
-        PdfXmpMetadata xmp = new PdfXmpMetadata();
-        xmp.BindPdf(compressedPath);
-        byte[] rawMetadata = xmp.GetXmpMetadata();
-
-        // Convert the metadata bytes to a readable string (UTF-8)
-        string metadataXml = Encoding.UTF8.GetString(rawMetadata);
-        Console.WriteLine("XMP Metadata (XML):");
-        Console.WriteLine(metadataXml);
     }
 }

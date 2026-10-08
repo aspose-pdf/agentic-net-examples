@@ -1,36 +1,35 @@
 using System;
-using Aspose.Pdf.Facades;          // Facade API for XMP manipulation
-using Aspose.Pdf;                 // Needed for DefaultMetadataProperties enum
+using System.IO;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input and output PDF file paths
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_no_nickname.pdf";
 
-        // Ensure the source file exists
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Manipulate XMP metadata using the PdfXmpMetadata facade
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        // Load the PDF document
+        using (Document pdfDocument = new Document(inputPath))
         {
-            // Bind the facade to the existing PDF document
-            xmp.BindPdf(inputPdf);
+            const string nicknameKey = "xmp:Nickname"; // XMP property name for Nickname
 
-            // Remove the Nickname element from the XMP metadata
-            // Two overloads are available; using the enum version is type‑safe
-            xmp.Remove(DefaultMetadataProperties.Nickname);
+            // Remove the Nickname entry from the XMP metadata dictionary if it exists
+            if (pdfDocument.Metadata.ContainsKey(nicknameKey))
+            {
+                pdfDocument.Metadata.Remove(nicknameKey);
+            }
 
-            // Save the modified PDF to a new file
-            xmp.Save(outputPdf);
+            // Save the updated PDF
+            pdfDocument.Save(outputPath);
         }
 
-        Console.WriteLine($"Nickname element removed. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Nickname removed. Output saved to '{outputPath}'.");
     }
 }

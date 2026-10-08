@@ -1,65 +1,75 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "encrypted_input.pdf";
-        const string outputPdf = "decrypted_output.pdf";
+        const string inputPath  = "encrypted.pdf";
+        const string outputPath = "output.pdf";
+        const string password   = "user123"; // replace with actual password if known
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // First try to load the PDF without a password.
         Document pdfDoc = null;
         try
         {
-            pdfDoc = new Document(inputPdf);
-            // If loading succeeds, the PDF is not encrypted.
-            Console.WriteLine("PDF loaded successfully – no encryption detected.");
+            // Try to load the PDF without a password.
+            pdfDoc = new Document(inputPath);
         }
-        catch (InvalidPasswordException ex)
+        catch (InvalidPasswordException)
         {
-            // The PDF is encrypted and requires a password.
-            Console.Error.WriteLine($"Load failed: the document is encrypted. {ex.Message}");
-
-            // Replace "myPassword" with the actual password if it is known.
-            const string userPassword = "myPassword";
+            // The PDF is encrypted – attempt to open it with the supplied password.
+            Console.WriteLine("PDF is encrypted – attempting decryption with provided password.");
             try
             {
-                // Attempt to load the PDF using the supplied password.
-                pdfDoc = new Document(inputPdf, userPassword);
-                // Save an unprotected copy.
-                pdfDoc.Save(outputPdf);
-                Console.WriteLine($"Decrypted PDF saved to '{outputPdf}'.");
+                pdfDoc = new Document(inputPath, password);
             }
-            catch (InvalidPasswordException innerEx)
+            catch (InvalidPasswordException)
             {
-                // Password was incorrect or not provided.
-                Console.Error.WriteLine($"Decryption failed: invalid password. {innerEx.Message}");
+                Console.Error.WriteLine("Unable to open the PDF – the password is incorrect or not provided.");
+                return;
             }
-            catch (Exception innerEx)
-            {
-                // Other errors during decryption.
-                Console.Error.WriteLine($"Unexpected error during decryption: {innerEx.Message}");
-            }
+        }
+        catch (PdfException ex)
+        {
+            Console.Error.WriteLine($"PDF processing error while loading: {ex.Message}");
+            return;
         }
         catch (Exception ex)
         {
-            // Handle any other unexpected errors during loading.
-            Console.Error.WriteLine($"Error loading PDF: {ex.Message}");
+            Console.Error.WriteLine($"Unexpected error while loading PDF: {ex.Message}");
+            return;
         }
-        finally
+
+        try
         {
-            // Ensure the Document is disposed if it was created.
-            if (pdfDoc != null)
-                pdfDoc.Dispose();
+            // Extract the first page to a new PDF.
+            if (pdfDoc.Pages.Count > 0)
+            {
+                Document firstPageDoc = new Document();
+                // Add a copy of the first page.
+                firstPageDoc.Pages.Add(pdfDoc.Pages[1]);
+                firstPageDoc.Save(outputPath);
+                Console.WriteLine($"First page extracted to: {outputPath}");
+            }
+            else
+            {
+                Console.Error.WriteLine("The source PDF contains no pages.");
+            }
+        }
+        catch (PdfException ex)
+        {
+            Console.Error.WriteLine($"PDF processing error during extraction: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Unexpected error during extraction: {ex.Message}");
         }
     }
 }
