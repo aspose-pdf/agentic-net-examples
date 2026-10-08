@@ -7,38 +7,42 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file name
-        const string pdfPath = "input.pdf";
-        const string outputDir = "BmpImages";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "BmpPages";
+
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
+        }
+
         Directory.CreateDirectory(outputDir);
 
-        // ---------------------------------------------------------------------
-        // Ensure a PDF exists – the sandbox does not contain any external files.
-        // If the file is missing we create a minimal one‑page PDF on the fly.
-        // ---------------------------------------------------------------------
-        if (!File.Exists(pdfPath))
-        {
-            using var placeholder = new Document();
-            placeholder.Pages.Add();
-            placeholder.Save(pdfPath);
-        }
-
         // Load the PDF document
-        var document = new Document(pdfPath);
+        Document pdfDocument = new Document(inputPdf);
 
-        // Use BmpDevice (cross‑platform) instead of System.Drawing.ImageFormat.
-        // The device renders each page to a BMP image using the specified resolution.
-        var resolution = new Resolution(300); // 300 DPI – adjust as needed
-        var bmpDevice = new BmpDevice(resolution);
+        // Desired resolution (dots per inch)
+        var resolution = new Resolution(150);
 
-        for (int pageNumber = 1; pageNumber <= document.Pages.Count; pageNumber++)
+        // Iterate through each page and render it as a BMP using the CropBox area
+        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
         {
-            string bmpPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
-            using var stream = new FileStream(bmpPath, FileMode.Create);
-            // The BmpDevice automatically respects the page's CropBox, so margins are trimmed.
-            bmpDevice.Process(document.Pages[pageNumber], stream);
-        }
+            Page page = pdfDocument.Pages[pageNumber];
 
-        Console.WriteLine("PDF has been converted to BMP images successfully.");
+            // Use the CropBox if it is defined; otherwise fall back to the page rectangle
+            var cropRect = (!page.CropBox.IsEmpty) ? page.CropBox : page.Rect;
+
+            // BmpDevice does NOT implement IDisposable – instantiate it directly
+            BmpDevice bmpDevice = new BmpDevice((int)cropRect.Width, (int)cropRect.Height, resolution);
+
+            // Render the page into a memory stream (the stream *is* disposable)
+            using (var ms = new MemoryStream())
+            {
+                bmpDevice.Process(page, ms);
+                string outPath = Path.Combine(outputDir, $"Page_{pageNumber}.bmp");
+                File.WriteAllBytes(outPath, ms.ToArray());
+                Console.WriteLine($"Saved: {outPath}");
+            }
+        }
     }
 }

@@ -1,56 +1,57 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // for Resolution
+using Aspose.Pdf.Devices; // BmpDevice, Resolution, PageCoordinateType
 
 class Program
 {
     static void Main()
     {
+        // Input PDF file
         const string inputPdf = "input.pdf";
-        const string outputDir = "BmpImages";
 
-        // Verify source file exists
+        // Base output path for BMP images (page number will be appended automatically)
+        const string outputBasePath = "output/page"; // e.g., "output/page" -> page1.bmp, page2.bmp, ...
+
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists (handle case where Path.GetDirectoryName returns null)
+        string outputDir = Path.GetDirectoryName(outputBasePath);
+        if (string.IsNullOrEmpty(outputDir))
+            outputDir = "."; // current directory
+        if (!Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
-        // PdfConverter also implements IDisposable, so wrap it as well
-        using (PdfConverter converter = new PdfConverter())
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
+
+        // Configure the desired resolution (DPI) for the BMP images
+        Resolution resolution = new Resolution(300); // 300 DPI
+
+        // BmpDevice does NOT implement IDisposable – instantiate it directly.
+        // Use the constructor that accepts a Resolution (width/height are optional and default to page size).
+        BmpDevice bmpDevice = new BmpDevice(resolution);
+        // Optional: set the coordinate system you need (CropBox, MediaBox, etc.)
+        // bmpDevice.CoordinateType = PageCoordinateType.CropBox;
+
+        // Iterate through each page and convert it to a BMP image using BmpDevice
+        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
         {
-            // Bind the document to the converter facade
-            converter.BindPdf(pdfDoc);
+            string outputPath = $"{outputBasePath}{pageNumber}.bmp";
 
-            // Configure conversion settings BEFORE DoConvert()
-            // Resolution expects an Aspose.Pdf.Devices.Resolution object, not an int.
-            converter.Resolution = new Resolution(300); // 300 DPI
-
-            // The CoordinateType property was removed in recent versions; the default (CropBox) is used.
-            // If a specific coordinate type is required, uncomment the line below and ensure the enum exists in your version.
-            // converter.CoordinateType = Aspose.Pdf.CoordinateType.CropBox;
-
-            // Prepare the converter for image extraction
-            converter.DoConvert();
-
-            int pageNumber = 1;
-            // Extract each page as a BMP image
-            while (converter.HasNextImage())
+            // Create a file stream for the output BMP. The stream is disposable, so we use a using block.
+            using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
-                string bmpPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
-                converter.GetNextImage(bmpPath, ImageFormat.Bmp);
-                pageNumber++;
+                // Convert the current page to BMP. The Process method takes (Page, Stream).
+                bmpDevice.Process(pdfDocument.Pages[pageNumber], outStream);
             }
         }
 
-        Console.WriteLine("PDF successfully converted to BMP images.");
+        Console.WriteLine("PDF has been converted to BMP images.");
     }
 }

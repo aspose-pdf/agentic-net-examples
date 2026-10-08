@@ -2,41 +2,39 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // needed for SimpleFontSubstitution
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";   // source PDF
-        const string outputTiff = "output.tiff"; // resulting multi‑page TIFF
+        const string inputPdf = "input.pdf";
+        const string outputTiff = "output.tiff";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal (document‑disposal‑with‑using rule)
-        using (Document pdfDoc = new Document(inputPdf))
-        {
-            // Apply font substitution: replace any occurrence of "Courier" with "Liberation Mono"
-            // Use FontRepository.Substitutions with SimpleFontSubstitution (correct API)
-            FontRepository.Substitutions.Add(new SimpleFontSubstitution("Courier", "Liberation Mono"));
+        // Register font substitution: replace Symbol with Arial Unicode MS
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Symbol", "Arial Unicode MS"));
 
-            // Initialise the PdfConverter facade with the loaded document
-            using (PdfConverter converter = new PdfConverter(pdfDoc))
-            {
-                // Optional: configure rendering options if needed (e.g., resolution)
-                // converter.RenderingOptions = new RenderingOptions { Resolution = new Resolution(300) };
+        // Initialize the PdfConverter facade
+        PdfConverter converter = new PdfConverter();
 
-                // Prepare the converter for conversion
-                converter.DoConvert();
+        // Load the PDF document
+        converter.BindPdf(inputPdf);
 
-                // Convert all pages to a single multi‑page TIFF file
-                converter.SaveAsTIFF(outputTiff);
-            }
-        }
+        // Convert all pages (1‑based indexing)
+        converter.StartPage = 1;
+        converter.EndPage = converter.PageCount;
+
+        // Save as a multi‑page TIFF at 300 DPI using CCITT Group4 compression
+        const int resolution = 300;
+        // SaveAsTIFF expects an int for compression, so cast the enum value
+        converter.SaveAsTIFF(outputTiff, resolution, (int)CompressionType.CCITT4);
 
         Console.WriteLine($"PDF successfully converted to TIFF: {outputTiff}");
     }

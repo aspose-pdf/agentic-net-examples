@@ -1,16 +1,16 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using System.Drawing.Imaging;
+using Aspose.Pdf;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing source PDF files
-        const string inputFolder = @"C:\InputPdfs";
+        // Folder containing source PDFs
+        const string inputFolder = "InputPdfs";
         // Folder where JPEG images will be saved
-        const string outputFolder = @"C:\OutputImages";
+        const string outputFolder = "OutputImages";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -21,35 +21,34 @@ class Program
         // Ensure the output root folder exists
         Directory.CreateDirectory(outputFolder);
 
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        // Retrieve all PDF files in the input folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
         foreach (string pdfPath in pdfFiles)
         {
-            // Create a subfolder for each PDF to keep its pages separate
+            // Create a subdirectory for each PDF to hold its page images
             string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
             string pdfOutputDir = Path.Combine(outputFolder, pdfName);
             Directory.CreateDirectory(pdfOutputDir);
 
-            // Use PdfConverter from Aspose.Pdf.Facades to convert pages to JPEG
-            using (PdfConverter converter = new PdfConverter())
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                // Bind the PDF file to the converter
-                converter.BindPdf(pdfPath);
-                // Prepare the converter for image extraction
-                converter.DoConvert();
+                // JpegDevice with desired resolution (DPI) and quality (0‑100)
+                JpegDevice jpegDevice = new JpegDevice(150, 90);
 
-                int pageIndex = 1;
-                // Extract each page as a JPEG image
-                while (converter.HasNextImage())
+                // Pages are 1‑based; iterate through each page and save as JPEG
+                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
                 {
-                    string imagePath = Path.Combine(pdfOutputDir, $"page_{pageIndex}.jpg");
-                    // Save the next image using the JPEG format (System.Drawing.Imaging.ImageFormat)
-                    converter.GetNextImage(imagePath, ImageFormat.Jpeg);
-                    pageIndex++;
+                    string imagePath = Path.Combine(pdfOutputDir, $"Page_{pageNum}.jpg");
+                    using (FileStream imageStream = new FileStream(imagePath, FileMode.Create))
+                    {
+                        jpegDevice.Process(pdfDoc.Pages[pageNum], imageStream);
+                    }
                 }
             }
 
-            Console.WriteLine($"Converted '{pdfPath}' to images in '{pdfOutputDir}'.");
+            Console.WriteLine($"Converted '{pdfPath}' to JPEG images in '{pdfOutputDir}'.");
         }
     }
 }

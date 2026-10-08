@@ -1,42 +1,56 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // <-- PngDevice lives here in recent versions
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputDir = "PngOutput";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "PngPages";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         Directory.CreateDirectory(outputDir);
 
-        // Set up font substitution: replace missing Helvetica with Times New Roman
-        SimpleFontSubstitution substitution = new SimpleFontSubstitution("Helvetica", "Times New Roman", false);
-        FontRepository.Substitutions.Add(substitution);
-
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a PNG device for rendering pages
-            PngDevice pngDevice = new PngDevice(); // default resolution (96 DPI). Adjust if needed.
-
-            // Iterate through all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load PDF
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                string outPath = Path.Combine(outputDir, $"page_{i}.png");
-                // Render the current page to a PNG file
-                pngDevice.Process(doc.Pages[i], outPath);
-                Console.WriteLine($"Saved {outPath}");
+                // Enable font substitution if the property exists (some older versions lack it)
+                var fontSubProp = pdfDoc.GetType().GetProperty("FontSubstitutionEnabled");
+                if (fontSubProp != null && fontSubProp.CanWrite)
+                {
+                    fontSubProp.SetValue(pdfDoc, true);
+                }
+
+                // Set the desired resolution (DPI) for the PNG images
+                var resolution = new Resolution(300);
+                var pngDevice = new PngDevice(resolution);
+
+                // Convert each page to a separate PNG file (1‑based indexing)
+                for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+                {
+                    string outPath = Path.Combine(outputDir, $"Page_{pageNumber}.png");
+                    using (FileStream outStream = new FileStream(outPath, FileMode.Create))
+                    {
+                        pngDevice.Process(pdfDoc.Pages[pageNumber], outStream);
+                    }
+                    Console.WriteLine($"Saved page {pageNumber} as PNG → {outPath}");
+                }
             }
+
+            Console.WriteLine("PDF to PNG conversion completed.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

@@ -1,50 +1,51 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;          // PdfConverter resides here
-using System.Drawing.Imaging;      // ImageFormat for PNG
+using Aspose.Pdf;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF
-        const string outputDir  = "output_images";     // folder for PNGs
-        const string filePrefix = "page_";             // e.g., page_1.png
-        const string fileSuffix = ".png";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "PageImages";
 
-        // Verify source file exists
-        if (!File.Exists(inputPdf))
+        // Verify input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // PdfConverter implements IDisposable – wrap in using for deterministic cleanup
-        using (PdfConverter converter = new PdfConverter())
+        // Load PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Bind the PDF file to the converter
-            converter.BindPdf(inputPdf);
+            // Set desired image resolution (dpi)
+            var resolution = new Resolution(300);
 
-            // Prepare internal structures for conversion
-            converter.DoConvert();
+            // Create a PNG device that will render each page
+            var pngDevice = new PngDevice(resolution);
 
-            int pageNumber = 1;
-            // Iterate over all pages; HasNextImage indicates another page image is available
-            while (converter.HasNextImage())
+            // Iterate through all pages (1‑based indexing as required by Aspose.Pdf)
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                // Build full path for the current page image
-                string outputPath = Path.Combine(outputDir, $"{filePrefix}{pageNumber}{fileSuffix}");
+                // Render the current page to a memory stream
+                using (var imgStream = new MemoryStream())
+                {
+                    pngDevice.Process(pdfDoc.Pages[pageNumber], imgStream);
 
-                // Save the current page as PNG
-                converter.GetNextImage(outputPath, ImageFormat.Png);
+                    // Build output file name with sequential numbering
+                    string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
 
-                pageNumber++;
+                    // Write the PNG bytes to disk
+                    File.WriteAllBytes(outputPath, imgStream.ToArray());
+                }
             }
         }
 
-        Console.WriteLine("PDF to PNG conversion completed.");
+        Console.WriteLine("PDF has been converted to PNG images successfully.");
     }
 }
