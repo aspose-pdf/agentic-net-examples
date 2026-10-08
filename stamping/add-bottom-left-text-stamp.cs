@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // for HorizontalAlignment & VerticalAlignment enums
 
 class Program
 {
@@ -16,29 +15,41 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a text stamp with the desired content
-            TextStamp stamp = new TextStamp("Bottom‑Left Stamp");
-
-            // Align to bottom‑left with a 10‑point margin
-            stamp.BottomMargin = 10;               // 10 points from the bottom edge
-            stamp.LeftMargin   = 10;               // 10 points from the left edge
-            stamp.HorizontalAlignment = HorizontalAlignment.Left;
-            stamp.VerticalAlignment   = VerticalAlignment.Bottom;
-
-            // Apply the stamp to every page in the document
-            for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[i];
-                page.AddStamp(stamp);
+                // Create a text stamp with the desired content
+                TextStamp stamp = new TextStamp("Your Text Here");
+
+                // Align to bottom‑left corner
+                stamp.HorizontalAlignment = HorizontalAlignment.Left;
+                stamp.VerticalAlignment   = VerticalAlignment.Bottom;
+
+                // Apply a 10‑point margin from the left and bottom edges
+                stamp.LeftMargin   = 10;
+                stamp.BottomMargin = 10;
+
+                // Optionally customize appearance (font size, color, etc.)
+                // stamp.TextState.FontSize = 12;
+                // stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+
+                // Add the stamp to every page in the document
+                foreach (Page page in doc.Pages)
+                {
+                    page.AddStamp(stamp);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Text stamp applied and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Text stamp applied and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

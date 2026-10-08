@@ -1,56 +1,52 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string stampImagePath = "stamp.png";
+        const string inputPath  = "input.pdf";      // source PDF with existing annotations
+        const string stampPath  = "stamp.png";      // image to use as stamp
+        const string outputPath = "output.pdf";     // result PDF
 
-        // Verify required files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(stampImagePath))
-        {
-            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        // Load the PDF (using statement ensures proper disposal)
-        using (Document doc = new Document(inputPdfPath))
+        if (!File.Exists(stampPath))
         {
-            // Access the first page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[1];
-
-            // Define the rectangle where the stamp will appear
-            // (lower‑left‑x, lower‑left‑y, upper‑right‑x, upper‑right‑y)
-            Aspose.Pdf.Rectangle stampRect = new Aspose.Pdf.Rectangle(100, 500, 200, 600);
-
-            // Create a StampAnnotation on the target page
-            StampAnnotation stamp = new StampAnnotation(page, stampRect);
-
-            // Load the image bytes and assign a stream to the annotation
-            byte[] imgBytes = File.ReadAllBytes(stampImagePath);
-            stamp.Image = new MemoryStream(imgBytes);
-
-            // Optional visual settings
-            stamp.Color = Aspose.Pdf.Color.Transparent; // No border color
-            stamp.Opacity = 0.5;                         // Semi‑transparent
-
-            // Add the stamp annotation to the page's annotation collection
-            page.Annotations.Add(stamp);
-
-            // Save the modified PDF (annotations are preserved)
-            doc.Save(outputPdfPath);
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
+            return;
         }
 
-        Console.WriteLine($"Image stamp added and saved to '{outputPdfPath}'.");
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPath))
+        {
+            // Create the image stamp and configure its appearance
+            ImageStamp imgStamp = new ImageStamp(stampPath)
+            {
+                // false = stamp appears on top of page content (preserves annotations underneath)
+                Background = false,
+                // Adjust opacity if needed (1.0 = fully opaque)
+                Opacity = 0.8,
+                // Position the stamp (centered on the page)
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center
+            };
+
+            // Apply the stamp to each page individually; this preserves existing annotations
+            foreach (Page page in pdfDocument.Pages)
+            {
+                page.AddStamp(imgStamp);
+            }
+
+            // Save the modified PDF; the original annotations remain intact
+            pdfDocument.Save(outputPath);
+        }
+
+        Console.WriteLine($"Image stamp added and saved to '{outputPath}'.");
     }
 }

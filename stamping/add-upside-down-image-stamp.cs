@@ -6,38 +6,44 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";   // source PDF
-        const string outputPdf = "output.pdf"; // result PDF
-        const string stampImg = "stamp.png";   // image to use as stamp
+        const string inputPdf  = "input.pdf";
+        const string stampImg  = "stamp.png";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPdf) || !File.Exists(stampImg))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine("Input PDF or stamp image not found.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use Document constructor)
+        if (!File.Exists(stampImg))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
+            return;
+        }
+
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdf))
         {
-            // Create an image stamp from a file (ImageStamp(string) constructor)
-            ImageStamp imgStamp = new ImageStamp(stampImg);
+            // Create an ImageStamp from the image file
+            ImageStamp imgStamp = new ImageStamp(stampImg)
+            {
+                // Rotate the stamp 180 degrees to appear upside‑down
+                RotateAngle = 180,
 
-            // Rotate the stamp 180 degrees (use the correct enum values with 'on' prefix)
-            imgStamp.Rotate = Rotation.on180;
+                // Optional: position the stamp (centered on the page)
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
 
-            // Position the stamp on the page (coordinates are from the lower‑left corner)
-            imgStamp.XIndent = 100; // distance from the left edge
-            imgStamp.YIndent = 100; // distance from the bottom edge
+                // Optional: make the stamp appear on top of page content
+                Background = false
+            };
 
-            // Optionally set size or opacity here, e.g.:
-            // imgStamp.Width  = 200;
-            // imgStamp.Height = 100;
-            // imgStamp.Opacity = 0.8;
+            // Apply the stamp to the first page (or any desired page)
+            Page page = doc.Pages[1];
+            page.AddStamp(imgStamp);
 
-            // Add the stamp to the first page (Page.AddStamp method)
-            doc.Pages[1].AddStamp(imgStamp);
-
-            // Save the modified PDF (lifecycle rule: use Document.Save)
+            // Save the modified PDF
             doc.Save(outputPdf);
         }
 

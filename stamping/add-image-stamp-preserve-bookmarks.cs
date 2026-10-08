@@ -7,40 +7,46 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
+        const string stampPath = "stamp.png";
         const string outputPath = "output.pdf";
-        const string stampImagePath = "logo.png";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
-        if (!File.Exists(stampImagePath))
-        {
-            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF (bookmarks and outline are preserved)
+        if (!File.Exists(stampPath))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
+            return;
+        }
+
+        // Load the PDF inside a using block to ensure proper disposal.
         using (Document doc = new Document(inputPath))
         {
-            // Create an image stamp
-            ImageStamp imgStamp = new ImageStamp(stampImagePath);
-            imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            imgStamp.VerticalAlignment   = VerticalAlignment.Center;
-            imgStamp.Opacity = 0.5;          // semi‑transparent
-            imgStamp.Background = false;    // stamp on top of page content
+            // Create an ImageStamp. Settings can be adjusted as needed.
+            ImageStamp imgStamp = new ImageStamp(stampPath)
+            {
+                // Example positioning – center of the page.
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
+                // Keep the original image size (ImageStamp has no Scale property).
+                Background = false,
+                // Set opacity if a translucent effect is desired.
+                Opacity = 0.8
+            };
 
-            // Apply the stamp to every page
+            // Apply the stamp to each page individually.
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF (bookmarks/outlines remain intact)
+            // Saving the document preserves all existing bookmarks/outlines.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Image stamp added and saved to '{outputPath}'.");
     }
 }

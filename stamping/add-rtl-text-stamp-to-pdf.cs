@@ -8,7 +8,8 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_rtl.pdf";
+        const string outputPath = "output.pdf";
+        const string stampText = "שלום עולם"; // Hebrew example (Arabic works similarly)
 
         if (!File.Exists(inputPath))
         {
@@ -16,38 +17,36 @@ class Program
             return;
         }
 
-        // Arabic (or Hebrew) text to be stamped
-        const string rtlText = "مثال على نص عربي من اليمين إلى اليسار";
-
-        // Create a TextStamp with the RTL text
-        TextStamp stamp = new TextStamp(rtlText);
-
-        // Configure the visual appearance of the stamp using the existing TextState instance
-        TextState ts = stamp.TextState;
-        ts.Font = FontRepository.FindFont("Arial");
-        ts.FontSize = 24;
-        ts.ForegroundColor = Color.Blue;
-        // If the used Aspose.PDF version supports RTL, the following line can be uncommented:
-        // ts.IsRightToLeft = true; // property may not exist in older versions
-
-        // Position the stamp at the centre of each page
-        stamp.HorizontalAlignment = HorizontalAlignment.Center;
-        stamp.VerticalAlignment   = VerticalAlignment.Center;
-
-        // Optional: make the stamp semi‑transparent
-        stamp.Opacity = 0.7f;
-
-        // Apply the stamp to every page in the document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            foreach (Page page in doc.Pages)
+            using (Document doc = new Document(inputPath))
             {
-                page.AddStamp(stamp);
+                // Create a text stamp. Use a Unicode font that contains Arabic/Hebrew glyphs.
+                TextStamp textStamp = new TextStamp(stampText);
+                textStamp.TextState.Font = FontRepository.FindFont("Arial Unicode MS"); // font supporting RTL scripts
+                textStamp.TextState.FontSize = 24;
+                textStamp.TextState.ForegroundColor = Aspose.Pdf.Color.DarkBlue;
+
+                // Position the stamp – centered at the top of each page.
+                textStamp.HorizontalAlignment = HorizontalAlignment.Center;
+                textStamp.VerticalAlignment = VerticalAlignment.Top;
+                // Use YIndent (or XIndent) instead of the non‑existent Margin property.
+                textStamp.YIndent = 10; // distance from the top edge in points
+
+                // Apply the stamp to every page.
+                foreach (Page page in doc.Pages)
+                {
+                    page.AddStamp(textStamp);
+                }
+
+                doc.Save(outputPath);
             }
 
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF saved with RTL text stamp to '{outputPath}'.");
         }
-
-        Console.WriteLine($"RTL text stamp applied and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

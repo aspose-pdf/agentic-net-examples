@@ -1,59 +1,52 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core PDF API
-using Aspose.Pdf.Annotations;   // For StampAnnotation if needed (not used here)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF that may contain JavaScript actions
-        const string inputPdf  = "input.pdf";
-        // Image to be used as a stamp (logo, watermark, etc.)
-        const string stampImage = "stamp.png";
-        // Output PDF – JavaScript actions are preserved automatically
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string stampPath  = "stamp.png";
+        const string outputPath = "stamped_output.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Verify required files exist
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            return;
+        }
+        if (!File.Exists(stampPath))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
             return;
         }
 
-        if (!File.Exists(stampImage))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImage}");
-            return;
-        }
-
-        // Load the source PDF
-        using (Document doc = new Document(inputPdf))
-        {
-            // Create an ImageStamp instance.
-            // The stamp can be reused for all pages; properties are applied per page.
-            ImageStamp imgStamp = new ImageStamp(stampImage)
+            // Create an ImageStamp – this does NOT affect existing JavaScript actions
+            ImageStamp imgStamp = new ImageStamp(stampPath)
             {
-                // Example visual settings – adjust as needed
-                Background = false,          // Stamp appears on top of page content
-                Opacity   = 0.5,             // Semi‑transparent
+                // Example positioning – adjust as needed
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment   = VerticalAlignment.Center,
-                // Position can also be set via XIndent/YIndent or margins
-                // Here we let alignment handle placement.
+                // Make the stamp appear on top of page content
+                Background = false,
+                // Optional opacity
+                Opacity = 0.8
             };
 
-            // Apply the stamp to every page.
-            // Page.AddStamp adds the stamp without affecting existing annotations,
-            // form fields, or JavaScript actions.
-            foreach (Page page in doc.Pages)
+            // Apply the stamp to each page individually (PageCollection has no AddStamp method)
+            foreach (Page page in pdfDocument.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF. Existing JavaScript actions remain intact.
-            doc.Save(outputPdf);
+            // Save the modified PDF; existing JavaScript actions are retained automatically
+            pdfDocument.Save(outputPath);
         }
 
-        Console.WriteLine($"Image stamp added. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Image stamp applied and saved to '{outputPath}'.");
     }
 }

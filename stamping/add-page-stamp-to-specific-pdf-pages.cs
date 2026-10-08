@@ -7,40 +7,44 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string stampPath  = "stamp.png";
+        const string outputPath = "stamped_output.pdf";
 
+        // Verify required files exist
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            return;
+        }
+        if (!File.Exists(stampPath))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPath))
         {
-            // Choose a source page to be used as the stamp (e.g., the first page)
-            Page sourcePage = doc.Pages[1];
-
-            // Create a PdfPageStamp from the source page
-            Aspose.Pdf.PdfPageStamp pageStamp = new Aspose.Pdf.PdfPageStamp(sourcePage);
-
-            // Optional: configure stamp appearance (background, opacity, etc.)
-            pageStamp.Background = false;   // stamp appears on top of content
-            pageStamp.Opacity   = 0.8;      // semi‑transparent
-
-            // Apply the stamp to pages 5 through 10 (inclusive)
-            // Ensure we do not exceed the actual page count
-            int lastPage = Math.Min(10, doc.Pages.Count);
-            for (int i = 5; i <= lastPage; i++)
+            // Configure the image stamp
+            ImageStamp imgStamp = new ImageStamp(stampPath)
             {
-                // Each page has an AddStamp method that accepts a Stamp instance
-                doc.Pages[i].AddStamp(pageStamp);
+                Background          = false,
+                Opacity             = 0.5,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center
+            };
+
+            // Pages are 1‑based. Apply the stamp to pages 5 through 10 (or up to the last page).
+            for (int i = 5; i <= 10 && i <= pdfDocument.Pages.Count; i++)
+            {
+                Page page = pdfDocument.Pages[i];
+                page.AddStamp(imgStamp); // AddStamp is a method on each Page, not on the collection
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            // Save the modified PDF while the Document is still alive
+            pdfDocument.Save(outputPath);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Stamp applied to pages 5‑10 and saved as '{outputPath}'.");
     }
 }

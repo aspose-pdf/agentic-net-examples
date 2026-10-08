@@ -6,53 +6,61 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string stampPath  = "stamp.png";
-        const string altText    = "Company logo for accessibility";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string stampImagePath = "stamp.png";
+        const string altText = "Company logo stamp";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(stampImagePath))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        if (!File.Exists(stampPath))
+        try
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
-            return;
-        }
-
-        // Load the PDF document (lifecycle rule: using block)
-        using (Document doc = new Document(inputPath))
-        {
-            // Verify that the document has at least three pages (1‑based indexing)
-            if (doc.Pages.Count < 3)
+            using (Document doc = new Document(inputPdf))
             {
-                Console.Error.WriteLine("The document does not contain a third page.");
-                return;
+                // Ensure the document has at least three pages (1‑based indexing)
+                if (doc.Pages.Count < 3)
+                {
+                    Console.Error.WriteLine("Document has fewer than 3 pages.");
+                    return;
+                }
+
+                // Create an image stamp
+                ImageStamp stamp = new ImageStamp(stampImagePath)
+                {
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Center,
+                    Background = false,   // place on top of existing content
+                    Opacity = 0.8         // optional transparency
+                };
+
+                // Add the stamp to page 3
+                doc.Pages[3].AddStamp(stamp);
+
+                // Set alternative text for the image resource on page 3
+                foreach (XImage img in doc.Pages[3].Resources.Images)
+                {
+                    // Links alt text to the image on the specified page
+                    img.TrySetAlternativeText(altText, doc.Pages[3]);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPdf);
             }
 
-            // Create an ImageStamp from the image file
-            ImageStamp imgStamp = new ImageStamp(stampPath);
-
-            // Set alternative text for the stamp (accessibility)
-            imgStamp.AlternativeText = altText;
-
-            // Optional positioning – place stamp in the top‑right corner with margins
-            imgStamp.HorizontalAlignment = HorizontalAlignment.Right;
-            imgStamp.VerticalAlignment   = VerticalAlignment.Top;
-            imgStamp.RightMargin = 20;
-            imgStamp.TopMargin   = 20;
-
-            // Add the stamp to page three
-            Page pageThree = doc.Pages[3];
-            pageThree.AddStamp(imgStamp);
-
-            // Save the modified PDF (lifecycle rule: using block)
-            doc.Save(outputPath);
+            Console.WriteLine($"Image stamp with alt text added to page 3. Saved as '{outputPdf}'.");
         }
-
-        Console.WriteLine($"Image stamp with alt text added to page 3 and saved as '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

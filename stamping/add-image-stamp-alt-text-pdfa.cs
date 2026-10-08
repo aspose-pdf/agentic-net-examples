@@ -1,49 +1,73 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core API (Document, Page, ImageStamp, PdfFormat, ConvertErrorAction)
+using Aspose.Pdf;
+using Aspose.Pdf.Facades; // Required for ConvertErrorAction enum
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // source PDF
-        const string outputPath = "output_pdfa.pdf";    // PDF/A‑1b result
-        const string imagePath  = "stamp.png";          // image to use as stamp
-        const string altText    = "Company logo";       // alternative text for accessibility
-        const string logPath    = "conversion_log.xml"; // conversion log (optional)
+        const string inputPdfPath   = "input.pdf";
+        const string stampImagePath = "stamp.png";
+        const string outputPdfAPath = "output_pdfa1b.pdf";
+        const string conversionLog   = "conversion_log.xml";
+        const string altText        = "Company logo";
 
-        // Verify required files exist
-        if (!File.Exists(inputPath))
+        // Validate input files
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(imagePath))
+        if (!File.Exists(stampImagePath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {imagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        // Load the source PDF (document disposal handled by using)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create an ImageStamp and set its alternative text
-            ImageStamp imgStamp = new ImageStamp(imagePath);
-            imgStamp.AlternativeText = altText; // <-- accessibility text for the stamp
-
-            // Apply the stamp to every page
-            foreach (Page page in doc.Pages)
+            // Load the source PDF
+            using (Document doc = new Document(inputPdfPath))
             {
-                page.AddStamp(imgStamp); // <-- Page.AddStamp adds the stamp to the page
+                // Prepare the image stamp
+                ImageStamp imgStamp = new ImageStamp(stampImagePath)
+                {
+                    // Position the stamp at the bottom‑right corner of each page
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment   = VerticalAlignment.Bottom,
+                    // Optional visual settings
+                    Opacity = 0.5,
+                    Background = false
+                };
+
+                // Apply the stamp to every page (per‑page call, not collection)
+                foreach (Page page in doc.Pages)
+                {
+                    page.AddStamp(imgStamp);
+                }
+
+                // Set alternative text for all images on each page (including the stamp)
+                foreach (Page page in doc.Pages)
+                {
+                    foreach (XImage img in page.Resources.Images)
+                    {
+                        img.TrySetAlternativeText(altText, page);
+                    }
+                }
+
+                // Convert the document to PDF/A‑1b
+                doc.Convert(conversionLog, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+
+                // Save the PDF/A‑1b output
+                doc.Save(outputPdfAPath);
             }
 
-            // Convert the document to PDF/A‑1b (PDF/A‑1b is PdfFormat.PDF_A_1B)
-            doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
-
-            // Save the PDF/A‑1b output
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF/A‑1b file created: {outputPdfAPath}");
         }
-
-        Console.WriteLine($"PDF/A‑1b file with image stamp saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -6,37 +6,58 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "encrypted.pdf";   // Encrypted source PDF
-        const string password   = "user123";        // Password to open the PDF
-        const string outputPath = "stamped.pdf";    // Resulting PDF with stamp
-        const string stampImage = "logo.png";       // Image to use as stamp
+        const string encryptedPdf = "encrypted.pdf";
+        const string password = "user123";
+        const string stampImage = "stamp.png";
+        const string outputPdf = "stamped.pdf";
 
-        if (!File.Exists(inputPath) || !File.Exists(stampImage))
+        if (!File.Exists(encryptedPdf))
         {
-            Console.Error.WriteLine("Input PDF or stamp image not found.");
+            Console.Error.WriteLine($"File not found: {encryptedPdf}");
+            return;
+        }
+        if (!File.Exists(stampImage))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampImage}");
             return;
         }
 
-        // Open the encrypted PDF using the password
-        using (Document doc = new Document(inputPath, password))
+        try
         {
-            // Decrypt the document so it can be modified
-            doc.Decrypt();
+            // Open the encrypted PDF using the provided password
+            using (Document doc = new Document(encryptedPdf, password))
+            {
+                // Decrypt the document (no parameters required)
+                doc.Decrypt();
 
-            // Create an image stamp
-            ImageStamp imgStamp = new ImageStamp(stampImage);
-            imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            imgStamp.VerticalAlignment   = VerticalAlignment.Center;
-            imgStamp.Opacity = 0.5f; // optional transparency
+                // Create an ImageStamp with desired properties
+                ImageStamp imgStamp = new ImageStamp(stampImage)
+                {
+                    Background = false,
+                    Opacity = 0.5,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
 
-            // Add the stamp to the first page (pages are 1‑based)
-            Page page = doc.Pages[1];
-            page.AddStamp(imgStamp);
+                // Apply the stamp to each page individually
+                foreach (Page page in doc.Pages)
+                {
+                    page.AddStamp(imgStamp);
+                }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+                // Save the modified PDF
+                doc.Save(outputPdf);
+            }
+
+            Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
         }
-
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        catch (InvalidPasswordException ex)
+        {
+            Console.Error.WriteLine($"Incorrect password: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
