@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Optimization;
+using Aspose.Pdf.Security.HiddenDataSanitization;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "sanitized.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,30 +16,20 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal.
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Keep existing metadata – do NOT call doc.RemoveMetadata().
+            // Configure hidden‑data sanitization: keep metadata, remove all other hidden content
+            var options = new HiddenDataSanitizationOptions
+            {
+                RemoveMetadata = false // Preserve document metadata (title, author, etc.)
+                // All other hidden‑data removal flags retain their default values (true)
+            };
 
-            // Remove PDF/A and PDF/UA compliance flags (they are considered hidden content).
-            doc.RemovePdfaCompliance();
-            doc.RemovePdfUaCompliance();
+            var sanitizer = new HiddenDataSanitizer(options);
+            sanitizer.Sanitize(doc);
 
-            // Ensure signature fields are sanitized (default is true, set explicitly for clarity).
-            doc.EnableSignatureSanitization = true;
-
-            // Create an optimization strategy that removes all hidden data except metadata.
-            OptimizationOptions opt = OptimizationOptions.All();
-            opt.RemovePrivateInfo      = true;   // Remove private page information.
-            opt.RemoveUnusedObjects    = true;   // Remove objects that are not referenced.
-            opt.RemoveUnusedStreams    = true;   // Remove unused resource streams.
-            opt.RemoveUnusedObjects    = true;   // Redundant but emphasizes intent.
-            // The All() method already enables many safe options; we keep the above explicit settings.
-
-            // Apply the optimization to the document.
-            doc.OptimizeResources(opt);
-
-            // Save the sanitized PDF.
+            // Save the sanitized PDF
             doc.Save(outputPath);
         }
 

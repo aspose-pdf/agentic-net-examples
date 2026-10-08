@@ -1,39 +1,69 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
-class Program
+class CrashReportGenerator
 {
     static void Main()
     {
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string reportPath = "crash_report.txt";
+
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
+        }
+
         try
         {
-            // Example operation that may throw a PdfException.
-            // Replace with actual PDF processing logic as needed.
-            using (Document doc = new Document("nonexistent.pdf"))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                Console.WriteLine($"Pages: {doc.Pages.Count}");
+                // Example operation: add a simple text fragment to the first page
+                // (Replace with any complex PDF processing as needed)
+                if (doc.Pages.Count > 0)
+                {
+                    var page = doc.Pages[1];
+                    TextFragment text = new TextFragment("Processing successful.");
+                    page.Paragraphs.Add(text);
+                }
+
+                // Save the modified document
+                doc.Save(outputPdf);
+                Console.WriteLine($"Document processed and saved to '{outputPdf}'.");
             }
-        }
-        catch (PdfException ex)
-        {
-            // Create crash report options based on the caught exception.
-            CrashReportOptions options = new CrashReportOptions(ex)
-            {
-                // Optional customizations:
-                CustomMessage = "An error occurred while processing the PDF document."
-                // CrashReportDirectory = "C:\\CrashReports";
-                // CrashReportFilename = "MyCrashReport.html";
-            };
-
-            // Generate the crash report HTML file.
-            PdfException.GenerateCrashReport(options);
-
-            Console.WriteLine($"Crash report generated at: {options.CrashReportPath}");
         }
         catch (Exception ex)
         {
-            // Handle any other unexpected exceptions.
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            // Build a custom stack trace message
+            StringWriter customTrace = new StringWriter();
+            customTrace.WriteLine("=== Crash Report ===");
+            customTrace.WriteLine($"Timestamp: {DateTime.UtcNow:O}");
+            customTrace.WriteLine($"Input File: {inputPdf}");
+            customTrace.WriteLine($"Output File: {outputPdf}");
+            customTrace.WriteLine($"Exception Type: {ex.GetType().FullName}");
+            customTrace.WriteLine($"Message: {ex.Message}");
+            customTrace.WriteLine("=== Original Stack Trace ===");
+            customTrace.WriteLine(ex.StackTrace);
+            customTrace.WriteLine("=== End of Report ===");
+
+            // Write the report to a file
+            try
+            {
+                File.WriteAllText(reportPath, customTrace.ToString());
+                Console.Error.WriteLine($"An error occurred. Crash report written to '{reportPath}'.");
+            }
+            catch (Exception writeEx)
+            {
+                // If writing the report fails, output both errors to console
+                Console.Error.WriteLine("Failed to write crash report:");
+                Console.Error.WriteLine(writeEx);
+                Console.Error.WriteLine("Original exception:");
+                Console.Error.WriteLine(ex);
+            }
         }
     }
 }

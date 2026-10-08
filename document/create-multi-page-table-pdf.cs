@@ -1,5 +1,5 @@
 using System;
-using System.Data;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,61 +7,55 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "multi_page_table.pdf";
+        const string outputPath = "MultiPageTable.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document inside a using block for deterministic disposal.
         using (Document doc = new Document())
         {
-            // Add a page to the document (first page is index 1)
+            // Add the first page where the table will start.
             Page page = doc.Pages.Add();
 
-            // Create a table that can break across pages automatically
+            // Create a table and define column widths (percentages of the page width).
             Table table = new Table
             {
-                // Allow the table to be split when it exceeds page height
-                IsBroken = true,
-                // Repeat the first row (header) on each new page
-                RepeatingRowsCount = 1,
-                // Let Aspose.Pdf adjust column widths automatically
-                ColumnAdjustment = ColumnAdjustment.AutoFitToContent,
-                // Explicit column widths prevent a NullReferenceException in some versions
-                // when AutoFitToContent tries to calculate widths before any data is present.
-                // The widths are placeholders; they will be overridden by the auto‑fit logic.
-                ColumnWidths = "100 100 100 100 100"
+                ColumnWidths = "20% 30% 30% 20%"
             };
 
-            // Add the table to the page's paragraph collection
+            // Add a header row.
+            Row header = table.Rows.Add();
+            header.Cells.Add("ID");
+            header.Cells.Add("Name");
+            header.Cells.Add("Description");
+            header.Cells.Add("Price");
+
+            // Style the header cells (background color and bold text).
+            foreach (Cell cell in header.Cells)
+            {
+                cell.BackgroundColor = Aspose.Pdf.Color.LightGray;
+                cell.DefaultCellTextState = new TextState
+                {
+                    FontSize = 12,
+                    FontStyle = FontStyles.Bold
+                };
+            }
+
+            // Add many data rows to force the table to span multiple pages.
+            for (int i = 1; i <= 200; i++)
+            {
+                Row row = table.Rows.Add();
+                row.Cells.Add(i.ToString());
+                row.Cells.Add($"Item {i}");
+                row.Cells.Add($"This is a description for item number {i}. It may be quite long to test wrapping.");
+                row.Cells.Add($"${(i * 1.23):F2}");
+            }
+
+            // Add the table to the page. Aspose.Pdf automatically splits the table across pages.
             page.Paragraphs.Add(table);
 
-            // Build a DataTable with many rows to force pagination
-            DataTable dt = new DataTable();
-
-            // Define five columns
-            for (int c = 0; c < 5; c++)
-            {
-                dt.Columns.Add($"Column {c + 1}", typeof(string));
-            }
-
-            // Populate 200 rows of sample data
-            for (int r = 0; r < 200; r++)
-            {
-                DataRow row = dt.NewRow();
-                for (int c = 0; c < dt.Columns.Count; c++)
-                {
-                    row[c] = $"R{r + 1}C{c + 1}";
-                }
-                dt.Rows.Add(row);
-            }
-
-            // Import the DataTable into the Aspose.Pdf Table.
-            // 'true' imports column names as the first row (header).
-            // Start importing at row 0, column 0 of the table.
-            table.ImportDataTable(dt, true, 0, 0);
-
-            // Save the PDF document to the specified file
+            // Save the document as PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with multi‑page table saved to '{outputPath}'.");
     }
 }

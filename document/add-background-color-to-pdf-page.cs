@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,38 +16,28 @@ class Program
             return;
         }
 
-        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page to modify (first page in this example)
+            // Aspose.Pdf uses 1‑based page indexing
             Page page = doc.Pages[1];
 
-            // Create a Graph container (size can be larger than the page)
-            Graph graph = new Graph(page.Rect.Width, page.Rect.Height);
+            // Create a Graph that spans the whole page – Graph is the container for drawing shapes
+            Graph graph = new Graph((float)page.PageInfo.Width, (float)page.PageInfo.Height);
 
-            // Define a rectangle that covers the whole page
-            // Cast double values to float because Aspose.Pdf.Drawing.Rectangle expects float parameters.
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(
-                (float)page.Rect.LLX,   // left
-                (float)page.Rect.LLY,   // bottom
-                (float)page.Rect.Width, // width
-                (float)page.Rect.Height // height
-            );
+            // Create a rectangle that covers the whole page (left, bottom, width, height)
+            var background = new Aspose.Pdf.Drawing.Rectangle(
+                0f,
+                0f,
+                (float)page.PageInfo.Width,
+                (float)page.PageInfo.Height);
 
-            // Set visual properties via GraphInfo.
-            // Use FromArgb(alpha, r, g, b) where alpha 0-255 defines opacity.
-            // Example: 128 (≈50% opacity) semi‑transparent blue.
-            rect.GraphInfo = new GraphInfo
-            {
-                FillColor = Color.FromArgb(128, 0, 0, 255), // semi‑transparent blue
-                Color     = Color.Empty, // no stroke
-                LineWidth = 0f
-            };
+            // Initialise GraphInfo and set a semi‑transparent fill colour (30 % opacity)
+            background.GraphInfo = new GraphInfo();
+            // 30 % opacity => alpha ≈ 0.3 × 255 ≈ 76
+            background.GraphInfo.FillColor = Aspose.Pdf.Color.FromArgb(76, 230, 230, 230);
 
-            // Add the rectangle shape to the graph
-            graph.Shapes.Add(rect);
-
-            // Add the graph to the page's paragraphs collection
+            // Add the rectangle to the graph, then add the graph to the page
+            graph.Shapes.Add(background);
             page.Paragraphs.Add(graph);
 
             // Save the modified PDF

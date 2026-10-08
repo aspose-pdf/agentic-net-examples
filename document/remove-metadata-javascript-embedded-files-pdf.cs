@@ -1,13 +1,14 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Optimization;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "cleaned.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,26 +17,47 @@ class Program
             return;
         }
 
-        // Load the PDF, process, and save – all within a using block for proper disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // 1. Remove standard metadata (author, title, etc.) and hidden metadata entries
-            doc.RemoveMetadata();
+            // ----- 1. Clear standard document information (metadata) -----
+            doc.Info.Title = string.Empty;
+            doc.Info.Author = string.Empty;
+            doc.Info.Subject = string.Empty;
+            doc.Info.Keywords = string.Empty;
+            doc.Info.Creator = string.Empty;
+            doc.Info.Producer = string.Empty;
+            // DateTime properties are non‑nullable, use MinValue to "clear"
+            doc.Info.CreationDate = DateTime.MinValue;
+            doc.Info.ModDate = DateTime.MinValue;
 
-            // 2. Remove all embedded files (attachments) from the document, if any
-            //    The EmbeddedFiles collection provides a Delete() method that clears them.
-            doc.EmbeddedFiles?.Delete();
+            // ----- 2. Clear XMP metadata packet if present -----
+            doc.Metadata?.Clear();
 
-            // 3. (Best‑effort) Remove JavaScript actions.
-            //    Aspose.Pdf does not expose a dedicated API for stripping JavaScript,
-            //    but calling OptimizeResources with default options removes unused objects,
-            //    which includes most script objects that are not referenced.
-            OptimizationOptions opt = OptimizationOptions.All();
-            doc.OptimizeResources(opt);
+            // ----- 3. Remove all JavaScript actions -----
+            if (doc.JavaScript != null)
+            {
+                // JavaScriptCollection does not expose Count/Clear; iterate via Keys and remove each entry
+                var keys = doc.JavaScript.Keys.ToList();
+                foreach (var key in keys)
+                {
+                    doc.JavaScript.Remove(key);
+                }
+            }
 
-            // 4. Optional: remove PDF/A and PDF/UA compliance flags that may retain extra data
-            doc.RemovePdfaCompliance();
-            doc.RemovePdfUaCompliance();
+            // ----- 4. Remove all embedded files (attachments) -----
+            if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+            {
+                // EmbeddedFileCollection is 1‑based; delete each file by name starting from the end
+                for (int i = doc.EmbeddedFiles.Count; i >= 1; i--)
+                {
+                    var fileSpec = doc.EmbeddedFiles[i];
+                    if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
+                    {
+                        doc.EmbeddedFiles.Delete(fileSpec.Name);
+                    }
+                }
+            }
 
             // Save the cleaned PDF
             doc.Save(outputPath);

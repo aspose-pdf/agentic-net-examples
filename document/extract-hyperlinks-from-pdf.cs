@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -8,46 +7,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "hyperlinks.txt";
+        const string inputPdf = "input.pdf";
+        const string outputTxt = "hyperlinks.txt";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use Document constructor)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            List<string> extractedLinks = new List<string>();
-
-            // Pages are 1‑based (global rule)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Load the PDF and open a writer for the output text file
+            using (Document doc = new Document(inputPdf))
+            using (StreamWriter writer = new StreamWriter(outputTxt, false))
             {
-                Page page = doc.Pages[pageIndex];
-
-                // Annotations collection is also 1‑based
-                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
+                // Pages are 1‑based in Aspose.Pdf
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    Annotation ann = page.Annotations[annIndex];
+                    Page page = doc.Pages[i];
 
-                    // We're interested only in LinkAnnotation objects
-                    if (ann is LinkAnnotation linkAnn)
+                    // Iterate all annotations on the page
+                    foreach (Annotation annotation in page.Annotations)
                     {
-                        // Extract the URL from a GoToURIAction attached to the link
-                        if (linkAnn.Action is GoToURIAction uriAction && !string.IsNullOrEmpty(uriAction.URI))
+                        // We are interested only in link annotations
+                        if (annotation is LinkAnnotation link)
                         {
-                            extractedLinks.Add(uriAction.URI);
+                            // The link's action may be a GoToURIAction containing the URL
+                            if (link.Action is GoToURIAction uriAction && !string.IsNullOrEmpty(uriAction.URI))
+                            {
+                                writer.WriteLine(uriAction.URI);
+                            }
                         }
                     }
                 }
             }
 
-            // Export the list of URLs to a plain‑text file (standard .NET I/O)
-            File.WriteAllLines(outputPath, extractedLinks);
+            Console.WriteLine($"Hyperlinks extracted to '{outputTxt}'.");
         }
-
-        Console.WriteLine($"Hyperlinks extracted to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

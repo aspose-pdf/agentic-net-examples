@@ -1,6 +1,6 @@
 using System;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // for TextFragment and TextState
 
 class Program
 {
@@ -14,65 +14,59 @@ class Program
             // Add a single page to the document
             Page page = doc.Pages.Add();
 
-            // -----------------------------------------------------------------
-            // 1) Header table – a single‑column table that acts as a merged header
-            // -----------------------------------------------------------------
-            Table headerTable = new Table
+            // Create a table with three equal‑width columns
+            Table table = new Table
             {
-                ColumnWidths = "300", // full width of the page (adjust as needed)
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black),
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
+                ColumnWidths = "100 100 100"
             };
 
-            Row headerRow = headerTable.Rows.Add();
+            // ----- Header row with a merged cell spanning two columns -----
+            Row headerRow = table.Rows.Add();
+
+            // Cell that *visually* spans the first two columns (ColumnSpan not available in this version)
             Cell mergedHeader = headerRow.Cells.Add("Merged Header");
             mergedHeader.BackgroundColor = Aspose.Pdf.Color.LightGray;
             mergedHeader.DefaultCellTextState = new TextState
             {
-                FontSize = 14,
                 Font = FontRepository.FindFont("Helvetica"),
-                ForegroundColor = Aspose.Pdf.Color.Blue,
-                FontStyle = FontStyles.Bold
+                FontSize = 12,
+                ForegroundColor = Aspose.Pdf.Color.Black
+            };
+            // Add a placeholder cell next to the merged header and hide its borders so the two cells appear as one
+            Cell placeholder = headerRow.Cells.Add("");
+            placeholder.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            placeholder.DefaultCellTextState = mergedHeader.DefaultCellTextState;
+            placeholder.Border = new BorderInfo(BorderSide.None);
+
+            // Cell for the third column
+            Cell headerCell3 = headerRow.Cells.Add("Third Column");
+            headerCell3.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            headerCell3.DefaultCellTextState = new TextState
+            {
+                Font = FontRepository.FindFont("Helvetica"),
+                FontSize = 12,
+                ForegroundColor = Aspose.Pdf.Color.Black
             };
 
-            // Add the header table to the page
-            page.Paragraphs.Add(headerTable);
+            // ----- First data row -----
+            Row dataRow1 = table.Rows.Add();
+            dataRow1.Cells.Add("Row1 Col1");
+            dataRow1.Cells.Add("Row1 Col2");
+            dataRow1.Cells.Add("Row1 Col3");
 
-            // Add a small vertical space between the two tables
-            page.Paragraphs.Add(new TextFragment("\n"));
+            // ----- Second data row -----
+            Row dataRow2 = table.Rows.Add();
+            dataRow2.Cells.Add("Row2 Col1");
+            dataRow2.Cells.Add("Row2 Col2");
+            dataRow2.Cells.Add("Row2 Col3");
 
-            // ---------------------------------------------------------------
-            // 2) Data table – three equal columns with sub‑header and rows
-            // ---------------------------------------------------------------
-            Table dataTable = new Table
-            {
-                ColumnWidths = "100 100 100", // three columns, each 100 units wide
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black),
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
-            };
+            // Add the constructed table to the page's paragraph collection
+            page.Paragraphs.Add(table);
 
-            // Sub‑header row with individual column titles
-            Row subHeader = dataTable.Rows.Add();
-            subHeader.Cells.Add("Column 1");
-            subHeader.Cells.Add("Column 2");
-            subHeader.Cells.Add("Column 3");
-
-            // Add a few data rows
-            for (int i = 1; i <= 5; i++)
-            {
-                Row dataRow = dataTable.Rows.Add();
-                dataRow.Cells.Add($"Row {i} - A");
-                dataRow.Cells.Add($"Row {i} - B");
-                dataRow.Cells.Add($"Row {i} - C");
-            }
-
-            // Add the data table to the page's paragraph collection
-            page.Paragraphs.Add(dataTable);
-
-            // Save the PDF document
+            // Save the PDF to the specified path
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF created: {outputPath}");
+        Console.WriteLine($"PDF with merged header cells saved to '{outputPath}'.");
     }
 }

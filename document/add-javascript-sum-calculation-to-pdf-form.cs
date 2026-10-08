@@ -1,67 +1,62 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // for JavascriptAction
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "SumForm.pdf";
+        const string outputPath = "form_with_sum.pdf";
 
-        // Create a new PDF document inside a using block (ensures proper disposal)
-        using (Document doc = new Document())
+        // Create a new PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
         {
-            // Add a single page (Pages collection is 1‑based)
-            Page page = doc.Pages.Add();
+            // Add a page to host the form fields
+            Aspose.Pdf.Page page = doc.Pages.Add();
 
-            // Define rectangles for the three fields (fully qualified to avoid ambiguity)
-            Aspose.Pdf.Rectangle rect1   = new Aspose.Pdf.Rectangle(100, 700, 250, 730); // Field 1
-            Aspose.Pdf.Rectangle rect2   = new Aspose.Pdf.Rectangle(100, 650, 250, 680); // Field 2
-            Aspose.Pdf.Rectangle rectSum = new Aspose.Pdf.Rectangle(100, 600, 250, 630); // Sum field (read‑only)
+            // First input field
+            Aspose.Pdf.Forms.TextBoxField field1 = new Aspose.Pdf.Forms.TextBoxField(
+                page,
+                new Aspose.Pdf.Rectangle(100, 700, 250, 720));
+            field1.PartialName = "Field1";
+            field1.Value = "0";
+            doc.Form.Add(field1, 1);
 
-            // Create two numeric input fields – note the constructor requires the *Page* instance, not the Document
-            NumberField field1 = new NumberField(page, rect1);
-            field1.PartialName = "field1";
-            field1.AlternateName = "First Number";
-            doc.Form.Add(field1);
+            // Second input field
+            Aspose.Pdf.Forms.TextBoxField field2 = new Aspose.Pdf.Forms.TextBoxField(
+                page,
+                new Aspose.Pdf.Rectangle(100, 650, 250, 670));
+            field2.PartialName = "Field2";
+            field2.Value = "0";
+            doc.Form.Add(field2, 1);
 
-            NumberField field2 = new NumberField(page, rect2);
-            field2.PartialName = "field2";
-            field2.AlternateName = "Second Number";
-            doc.Form.Add(field2);
+            // Result field (read‑only)
+            Aspose.Pdf.Forms.TextBoxField resultField = new Aspose.Pdf.Forms.TextBoxField(
+                page,
+                new Aspose.Pdf.Rectangle(100, 600, 250, 620));
+            resultField.PartialName = "Result";
+            resultField.Value = "";
+            resultField.ReadOnly = true;
+            doc.Form.Add(resultField, 1);
 
-            // Create a read‑only text box to display the result
-            TextBoxField sumField = new TextBoxField(page, rectSum);
-            sumField.PartialName = "sum";
-            sumField.AlternateName = "Sum";
-            sumField.ReadOnly = true;               // Prevent user editing
-            sumField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
-            doc.Form.Add(sumField);
-
-            // JavaScript that calculates the sum and assigns it to the 'sum' field
+            // JavaScript that calculates the sum of Field1 and Field2
             string js = @"
-                var v1 = this.getField('field1').value;
-                var v2 = this.getField('field2').value;
-                var n1 = parseFloat(v1);
-                var n2 = parseFloat(v2);
-                if (isNaN(n1)) n1 = 0;
-                if (isNaN(n2)) n2 = 0;
-                this.getField('sum').value = (n1 + n2).toString();
-            ";
+var f1 = this.getField('Field1').value;
+var f2 = this.getField('Field2').value;
+var sum = parseFloat(f1) + parseFloat(f2);
+this.getField('Result').value = sum;
+";
 
-            // Attach the JavaScript to the OnCalculate action of both input fields
-            field1.Actions.OnCalculate = new JavascriptAction(js);
-            field2.Actions.OnCalculate = new JavascriptAction(js);
+            // Attach the script to both input fields (executed when the field loses focus)
+            JavascriptAction calcAction = new JavascriptAction(js);
+            field1.Actions.OnExit = calcAction; // runs when user leaves Field1
+            field2.Actions.OnExit = calcAction; // runs when user leaves Field2
 
-            // Ensure automatic recalculation when any field changes (default is true)
-            doc.Form.AutoRecalculate = true;
-
-            // Save the PDF (using the standard Save method inside the using block)
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with sum calculation saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

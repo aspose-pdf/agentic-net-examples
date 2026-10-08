@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 
 class Program
@@ -7,44 +9,41 @@ class Program
     {
         const string inputPath = "input.pdf";
 
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal.
         using (Document doc = new Document(inputPath))
         {
-            OutlineCollection outlines = doc.Outlines;
-
-            if (outlines.VisibleCount == 0)
+            // The outline (bookmark) hierarchy is stored in doc.Outlines.
+            // If there are no outlines, inform the user.
+            if (doc.Outlines == null || doc.Outlines.Count == 0)
             {
-                Console.WriteLine("The document has no outline entries.");
+                Console.WriteLine("The document does not contain any outlines.");
                 return;
             }
 
-            Console.WriteLine("Document Outline:");
-            // Iterate over top‑level outline items
-            foreach (OutlineItemCollection item in outlines)
-            {
-                PrintOutline(item, string.Empty);
-            }
+            Console.WriteLine("Outline hierarchy:");
+            PrintOutlineItems(doc.Outlines, string.Empty);
         }
     }
 
-    // Recursively prints an outline item and its children with indentation
-    static void PrintOutline(OutlineItemCollection item, string indent)
+    // Recursively prints outline items with indentation to visualize the tree.
+    static void PrintOutlineItems(IEnumerable<OutlineItemCollection> items, string indent)
     {
-        // Title may be null; fallback to empty string
-        string title = item.Title ?? "(no title)";
-        Console.WriteLine($"{indent}- {title}");
-
-        // Each OutlineItemCollection can contain child outline items.
-        // Iterate over them recursively.
-        foreach (OutlineItemCollection child in item)
+        foreach (OutlineItemCollection item in items)
         {
-            PrintOutline(child, indent + "  ");
+            // Display the title of the outline entry.
+            Console.WriteLine($"{indent}- {item.Title}");
+
+            // If the item has child outlines, recurse with increased indentation.
+            if (item.Count > 0)
+            {
+                PrintOutlineItems(item, indent + "  ");
+            }
         }
     }
 }

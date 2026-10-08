@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "hyperlink_output.pdf";
         const string url        = "https://www.example.com";
 
         if (!File.Exists(inputPath))
@@ -17,23 +17,23 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            // Choose the page where the hyperlink will be placed (first page in this example)
             Page page = doc.Pages[1];
 
-            // Define the clickable rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the rectangle area for the clickable link (coordinates are in points)
+            // Fully qualify Rectangle to avoid any ambiguity with System.Drawing
+            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 700, 300, 720);
 
-            // Create a link annotation and assign a URI action to open the external website
-            LinkAnnotation link = new LinkAnnotation(page, rect)
+            // Create a LinkAnnotation and assign a GoToURIAction to open the external website
+            LinkAnnotation link = new LinkAnnotation(page, linkRect)
             {
-                Color  = Aspose.Pdf.Color.Blue,          // optional visual cue
-                Action = new GoToURIAction(url)          // opens the URL when clicked
+                Action = new GoToURIAction(url)
             };
 
-            // Add the annotation to the page
+            // Add the annotation to the page's annotation collection
             page.Annotations.Add(link);
 
             // Save the modified PDF

@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Optimization;
+using Aspose.Pdf.Security.HiddenDataSanitization; // Correct namespace for hidden‑data sanitization
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "sanitized_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "sanitized.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,27 +16,31 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Remove standard metadata entries
-            doc.RemoveMetadata();
-
-            // Configure optimization options to strip private information (search index, etc.)
-            OptimizationOptions opt = new OptimizationOptions
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                RemovePrivateInfo = true,
-                RemoveUnusedObjects = true,
-                RemoveUnusedStreams = true
-            };
+                // Configure hidden‑data sanitization options
+                var options = new HiddenDataSanitizationOptions
+                {
+                    // Enable removal of search index and private information
+                    RemoveSearchIndexAndPrivateInfo = true
+                };
 
-            // Apply the optimization to the document
-            doc.OptimizeResources(opt);
+                // Create the sanitizer with the configured options and apply it
+                var sanitizer = new HiddenDataSanitizer(options);
+                sanitizer.Sanitize(doc);
 
-            // Save the sanitized PDF
-            doc.Save(outputPath);
+                // Save the sanitized PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Sanitized PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Sanitized PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,62 +1,103 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
-class PdfSanitizer
+class Program
 {
     static void Main()
     {
-        // Input folder containing PDFs to be sanitized
-        const string inputFolder = @"C:\InputPdfs";
-        // Output folder where cleaned PDFs will be saved
-        const string outputFolder = @"C:\SanitizedPdfs";
+        // Folder containing the original PDFs
+        const string sourceFolder = "SourcePdfs";
+        // Folder where sanitized PDFs will be written
+        const string targetFolder = "SanitizedPdfs";
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Get all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string sourcePath in pdfFiles)
+        if (!Directory.Exists(sourceFolder))
         {
-            // Determine the destination path with the same file name
-            string fileName = Path.GetFileName(sourcePath);
-            string destPath = Path.Combine(outputFolder, fileName);
+            Console.Error.WriteLine($"Source folder not found: {sourceFolder}");
+            return;
+        }
+
+        // Ensure the target folder exists
+        Directory.CreateDirectory(targetFolder);
+
+        // Get all PDF files in the source folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        foreach (string inputPath in pdfFiles)
+        {
+            // Build output file name (append "_clean" to avoid overwriting)
+            string fileName   = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(targetFolder, fileName + "_clean.pdf");
 
             try
             {
-                // Load the PDF document inside a using block for deterministic disposal
-                using (Document doc = new Document(sourcePath))
+                // Load each PDF inside a using block for deterministic disposal
+                using (Document doc = new Document(inputPath))
                 {
-                    // ---- Sanitization steps ----
+                    // ==== Sanitization steps ====
 
-                    // Remove all document metadata (author, title, etc.)
-                    doc.RemoveMetadata();
+                    // 1. Clear document metadata (title, author, etc.)
+                    doc.Info.Title        = "";
+                    doc.Info.Author       = "";
+                    doc.Info.Subject      = "";
+                    doc.Info.Keywords     = "";
+                    doc.Info.Creator      = "";
+                    doc.Info.Producer     = "";
+                    doc.Info.ModDate      = DateTime.Now;
+                    doc.Info.CreationDate = DateTime.Now;
 
-                    // Remove PDF/UA compliance information (if present)
-                    doc.RemovePdfUaCompliance();
+                    // 2. Remove any embedded JavaScript actions
+                    // The JavaScriptCollection does not expose Count/Clear. Remove each entry via its key.
+                    if (doc.JavaScript != null && doc.JavaScript.Keys != null && doc.JavaScript.Keys.Count > 0)
+                    {
+                        // Collect keys first to avoid modifying the collection while iterating
+                        var keys = new System.Collections.Generic.List<string>(doc.JavaScript.Keys);
+                        foreach (string key in keys)
+                        {
+                            doc.JavaScript.Remove(key);
+                        }
+                    }
+                    // Also clear the document level OpenAction if it contains JavaScript
+                    doc.OpenAction = null;
 
-                    // Remove PDF/A compliance information (if present)
-                    doc.RemovePdfaCompliance();
+                    // 3. Remove embedded files (attachments)
+                    if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+                    {
+                        // Delete each embedded file by its name (1‑based indexing)
+                        for (int i = doc.EmbeddedFiles.Count; i >= 1; i--)
+                        {
+                            var fileSpec = doc.EmbeddedFiles[i];
+                            if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
+                            {
+                                doc.EmbeddedFiles.Delete(fileSpec.Name);
+                            }
+                        }
+                    }
 
-                    // Flatten form fields and annotations so only their visual appearance remains
-                    doc.Flatten();
+                    // 4. Remove all annotations from every page
+                    foreach (Page page in doc.Pages)
+                    {
+                        if (page.Annotations != null && page.Annotations.Count > 0)
+                        {
+                            // Annotations collection also uses 1‑based indexing; clear by deleting each.
+                            for (int i = page.Annotations.Count; i >= 1; i--)
+                            {
+                                page.Annotations.Delete(i);
+                            }
+                        }
+                    }
 
-                    // Optimize resources: remove unused objects, merge duplicates, etc.
-                    doc.OptimizeResources();
-
-                    // Save the cleaned PDF to the target folder
-                    doc.Save(destPath);
+                    // Save the sanitized PDF (PDF format is default)
+                    doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Sanitized: {fileName}");
+                Console.WriteLine($"Sanitized: {outputPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
+                Console.Error.WriteLine($"Failed to process '{inputPath}': {ex.Message}");
             }
         }
-
-        Console.WriteLine("All PDFs have been processed.");
     }
 }

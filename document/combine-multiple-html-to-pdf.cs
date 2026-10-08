@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Aspose.Pdf;
@@ -8,66 +7,64 @@ class Program
 {
     static void Main()
     {
-        // Collection of HTML strings to be converted into a single PDF.
-        List<string> htmlStrings = new List<string>
+        // Collection of HTML strings to be rendered as PDF pages
+        string[] htmlContents = new string[]
         {
-            "<html><body><h1>First Document</h1><p>Hello World!</p></body></html>",
-            "<html><body><h2>Second Document</h2><p>Another paragraph.</p></body></html>"
-            // Add more HTML strings as needed.
+            "<html><body><h1>First Page</h1><p>This is the first HTML page.</p></body></html>",
+            "<html><body><h2>Second Page</h2><p>Content of the second page.</p></body></html>",
+            "<html><body><h3>Third Page</h3><p>More content here.</p></body></html>"
         };
 
-        // Path for the resulting PDF file.
-        const string outputPdfPath = "CombinedOutput.pdf";
+        // Output PDF path
+        const string outputPdfPath = "CombinedFromHtml.pdf";
 
-        // List to hold temporary Document objects created from each HTML string.
-        List<Document> tempDocs = new List<Document>();
-
-        // Load each HTML string into a separate Document using HtmlLoadOptions.
-        foreach (string html in htmlStrings)
+        try
         {
-            // Convert the HTML string to a UTF-8 memory stream.
-            using (MemoryStream htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(html)))
+            // Create an empty target document that will hold all pages
+            using (Document targetDoc = new Document())
             {
-                // Configure custom rendering options for HTML loading.
-                HtmlLoadOptions loadOptions = new HtmlLoadOptions
+                // Iterate over each HTML string, load it into a temporary Document,
+                // then merge its pages into the target document.
+                foreach (string html in htmlContents)
                 {
-                    // Embed fonts into the resulting PDF.
-                    IsEmbedFonts = true,
-                    // Render each HTML page as a separate PDF page (default behavior).
-                    IsRenderToSinglePage = false
-                    // Additional options can be set here as needed.
-                };
+                    // Convert the HTML string to a stream (UTF-8 encoding)
+                    using (MemoryStream htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(html)))
+                    {
+                        // Load HTML with default options (no unsupported properties)
+                        HtmlLoadOptions loadOptions = new HtmlLoadOptions();
 
-                // Load the HTML content into a Document.
-                Document doc = new Document(htmlStream, loadOptions);
-                tempDocs.Add(doc);
-            }
-        }
+                        // Load the HTML into a temporary Document
+                        using (Document tempDoc = new Document(htmlStream, loadOptions))
+                        {
+                            // Apply desired page size/orientation to each page of the temporary document
+                            foreach (Page page in tempDoc.Pages)
+                            {
+                                // Set A4 size (portrait) using width and height doubles
+                                page.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
+                                // Ensure portrait orientation
+                                page.PageInfo.IsLandscape = false;
+                            }
 
-        // Ensure there is at least one document to work with.
-        if (tempDocs.Count == 0)
-        {
-            Console.Error.WriteLine("No HTML content provided.");
-            return;
-        }
-
-        // Use the first document as the target and merge the rest into it.
-        using (Document targetDoc = tempDocs[0])
-        {
-            // Merge remaining documents into the target document.
-            for (int i = 1; i < tempDocs.Count; i++)
-            {
-                using (Document srcDoc = tempDocs[i])
-                {
-                    // The Merge method appends pages from srcDoc to targetDoc.
-                    targetDoc.Merge(srcDoc);
+                            // Append all pages from the temporary document to the target
+                            targetDoc.Pages.Add(tempDoc.Pages);
+                        }
+                    }
                 }
+
+                // Save the combined PDF
+                targetDoc.Save(outputPdfPath);
             }
 
-            // Save the combined PDF to the specified file.
-            targetDoc.Save(outputPdfPath);
+            Console.WriteLine($"PDF successfully created at '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"PDF created successfully at '{outputPdfPath}'.");
+        catch (TypeInitializationException)
+        {
+            // HTML-to-PDF conversion requires GDI+ (Windows only)
+            Console.WriteLine("HTML rendering requires Windows (GDI+). Operation skipped on this platform.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
