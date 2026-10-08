@@ -1,56 +1,48 @@
 using System;
 using System.IO;
-using System.Threading.Tasks;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
-class Program
+class CreatorToolRefresher
 {
-    // Entry point – optionally receives the repository path as a command‑line argument.
-    static async Task Main(string[] args)
-    {
-        string repositoryPath = args.Length > 0 ? args[0] : @"C:\PdfRepository";
-        await RefreshCreatorToolValuesAsync(repositoryPath);
-    }
+    // Value to set for the Creator metadata field
+    private const string NewCreatorTool = "MyCreatorTool";
 
-    // Refreshes CreatorTool‑related metadata for every PDF in the specified folder.
-    static async Task RefreshCreatorToolValuesAsync(string folderPath)
+    // Entry point – can be scheduled to run nightly (e.g., via Windows Task Scheduler)
+    static void Main()
     {
-        if (!Directory.Exists(folderPath))
+        // Path to the repository containing PDF files
+        const string repositoryPath = @"C:\PdfRepository";
+
+        if (!Directory.Exists(repositoryPath))
         {
-            Console.Error.WriteLine($"Folder not found: {folderPath}");
+            Console.Error.WriteLine($"Repository folder not found: {repositoryPath}");
             return;
         }
 
-        // Find all PDFs recursively.
-        string[] pdfFiles = Directory.GetFiles(folderPath, "*.pdf", SearchOption.AllDirectories);
-
-        foreach (string pdfFile in pdfFiles)
+        // Process each PDF file in the repository (including subfolders)
+        foreach (string pdfFile in Directory.EnumerateFiles(repositoryPath, "*.pdf", SearchOption.AllDirectories))
         {
             try
             {
-                // PdfFileInfo is a Facade class that allows editing document metadata.
-                // It implements IDisposable, so we wrap it in a using block (document‑disposal rule).
-                using (PdfFileInfo info = new PdfFileInfo(pdfFile))
+                // Load PDF document using the Document API (not Facades)
+                using (Document doc = new Document(pdfFile))
                 {
-                    // Update the metadata fields that represent the CreatorTool values.
-                    info.Creator = "MyApp CreatorTool";          // CreatorTool identifier
-                    info.Author  = "Automated Process";          // Example author
-                    info.Title   = Path.GetFileNameWithoutExtension(pdfFile); // Use file name as title
+                    // Update the Creator metadata field
+                    doc.Info.Creator = NewCreatorTool;
 
-                    // Save the updated metadata back to the same file.
-                    // SaveNewInfo overwrites the original PDF with the new metadata.
-                    info.SaveNewInfo(pdfFile);
+                    // Save changes back to the same file (overwrite)
+                    doc.Save(pdfFile);
                 }
 
-                Console.WriteLine($"Metadata refreshed: {pdfFile}");
+                Console.WriteLine($"Updated Creator for: {pdfFile}");
             }
             catch (Exception ex)
             {
-                // Log any errors but continue processing other files.
+                // Log any errors but continue processing other files
                 Console.Error.WriteLine($"Error processing '{pdfFile}': {ex.Message}");
             }
         }
 
-        await Task.CompletedTask; // Placeholder for async compatibility.
+        Console.WriteLine("CreatorTool refresh job completed.");
     }
 }

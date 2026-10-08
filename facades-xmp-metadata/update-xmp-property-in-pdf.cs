@@ -1,45 +1,43 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Document class provides XMP metadata handling
+using Aspose.Pdf;
 
-class Program
+class UpdateXmpProperty
 {
-    // Entry point: args[0]=input PDF, args[1]=output PDF, args[2]=XMP property name, args[3]=new value
     static void Main(string[] args)
     {
-        if (args.Length != 4)
+        // Expected arguments: inputPdf outputPdf propertyName propertyValue
+        if (args.Length < 4)
         {
-            Console.Error.WriteLine("Usage: <input.pdf> <output.pdf> <xmpPropertyName> <newValue>");
+            Console.Error.WriteLine("Usage: UpdateXmpProperty <input.pdf> <output.pdf> <propertyName> <propertyValue>");
             return;
         }
 
-        string inputPath  = args[0];
+        string inputPath = args[0];
         string outputPath = args[1];
-        string propName   = args[2];
-        string propValue  = args[3];
+        string propertyName = args[2];
+        string propertyValue = args[3];
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
-        {
-            // Load the PDF document
-            Document pdfDoc = new Document(inputPath);
+        // Copy the original PDF to the output location (modifications will be written here)
+        File.Copy(inputPath, outputPath, true);
 
-            // Update (or add) the specified XMP property using the Metadata dictionary
-            pdfDoc.Metadata[propName] = propValue;
+        // Load the PDF document
+        Document pdfDoc = new Document(outputPath);
 
-            // Save the modified PDF
-            pdfDoc.Save(outputPath);
+        // Update (or add) the XMP property using the Document.Metadata indexer.
+        // If a custom namespace is required, register it before setting the value.
+        // Example: pdfDoc.Metadata.RegisterNamespaceUri("my", "http://example.com/custom");
+        pdfDoc.Metadata[propertyName] = propertyValue;
 
-            Console.WriteLine($"XMP property '{propName}' updated and saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        // Save the PDF with the new metadata
+        pdfDoc.Save(outputPath);
+
+        Console.WriteLine($"Property '{propertyName}' updated to '{propertyValue}' in '{outputPath}'.");
     }
 }

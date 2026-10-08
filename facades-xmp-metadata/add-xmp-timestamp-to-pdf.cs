@@ -1,38 +1,30 @@
 using System;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // Added for TextFragment
 
 class Program
 {
     static void Main()
     {
-        // Path for the generated PDF
-        const string outputPath = "generated_with_timestamp.pdf";
+        const string pdfPath = "generated.pdf";
 
-        // Create a new PDF document
-        using (Document doc = new Document())
-        {
-            // Add a blank page (required for a valid PDF)
-            doc.Pages.Add();
+        // Create a simple PDF with one blank page
+        Document doc = new Document();
+        doc.Pages.Add(); // ensure the PDF has at least one page
 
-            // OPTIONAL: add some content to the page
-            // (demonstrates that the PDF is not empty)
-            Page page = doc.Pages[1];
-            page.Paragraphs.Add(new TextFragment("Sample PDF generated with timestamp."));
+        // Prepare XMP metadata and add a timestamp property
+        string timestamp = DateTime.UtcNow.ToString("o"); // ISO‑8601 format
 
-            // Initialize XMP metadata facade bound to the document
-            PdfXmpMetadata xmp = new PdfXmpMetadata(doc);
+        // Register a custom namespace (optional, you can use any prefix you like)
+        doc.Metadata.RegisterNamespaceUri("my", "http://example.com/custom");
 
-            // Add a timestamp property (ModifyDate) in ISO 8601 format
-            // Using the string key "xmp:ModifyDate" and a formatted DateTime value
-            string timestamp = DateTime.UtcNow.ToString("o"); // e.g., 2023-08-18T12:34:56.789Z
-            xmp.Add("xmp:ModifyDate", timestamp);
+        // Standard XMP property
+        doc.Metadata["xmp:CreateDate"] = timestamp;
+        // Custom property in our namespace
+        doc.Metadata["my:Timestamp"] = timestamp;
 
-            // Save the PDF (Document disposal handled by using)
-            doc.Save(outputPath);
-        }
+        // Save the PDF – the XMP metadata is embedded automatically
+        doc.Save(pdfPath);
 
-        Console.WriteLine($"PDF saved to '{outputPath}' with XMP timestamp.");
+        Console.WriteLine($"PDF generated with timestamp metadata at '{pdfPath}'.");
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -18,20 +19,28 @@ class Program
 
         try
         {
-            // PdfXmpMetadata implements IDisposable, so use a using block for deterministic cleanup
-            using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+            // Load the PDF document first – PdfXmpMetadata expects a Document instance.
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                // Bind the PDF file (can be a UNC path) to the facade
-                xmp.BindPdf(pdfPath);
+                // Pass the Document to the PdfXmpMetadata facade.
+                using (PdfXmpMetadata xmp = new PdfXmpMetadata(pdfDoc))
+                {
+                    // GetXmpMetadata returns a byte[]; convert it to a UTF‑8 string for display.
+                    byte[] xmpBytes = xmp.GetXmpMetadata();
+                    string xmpMetadata = xmpBytes != null && xmpBytes.Length > 0
+                        ? Encoding.UTF8.GetString(xmpBytes)
+                        : string.Empty;
 
-                // Retrieve the entire XMP metadata as a byte array (XML format)
-                byte[] rawData = xmp.GetXmpMetadata();
-
-                // Convert the byte array to a UTF‑8 string for display or further processing
-                string xmpXml = Encoding.UTF8.GetString(rawData);
-
-                Console.WriteLine("XMP Metadata:");
-                Console.WriteLine(xmpXml);
+                    if (string.IsNullOrEmpty(xmpMetadata))
+                    {
+                        Console.WriteLine("No XMP metadata found in the PDF.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("XMP Metadata:");
+                        Console.WriteLine(xmpMetadata);
+                    }
+                }
             }
         }
         catch (Exception ex)

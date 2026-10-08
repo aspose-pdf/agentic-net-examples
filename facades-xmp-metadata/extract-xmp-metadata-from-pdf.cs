@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using System.Text;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
         const string pdfPath = "input.pdf";
-        const string outputXmlPath = "xmp_metadata.xml";
 
         if (!File.Exists(pdfPath))
         {
@@ -16,18 +15,28 @@ class Program
             return;
         }
 
-        // Bind the PDF to the XMP metadata facade and retrieve the raw XML bytes
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        // Load the PDF document
+        Document pdfDoc = new Document(pdfPath);
+
+        // Retrieve the raw XMP metadata as a byte array using GetXmpMetadata(Stream)
+        byte[] xmpBytes;
+        using (MemoryStream ms = new MemoryStream())
         {
-            xmp.BindPdf(pdfPath);
-            byte[] data = xmp.GetXmpMetadata(); // returns XML as byte[]
+            // The current Aspose.PDF API writes the XMP data into the provided stream
+            pdfDoc.GetXmpMetadata(ms);
+            xmpBytes = ms.ToArray();
+        }
 
+        if (xmpBytes == null || xmpBytes.Length == 0)
+        {
+            Console.WriteLine("No XMP metadata found in the PDF.");
+        }
+        else
+        {
             // Convert the byte array to a UTF‑8 string
-            string xml = Encoding.UTF8.GetString(data);
-
-            // Save the XML string to a file (optional)
-            File.WriteAllText(outputXmlPath, xml, Encoding.UTF8);
-            Console.WriteLine($"XMP metadata saved to '{outputXmlPath}'.");
+            string xmpXml = Encoding.UTF8.GetString(xmpBytes);
+            Console.WriteLine("XMP Metadata:");
+            Console.WriteLine(xmpXml);
         }
     }
 }
