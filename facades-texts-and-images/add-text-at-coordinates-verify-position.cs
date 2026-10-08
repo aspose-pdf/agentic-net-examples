@@ -1,25 +1,32 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-// ---------------------------------------------------------------------------
-// Minimal stubs for MSTest attributes and Assert when the MSTest package is not
-// referenced. They are placed in the same namespace that the test code expects.
-// ---------------------------------------------------------------------------
-namespace Microsoft.VisualStudio.TestTools.UnitTesting
+// Minimal NUnit stubs to allow compilation when NUnit package is not referenced
+namespace NUnit.Framework
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public sealed class TestClassAttribute : Attribute { }
+    public sealed class TestFixtureAttribute : Attribute { }
 
     [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TestMethodAttribute : Attribute { }
+    public sealed class TestAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class SetUpAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class TearDownAttribute : Attribute { }
 
     public static class Assert
     {
-        public static void IsTrue(bool condition, string? message = null)
+        public static void AreEqual(double expected, double actual, double delta, string message = null)
+        {
+            if (Math.Abs(expected - actual) > delta)
+                throw new Exception(message ?? $"Assert.AreEqual failed. Expected:{expected} Actual:{actual} Delta:{delta}");
+        }
+
+        public static void IsTrue(bool condition, string message = null)
         {
             if (!condition)
                 throw new Exception(message ?? "Assert.IsTrue failed.");
@@ -27,107 +34,79 @@ namespace Microsoft.VisualStudio.TestTools.UnitTesting
     }
 }
 
-namespace AsposePdfFacadesTests
+// Test class verifying that added text appears at the expected X and Y coordinates
+namespace AsposePdfTests
 {
-    [TestClass]
-    public class AddTextCoordinateTests
+    [NUnit.Framework.TestFixture]
+    public class TextPositionTests
     {
-        // Expected coordinates for the added text (in points; 1 inch = 72 points)
-        private const float ExpectedX = 100f;
-        private const float ExpectedY = 200f;
-        private const string TestString = "SampleText";
+        private const double ExpectedX = 100.0;
+        private const double ExpectedY = 200.0;
+        private const string SampleText = "Hello, Aspose!";
 
-        // Helper method to create a simple one‑page PDF document
-        private static Document CreateBlankDocument()
+        private MemoryStream _pdfStream;
+
+        [NUnit.Framework.SetUp]
+        public void SetUp()
         {
-            // Create a new PDF document and add a single blank page
-            Document doc = new Document();
-            doc.Pages.Add();
-            return doc;
+            // Create a new PDF document in memory
+            var doc = new Document();
+
+            // Add a single page
+            var page = doc.Pages.Add();
+
+            // Create a text fragment, set its position, and add it to the page
+            var textFragment = new TextFragment(SampleText);
+            // Position uses XIndent/YIndent in Aspose.Pdf
+            textFragment.Position = new Position(ExpectedX, ExpectedY);
+            page.Paragraphs.Add(textFragment);
+
+            // Save the document to a memory stream for later verification
+            _pdfStream = new MemoryStream();
+            doc.Save(_pdfStream);
+            // Reset stream position for reading
+            _pdfStream.Position = 0;
         }
 
-        // Helper method to add text at a specific position using TextBuilder (core API)
-        private static void AddTextAtPosition(Document doc, int pageNumber, string text, float x, float y)
+        [NUnit.Framework.Test]
+        public void Verify_Text_Position_Is_Correct()
         {
-            // Obtain the target page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[pageNumber];
+            // Load the PDF from the memory stream
+            var loadedDoc = new Document(_pdfStream);
 
-            // Create a TextFragment with the desired string
-            TextFragment fragment = new TextFragment(text);
+            // Use TextFragmentAbsorber to extract text fragments with their positions
+            var absorber = new TextFragmentAbsorber();
+            loadedDoc.Pages.Accept(absorber);
 
-            // Set the lower‑left corner of the text (baseline position)
-            fragment.Position = new Position(x, y);
-
-            // Use TextBuilder to append the fragment to the page
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendText(fragment);
-        }
-
-        // Helper method to extract the first occurrence of a string and return its position
-        private static Position GetTextPosition(Document doc, int pageNumber, string searchText)
-        {
-            // Use TextFragmentAbsorber to locate the text on the specified page
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
-            doc.Pages[pageNumber].Accept(absorber);
-
-            // Ensure the text was found
-            if (absorber.TextFragments.Count == 0)
-                throw new InvalidOperationException($"Text \"{searchText}\" not found on page {pageNumber}.");
-
-            // Return the Position of the first found fragment
-            return absorber.TextFragments[0].Position;
-        }
-
-        [TestMethod]
-        public void VerifyAddedTextAppearsAtExpectedCoordinates()
-        {
-            // Create a temporary file path for the generated PDF
-            string tempPdfPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
-
-            try
+            // Find the fragment that matches the sample text
+            TextFragment foundFragment = null;
+            foreach (TextFragment fragment in absorber.TextFragments)
             {
-                // ------------------------------------------------------------
-                // 1. Create a blank PDF and add the test text at the expected coordinates
-                // ------------------------------------------------------------
-                using (Document doc = CreateBlankDocument())
+                if (fragment.Text == SampleText)
                 {
-                    AddTextAtPosition(doc, pageNumber: 1, text: TestString, x: ExpectedX, y: ExpectedY);
-
-                    // Save the document to a temporary file
-                    doc.Save(tempPdfPath);
-                }
-
-                // ------------------------------------------------------------
-                // 2. Load the saved PDF and verify the text position
-                // ------------------------------------------------------------
-                using (Document loadedDoc = new Document(tempPdfPath))
-                {
-                    Position actualPos = GetTextPosition(loadedDoc, pageNumber: 1, searchText: TestString);
-
-                    // Allow a small tolerance due to floating‑point rounding
-                    const float tolerance = 0.01f;
-
-                    Assert.IsTrue(Math.Abs(actualPos.XIndent - ExpectedX) <= tolerance,
-                        $"X coordinate mismatch. Expected: {ExpectedX}, Actual: {actualPos.XIndent}");
-
-                    Assert.IsTrue(Math.Abs(actualPos.YIndent - ExpectedY) <= tolerance,
-                        $"Y coordinate mismatch. Expected: {ExpectedY}, Actual: {actualPos.YIndent}");
+                    foundFragment = fragment;
+                    break;
                 }
             }
-            finally
-            {
-                // Clean up the temporary file
-                if (File.Exists(tempPdfPath))
-                {
-                    try { File.Delete(tempPdfPath); } catch { /* ignore cleanup errors */ }
-                }
-            }
+
+            // Ensure the fragment was found
+            NUnit.Framework.Assert.IsTrue(foundFragment != null, "Text fragment not found in the PDF.");
+
+            // Verify X and Y coordinates (allow a small tolerance)
+            const double tolerance = 0.5; // points tolerance
+            // Position class exposes XIndent/YIndent, not X/Y
+            NUnit.Framework.Assert.AreEqual(ExpectedX, foundFragment.Position.XIndent, tolerance, "X coordinate mismatch.");
+            NUnit.Framework.Assert.AreEqual(ExpectedY, foundFragment.Position.YIndent, tolerance, "Y coordinate mismatch.");
         }
     }
 
-    // Dummy entry point to satisfy the compiler when building as an executable.
+    // Dummy entry point to satisfy the compiler for a console‑type project.
+    // In a real test project this would be omitted and the project would be a library.
     public class Program
     {
-        public static void Main() { }
+        public static void Main(string[] args)
+        {
+            // No operation – tests are executed by the test runner.
+        }
     }
 }

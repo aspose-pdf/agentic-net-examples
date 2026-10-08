@@ -1,65 +1,40 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class ReplaceImageExample
+class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, the high‑resolution BMP source, and the output PDF.
-        const string inputPdfPath  = "input.pdf";
-        const string bmpSourcePath = "highres.bmp";
-        const string outputPdfPath = "output.pdf";
+        const string inputPdfPath  = "input.pdf";      // source PDF containing the JPEG
+        const string outputPdfPath = "output.pdf";     // PDF after replacement
+        const string bmpImagePath  = "highres.bmp";    // higher‑resolution BMP to insert
 
-        // Verify that the required files exist.
+        // Verify files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(bmpSourcePath))
+        if (!File.Exists(bmpImagePath))
         {
-            Console.Error.WriteLine($"BMP source not found: {bmpSourcePath}");
+            Console.Error.WriteLine($"BMP image not found: {bmpImagePath}");
             return;
         }
 
-        // Create a temporary file to hold the BMP data because PdfContentEditor.ReplaceImage
-        // expects a file path (it does not accept a Stream directly).
-        string tempBmpPath = Path.GetTempFileName();
-        try
-        {
-            // Copy the BMP stream to the temporary file.
-            using (FileStream srcStream = File.OpenRead(bmpSourcePath))
-            using (FileStream tmpStream = File.OpenWrite(tempBmpPath))
-            {
-                srcStream.CopyTo(tmpStream);
-            }
+        // PdfContentEditor does not implement IDisposable, so no using block is needed.
+        PdfContentEditor editor = new PdfContentEditor();
 
-            // Load the PDF document inside a using block for deterministic disposal.
-            using (Document pdfDoc = new Document(inputPdfPath))
-            {
-                // Initialize the content editor and bind it to the loaded document.
-                PdfContentEditor editor = new PdfContentEditor();
-                editor.BindPdf(pdfDoc);
+        // Bind the source PDF
+        editor.BindPdf(inputPdfPath);
 
-                // Replace the first image (index = 1) on the first page (pageNumber = 1)
-                // with the high‑resolution BMP stored in the temporary file.
-                editor.ReplaceImage(pageNumber: 1, index: 1, imageFile: tempBmpPath);
+        // Replace the first image on page 1 (imageIndex is 1‑based)
+        // Use the overload that accepts a file path (string).
+        editor.ReplaceImage(1, 1, bmpImagePath);
 
-                // Save the modified PDF.
-                pdfDoc.Save(outputPdfPath);
-            }
+        // Save the modified PDF
+        editor.Save(outputPdfPath);
 
-            Console.WriteLine($"Image replaced successfully. Output saved to '{outputPdfPath}'.");
-        }
-        finally
-        {
-            // Clean up the temporary BMP file.
-            if (File.Exists(tempBmpPath))
-            {
-                try { File.Delete(tempBmpPath); } catch { /* ignore cleanup errors */ }
-            }
-        }
+        Console.WriteLine($"Image replaced and saved to '{outputPdfPath}'.");
     }
 }

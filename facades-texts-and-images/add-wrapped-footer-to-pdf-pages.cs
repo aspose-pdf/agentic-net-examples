@@ -1,9 +1,7 @@
 using System;
 using System.IO;
-using System.Drawing;               // System.Drawing.Color for FormattedText
-using System.Linq;                 // Enumerable.Range for page list
-using Aspose.Pdf;                  // Document, PageInfo, etc.
-using Aspose.Pdf.Facades;          // FormattedText, EncodingType, PdfFileMend
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -11,51 +9,52 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const float bottomMargin = 20f;   // Margin from the bottom edge of each page
-        const float footerHeight = 30f;   // Approximate height of the footer area
+        const string footerText = "Confidential – Page footer text that may be long and needs word‑by‑word wrapping.";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the document to obtain page dimensions and count.
-        Document doc = new Document(inputPath);
-        int pageCount = doc.Pages.Count;
-        // Build an array containing every page number (1‑based).
-        int[] allPages = Enumerable.Range(1, pageCount).ToArray();
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            {
+                Page page = doc.Pages[pageNum];
 
-        // Create the formatted text that will appear in the footer.
-        // Note: use System.Drawing.Color, not Aspose.Pdf.Color, and a float for font size.
-        Aspose.Pdf.Facades.FormattedText footer = new Aspose.Pdf.Facades.FormattedText(
-            "This is a sample footer text that should wrap word by word across the page width.",
-            System.Drawing.Color.Black,
-            "Helvetica",
-            Aspose.Pdf.Facades.EncodingType.Winansi,
-            false,
-            10f); // font size
+                // Determine page dimensions (points)
+                double pageWidth = page.PageInfo.Width;
+                double pageHeight = page.PageInfo.Height;
 
-        // Determine the width of the first page (all pages share the same size in most PDFs).
-        float pageWidth = (float)doc.Pages[1].PageInfo.Width;
+                // Height of the footer area (in points)
+                double rectHeight = 50;
 
-        // Use PdfFileMend (the Facade API) to add the footer to every page.
-        PdfFileMend mend = new PdfFileMend();
-        mend.BindPdf(inputPath);
-        // AddText parameters: formatted text, page numbers, lower‑left X, lower‑left Y, upper‑right X, upper‑right Y.
-        // The rectangle is placed at the bottom of the page using the bottomMargin.
-        mend.AddText(
-            footer,
-            allPages,
-            0f,                                 // llx (left edge)
-            bottomMargin,                       // lly (bottom margin)
-            pageWidth,                          // urx (right edge)
-            bottomMargin + footerHeight);       // ury (top of footer area)
+                // Create a TextFragment for the footer
+                var fragment = new TextFragment(footerText);
 
-        // Save the modified PDF.
-        mend.Save(outputPath);
-        mend.Close();
+                // Configure the rectangle that defines the wrapping area
+                // TextFragment.Rectangle is read‑only, but the returned Rectangle object is mutable
+                fragment.Rectangle.LLX = 0;                                 // left
+                fragment.Rectangle.LLY = pageHeight - rectHeight;          // bottom
+                fragment.Rectangle.URX = pageWidth;                        // right
+                fragment.Rectangle.URY = pageHeight;                       // top
 
-        Console.WriteLine($"Footer added successfully. Output saved to '{outputPath}'.");
+                // Configure text appearance – TextState is also read‑only, modify its members directly
+                fragment.TextState.Font = FontRepository.FindFont("Arial");
+                fragment.TextState.FontSize = 12;
+                fragment.TextState.ForegroundColor = Color.Gray;
+
+                // Add the fragment to the page – it will wrap word‑by‑word inside the rectangle
+                page.Paragraphs.Add(fragment);
+            }
+
+            // Save the modified document
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Footer added to all pages. Output saved to '{outputPath}'.");
     }
 }

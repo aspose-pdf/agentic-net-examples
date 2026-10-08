@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // source PDF
-        const string outputPdf = "output.pdf";     // PDF with added images
-        const string imagePath = "logo.png";       // image to place
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string imagePath = "stamp.png";
 
         if (!File.Exists(inputPdf))
         {
@@ -22,56 +21,50 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document inside a using block for deterministic disposal.
         using (Document doc = new Document(inputPdf))
         {
-            // Initialize PdfFileMend facade on the loaded document
-            PdfFileMend mend = new PdfFileMend(doc);
+            // Retrieve the first page (1‑based indexing).
+            Page page = doc.Pages[1];
 
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Get page dimensions (points). Width and Height are in points (1/72 inch).
+            double pageWidth  = page.PageInfo.Width;
+            double pageHeight = page.PageInfo.Height;
+
+            // Define desired image size (e.g., 100x100 points).
+            const double imageWidth  = 100;
+            const double imageHeight = 100;
+
+            // Define a margin from the page edges.
+            const double margin = 20;
+
+            // Calculate bottom‑right placement coordinates dynamically.
+            // X coordinate of lower‑left corner:
+            double llx = pageWidth - imageWidth - margin;
+            // Y coordinate of lower‑left corner:
+            double lly = margin;
+
+            // Create an ImageStamp and position it using the calculated coordinates.
+            ImageStamp stamp = new ImageStamp(imagePath)
             {
-                Page page = doc.Pages[pageNum];
+                // Set the size of the stamp.
+                Width  = imageWidth,
+                Height = imageHeight,
+                // Position the lower‑left corner.
+                XIndent = llx,
+                YIndent = lly,
+                // Ensure the image is not scaled beyond the defined size.
+                // (Optional) Set the background to transparent.
+                Background = false
+            };
 
-                // Retrieve page dimensions (in points; 1 point = 1/72 inch)
-                double pageWidth  = page.Rect.Width;
-                double pageHeight = page.Rect.Height;
+            // Add the stamp to the target page.
+            page.AddStamp(stamp);
 
-                // Define desired image size as a fraction of the page size
-                // Here we use 20 % of the page width for both width and height
-                double imgWidth  = pageWidth  * 0.20;
-                double imgHeight = pageHeight * 0.20;
-
-                // Define a margin from the page borders (e.g., 10 points)
-                const double margin = 10.0;
-
-                // Calculate lower‑left and upper‑right coordinates so the image
-                // appears in the bottom‑right corner of the page
-                double lowerLeftX  = pageWidth  - imgWidth - margin;
-                double lowerLeftY  = margin;
-                double upperRightX = pageWidth  - margin;
-                double upperRightY = margin + imgHeight;
-
-                // Add the image to the current page.
-                // The stream must be opened for each call because AddImage consumes it.
-                using (FileStream imgStream = File.OpenRead(imagePath))
-                {
-                    mend.AddImage(
-                        imgStream,          // image stream
-                        pageNum,            // target page number
-                        (float)lowerLeftX,  // lower‑left X
-                        (float)lowerLeftY,  // lower‑left Y
-                        (float)upperRightX, // upper‑right X
-                        (float)upperRightY  // upper‑right Y
-                    );
-                }
-            }
-
-            // Save the modified PDF (lifecycle rule: use Save(string))
-            mend.Save(outputPdf);
-            mend.Close(); // optional but explicit
+            // Save the modified PDF.
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image placed on each page and saved to '{outputPdf}'.");
+        Console.WriteLine($"Image placed and PDF saved to '{outputPdf}'.");
     }
 }

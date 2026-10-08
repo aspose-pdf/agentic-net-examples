@@ -1,74 +1,70 @@
 using System;
 using System.IO;
-using System.Drawing; // for System.Drawing.Color
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Facades types (PdfFileMend, FormattedText, EncodingType)
+using Aspose.Pdf.Text;
 
 class Program
 {
-    // Simple logger that writes to console (could be redirected to a file)
-    static void LogOperation(string operation, string fileName, int pageNumber)
-    {
-        string timestamp = DateTime.Now.ToString("o"); // ISO 8601 format
-        Console.WriteLine($"{timestamp} | {operation} | Page: {pageNumber} | File: {fileName}");
-    }
-
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string imagePath = "image.jpg";
+        const string textToAdd = "Sample text added.";
+        const string auditLog  = "audit.log";
 
-        const string imagePath = "logo.png";          // image to add
-        const string textToAdd = "Confidential";     // text to add
-
-        // Coordinates for image and text (lower‑left X/Y, upper‑right X/Y for image;
-        // X/Y for text). Adjust as needed.
-        const float imgLlX = 50f, imgLlY = 700f, imgUrX = 150f, imgUrY = 800f;
-        const float textX = 200f, textY = 750f;
-
-        // Ensure the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Ensure the image file exists
         if (!File.Exists(imagePath))
         {
             Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using)
-        using (Document doc = new Document(inputPdfPath))
+        // Create or overwrite the audit log
+        using (var logWriter = new StreamWriter(auditLog, false))
         {
-            // Initialize PdfFileMend with the loaded document (facade for adding content)
-            using (PdfFileMend mend = new PdfFileMend(doc))
+            // Load the source PDF using the high‑level Document API
+            var pdfDocument = new Document(inputPdf);
+
+            // Page numbers are 1‑based
+            int pageNumber = 1;
+
+            // ------------------------------------------------------------
+            // Insert an image (coordinates: lower‑left x,y and upper‑right x,y)
+            // ------------------------------------------------------------
+            double llx = 100, lly = 500, urx = 300, ury = 700;
+            var imageStamp = new ImageStamp(imagePath)
             {
-                // ---- Add Image -------------------------------------------------
-                bool imgResult = mend.AddImage(imagePath, 1, imgLlX, imgLlY, imgUrX, imgUrY);
-                LogOperation("AddImage", Path.GetFileName(imagePath), 1);
+                // Position – lower‑left corner
+                XIndent = llx,
+                YIndent = lly,
+                // Size – width/height derived from the rectangle
+                Width  = urx - llx,
+                Height = ury - lly
+            };
+            pdfDocument.Pages[pageNumber].AddStamp(imageStamp);
+            logWriter.WriteLine($"{DateTime.UtcNow:u} | Page {pageNumber} | AddImage | {Path.GetFileName(imagePath)}");
 
-                // ---- Add Text --------------------------------------------------
-                // FormattedText constructor expects System.Drawing.Color and a float font size.
-                FormattedText ft = new FormattedText(
-                    textToAdd,
-                    System.Drawing.Color.Red,
-                    "Helvetica",
-                    EncodingType.Winansi,
-                    false,
-                    24f);
+            // ------------------------------------------------------------
+            // Insert text (coordinates: lower‑left x,y)
+            // ------------------------------------------------------------
+            double txtX = 100, txtY = 450;
+            var textFragment = new TextFragment(textToAdd)
+            {
+                Position = new Position(txtX, txtY)
+            };
+            pdfDocument.Pages[pageNumber].Paragraphs.Add(textFragment);
+            logWriter.WriteLine($"{DateTime.UtcNow:u} | Page {pageNumber} | AddText | \"{textToAdd}\"");
 
-                // AddText overload that accepts a single page number.
-                bool txtResult = mend.AddText(ft, 1, textX, textY);
-                LogOperation("AddText", "FormattedText", 1);
-            }
-
-            // Save the modified document (lifecycle rule: save inside using)
-            doc.Save(outputPdfPath);
+            // Save the modified PDF
+            pdfDocument.Save(outputPdf);
         }
 
-        Console.WriteLine($"Processing completed. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPdf}'. Audit log written to '{auditLog}'.");
     }
 }
