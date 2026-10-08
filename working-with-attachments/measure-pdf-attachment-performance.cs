@@ -2,104 +2,88 @@ using System;
 using System.IO;
 using System.Diagnostics;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
-class AttachmentPerformanceDemo
+class AttachmentPerformance
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string attachmentFilePath = "sample.txt";
+        const string inputPdf = "input.pdf";
+        const string outputPdfAdd = "output_add.pdf";
+        const string outputPdfRemove = "output_remove.pdf";
+        const string attachmentFile = "sample.txt";
+        const string extractFolder = "ExtractedAttachments";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(attachmentFilePath))
+        // Ensure the attachment file exists
+        if (!File.Exists(attachmentFile))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentFilePath}");
-            return;
+            File.WriteAllText(attachmentFile, "This is a sample attachment.");
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        // ---------------- Add attachment ----------------
+        Stopwatch swAdd = Stopwatch.StartNew();
+        using (Document doc = new Document(inputPdf))
         {
-            // -------------------------------------------------
-            // Add a file attachment annotation and measure time
-            // -------------------------------------------------
-            Stopwatch swAdd = Stopwatch.StartNew();
-
             // Create a FileSpecification for the attachment
-            FileSpecification fileSpec = new FileSpecification(attachmentFilePath);
-
-            // Define the rectangle where the annotation will appear (fully qualified to avoid ambiguity)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 150, 550);
-
-            // Create the FileAttachmentAnnotation on the first page (1‑based indexing)
-            FileAttachmentAnnotation attachAnnot = new FileAttachmentAnnotation(doc.Pages[1], rect, fileSpec)
+            var fileSpec = new FileSpecification(Path.GetFileName(attachmentFile))
             {
-                // Optional visual properties (Icon enum is not available in this version, so it is omitted)
-                Color = Aspose.Pdf.Color.Blue,
-                Contents = $"Attachment: {Path.GetFileName(attachmentFilePath)}"
+                // Set the file contents via a MemoryStream
+                Contents = new MemoryStream(File.ReadAllBytes(attachmentFile))
             };
-
-            // Add the annotation to the page
-            doc.Pages[1].Annotations.Add(attachAnnot);
-
-            swAdd.Stop();
-            Console.WriteLine($"Add attachment time: {swAdd.ElapsedMilliseconds} ms");
-
-            // -------------------------------------------------
-            // Extract (list) attachments and measure time
-            // -------------------------------------------------
-            Stopwatch swExtract = Stopwatch.StartNew();
-
-            // Iterate through all pages and collect file attachment annotations
-            foreach (Page page in doc.Pages)
-            {
-                for (int i = 1; i <= page.Annotations.Count; i++) // 1‑based indexing
-                {
-                    Annotation ann = page.Annotations[i];
-                    if (ann is FileAttachmentAnnotation fileAnn && fileAnn.File != null)
-                    {
-                        Console.WriteLine($"Found attachment on page {page.Number}: {fileAnn.File.Name}");
-                    }
-                }
-            }
-
-            swExtract.Stop();
-            Console.WriteLine($"Extract attachments time: {swExtract.ElapsedMilliseconds} ms");
-
-            // -------------------------------------------------
-            // Remove the previously added attachment and measure time
-            // -------------------------------------------------
-            Stopwatch swRemove = Stopwatch.StartNew();
-
-            // Find and remove the attachment annotation we added
-            for (int pageIdx = 1; pageIdx <= doc.Pages.Count; pageIdx++)
-            {
-                Page page = doc.Pages[pageIdx];
-                for (int annIdx = page.Annotations.Count; annIdx >= 1; annIdx--) // iterate backwards when removing
-                {
-                    Annotation ann = page.Annotations[annIdx];
-                    if (ann is FileAttachmentAnnotation fileAnn && fileAnn.File != null &&
-                        fileAnn.File.Name.Equals(Path.GetFileName(attachmentFilePath), StringComparison.OrdinalIgnoreCase))
-                    {
-                        page.Annotations.Delete(annIdx);
-                    }
-                }
-            }
-
-            swRemove.Stop();
-            Console.WriteLine($"Remove attachment time: {swRemove.ElapsedMilliseconds} ms");
-
-            // Save the modified document
-            doc.Save(outputPdfPath);
+            // Add to the EmbeddedFiles collection
+            doc.EmbeddedFiles.Add(fileSpec);
+            doc.Save(outputPdfAdd);
         }
+        swAdd.Stop();
+        Console.WriteLine($"Add attachment time: {swAdd.ElapsedMilliseconds} ms");
 
-        Console.WriteLine($"Processing completed. Output saved to '{outputPdfPath}'.");
+        // ---------------- Extract attachments ----------------
+        Stopwatch swExtract = Stopwatch.StartNew();
+        Directory.CreateDirectory(extractFolder);
+        using (Document doc = new Document(outputPdfAdd))
+        {
+            // Iterate using 1‑based indexing (the collection implements IEnumerable, but 1‑based is the official API contract)
+            for (int i = 1; i <= doc.EmbeddedFiles.Count; i++)
+            {
+                FileSpecification fileSpec = doc.EmbeddedFiles[i];
+                string outPath = Path.Combine(extractFolder, fileSpec.Name);
+                // Ensure the stream is at the beginning before copying
+                if (fileSpec.Contents.CanSeek)
+                    fileSpec.Contents.Position = 0;
+                using (FileStream outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                {
+                    fileSpec.Contents.CopyTo(outStream);
+                }
+                Console.WriteLine($"Extracted: {fileSpec.Name}");
+            }
+        }
+        swExtract.Stop();
+        Console.WriteLine($"Extract attachments time: {swExtract.ElapsedMilliseconds} ms");
+
+        // ---------------- Remove attachment ----------------
+        Stopwatch swRemove = Stopwatch.StartNew();
+        using (Document doc = new Document(outputPdfAdd))
+        {
+            // Delete each embedded file individually – EmbeddedFileCollection has no Clear() method.
+            if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+            {
+                for (int i = doc.EmbeddedFiles.Count; i >= 1; i--)
+                {
+                    var fileSpec = doc.EmbeddedFiles[i];
+                    if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
+                    {
+                        doc.EmbeddedFiles.Delete(fileSpec.Name);
+                    }
+                }
+            }
+            doc.Save(outputPdfRemove);
+        }
+        swRemove.Stop();
+        Console.WriteLine($"Remove attachment time: {swRemove.ElapsedMilliseconds} ms");
     }
 }

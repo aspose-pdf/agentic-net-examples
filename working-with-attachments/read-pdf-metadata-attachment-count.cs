@@ -6,45 +6,51 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "sample.pdf";      // input PDF path
-        const string reportTxt = "metadata_report.txt"; // output report path
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPdf))
+        // Open the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(pdfPath))
         {
-            // Access standard metadata via DocumentInfo
-            DocumentInfo info = doc.Info;
+            // Standard document metadata (fallback to "(none)" if missing)
+            string title   = doc.Info.Title ?? "(none)";
+            string author  = doc.Info.Author ?? "(none)";
+            string subject = doc.Info.Subject ?? "(none)";
+            string keywords = doc.Info.Keywords ?? "(none)";
+            string creator = doc.Info.Creator ?? "(none)";
+            string producer = doc.Info.Producer ?? "(none)";
 
-            // Get the number of embedded file attachments (may be zero)
+            // Creation and modification dates are non‑nullable DateTime values.
+            // Aspose.Pdf returns DateTime.MinValue when the value is not set.
+            string creationDate = doc.Info.CreationDate != DateTime.MinValue
+                ? doc.Info.CreationDate.ToString("u")
+                : "(none)";
+            string modificationDate = doc.Info.ModDate != DateTime.MinValue
+                ? doc.Info.ModDate.ToString("u")
+                : "(none)";
+
+            // Count embedded file attachments (if any)
             int attachmentCount = doc.EmbeddedFiles?.Count ?? 0;
 
-            // Build a simple text report
-            string report = $"Title: {info.Title}\n" +
-                            $"Author: {info.Author}\n" +
-                            $"Subject: {info.Subject}\n" +
-                            $"Keywords: {info.Keywords}\n" +
-                            $"Creator: {info.Creator}\n" +
-                            $"Producer: {info.Producer}\n" +
-                            $"Creation Date: {info.CreationDate}\n" +
-                            $"Modification Date: {info.ModDate}\n" +
-                            $"Attachment Count: {attachmentCount}\n";
-
-            // Output to console
-            Console.WriteLine(report);
-
-            // Write the report to a text file
-            File.WriteAllText(reportTxt, report);
-
-            // Demonstrate a save operation (no modifications made)
-            doc.Save("output_copy.pdf");
+            // Output a simple report to the console
+            Console.WriteLine("PDF Metadata Report");
+            Console.WriteLine("-------------------");
+            Console.WriteLine($"File: {pdfPath}");
+            Console.WriteLine($"Title: {title}");
+            Console.WriteLine($"Author: {author}");
+            Console.WriteLine($"Subject: {subject}");
+            Console.WriteLine($"Keywords: {keywords}");
+            Console.WriteLine($"Creator: {creator}");
+            Console.WriteLine($"Producer: {producer}");
+            Console.WriteLine($"Creation Date: {creationDate}");
+            Console.WriteLine($"Modification Date: {modificationDate}");
+            Console.WriteLine($"Page Count: {doc.Pages.Count}");
+            Console.WriteLine($"Attachment Count: {attachmentCount}");
         }
-
-        Console.WriteLine($"Metadata report saved to '{reportTxt}'.");
     }
 }

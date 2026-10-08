@@ -2,86 +2,65 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class PortfolioExtractor
+class Program
 {
     static void Main()
     {
-        // Input PDF portfolio file
-        const string inputPdf = "portfolio.pdf";
-        // Output directory where extracted files will be saved
-        const string outputDir = "ExtractedFiles";
+        const string pdfPath = "portfolio.pdf";          // input PDF Portfolio
+        const string outputRoot = "ExtractedFiles";      // root folder for extracted files
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
+        // Ensure the output root directory exists
+        Directory.CreateDirectory(outputRoot);
+
         try
         {
-            // Open the PDF document (wrapped in using for deterministic disposal)
-            using (Document doc = new Document(inputPdf))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                // Ensure the output root directory exists
-                Directory.CreateDirectory(outputDir);
-
-                // Check if the document contains any embedded files (portfolio items)
-                if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
+                // Aspose.Pdf exposes embedded files as a collection of FileSpecification objects.
+                // The Name property may contain a relative path (e.g., "Folder1/SubFolder/file.txt").
+                // We recreate that hierarchy under the outputRoot folder.
+                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
                 {
-                    Console.WriteLine("No embedded files found in the PDF portfolio.");
-                    return;
-                }
-
-                // Iterate over each embedded file in the portfolio using reflection to avoid
-                // a direct compile‑time dependency on the EmbeddedFile type (which may not be
-                // available in the core Aspose.Pdf namespace).
-                foreach (var embedded in doc.EmbeddedFiles)
-                {
-                    // Retrieve the virtual path/name of the embedded file.
-                    var nameProp = embedded.GetType().GetProperty("Name");
-                    string virtualPath = nameProp?.GetValue(embedded) as string ?? "UnnamedFile";
-
-                    // Build the full destination path on the local file system.
-                    string destinationPath = Path.Combine(outputDir, virtualPath);
-
-                    // Ensure the directory hierarchy exists before saving the file.
-                    string destinationDir = Path.GetDirectoryName(destinationPath);
-                    if (!string.IsNullOrEmpty(destinationDir))
-                    {
-                        Directory.CreateDirectory(destinationDir);
-                    }
-
-                    // Try to invoke the Save(string) method that Aspose.Pdf provides for embedded files.
-                    var saveMethod = embedded.GetType().GetMethod("Save", new[] { typeof(string) });
-                    if (saveMethod != null)
-                    {
-                        saveMethod.Invoke(embedded, new object[] { destinationPath });
-                    }
-                    else
-                    {
-                        // Fallback: extract the raw stream from the FileSpecification if Save is unavailable.
-                        var fileSpecProp = embedded.GetType().GetProperty("FileSpecification");
-                        var fileSpec = fileSpecProp?.GetValue(embedded);
-                        var contentsProp = fileSpec?.GetType().GetProperty("Contents");
-                        var contents = contentsProp?.GetValue(fileSpec) as Stream;
-                        if (contents != null)
-                        {
-                            using (var outStream = File.Create(destinationPath))
-                            {
-                                contents.CopyTo(outStream);
-                            }
-                        }
-                    }
-
-                    Console.WriteLine($"Extracted: {virtualPath} -> {destinationPath}");
+                    SaveFileSpecification(fileSpec, outputRoot);
                 }
             }
 
-            Console.WriteLine("All embedded files have been extracted successfully.");
+            Console.WriteLine($"All embedded files have been extracted to '{outputRoot}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    // Saves a single FileSpecification (embedded file) to the appropriate location under basePath.
+    private static void SaveFileSpecification(FileSpecification fileSpec, string basePath)
+    {
+        if (fileSpec == null) return;
+
+        // The Name may contain folder separators – use it to build the target path.
+        string relativePath = fileSpec.Name ?? "unnamed";
+        string targetPath = Path.Combine(basePath, relativePath);
+
+        // Ensure the directory for the file exists.
+        string directory = Path.GetDirectoryName(targetPath);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        // Write the file's content to disk.
+        using (FileStream outStream = new FileStream(targetPath, FileMode.Create, FileAccess.Write))
+        using (Stream content = fileSpec.Contents)
+        {
+            content?.CopyTo(outStream);
         }
     }
 }

@@ -1,86 +1,90 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string watermarkImagePath = "watermark.png";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_watermarked.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(watermarkImagePath))
+        // Load the main PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            Console.Error.WriteLine($"Watermark image not found: {watermarkImagePath}");
-            return;
-        }
+            // Work with the collection of embedded files (1‑based indexing)
+            EmbeddedFileCollection attachments = doc.EmbeddedFiles;
 
-        // Load the main PDF document
-        using (Document doc = new Document(inputPdfPath))
-        {
-            // Iterate over all embedded file attachments in the PDF
-            foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
+            // Iterate backwards so we can safely replace items
+            for (int idx = attachments.Count; idx >= 1; idx--)
             {
-                // Process only PDF attachments (case‑insensitive check)
-                if (fileSpec.Name != null &&
-                    fileSpec.Name.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                FileSpecification spec = attachments[idx];
+                string name = spec.Name; // use Name property (not FileName)
+
+                // Process only PDF attachments (by file extension)
+                if (!name.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                // Read the original attachment into a memory stream
+                using (MemoryStream originalStream = new MemoryStream())
                 {
-                    // Read the attachment content into a memory stream
-                    using (MemoryStream originalStream = new MemoryStream())
+                    spec.Contents.CopyTo(originalStream);
+                    originalStream.Position = 0;
+
+                    // Load the attached PDF
+                    using (Document attachedDoc = new Document(originalStream))
                     {
-                        // Ensure the source stream is at the beginning
-                        if (fileSpec.Contents.CanSeek)
-                            fileSpec.Contents.Position = 0;
-                        fileSpec.Contents.CopyTo(originalStream);
-                        originalStream.Position = 0;
+                        // Prepare a text watermark stamp
+                        TextStamp watermark = new TextStamp("CONFIDENTIAL");
+                        // TextState is read‑only; modify its properties instead of assigning a new instance
+                        watermark.TextState.FontSize = 72;
+                        watermark.TextState.FontStyle = FontStyles.Bold;
+                        watermark.TextState.ForegroundColor = Color.FromRgb(0.8, 0.8, 0.8);
+                        watermark.Opacity = 0.3;
+                        watermark.RotateAngle = 45;
+                        watermark.HorizontalAlignment = HorizontalAlignment.Center;
+                        watermark.VerticalAlignment = VerticalAlignment.Center;
+                        watermark.Background = false;
 
-                        // Load the attachment as a separate PDF document
-                        using (Document attachedDoc = new Document(originalStream))
+                        // Apply the watermark to every page of the attached PDF
+                        for (int i = 1; i <= attachedDoc.Pages.Count; i++)
                         {
-                            // Add the image watermark to every page of the attached PDF
-                            foreach (Page page in attachedDoc.Pages)
-                            {
-                                ImageStamp stamp = new ImageStamp(watermarkImagePath)
-                                {
-                                    // Example size – adjust as needed
-                                    Width = 200,
-                                    Height = 100,
-                                    HorizontalAlignment = HorizontalAlignment.Center,
-                                    VerticalAlignment = VerticalAlignment.Center,
-                                    Opacity = 0.5,
-                                    Background = true // place behind page content
-                                };
-                                page.AddStamp(stamp);
-                            }
+                            attachedDoc.Pages[i].AddStamp(watermark);
+                        }
 
-                            // Save the modified attachment back into a new stream
-                            using (MemoryStream updatedStream = new MemoryStream())
-                            {
-                                attachedDoc.Save(updatedStream);
-                                updatedStream.Position = 0;
+                        // Save the modified attachment to a new memory stream
+                        using (MemoryStream updatedStream = new MemoryStream())
+                        {
+                            attachedDoc.Save(updatedStream);
+                            updatedStream.Position = 0;
 
-                                // Replace the original attachment data with the watermarked version
-                                // Assign a fresh stream to the Contents property
-                                fileSpec.Contents = new MemoryStream(updatedStream.ToArray());
-                            }
+                            // Remove the old attachment (by name, not by index)
+                            attachments.Delete(name);
+
+                            // Create a new FileSpecification from the updated stream
+                            FileSpecification newSpec = new FileSpecification(updatedStream, name)
+                            {
+                                Description = spec.Description
+                            };
+
+                            // Add the new specification back to the collection
+                            attachments.Add(newSpec);
                         }
                     }
                 }
             }
 
-            // Save the main document (now containing watermarked attachments)
-            doc.Save(outputPdfPath);
+            // Save the main document with updated attachments
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with watermarked attachments saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

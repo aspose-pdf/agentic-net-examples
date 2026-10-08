@@ -6,45 +6,51 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";               // Source PDF containing attachments
-        const string attachmentName = "example.txt";       // Name of the attachment to extract
-        const string outputDirectory = "ExtractedFiles";  // Target directory for the saved file
+        // Paths and attachment name
+        const string pdfPath = "input.pdf";
+        const string attachmentName = "myfile.txt";
+        const string outputDirectory = "Attachments";
 
-        // Verify source PDF exists
+        // Verify PDF exists
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDirectory);
+
         try
         {
-            // Ensure the target directory exists
-            Directory.CreateDirectory(outputDirectory);
-
-            // Load the PDF document (lifecycle: create, load, save)
+            // Load PDF inside a using block for deterministic disposal
             using (Document doc = new Document(pdfPath))
             {
-                // Locate the embedded file by its name
-                FileSpecification fileSpec = doc.EmbeddedFiles.FindByName(attachmentName);
+                // Locate the attachment by name (case‑insensitive) using FileSpecification
+                FileSpecification targetSpec = null;
+                foreach (FileSpecification spec in doc.EmbeddedFiles)
+                {
+                    if (string.Equals(spec.Name, attachmentName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        targetSpec = spec;
+                        break;
+                    }
+                }
 
-                if (fileSpec == null)
+                if (targetSpec == null)
                 {
                     Console.WriteLine($"Attachment '{attachmentName}' not found in the PDF.");
                     return;
                 }
 
-                // Build the full path for the extracted file
-                string outputPath = Path.Combine(outputDirectory, attachmentName);
+                // Build full path for the extracted file
+                string outputPath = Path.Combine(outputDirectory, targetSpec.Name);
 
-                // Save the embedded file to the target location by copying its content stream
-                using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                // Write the attachment's binary content to disk using the Contents stream
+                using (FileStream outStream = File.Create(outputPath))
+                using (Stream content = targetSpec.Contents)
                 {
-                    // Reset the position of the content stream just in case
-                    if (fileSpec.Contents.CanSeek)
-                        fileSpec.Contents.Position = 0;
-
-                    fileSpec.Contents.CopyTo(outStream);
+                    content.CopyTo(outStream);
                 }
 
                 Console.WriteLine($"Attachment saved to: {outputPath}");

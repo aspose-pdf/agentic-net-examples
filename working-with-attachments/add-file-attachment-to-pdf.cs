@@ -1,55 +1,44 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string attachmentFile = "attachment.txt";
-        const string outputPdf = "output.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output_attached.pdf";
+        const string fileToAttach = "attachment.txt"; // file to embed
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(attachmentFile))
-        {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentFile}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the existing PDF (document disposal handled by using)
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(fileToAttach))
         {
-            // Use 1‑based page indexing to get the first page
-            Page page = doc.Pages[1];
-
-            // Define the annotation rectangle (fully qualified to avoid ambiguity)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 150, 550);
-
-            // Create a FileSpecification for the file to be attached
-            FileSpecification fileSpec = new FileSpecification(attachmentFile);
-
-            // Create the file attachment annotation
-            FileAttachmentAnnotation fileAnnot = new FileAttachmentAnnotation(page, rect, fileSpec)
-            {
-                // Optional visual settings
-                Icon = FileIcon.Paperclip, // corrected enum reference
-                Color = Aspose.Pdf.Color.Blue,
-                Contents = "Attached file"
-            };
-
-            // Add the annotation to the page's annotation collection
-            page.Annotations.Add(fileAnnot);
-
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            Console.Error.WriteLine($"Attachment file not found: {fileToAttach}");
+            return;
         }
 
-        Console.WriteLine($"File attachment added and saved to '{outputPdf}'.");
+        // Load the existing PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
+        {
+            // Create a FileSpecification for the attachment.
+            // Use the file name as the specification name and provide a description.
+            var attachment = new FileSpecification(Path.GetFileName(fileToAttach), "Sample attachment");
+
+            // Set the file data as a stream (required for embedding).
+            attachment.Contents = new MemoryStream(File.ReadAllBytes(fileToAttach));
+
+            // Add the attachment to the document's EmbeddedFiles collection.
+            pdfDoc.EmbeddedFiles.Add(attachment);
+
+            // Save the modified PDF.
+            pdfDoc.Save(outputPdfPath);
+        }
+
+        Console.WriteLine($"Attachment added and saved to '{outputPdfPath}'.");
     }
 }

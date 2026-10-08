@@ -6,48 +6,55 @@ class Program
 {
     static void Main()
     {
-        // Path to the PDF that contains a portfolio (embedded files)
-        const string pdfPath = "portfolio.pdf";
+        // Path to the source PDF containing portfolio (embedded) files
+        const string inputPdfPath = "portfolio.pdf";
 
-        // Index of the embedded file to extract (1‑based as per Aspose.Pdf docs)
-        const int embeddedIndex = 2;
+        // Zero‑based index of the portfolio item to extract (e.g., 0 for the first item)
+        int itemIndexZeroBased = 0;
 
-        // Ensure the source PDF exists
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        try
         {
-            // Access the collection of embedded files (portfolio items)
-            EmbeddedFileCollection embeddedFiles = doc.EmbeddedFiles;
-
-            // Validate the requested index
-            if (embeddedIndex < 1 || embeddedIndex > embeddedFiles.Count)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdfPath))
             {
-                Console.Error.WriteLine($"Invalid index {embeddedIndex}. " +
-                                        $"Document contains {embeddedFiles.Count} embedded file(s).");
-                return;
+                // Aspose.Pdf collections are 1‑based; convert the zero‑based index
+                int itemIndex = itemIndexZeroBased + 1;
+
+                // Verify that the requested index exists
+                if (itemIndex < 1 || itemIndex > doc.EmbeddedFiles.Count)
+                {
+                    Console.Error.WriteLine($"Invalid index. PDF contains {doc.EmbeddedFiles.Count} portfolio items.");
+                    return;
+                }
+
+                // Retrieve the embedded file specification (Aspose.Pdf uses FileSpecification)
+                FileSpecification fileSpec = doc.EmbeddedFiles[itemIndex];
+
+                // The original file name (including extension) is stored in the Name property
+                string originalFileName = fileSpec.Name;
+
+                // Determine an output path – here we save to the current directory
+                string outputPath = Path.Combine(Directory.GetCurrentDirectory(), originalFileName);
+
+                // Write the raw bytes to disk preserving the original extension
+                using (FileStream outStream = File.Create(outputPath))
+                {
+                    // fileSpec.Contents returns a Stream containing the embedded data
+                    fileSpec.Contents.CopyTo(outStream);
+                }
+
+                Console.WriteLine($"Extracted portfolio item saved as: {outputPath}");
             }
-
-            // Retrieve the specific embedded file (FileSpecification)
-            FileSpecification fileSpec = embeddedFiles[embeddedIndex];
-
-            // Determine the original file name (includes its extension)
-            // Use the Name property – the correct way to get the embedded file's name
-            string originalFileName = fileSpec.Name ?? $"embedded_{embeddedIndex}";
-
-            // Save the embedded file using its original name
-            using (Stream source = fileSpec.Contents)
-            using (FileStream destination = new FileStream(originalFileName, FileMode.Create, FileAccess.Write))
-            {
-                source.CopyTo(destination);
-            }
-
-            Console.WriteLine($"Embedded file extracted and saved as: {originalFileName}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

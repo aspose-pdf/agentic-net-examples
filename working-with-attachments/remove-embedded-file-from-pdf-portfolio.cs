@@ -8,8 +8,7 @@ class Program
     {
         const string inputPath = "portfolio.pdf";
         const string outputPath = "portfolio_updated.pdf";
-        // Index of the embedded file to delete (1‑based for user convenience)
-        int fileIndex = 2;
+        const int fileIndex = 2; // 1‑based index of the embedded file to remove
 
         if (!File.Exists(inputPath))
         {
@@ -17,29 +16,37 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF portfolio
         using (Document doc = new Document(inputPath))
         {
-            // Access the collection of embedded files in the portfolio
-            var embeddedFiles = doc.EmbeddedFiles;
-
-            // Validate the requested index (user supplied is 1‑based)
-            if (fileIndex < 1 || fileIndex > embeddedFiles.Count)
+            // Ensure the document actually contains embedded files
+            if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
             {
-                Console.Error.WriteLine($"Invalid index {fileIndex}. Collection contains {embeddedFiles.Count} items.");
+                Console.Error.WriteLine("The PDF does not contain any embedded files.");
                 return;
             }
 
-            // Convert to zero‑based index for the collection
-            int zeroBasedIndex = fileIndex - 1;
+            // Validate the index against the collection count (EmbeddedFileCollection is 1‑based)
+            if (fileIndex < 1 || fileIndex > doc.EmbeddedFiles.Count)
+            {
+                Console.Error.WriteLine($"Invalid index: {fileIndex}. Portfolio contains {doc.EmbeddedFiles.Count} files.");
+                return;
+            }
 
-            // Get the name of the file at the specified index
-            string fileName = embeddedFiles[zeroBasedIndex].Name;
+            // Retrieve the file specification at the given 1‑based index
+            FileSpecification fileSpec = doc.EmbeddedFiles[fileIndex];
+            string attachmentName = fileSpec?.Name;
 
-            // Delete the embedded file by its name
-            embeddedFiles.Delete(fileName);
+            if (string.IsNullOrEmpty(attachmentName))
+            {
+                Console.Error.WriteLine("Unable to determine the name of the embedded file to delete.");
+                return;
+            }
 
-            // Save the modified PDF
+            // Remove the embedded file by its name
+            doc.EmbeddedFiles.Delete(attachmentName);
+
+            // Save the modified PDF portfolio
             doc.Save(outputPath);
         }
 
