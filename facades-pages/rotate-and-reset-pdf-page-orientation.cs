@@ -1,15 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf; // Document API
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath   = "input.pdf";
         const string rotatedPath = "rotated.pdf";
-        const string restoredPath = "restored.pdf";
+        const string resetPath   = "reset.pdf";
+        const int pageNumber     = 1; // first page (1‑based indexing)
 
         if (!File.Exists(inputPath))
         {
@@ -17,49 +17,19 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // ---------- Rotate page 1 ----------
-            using (PdfPageEditor editor = new PdfPageEditor())
-            {
-                // Bind the document to the editor
-                editor.BindPdf(doc);
+        // ---------- Rotate the page ----------
+        // Load the source PDF, rotate the specified page, and save the result.
+        Document doc = new Document(inputPath);
+        // Rotation enum values: None, on90, on180, on270
+        doc.Pages[pageNumber].Rotate = Rotation.on90; // rotate 90° clockwise
+        doc.Save(rotatedPath);
+        Console.WriteLine($"Page {pageNumber} rotated and saved to '{rotatedPath}'.");
 
-                // Set rotation for page 1 (90 degrees clockwise)
-                editor.PageRotations = new System.Collections.Generic.Dictionary<int, int>
-                {
-                    { 1, 90 } // key = page number (1‑based), value = rotation in degrees
-                };
-
-                // Apply the rotation change
-                editor.ApplyChanges();
-
-                // Save the rotated document
-                doc.Save(rotatedPath);
-            }
-
-            // ---------- Reset rotation to original ----------
-            using (PdfPageEditor editor = new PdfPageEditor())
-            {
-                // Bind the same document (now rotated) to the editor
-                editor.BindPdf(doc);
-
-                // Reset rotation for page 1 to 0 degrees
-                editor.PageRotations = new System.Collections.Generic.Dictionary<int, int>
-                {
-                    { 1, 0 }
-                };
-
-                // Apply the reset change
-                editor.ApplyChanges();
-
-                // Save the restored document
-                doc.Save(restoredPath);
-            }
-        }
-
-        Console.WriteLine($"Rotated PDF saved to '{rotatedPath}'.");
-        Console.WriteLine($"Restored PDF saved to '{restoredPath}'.");
+        // ---------- Reset the rotation ----------
+        // Load the rotated PDF, reset the rotation, and save the final document.
+        Document resetDoc = new Document(rotatedPath);
+        resetDoc.Pages[pageNumber].Rotate = Rotation.None; // back to original orientation
+        resetDoc.Save(resetPath);
+        Console.WriteLine($"Page {pageNumber} rotation reset and saved to '{resetPath}'.");
     }
 }

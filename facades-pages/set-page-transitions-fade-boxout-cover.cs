@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_transitions.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,42 +16,50 @@ class Program
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create a PdfPageEditor bound to the loaded document
+            // PdfPageEditor works on an existing Document instance
             using (PdfPageEditor editor = new PdfPageEditor(doc))
             {
                 // -----------------------------------------------------------------
-                // Page 1 – Fade effect (implemented as DISSOLVE transition)
+                // Fade transition on page 1 (TransitionType = 0)
                 // -----------------------------------------------------------------
-                editor.ProcessPages = new int[] { 1 };               // edit only page 1
-                editor.TransitionType = PdfPageEditor.DISSOLVE;     // Fade/Dissolve effect
-                editor.TransitionDuration = 2;                       // duration in seconds
-                editor.ApplyChanges();
+                if (doc.Pages.Count >= 1)
+                {
+                    editor.ProcessPages = new int[] { 1 };   // 1‑based page number
+                    editor.TransitionType = 0;               // 0 = Fade
+                    editor.TransitionDuration = 2;           // seconds
+                    editor.ApplyChanges();
+                }
 
                 // -----------------------------------------------------------------
-                // Page 2 – BoxOut effect (OUTBOX transition)
+                // BoxOut transition on page 2 (TransitionType = 1)
                 // -----------------------------------------------------------------
-                editor.ProcessPages = new int[] { 2 };
-                editor.TransitionType = PdfPageEditor.OUTBOX;       // BoxOut effect
-                editor.TransitionDuration = 2;
-                editor.ApplyChanges();
+                if (doc.Pages.Count >= 2)
+                {
+                    editor.ProcessPages = new int[] { 2 };
+                    editor.TransitionType = 1;               // 1 = BoxOut
+                    editor.TransitionDuration = 2;
+                    editor.ApplyChanges();
+                }
 
                 // -----------------------------------------------------------------
-                // Page 3 – Cover effect (INBOX transition)
+                // Cover transition on page 3 (TransitionType = 2)
                 // -----------------------------------------------------------------
-                editor.ProcessPages = new int[] { 3 };
-                editor.TransitionType = PdfPageEditor.INBOX;        // Cover effect
-                editor.TransitionDuration = 2;
-                editor.ApplyChanges();
+                if (doc.Pages.Count >= 3)
+                {
+                    editor.ProcessPages = new int[] { 3 };
+                    editor.TransitionType = 2;               // 2 = Cover
+                    editor.TransitionDuration = 2;
+                    editor.ApplyChanges();
+                }
 
-                // Save the modified PDF. The Save method of PdfPageEditor writes the
-                // result document to the specified file path.
+                // Save the modified PDF
                 editor.Save(outputPath);
             }
         }
 
-        Console.WriteLine($"PDF with page transitions saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with transitions to '{outputPath}'.");
     }
 }

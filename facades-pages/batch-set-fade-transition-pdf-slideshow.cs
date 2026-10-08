@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,33 +8,35 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_fade.pdf";
+        const string inputPath = "input.pdf";   // source 200‑page PDF
+        const string outputPath = "output.pdf"; // PDF with slide transitions
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Use PdfPageEditor to apply a Fade transition (2‑second duration) to every page
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Initialize the PdfPageEditor facade with the loaded document
-            PdfPageEditor editor = new PdfPageEditor(doc);
+            editor.BindPdf(doc);
 
-            // Set the transition effect to Fade (using DISSOLVE as the closest built‑in constant)
-            editor.TransitionType = PdfPageEditor.DISSOLVE; // Fade effect
-            // Set the transition duration to 2 seconds
-            editor.TransitionDuration = 2;
+            // Specify the pages to edit – 1‑based indexing
+            editor.ProcessPages = Enumerable.Range(1, doc.Pages.Count).ToArray();
 
-            // Apply the changes to all pages (default ProcessPages processes every page)
-            editor.ApplyChanges();
+            // TransitionType uses the integer value defined by Aspose.Pdf's TransitionType enum.
+            // Fade corresponds to the value 11 in the current library version.
+            editor.TransitionType = 11;          // Fade transition
+            editor.TransitionDuration = 2;       // 2 seconds
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Persist the changes
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with fade transition saved to '{outputPath}'.");
+        Console.WriteLine($"Transitions applied and saved to '{outputPath}'.");
     }
 }

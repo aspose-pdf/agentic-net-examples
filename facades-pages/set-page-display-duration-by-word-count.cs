@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
@@ -9,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_durations.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,44 +17,41 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block (lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
-            // Create a PdfPageEditor bound to the loaded document
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            // Loop through all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Iterate through all pages (1‑based indexing)
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                // Extract text of the current page using TextAbsorber (correct API)
+                TextAbsorber absorber = new TextAbsorber();
+                absorber.Visit(doc.Pages[i]);
+                string pageText = absorber.Text ?? string.Empty;
+
+                // Simple word count (split on whitespace)
+                int wordCount = pageText.Split(
+                    new[] { ' ', '\t', '\r', '\n' },
+                    StringSplitOptions.RemoveEmptyEntries).Length;
+
+                // Determine display duration (seconds) proportional to word count
+                // Example: 1 second per 100 words, minimum 1 second
+                int durationSeconds = Math.Max(1, wordCount / 100);
+
+                // Set page transition duration using PdfPageEditor (correct API)
+                // Transition type "Fade" corresponds to integer value 4 in Aspose.Pdf
+                using (PdfPageEditor editor = new PdfPageEditor(doc))
                 {
-                    // Extract text from the current page
-                    TextAbsorber absorber = new TextAbsorber();
-                    doc.Pages[pageNum].Accept(absorber);
-                    string pageText = absorber.Text ?? string.Empty;
-
-                    // Count words (split on whitespace)
-                    int wordCount = pageText
-                        .Split(new char[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-                        .Length;
-
-                    // Define reading speed: e.g., 200 words per second
-                    const double wordsPerSecond = 200.0;
-                    int durationSeconds = (int)Math.Ceiling(wordCount / wordsPerSecond);
-
-                    // Ensure a minimum duration of 1 second for pages with text
-                    if (durationSeconds < 1 && wordCount > 0)
-                        durationSeconds = 1;
-
-                    // Apply the duration to the current page
-                    editor.ProcessPages = new int[] { pageNum };
-                    editor.DisplayDuration = durationSeconds;
+                    editor.ProcessPages = new int[] { i }; // apply to current page only
+                    editor.TransitionType = 4;               // Fade transition
+                    editor.TransitionDuration = durationSeconds;
                     editor.ApplyChanges();
                 }
-
-                // Save the modified PDF
-                editor.Save(outputPath);
             }
+
+            // Save the modified PDF (creation/saving rule)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with page display durations: {outputPath}");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

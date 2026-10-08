@@ -1,46 +1,37 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "rotated_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfPageEditor (Facade) to rotate specific pages
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        // Pages to rotate (1‑based indexes)
+        int[] pagesToRotate = { 3, 5, 7 };
+        foreach (int pageNumber in pagesToRotate)
         {
-            // Load the source PDF
-            editor.BindPdf(inputPath);
-
-            // Define rotations: pages 3, 5, and 7 -> 180 degrees
-            var rotations = new Dictionary<int, int>
+            // Ensure the page exists
+            if (pageNumber <= pdfDocument.Pages.Count)
             {
-                { 3, 180 },
-                { 5, 180 },
-                { 7, 180 }
-            };
-
-            // Assign the rotation map to the editor
-            editor.PageRotations = rotations;
-
-            // Apply the changes to the document
-            editor.ApplyChanges();
-
-            // Save the modified PDF
-            editor.Save(outputPath);
+                pdfDocument.Pages[pageNumber].Rotate = Rotation.on180; // 180° rotation
+            }
         }
 
-        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+        // Save the modified PDF
+        pdfDocument.Save(outputPath);
+
+        Console.WriteLine($"Pages 3, 5, and 7 rotated 180° and saved to '{outputPath}'.");
     }
 }

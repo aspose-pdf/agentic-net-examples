@@ -1,61 +1,71 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string logPath = "audit_log.txt";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string logFilePath = "audit_log.txt";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Open log file and PDF editor within using blocks for deterministic disposal
-        using (StreamWriter logWriter = new StreamWriter(logPath, false))
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // -----------------------------------------------------------------
+        // 1. Log page dimensions and rotation BEFORE any edits
+        // -----------------------------------------------------------------
+        using (Document srcDoc = new Document(inputPdfPath))
+        using (StreamWriter logWriter = new StreamWriter(logFilePath, false))
         {
-            // Load the PDF document
-            editor.BindPdf(inputPdf);
-
-            int pageCount = editor.GetPages();
-
-            logWriter.WriteLine($"Audit Log - {DateTime.Now}");
-            logWriter.WriteLine($"Total pages: {pageCount}");
-            logWriter.WriteLine("Before edit:");
-
-            // Log dimensions and rotation for each page before modifications
-            for (int i = 1; i <= pageCount; i++)
+            logWriter.WriteLine("=== BEFORE EDITS ===");
+            for (int i = 1; i <= srcDoc.Pages.Count; i++) // 1‑based indexing
             {
-                var size = editor.GetPageSize(i);          // returns PageSize with Width/Height
-                int rotation = editor.GetPageRotation(i); // rotation in degrees
-                logWriter.WriteLine($"Page {i}: Width={size.Width}, Height={size.Height}, Rotation={rotation}");
+                Page page = srcDoc.Pages[i];
+                double width = page.PageInfo.Width;
+                double height = page.PageInfo.Height;
+                int rotation = (int)page.Rotate; // Rotation enum -> int (0,90,180,270)
+
+                logWriter.WriteLine($"Page {i}: Width={width:F2}, Height={height:F2}, Rotation={rotation}");
             }
-
-            // Example edit: rotate the first page by 90 degrees
-            editor.Rotation = 90;                 // set desired rotation
-            editor.ProcessPages = new int[] { 1 }; // apply only to page 1
-            editor.ApplyChanges();                // commit changes
-
-            logWriter.WriteLine("After edit:");
-
-            // Log dimensions and rotation after modifications
-            for (int i = 1; i <= pageCount; i++)
-            {
-                var sizeAfter = editor.GetPageSize(i);
-                int rotationAfter = editor.GetPageRotation(i);
-                logWriter.WriteLine($"Page {i}: Width={sizeAfter.Width}, Height={sizeAfter.Height}, Rotation={rotationAfter}");
-            }
-
-            // Save the edited PDF
-            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Processing completed. Audit log written to '{logPath}'.");
+        // -----------------------------------------------------------------
+        // 2. Perform edits – rotate each page 90° clockwise
+        // -----------------------------------------------------------------
+        // Using Document API (PdfPageEditor no longer provides RotatePage)
+        using (Document doc = new Document(inputPdfPath))
+        {
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                doc.Pages[i].Rotate = Rotation.on90; // rotate 90° clockwise
+            }
+            doc.Save(outputPdfPath);
+        }
+
+        // -----------------------------------------------------------------
+        // 3. Log page dimensions and rotation AFTER edits
+        // -----------------------------------------------------------------
+        using (Document editedDoc = new Document(outputPdfPath))
+        using (StreamWriter logWriter = new StreamWriter(logFilePath, true)) // append
+        {
+            logWriter.WriteLine();
+            logWriter.WriteLine("=== AFTER EDITS ===");
+            for (int i = 1; i <= editedDoc.Pages.Count; i++) // 1‑based indexing
+            {
+                Page page = editedDoc.Pages[i];
+                double width = page.PageInfo.Width;
+                double height = page.PageInfo.Height;
+                int rotation = (int)page.Rotate;
+
+                logWriter.WriteLine($"Page {i}: Width={width:F2}, Height={height:F2}, Rotation={rotation}");
+            }
+        }
+
+        Console.WriteLine($"Audit log written to '{logFilePath}'. Edited PDF saved as '{outputPdfPath}'.");
     }
 }

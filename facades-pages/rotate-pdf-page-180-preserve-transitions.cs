@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "rotated_output.pdf";
-        const int targetPage    = 1; // page to rotate (1‑based index)
+        const string inputPath = "input.pdf";
+        const string outputPath = "rotated.pdf";
+        const int pageNumber = 1; // 1‑based page index to rotate
 
         if (!File.Exists(inputPath))
         {
@@ -17,26 +17,41 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Initialize the facade and bind the source PDF
-            PdfPageEditor editor = new PdfPageEditor();
-            editor.BindPdf(inputPath);
+            if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+            {
+                Console.Error.WriteLine("Invalid page number.");
+                return;
+            }
 
-            // Preserve any existing transition settings (do not modify them)
-            // Apply a 180° rotation to the desired page.
-            // Use the PageRotations dictionary to affect a single page.
-            editor.PageRotations[targetPage] = 180;
+            // -----------------------------------------------------------------
+            // Verify that the target page already has a transition effect.
+            // In recent Aspose.Pdf versions the Page class does not expose a
+            // Transition property. The transition can be inspected/modified via
+            // PdfPageEditor using the integer based TransitionType property.
+            // -----------------------------------------------------------------
+            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            {
+                editor.ProcessPages = new int[] { pageNumber };
+                // TransitionType == 0 means "No transition" in the library.
+                if (editor.TransitionType == 0)
+                    Console.WriteLine("Warning: page has no transition effect.");
+                else
+                    Console.WriteLine($"Existing transition type (int value): {editor.TransitionType}");
+            }
+
+            // -----------------------------------------------------------------
+            // Rotate the page 180 degrees. The Rotate property of Page uses the
+            // Rotation enum (on0, on90, on180, on270).
+            // -----------------------------------------------------------------
+            doc.Pages[pageNumber].Rotate = Rotation.on180;
 
             // Save the modified PDF
-            editor.Save(outputPath);
-            editor.Close();
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"Page {targetPage} rotated 180° and saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Page {pageNumber} rotated 180° and saved to '{outputPath}'.");
     }
 }

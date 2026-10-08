@@ -2,12 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // Added to resolve TextFragment and HorizontalAlignment
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "aligned_output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,21 +17,34 @@ class Program
             return;
         }
 
-        // Initialize the PdfPageEditor facade and bind the source PDF
+        // Use PdfPageEditor inside a using block for deterministic disposal
         using (PdfPageEditor editor = new PdfPageEditor())
         {
+            // Bind the existing PDF file
             editor.BindPdf(inputPath);
 
-            // Set horizontal alignment for all pages to left‑justified
-            editor.HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Left;
+            // The bound document can be accessed via the Document property
+            using (Document doc = editor.Document)
+            {
+                // Pages are 1‑based; set each page's text fragments to left alignment
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    Page page = doc.Pages[i];
+                    foreach (var paragraph in page.Paragraphs)
+                    {
+                        // Only TextFragment (and derived types) expose HorizontalAlignment
+                        if (paragraph is TextFragment tf)
+                        {
+                            tf.HorizontalAlignment = HorizontalAlignment.Left;
+                        }
+                    }
+                }
 
-            // Apply the changes to the document
-            editor.ApplyChanges();
-
-            // Save the edited PDF
-            editor.Save(outputPath);
+                // Save the modified document through the facade
+                editor.Save(outputPath);
+            }
         }
 
-        Console.WriteLine($"Horizontal alignment applied. Output saved to '{outputPath}'.");
+        Console.WriteLine($"All pages left‑justified and saved to '{outputPath}'.");
     }
 }

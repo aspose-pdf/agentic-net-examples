@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,37 +8,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_hybrid.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "resized_output.pdf";
 
-        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create hybrid resize parameters:
-        // - Left margin: 10% of page width (percentage)
-        // - Right margin: 30 units (absolute)
-        // - Top margin: 5% of page height (percentage)
-        // - Bottom margin: 20 units (absolute)
-        // - Contents width/height are left as auto (null) so they are calculated automatically.
-        PdfFileEditor.ContentsResizeParameters parameters = new PdfFileEditor.ContentsResizeParameters(
-            PdfFileEditor.ContentsResizeValue.Percents(10),   // left margin (percent)
-            null,                                            // contents width (auto)
-            PdfFileEditor.ContentsResizeValue.Units(30),    // right margin (absolute units)
-            PdfFileEditor.ContentsResizeValue.Percents(5),  // top margin (percent)
-            null,                                            // contents height (auto)
-            PdfFileEditor.ContentsResizeValue.Units(20)     // bottom margin (absolute units)
-        );
+        // Load the PDF document
+        Document doc = new Document(inputPath);
 
-        // Perform the resize on all pages (pages = null)
+        // Define the pages to be resized (all pages in this example)
+        int[] pages = Enumerable.Range(1, doc.Pages.Count).ToArray();
+
+        // Create resize parameters.
+        // The Margins factory method creates a ContentsResizeParameters instance.
+        // Here we use absolute margins of 20 points for left/right and 20 points for top/bottom.
+        // If a mixed (percent/absolute) overload exists, replace the values accordingly.
+        var resizeParams = PdfFileEditor.ContentsResizeParameters.Margins(20, 20, 20, 20);
+
+        // Perform the resize operation on the specified pages
         PdfFileEditor editor = new PdfFileEditor();
-        bool success = editor.ResizeContents(inputPath, outputPath, null, parameters);
+        editor.ResizeContents(doc, pages, resizeParams);
 
-        Console.WriteLine(success
-            ? $"Resizing succeeded. Output saved to '{outputPath}'."
-            : "Resizing failed.");
+        // Save the modified document
+        doc.Save(outputPath);
+        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -9,29 +10,21 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create PdfPageEditor facade, bind the PDF, set zoom, apply changes, and save
+        // Use PdfPageEditor to set the zoom factor for all pages.
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the PDF document
             editor.BindPdf(inputPath);
-
-            // Set zoom coefficient to 1.0 (100%) for all pages
-            editor.Zoom = 1.0f;
-
-            // Apply the modifications to the document
-            editor.ApplyChanges();
-
-            // Save the updated PDF
+            // When ProcessPages is not specified the editor operates on every page.
+            editor.Zoom = 1.0f; // 100 % scaling (default)
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Zoom set to 1.0 for all pages. Saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with Zoom=1.0 for all pages to '{outputPath}'.");
     }
 }

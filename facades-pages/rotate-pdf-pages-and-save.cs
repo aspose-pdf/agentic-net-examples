@@ -1,95 +1,101 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf; // Document, Rotation enum
 
-public static class PdfRotationHelper
+// Entry point required for an executable project.
+class Program
 {
-    /// <summary>
-    /// Loads a PDF from the provided input stream, rotates all pages by the specified angle,
-    /// and writes the result back to a new stream (position set to the beginning).
-    /// </summary>
-    /// <param name="inputPdfStream">Stream containing the source PDF (must support reading).</param>
-    /// <param name="rotationAngle">Rotation angle in degrees (allowed values: 0, 90, 180, 270).</param>
-    /// <returns>A stream containing the rotated PDF; the caller is responsible for disposing it.</returns>
-    public static Stream RotatePdf(Stream inputPdfStream, int rotationAngle)
+    static void Main(string[] args)
     {
-        if (inputPdfStream == null) throw new ArgumentNullException(nameof(inputPdfStream));
-        if (rotationAngle != 0 && rotationAngle != 90 && rotationAngle != 180 && rotationAngle != 270)
-            throw new ArgumentException("Rotation must be 0, 90, 180, or 270 degrees.", nameof(rotationAngle));
+        // -----------------------------------------------------------------
+        // Example usage (can be removed or replaced in production code).
+        // -----------------------------------------------------------------
+        // The example expects a file named "input.pdf" in the working folder.
+        // It rotates the first page 90 degrees clockwise and writes the result
+        // to "output.pdf".
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Ensure the input stream is positioned at the beginning.
-        if (inputPdfStream.CanSeek)
-            inputPdfStream.Position = 0;
-
-        // Output stream that will receive the edited PDF.
-        MemoryStream outputStream = new MemoryStream();
-
-        // Use PdfPageEditor (a SaveableFacade) to edit the PDF.
-        using (PdfPageEditor editor = new PdfPageEditor())
+        if (!File.Exists(inputPath))
         {
-            // Bind the source PDF from the input stream.
-            editor.BindPdf(inputPdfStream);
-
-            // Apply rotation to all pages.
-            editor.Rotation = rotationAngle;
-
-            // Apply the changes before saving.
-            editor.ApplyChanges();
-
-            // Save the modified PDF into the output stream.
-            editor.Save(outputStream);
-        }
-
-        // Reset the output stream position so it can be read from the start.
-        if (outputStream.CanSeek)
-            outputStream.Position = 0;
-
-        return outputStream;
-    }
-}
-
-public class Program
-{
-    /// <summary>
-    /// Simple entry point required for a console‑application project.
-    /// Demonstrates how to call <see cref="PdfRotationHelper.RotatePdf"/>.
-    /// </summary>
-    public static void Main(string[] args)
-    {
-        // If no arguments are supplied, just inform the user and exit.
-        if (args.Length == 0)
-        {
-            Console.WriteLine("Usage: <exe> <pdf-file-path> [rotation-angle]");
-            Console.WriteLine("If rotation-angle is omitted, 90 degrees is used.");
+            Console.WriteLine($"Input file '{inputPath}' not found. Demo skipped.");
             return;
         }
 
-        string pdfPath = args[0];
-        int angle = 90; // default rotation
-        if (args.Length > 1 && int.TryParse(args[1], out int parsedAngle))
+        using (FileStream inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.ReadWrite))
         {
-            angle = parsedAngle;
-        }
+            // Rotate page 1 by 90 degrees.
+            PdfProcessor.RotatePdfInStream(inputStream, 1, Rotation.on90);
 
-        // Validate the angle early to surface a clear error message.
-        if (angle != 0 && angle != 90 && angle != 180 && angle != 270)
-        {
-            Console.WriteLine("Rotation angle must be one of 0, 90, 180, 270.");
-            return;
-        }
-
-        // Open the source PDF for read/write. The stream is closed automatically by the using block.
-        using (FileStream sourceStream = new FileStream(pdfPath, FileMode.Open, FileAccess.ReadWrite))
-        {
-            // Rotate the PDF and obtain a new stream containing the result.
-            using (Stream rotatedStream = PdfRotationHelper.RotatePdf(sourceStream, angle))
+            // After rotation the stream now contains the new PDF. Write it to a new file.
+            inputStream.Position = 0;
+            using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
-                // Overwrite the original file with the rotated content.
-                sourceStream.SetLength(0); // truncate the file
-                rotatedStream.CopyTo(sourceStream);
+                inputStream.CopyTo(outputStream);
             }
         }
 
-        Console.WriteLine($"PDF rotated by {angle} degrees and saved back to '{pdfPath}'.");
+        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+    }
+}
+
+class PdfProcessor
+{
+    /// <summary>
+    /// Loads a PDF from a stream, rotates a page, and writes the result back to the same stream.
+    /// The method works with any seek‑able stream (e.g., MemoryStream, NetworkStream that supports seeking).
+    /// </summary>
+    /// <param name="pdfStream">Stream containing the original PDF. It will be overwritten with the rotated PDF.</param>
+    /// <param name="pageNumber">1‑based page index to rotate.</param>
+    /// <param name="rotation">Desired rotation (e.g., Rotation.on90, Rotation.on180, Rotation.on270).</param>
+    public static void RotatePdfInStream(Stream pdfStream, int pageNumber, Rotation rotation)
+    {
+        // Ensure the input stream can be read from the beginning.
+        if (!pdfStream.CanSeek)
+        {
+            // If the stream is not seekable, copy it to a temporary MemoryStream.
+            using (MemoryStream tempInput = new MemoryStream())
+            {
+                pdfStream.CopyTo(tempInput);
+                tempInput.Position = 0;
+                ApplyRotation(tempInput, pdfStream, pageNumber, rotation);
+            }
+        }
+        else
+        {
+            // Seekable stream: reset position to the start.
+            pdfStream.Position = 0;
+            ApplyRotation(pdfStream, pdfStream, pageNumber, rotation);
+        }
+    }
+
+    // Core logic that uses Aspose.Pdf.Document to rotate a page.
+    private static void ApplyRotation(Stream input, Stream output, int pageNumber, Rotation rotation)
+    {
+        // Load the PDF document from the input stream.
+        Document doc = new Document(input);
+
+        // Rotate the specified page (pages are 1‑based in Aspose.Pdf).
+        doc.Pages[pageNumber].Rotate = rotation;
+
+        // Save the modified PDF into a temporary buffer.
+        using (MemoryStream tempOutput = new MemoryStream())
+        {
+            doc.Save(tempOutput);
+            tempOutput.Position = 0;
+
+            // Overwrite the original output stream with the new content.
+            if (output.CanSeek)
+            {
+                output.SetLength(0);          // truncate existing data if possible
+                tempOutput.CopyTo(output);
+                output.Position = 0;          // reset for any further reading
+            }
+            else
+            {
+                // If the output stream cannot be truncated, just write the new data.
+                tempOutput.CopyTo(output);
+            }
+        }
     }
 }

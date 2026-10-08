@@ -1,70 +1,64 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF containing the whole book
-        const string inputPdf = "input.pdf";
+        const string inputPath   = "book.pdf";          // source PDF
+        const string resizedPath = "book_resized.pdf";  // intermediate uniform PDF
+        const string outputDir   = "Chapters";          // folder for chapter files
 
-        // Temporary file that will hold the uniformly resized pages
-        const string resizedPdf = "resized.pdf";
-
-        // Directory where each chapter PDF will be saved
-        const string outputDir = "Chapters";
-
-        // Verify that the source file exists
-        if (!File.Exists(inputPdf))
+        // Verify input exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
         // ------------------------------------------------------------
-        // 1. Resize all pages to a uniform size (e.g., 500x700 units)
-        //    This adds equal margins around the original content.
+        // Step 1 – Resize every page to a uniform size (A4).
         // ------------------------------------------------------------
-        PdfFileEditor editor = new PdfFileEditor();
+        const double a4Width  = 595; // points (A4 width)
+        const double a4Height = 842; // points (A4 height)
 
-        // The overload ResizeContents(string inputFile, string outputFile, int[] pages, double newWidth, double newHeight)
-        // Passing null for the pages array applies the operation to all pages.
-        editor.ResizeContents(inputPdf, resizedPdf, null, 500, 700);
-
-        // ------------------------------------------------------------
-        // 2. Define chapter boundaries (start page, end page) as needed.
-        //    Here we use a hard‑coded example; in a real scenario this could be
-        //    read from a table of contents or another source.
-        // ------------------------------------------------------------
-        int[][] chapters = new int[][]
+        // Load the source document, adjust each page size, and save as a new file.
+        using (Document doc = new Document(inputPath))
         {
-            new int[] { 1, 5 },   // Chapter 1: pages 1‑5
-            new int[] { 6, 12 },  // Chapter 2: pages 6‑12
-            new int[] { 13, 20 }  // Chapter 3: pages 13‑20
+            foreach (Page page in doc.Pages)
+            {
+                page.PageInfo.Width  = a4Width;
+                page.PageInfo.Height = a4Height;
+            }
+            doc.Save(resizedPath);
+        }
+
+        // ------------------------------------------------------------
+        // Step 2 – Split the resized PDF into chapter files.
+        // ------------------------------------------------------------
+        var chapters = new (int start, int end, string fileName)[]
+        {
+            (1, 10, "Chapter1.pdf"),
+            (11, 20, "Chapter2.pdf"),
+            (21, 30, "Chapter3.pdf")
+            // Add more ranges as needed
         };
 
-        // ------------------------------------------------------------
-        // 3. Split the resized PDF into separate chapter PDFs.
-        //    SplitToBulks returns an array of MemoryStream objects,
-        //    each containing one chapter document.
-        // ------------------------------------------------------------
-        MemoryStream[] chapterStreams = editor.SplitToBulks(resizedPdf, chapters);
+        PdfFileEditor fileEditor = new PdfFileEditor(); // does NOT implement IDisposable
 
-        // ------------------------------------------------------------
-        // 4. Write each chapter stream to a distinct file.
-        // ------------------------------------------------------------
-        for (int i = 0; i < chapterStreams.Length; i++)
+        foreach (var (start, end, fileName) in chapters)
         {
-            string chapterPath = Path.Combine(outputDir, $"Chapter_{i + 1}.pdf");
-            using (FileStream fs = new FileStream(chapterPath, FileMode.Create, FileAccess.Write))
-            {
-                chapterStreams[i].WriteTo(fs);
-            }
-            Console.WriteLine($"Saved chapter {i + 1} to '{chapterPath}'.");
+            string outPath = Path.Combine(outputDir, fileName);
+            // Extract the specified page range into a new PDF file.
+            // Note: the correct overload order is (source, startPage, endPage, output).
+            fileEditor.Extract(resizedPath, start, end, outPath);
         }
+
+        Console.WriteLine("PDF has been resized and split into chapters successfully.");
     }
 }

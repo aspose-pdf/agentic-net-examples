@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_a5_last_page.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "booklet.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,32 +15,24 @@ class Program
             return;
         }
 
-        // Determine the index of the last page (1‑based indexing)
-        int lastPageNumber;
+        // Load the PDF document, change the size of the last page to A5, and save.
         using (Document doc = new Document(inputPath))
         {
-            lastPageNumber = doc.Pages.Count;
+            // 1‑based page indexing – get the last page.
+            int lastPageNumber = doc.Pages.Count;
+            Page lastPage = doc.Pages[lastPageNumber];
+
+            // Set the page dimensions to A5.
+            // Aspose.Pdf.PageSize provides static A5 dimensions (Width & Height are in points).
+            lastPage.PageInfo.Width = PageSize.A5.Width;
+            lastPage.PageInfo.Height = PageSize.A5.Height;
+            // Optional: adjust orientation flag if needed.
+            lastPage.PageInfo.IsLandscape = lastPage.PageInfo.Width > lastPage.PageInfo.Height;
+
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
 
-        // Use PdfPageEditor (Facade) to change the size of the last page only
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            // Bind the source PDF
-            editor.BindPdf(inputPath);
-
-            // Specify that only the last page should be processed
-            editor.ProcessPages = new int[] { lastPageNumber };
-
-            // Set the desired page size (A5)
-            editor.PageSize = PageSize.A5;
-
-            // Apply the changes to the document
-            editor.ApplyChanges();
-
-            // Save the modified PDF
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"PDF saved with last page set to A5: {outputPath}");
+        Console.WriteLine($"Last page set to A5 and saved as '{outputPath}'.");
     }
 }

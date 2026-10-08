@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // PdfPageEditor resides in this namespace
 
 class Program
 {
@@ -16,25 +16,16 @@ class Program
             return;
         }
 
-        // Use PdfPageEditor to modify page display duration
+        // Set the display duration of page 5 to 5 seconds using PdfPageEditor.
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the PDF document into the facade
             editor.BindPdf(inputPath);
-
-            // Edit only page 5 (1‑based indexing)
-            editor.ProcessPages = new int[] { 5 };
-
-            // Set the display duration to 5 seconds
-            editor.DisplayDuration = 5;
-
-            // Apply the changes to the document
-            editor.ApplyChanges();
-
-            // Save the modified PDF
+            editor.ProcessPages = new int[] { 5 }; // select page 5 (1‑based index)
+            editor.DisplayDuration = 5;            // duration in seconds
+            editor.ApplyChanges();                  // apply the changes before saving
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Page 5 display duration set to 5 seconds. Saved to '{outputPath}'.");
+        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
     }
 }

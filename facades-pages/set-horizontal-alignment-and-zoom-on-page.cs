@@ -1,45 +1,44 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf; // HorizontalAlignment enum
+using Aspose.Pdf.Devices; // Resolution struct lives here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputImage = "page4.tiff"; // PdfConverter supports TIFF output
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Initialize the PdfPageEditor facade
-        PdfPageEditor editor = new PdfPageEditor();
+        // Render a single page to an image using PdfConverter.
+        // PdfViewer does not expose PageNumber, HorizontalAlignment or Zoom in older
+        // Aspose.Pdf versions, so PdfConverter is the reliable alternative.
+        using (PdfConverter converter = new PdfConverter())
+        {
+            // Load the PDF document.
+            converter.BindPdf(inputPdf);
 
-        // Bind the source PDF
-        editor.BindPdf(inputPath);
+            // Specify the page range – we need only page 4.
+            converter.StartPage = 4;
+            converter.EndPage   = 4;
 
-        // Target only page 4 for editing
-        editor.ProcessPages = new int[] { 4 };
+            // "Zoom" is achieved by increasing the resolution. The default screen DPI is 96.
+            // A 1.2× zoom corresponds to roughly 115 DPI.
+            converter.Resolution = new Resolution(115);
 
-        // Set horizontal alignment (center the content)
-        editor.HorizontalAlignment = HorizontalAlignment.Center;
+            // Perform the conversion.
+            converter.DoConvert();
 
-        // Set zoom level (150% for better readability)
-        editor.Zoom = 1.5f;
+            // Save the rendered page as TIFF (PdfConverter does not provide SaveAsPNG).
+            converter.SaveAsTIFF(outputImage);
+        }
 
-        // Apply the changes to the document
-        editor.ApplyChanges();
-
-        // Save the modified PDF
-        editor.Save(outputPath);
-
-        // Clean up the facade
-        editor.Close();
-
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Page 4 rendered to '{outputImage}' with increased resolution.");
     }
 }

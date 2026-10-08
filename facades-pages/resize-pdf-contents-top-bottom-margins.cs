@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -7,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "resized.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,27 +16,24 @@ class Program
             return;
         }
 
-        // Create resize parameters:
-        // Top margin = 5% of page height, Bottom margin = 15% of page height.
-        // Left, right margins and content size are set to auto (null).
-        PdfFileEditor.ContentsResizeParameters parameters = new PdfFileEditor.ContentsResizeParameters(
-            leftMargin: null,
-            contentsWidth: null,
-            rightMargin: null,
-            topMargin: PdfFileEditor.ContentsResizeValue.Percents(5),
-            contentsHeight: null,
-            bottomMargin: PdfFileEditor.ContentsResizeValue.Percents(15)
-        );
+        // Desired margins (in points)
+        double leftMargin   = 0.0;   // no change on the left side
+        double rightMargin  = 0.0;   // no change on the right side
+        double topMargin    = 50.0;  // top margin to add
+        double bottomMargin = 30.0;  // bottom margin to add
 
-        // Process all pages (null array means all pages)
-        int[] pages = null;
+        // Create resize parameters via the static Margins method (left, right, top, bottom)
+        var resizeParams = PdfFileEditor.ContentsResizeParameters.Margins(
+            leftMargin, rightMargin, topMargin, bottomMargin);
 
-        PdfFileEditor fileEditor = new PdfFileEditor();
-        bool success = fileEditor.ResizeContents(inputPath, outputPath, pages, parameters);
+        // Load the PDF, apply the resize, and save the result
+        using (Document doc = new Document(inputPath))
+        {
+            PdfFileEditor editor = new PdfFileEditor();
+            editor.ResizeContents(doc, resizeParams);
+            doc.Save(outputPath);
+        }
 
-        if (success)
-            Console.WriteLine($"Resizing completed. Output saved to '{outputPath}'.");
-        else
-            Console.Error.WriteLine("Resizing failed.");
+        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
     }
 }

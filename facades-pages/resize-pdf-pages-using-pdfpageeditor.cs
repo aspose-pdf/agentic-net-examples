@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -10,7 +9,7 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Ensure the source PDF exists – create a minimal placeholder if it does not.
+        // Ensure the input PDF exists – create a minimal placeholder if it does not.
         if (!File.Exists(inputPath))
         {
             using var placeholder = new Document();
@@ -18,25 +17,31 @@ class Program
             placeholder.Save(inputPath);
         }
 
-        // Load the source PDF into a byte array.
+        // Load PDF bytes from the (now guaranteed) file.
         byte[] pdfBytes = File.ReadAllBytes(inputPath);
 
-        // Create a memory stream from the byte array.
-        using var inputStream = new MemoryStream(pdfBytes);
-        using var editor = new PdfPageEditor();
+        // Create a MemoryStream from the byte array and load it into a Document.
+        using (var ms = new MemoryStream(pdfBytes))
+        using (var doc = new Document(ms))
+        {
+            // Define the new page size (width and height in points).
+            // Example: A5 size (420 x 595 points).
+            const double newWidth = 420;   // points
+            const double newHeight = 595;  // points
 
-        // Bind the PDF stream to the editor.
-        editor.BindPdf(inputStream);
+            // Apply the new size to every page via the PageInfo object.
+            foreach (Page page in doc.Pages)
+            {
+                page.PageInfo.Width = newWidth;
+                page.PageInfo.Height = newHeight;
+                // Optional: set orientation flag based on dimensions.
+                page.PageInfo.IsLandscape = newWidth > newHeight;
+            }
 
-        // Set the desired page size for the output (e.g., A4).
-        editor.PageSize = PageSize.A4;
+            // Save the modified PDF to a new file.
+            doc.Save(outputPath);
+        }
 
-        // Apply the changes to the document pages.
-        editor.ApplyChanges();
-
-        // Save the modified PDF to a new file.
-        editor.Save(outputPath);
-
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Page size modified and saved to '{outputPath}'.");
     }
 }

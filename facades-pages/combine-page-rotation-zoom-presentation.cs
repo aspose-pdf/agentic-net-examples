@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,44 +9,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "presentation.pdf";
+        const string inputPath = "presentation.pdf";
+        const string outputPath = "presentation_transformed.pdf";
+        const float zoomFactor = 1.5f; // 150% zoom
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF document
-        using (Document doc = new Document(inputPath))
+        // Load source PDF to obtain page count (ensuring disposal)
+        int pageCount;
+        using (Document srcDoc = new Document(inputPath))
         {
-            // Initialize the PdfPageEditor facade
-            PdfPageEditor editor = new PdfPageEditor();
-            editor.BindPdf(doc);
-
-            // Set rotation (must be 0, 90, 180, or 270 degrees)
-            editor.Rotation = 90;
-
-            // Set zoom factor (1.0 = 100%)
-            editor.Zoom = 1.5f;
-
-            // Choose a transition effect for slide changes
-            editor.TransitionType = PdfPageEditor.BLINDV; // vertical blinds
-
-            // Set how long the transition lasts (seconds)
-            editor.TransitionDuration = 2;
-
-            // Set how long each page is displayed during the presentation (seconds)
-            editor.DisplayDuration = 5;
-
-            // Apply the changes to all pages
-            editor.ApplyChanges();
-
-            // Save the modified PDF as a presentation PDF
-            doc.Save(outputPath);
+            pageCount = srcDoc.Pages.Count;
         }
 
-        Console.WriteLine($"Presentation PDF saved to '{outputPath}'.");
+        // Bind PDF to the editor (PdfPageEditor does not implement IDisposable)
+        PdfPageEditor editor = new PdfPageEditor();
+        editor.BindPdf(inputPath);
+
+        // Apply a 90° clockwise rotation to every page via the PageRotations dictionary
+        var rotations = new Dictionary<int, int>();
+        for (int i = 1; i <= pageCount; i++)
+        {
+            rotations[i] = 90; // 90 degrees clockwise
+        }
+        editor.PageRotations = rotations;
+
+        // Apply zoom to all pages. Use ProcessPages to specify the pages the zoom applies to.
+        editor.ProcessPages = Enumerable.Range(1, pageCount).ToArray();
+        editor.Zoom = zoomFactor;
+
+        // Save the transformed PDF
+        editor.Save(outputPath);
+        Console.WriteLine($"Transformed PDF saved to '{outputPath}'.");
     }
 }
