@@ -6,8 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const string versionValue = "1.0";
 
         if (!File.Exists(inputPath))
         {
@@ -15,17 +16,16 @@ class Program
             return;
         }
 
-        // Load the PDF with PdfFileInfo facade
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
-        {
-            // Preserve existing custom metadata and add a new field "Version"
-            pdfInfo.SetMetaInfo("Version", "1.0");
+        // Load the PDF for metadata manipulation
+        PdfFileInfo pdfInfo = new PdfFileInfo();
+        pdfInfo.BindPdf(inputPath);
 
-            // Save the updated PDF (other metadata remains unchanged)
-            bool saved = pdfInfo.SaveNewInfo(outputPath);
-            Console.WriteLine(saved
-                ? $"Metadata updated successfully. Saved to '{outputPath}'."
-                : "Failed to save the updated PDF.");
-        }
+        // Add or update the "Version" metadata field; existing metadata remains unchanged
+        pdfInfo.SetMetaInfo("Version", versionValue);
+
+        // Save the PDF with the updated metadata
+        pdfInfo.Save(outputPath);
+
+        Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
     }
 }

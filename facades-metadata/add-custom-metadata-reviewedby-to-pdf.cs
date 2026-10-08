@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string reviewer = "John Doe";
+        const string reviewer   = "John Doe";
 
         if (!File.Exists(inputPath))
         {
@@ -16,21 +16,23 @@ class Program
             return;
         }
 
-        // Load the PDF using the PdfFileInfo facade
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+        try
         {
-            // Set the custom metadata field "ReviewedBy"
+            // Bind the PDF file to the PdfFileInfo object
+            PdfFileInfo pdfInfo = new PdfFileInfo();
+            pdfInfo.BindPdf(inputPath);
+
+            // Set a custom metadata field named "ReviewedBy"
             pdfInfo.SetMetaInfo("ReviewedBy", reviewer);
 
-            // Persist the changes to a new file
-            bool saved = pdfInfo.SaveNewInfo(outputPath);
-            if (!saved)
-            {
-                Console.Error.WriteLine("Failed to save the updated PDF.");
-                return;
-            }
-        }
+            // Save the modified PDF to a new file (preserves original)
+            pdfInfo.Save(outputPath);
 
-        Console.WriteLine($"Custom metadata 'ReviewedBy' added and saved to '{outputPath}'.");
+            Console.WriteLine($"Metadata 'ReviewedBy' set to '{reviewer}' and saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

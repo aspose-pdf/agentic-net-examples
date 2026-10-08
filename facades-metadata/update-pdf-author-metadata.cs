@@ -10,24 +10,29 @@ class Program
         const string outputPath = "output.pdf";
         const string newAuthor  = "John Doe";
 
-        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF metadata using PdfFileInfo facade
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+        try
         {
-            // Update the Author property
-            pdfInfo.Author = newAuthor;
+            // Load PDF file information using PdfFileInfo (Facades API)
+            using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+            {
+                // Set the new Author value
+                pdfInfo.Author = newAuthor;
 
-            // Save the updated PDF to a new file
-            bool saved = pdfInfo.SaveNewInfo(outputPath);
-            Console.WriteLine(saved
-                ? $"Author updated successfully. Saved to '{outputPath}'."
-                : "Failed to save the updated PDF.");
+                // Persist the updated metadata to a new file
+                pdfInfo.SaveNewInfo(outputPath);
+            }
+
+            Console.WriteLine($"Author updated and saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

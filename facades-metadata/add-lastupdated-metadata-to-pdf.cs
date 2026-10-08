@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,25 +15,24 @@ class Program
             return;
         }
 
-        // Open the PDF with PdfFileInfo facade
-        using (PdfFileInfo pdfInfo = new PdfFileInfo())
+        try
         {
-            // Load the existing PDF
-            pdfInfo.BindPdf(inputPath);
+            // Load the PDF using the Facades API (no full Document load required)
+            PdfFileInfo pdfInfo = new PdfFileInfo(inputPath);
 
-            // Add custom metadata field "LastUpdated" with current UTC time (ISO 8601)
-            string utcNow = DateTime.UtcNow.ToString("o");
+            // Set a custom metadata field "LastUpdated" with the current UTC timestamp
+            string utcNow = DateTime.UtcNow.ToString("o"); // ISO 8601 format
             pdfInfo.SetMetaInfo("LastUpdated", utcNow);
 
             // Save the updated PDF to a new file
-            bool saved = pdfInfo.SaveNewInfo(outputPath);
-            if (!saved)
-            {
-                Console.Error.WriteLine("Failed to save the updated PDF.");
-                return;
-            }
-        }
+            pdfInfo.Save(outputPath);
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Metadata updated. 'LastUpdated' = {utcNow}");
+            Console.WriteLine($"Saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

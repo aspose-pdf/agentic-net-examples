@@ -8,25 +8,24 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string projectCode = "PRJ-001";
+        const string projectCode = "ABC123";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF using PdfFileInfo facade
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
-        {
-            // Add custom metadata entry
-            pdfInfo.SetMetaInfo("ProjectCode", projectCode);
+        // Load the PDF file information (metadata handling) via Facades API
+        PdfFileInfo pdfInfo = new PdfFileInfo(inputPath);
 
-            // Save the updated PDF to a new file
-            bool saved = pdfInfo.SaveNewInfo(outputPath);
-            Console.WriteLine(saved
-                ? $"Custom metadata added and saved to '{outputPath}'."
-                : "Failed to save the updated PDF.");
-        }
+        // Add or update a custom metadata entry named "ProjectCode"
+        pdfInfo.SetMetaInfo("ProjectCode", projectCode);
+
+        // Save the PDF with the updated metadata to a new file
+        pdfInfo.Save(outputPath);
+
+        Console.WriteLine($"Custom metadata 'ProjectCode' added and saved to '{outputPath}'.");
     }
 }

@@ -6,17 +6,17 @@ class Program
 {
     static void Main()
     {
-        // Folder containing PDFs to process
-        const string inputFolder = "InputPdfs";
+        // Directory containing PDFs to process
+        const string pdfDirectory = @"C:\PdfFiles";
 
-        if (!Directory.Exists(inputFolder))
+        if (!Directory.Exists(pdfDirectory))
         {
-            Console.Error.WriteLine($"Folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Directory not found: {pdfDirectory}");
             return;
         }
 
-        // Process each PDF file in the folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Process each PDF file in the directory
+        foreach (string pdfPath in Directory.GetFiles(pdfDirectory, "*.pdf"))
         {
             try
             {
@@ -25,34 +25,28 @@ class Program
                     Path.GetDirectoryName(pdfPath),
                     Path.GetFileNameWithoutExtension(pdfPath) + "_backup.pdf");
 
+                // Overwrite any existing backup to ensure the latest original is saved
                 File.Copy(pdfPath, backupPath, true);
                 Console.WriteLine($"Backup created: {backupPath}");
 
-                // Open the PDF with PdfFileInfo facade
-                using (PdfFileInfo pdfInfo = new PdfFileInfo(pdfPath))
-                {
-                    // Modify desired metadata properties
-                    pdfInfo.Title = "Updated Title";
-                    pdfInfo.Author = "Updated Author";
-                    pdfInfo.Subject = "Updated Subject";
-                    pdfInfo.Keywords = "Aspose, PDF, Metadata";
+                // Modify metadata using PdfFileInfo (Facades API)
+                PdfFileInfo fileInfo = new PdfFileInfo();
+                fileInfo.BindPdf(pdfPath);               // Load the PDF for metadata editing
+                fileInfo.Title = "Updated Title";        // Example metadata changes
+                fileInfo.Author = "Updated Author";
+                fileInfo.Subject = "Updated Subject";
+                fileInfo.Keywords = "Aspose, PDF, Metadata";
 
-                    // Save the updated metadata back to the original file
-                    bool saved = pdfInfo.SaveNewInfo(pdfPath);
-                    if (saved)
-                    {
-                        Console.WriteLine($"Metadata updated: {pdfPath}");
-                    }
-                    else
-                    {
-                        Console.Error.WriteLine($"Failed to save metadata for: {pdfPath}");
-                    }
-                }
+                // Save changes back to the original file
+                fileInfo.Save(pdfPath);
+                Console.WriteLine($"Metadata updated for: {pdfPath}");
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Processing completed.");
     }
 }

@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "sample.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,29 +16,24 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block to ensure disposal
-        using (Document doc = new Document(inputPath))
+        // Retrieve basic PDF metadata using PdfFileInfo.
+        using (PdfFileInfo info = new PdfFileInfo(inputPath))
         {
-            // Example operation: display page count
-            Console.WriteLine($"Page count: {doc.Pages.Count}");
-
-            // Use PdfFileInfo to retrieve file-level information
-            PdfFileInfo fileInfo = new PdfFileInfo(inputPath);
-            try
-            {
-                // Example: check if the PDF is encrypted
-                Console.WriteLine($"Is encrypted: {fileInfo.IsEncrypted}");
-            }
-            finally
-            {
-                // Explicitly close PdfFileInfo (it does not implement IDisposable)
-                fileInfo.Close();
-            }
-
-            // Save the document (could be the same or a different file)
-            doc.Save(outputPath);
+            Console.WriteLine($"Pages: {info.NumberOfPages}");
+            Console.WriteLine($"Author: {info.Author}");
+            Console.WriteLine($"Title: {info.Title}");
         }
 
-        Console.WriteLine($"Document saved to '{outputPath}'.");
+        // Perform low‑level PDF manipulation with Document.
+        using (Document pdfDoc = new Document(inputPath))
+        {
+            // Add a blank page at the end of the document.
+            pdfDoc.Pages.Add();
+
+            // Save the modified PDF.
+            pdfDoc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

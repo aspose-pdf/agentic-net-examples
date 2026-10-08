@@ -6,22 +6,22 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string pdfPath = "input.pdf";
+        const string metaKey = "ProjectCode";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Initialize the PdfFileInfo facade for the PDF document
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
-        {
-            // Retrieve the custom metadata value for "ProjectCode"
-            string projectCode = pdfInfo.GetMetaInfo("ProjectCode");
+        // PdfFileInfo allows reading metadata without loading the full PDF.
+        PdfFileInfo fileInfo = new PdfFileInfo(pdfPath);
+        string metaValue = fileInfo.GetMetaInfo(metaKey);
 
-            // Display the retrieved value (empty string if the key does not exist)
-            Console.WriteLine($"ProjectCode: {projectCode}");
-        }
+        if (metaValue != null)
+            Console.WriteLine($"{metaKey}: {metaValue}");
+        else
+            Console.WriteLine($"Metadata '{metaKey}' not found.");
     }
 }
