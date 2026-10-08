@@ -1,72 +1,89 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using Aspose.Pdf.Facades;
-using System.Drawing.Imaging; // Added for ImageFormat
+using System.Text;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths for input PDF and output HTML report
-        const string inputPdfPath = "input.pdf";
-        const string outputHtmlPath = "report.html";
+        const string inputPdf = "input.pdf";
+        const string outputHtml = "report.html";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // List to hold generated <img> tags
-        List<string> imageTags = new List<string>();
-
-        // Use PdfExtractor (Facade) to extract images from the PDF
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Bind the PDF file – this is the required load operation
-            extractor.BindPdf(inputPdfPath);
+            var htmlBuilder = new StringBuilder();
 
-            // Extract images from the bound document
-            extractor.ExtractImage();
+            // Basic HTML skeleton
+            htmlBuilder.AppendLine("<!DOCTYPE html>");
+            htmlBuilder.AppendLine("<html><head><meta charset=\"UTF-8\"><title>Extracted Images</title></head><body>");
+            htmlBuilder.AppendLine("<h1>Images extracted from PDF</h1>");
 
-            int imageIndex = 1;
-            // Iterate over all extracted images
-            while (extractor.HasNextImage())
+            int imageIndex = 0;
+
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
-                // Store each image in a memory stream as PNG
-                using (MemoryStream imageStream = new MemoryStream())
+                Page page = pdfDoc.Pages[pageNum];
+
+                // Iterate over all images on the current page
+                foreach (XImage img in page.Resources.Images)
                 {
-                    extractor.GetNextImage(imageStream, ImageFormat.Png);
-                    // Convert the image bytes to a Base64 string
-                    string base64 = Convert.ToBase64String(imageStream.ToArray());
-                    // Build a data‑URI <img> tag
-                    string imgTag = $"<img src=\"data:image/png;base64,{base64}\" alt=\"Image {imageIndex}\" />";
-                    imageTags.Add(imgTag);
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        // Save the image to a memory stream in its original format
+                        img.Save(ms);
+                        byte[] imageBytes = ms.ToArray();
+
+                        // Determine MIME type by inspecting the image header
+                        string mime = GetMimeType(imageBytes);
+
+                        htmlBuilder.AppendLine("<div>");
+                        htmlBuilder.AppendLine($"<p>Page {pageNum}, Image {++imageIndex}</p>");
+                        string base64 = Convert.ToBase64String(imageBytes);
+                        htmlBuilder.AppendLine($"<img src=\"data:{mime};base64,{base64}\" alt=\"Extracted image\"/>");
+                        htmlBuilder.AppendLine("</div>");
+                    }
                 }
-                imageIndex++;
             }
+
+            htmlBuilder.AppendLine("</body></html>");
+
+            // Write the generated HTML to disk
+            File.WriteAllText(outputHtml, htmlBuilder.ToString());
+            Console.WriteLine($"HTML report created at '{outputHtml}'.");
         }
+    }
 
-        // Assemble a simple HTML document containing all images
-        string htmlContent = "<!DOCTYPE html>\n" +
-                             "<html>\n" +
-                             "<head>\n" +
-                             "    <meta charset=\"UTF-8\">\n" +
-                             "    <title>PDF Image Report</title>\n" +
-                             "    <style>\n" +
-                             "        body { font-family: Arial, sans-serif; margin: 20px; }\n" +
-                             "        img { display: block; margin-bottom: 20px; max-width: 100%; height: auto; }\n" +
-                             "    </style>\n" +
-                             "</head>\n" +
-                             "<body>\n" +
-                             "    <h1>Extracted Images</h1>\n" +
-                             string.Join(Environment.NewLine, imageTags) + "\n" +
-                             "</body>\n" +
-                             "</html>";
+    /// <summary>
+    /// Very small header‑based MIME detection. Supports JPEG, PNG, GIF, BMP. Falls back to PNG.
+    /// </summary>
+    private static string GetMimeType(byte[] bytes)
+    {
+        if (bytes == null || bytes.Length < 4)
+            return "image/png"; // safe default
 
-        // Save the HTML report – plain file write (no Aspose PDF SaveOptions needed)
-        File.WriteAllText(outputHtmlPath, htmlContent);
-        Console.WriteLine($"HTML report generated: {outputHtmlPath}");
+        // JPEG: FF D8 FF
+        if (bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF)
+            return "image/jpeg";
+        // PNG: 89 50 4E 47
+        if (bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47)
+            return "image/png";
+        // GIF: 47 49 46 38
+        if (bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x38)
+            return "image/gif";
+        // BMP: 42 4D
+        if (bytes[0] == 0x42 && bytes[1] == 0x4D)
+            return "image/bmp";
+
+        // Default fallback
+        return "image/png";
     }
 }

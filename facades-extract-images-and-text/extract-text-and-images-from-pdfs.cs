@@ -6,76 +6,53 @@ namespace PdfProcessor
 {
     class Program
     {
-        // Input, output and image directories are expected to be mounted at /data
-        private const string InputDir = "/data/input";
-        private const string OutputDir = "/data/output";
-        private const string ImageDir = "/data/images";
+        // Directory inside the container that will be mounted from the host
+        private const string InputDirectory = "/data";
 
         static void Main(string[] args)
         {
-            // Ensure directories exist
-            Directory.CreateDirectory(InputDir);
-            Directory.CreateDirectory(OutputDir);
-            Directory.CreateDirectory(ImageDir);
+            Console.WriteLine("PDF extraction service started.");
+            if (!Directory.Exists(InputDirectory))
+            {
+                Console.Error.WriteLine($"Input directory '{InputDirectory}' does not exist.");
+                return;
+            }
 
-            // Process each PDF file found in the input directory
-            foreach (var pdfPath in Directory.GetFiles(InputDir, "*.pdf"))
+            // Process all PDF files found in the mounted volume
+            foreach (string pdfPath in Directory.EnumerateFiles(InputDirectory, "*.pdf", SearchOption.TopDirectoryOnly))
             {
                 try
                 {
-                    ProcessPdf(pdfPath);
+                    ExtractText(pdfPath);
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                    Console.Error.WriteLine($"Failed to process '{pdfPath}': {ex.Message}");
                 }
             }
 
-            Console.WriteLine("PDF processing completed.");
+            Console.WriteLine("PDF extraction service completed.");
         }
 
-        private static void ProcessPdf(string pdfPath)
+        // Uses Aspose.Pdf.Facades.PdfExtractor to extract text from a PDF file
+        private static void ExtractText(string pdfPath)
         {
-            // Derive base file name without extension
-            string baseName = Path.GetFileNameWithoutExtension(pdfPath);
+            // Output text file will be placed alongside the source PDF
+            string txtPath = Path.ChangeExtension(pdfPath, ".txt");
 
-            // Output text file path
-            string textOutputPath = Path.Combine(OutputDir, $"{baseName}.txt");
+            // PdfExtractor does NOT implement IDisposable, so no using block is required
+            PdfExtractor extractor = new PdfExtractor();
 
-            // Counter for extracted images – declared outside the using block so it is visible later
-            int extractedImageCount = 0;
+            // Bind the PDF file to the extractor
+            extractor.BindPdf(pdfPath);
 
-            // Create a PdfExtractor facade and bind the PDF file
-            using (PdfExtractor extractor = new PdfExtractor())
-            {
-                // Bind the source PDF
-                extractor.BindPdf(pdfPath);
+            // Enable text extraction
+            extractor.ExtractText();
 
-                // ------------------- Extract Text -------------------
-                extractor.ExtractText();                     // extracts all text using Unicode encoding
-                extractor.GetText(textOutputPath);           // saves extracted text to a .txt file
+            // Save extracted text to a .txt file
+            extractor.GetText(txtPath);
 
-                // ------------------- Extract Images -------------------
-                // Optional: set higher resolution for clearer images
-                extractor.Resolution = 300;                  // default is 150 DPI
-                extractor.ExtractImage();                    // prepares image extraction
-
-                int imageIndex = 1;
-                while (extractor.HasNextImage())
-                {
-                    // Save each image as PNG (default format is PNG)
-                    string imagePath = Path.Combine(ImageDir, $"{baseName}_img{imageIndex}.png");
-                    extractor.GetNextImage(imagePath);
-                    imageIndex++;
-                }
-                // Store the number of images extracted for the final log message
-                extractedImageCount = Math.Max(0, imageIndex - 1);
-
-                // Close the facade (also disposes the bound Document)
-                extractor.Close();
-            }
-
-            Console.WriteLine($"Processed '{pdfPath}' -> text: '{textOutputPath}', images: {extractedImageCount} extracted.");
+            Console.WriteLine($"Extracted text from '{Path.GetFileName(pdfPath)}' to '{Path.GetFileName(txtPath)}'.");
         }
     }
 }

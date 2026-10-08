@@ -1,88 +1,135 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Linq;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.AI;
 
 class Program
 {
-    // Replace with your actual OpenAI API key
-    private const string OpenAiApiKey = "YOUR_OPENAI_API_KEY";
-
-    static async Task Main(string[] args)
+    static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string imagesFolder = "ExtractedImages";
-        const string ocrResultsFolder = "OcrResults";
+        const string inputPdf = "input.pdf";
+        const string outputFolder = "ExtractedImages";
+        const string ocrOutput = "OcrResults.txt";
 
-        // Ensure the input PDF exists – create a minimal placeholder if it does not.
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            using var placeholder = new Document();
-            placeholder.Pages.Add();
-            placeholder.Save(inputPdfPath);
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
         }
 
-        // Ensure output directories exist
-        Directory.CreateDirectory(imagesFolder);
-        Directory.CreateDirectory(ocrResultsFolder);
+        // Ensure the folder for extracted images exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Extract images from the PDF using PdfExtractor (Facades API)
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            extractor.BindPdf(inputPdfPath);
-            // Extract all images defined in resources (default mode)
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-            while (extractor.HasNextImage())
+            // Prepare a text file to collect OCR results
+            using (StreamWriter ocrWriter = new StreamWriter(ocrOutput, false))
             {
-                // Save each extracted image to a file (default format is JPEG)
-                string imagePath = Path.Combine(imagesFolder, $"image_{imageIndex}.jpg");
-                extractor.GetNextImage(imagePath);
+                // Pages are 1‑based in Aspose.Pdf
+                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                {
+                    Page page = doc.Pages[pageNum];
+                    int imageIndex = 0;
 
-                // Perform OCR on the extracted image using OpenAIOcrCopilot
-                string ocrText = await PerformOcrOnImageAsync(imagePath);
+                    // Iterate over all images on the page
+                    foreach (XImage img in page.Resources.Images)
+                    {
+                        imageIndex++;
 
-                // Save OCR result to a text file
-                string ocrTextPath = Path.Combine(ocrResultsFolder, $"image_{imageIndex}.txt");
-                File.WriteAllText(ocrTextPath, ocrText);
+                        // Export the image to a memory stream in its original format
+                        using (MemoryStream imgStream = new MemoryStream())
+                        {
+                            img.Save(imgStream);
+                            imgStream.Position = 0;
 
-                imageIndex++;
+                            // ---------- OCR (reflection based) ----------
+                            // Try to locate Aspose.Pdf.Facades.OcrEngine at runtime.
+                            Type ocrEngineType = Type.GetType("Aspose.Pdf.Facades.OcrEngine, Aspose.Pdf");
+                            if (ocrEngineType != null)
+                            {
+                                // Create an instance of OcrEngine
+                                object ocrEngine = Activator.CreateInstance(ocrEngineType);
+
+                                // Locate ImageStream type and create an instance wrapping the image stream
+                                Type imageStreamType = Type.GetType("Aspose.Pdf.Facades.ImageStream, Aspose.Pdf");
+                                if (imageStreamType != null)
+                                {
+                                    // ImageStream has a constructor that accepts a Stream
+                                    object imageStream = Activator.CreateInstance(imageStreamType, imgStream);
+                                    // Set the Image property
+                                    PropertyInfo imageProp = ocrEngineType.GetProperty("Image");
+                                    imageProp?.SetValue(ocrEngine, imageStream);
+                                }
+
+                                // Run OCR
+                                MethodInfo processMethod = ocrEngineType.GetMethod("Process");
+                                bool success = processMethod != null && (bool)processMethod.Invoke(ocrEngine, null);
+
+                                if (success)
+                                {
+                                    PropertyInfo textProp = ocrEngineType.GetProperty("Text");
+                                    string text = textProp?.GetValue(ocrEngine) as string ?? string.Empty;
+                                    ocrWriter.WriteLine($"Page {pageNum}, Image {imageIndex}:");
+                                    ocrWriter.WriteLine(text);
+                                    ocrWriter.WriteLine(new string('-', 40));
+                                }
+                                else
+                                {
+                                    ocrWriter.WriteLine($"Page {pageNum}, Image {imageIndex}: OCR failed.");
+                                }
+                            }
+                            else
+                            {
+                                // OcrEngine type not available – write a placeholder message.
+                                ocrWriter.WriteLine($"Page {pageNum}, Image {imageIndex}: OCR engine not found in the referenced Aspose.Pdf version.");
+                            }
+
+                            // ---------- Save extracted image ----------
+                            // Determine a suitable file extension by inspecting the first bytes of the image.
+                            string extension = GetImageExtensionFromStream(imgStream);
+                            string imgPath = Path.Combine(outputFolder, $"Page{pageNum}_Img{imageIndex}{extension}");
+
+                            // Reset stream position before copying to file.
+                            imgStream.Position = 0;
+                            using (FileStream file = new FileStream(imgPath, FileMode.Create, FileAccess.Write))
+                            {
+                                imgStream.CopyTo(file);
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        Console.WriteLine("Image extraction and OCR processing completed.");
+        Console.WriteLine("Image extraction and OCR completed.");
     }
 
-    // Helper method that runs OCR on a single image file using Aspose.Pdf.AI OpenAIOcrCopilot
-    private static async Task<string> PerformOcrOnImageAsync(string imagePath)
+    // Helper method to infer a suitable file extension from the image's header bytes.
+    private static string GetImageExtensionFromStream(Stream stream)
     {
-        // Create OpenAI client
-        var openAiClient = OpenAIClient
-            .CreateWithApiKey(OpenAiApiKey)
-            .Build();
+        if (stream == null)
+            return ".bin";
 
-        // Configure OCR copilot options and add the image file
-        var ocrOptions = OpenAIOcrCopilotOptions
-            .Create()
-            .WithDocument(imagePath); // adds the image as a document to be processed
+        long originalPos = stream.Position;
+        byte[] header = new byte[8];
+        int read = stream.Read(header, 0, header.Length);
+        stream.Position = originalPos; // restore original position
 
-        // Create the OCR copilot
-        IOcrCopilot ocrCopilot = AICopilotFactory.CreateOcrCopilot(openAiClient, ocrOptions);
-
-        // Retrieve OCR results (await the async call)
-        List<TextRecognitionResult> results = await ocrCopilot.GetTextRecognitionResultAsync(CancellationToken.None);
-
-        // Return the extracted text from the first result (if any)
-        if (results != null && results.Count > 0 && results[0].OcrDetails.Count > 0)
-        {
-            return results[0].OcrDetails[0].ExtractedText;
-        }
-
-        return string.Empty;
+        if (read >= 2 && header[0] == 0xFF && header[1] == 0xD8)
+            return ".jpg"; // JPEG
+        if (read >= 8 && header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
+            return ".png"; // PNG
+        if (read >= 4 && header[0] == 0x49 && header[1] == 0x49 && header[2] == 0x2A && header[3] == 0x00)
+            return ".tif"; // TIFF (little‑endian)
+        if (read >= 4 && header[0] == 0x4D && header[1] == 0x4D && header[2] == 0x00 && header[3] == 0x2A)
+            return ".tif"; // TIFF (big‑endian)
+        if (read >= 2 && header[0] == 0x42 && header[1] == 0x4D)
+            return ".bmp"; // BMP
+        if (read >= 6 && header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
+            return ".gif"; // GIF
+        return ".bin"; // fallback
     }
 }

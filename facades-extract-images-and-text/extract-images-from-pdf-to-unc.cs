@@ -1,17 +1,16 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using System.Drawing;
 using System.Drawing.Imaging;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // UNC path to the source PDF
-        const string pdfPath = @"\\server\share\input\sample.pdf";
-
-        // UNC folder where extracted images will be saved
-        const string outputFolder = @"\\server\share\output\images";
+        const string pdfPath = "input.pdf";
+        // UNC path to the network‑mapped drive
+        const string outputFolder = @"\\server\share\images";
 
         if (!File.Exists(pdfPath))
         {
@@ -19,32 +18,61 @@ class Program
             return;
         }
 
-        // Ensure the destination directory exists
+        // Ensure the target directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Use PdfExtractor (Facade) inside a using block for deterministic disposal
-        using (PdfExtractor extractor = new PdfExtractor())
+        try
         {
-            // Bind the PDF file to the extractor
-            extractor.BindPdf(pdfPath);
-
-            // Prepare the extractor to pull images from the document
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-            // Iterate over all images found in the PDF
-            while (extractor.HasNextImage())
+            // PdfExtractor implements IDisposable – wrap in using
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                // Build the UNC file name for each extracted image
-                string outputFile = Path.Combine(outputFolder, $"image-{imageIndex}.png");
+                // Load the PDF document
+                extractor.BindPdf(pdfPath);
+                // Extract images from all pages
+                extractor.ExtractImage();
 
-                // Save the current image as PNG; GetNextImage returns a bool indicating success
-                extractor.GetNextImage(outputFile, ImageFormat.Png);
+                int imageIndex = 1;
+                // Iterate over extracted images
+                while (extractor.HasNextImage())
+                {
+                    // Get the image into a MemoryStream (the overload requires a stream)
+                    using (MemoryStream imgStream = new MemoryStream())
+                    {
+                        extractor.GetNextImage(imgStream);
+                        imgStream.Position = 0; // reset for reading
 
-                imageIndex++;
+                        using (Image img = Image.FromStream(imgStream))
+                        {
+                            // Determine appropriate file extension
+                            string ext = GetImageExtension(img);
+                            string fileName = $"Image_{imageIndex}{ext}";
+                            string outputPath = Path.Combine(outputFolder, fileName);
+
+                            // Save the image to the UNC location
+                            img.Save(outputPath);
+                            Console.WriteLine($"Saved: {outputPath}");
+
+                            imageIndex++;
+                        }
+                    }
+                }
             }
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
 
-        Console.WriteLine("Image extraction completed.");
+    // Helper to map Image.RawFormat to a file extension
+    static string GetImageExtension(Image img)
+    {
+        if (img.RawFormat.Equals(ImageFormat.Jpeg)) return ".jpg";
+        if (img.RawFormat.Equals(ImageFormat.Png))  return ".png";
+        if (img.RawFormat.Equals(ImageFormat.Gif))  return ".gif";
+        if (img.RawFormat.Equals(ImageFormat.Bmp))  return ".bmp";
+        if (img.RawFormat.Equals(ImageFormat.Tiff)) return ".tiff";
+        // Fallback if format is unknown
+        return ".img";
     }
 }

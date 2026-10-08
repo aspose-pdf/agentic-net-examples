@@ -3,51 +3,57 @@ using System.IO;
 using System.Text;
 using Aspose.Pdf.Facades;
 
-class BatchPdfTextExtractor
+namespace PdfBatchExtract
 {
-    static void Main()
+    class Program
     {
-        // Folder containing PDF files to process
-        const string inputFolder = @"C:\PdfInput";
-        // Folder where extracted text files will be saved
-        const string outputFolder = @"C:\PdfTextOutput";
-
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Get all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
+        static void Main(string[] args)
         {
-            // Build the output text file path (same name, .txt extension)
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-            string txtPath = Path.Combine(outputFolder, fileNameWithoutExt + ".txt");
+            // Adjust these paths as needed
+            string inputDirectory = @"C:\PDFs";
+            string outputDirectory = @"C:\ExtractedText";
 
-            try
+            // Ensure the output directory exists
+            if (!Directory.Exists(outputDirectory))
+                Directory.CreateDirectory(outputDirectory);
+
+            // Get all PDF files in the input directory (non‑recursive)
+            string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
+
+            foreach (string pdfPath in pdfFiles)
             {
-                // Use PdfExtractor facade to extract text
-                using (PdfExtractor extractor = new PdfExtractor())
+                string txtPath = Path.Combine(outputDirectory, Path.GetFileNameWithoutExtension(pdfPath) + ".txt");
+
+                try
                 {
-                    // Bind the PDF file to the extractor
-                    extractor.BindPdf(pdfPath);
+                    // PdfExtractor implements IDisposable – use a using block to guarantee disposal
+                    using (PdfExtractor extractor = new PdfExtractor())
+                    {
+                        extractor.BindPdf(pdfPath);
+                        extractor.ExtractText();
 
-                    // Extract text using Unicode encoding (covers most languages)
-                    extractor.ExtractText(Encoding.Unicode);
+                        // GetText requires a destination stream. Write the extracted text to a MemoryStream
+                        // and then read it back as a string.
+                        using (MemoryStream textStream = new MemoryStream())
+                        {
+                            extractor.GetText(textStream);
+                            textStream.Position = 0; // rewind
+                            using (StreamReader reader = new StreamReader(textStream, Encoding.UTF8))
+                            {
+                                string extractedText = reader.ReadToEnd();
+                                // Write the text to a UTF‑8 encoded file
+                                File.WriteAllText(txtPath, extractedText, Encoding.UTF8);
+                            }
+                        }
+                    }
 
-                    // Save the extracted text to the .txt file
-                    extractor.GetText(txtPath);
+                    Console.WriteLine($"Extracted: {Path.GetFileName(pdfPath)} → {Path.GetFileName(txtPath)}");
                 }
-
-                Console.WriteLine($"Extracted text from '{pdfPath}' to '{txtPath}'.");
-            }
-            catch (Exception ex)
-            {
-                // Log any errors but continue processing other files
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Failed to extract '{pdfPath}': {ex.Message}");
+                }
             }
         }
-
-        Console.WriteLine("Batch extraction completed.");
     }
 }
