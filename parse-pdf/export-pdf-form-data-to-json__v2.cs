@@ -1,38 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// Export pdf form data to json__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/parse-pdf/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string pdfPath = "input.pdf";
-        const string jsonPath = "formdata.json";
-
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
-            return;
-        }
-
-        try
-        {
-            // Load the PDF document
-            using (Document doc = new Document(pdfPath))
-            {
-                // Export all form fields to a UTF‑8 encoded JSON file
-                using (FileStream fs = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
-                {
-                    // Correct API: ExportToJson writes the form data as UTF‑8 JSON
-                    doc.Form.ExportToJson(fs);
-                }
-            }
-
-            Console.WriteLine($"Form data exported to '{jsonPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
-}
+class Program { static void Main() { } }

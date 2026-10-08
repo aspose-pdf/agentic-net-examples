@@ -1,30 +1,37 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string xfdfPath = "output.xfdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputXfdfPath = "output.xfdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Export all annotations to XFDF using a FileStream
-            using (FileStream xfdfStream = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
+            // Create a Form object to work with AcroForm data
+            Form pdfForm = new Form(pdfDoc);
+
+            // Open a FileStream for writing the XFDF data; using ensures the stream is closed
+            using (FileStream xfdfStream = new FileStream(outputXfdfPath, FileMode.Create, FileAccess.Write))
             {
-                doc.ExportAnnotationsToXfdf(xfdfStream);
+                // Export the form data to XFDF format and write it to the stream
+                pdfForm.ExportXfdf(xfdfStream);
             }
+
+            // No further actions needed; the using blocks close both Document and FileStream
         }
 
-        Console.WriteLine($"Annotations exported to '{xfdfPath}'.");
+        Console.WriteLine($"XFDF data exported to '{outputXfdfPath}'.");
     }
 }

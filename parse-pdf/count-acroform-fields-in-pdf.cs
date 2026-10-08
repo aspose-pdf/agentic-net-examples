@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "sample.pdf";
+        const string inputPath = "input.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,9 +17,8 @@ class Program
         // Load the PDF document inside a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the total number of AcroForm fields
+            // Document.Form holds the AcroForm fields; Count gives the total number
             int fieldCount = doc.Form.Count;
-
             Console.WriteLine($"Total AcroForm fields: {fieldCount}");
         }
     }

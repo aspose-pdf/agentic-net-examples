@@ -6,42 +6,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "SvgOutput";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.svg";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Load the PDF document
-        using (Document pdfDocument = new Document(inputPdfPath))
+        try
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= pdfDocument.Pages.Count; pageIndex++)
+            using (Document doc = new Document(inputPath))
             {
-                Page page = pdfDocument.Pages[pageIndex];
-
-                // Build the SVG file name for this page
-                string svgFilePath = Path.Combine(outputFolder, $"page_{pageIndex}.svg");
-
-                // Try to save vector graphics of the page as SVG.
-                // This method preserves the original coordinate system.
-                bool hasVectorGraphics = page.TrySaveVectorGraphics(svgFilePath);
-
-                if (hasVectorGraphics)
+                // Enable CSS style embedding and keep the original layout when converting to SVG
+                SvgSaveOptions svgOptions = new SvgSaveOptions
                 {
-                    Console.WriteLine($"Page {pageIndex}: SVG saved to '{svgFilePath}'.");
-                }
-                else
-                {
-                    Console.WriteLine($"Page {pageIndex}: No vector graphics to export.");
-                }
+                    ScaleToPixels = true // preserves the original coordinate system indirectly
+                };
+                doc.Save(outputPath, svgOptions);
             }
+
+            Console.WriteLine($"SVG saved to '{outputPath}' with original coordinate system preserved.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

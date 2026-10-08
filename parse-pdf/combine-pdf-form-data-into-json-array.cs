@@ -1,57 +1,75 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class Program
+namespace PdfFormBatchProcessor
 {
-    static void Main()
+    // Simple DTO to hold form data for each PDF
+    public class FormData
     {
-        // Input PDF files containing form data
-        string[] pdfFiles = { "form1.pdf", "form2.pdf", "form3.pdf" };
-        // Output JSON file that will contain a JSON array with all form data
-        const string outputJson = "combined_forms.json";
+        public string FileName { get; set; }
+        public Dictionary<string, string> Fields { get; set; }
 
-        // JSON array that will hold the exported form data from each PDF
-        JsonArray combinedArray = new JsonArray();
-
-        foreach (string pdfPath in pdfFiles)
+        // Constructor ensures non‑null properties for C# 8+ nullable reference types
+        public FormData(string fileName, Dictionary<string, string> fields)
         {
-            if (!File.Exists(pdfPath))
-            {
-                Console.Error.WriteLine($"File not found: {pdfPath}");
-                continue;
-            }
+            FileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
+            Fields = fields ?? throw new ArgumentNullException(nameof(fields));
+        }
+    }
 
-            // Load the PDF document
-            using (Document doc = new Document(pdfPath))
+    class Program
+    {
+        static void Main()
+        {
+            // Folder containing the source PDFs
+            const string inputFolder = @"C:\InputPdfs";
+            // Path for the resulting JSON file
+            const string outputJsonPath = @"C:\Output\combinedFormData.json";
+
+            // Collect all PDF files in the folder
+            string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+
+            // List that will become the JSON array
+            List<FormData> batchData = new List<FormData>();
+
+            foreach (string pdfPath in pdfFiles)
             {
-                // Export the form fields to a memory stream in JSON format
-                using (MemoryStream jsonStream = new MemoryStream())
+                // Ensure each Document is disposed promptly
+                using (Document doc = new Document(pdfPath))
                 {
-                    doc.Form.ExportToJson(jsonStream);
-                    jsonStream.Position = 0; // Reset stream for reading
+                    // Prepare a dictionary for the current PDF's form fields
+                    Dictionary<string, string> fieldValues = new Dictionary<string, string>();
 
-                    // Parse the exported JSON
-                    using (JsonDocument jsonDoc = JsonDocument.Parse(jsonStream))
+                    // Iterate over all form fields in the document using the correct Field type
+                    foreach (Field field in doc.Form.Fields)
                     {
-                        // The ExportToJson method writes a JSON object (or array) representing the form fields.
-                        // Clone the root element and add it to the combined array.
-                        combinedArray.Add(jsonDoc.RootElement.Clone());
+                        // PartialName uniquely identifies the field; Value may be null
+                        string name = field.PartialName;
+                        string value = field.Value?.ToString() ?? string.Empty;
+                        fieldValues[name] = value;
                     }
+
+                    // Add the extracted data to the batch list
+                    batchData.Add(new FormData(
+                        Path.GetFileName(pdfPath),
+                        fieldValues
+                    ));
                 }
             }
-        }
 
-        // Write the combined JSON array to the output file
-        using (FileStream outStream = new FileStream(outputJson, FileMode.Create, FileAccess.Write))
-        using (Utf8JsonWriter writer = new Utf8JsonWriter(outStream, new JsonWriterOptions { Indented = true }))
-        {
-            combinedArray.WriteTo(writer);
-        }
+            // Serialize the batch list to a pretty‑printed JSON string
+            string json = JsonSerializer.Serialize(
+                batchData,
+                new JsonSerializerOptions { WriteIndented = true });
 
-        Console.WriteLine($"Combined form data saved to '{outputJson}'.");
+            // Write the JSON to the output file
+            File.WriteAllText(outputJsonPath, json);
+
+            Console.WriteLine($"Combined form data saved to '{outputJsonPath}'.");
+        }
     }
 }

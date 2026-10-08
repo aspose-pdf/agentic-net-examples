@@ -1,14 +1,14 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,37 +16,36 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule for document disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through each page (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
             {
-                Page page = doc.Pages[i];
-                // Get all form fields on the current page in tab order
-                var fields = page.FieldsInTabOrder;
+                Page page = doc.Pages[pageNumber];
 
-                if (fields != null && fields.Count > 0)
+                // Form fields are represented as WidgetAnnotation objects on a page.
+                var widgetAnnotations = page.Annotations
+                                            .OfType<WidgetAnnotation>()
+                                            .ToList();
+
+                if (widgetAnnotations.Any())
                 {
-                    Console.WriteLine($"Page {i} contains {fields.Count} form field(s):");
-                    foreach (Field field in fields)
+                    Console.WriteLine($"Page {pageNumber} contains {widgetAnnotations.Count} form field(s):");
+                    foreach (WidgetAnnotation widget in widgetAnnotations)
                     {
-                        // Most field types derive from WidgetAnnotation which has a Name property
-                        // Use the field's FullyQualifiedName if available, otherwise fallback to Name
-                        string fieldName = field.FullName ?? field.Name ?? "(unnamed)";
-                        Console.WriteLine($"  - Field: {fieldName}");
+                        // The field name is stored in the Name property of the widget.
+                        string name = widget.Name;
+                        string typeName = widget.GetType().Name;
+                        Console.WriteLine($"  - {name} ({typeName})");
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"Page {i} contains no form fields.");
+                    // No form fields on this page
+                    Console.WriteLine($"Page {pageNumber} contains no form fields.");
                 }
             }
-
-            // No modifications are made, but saving follows the lifecycle rule
-            doc.Save(outputPath);
         }
-
-        Console.WriteLine($"Processing complete. Document saved to '{outputPath}'.");
     }
 }

@@ -9,42 +9,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputJsonPath = "stamps.json";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPdfPath))
-        {
-            var stampTexts = new List<string>();
+        // List to hold extracted stamp texts
+        List<string> stampTexts = new List<string>();
 
-            // Iterate over all pages and their annotations
-            foreach (Page page in doc.Pages)
+        // Open the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Pages are 1‑based in Aspose.Pdf
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
+                Page page = doc.Pages[i];
+
+                // Iterate over all annotations on the page
                 foreach (Annotation annotation in page.Annotations)
                 {
-                    // StampAnnotation represents rubber‑stamp annotations
-                    if (annotation is StampAnnotation stamp)
+                    // StampAnnotation represents a PDF stamp
+                    if (annotation is StampAnnotation stampAnno)
                     {
-                        // The visible text of a stamp is stored in the Contents property
-                        if (!string.IsNullOrEmpty(stamp.Contents))
+                        // The textual content of the stamp is stored in the Contents property
+                        if (!string.IsNullOrEmpty(stampAnno.Contents))
                         {
-                            stampTexts.Add(stamp.Contents);
+                            stampTexts.Add(stampAnno.Contents);
                         }
                     }
                 }
             }
-
-            // Serialize the collected strings to a JSON array
-            string json = JsonSerializer.Serialize(stampTexts, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(outputJsonPath, json);
-
-            Console.WriteLine($"Extracted {stampTexts.Count} stamp text(s) to '{outputJsonPath}'.");
         }
+
+        // Serialize the list of strings to a JSON array
+        string json = JsonSerializer.Serialize(stampTexts, new JsonSerializerOptions { WriteIndented = true });
+
+        // Write JSON to file
+        File.WriteAllText(outputJsonPath, json);
+
+        Console.WriteLine($"Extracted {stampTexts.Count} stamp text(s) to '{outputJsonPath}'.");
     }
 }
