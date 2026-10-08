@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";               // source PDF
-        const string outputDir = "PagesAsTiff";             // folder for page images
+        const string inputPdf = "input.pdf";
+        const string outputDir = "TiffPages";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,32 +16,33 @@ class Program
             return;
         }
 
-        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Use PdfConverter (Facade) to extract each page as a TIFF image
-        using (PdfConverter converter = new PdfConverter())
+        try
         {
-            // Bind the PDF file
-            converter.BindPdf(inputPdf);
+            // Load the PDF document
+            Document pdfDocument = new Document(inputPdf);
+            int pageCount = pdfDocument.Pages.Count;
 
-            // Prepare for conversion
-            converter.DoConvert();
-
-            int pageIndex = 1;
-            // Loop while there are more pages to convert
-            while (converter.HasNextImage())
+            // Iterate through each page and render it as a separate TIFF image
+            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
             {
-                // Build output file name: e.g., PagesAsTiff/page_1.tiff
-                string outPath = Path.Combine(outputDir, $"page_{pageIndex}.tiff");
+                string outPath = Path.Combine(outputDir, $"page_{pageNumber}.tiff");
 
-                // Save current page as TIFF
-                converter.GetNextImage(outPath, ImageFormat.Tiff);
-
-                pageIndex++;
+                using (FileStream outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                {
+                    // TiffDevice renders a single page to the provided stream.
+                    // Resolution can be adjusted as needed (e.g., 300 DPI).
+                    TiffDevice tiffDevice = new TiffDevice(new Resolution(300));
+                    tiffDevice.Process(pdfDocument.Pages[pageNumber], outStream);
+                }
             }
-        }
 
-        Console.WriteLine("PDF pages have been saved as individual TIFF files.");
+            Console.WriteLine("PDF successfully converted to separate TIFF images.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

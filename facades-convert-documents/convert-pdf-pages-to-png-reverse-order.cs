@@ -1,54 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using System.Drawing.Imaging; // ImageFormat for PNG
+using Aspose.Pdf.Devices;
 
-class PdfToPngReverse
+class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputDir = "PngPages";
+        const string pdfPath = "input.pdf";
+        const string outputFolder = "Pages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document (disposal handled by using)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            int pageCount = doc.Pages.Count; // 1‑based page count
+            // Define the resolution (DPI) for the PNG output – 300 DPI as an example
+            const int dpi = 300;
 
-            // Initialize the converter facade
-            PdfConverter converter = new PdfConverter();
-
-            // Bind the PDF file path (alternatively BindPdf(doc))
-            converter.BindPdf(inputPdf);
-
-            // Process pages in reverse order
-            for (int i = pageCount; i >= 1; i--)
+            // PngDevice does NOT implement IDisposable, so instantiate it directly.
+            // Use the Resolution constructor to set DPI and optionally enable transparency.
+            var pngDevice = new PngDevice(new Resolution(dpi))
             {
-                // Convert a single page at a time
-                converter.StartPage = i;
-                converter.EndPage   = i;
-                converter.DoConvert();
+                TransparentBackground = true // optional, can be omitted if not needed
+            };
 
-                string outPath = Path.Combine(outputDir, $"page_{i}.png");
+            // Process pages in reverse order (last page to first page)
+            for (int pageNum = pdfDoc.Pages.Count; pageNum >= 1; pageNum--)
+            {
+                // Build the output file path
+                string outPath = Path.Combine(outputFolder, $"Page_{pageNum}.png");
 
-                // Save the current page as PNG
-                converter.GetNextImage(outPath, ImageFormat.Png);
+                // Convert the current page to PNG and write it to the file stream
+                using (FileStream imageStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                {
+                    pngDevice.Process(pdfDoc.Pages[pageNum], imageStream);
+                }
             }
-
-            // Release resources held by the converter
-            converter.Close();
         }
 
-        Console.WriteLine("PDF pages have been converted to PNG in reverse order.");
+        Console.WriteLine("PDF pages have been converted to PNG images in reverse order.");
     }
 }

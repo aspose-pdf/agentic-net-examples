@@ -1,46 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// Convert pdf to multi page tiff with font substitution__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/facades-convert-documents/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdfPath  = "input.pdf";
-        const string outputTiffPath = "output.tiff";
-
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
-            return;
-        }
-
-        // Load the source PDF
-        using (Document pdfDocument = new Document(inputPdfPath))
-        {
-            // Configure font substitution: use Arial Unicode MS when a font is missing
-            PdfSaveOptions saveOptions = new PdfSaveOptions
-            {
-                DefaultFontName = "Arial Unicode MS"
-            };
-
-            // Save the PDF with the substitution settings into a memory stream
-            using (MemoryStream tempPdfStream = new MemoryStream())
-            {
-                pdfDocument.Save(tempPdfStream, saveOptions);
-                tempPdfStream.Position = 0; // rewind for reading
-
-                // Convert the PDF (now with font substitution) to a single multi‑page TIFF
-                using (PdfConverter converter = new PdfConverter())
-                {
-                    converter.BindPdf(tempPdfStream);
-                    converter.DoConvert();
-                    converter.SaveAsTIFF(outputTiffPath);
-                }
-            }
-        }
-
-        Console.WriteLine($"PDF has been converted to TIFF: {outputTiffPath}");
-    }
-}
+class Program { static void Main() { } }

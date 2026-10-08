@@ -1,18 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // PdfConverter resides here
+using Aspose.Pdf;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file
         const string inputPdf = "input.pdf";
+        const string outputDir = "OutputImages";
 
-        // Directory where JPEG images will be saved
-        const string outputDir = "Images";
-
-        // Verify that the source PDF exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
@@ -22,30 +19,25 @@ class Program
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // PdfConverter implements IDisposable – wrap it in a using block
-        using (PdfConverter converter = new PdfConverter())
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
+        int pageCount = pdfDocument.Pages.Count;
+
+        // Process each page sequentially and save as JPEG
+        for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
         {
-            // Bind the PDF file to the converter
-            converter.BindPdf(inputPdf);
+            string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
 
-            // Perform any required initialization before extracting images
-            converter.DoConvert();
+            // Create a JPEG device with the desired resolution (150 DPI)
+            var jpegDevice = new JpegDevice(new Resolution(150));
 
-            int pageNumber = 1;
-
-            // Iterate over all pages; GetNextImage preserves original page size
-            while (converter.HasNextImage())
+            // Convert the current page to JPEG and write directly to a file stream
+            using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
             {
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
-
-                // Save the current page as a JPEG image.
-                // This overload uses the default image format (JPEG) and the original page dimensions.
-                converter.GetNextImage(outputPath);
-
-                pageNumber++;
+                jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
             }
         }
 
-        Console.WriteLine("PDF has been converted to JPEG images successfully.");
+        Console.WriteLine("PDF pages have been converted to JPEG images.");
     }
 }

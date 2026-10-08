@@ -1,46 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+// URL-STABILITY STUB
+//
+// Convert pdf to png 72 dpi__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/facades-convert-documents/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class PdfToPngConverter
-{
-    static void Main()
-    {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
-
-        // Output directory for PNG images
-        const string outputDir = "PngImages";
-
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
-
-        // Verify the input file exists
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPdf);
-
-        // Set the desired resolution (72 DPI)
-        Resolution resolution = new Resolution(72);
-
-        // PngDevice does NOT implement IDisposable, so instantiate it directly
-        PngDevice pngDevice = new PngDevice(resolution);
-
-        // Iterate through each page and convert to PNG using CropBox (default behavior respects CropBox)
-        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
-        {
-            string outputFile = Path.Combine(outputDir, $"page_{pageNumber}.png");
-
-            // Convert the page to an image and save directly to file
-            pngDevice.Process(pdfDocument.Pages[pageNumber], outputFile);
-        }
-
-        Console.WriteLine("PDF to PNG conversion completed.");
-    }
-}
+class Program { static void Main() { } }

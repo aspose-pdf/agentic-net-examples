@@ -1,41 +1,47 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;   // PdfConverter resides here
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputTiff = "pages3to8.tiff";    // resulting TIFF file
+        const string inputPath = "input.pdf";
+        const string outputDir = "TiffPages";
 
-        if (!File.Exists(inputPdf))
+        // Verify input file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
-        // PdfConverter is a Facade; it also implements IDisposable
-        using (PdfConverter converter = new PdfConverter())
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Bind the PDF document to the converter
+        PdfConverter converter = new PdfConverter();
+        converter.BindPdf(inputPath);
+
+        // Define the page range (pages 3 through 8, inclusive)
+        int startPage = 3;
+        int endPage   = 8;
+
+        // Loop through each page in the range and save it as a separate TIFF file
+        for (int pageNum = startPage; pageNum <= endPage; pageNum++)
         {
-            // Bind the loaded document to the converter
-            converter.BindPdf(pdfDoc);
+            // Output file name for the current page
+            string outPath = Path.Combine(outputDir, $"page_{pageNum}.tiff");
 
-            // Specify the page range (Aspose.Pdf uses 1‑based indexing)
-            converter.StartPage = 3;
-            converter.EndPage   = 8;
-
-            // Perform any necessary initialization
-            converter.DoConvert();
-
-            // Save the selected pages as a single multi‑page TIFF.
-            // Default resolution (150 DPI) and default CoordinateType (CropBox) are used.
-            converter.SaveAsTIFF(outputTiff);
+            // Save the current page as TIFF.
+            // The overload SaveAsTIFF(string, int, int) uses the page's CropBox
+            // and the default resolution when no additional options are supplied.
+            converter.SaveAsTIFF(outPath, pageNum, pageNum);
         }
 
-        Console.WriteLine($"Pages 3‑8 have been saved to TIFF file: {outputTiff}");
+        // Release any resources held by the converter
+        converter.Close();
+
+        Console.WriteLine("Pages 3‑8 have been converted to TIFF images.");
     }
 }

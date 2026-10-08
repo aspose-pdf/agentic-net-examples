@@ -2,37 +2,51 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Devices; // Added for Resolution
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTiff = "output.tiff";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "TiffPages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        try
         {
-            // Initialize the PdfConverter facade with the loaded document
-            PdfConverter converter = new PdfConverter(pdfDoc);
+            // PdfConverter implements IDisposable – wrap it in a using block
+            using (PdfConverter converter = new PdfConverter())
+            {
+                // Bind the source PDF file
+                converter.BindPdf(inputPdfPath);
 
-            // Set the page range (Aspose.Pdf uses 1‑based indexing)
-            converter.StartPage = 4;
-            converter.EndPage = 9;
+                // Define the page range to extract (inclusive)
+                converter.StartPage = 4; // first page to convert (1‑based indexing)
+                converter.EndPage   = 9; // last page to convert
 
-            // Prepare the converter
-            converter.DoConvert();
+                // Optional: set resolution for better quality (dpi)
+                converter.Resolution = new Resolution(150);
 
-            // Convert the selected pages to a single multi‑page TIFF file
-            converter.SaveAsTIFF(outputTiff);
+                // Perform the conversion preparation
+                converter.DoConvert();
+
+                // Save the selected pages as a (multi‑page) TIFF file
+                string outputPath = Path.Combine(outputFolder, "Pages_4_to_9.tiff");
+                converter.SaveAsTIFF(outputPath);
+                Console.WriteLine($"Saved pages 4‑9 as TIFF: {outputPath}");
+            }
         }
-
-        Console.WriteLine($"TIFF image created at: {outputTiff}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

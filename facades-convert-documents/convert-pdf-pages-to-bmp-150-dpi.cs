@@ -1,55 +1,53 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Devices; // Resolution struct
 
 class Program
 {
     static void Main()
     {
-        // Directory containing the PDF and where BMP images will be saved
-        const string dataDir = @"C:\PdfSamples";
-        // Input PDF file name
-        const string pdfFile = "sample.pdf";
+        const string pdfPath   = "input.pdf";
+        const string outputDir = "BmpPages";
 
-        // Build full path to the input PDF
-        string inputPath = Path.Combine(dataDir, pdfFile);
-
-        // Ensure the input file exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPath))
+        Directory.CreateDirectory(outputDir);
+
+        // PdfConverter implements IDisposable, so wrap it in a using block
+        using (PdfConverter converter = new PdfConverter())
         {
-            // Create a Resolution object with 150 DPI (namespace Aspose.Pdf.Devices)
-            Aspose.Pdf.Devices.Resolution resolution = new Aspose.Pdf.Devices.Resolution(150);
-
-            // Initialize the BMP device. Width and Height set to 0 let the device use the page size.
-            BmpDevice bmpDevice = new BmpDevice(0, 0, resolution);
-
-            // Determine how many pages to process (pages 1‑20 or up to the document's page count)
-            int pagesToConvert = Math.Min(20, pdfDocument.Pages.Count);
-
-            // Loop through the selected pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pagesToConvert; pageNumber++)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                // Construct the output BMP file name for each page
-                string outputBmpPath = Path.Combine(dataDir, $"page_{pageNumber}.bmp");
+                // Bind the document to the converter
+                converter.BindPdf(doc);
 
-                // Convert the current page to BMP and write it to a file stream
-                using (FileStream bmpStream = new FileStream(outputBmpPath, FileMode.Create))
+                // Determine how many pages we will convert (max 20)
+                int maxPage = Math.Min(20, doc.Pages.Count);
+
+                // Configure the conversion range and resolution
+                converter.StartPage = 1;
+                converter.EndPage   = maxPage;
+                converter.Resolution = new Resolution(150); // 150 DPI
+
+                // Perform the conversion; after this call GetNextImage() will return each page image
+                converter.DoConvert();
+
+                // Retrieve each page image as BMP (format inferred from file extension)
+                for (int pageNum = 1; pageNum <= maxPage; pageNum++)
                 {
-                    bmpDevice.Process(pdfDocument.Pages[pageNumber], bmpStream);
+                    string outPath = Path.Combine(outputDir, $"Page_{pageNum}.bmp");
+                    converter.GetNextImage(outPath); // BMP format because of .bmp extension
                 }
-
-                Console.WriteLine($"Page {pageNumber} saved as BMP: {outputBmpPath}");
             }
         }
 
-        Console.WriteLine("Conversion completed.");
+        Console.WriteLine("PDF pages 1‑20 have been converted to BMP images.");
     }
 }

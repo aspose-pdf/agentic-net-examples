@@ -1,13 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Devices; // for Resolution
+using Aspose.Pdf.Text;    // for FontRepository and SimpleFontSubstitution
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
+        const string inputPdfPath = "input.pdf";
         const string outputTiffPath = "output.tiff";
 
         if (!File.Exists(inputPdfPath))
@@ -16,36 +18,38 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        try
         {
-            // ------------------------------------------------------------
-            // OPTIONAL: Font substitution (Symbol → Arial Unicode MS)
-            // Aspose.Pdf performs font substitution automatically when the
-            // requested font is missing. Ensure that "Arial Unicode MS"
-            // is installed on the system; the Symbol font will be mapped
-            // to it during rendering.
-            // ------------------------------------------------------------
+            // Register a substitution: replace the Symbol font with Arial Unicode MS.
+            // Resolve the system path to Arial Unicode MS (ARIALUNI.TTF).
+            string arialUnicodePath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.Fonts),
+                "ARIALUNI.TTF");
 
-            // Create a resolution for the output TIFF (300 DPI is a common choice)
-            Resolution resolution = new Resolution(300);
+            if (!File.Exists(arialUnicodePath))
+                throw new FileNotFoundException("Arial Unicode MS font file not found.", arialUnicodePath);
 
-            // Configure TIFF settings (no compression, default color depth, landscape)
-            TiffSettings tiffSettings = new TiffSettings
+            FontRepository.Substitutions.Add(new SimpleFontSubstitution("Symbol", arialUnicodePath));
+
+            // PdfConverter implements IDisposable, so use a using block
+            using (PdfConverter converter = new PdfConverter())
             {
-                Compression = CompressionType.None,
-                Depth = ColorDepth.Default,
-                Shape = ShapeType.Landscape,
-                SkipBlankPages = false
-            };
+                // Load the source PDF
+                converter.BindPdf(inputPdfPath);
 
-            // Initialise the TIFF device with the resolution and settings
-            TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
+                // Set higher resolution for better image quality (Resolution object required)
+                converter.Resolution = new Resolution(300); // DPI
 
-            // Convert the entire PDF document to a single multi‑page TIFF file
-            tiffDevice.Process(pdfDocument, outputTiffPath);
+                // Convert all pages and save as a multi‑page TIFF
+                converter.DoConvert();
+                converter.SaveAsTIFF(outputTiffPath);
+            }
+
+            Console.WriteLine($"PDF successfully converted to TIFF: {outputTiffPath}");
         }
-
-        Console.WriteLine($"PDF successfully converted to TIFF: '{outputTiffPath}'");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+        }
     }
 }
