@@ -7,50 +7,45 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF
-        const string outputPdf  = "output.pdf";         // result PDF
-        const string attachment = "attachment.pdf";     // PDF to open on click
+        const string inputPdf = "input.pdf";
+        const string attachmentPath = "attachment.pdf";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdf) || !File.Exists(attachmentPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine("Input PDF or attachment file not found.");
             return;
         }
 
-        if (!File.Exists(attachment))
-        {
-            Console.Error.WriteLine($"Attachment file not found: {attachment}");
-            return;
-        }
-
-        // Load the document (lifecycle rule: use using)
+        // Load the source PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdf))
         {
-            // Choose the page where the link will be placed (first page in this example)
-            Page page = doc.Pages[1];
-
-            // Define the clickable rectangle (fully qualified to avoid ambiguity)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            // Create the link annotation
-            LinkAnnotation link = new LinkAnnotation(page, rect)
+            // Embed the PDF attachment into the document using the EmbeddedFiles collection
+            var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath))
             {
-                // Optional visual styling
-                Color = Aspose.Pdf.Color.Blue,
-                Contents = "Open attached PDF"
+                Contents = new MemoryStream(File.ReadAllBytes(attachmentPath))
             };
+            doc.EmbeddedFiles.Add(fileSpec);
 
-            // Set the action to open the external PDF file at its first page
-            // GoToRemoteAction opens a PDF document (remotePdf) and jumps to a page number.
-            link.Action = new GoToRemoteAction(attachment, 1);
+            // Define the clickable area (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
 
-            // Add the annotation to the page
-            page.Annotations.Add(link);
+            // Create a link annotation that will launch the attachment file when clicked
+            LinkAnnotation link = new LinkAnnotation(doc.Pages[1], rect);
+            // LaunchAction expects a string (file path). Use the attachment path directly.
+            link.Action = new LaunchAction(attachmentPath);
 
-            // Save the modified document (lifecycle rule: use using, then Save)
+            // Optional: make the link invisible (no border, transparent)
+            link.Border = new Border(link) { Width = 0 };
+            link.Color = Aspose.Pdf.Color.Transparent;
+
+            // Add the annotation to the first page (adjust page index as needed)
+            doc.Pages[1].Annotations.Add(link);
+
+            // Save the modified PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Link annotation added. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with link annotation saved to '{outputPdf}'.");
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,53 +8,67 @@ class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF and self‑signed certificate (PFX) paths
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "signed_output.pdf";
-        const string certificatePath = "selfsigned.pfx";
-        const string certificatePassword = "pfxPassword";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "signed_output.pdf";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "pfxPassword";
 
-        // Verify that required files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(certificatePath))
+
+        if (!File.Exists(certPath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPdfPath))
+        // -----------------------------------------------------------------
+        // 1. Load the PDF and add a visible signature field on the first page
+        // -----------------------------------------------------------------
+        Document pdfDoc = new Document(inputPdfPath);
+        // Define the rectangle where the signature will appear (llx, lly, urx, ury)
+        Rectangle sigRect = new Rectangle(100, 100, 300, 200);
+
+        // Create the signature field and assign a unique name
+        SignatureField sigField = new SignatureField(pdfDoc, sigRect)
         {
-            // Define the rectangle where the signature field will appear
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            Name = "Signature1"
+        };
 
-            // Create a signature field and add it to the document's form collection
-            SignatureField sigField = new SignatureField(doc, sigRect);
-            doc.Form.Add(sigField);
+        // Add the field to the document's form collection
+        pdfDoc.Form.Add(sigField);
 
-            // Create a PKCS#1 signature object using the self‑signed certificate
-            // The constructor (string pfx, string password) loads the certificate from file
-            PKCS1 pkcs1Signature = new PKCS1(certificatePath, certificatePassword)
-            {
-                // Optional metadata for the signature appearance
-                Reason   = "Document approved",
-                Location = "Office",
-                ContactInfo = "admin@example.com",
-                Date = DateTime.Now
-            };
+        // -----------------------------------------------------------------
+        // 2. Load the self‑signed certificate (PFX) that will be used for signing
+        // -----------------------------------------------------------------
+        // Use the non‑obsolete constructor that loads the certificate directly
+        X509Certificate2 signingCert = new X509Certificate2(certPath, certPassword, X509KeyStorageFlags.DefaultKeySet);
 
-            // Sign the document using the created signature field
-            sigField.Sign(pkcs1Signature);
+        // -----------------------------------------------------------------
+        // 3. Prepare PKCS#7 signature object (Aspose.Pdf.Forms) and optional appearance
+        // -----------------------------------------------------------------
+        PKCS7 pkcs7 = new PKCS7(certPath, certPassword);
+        // Optional custom visual appearance
+        pkcs7.CustomAppearance = new SignatureCustomAppearance
+        {
+            ShowContactInfo = true,
+            ShowLocation = true,
+            ContactInfoLabel = "Contact:",
+            LocationLabel = "Location:"
+        };
 
-            // Save the signed PDF (lifecycle rule: use Document.Save)
-            doc.Save(outputPdfPath);
-        }
+        // -----------------------------------------------------------------
+        // 4. Sign the PDF using the field added in step 1
+        // -----------------------------------------------------------------
+        // The Sign overload for SignatureField takes only the PKCS7 object.
+        sigField.Sign(pkcs7);
 
-        Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");
+        // Save the signed PDF
+        pdfDoc.Save(outputPdfPath);
+
+        Console.WriteLine($"PDF signed successfully: {outputPdfPath}");
     }
 }

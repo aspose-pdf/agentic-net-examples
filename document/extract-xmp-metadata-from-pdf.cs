@@ -6,26 +6,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputXmlPath = "metadata.xml";
+        const string pdfPath = "input.pdf";
+        const string xmpPath = "metadata.xml";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Create a file stream to receive the XMP metadata
-            using (FileStream xmlStream = new FileStream(outputXmlPath, FileMode.Create, FileAccess.Write))
+            // Use a using block for deterministic disposal of the Document.
+            using (Document doc = new Document(pdfPath))
             {
-                // Extract XMP metadata from the PDF into the stream
-                pdfDoc.GetXmpMetadata(xmlStream);
+                // The Metadata property returns a Metadata object that represents the native XMP packet.
+                Metadata metadata = doc.Metadata;
+
+                // If the document has no XMP metadata, the Metadata object will be empty (its string representation is empty).
+                if (metadata == null || string.IsNullOrEmpty(metadata.ToString()))
+                {
+                    Console.WriteLine("No XMP metadata found in the PDF.");
+                }
+                else
+                {
+                    // Convert the Metadata object to its XML string representation and write it to a file.
+                    string xmpXml = metadata.ToString();
+                    File.WriteAllText(xmpPath, xmpXml);
+                    Console.WriteLine($"XMP metadata extracted to '{xmpPath}'.");
+                }
             }
         }
-
-        Console.WriteLine($"XMP metadata extracted to '{outputXmlPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

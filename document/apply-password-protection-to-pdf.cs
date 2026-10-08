@@ -6,10 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "protected.pdf";
-        const string userPassword  = "user123";
-        const string ownerPassword = "owner123";
+        const string inputPath      = "input.pdf";
+        const string encryptedPath  = "protected.pdf";
+        const string userPassword   = "user123";
+        const string ownerPassword  = "owner123";
 
         if (!File.Exists(inputPath))
         {
@@ -19,20 +19,20 @@ class Program
 
         try
         {
-            // Load the PDF document
+            // Load the source PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Set desired permissions (e.g., allow printing and content extraction)
+                // Define desired permissions (e.g., allow printing and content extraction)
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                // Encrypt the document using AES-256 algorithm
+                // Apply encryption with user/owner passwords and AES-256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF
-                doc.Save(outputPath);
+                doc.Save(encryptedPath);
             }
 
-            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+            Console.WriteLine($"PDF encrypted and saved to '{encryptedPath}'.");
         }
         catch (Exception ex)
         {

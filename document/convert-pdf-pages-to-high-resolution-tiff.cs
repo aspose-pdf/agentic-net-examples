@@ -1,68 +1,49 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Devices; // for TiffDevice and Resolution
 
 class PdfToTiffConverter
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Expected arguments: <inputPdfPath> <outputFolder> [dpi]
-        if (args.Length < 2)
-        {
-            Console.Error.WriteLine("Usage: PdfToTiffConverter <input.pdf> <outputFolder> [dpi]");
-            return;
-        }
-
-        string inputPath = args[0];
-        string outputFolder = args[1];
-        int dpi = args.Length >= 3 ? int.Parse(args[2]) : 300; // Default to 300 DPI if not specified
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
+        const string inputPdfPath = "input.pdf";          // source PDF
+        const string outputFolder = "TiffPages";         // folder for TIFF images
+        const int dpi = 300;                              // desired resolution
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        try
+        // If the input PDF does not exist, create a minimal placeholder PDF
+        if (!File.Exists(inputPdfPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDocument = new Document(inputPath))
+            using var placeholder = new Document();
+            placeholder.Pages.Add();
+            placeholder.Save(inputPdfPath);
+        }
+
+        // Load the PDF inside a using block for deterministic disposal (document-disposal-with-using rule)
+        using (Document pdfDoc = new Document(inputPdfPath))
+        {
+            // Iterate pages using 1‑based indexing (page-indexing-one-based rule)
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                // Create a Resolution object with the desired DPI
-                Resolution resolution = new Resolution(dpi);
+                // Build the output file name for the current page
+                string tiffPath = Path.Combine(outputFolder, $"Page_{pageNumber}.tiff");
 
-                // Configure TiffSettings (optional: no compression for lossless output)
-                TiffSettings tiffSettings = new TiffSettings
+                // Create a TiffDevice with the required DPI. The constructor that accepts only Resolution
+                // uses DPI as the default unit, so we avoid the missing ResolutionUnit enum.
+                var resolution = new Resolution(dpi);
+                var tiffDevice = new TiffDevice(resolution);
+
+                // Save the individual page as a high‑resolution TIFF image
+                using (FileStream imageStream = new FileStream(tiffPath, FileMode.Create))
                 {
-                    Compression = CompressionType.None,
-                    Depth = ColorDepth.Default,
-                    Shape = ShapeType.Landscape,
-                    SkipBlankPages = false
-                };
-
-                // Initialize the TiffDevice with the resolution and settings
-                TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
-
-                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-                for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
-                {
-                    // Construct the output file name for each page
-                    string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.tif");
-
-                    // Convert the specific page to a TIFF image and save it
-                    tiffDevice.Process(pdfDocument.Pages[pageNumber], outputPath);
+                    tiffDevice.Process(pdfDoc.Pages[pageNumber], imageStream);
                 }
             }
+        }
 
-            Console.WriteLine("PDF pages successfully converted to high‑resolution TIFF images.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
-        }
+        Console.WriteLine("Conversion completed. TIFF files are located in: " + Path.GetFullPath(outputFolder));
     }
 }

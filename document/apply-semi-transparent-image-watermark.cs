@@ -1,42 +1,37 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core API (Document, Page, ImageStamp, etc.)
+using Aspose.Pdf;
+using Aspose.Pdf.Text; // TextState, FontRepository, FontStyles
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";      // source PDF
-        const string watermarkImg = "watermark.png"; // PNG with transparent background
-        const string outputPdf  = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "watermarked.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(watermarkImg))
-        {
-            Console.Error.WriteLine($"Watermark image not found: {watermarkImg}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Create an ImageStamp that will be used as the overlay
-            ImageStamp stamp = new ImageStamp(watermarkImg)
-            {
-                // Semi‑transparent (0.0 = fully transparent, 1.0 = opaque)
-                Opacity = 0.5f,
+            // Create a semi‑transparent text stamp that will act as a watermark
+            TextStamp stamp = new TextStamp("CONFIDENTIAL");
+            stamp.HorizontalAlignment = HorizontalAlignment.Center;
+            stamp.VerticalAlignment   = VerticalAlignment.Center;
+            stamp.RotateAngle         = 45;      // diagonal watermark
+            stamp.Opacity             = 0.3;     // 30% opacity (semi‑transparent)
+            stamp.Background          = false;   // no opaque background rectangle
 
-                // Place the stamp on top of page content (false = foreground)
-                Background = false,
-
-                // Center the stamp on each page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center
-            };
+            // Configure the TextState of the stamp (TextState is read‑only, so modify its members directly)
+            stamp.TextState.FontSize        = 72;
+            stamp.TextState.FontStyle       = FontStyles.Bold;
+            stamp.TextState.Font            = FontRepository.FindFont("Arial");
+            stamp.TextState.ForegroundColor = Color.FromRgb(0.8, 0.0, 0.0); // light red
 
             // Apply the stamp to every page in the document
             foreach (Page page in doc.Pages)
@@ -44,10 +39,10 @@ class Program
                 page.AddStamp(stamp);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // Save the watermarked PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

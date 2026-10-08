@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";          // PDF containing numeric fields
-        const string outputPath = "output_with_total.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_js.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,54 +17,51 @@ class Program
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the form object
-            Form form = doc.Form;
-
-            // Ensure automatic recalculation is enabled (default is true)
-            form.AutoRecalculate = true;
-
-            // Example field names – replace with actual field names in your PDF
-            const string fieldName1 = "Amount1";
-            const string fieldName2 = "Amount2";
-            const string totalFieldName = "TotalAmount";
-
-            // Retrieve the numeric fields (they are TextBoxField derivatives)
-            TextBoxField field1 = form[fieldName1] as TextBoxField;
-            TextBoxField field2 = form[fieldName2] as TextBoxField;
-            TextBoxField totalField = form[totalFieldName] as TextBoxField;
-
-            if (field1 == null || field2 == null || totalField == null)
+            // Create a read‑only textbox to display the total (if it does not already exist)
+            // Note: Aspose.Pdf uses 1‑based page indexing
+            Aspose.Pdf.Rectangle totalRect = new Aspose.Pdf.Rectangle(100, 500, 200, 520);
+            TextBoxField totalField = new TextBoxField(doc.Pages[1], totalRect)
             {
-                Console.Error.WriteLine("One or more required fields were not found in the PDF form.");
-                return;
-            }
+                PartialName = "Total",
+                Value       = "0",
+                ReadOnly    = true
+            };
+            doc.Form.Add(totalField, 1);
 
-            // JavaScript that sums the two numeric fields and writes the result to the total field
-            // The script runs in the context of the PDF viewer (Acrobat JavaScript)
-            string jsCode = $@"
-                var f1 = this.getField('{fieldName1}');
-                var f2 = this.getField('{fieldName2}');
-                var total = 0;
-                // Parse values as numbers; treat empty or non‑numeric as 0
-                if (f1 && !isNaN(parseFloat(f1.value))) total += parseFloat(f1.value);
-                if (f2 && !isNaN(parseFloat(f2.value))) total += parseFloat(f2.value);
-                var totalField = this.getField('{totalFieldName}');
-                if (totalField) totalField.value = total.toString();
+            // JavaScript that sums numeric fields named Field1, Field2, Field3
+            // and writes the result into the Total field
+            string js = @"
+                var sum = 0;
+                var fields = ['Field1','Field2','Field3'];
+                for (var i = 0; i < fields.length; i++) {
+                    var f = this.getField(fields[i]);
+                    if (f && !isNaN(parseFloat(f.value))) {
+                        sum += parseFloat(f.value);
+                    }
+                }
+                this.getField('Total').value = sum.toString();
             ";
 
-            // Create a JavascriptAction with the script (constructor requires the script string)
-            JavascriptAction jsAction = new JavascriptAction(jsCode);
+            // Attach the script to the document's Open action so it runs when the PDF is opened
+            doc.OpenAction = new JavascriptAction(js);
 
-            // Attach the JavaScript to the total field so it runs whenever the field is calculated
-            totalField.ExecuteFieldJavaScript(jsAction);
+            // Alternatively, you could attach the script to a button's MouseUp action:
+            // Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 540, 200, 560);
+            // PushButtonField calcBtn = new PushButtonField(doc.Pages[1], btnRect)
+            // {
+            //     PartialName = "CalcButton",
+            //     Caption     = "Calculate",
+            //     Action      = new JavascriptAction(js)
+            // };
+            // doc.Form.Add(calcBtn, 1);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with total calculation: '{outputPath}'");
+        Console.WriteLine($"PDF saved with JavaScript to '{outputPath}'.");
     }
 }

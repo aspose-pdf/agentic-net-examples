@@ -1,38 +1,34 @@
 using System;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // optional, for TextFragment
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "rotated_landscape.pdf";
+        const string outputPath = "landscape.pdf";
 
         // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page to the document
+            // Add a blank page (Pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Set the page size to Letter (you can choose any size)
-            page.SetPageSize(PageSize.PageLetter.Width, PageSize.PageLetter.Height);
+            // Set the page size to landscape by assigning Width > Height.
+            // Example: A4 landscape (842 x 595 points). Adjust as needed.
+            page.PageInfo.Width = 842;   // points (1 point = 1/72 inch)
+            page.PageInfo.Height = 595;
 
-            // Rotate the page 90 degrees clockwise to achieve landscape orientation
-            // Note: Aspose.Pdf uses the "on" prefix for rotation enum values.
-            page.Rotate = Rotation.on90;
+            // OPTIONAL: add a text fragment to visualize the orientation
+            // TextFragment tf = new TextFragment("Landscape Page");
+            // tf.TextState.FontSize = 24;
+            // tf.TextState.HorizontalAlignment = HorizontalAlignment.Center;
+            // page.Paragraphs.Add(tf);
 
-            // Optionally, indicate that the page is landscape (affects some viewers)
-            page.PageInfo.IsLandscape = true;
-
-            // Add some sample content to visualize the orientation
-            TextFragment tf = new TextFragment("Landscape page with 90° rotation");
-            tf.Position = new Position(100, 500); // position after rotation
-            page.Paragraphs.Add(tf);
-
-            // Save the PDF to the specified path
+            // Save the PDF (extension .pdf ensures PDF format)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF created with rotated landscape page: {outputPath}");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

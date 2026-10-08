@@ -2,29 +2,38 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class PdfAValidatorProgram
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPath = "input.pdf";
+        const string logPath = "validation_log.txt";
         const string reportPath = "validation_report.txt";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use Document constructor)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Validate the document against PDF/A‑1A and write a detailed log file
-            // Validate(string, PdfFormat) returns true if the document complies
-            bool isCompliant = doc.Validate(reportPath, PdfFormat.PDF_A_1A);
+            // Validate against PDF/A‑1A conformance.
+            // Document.Validate returns a bool indicating overall validity and writes a detailed log file.
+            bool isValid = doc.Validate(logPath, PdfFormat.PDF_A_1A);
 
-            // Report the outcome
-            Console.WriteLine($"PDF/A‑1A compliance: {(isCompliant ? "Compliant" : "Non‑compliant")}");
-            Console.WriteLine($"Detailed validation report saved to: {reportPath}");
+            // Build a concise validation report and reference the detailed log.
+            using (StreamWriter writer = new StreamWriter(reportPath))
+            {
+                writer.WriteLine($"PDF/A‑1A validation report for '{Path.GetFileName(inputPath)}'");
+                writer.WriteLine($"IsValid: {isValid}");
+                writer.WriteLine();
+                writer.WriteLine($"A detailed validation log has been saved to '{logPath}'.");
+                writer.WriteLine("You can inspect this file for the list of errors and warnings.");
+            }
+
+            Console.WriteLine($"Validation report saved to '{reportPath}'.");
         }
     }
 }

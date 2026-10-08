@@ -1,55 +1,61 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class PdfSanitizer
 {
     static void Main()
     {
-        // Input folder containing PDFs to be sanitized
-        const string inputFolder = @"C:\InputPdfs";
-        // Output folder where cleaned PDFs will be saved
+        // Input and output directories
+        const string inputFolder  = @"C:\InputPdfs";
         const string outputFolder = @"C:\SanitizedPdfs";
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
         // Process each PDF file in the input folder
         foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Build the output file path (same file name, different folder)
-            string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
-
             try
             {
-                // Load the PDF document (lifecycle rule: use constructor)
+                // Determine output file path
+                string fileName   = Path.GetFileName(inputPath);
+                string outputPath = Path.Combine(outputFolder, fileName);
+
+                // Load the PDF inside a using block for deterministic disposal
                 using (Document doc = new Document(inputPath))
                 {
-                    // ---- Sanitization steps ----
-                    // Remove all document metadata
-                    doc.RemoveMetadata();
+                    // ---------- Sanitize metadata ----------
+                    doc.Info.Title        = string.Empty;
+                    doc.Info.Author       = string.Empty;
+                    doc.Info.Subject      = string.Empty;
+                    doc.Info.Keywords     = string.Empty;
+                    doc.Info.Creator      = string.Empty;
+                    doc.Info.Producer     = string.Empty;
+                    doc.Info.ModDate      = DateTime.Now;
+                    doc.Info.CreationDate = DateTime.Now;
 
-                    // Remove PDF/A compliance information if present
-                    doc.RemovePdfaCompliance();
+                    // ---------- Remove all annotations ----------
+                    // Pages are 1‑based in Aspose.Pdf
+                    for (int i = 1; i <= doc.Pages.Count; i++)
+                    {
+                        Page page = doc.Pages[i];
+                        // Clear the annotations collection if it contains any
+                        if (page.Annotations != null && page.Annotations.Count > 0)
+                        {
+                            page.Annotations.Clear();
+                        }
+                    }
 
-                    // Remove PDF/UA compliance information if present
-                    doc.RemovePdfUaCompliance();
-
-                    // Flatten form fields and annotations into the page content
-                    doc.Flatten();
-
-                    // Optimize resources (remove unused objects, merge duplicates, etc.)
-                    doc.OptimizeResources();
-
-                    // Save the sanitized PDF (save without explicit SaveOptions writes PDF)
+                    // Save the sanitized PDF to the output folder
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Sanitized: {Path.GetFileName(inputPath)} → {outputPath}");
+                Console.WriteLine($"Sanitized: {fileName}");
             }
             catch (Exception ex)
             {
-                // General error handling (covers any sanitization‑related failures)
                 Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }

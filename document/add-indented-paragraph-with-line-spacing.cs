@@ -7,52 +7,44 @@ class Program
 {
     static void Main()
     {
-        // Input and output PDF file paths
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF document (lifecycle: load)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[1];
+            // Create a text fragment containing the paragraph to format
+            TextFragment paragraph = new TextFragment(
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. " +
+                "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+            );
 
-            // Create a new TextParagraph instance
-            TextParagraph paragraph = new TextParagraph();
+            // Apply line spacing as a multiplier (1.5 = 150% line height)
+            paragraph.TextState.LineSpacing = 1.5f;
 
-            // Define the rectangle where the paragraph will be placed
-            // Fully qualify the Rectangle type to avoid ambiguity
-            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 600, 500, 800);
+            // Optional: set basic font properties for readability
+            paragraph.TextState.FontSize = 12;
+            paragraph.TextState.Font = FontRepository.FindFont("Arial");
 
-            // Set indentation values (in points)
-            paragraph.FirstLineIndent      = 20; // indent for the first line
-            paragraph.SubsequentLinesIndent = 10; // indent for subsequent lines
+            // Simulate a first‑line indent by shifting the whole paragraph to the right.
+            // Aspose.Pdf does not expose a direct ParagraphIndent property on TextState.
+            paragraph.Position = new Position(70, 700); // X increased to create an indent effect
 
-            // Optional: set horizontal alignment (Left, Center, Right, Justify)
-            paragraph.HorizontalAlignment = HorizontalAlignment.Justify;
+            // Add the formatted paragraph to the first page
+            Page firstPage = doc.Pages[1];
+            firstPage.Paragraphs.Add(paragraph);
 
-            // Append lines with optional line spacing.
-            // The second parameter adds extra spacing after the line (in points).
-            paragraph.AppendLine("Lorem ipsum dolor sit amet, consectetur adipiscing elit.", 5);
-            paragraph.AppendLine("Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", 5);
-            paragraph.AppendLine("Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.", 5);
-            paragraph.AppendLine("Nisi ut aliquip ex ea commodo consequat.", 5);
-
-            // Use TextBuilder to add the paragraph to the page
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendParagraph(paragraph);
-
-            // Save the modified PDF document (lifecycle: save)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Paragraph with indentation and line spacing saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with formatted paragraph saved to '{outputPath}'.");
     }
 }

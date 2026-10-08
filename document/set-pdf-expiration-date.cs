@@ -1,33 +1,32 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // Required for JavascriptAction
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "expired.pdf";
-
-        // Set the expiration date (year, month (1‑based), day)
-        DateTime expireDate = new DateTime(2025, 12, 31);
+        const string outputPath = "expiring_output.pdf";
+        // Desired expiration date (year, month, day)
+        DateTime expirationDate = new DateTime(2025, 12, 31);
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Build JavaScript that closes the document after the specified date
-            string js = $@"
-                var exp = new Date({expireDate.Year}, {expireDate.Month - 1}, {expireDate.Day});
-                if (new Date() > exp) this.closeDoc();";
+            // Build JavaScript that closes the document after the expiration date
+            string js = $@"var now = new Date();
+var exp = new Date('{expirationDate:yyyy-MM-dd}');
+if (now > exp) this.closeDoc();";
 
-            // Attach the JavaScript as the document's OpenAction
+            // Attach the script to the document's OpenAction (executed when the PDF is opened)
             doc.OpenAction = new JavascriptAction(js);
 
             // Save the modified PDF

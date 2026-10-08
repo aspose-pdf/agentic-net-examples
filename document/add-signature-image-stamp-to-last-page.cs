@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "signed_appearance.pdf";
-        const string signatureImagePath = "signature.png";
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "signed_output.pdf";
+        const string signatureImgPath = "signature.png";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -16,40 +16,41 @@ class Program
             return;
         }
 
-        if (!File.Exists(signatureImagePath))
+        if (!File.Exists(signatureImgPath))
         {
-            Console.Error.WriteLine($"Signature image not found: {signatureImagePath}");
+            Console.Error.WriteLine($"Signature image not found: {signatureImgPath}");
             return;
         }
 
         // Load the PDF document
         using (Document doc = new Document(inputPdfPath))
         {
-            // Determine the last page (Aspose.Pdf uses 1‑based indexing)
-            int lastPageNumber = doc.Pages.Count;
-            Page lastPage = doc.Pages[lastPageNumber];
+            // Get the last page (Aspose.Pdf uses 1‑based indexing)
+            Page lastPage = doc.Pages[doc.Pages.Count];
 
-            // Create an image stamp with the custom signature image
-            ImageStamp signatureStamp = new ImageStamp(signatureImagePath);
+            // Create an ImageStamp from the signature image file
+            using (FileStream imgStream = File.OpenRead(signatureImgPath))
+            {
+                ImageStamp signatureStamp = new ImageStamp(imgStream);
 
-            // Optional: set the size of the stamp (width and height in points)
-            signatureStamp.Width = 150;   // example width
-            signatureStamp.Height = 50;   // example height
+                // Configure stamp appearance
+                signatureStamp.Background = false;          // place over page content
+                signatureStamp.Opacity    = 0.85;           // semi‑transparent
+                signatureStamp.XIndent    = 100;            // distance from left edge (points)
+                signatureStamp.YIndent    = 150;            // distance from bottom edge (points)
 
-            // Position the stamp on the page (coordinates are measured from the bottom‑left corner)
-            signatureStamp.XIndent = 100; // distance from the left edge
-            signatureStamp.YIndent = 100; // distance from the bottom edge
+                // Optionally set explicit size (in points)
+                // signatureStamp.Width  = 200;
+                // signatureStamp.Height = 80;
 
-            // Set opacity if a translucent appearance is desired
-            signatureStamp.Opacity = 0.8f;
+                // Add the stamp to the last page
+                lastPage.AddStamp(signatureStamp);
+            }
 
-            // Add the stamp to the last page
-            lastPage.AddStamp(signatureStamp);
-
-            // Save the updated PDF
+            // Save the modified PDF
             doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF with signature appearance saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Signature image added and saved to '{outputPdfPath}'.");
     }
 }

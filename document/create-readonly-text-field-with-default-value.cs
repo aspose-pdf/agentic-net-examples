@@ -1,47 +1,33 @@
 using System;
-using System.Drawing; // kept for potential other uses, but not for Color ambiguity
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "text_field_readonly.pdf";
+        const string outputPath = "form.pdf";
 
-        // Create a new PDF document (lifecycle rule: use using for disposal)
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page to host the field
+            // Add a blank page to host the form field
             Page page = doc.Pages.Add();
 
-            // Define the rectangle where the text field will appear
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the field rectangle (lower‑left x/y, upper‑right x/y)
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 630);
 
-            // Create a TextBoxField on the *page* with the specified rectangle
-            TextBoxField textField = new TextBoxField(page, fieldRect)
-            {
-                // Set a name for the field (PartialName is the correct property)
-                PartialName = "SampleField",
+            // Create a text box form field
+            TextBoxField textField = new TextBoxField(page, fieldRect);
+            textField.PartialName = "MyTextField";   // field identifier
+            textField.Value = "Default text";        // default value displayed in the field
+            textField.ReadOnly = true;               // make the field read‑only by default
 
-                // Set the default value that appears when the PDF is opened
-                Value = "Default Text",
+            // Add the field to the document's form collection (page index is 1‑based)
+            doc.Form.Add(textField, 1);
 
-                // Make the field read‑only
-                ReadOnly = true,
-
-                // Set the default appearance (font, size, color)
-                // Use System.Drawing.Color for DefaultAppearance as required by the API
-                DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black)
-            };
-
-            // Add the field to the document's form collection
-            doc.Form.Add(textField);
-
-            // Save the PDF (lifecycle rule: Document.Save)
+            // Save the PDF with the read‑only text field
             doc.Save(outputPath);
         }
 

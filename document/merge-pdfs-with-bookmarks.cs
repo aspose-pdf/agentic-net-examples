@@ -6,78 +6,61 @@ class Program
 {
     static void Main()
     {
-        const string firstPdf = "first.pdf";   // Path to the first source PDF
-        const string secondPdf = "second.pdf"; // Path to the second source PDF
-        const string outputPdf = "merged.pdf"; // Path for the merged result
+        const string firstPdf = "first.pdf";
+        const string secondPdf = "second.pdf";
+        const string outputPdf = "merged.pdf";
 
-        // Verify that source files exist
-        if (!File.Exists(firstPdf))
+        if (!File.Exists(firstPdf) || !File.Exists(secondPdf))
         {
-            Console.Error.WriteLine($"File not found: {firstPdf}");
-            return;
-        }
-        if (!File.Exists(secondPdf))
-        {
-            Console.Error.WriteLine($"File not found: {secondPdf}");
+            Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
-        try
+        // Load the target (first) and source (second) documents
+        using (Document target = new Document(firstPdf))
+        using (Document source = new Document(secondPdf))
         {
-            // Load both documents. The first document will receive the pages and bookmarks of the second.
-            using (Document doc1 = new Document(firstPdf))
-            using (Document doc2 = new Document(secondPdf))
+            // Append all pages from the source document to the target document
+            target.Pages.Add(source.Pages);
+
+            // Preserve bookmarks (outlines) from the source document
+            foreach (OutlineItemCollection srcOutline in source.Outlines)
             {
-                // ----- Merge pages -----
-                foreach (Page page in doc2.Pages)
-                {
-                    // Adding the page object directly preserves its content.
-                    doc1.Pages.Add(page);
-                }
-
-                // ----- Merge bookmarks/outlines -----
-                foreach (OutlineItemCollection outline in doc2.Outlines)
-                {
-                    // Clone each top‑level outline from the second document and add it to the first.
-                    OutlineItemCollection cloned = CloneOutline(outline, doc1);
-                    doc1.Outlines.Add(cloned);
-                }
-
-                // Save the merged document.
-                doc1.Save(outputPdf);
+                OutlineItemCollection cloned = CloneOutline(srcOutline, target);
+                target.Outlines.Add(cloned);
             }
 
-            Console.WriteLine($"Merged PDF saved to '{outputPdf}'.");
+            // Save the merged PDF with bookmarks from both sources
+            target.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during merge: {ex.Message}");
-        }
+
+        Console.WriteLine($"Merged PDF saved to '{outputPdf}'.");
     }
 
     /// <summary>
-    /// Recursively clones an OutlineItemCollection (bookmark) from a source document
-    /// into the target document, preserving title, action, appearance and child hierarchy.
+    /// Recursively clones an outline item (and its children) from a source document
+    /// into the target document.
     /// </summary>
-    private static OutlineItemCollection CloneOutline(OutlineItemCollection source, Document targetDoc)
+    private static OutlineItemCollection CloneOutline(OutlineItemCollection sourceItem, Document targetDoc)
     {
-        // The constructor requires a parent collection; we use the root of the target document.
-        var copy = new OutlineItemCollection(targetDoc.Outlines)
+        // Create a new outline item attached to the target document's root outline collection
+        var clonedItem = new OutlineItemCollection(targetDoc.Outlines)
         {
-            Title = source.Title,
-            Open = source.Open,
-            Action = source.Action,
-            Color = source.Color,
-            Italic = source.Italic,
-            Bold = source.Bold
+            Title = sourceItem.Title,
+            Italic = sourceItem.Italic,
+            Bold = sourceItem.Bold,
+            Color = sourceItem.Color,
+            // The Action object can be reused; if a more complex copy is required,
+            // additional handling would be needed.
+            Action = sourceItem.Action
         };
 
-        // Recursively copy child outlines.
-        foreach (OutlineItemCollection child in source)
+        // Recursively clone child outline items
+        foreach (OutlineItemCollection child in sourceItem)
         {
-            copy.Add(CloneOutline(child, targetDoc));
+            clonedItem.Add(CloneOutline(child, targetDoc));
         }
 
-        return copy;
+        return clonedItem;
     }
 }

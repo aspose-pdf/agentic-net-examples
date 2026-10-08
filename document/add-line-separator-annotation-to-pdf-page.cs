@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_line.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,35 +16,42 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Open the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Select the page where the separator will be placed (first page in this example)
-            Page page = doc.Pages[1];
-
-            // Define start and end points of the line (coordinates are in points)
-            Aspose.Pdf.Point start = new Aspose.Pdf.Point(50, 750);
-            Aspose.Pdf.Point end   = new Aspose.Pdf.Point(550, 750);
-
-            // Define a rectangle that encloses the line (required by the constructor)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 750, 550, 750);
-
-            // Create the line annotation
-            LineAnnotation line = new LineAnnotation(page, rect, start, end)
+            // Iterate over each page and add a horizontal line as a separator
+            foreach (Page page in doc.Pages)
             {
-                Color = Aspose.Pdf.Color.Gray
-            };
+                // Page dimensions
+                double pageWidth  = page.PageInfo.Width;
+                double pageHeight = page.PageInfo.Height;
 
-            // Set line width via Border (requires the parent annotation in the constructor)
-            line.Border = new Border(line) { Width = 1 };
+                // Y position for the separator (middle of the page)
+                double yPos = pageHeight / 2;
 
-            // Add the annotation to the page
-            page.Annotations.Add(line);
+                // Create a Graph container that covers the whole page
+                Graph graph = new Graph(pageWidth, pageHeight);
+
+                // Define the line (start X, start Y, end X, end Y)
+                Line line = new Line(new float[] { 0, (float)yPos, (float)pageWidth, (float)yPos });
+
+                // Visual properties for the line
+                line.GraphInfo = new GraphInfo
+                {
+                    Color = Color.Gray,
+                    LineWidth = 1,
+                    // Opacity can be simulated with a semi‑transparent color if needed
+                };
+
+                // Add the line to the graph and the graph to the page
+                graph.Shapes.Add(line);
+                page.Paragraphs.Add(graph);
+            }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Line annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with line separators to '{outputPath}'.");
     }
 }
