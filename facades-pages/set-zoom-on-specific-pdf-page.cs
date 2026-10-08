@@ -15,20 +15,14 @@ class Program
             return;
         }
 
-        // Initialize the page editor and bind the source PDF
-        PdfPageEditor editor = new PdfPageEditor();
-        editor.BindPdf(inputPath);
-
-        // Specify that only page 7 should be edited
-        editor.ProcessPages = new int[] { 7 };
-
-        // Set zoom factor to 2.0 (200% magnification)
-        editor.Zoom = 2.0f;
-
-        // Apply the changes and save the result
-        editor.ApplyChanges();
-        editor.Save(outputPath);
-        editor.Close();
+        // Use PdfPageEditor to apply zoom to specific pages.
+        using (PdfPageEditor editor = new PdfPageEditor())
+        {
+            editor.BindPdf(inputPath);
+            editor.ProcessPages = new int[] { 7 }; // target page (1‑based index)
+            editor.Zoom = 2.0f; // 200 % magnification
+            editor.Save(outputPath);
+        }
 
         Console.WriteLine($"Page 7 zoom set to 2.0 and saved to '{outputPath}'.");
     }

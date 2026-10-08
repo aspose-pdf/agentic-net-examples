@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -9,9 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string resizedPath = "resized.pdf";
-        const string outputPath = "rotated.pdf";
-        const int pageNumber = 1; // page to rotate (1‑based index)
+        const string outputPath = "rotated_resized.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,21 +16,45 @@ class Program
             return;
         }
 
-        // Resize page contents (keep original size: 100% width, 100% height)
-        var fileEditor = new PdfFileEditor();
-        fileEditor.ResizeContents(inputPath, resizedPath, new int[] { pageNumber }, 100, 100);
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPath);
 
-        // Rotate the specified page by 90 degrees
-        var pageEditor = new PdfPageEditor();
-        pageEditor.BindPdf(resizedPath);
-        pageEditor.PageRotations = new Dictionary<int, int>
-        {
-            { pageNumber, 90 } // rotate pageNumber by 90°
-        };
-        pageEditor.ApplyChanges();
-        pageEditor.Save(outputPath);
-        pageEditor.Close();
+        // Page numbers are 1‑based in Aspose.Pdf
+        int pageNumber = 1;
+        Page page = pdfDoc.Pages[pageNumber];
 
-        Console.WriteLine($"Page {pageNumber} rotated and saved to '{outputPath}'.");
+        // Retrieve the current page dimensions
+        double originalWidth = page.PageInfo.Width;
+        double originalHeight = page.PageInfo.Height;
+
+        // Define new dimensions (example: shrink to 80% of original size)
+        double scaleFactor = 0.8;
+        double newWidth = originalWidth * scaleFactor;
+        double newHeight = originalHeight * scaleFactor;
+
+        // Resize the page itself
+        page.SetPageSize(newWidth, newHeight);
+
+        // Compute margins that will effectively shrink the existing content to the same scale.
+        // The margins are the difference between the original and new size divided by two.
+        double marginLeft = (originalWidth - newWidth) / 2;
+        double marginTop = (originalHeight - newHeight) / 2;
+        double marginRight = marginLeft;
+        double marginBottom = marginTop;
+
+        // Resize the page contents using the margins‑based overload.
+        int[] pages = new int[] { pageNumber }; // 1‑based page numbers
+        var resizeParams = PdfFileEditor.ContentsResizeParameters.Margins(
+            marginLeft, marginTop, marginRight, marginBottom);
+
+        new PdfFileEditor().ResizeContents(pdfDoc, pages, resizeParams);
+
+        // Rotate the page 90 degrees clockwise
+        page.Rotate = Rotation.on90;
+
+        // Persist the final PDF
+        pdfDoc.Save(outputPath);
+
+        Console.WriteLine($"Page {pageNumber} resized and rotated saved to '{outputPath}'.");
     }
 }

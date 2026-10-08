@@ -5,9 +5,13 @@ class Program
 {
     static void Main()
     {
-        // Create resize parameters with absolute margins of 5 points on all sides
-        PdfFileEditor.ContentsResizeParameters parameters = PdfFileEditor.ContentsResizeParameters.Margins(5, 5, 5, 5);
+        // Create a ContentsResizeParameters instance with 5‑point margins on all sides
+        var resizeParams = PdfFileEditor.ContentsResizeParameters.Margins(5, 5, 5, 5);
 
-        // The 'parameters' object can now be passed to PdfFileEditor methods (e.g., ResizeContents)
+        // Example usage (uncomment when a real PDF file is available):
+        // var editor = new PdfFileEditor();
+        // editor.ResizeContents("input.pdf", "output.pdf", resizeParams);
+
+        Console.WriteLine("ContentsResizeParameters configured with 5‑point margins.");
     }
 }

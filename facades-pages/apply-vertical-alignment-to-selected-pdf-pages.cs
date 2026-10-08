@@ -1,41 +1,47 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf; // for VerticalAlignment enum
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "aligned_output.pdf";
 
-        // Define the pages you want to align (1‑based indexing)
-        int[] selectedPages = new int[] { 1, 2, 3 };
+        // 1‑based page numbers that should be aligned to the top
+        int[] pagesToAlign = { 1, 3, 5 };
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfPageEditor to modify page layout
-        using (PdfPageEditor editor = new PdfPageEditor())
+        try
         {
-            // Load the source PDF
-            editor.BindPdf(inputPath);
+            // Use PdfPageEditor within a using block to ensure resources are released
+            using (PdfPageEditor editor = new PdfPageEditor())
+            {
+                // Load the source PDF
+                editor.BindPdf(inputPath);
 
-            // Specify which pages to process
-            editor.ProcessPages = selectedPages;
+                // Set vertical alignment to the top of the page (new API)
+                editor.VerticalAlignmentType = VerticalAlignment.Top;
 
-            // Align the original content to the top of each selected page
-            // Use the correct property and enum for vertical alignment
-            editor.VerticalAlignmentType = VerticalAlignment.Top;
+                // Specify the pages that the alignment should be applied to
+                editor.ProcessPages = pagesToAlign;
 
-            // Save the modified PDF (no ApplyChanges call needed)
-            editor.Save(outputPath);
+                // Save the resulting PDF
+                editor.Save(outputPath);
+            }
+
+            Console.WriteLine($"Vertical alignment applied. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Vertical alignment applied. Saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

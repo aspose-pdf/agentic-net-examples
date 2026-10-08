@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,28 +15,17 @@ class Program
             return;
         }
 
-        // PdfPageEditor implements IDisposable via SaveableFacade, so we can use a using block.
+        // Use PdfPageEditor to modify page‑level settings.
+        // The Zoom factor is applied via the Zoom property together with the ProcessPages array
+        // which specifies the 1‑based page numbers to affect.
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the source PDF.
             editor.BindPdf(inputPath);
-
-            // Restrict editing to page 5 only (pages are 1‑based).
-            editor.ProcessPages = new int[] { 5 };
-
-            // Set zoom to 0.75 (75 %).
-            editor.Zoom = 0.75f;
-
-            // Apply the changes to the document.
-            editor.ApplyChanges();
-
-            // Save the modified PDF.
+            editor.ProcessPages = new int[] { 5 };   // target page 5 (1‑based index)
+            editor.Zoom = 0.75f;                     // 75 % view (0.75 factor)
             editor.Save(outputPath);
-
-            // Close the editor (optional, as using will dispose it).
-            editor.Close();
         }
 
-        Console.WriteLine($"Zoom of page 5 set to 75 % and saved to '{outputPath}'.");
+        Console.WriteLine($"Zoom of page 5 set to 75% and saved to '{outputPath}'.");
     }
 }

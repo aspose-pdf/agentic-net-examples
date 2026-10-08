@@ -1,36 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// Rotate pdf pages using pdfpageeditor__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/facades-pages/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "rotated.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Rotate all pages of the PDF using PdfPageEditor
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            // Load the source PDF
-            editor.BindPdf(inputPath);
-
-            // Allowed rotation values: 0, 90, 180, 270
-            editor.Rotation = 90;
-
-            // Apply the rotation to the document
-            editor.ApplyChanges();
-
-            // Save the rotated PDF
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

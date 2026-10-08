@@ -12,33 +12,29 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Use PdfPageEditor to set page transition (BoxOut) for page 2
+        using (PdfPageEditor editor = new PdfPageEditor(doc))
         {
-            // Initialize PdfPageEditor with the loaded document
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
-            {
-                // Edit only page 2
-                editor.ProcessPages = new int[] { 2 };
+            // Specify the page(s) to edit – pages are 1‑based
+            editor.ProcessPages = new int[] { 2 };
 
-                // Set transition type to BoxOut (outward box)
-                editor.TransitionType = PdfPageEditor.OUTBOX;
+            // TransitionType values are integer based in older Aspose.Pdf versions.
+            // BoxOut corresponds to the integer value 4.
+            editor.TransitionType = 4;          // BoxOut transition (zoom‑out effect)
+            editor.TransitionDuration = 3;      // Duration in seconds
 
-                // Set transition duration to 3 seconds
-                editor.TransitionDuration = 3;
-
-                // Apply the changes to the document
-                editor.ApplyChanges();
-            }
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Apply the changes and save the result
+            editor.ApplyChanges();
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with transition effect to '{outputPath}'.");
+        Console.WriteLine($"Transition applied and saved to '{outputPath}'.");
     }
 }

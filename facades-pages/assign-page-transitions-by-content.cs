@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
@@ -12,55 +13,58 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the PdfPageEditor facade with the loaded document
-            PdfPageEditor editor = new PdfPageEditor(doc);
-
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // PdfPageEditor is the Facades class that allows setting page transitions
+            using (PdfPageEditor editor = new PdfPageEditor(doc))
             {
-                Page page = doc.Pages[pageNum];
-
-                // Simple content‑type detection:
-                // If the page contains any images, treat it as an "image" page,
-                // otherwise treat it as a "text" page.
-                bool hasImages = page.Resources.Images.Count > 0;
-
-                // Configure the editor to edit only the current page
-                editor.ProcessPages = new int[] { pageNum };
-
-                // Assign a distinct transition type based on the content
-                if (hasImages)
+                // Define transition type per page (page numbers are 1‑based)
+                // Transition types are integer values defined by the PDF specification.
+                // Example values:
+                // 0 – No transition
+                // 1 – Replace
+                // 2 – Split
+                // 3 – Blinds
+                // 4 – Box
+                // 5 – Wipe
+                // 6 – Dissolve
+                // 7 – Glitter
+                // 8 – Fly
+                // 9 – Push
+                // 10 – Cover
+                // 11 – Uncover
+                // 12 – Fade
+                var pageTransitions = new Dictionary<int, int>
                 {
-                    // Vertical blinds for image pages
-                    editor.TransitionType = PdfPageEditor.BLINDV;
-                }
-                else
+                    { 1, 0 },  // No transition on page 1
+                    { 2, 4 },  // Box transition on page 2
+                    { 3, 6 },  // Dissolve transition on page 3
+                    // Add more mappings as needed
+                };
+
+                foreach (var kvp in pageTransitions)
                 {
-                    // Dissolve effect for text pages
-                    editor.TransitionType = PdfPageEditor.DISSOLVE;
+                    int pageNumber = kvp.Key;      // 1‑based page index
+                    int transition = kvp.Value;    // integer representing the transition style
+
+                    // Apply the transition only to the specified page
+                    editor.ProcessPages = new int[] { pageNumber };
+                    editor.TransitionType = transition;
+                    editor.TransitionDuration = 1; // duration in seconds (adjust as required)
+
+                    editor.ApplyChanges();
                 }
 
-                // Optional: set transition duration (in seconds)
-                editor.TransitionDuration = 2;
-
-                // Apply the changes to the current page
-                editor.ApplyChanges();
+                // Persist all changes to the output file
+                editor.Save(outputPath);
             }
-
-            // Save the modified PDF using the facade's Save method
-            editor.Save(outputPath);
-
-            // Release resources held by the facade
-            editor.Close();
         }
 
-        Console.WriteLine($"PDF saved with page transitions: {outputPath}");
+        Console.WriteLine($"PDF saved with page transitions to '{outputPath}'.");
     }
 }

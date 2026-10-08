@@ -1,38 +1,40 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_A3.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfPageEditor (Facade) to modify page size
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the source PDF
-            editor.BindPdf(inputPath);
+            // A3 size in points (1 point = 1/72 inch)
+            double a3Width = PageSize.A3.Width;
+            double a3Height = PageSize.A3.Height;
 
-            // Set the output page size to A3 (420 mm × 297 mm)
-            editor.PageSize = PageSize.A3;
+            // Resize every page to A3
+            foreach (Page page in doc.Pages)
+            {
+                page.PageInfo.Width = a3Width;
+                page.PageInfo.Height = a3Height;
+                // Optional: set orientation flag based on dimensions
+                page.PageInfo.IsLandscape = a3Width > a3Height;
+            }
 
-            // Optional: increase resolution by scaling the content
-            // editor.Zoom = 2.0; // uncomment to double the resolution
-
-            // Save the result
-            editor.Save(outputPath);
-            editor.Close();
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with A3 page size to '{outputPath}'.");
+        Console.WriteLine($"PDF pages resized to A3 and saved as '{outputPath}'.");
     }
 }

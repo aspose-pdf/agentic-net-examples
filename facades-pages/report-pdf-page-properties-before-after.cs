@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -9,73 +9,81 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "edited.pdf";
+        const string reportPath = "page_report.txt";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // Report page properties BEFORE any edits
-        // -----------------------------------------------------------------
-        Console.WriteLine("=== BEFORE EDIT ===");
-        using (PdfFileInfo info = new PdfFileInfo(inputPath))
-        {
-            int pageCount = info.NumberOfPages;
-            for (int i = 1; i <= pageCount; i++) // 1‑based indexing
-            {
-                double width = info.GetPageWidth(i);
-                double height = info.GetPageHeight(i);
-                int rotation = info.GetPageRotation(i);
-                double xOffset = info.GetPageXOffset(i);
-                double yOffset = info.GetPageYOffset(i);
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPath);
+        int pageCount = pdfDoc.Pages.Count; // 1‑based indexing
 
-                Console.WriteLine(
-                    $"Page {i}: Size=({width} x {height}), Rotation={rotation}°, XOffset={xOffset}, YOffset={yOffset}");
+        // Prepare the report
+        using (StreamWriter report = new StreamWriter(reportPath, false))
+        {
+            report.WriteLine("Page Properties Report");
+            report.WriteLine($"Source: {inputPath}");
+            report.WriteLine($"Edited: {outputPath}");
+            report.WriteLine(new string('=', 40));
+
+            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
+            {
+                Page page = pdfDoc.Pages[pageNumber];
+
+                // ----- BEFORE EDIT -----
+                double beforeWidth = page.PageInfo.Width;
+                double beforeHeight = page.PageInfo.Height;
+                int beforeRotation = (int)page.Rotate; // Rotation enum values are 0,90,180,270
+                double beforeZoom = 1.0; // default zoom (no native property)
+
+                // ----- CALCULATE AFTER VALUES -----
+                double afterWidth = beforeWidth * 1.10;
+                double afterHeight = beforeHeight * 1.10;
+                int afterRotationDeg = (beforeRotation + 90) % 360;
+                double afterZoom = beforeZoom * 1.50;
+
+                // Apply size changes
+                page.PageInfo.Width = afterWidth;
+                page.PageInfo.Height = afterHeight;
+
+                // Apply rotation change using the Page.Rotate property
+                page.Rotate = (Rotation)afterRotationDeg;
+
+                // ----- AFTER EDIT (values read back from the page) -----
+                double finalWidth = page.PageInfo.Width;
+                double finalHeight = page.PageInfo.Height;
+                int finalRotation = (int)page.Rotate;
+                double finalZoom = afterZoom; // stored value, not a native attribute
+
+                // Write details to the report
+                report.WriteLine($"Page {pageNumber}:");
+                report.WriteLine("  Before Edit:");
+                report.WriteLine($"    Size     : {beforeWidth:F2} x {beforeHeight:F2}");
+                report.WriteLine($"    Rotation : {beforeRotation}°");
+                report.WriteLine($"    Zoom     : {beforeZoom:F2}");
+                report.WriteLine("  After Edit:");
+                report.WriteLine($"    Size     : {finalWidth:F2} x {finalHeight:F2}");
+                report.WriteLine($"    Rotation : {finalRotation}°");
+                report.WriteLine($"    Zoom     : {finalZoom:F2}");
+                report.WriteLine(new string('-', 30));
             }
         }
 
-        // -----------------------------------------------------------------
-        // Edit pages: rotate first page, apply a zoom factor, and shift origin
-        // -----------------------------------------------------------------
+        // Apply zoom to all pages using PdfPageEditor (native support)
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Bind the source PDF
-            editor.BindPdf(inputPath);
-
-            // Rotate page 1 by 90 degrees (use Dictionary<int,int>)
-            editor.PageRotations = new Dictionary<int, int> { { 1, 90 } };
-
-            // Apply a zoom of 80% to all pages (float literal)
-            editor.Zoom = 0.8f;
-
-            // Move the content origin by (10, 20) points
-            editor.MovePosition(10, 20);
-
-            // Apply the changes and save the result
-            editor.ApplyChanges();
+            editor.BindPdf(pdfDoc);
+            // Process all pages (1‑based array)
+            int[] allPages = new int[pageCount];
+            for (int i = 0; i < pageCount; i++) allPages[i] = i + 1;
+            editor.ProcessPages = allPages;
+            editor.Zoom = 1.5f; // 150% magnification (matches the calculated afterZoom)
             editor.Save(outputPath);
         }
 
-        // -----------------------------------------------------------------
-        // Report page properties AFTER the edits
-        // -----------------------------------------------------------------
-        Console.WriteLine("\n=== AFTER EDIT ===");
-        using (PdfFileInfo info = new PdfFileInfo(outputPath))
-        {
-            int pageCount = info.NumberOfPages;
-            for (int i = 1; i <= pageCount; i++) // 1‑based indexing
-            {
-                double width = info.GetPageWidth(i);
-                double height = info.GetPageHeight(i);
-                int rotation = info.GetPageRotation(i);
-                double xOffset = info.GetPageXOffset(i);
-                double yOffset = info.GetPageYOffset(i);
-
-                Console.WriteLine(
-                    $"Page {i}: Size=({width} x {height}), Rotation={rotation}°, XOffset={xOffset}, YOffset={yOffset}");
-            }
-        }
+        Console.WriteLine($"Editing completed. Report saved to '{reportPath}'. Edited PDF saved to '{outputPath}'.");
     }
 }

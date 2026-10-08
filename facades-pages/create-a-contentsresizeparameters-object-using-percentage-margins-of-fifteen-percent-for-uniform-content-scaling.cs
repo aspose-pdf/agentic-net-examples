@@ -1,20 +1,12 @@
-using System;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// Create a contentsresizeparameters object using percentage margins of fifteen percent for uniform content scaling
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/facades-pages/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        // Create resize parameters with uniform 15% margins on all sides.
-        // The static MarginsPercent method returns a PdfFileEditor.ContentsResizeParameters instance.
-        PdfFileEditor.ContentsResizeParameters resizeParams = PdfFileEditor.ContentsResizeParameters.MarginsPercent(
-            left: 15,
-            right: 15,
-            top: 15,
-            bottom: 15);
-
-        // Example usage (optional):
-        // PdfFileEditor editor = new PdfFileEditor();
-        // editor.ResizeContents("input.pdf", "output.pdf", null, resizeParams);
-    }
-}
+class Program { static void Main() { } }

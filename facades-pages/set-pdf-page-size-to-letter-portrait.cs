@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -16,25 +15,25 @@ class Program
             return;
         }
 
+        // Letter size in points (1 inch = 72 points)
+        const double letterWidth  = 8.5 * 72; // 612 points
+        const double letterHeight = 11  * 72; // 792 points
+
         // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        Document pdfDocument = new Document(inputPath);
+
+        // Set the custom size for each page (pages are 1‑based in Aspose.Pdf)
+        foreach (Page page in pdfDocument.Pages)
         {
-            // Initialize the facade for page editing
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
-            {
-                // Letter size in points (1 inch = 72 points)
-                double width  = 8.5 * 72; // 612 points
-                double height = 11  * 72; // 792 points
-
-                // Set the new page size for all pages
-                editor.PageSize = new PageSize((float)width, (float)height);
-                editor.ApplyChanges(); // Apply changes to the document
-            }
-
-            // Save the updated PDF
-            doc.Save(outputPath);
+            page.PageInfo.Width  = letterWidth;
+            page.PageInfo.Height = letterHeight;
+            // Optional: ensure orientation is portrait
+            page.PageInfo.IsLandscape = false;
         }
 
-        Console.WriteLine($"Page size set to Letter portrait and saved to '{outputPath}'.");
+        // Save the modified PDF
+        pdfDocument.Save(outputPath);
+
+        Console.WriteLine($"Page size set to Letter portrait. Saved to '{outputPath}'.");
     }
 }

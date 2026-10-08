@@ -1,33 +1,61 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Text; // for FontStyles enum
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // original PDF (unchanged)
-        const string outputPath = "edited_copy.pdf";    // new file with edits
+        const string originalPath = "original.pdf";
+        const string backupPath   = "original_backup.pdf";
+        const string editedPath   = "edited.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(originalPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {originalPath}");
             return;
         }
 
-        // Bind the original PDF to the facade. The facade works on an in‑memory
-        // representation, so the source file stays untouched.
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Create a backup copy of the original PDF (keeps the source unchanged)
+        if (!File.Exists(backupPath))
         {
-            editor.BindPdf(inputPath);
-
-            // Example edit: change the zoom factor for all pages.
-            editor.Zoom = 0.75f;
-
-            // Save the edited document to a separate file.
-            editor.Save(outputPath);
+            File.Copy(originalPath, backupPath);
+            Console.WriteLine($"Backup created at '{backupPath}'.");
+        }
+        else
+        {
+            Console.WriteLine($"Backup already exists at '{backupPath}'.");
         }
 
-        Console.WriteLine($"Edited PDF saved as '{outputPath}'. Original file remains unchanged.");
+        try
+        {
+            // Load the original PDF using the high‑level Document API
+            Document pdfDocument = new Document(originalPath);
+
+            // Example edit: add a text stamp on the first page
+            TextStamp stamp = new TextStamp("Edited with Aspose.Pdf.Facades")
+            {
+                XIndent = 100,
+                YIndent = 500,
+                TextState =
+                {
+                    FontSize = 14,
+                    FontStyle = FontStyles.Bold,
+                    ForegroundColor = Color.Blue
+                }
+            };
+
+            // Apply the stamp to the first page (or iterate over all pages if needed)
+            pdfDocument.Pages[1].AddStamp(stamp);
+
+            // Save the edited document to a new file; original remains untouched
+            pdfDocument.Save(editedPath);
+            Console.WriteLine($"Edited PDF saved as '{editedPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during PDF editing: {ex.Message}");
+        }
     }
 }

@@ -2,13 +2,12 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,38 +16,40 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Use PdfPageEditor for page‑level transition editing
+        using (PdfPageEditor editor = new PdfPageEditor(doc))
         {
-            // Initialize PdfPageEditor with the loaded document
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            // Pages are 1‑based in Aspose.Pdf
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Iterate through all pages (1‑based indexing)
-                for (int i = 1; i <= doc.Pages.Count; i++)
-                {
-                    // Extract visible text from the current page
-                    TextAbsorber absorber = new TextAbsorber();
-                    doc.Pages[i].Accept(absorber);
-                    string pageText = absorber.Text ?? string.Empty;
+                Page page = doc.Pages[i];
 
-                    // Determine transition duration based on title length (here using text length)
-                    // Example: 1 second per 10 characters, capped at 10 seconds
-                    int duration = Math.Min(pageText.Length / 10 + 1, 10);
+                // Retrieve a custom title for the current page from the document's Info dictionary.
+                // Expected key format: "Title_1", "Title_2", ...
+                string titleKey = $"Title_{i}";
+                string title = doc.Info[titleKey] ?? string.Empty;
+                int titleLength = title.Length;
 
-                    // Configure the editor for the current page only
-                    editor.ProcessPages = new int[] { i };
-                    editor.TransitionDuration = duration;          // duration in seconds
-                    editor.TransitionType = PdfPageEditor.DISSOLVE; // any transition style
+                // Compute transition duration: 1 s + 1 s per 10 characters, capped at 5 s
+                int duration = 1 + titleLength / 10;
+                if (duration > 5) duration = 5;
 
-                    // Apply the changes to the page
-                    editor.ApplyChanges();
-                }
+                // Configure the editor for the current page
+                editor.ProcessPages = new int[] { i };
+                editor.TransitionType = 4;          // 4 = Wipe transition (integer value from Aspose.Pdf enum)
+                editor.TransitionDuration = duration;
+
+                // Apply the transition to the page
+                editor.ApplyChanges();
             }
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with transitions saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with page transitions saved to '{outputPath}'.");
     }
 }

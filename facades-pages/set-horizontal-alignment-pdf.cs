@@ -1,46 +1,41 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // Added for TextFragment
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "aligned_output.pdf";
+        const string outputPath = "aligned.pdf";
 
-        // Ensure the source PDF exists – create a minimal one if it does not.
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
-            using (var seed = new Document())
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Facade for page‑level operations
+            using (PdfPageEditor pageEditor = new PdfPageEditor())
             {
-                var page = seed.Pages.Add();
-                page.Paragraphs.Add(new TextFragment("Sample content for alignment demo."));
-                seed.Save(inputPath);
+                // Bind the document to the editor
+                pageEditor.BindPdf(doc);
+
+                // Specify the page(s) to edit (1‑based indexing)
+                pageEditor.ProcessPages = new int[] { 1 };
+
+                // Set horizontal alignment – choose Left, Center, or Right
+                pageEditor.HorizontalAlignment = HorizontalAlignment.Center;
+
+                // Save the modified PDF
+                pageEditor.Save(outputPath);
             }
         }
 
-        // Choose the desired horizontal alignment for the page content.
-        // Options: HorizontalAlignment.Left, HorizontalAlignment.Center, HorizontalAlignment.Right
-        HorizontalAlignment alignment = HorizontalAlignment.Center; // example: center alignment
-
-        // PdfPageEditor implements IDisposable, so wrap it in a using block.
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            // Load the source PDF document.
-            editor.BindPdf(inputPath);
-
-            // Set the horizontal alignment of the original content on the result page.
-            editor.HorizontalAlignment = alignment;
-
-            // Apply the changes to the document.
-            editor.ApplyChanges();
-
-            // Save the modified PDF.
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"PDF saved with {alignment} alignment to '{outputPath}'.");
+        Console.WriteLine($"Alignment applied and saved to '{outputPath}'.");
     }
 }

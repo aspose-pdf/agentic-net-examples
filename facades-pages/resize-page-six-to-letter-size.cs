@@ -1,41 +1,37 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_letter_page6.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Verify the source file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
-        // PdfPageEditor is a disposable facade – wrap it in a using block.
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPath);
+
+        // Ensure the document has at least six pages
+        if (pdfDoc.Pages.Count < 6)
         {
-            // Load the source PDF.
-            editor.BindPdf(inputPdf);
-
-            // Specify that only page 6 should be processed.
-            editor.ProcessPages = new int[] { 6 };
-
-            // Set the desired output page size to Letter (8.5" x 11" = 612 x 792 points).
-            // The PageSize class does not expose a "Letter" member; use a custom size instead.
-            editor.PageSize = new PageSize(612, 792);
-
-            // Apply the changes to the bound document.
-            editor.ApplyChanges();
-
-            // Save the modified PDF.
-            editor.Save(outputPdf);
+            Console.Error.WriteLine("The PDF contains fewer than 6 pages.");
+            return;
         }
 
-        Console.WriteLine($"Page 6 resized to Letter size and saved as '{outputPdf}'.");
+        // Letter size in points (1 inch = 72 points): 8.5" x 11" => 612 x 792
+        pdfDoc.Pages[6].SetPageSize(612, 792);
+
+        // Save the modified PDF
+        pdfDoc.Save(outputPath);
+
+        Console.WriteLine($"Page 6 resized to Letter and saved as '{outputPath}'.");
     }
 }

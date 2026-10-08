@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf; // Document, Page, Rotation
 
 class Program
 {
@@ -10,24 +9,33 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Edit page 3: rotate 90° and set size to Letter in a single operation
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        // Ensure the document has at least three pages
+        if (pdfDocument.Pages.Count < 3)
         {
-            editor.BindPdf(inputPath);                 // Load source PDF
-            editor.ProcessPages = new int[] { 3 };     // Target only page 3
-            editor.Rotation = 90;                      // Rotate 90 degrees
-            // Letter size = 8.5" x 11" = 612 x 792 points
-            editor.PageSize = new Aspose.Pdf.PageSize(612, 792);
-            editor.ApplyChanges();                     // Apply modifications
-            editor.Save(outputPath);                   // Save result
+            Console.Error.WriteLine("The PDF does not contain a third page.");
+            return;
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        // Get page 3 (pages are 1‑based)
+        Page page = pdfDocument.Pages[3];
+
+        // Rotate page 3 by 90 degrees clockwise and resize to Letter (612 x 792 points)
+        page.Rotate = Rotation.on90;
+        page.SetPageSize(612, 792);
+
+        // Save the modified PDF
+        pdfDocument.Save(outputPath);
+
+        Console.WriteLine($"Page 3 rotated 90° and resized to Letter saved as '{outputPath}'.");
     }
 }

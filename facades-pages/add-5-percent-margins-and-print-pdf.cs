@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Linq;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -7,55 +9,43 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string tempPath  = "temp_with_margins.pdf";
+        const string outputPath = "output_with_margin.pdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // Step 1: Add a 5 % margin on all four sides of every page.
-        // The AddMarginsPct overload that accepts file paths processes all
-        // pages when the pages array is null.
-        // -----------------------------------------------------------------
-        PdfFileEditor editor = new PdfFileEditor();
-        bool added = editor.AddMarginsPct(
-            source:      inputPath,
-            destination: tempPath,
-            pages:       null,   // null → all pages
-            leftMargin:  5,      // 5 % of page width
-            rightMargin: 5,      // 5 % of page width
-            topMargin:   5,      // 5 % of page height
-            bottomMargin:5);     // 5 % of page height
-
-        if (!added)
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            Console.Error.WriteLine("Failed to add margins to the PDF.");
-            return;
+            // First, enlarge each page by 5 % (white margin will be added)
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                double origWidth = doc.Pages[i].PageInfo.Width;
+                double origHeight = doc.Pages[i].PageInfo.Height;
+
+                double newWidth = origWidth * 1.05;
+                double newHeight = origHeight * 1.05;
+
+                // Update the page size – this creates the extra white area
+                doc.Pages[i].PageInfo.Width = newWidth;
+                doc.Pages[i].PageInfo.Height = newHeight;
+            }
+
+            // Now shrink the original content so it is centred inside the larger page.
+            // The content must be scaled to 1/1.05 (≈ 95 %).
+            using (PdfPageEditor editor = new PdfPageEditor())
+            {
+                editor.BindPdf(doc);
+                editor.Zoom = (float)(1.0 / 1.05); // scale down content
+                // Apply the zoom to every page (1‑based indexing)
+                editor.ProcessPages = Enumerable.Range(1, doc.Pages.Count).ToArray();
+                editor.Save(outputPath);
+            }
         }
 
-        // -----------------------------------------------------------------
-        // Step 2: Print the modified PDF.
-        // AutoResize = true scales the document to fit the printable area,
-        // ensuring the added white space is respected.
-        // -----------------------------------------------------------------
-        PdfViewer viewer = new PdfViewer();
-        try
-        {
-            viewer.BindPdf(tempPath);
-            viewer.AutoResize = true;   // fit to printable area
-            viewer.AutoRotate = true;   // rotate if needed
-            viewer.PrintDocument();     // print using the default printer
-        }
-        finally
-        {
-            viewer.Close(); // release resources
-        }
-
-        // Optional: clean up the temporary file
-        try { File.Delete(tempPath); } catch { /* ignore cleanup errors */ }
+        Console.WriteLine($"PDF saved with 5% margin to '{outputPath}'.");
     }
 }

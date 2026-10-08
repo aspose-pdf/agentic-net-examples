@@ -10,6 +10,7 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
@@ -17,28 +18,32 @@ class Program
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        Document pdfDocument = new Document(inputPath);
+
+        // Ensure the document has at least three pages
+        if (pdfDocument.Pages.Count < 3)
         {
-            // Initialize the page editor with the document
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
-            {
-                // Apply changes only to page 3 (1‑based indexing)
-                editor.ProcessPages = new int[] { 3 };
-
-                // Set transition to a horizontal split (IN)
-                editor.TransitionType = PdfPageEditor.SPLITHIN;
-
-                // Set transition duration to 2 seconds
-                editor.TransitionDuration = 2;
-
-                // Apply the changes to the document
-                editor.ApplyChanges();
-            }
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.Error.WriteLine("The PDF does not contain a third page.");
+            return;
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        // Use PdfPageEditor to set a Split transition (type = 5) with a duration of 2 seconds on page 3
+        using (PdfPageEditor editor = new PdfPageEditor(pdfDocument))
+        {
+            // Specify the page(s) to which the transition will be applied (1‑based index)
+            editor.ProcessPages = new int[] { 3 };
+
+            // TransitionType values are defined by the library; Split corresponds to integer value 5
+            editor.TransitionType = 5; // Split transition
+            editor.TransitionDuration = 2; // 2 seconds
+
+            // Apply the changes to the document
+            editor.ApplyChanges();
+        }
+
+        // Save the modified PDF
+        pdfDocument.Save(outputPath);
+
+        Console.WriteLine($"Page 3 transition set to Split (2 seconds) and saved to '{outputPath}'.");
     }
 }

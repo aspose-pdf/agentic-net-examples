@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -12,43 +11,59 @@ class Program
         // Folder where processed PDFs will be saved
         const string outputFolder = @"C:\PdfOutput";
 
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
+            return;
+        }
+
         Directory.CreateDirectory(outputFolder);
 
         // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = Path.GetFileNameWithoutExtension(pdfPath);
-            string outputPath = Path.Combine(outputFolder, $"{fileName}_Adjusted.pdf");
+            string fileName = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputFolder, $"{fileName}_sized.pdf");
 
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfPath))
+            try
             {
-                // Create a PdfPageEditor facade to work with page properties
-                using (PdfPageEditor editor = new PdfPageEditor())
+                // Load the PDF document inside a using block for deterministic disposal
+                using (Document doc = new Document(inputPath))
                 {
-                    // Bind the loaded document to the editor
-                    editor.BindPdf(doc);
+                    // Example logic: assign A4 size to odd pages, Letter size to even pages
+                    // Sizes are in points (1 point = 1/72 inch)
+                    const double a4Width = 595;   // 8.27 inches
+                    const double a4Height = 842;  // 11.69 inches
+                    const double letterWidth = 612; // 8.5 inches
+                    const double letterHeight = 792; // 11 inches
 
-                    // Define the target page size (example: A4)
-                    // PageSize.PageLetter, PageSize.A4, etc. are available static properties
-                    PageSize targetSize = PageSize.A4;
-
-                    // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-                    for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                    for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
                     {
-                        // Set the size of each page to the target dimensions
-                        // Page.SetPageSize expects width and height as double values
-                        doc.Pages[pageIndex].SetPageSize(targetSize.Width, targetSize.Height);
+                        var pageInfo = doc.Pages[pageNum].PageInfo;
+                        if (pageNum % 2 == 1) // odd page -> A4
+                        {
+                            pageInfo.Width = a4Width;
+                            pageInfo.Height = a4Height;
+                        }
+                        else // even page -> Letter
+                        {
+                            pageInfo.Width = letterWidth;
+                            pageInfo.Height = letterHeight;
+                        }
                     }
 
-                    // Apply any pending changes made through the editor
-                    editor.ApplyChanges();
+                    // Save the modified PDF to the output path
+                    doc.Save(outputPath);
                 }
 
-                // Save the modified document to the output folder
-                doc.Save(outputPath);
-                Console.WriteLine($"Processed and saved: {outputPath}");
+                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {Path.GetFileName(outputPath)}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch processing completed.");
     }
 }

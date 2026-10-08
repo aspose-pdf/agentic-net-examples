@@ -1,12 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using System.Linq;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades; // PdfPageEditor resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "slideshow.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,36 +17,19 @@ class Program
             return;
         }
 
-        // Define display durations (in seconds) for pages.
-        // Index 0 => page 1, index 1 => page 2, etc.
-        // Pages beyond the array will use a default duration of 3 seconds.
-        int[] pageDurations = { 5, 10, 3 };
+        // Load the document only to obtain the total page count
+        Document pdfDocument = new Document(inputPath);
+        int pageCount = pdfDocument.Pages.Count;
 
-        // Use PdfPageEditor (a Facade) to edit page properties.
+        // Prepare an array with all page numbers (1‑based indexing)
+        int[] allPages = Enumerable.Range(1, pageCount).ToArray();
+
+        // Use PdfPageEditor to set the display duration for the selected pages
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the PDF document into the editor.
             editor.BindPdf(inputPath);
-
-            // Total number of pages in the document.
-            int totalPages = editor.GetPages();
-
-            // Set the display duration for each page individually.
-            for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++)
-            {
-                int duration = (pageNumber <= pageDurations.Length) ? pageDurations[pageNumber - 1] : 3;
-
-                // Restrict editing to the current page.
-                editor.ProcessPages = new int[] { pageNumber };
-
-                // Assign the desired duration (seconds).
-                editor.DisplayDuration = duration;
-
-                // Apply the change to the document.
-                editor.ApplyChanges();
-            }
-
-            // Save the modified PDF with the new slideshow timings.
+            editor.ProcessPages = allPages;          // apply to every page
+            editor.DisplayDuration = 5;              // duration in seconds (int, not double)
             editor.Save(outputPath);
         }
 
