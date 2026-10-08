@@ -1,43 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "portfolio.pdf";
+        // Paths for the output portfolio PDF and a sample file to embed
+        const string outputPdfPath = "portfolio.pdf";
+        const string sampleFilePath = "sample.txt";
 
-        // Create a new PDF document. The Portfolio collection is created automatically.
+        // Ensure the sample file exists (create a simple placeholder if missing)
+        if (!File.Exists(sampleFilePath))
+        {
+            File.WriteAllText(sampleFilePath, "This is a sample file embedded in the PDF Portfolio.");
+        }
+
+        // Create a new PDF document using the Document constructor.
+        // Wrap the Document in a using block for deterministic disposal (lifecycle rule).
         using (Document doc = new Document())
         {
-            // Ensure the Collection object exists – it represents the PDF portfolio.
+            // Initialise the collection that represents a PDF Portfolio.
             if (doc.Collection == null)
                 doc.Collection = new Collection();
 
-            // Files that will be embedded in the portfolio
-            string[] filesToAttach = { "file1.txt", "image.png" };
-
-            foreach (string filePath in filesToAttach)
+            // Create a FileSpecification for the file we want to embed.
+            var fileSpec = new FileSpecification(sampleFilePath, Path.GetFileName(sampleFilePath))
             {
-                if (!File.Exists(filePath))
-                    continue; // Skip missing files
+                // Load the file contents into a memory stream.
+                Contents = new MemoryStream(File.ReadAllBytes(sampleFilePath))
+            };
 
-                // Create a FileSpecification for the attachment.
-                // The first argument is the file name that will appear in the portfolio,
-                // the second argument is a description (using the same name here).
-                var fileSpec = new FileSpecification(Path.GetFileName(filePath), Path.GetFileName(filePath));
-                // Set the file contents via a memory stream.
-                fileSpec.Contents = new MemoryStream(File.ReadAllBytes(filePath));
+            // Add the file specification to the portfolio collection.
+            doc.Collection.Add(fileSpec);
 
-                // Add the file specification to the document's collection (portfolio).
-                doc.Collection.Add(fileSpec);
-            }
+            // Optionally set a title for the portfolio (metadata).
+            doc.Info.Title = "Sample PDF Portfolio";
 
-            // Save the PDF portfolio
-            doc.Save(outputPath);
+            // Save the portfolio PDF.
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF Portfolio created at '{outputPath}'.");
+        Console.WriteLine($"PDF Portfolio created at '{outputPdfPath}'.");
     }
 }

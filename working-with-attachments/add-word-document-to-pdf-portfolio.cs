@@ -1,37 +1,36 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core PDF API
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string outputPdfPath = "portfolio.pdf";
-        const string wordFilePath = "sample.docx";
+        const string portfolioPath = "portfolio.pdf";          // existing PDF portfolio (optional)
+        const string wordPath      = "document.docx";          // Word file to embed
+        const string outputPath    = "portfolio_with_word.pdf"; // result PDF
 
-        // Verify the Word document exists
-        if (!File.Exists(wordFilePath))
+        if (!File.Exists(wordPath))
         {
-            Console.Error.WriteLine($"Word file not found: {wordFilePath}");
+            Console.Error.WriteLine($"Word file not found: {wordPath}");
             return;
         }
 
-        // Create a new (empty) PDF document
-        using (Document pdfDoc = new Document())
+        // Load existing portfolio if it exists; otherwise create a new empty PDF.
+        using (Document pdf = File.Exists(portfolioPath) ? new Document(portfolioPath) : new Document())
         {
-            // Initialize the collection that represents a PDF portfolio
-            pdfDoc.Collection = new Collection();
+            // Create a FileSpecification for the Word document.
+            var fileSpec = new FileSpecification(wordPath, Path.GetFileName(wordPath));
+            // Optional: set the modification date of the attachment.
+            fileSpec.Params.ModDate = DateTime.UtcNow;
 
-            // Create a file specification for the Word document
-            var fileSpec = new FileSpecification(wordFilePath, "Word Document");
+            // Add the FileSpecification to the PDF portfolio collection.
+            pdf.Collection.Add(fileSpec);
 
-            // Add the Word document to the portfolio
-            pdfDoc.Collection.Add(fileSpec);
-
-            // Save the resulting PDF portfolio
-            pdfDoc.Save(outputPdfPath);
+            // Save the updated PDF portfolio.
+            pdf.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF portfolio created at '{outputPdfPath}'.");
+        Console.WriteLine($"Word document added to portfolio: {outputPath}");
     }
 }

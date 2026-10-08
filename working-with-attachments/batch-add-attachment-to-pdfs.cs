@@ -1,22 +1,21 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
-class BatchAttachmentProcessor
+class Program
 {
     static void Main()
     {
-        // Input folder containing PDFs to process
-        const string inputFolder = @"C:\InputPdfs";
-        // Output folder where processed PDFs will be saved
-        const string outputFolder = @"C:\OutputPdfs";
-        // Path to the file that will be attached to every PDF
-        const string attachmentPath = @"C:\Attachment\sample-attachment.pdf";
+        // Folder containing the PDFs to process
+        const string inputFolder = "InputPdfs";
+        // Folder where the processed PDFs will be saved
+        const string outputFolder = "OutputPdfs";
+        // Path to the file that will be attached to each PDF
+        const string attachmentPath = "attachment.pdf";
 
-        // Validate paths
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
@@ -26,41 +25,42 @@ class BatchAttachmentProcessor
             return;
         }
 
-        // Ensure output folder exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
+
+        // Read the attachment once – reuse the byte array for every PDF
+        byte[] attachmentBytes = File.ReadAllBytes(attachmentPath);
+        string attachmentFileName = Path.GetFileName(attachmentPath);
 
         // Process each PDF file in the input folder
         foreach (string pdfFilePath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
+            string fileName = Path.GetFileName(pdfFilePath);
+            string outputPath = Path.Combine(outputFolder, fileName);
+
             try
             {
-                // Load the PDF document inside a using block for deterministic disposal
+                // Open the PDF inside a using block for deterministic disposal
                 using (Document doc = new Document(pdfFilePath))
                 {
-                    // Create a FileSpecification for the attachment using the constructor that accepts the file path
-                    // The second argument is an optional description; we use the file name as a simple description.
-                    FileSpecification attachmentSpec = new FileSpecification(attachmentPath, Path.GetFileName(attachmentPath));
+                    // Create a FileSpecification for the attachment and add it to the PDF
+                    var attachmentSpec = new FileSpecification(attachmentFileName)
+                    {
+                        // Provide the file data via a MemoryStream
+                        Contents = new MemoryStream(attachmentBytes)
+                    };
+                    doc.EmbeddedFiles.Add(attachmentSpec);
 
-                    // Add the attachment to the document's EmbeddedFiles collection
-                    string attachmentKey = Path.GetFileName(attachmentPath);
-                    doc.EmbeddedFiles.Add(attachmentKey, attachmentSpec);
-
-                    // Determine output file path (same name, different folder)
-                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfFilePath));
-
-                    // Save the modified PDF
+                    // Save the modified PDF to the output folder (overwrites if exists)
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed and saved: {Path.GetFileName(pdfFilePath)}");
+                Console.WriteLine($"Processed: {fileName}");
             }
             catch (Exception ex)
             {
-                // Log any errors but continue processing remaining files
-                Console.Error.WriteLine($"Error processing '{pdfFilePath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
             }
         }
-
-        Console.WriteLine("Batch attachment processing completed.");
     }
 }
