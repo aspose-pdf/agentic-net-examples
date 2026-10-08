@@ -1,38 +1,40 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfExtractor facade to work with attachments
-        using (PdfExtractor extractor = new PdfExtractor())
+        try
         {
-            // Bind the PDF document
-            extractor.BindPdf(inputPdf);
+            // Load the PDF document
+            Document pdfDoc = new Document(inputPath);
 
-            // Extract attachments (required before retrieving names)
-            extractor.ExtractAttachment();
-
-            // Get the list of attachment names
-            IList<string> attachmentNames = extractor.GetAttachNames();
-
-            // List the attachment names
-            Console.WriteLine("Embedded attachments:");
-            foreach (string name in attachmentNames)
+            // List the names of all embedded attachments (no file saving)
+            if (pdfDoc.EmbeddedFiles != null && pdfDoc.EmbeddedFiles.Count > 0)
             {
-                Console.WriteLine(name);
+                foreach (FileSpecification fileSpec in pdfDoc.EmbeddedFiles)
+                {
+                    Console.WriteLine($"Attachment: {fileSpec.Name}");
+                }
             }
+            else
+            {
+                Console.WriteLine("No embedded attachments found.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

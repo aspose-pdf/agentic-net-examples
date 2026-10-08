@@ -1,59 +1,43 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf; // Added to resolve FileSpecification
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Input PDF path – either from command line or a default file name
-        string inputPath = args.Length > 0 ? args[0] : "sample.pdf";
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // ---------- Page count ----------
-        int pageCount;
-        using (PdfFileInfo fileInfo = new PdfFileInfo(inputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(pdfPath))
         {
-            pageCount = fileInfo.NumberOfPages;
-        }
+            // Total pages (1‑based indexing, but Count gives the total)
+            int pageCount = doc.Pages.Count;
 
-        // ---------- Images and Attachments ----------
-        int imageCount = 0;
-        int attachmentCount = 0;
-
-        using (PdfExtractor extractor = new PdfExtractor())
-        {
-            // Bind the PDF file to the extractor
-            extractor.BindPdf(inputPath);
-
-            // ----- Images -----
-            extractor.ExtractImage(); // Prepare image extraction
-            while (extractor.HasNextImage())
+            // Count images by iterating each page's image collection
+            int imageCount = 0;
+            foreach (Aspose.Pdf.Page page in doc.Pages)
             {
-                // Retrieve each image into a dummy stream; we only need the count
-                using (MemoryStream dummyStream = new MemoryStream())
+                foreach (Aspose.Pdf.XImage img in page.Resources.Images)
                 {
-                    extractor.GetNextImage(dummyStream);
+                    imageCount++;
                 }
-                imageCount++;
             }
 
-            // ----- Attachments -----
-            extractor.ExtractAttachment(); // Prepare attachment extraction
-            List<FileSpecification> attachments = extractor.GetAttachmentInfo();
-            attachmentCount = attachments?.Count ?? 0;
-        }
+            // Count embedded files (attachments) – Document.Attachments does not exist
+            int attachmentCount = (doc.EmbeddedFiles != null) ? doc.EmbeddedFiles.Count : 0;
 
-        // ---------- Report ----------
-        Console.WriteLine($"Pages: {pageCount}");
-        Console.WriteLine($"Images: {imageCount}");
-        Console.WriteLine($"Attachments: {attachmentCount}");
+            // Report the diagnostics
+            Console.WriteLine($"Pages      : {pageCount}");
+            Console.WriteLine($"Images     : {imageCount}");
+            Console.WriteLine($"Attachments: {attachmentCount}");
+        }
     }
 }

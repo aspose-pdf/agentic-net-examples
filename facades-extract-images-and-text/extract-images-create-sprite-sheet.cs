@@ -9,72 +9,79 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputSprite = "sprite.png";
+        const string inputPdfPath = "input.pdf";
+        const string outputSpritePath = "sprite_sheet.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Extract images from the PDF using PdfExtractor
-        List<Bitmap> extractedBitmaps = new List<Bitmap>();
+        // List to hold extracted images
+        List<Image> extractedImages = new List<Image>();
+
+        // Extract images using PdfExtractor (Facades API)
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.BindPdf(inputPdf);
-            // Use the mode that extracts actually used images (optional)
-            // extractor.ExtractImageMode = ExtractImageMode.ActuallyUsed;
+            extractor.BindPdf(inputPdfPath);
             extractor.ExtractImage();
 
             while (extractor.HasNextImage())
             {
                 using (MemoryStream imgStream = new MemoryStream())
                 {
-                    // Save each image as PNG to the memory stream
-                    extractor.GetNextImage(imgStream, ImageFormat.Png);
-                    imgStream.Position = 0;
-                    // Load the image into a Bitmap for composition
-                    Bitmap bmp = new Bitmap(imgStream);
-                    extractedBitmaps.Add(bmp);
+                    extractor.GetNextImage(imgStream);
+                    imgStream.Position = 0; // reset stream position
+
+                    // Load the image into System.Drawing.Image
+                    Image img = Image.FromStream(imgStream);
+                    extractedImages.Add(img);
                 }
             }
         }
 
-        if (extractedBitmaps.Count == 0)
+        if (extractedImages.Count == 0)
         {
             Console.WriteLine("No images were found in the PDF.");
             return;
         }
 
-        // Calculate sprite sheet dimensions (horizontal layout)
+        // Determine sprite sheet dimensions (horizontal layout)
         int totalWidth = 0;
         int maxHeight = 0;
-        foreach (Bitmap bmp in extractedBitmaps)
+        foreach (var img in extractedImages)
         {
-            totalWidth += bmp.Width;
-            if (bmp.Height > maxHeight)
-                maxHeight = bmp.Height;
+            totalWidth += img.Width;
+            if (img.Height > maxHeight)
+                maxHeight = img.Height;
         }
 
         // Create the sprite sheet bitmap
-        using (Bitmap sprite = new Bitmap(totalWidth, maxHeight))
-        using (Graphics g = Graphics.FromImage(sprite))
+        using (Bitmap spriteSheet = new Bitmap(totalWidth, maxHeight))
         {
-            g.Clear(Color.Transparent);
-
-            int offsetX = 0;
-            foreach (Bitmap bmp in extractedBitmaps)
+            using (Graphics g = Graphics.FromImage(spriteSheet))
             {
-                g.DrawImage(bmp, offsetX, 0, bmp.Width, bmp.Height);
-                offsetX += bmp.Width;
-                bmp.Dispose(); // Dispose individual bitmaps after drawing
+                g.Clear(Color.Transparent); // clear background
+
+                int offsetX = 0;
+                foreach (var img in extractedImages)
+                {
+                    g.DrawImage(img, offsetX, 0, img.Width, img.Height);
+                    offsetX += img.Width;
+                }
             }
 
-            // Save the combined sprite sheet as PNG
-            sprite.Save(outputSprite, ImageFormat.Png);
+            // Save the sprite sheet as PNG
+            spriteSheet.Save(outputSpritePath, ImageFormat.Png);
         }
 
-        Console.WriteLine($"Sprite sheet created: {outputSprite}");
+        // Dispose extracted images
+        foreach (var img in extractedImages)
+        {
+            img.Dispose();
+        }
+
+        Console.WriteLine($"Sprite sheet created: {outputSpritePath}");
     }
 }

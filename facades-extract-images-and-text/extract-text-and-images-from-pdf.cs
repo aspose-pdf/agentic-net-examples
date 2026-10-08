@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -7,47 +8,66 @@ class Program
     static void Main()
     {
         const string pdfPath = "input.pdf";
-        const string textOutputPath = "extracted_text.txt";
-        const string imagesOutputDir = "ExtractedImages";
 
-        // Verify the source PDF exists
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Ensure the images output directory exists
-        Directory.CreateDirectory(imagesOutputDir);
-
-        // PdfExtractor implements IDisposable, so use a using block for deterministic cleanup
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Determine the number of pages in the PDF
+        int pageCount;
+        using (var doc = new Document(pdfPath))
         {
-            // Bind the PDF file to the extractor
-            extractor.BindPdf(pdfPath);
-
-            // Optional: set extraction modes (defaults are suitable for most scenarios)
-            // 0 = pure text mode, 1 = raw ordering mode
-            extractor.ExtractTextMode = 0;
-            // extractor.ExtractImageMode = ExtractImageMode.DefinedInResources; // default
-
-            // ----------- Text Extraction -----------
-            extractor.ExtractText();                     // Perform text extraction
-            extractor.GetText(textOutputPath);           // Save all extracted text to a file
-
-            // ----------- Image Extraction -----------
-            extractor.ExtractImage();                    // Perform image extraction
-
-            int imageIndex = 1;
-            while (extractor.HasNextImage())
-            {
-                // Save each image as a separate file (PNG format by default)
-                string imagePath = Path.Combine(imagesOutputDir, $"image-{imageIndex}.png");
-                extractor.GetNextImage(imagePath);
-                imageIndex++;
-            }
+            pageCount = doc.Pages.Count;
         }
 
-        Console.WriteLine("Text and image extraction completed successfully.");
+        using (PdfExtractor extractor = new PdfExtractor())
+        {
+            // Bind the PDF file
+            extractor.BindPdf(pdfPath);
+
+            // ---------- Text extraction ----------
+            // Call the method to start text extraction
+            extractor.ExtractText();
+
+            // Get the extracted text via a stream (PdfExtractor has no parameter‑less GetText())
+            string extractedText;
+            using (MemoryStream textStream = new MemoryStream())
+            {
+                extractor.GetText(textStream);
+                textStream.Position = 0;
+                using (StreamReader reader = new StreamReader(textStream))
+                {
+                    extractedText = reader.ReadToEnd();
+                }
+            }
+            Console.WriteLine("=== Extracted Text ===");
+            Console.WriteLine(extractedText);
+
+            // ---------- Image extraction ----------
+            // Enable resource‑based image extraction (recommended for most PDFs)
+            extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
+
+            for (int page = 1; page <= pageCount; page++)
+            {
+                // Set the page range for the current iteration
+                extractor.StartPage = page;
+                extractor.EndPage   = page;
+
+                // Start image extraction for the selected page
+                extractor.ExtractImage();
+
+                int imageIndex = 1;
+                // Retrieve each image sequentially
+                while (extractor.HasNextImage())
+                {
+                    string imgPath = $"image_page{page}_{imageIndex}.png";
+                    extractor.GetNextImage(imgPath); // saves the image to file
+                    Console.WriteLine($"Saved image: {imgPath}");
+                    imageIndex++;
+                }
+            }
+        }
     }
 }

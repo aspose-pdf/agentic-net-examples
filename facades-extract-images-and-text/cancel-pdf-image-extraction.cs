@@ -1,90 +1,97 @@
 using System;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
-using Aspose.Pdf.Facades;                 // PdfExtractor
-using Aspose.Pdf.Multithreading;          // InterruptMonitor
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "sample.pdf";
+        const string inputPath = "input.pdf";
+        const string outputText = "output.txt";
+        const string outputImageDir = "Images";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create an interrupt monitor and make it the thread‑local instance.
-        using (InterruptMonitor monitor = new InterruptMonitor())
+        var cts = new CancellationTokenSource();
+
+        // Example cancellation trigger (after 5 seconds)
+        var cancelThread = new Thread(() =>
         {
-            InterruptMonitor.ThreadLocalInstance = monitor;
+            Thread.Sleep(5000);
+            Console.WriteLine("Cancellation requested.");
+            cts.Cancel();
+        });
+        cancelThread.Start();
 
-            // Start a background task that waits for a key press and then requests interruption.
-            Task.Run(() =>
+        try
+        {
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                Console.WriteLine("Press any key to cancel the extraction...");
-                Console.ReadKey(intercept: true);
-                monitor.Interrupt(); // Signal cancellation to the running operation.
-            });
+                // Bind the PDF file
+                extractor.BindPdf(inputPath);
 
-            // Run the extraction on a separate task so we can observe the cancellation token.
-            Task extractionTask = Task.Run(() =>
-            {
-                // PdfExtractor does not implement IDisposable, but we wrap it in a using block for symmetry.
-                using (PdfExtractor extractor = new PdfExtractor())
+                // Optional: limit to specific pages (1‑based indexing)
+                extractor.StartPage = 1;
+                // extractor.EndPage can be set if a range is needed
+
+                // Abort if cancellation requested before any extraction
+                if (cts.Token.IsCancellationRequested)
                 {
-                    // Bind the PDF file.
-                    extractor.BindPdf(inputPdf);
+                    Console.WriteLine("Operation cancelled before extraction.");
+                    return;
+                }
 
-                    // Begin image extraction.
-                    extractor.ExtractImage();
+                // Extract text
+                extractor.ExtractText();
 
-                    int imageIndex = 1;
-                    while (extractor.HasNextImage())
+                if (cts.Token.IsCancellationRequested)
+                {
+                    Console.WriteLine("Operation cancelled after text extraction.");
+                    return;
+                }
+
+                // Save extracted text directly to file (GetText overload expects output path)
+                extractor.GetText(outputText);
+
+                // Extract images (no need to set ExtractImageMode – the method starts extraction)
+                extractor.ExtractImage();
+
+                if (cts.Token.IsCancellationRequested)
+                {
+                    Console.WriteLine("Operation cancelled after image extraction.");
+                    return;
+                }
+
+                // Save extracted images
+                Directory.CreateDirectory(outputImageDir);
+                int imageIndex = 1;
+                while (extractor.HasNextImage())
+                {
+                    if (cts.Token.IsCancellationRequested)
                     {
-                        // Periodically check the monitor's token; if cancellation was requested,
-                        // we break out of the loop after signalling interruption.
-                        if (monitor.CancellationToken.IsCancellationRequested)
-                        {
-                            // The monitor already knows an interrupt was requested via Interrupt(),
-                            // but we break to stop further processing.
-                            break;
-                        }
-
-                        // Save each extracted image to a file.
-                        string outputImage = $"image-{imageIndex}.png";
-                        extractor.GetNextImage(outputImage);
-                        Console.WriteLine($"Saved {outputImage}");
-                        imageIndex++;
+                        Console.WriteLine("Operation cancelled during image saving.");
+                        break;
                     }
-                }
-            }, monitor.CancellationToken);
 
-            try
-            {
-                // Wait for the extraction task to finish (or be cancelled).
-                extractionTask.Wait();
-                Console.WriteLine("Extraction completed.");
-            }
-            catch (AggregateException ae)
-            {
-                // If the task was cancelled, handle the OperationCanceledException.
-                foreach (var ex in ae.InnerExceptions)
-                {
-                    if (ex is OperationCanceledException)
-                        Console.WriteLine("Extraction was cancelled by the user.");
-                    else
-                        Console.Error.WriteLine($"Error: {ex.Message}");
+                    string imgPath = Path.Combine(outputImageDir, $"Image_{imageIndex}.png");
+                    using (FileStream imgStream = new FileStream(imgPath, FileMode.Create, FileAccess.Write))
+                    {
+                        extractor.GetNextImage(imgStream);
+                    }
+                    imageIndex++;
                 }
             }
-            finally
-            {
-                // Clean up the thread‑local reference.
-                InterruptMonitor.ThreadLocalInstance = null;
-            }
+
+            Console.WriteLine("Extraction completed.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

@@ -7,44 +7,57 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputDir = "ExtractedImages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // PdfExtractor implements IDisposable, so use a using block.
-        using (PdfExtractor extractor = new PdfExtractor())
+        try
         {
-            // Bind the source PDF file.
-            extractor.BindPdf(inputPdf);
+            // Load the PDF document to obtain the page count (PdfExtractor does not expose it directly)
+            Document pdfDoc = new Document(inputPath);
+            int totalPages = pdfDoc.Pages.Count;
 
-            // Set the extraction mode to retrieve images as they are stored in the PDF.
-            // This keeps the original image format (e.g., JPEG, PNG, etc.).
-            extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
-
-            // Perform the extraction.
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-            while (extractor.HasNextImage())
+            // PdfExtractor implements IDisposable, so wrap it in a using block
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                // GetNextImage without specifying an ImageFormat preserves the original format.
-                string outputPath = Path.Combine(outputDir, $"image_{imageIndex}.img");
-                bool success = extractor.GetNextImage(outputPath);
-                if (!success)
-                {
-                    Console.Error.WriteLine($"Failed to extract image {imageIndex}");
-                }
-                imageIndex++;
-            }
-        }
+                // Bind the PDF file
+                extractor.BindPdf(inputPath);
 
-        Console.WriteLine($"Image extraction completed. Files saved to '{outputDir}'.");
+                // Configure extraction to keep images in their original format.
+                // The correct property in this library version is ExtractImageMode.
+                // Using DefinedInResources extracts the image streams exactly as stored in the PDF.
+                extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
+
+                // Set the page range to the whole document
+                extractor.StartPage = 1;
+                extractor.EndPage   = totalPages;
+
+                // Perform the extraction
+                extractor.ExtractImage();
+
+                // Save each extracted image. The extractor provides HasNextImage/GetNextImage methods.
+                int imageIndex = 1;
+                while (extractor.HasNextImage())
+                {
+                    string outPath = Path.Combine(outputDir, $"Image_{imageIndex}.png");
+                    extractor.GetNextImage(outPath);
+                    imageIndex++;
+                }
+            }
+
+            Console.WriteLine($"Images have been extracted to '{outputDir}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

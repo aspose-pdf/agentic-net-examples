@@ -1,67 +1,83 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF containing attachments
+        // Path to the source PDF
         const string inputPdfPath = "input.pdf";
 
-        // Base folder where attachments will be saved
-        const string outputBaseFolder = "ExtractedAttachments";
+        // Root folder where attachments will be organized
+        const string outputRootFolder = "Attachments";
 
+        // Verify the PDF exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Error: PDF file not found at '{inputPdfPath}'.");
             return;
         }
 
-        // Ensure the base output folder exists
-        Directory.CreateDirectory(outputBaseFolder);
+        // Ensure the root output folder exists
+        Directory.CreateDirectory(outputRootFolder);
 
-        // Use PdfExtractor (Facade) to extract attachments
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPdfPath);
+
+        // If there are no embedded files, exit early
+        if (pdfDoc.EmbeddedFiles == null || pdfDoc.EmbeddedFiles.Count == 0)
         {
-            // Bind the source PDF
-            extractor.BindPdf(inputPdfPath);
+            Console.WriteLine("No attachments found in the PDF.");
+            return;
+        }
 
-            // Perform the extraction operation
-            extractor.ExtractAttachment();
+        // Iterate over each embedded file and save it to the appropriate folder
+        foreach (FileSpecification fileSpec in pdfDoc.EmbeddedFiles)
+        {
+            // The name stored in the PDF (may include extension)
+            string originalFileName = fileSpec.Name ?? "unnamed";
 
-            // Retrieve attachment names
-            IList<string> attachmentNames = extractor.GetAttachNames();
+            // Determine the file extension (e.g., ".png", ".txt")
+            string extension = Path.GetExtension(originalFileName);
+            string extensionFolderName = string.IsNullOrEmpty(extension)
+                ? "no_extension"
+                : extension.TrimStart('.').ToLowerInvariant();
 
-            // Retrieve attachment streams (one stream per attachment)
-            MemoryStream[] attachmentStreams = extractor.GetAttachment();
+            // Build the target directory path and ensure it exists
+            string targetFolder = Path.Combine(outputRootFolder, extensionFolderName);
+            Directory.CreateDirectory(targetFolder);
 
-            // Iterate over each attachment
-            for (int i = 0; i < attachmentNames.Count; i++)
+            // Destination file path (handle possible name collisions)
+            string destinationPath = Path.Combine(targetFolder, originalFileName);
+            int duplicateIndex = 1;
+            while (File.Exists(destinationPath))
             {
-                string name = attachmentNames[i];
-                string extension = Path.GetExtension(name).TrimStart('.').ToLowerInvariant();
+                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(originalFileName);
+                string newFileName = $"{fileNameWithoutExt}_{duplicateIndex}{extension}";
+                destinationPath = Path.Combine(targetFolder, newFileName);
+                duplicateIndex++;
+            }
 
-                // Create a subfolder for the current file extension
-                string extensionFolder = Path.Combine(outputBaseFolder, string.IsNullOrEmpty(extension) ? "no_ext" : extension);
-                Directory.CreateDirectory(extensionFolder);
-
-                // Full path for the extracted file
-                string outputPath = Path.Combine(extensionFolder, name);
-
-                // Write the stream to disk
-                using (FileStream fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+            // Write the attachment contents to disk
+            using (Stream contentStream = fileSpec.Contents)
+            {
+                if (contentStream == null)
                 {
-                    MemoryStream srcStream = attachmentStreams[i];
-                    srcStream.Position = 0; // Ensure we start from the beginning
-                    srcStream.CopyTo(fileStream);
+                    Console.WriteLine($"Warning: Attachment '{originalFileName}' has no content and will be skipped.");
+                    continue;
                 }
+                // Ensure the stream is positioned at the beginning
+                if (contentStream.CanSeek)
+                    contentStream.Position = 0;
 
-                Console.WriteLine($"Extracted: {outputPath}");
+                using (FileStream fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write))
+                {
+                    contentStream.CopyTo(fileStream);
+                }
             }
         }
 
-        Console.WriteLine("All attachments have been extracted and organized.");
+        Console.WriteLine("All attachments have been extracted and organized by file extension.");
     }
 }

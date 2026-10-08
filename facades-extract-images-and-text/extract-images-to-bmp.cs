@@ -1,49 +1,60 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging; // Added for ImageFormat
-using Aspose.Pdf.Facades; // PdfExtractor facade
+using System.Drawing;
+using System.Drawing.Imaging;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";                 // source PDF
-        const string outputFolder = "ExtractedImages";       // folder for BMP files
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "ExtractedImages";
 
-        // Verify source file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // PdfExtractor extracts images directly from the PDF resources,
-        // preserving original resolution and color depth.
+        // Use PdfExtractor (IDisposable) to extract images from the PDF
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Load the PDF document
-            extractor.BindPdf(inputPdf);
+            // Bind the source PDF
+            extractor.BindPdf(inputPdfPath);
 
-            // Extract all images defined in the PDF resources
+            // Extract all images from the document
             extractor.ExtractImage();
 
-            int imageNumber = 1;
-            // Iterate through each extracted image
+            int imageIndex = 1;
+            // Iterate over extracted images
             while (extractor.HasNextImage())
             {
-                // Build output BMP file path
-                string bmpPath = Path.Combine(outputFolder, $"image_{imageNumber}.bmp");
+                // Get the next image into a memory stream
+                using (MemoryStream imgStream = new MemoryStream())
+                {
+                    // The overload requires a Stream destination
+                    extractor.GetNextImage(imgStream);
+                    imgStream.Position = 0; // reset for reading
 
-                // Save the image as BMP; the original image data is written unchanged
-                extractor.GetNextImage(bmpPath, ImageFormat.Bmp);
+                    // Create a System.Drawing.Image from the stream
+                    using (Image img = Image.FromStream(imgStream))
+                    {
+                        // Build the output BMP file path
+                        string bmpPath = Path.Combine(outputFolder, $"Image_{imageIndex}.bmp");
 
-                imageNumber++;
+                        // Save the image as BMP preserving original resolution and color depth
+                        img.Save(bmpPath, ImageFormat.Bmp);
+                    }
+                }
+
+                imageIndex++;
             }
         }
 
-        Console.WriteLine("Image extraction to BMP completed successfully.");
+        Console.WriteLine("Image extraction completed.");
     }
 }

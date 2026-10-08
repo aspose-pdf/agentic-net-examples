@@ -1,92 +1,78 @@
 using System;
 using System.IO;
 using System.IO.Compression;
-using System.Drawing.Imaging; // Added for ImageFormat
-using Aspose.Pdf;
-using Aspose.Pdf.Facades; // PdfExtractor, ImageFormat (Aspose enum)
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // -----------------------------------------------------------------
-        // 1. Create a self‑contained sample PDF (input.pdf) that contains at least
-        //    one image. This guarantees the example runs in the sandbox where no
-        //    external files exist.
-        // -----------------------------------------------------------------
-        const string pdfPath = "input.pdf";
-        CreateSamplePdfWithImage(pdfPath);
+        // Input PDF file
+        const string inputPdf = "input.pdf";
 
-        // -----------------------------------------------------------------
-        // 2. Directory where extracted PNG images will be saved
-        // -----------------------------------------------------------------
+        // Directory where extracted PNG images will be saved
         const string outputDir = "ExtractedImages";
+
+        // Path of the final ZIP archive (lossless compression of PNG files)
+        const string zipPath = "images.zip";
+
+        // Verify that the input file exists
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
+        }
+
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
         // -----------------------------------------------------------------
-        // 3. Extract images from the PDF using PdfExtractor (Facades API)
+        // 1. Extract images from the PDF using Aspose.Pdf.Facades.PdfExtractor
         // -----------------------------------------------------------------
-        using (PdfExtractor extractor = new PdfExtractor())
-        {
-            extractor.BindPdf(pdfPath);
-            extractor.ExtractImage();
+        PdfExtractor extractor = new PdfExtractor();
 
-            int imageIndex = 1;
-            while (extractor.HasNextImage())
+        // Bind the PDF document to the extractor
+        extractor.BindPdf(inputPdf);
+
+        // Instruct the extractor to look for images
+        extractor.ExtractImage();
+
+        int imageIndex = 1;
+
+        // Loop through all extracted images
+        while (extractor.HasNextImage())
+        {
+            // Retrieve the current image into a memory stream
+            using (MemoryStream imgStream = new MemoryStream())
             {
-                string pngFile = Path.Combine(outputDir, $"image-{imageIndex}.png");
-                // Use System.Drawing.Imaging.ImageFormat for PNG output.
-                extractor.GetNextImage(pngFile, ImageFormat.Png);
+                // GetNextImage fills the provided stream with the image bytes
+                extractor.GetNextImage(imgStream);
+
+                // Build a file name for the PNG image
+                string pngPath = Path.Combine(outputDir, $"image_{imageIndex}.png");
+
+                // The extracted image bytes are already in PNG format (Aspose extracts
+                // the original image data). Write them directly to disk.
+                File.WriteAllBytes(pngPath, imgStream.ToArray());
+
                 imageIndex++;
             }
         }
 
         // -----------------------------------------------------------------
-        // 4. Compress the extracted PNG files using a lossless ZIP archive
+        // 2. Compress the PNG files using a lossless ZIP archive
         // -----------------------------------------------------------------
-        const string zipPath = "ExtractedImages.zip";
-        using (FileStream zipStream = new FileStream(zipPath, FileMode.Create))
-        using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Create))
+        // Delete any existing archive to avoid exceptions
+        if (File.Exists(zipPath))
         {
-            foreach (string pngFile in Directory.GetFiles(outputDir, "*.png"))
-            {
-                archive.CreateEntryFromFile(pngFile, Path.GetFileName(pngFile), CompressionLevel.Optimal);
-            }
+            File.Delete(zipPath);
         }
 
-        Console.WriteLine("Image extraction and lossless compression completed successfully.");
-    }
+        // Create a ZIP archive containing all PNG files.
+        // CompressionLevel.Optimal provides lossless compression.
+        ZipFile.CreateFromDirectory(outputDir, zipPath, CompressionLevel.Optimal, false);
 
-    /// <summary>
-    /// Generates a minimal PDF containing a single embedded PNG image.
-    /// The PNG data is created from a hard‑coded 1×1 pixel red image (base64).
-    /// </summary>
-    private static void CreateSamplePdfWithImage(string path)
-    {
-        // 1×1 red PNG (base64 encoded). This avoids any System.Drawing usage.
-        const string base64Png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+XK6cAAAAASUVORK5CYII=";
-        byte[] pngBytes = Convert.FromBase64String(base64Png);
-
-        using (MemoryStream imgStream = new MemoryStream(pngBytes))
-        {
-            // Create a new PDF document.
-            Document doc = new Document();
-            Page page = doc.Pages.Add();
-
-            // Add the image to the page.
-            Aspose.Pdf.Image pdfImage = new Aspose.Pdf.Image
-            {
-                ImageStream = imgStream,
-                // Position the image at (100,500) with its original size.
-                FixWidth = 100,
-                FixHeight = 100,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            page.Paragraphs.Add(pdfImage);
-
-            // Save the PDF so the extractor can work on it.
-            doc.Save(path);
-        }
+        Console.WriteLine($"Extracted {imageIndex - 1} image(s) to '{outputDir}'.");
+        Console.WriteLine($"Compressed images into '{zipPath}'.");
     }
 }

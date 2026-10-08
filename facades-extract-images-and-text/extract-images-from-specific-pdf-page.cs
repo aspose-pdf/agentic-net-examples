@@ -1,53 +1,56 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
-using System.Drawing.Imaging; // <-- required for ImageFormat
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";          // source PDF
-        const string outputDir = "ExtractedImages";   // folder for extracted images
-        const int pageNumber = 2;                     // page to extract from (1‑based)
+        // Input PDF path
+        const string pdfPath = "input.pdf";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        // Directory to store extracted images
+        const string outputDir = "ExtractedImages";
+
+        // Page number to extract images from (1‑based indexing)
+        const int pageNumber = 2;
+
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Use PdfExtractor to pull images from a single page
+        // Use PdfExtractor and limit extraction to a single page
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF document
-            extractor.BindPdf(inputPdf);
+            // Bind the PDF file to the extractor
+            extractor.BindPdf(pdfPath);
 
-            // Limit extraction range to the desired page
-            extractor.StartPage = pageNumber;   // start page (inclusive)
-            extractor.EndPage   = pageNumber;   // end page (inclusive)
+            // Limit extraction to the desired page (same start and end page)
+            extractor.StartPage = pageNumber; // first page to extract (1‑based)
+            extractor.EndPage   = pageNumber; // last page to extract (same as start)
 
-            // Perform image extraction for the specified range
+            // NOTE: The ExtractImageMode property is not available in the current
+            // version of Aspose.Pdf.Facades. The default behavior extracts all images,
+            // so we simply call ExtractImage() without setting a mode.
+
+            // Perform the extraction
             extractor.ExtractImage();
 
             int imageIndex = 1;
-            // Iterate through all images found on that page
             while (extractor.HasNextImage())
             {
-                string outPath = Path.Combine(
-                    outputDir,
-                    $"page{pageNumber}_image{imageIndex}.jpg");
-
-                // Save each image as JPEG (default format)
-                extractor.GetNextImage(outPath, ImageFormat.Jpeg);
+                string imagePath = Path.Combine(outputDir, $"page{pageNumber}_image{imageIndex}.png");
+                extractor.GetNextImage(imagePath);
+                Console.WriteLine($"Saved image {imageIndex} to '{imagePath}'.");
                 imageIndex++;
             }
-        }
 
-        Console.WriteLine("Image extraction completed.");
+            Console.WriteLine($"Extracted {imageIndex - 1} image(s) from page {pageNumber}.");
+        }
     }
 }
