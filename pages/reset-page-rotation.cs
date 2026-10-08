@@ -6,8 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "rotated.pdf";
-        const string outputPath = "restored.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "rotated_back.pdf";
+        const int pageNumber = 1; // 1‑based index
 
         if (!File.Exists(inputPath))
         {
@@ -15,25 +16,26 @@ class Program
             return;
         }
 
-        // Load the PDF document (using block ensures proper disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based; get the page that was previously rotated
-            Page page = doc.Pages[1];
+            // Ensure the requested page exists
+            if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+            {
+                Console.Error.WriteLine($"Page {pageNumber} is out of range. Document has {doc.Pages.Count} pages.");
+                return;
+            }
 
-            // Display the current rotation value
-            Console.WriteLine($"Current rotation: {page.Rotate}");
+            // Access the page (1‑based indexing)
+            Page page = doc.Pages[pageNumber];
 
-            // Reset the rotation to its original (no rotation) state
-            page.Rotate = Rotation.None;
+            // Reset the page rotation to its original orientation
+            page.Rotate = Rotation.None; // equivalent to 0°
 
-            // Confirm the rotation has been cleared
-            Console.WriteLine($"Rotation after reset: {page.Rotate}");
-
-            // Save the updated PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved to '{outputPath}'.");
+        Console.WriteLine($"Page {pageNumber} rotation reset. Saved to '{outputPath}'.");
     }
 }

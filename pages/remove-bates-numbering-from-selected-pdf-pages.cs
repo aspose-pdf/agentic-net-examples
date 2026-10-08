@@ -2,16 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Pages from which the Bates numbering stamp should be removed (1‑based indexes)
-        var pagesToRemove = new HashSet<int> { 2, 4, 7 };
+        // The Bates number stamp text to remove
+        const string targetBatesNumber = "BATES-00123";
+
+        // Pages (1‑based) from which the stamp should be removed
+        List<int> pagesToProcess = new List<int> { 2, 3, 5 };
 
         if (!File.Exists(inputPath))
         {
@@ -19,64 +23,42 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // -----------------------------------------------------------------
-            // Step 1 – Remove all Bates numbering artifacts from the whole document.
-            // The core API provides DeleteBatesNumbering() as an extension method
-            // on PageCollection. This removes every Bates numbering artifact from
-            // each page.
-            // -----------------------------------------------------------------
-            doc.Pages.DeleteBatesNumbering();
-
-            // -----------------------------------------------------------------
-            // Step 2 – Re‑add Bates numbering to pages that should keep it.
-            // Because the core API does not expose a method to delete a single
-            // Bates artifact, we delete all and then add the artifact back only
-            // to the pages that are NOT in the removal list.
-            // -----------------------------------------------------------------
-            // Create a configured Bates numbering artifact (customize as needed)
-            BatesNArtifact batesArtifact = new BatesNArtifact
+            // Document must be wrapped in a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                StartNumber      = 1,          // starting number
-                NumberOfDigits   = 6,          // e.g., 000001
-                Prefix           = "Bates-",   // optional prefix
-                ArtifactHorizontalAlignment = HorizontalAlignment.Right,
-                ArtifactVerticalAlignment   = VerticalAlignment.Bottom,
-                BottomMargin = 20,            // distance from bottom edge
-                RightMargin  = 20             // distance from right edge
-            };
-
-            // Add the artifact only to pages that are NOT marked for removal
-            for (int i = 1; i <= doc.Pages.Count; i++)
-            {
-                if (!pagesToRemove.Contains(i))
+                foreach (int pageIndex in pagesToProcess)
                 {
-                    // The AddBatesNumbering overload that accepts a pre‑configured
-                    // artifact adds the same artifact instance to every page in the
-                    // collection, so we need to clone it for each page to avoid shared
-                    // state. Creating a new instance per page is the safest approach.
-                    BatesNArtifact artifactForPage = new BatesNArtifact
-                    {
-                        StartNumber      = batesArtifact.StartNumber,
-                        NumberOfDigits   = batesArtifact.NumberOfDigits,
-                        Prefix           = batesArtifact.Prefix,
-                        ArtifactHorizontalAlignment = batesArtifact.ArtifactHorizontalAlignment,
-                        ArtifactVerticalAlignment   = batesArtifact.ArtifactVerticalAlignment,
-                        BottomMargin = batesArtifact.BottomMargin,
-                        RightMargin  = batesArtifact.RightMargin
-                    };
+                    // Ensure the page index is within the document range
+                    if (pageIndex < 1 || pageIndex > doc.Pages.Count)
+                        continue; // skip invalid page numbers
 
-                    // Add the artifact to the specific page
-                    doc.Pages[i].Artifacts.Add(artifactForPage);
+                    Page page = doc.Pages[pageIndex];
+
+                    // Iterate backwards when removing items from the Annotations collection
+                    for (int i = page.Annotations.Count - 1; i >= 0; i--)
+                    {
+                        Annotation ann = page.Annotations[i];
+                        // StampAnnotation stores its visible text in the Contents property
+                        if (ann is StampAnnotation stamp &&
+                            string.Equals(stamp.Contents, targetBatesNumber, StringComparison.Ordinal))
+                        {
+                            // Remove the matching stamp annotation from the page
+                            page.Annotations.Delete(i);
+                        }
+                    }
                 }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Bates number '{targetBatesNumber}' removed. Output saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Bates numbering removed from pages {string.Join(", ", pagesToRemove)} and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

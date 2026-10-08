@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,32 +15,42 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Verify that there are at least two pages
+            // Verify that the document has at least two pages (pages are 1‑based)
             if (doc.Pages.Count < 2)
             {
-                Console.Error.WriteLine("The document must contain at least two pages.");
+                Console.Error.WriteLine("The document does not contain a second page.");
                 return;
             }
 
-            // Retrieve width and height of page 2 (pages are 1‑based)
-            Page sourcePage = doc.Pages[2];
-            double width = sourcePage.PageInfo.Width;
-            double height = sourcePage.PageInfo.Height;
+            // Retrieve the PageInfo (size, margins, etc.) from page 2
+            PageInfo sourceInfo = doc.Pages[2].PageInfo;
 
-            // Insert a new empty page at position 5
-            // If the document has fewer than 5 pages, the page is added at the end
-            Page newPage = doc.Pages.Insert(5);
+            // Insert a new blank page at position 5 (1‑based index)
+            // If the document has fewer than 4 pages, Insert adds the page at the end
+            int insertPosition = 5;
+            doc.Pages.Insert(insertPosition);
 
-            // Set the new page size to match page 2
-            newPage.SetPageSize(width, height);
+            // Get the newly inserted page and copy the size/margin information from the source page
+            Page newPage = doc.Pages[insertPosition];
+            newPage.PageInfo.Width  = sourceInfo.Width;
+            newPage.PageInfo.Height = sourceInfo.Height;
+            // Copy margin information if needed (MarginInfo is a reference type, so we clone its values)
+            if (sourceInfo.Margin != null)
+            {
+                newPage.PageInfo.Margin = new MarginInfo(
+                    sourceInfo.Margin.Left,
+                    sourceInfo.Margin.Right,
+                    sourceInfo.Margin.Top,
+                    sourceInfo.Margin.Bottom);
+            }
 
-            // Save the modified PDF
+            // Save the modified document as PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Inserted page at position 5 with dimensions of page 2. Saved to '{outputPath}'.");
+        Console.WriteLine($"Inserted a new page at position 5. Saved to '{outputPath}'.");
     }
 }

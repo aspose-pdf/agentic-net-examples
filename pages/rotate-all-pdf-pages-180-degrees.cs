@@ -15,16 +15,17 @@ class Program
             return;
         }
 
-        // Load the PDF document; using ensures deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based; rotate each page 180 degrees
+            // Aspose.Pdf uses 1‑based page indexing
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
+                // Rotate each page 180 degrees using the correct property and enum value
                 doc.Pages[i].Rotate = Rotation.on180;
             }
 
-            // Save the rotated document
+            // Save the rotated document (PDF format by default)
             doc.Save(outputPath);
         }
 

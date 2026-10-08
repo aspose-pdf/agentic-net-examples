@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -8,67 +9,60 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "watermarked_curved.pdf";
+        const string outputPath = "watermarked.pdf";
         const string watermarkText = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages and add a series of WatermarkArtifact objects that follow a curved path.
+            // Define a quadratic Bezier curve for the watermark path
+            var start   = new Aspose.Pdf.Point(50, 400);
+            var control = new Aspose.Pdf.Point(300, 800);
+            var end     = new Aspose.Pdf.Point(550, 400);
+            var curvePoints = GetQuadraticBezierPoints(start, control, end, 20);
+
             foreach (Page page in doc.Pages)
             {
-                // Parameters for the curved path
-                int steps = 7; // number of artifacts to create for a smoother curve
-                double startAngle = -30; // degrees
-                double endAngle = 30;    // degrees
-                double radius = Math.Min(page.PageInfo.Width, page.PageInfo.Height) / 3.0;
-                double centerX = page.PageInfo.Width / 2.0;
-                double centerY = page.PageInfo.Height / 2.0;
-
-                for (int i = 0; i < steps; i++)
+                // Place a small text stamp at each point to simulate a curved watermark
+                foreach (var pt in curvePoints)
                 {
-                    double t = (double)i / (steps - 1);
-                    double angle = startAngle + t * (endAngle - startAngle);
-                    double rad = angle * Math.PI / 180.0;
-
-                    // Position on the circular arc
-                    double posX = centerX + radius * Math.Cos(rad);
-                    double posY = centerY + radius * Math.Sin(rad);
-
-                    // Create the watermark artifact
-                    WatermarkArtifact artifact = new WatermarkArtifact
-                    {
-                        Text = watermarkText,
-                        // Position expects a Point, not a Position
-                        Position = new Point(posX, posY),
-                        // Rotate the text so it follows the tangent of the curve
-                        Rotation = angle,
-                        // Configure text appearance via TextState
-                        TextState = new TextState
-                        {
-                            Font = FontRepository.FindFont("Helvetica"),
-                            FontSize = 72,
-                            // Use an ARGB color to embed transparency (alpha ~ 30%)
-                            ForegroundColor = Color.FromArgb(77, 204, 0, 0), // 30% opaque red
-                            BackgroundColor = Color.Transparent,
-                            RenderingMode = TextRenderingMode.FillText
-                        }
-                    };
-
-                    page.Artifacts.Add(artifact);
+                    TextStamp stamp = new TextStamp(watermarkText);
+                    stamp.TextState.Font = FontRepository.FindFont("Arial");
+                    stamp.TextState.FontSize = 24;
+                    stamp.TextState.FontStyle = FontStyles.Bold;
+                    stamp.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0.8, 0.0, 0.0);
+                    stamp.Opacity = 0.3;
+                    stamp.XIndent = pt.X;
+                    stamp.YIndent = pt.Y;
+                    // Simple rotation can be added if desired
+                    stamp.RotateAngle = 0;
+                    page.AddStamp(stamp);
                 }
             }
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
             doc.Save(outputPath);
         }
 
         Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
+    }
+
+    // Generates points on a quadratic Bezier curve
+    static List<Aspose.Pdf.Point> GetQuadraticBezierPoints(Aspose.Pdf.Point p0, Aspose.Pdf.Point p1, Aspose.Pdf.Point p2, int segments)
+    {
+        var points = new List<Aspose.Pdf.Point>();
+        for (int i = 0; i <= segments; i++)
+        {
+            double t = (double)i / segments;
+            double oneMinusT = 1 - t;
+            double x = oneMinusT * oneMinusT * p0.X + 2 * oneMinusT * t * p1.X + t * t * p2.X;
+            double y = oneMinusT * oneMinusT * p0.Y + 2 * oneMinusT * t * p1.Y + t * t * p2.Y;
+            points.Add(new Aspose.Pdf.Point(x, y));
+        }
+        return points;
     }
 }

@@ -1,65 +1,57 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // required for HtmlFragment
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputHtml = "output.html";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_header.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the source PDF inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPath))
         {
-            // Define the HTML header with embedded CSS
-            string headerHtml = @"
-                <style>
-                    .myHeader { 
-                        font-family: Arial, sans-serif; 
-                        font-size: 14pt; 
-                        color: #003366; 
-                        text-align: center; 
-                        margin-bottom: 5pt;
-                    }
-                </style>
-                <div class='myHeader'>Confidential Report – Page {page}</div>";
+            // Define the HTML header with embedded CSS.
+            string htmlHeader = @"
+                <html>
+                <head>
+                    <style>
+                        .header {
+                            font-size:14pt;
+                            color:#333333;
+                            text-align:center;
+                            margin-bottom:10pt;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class='header'>My Document Header</div>
+                </body>
+                </html>";
 
-            // Apply the header to the first three pages
-            for (int i = 1; i <= Math.Min(3, doc.Pages.Count); i++)
+            // Add the header to the first three pages (or fewer if the document has less pages).
+            int pagesToProcess = Math.Min(3, doc.Pages.Count);
+            for (int i = 1; i <= pagesToProcess; i++) // Aspose.Pdf uses 1‑based page indexing
             {
                 Page page = doc.Pages[i];
-
-                // Create an HtmlFragment (HTML rendering is supported via HtmlFragment)
-                HtmlFragment headerFragment = new HtmlFragment(headerHtml);
-
-                // Create a HeaderFooter object and add the fragment to its Paragraphs collection
-                HeaderFooter header = new HeaderFooter();
-                header.Paragraphs.Add(headerFragment);
-
-                // Assign the header to the page
-                page.Header = header;
+                // Create a fresh HtmlFragment for each page (a fragment instance cannot be shared across pages).
+                HtmlFragment headerFragment = new HtmlFragment(htmlHeader);
+                // Insert the header at the beginning of the page's paragraph collection.
+                page.Paragraphs.Insert(0, headerFragment);
             }
 
-            // Prepare HTML save options with CSS embedded into the HTML file
-            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
-            {
-                PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                // Ensure the header/footer is rendered
-                HtmlMarkupGenerationMode = HtmlSaveOptions.HtmlMarkupGenerationModes.WriteAllHtml
-            };
-
-            // Save the document as HTML
-            doc.Save(outputHtml, htmlOpts);
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"HTML with embedded CSS header saved to '{outputHtml}'.");
+        Console.WriteLine($"PDF saved with HTML header to '{outputPath}'.");
     }
 }

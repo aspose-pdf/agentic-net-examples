@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;   // required for TextStamp
 
 class Program
 {
@@ -15,24 +16,39 @@ class Program
             return;
         }
 
-        // Load the PDF, add Bates numbering, and save.
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Add Bates numbering to every page.
-            // Start at 1000, use a dash as suffix, and display 4 digits.
-            doc.Pages.AddBatesNumbering(artifact =>
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                artifact.StartNumber   = 1000;   // first Bates number
-                artifact.NumberOfDigits = 4;     // ensures numbers like 1000, 1001, ...
-                artifact.Suffix        = "-";    // dash separator after the number
-                // Optional: set alignment or margins if needed
-                // artifact.ArtifactHorizontalAlignment = HorizontalAlignment.Right;
-            });
+                // Create the Bates number: year prefix + zero‑padded page number
+                string batesText = $"2026-{i:D4}";
 
-            // Save the modified PDF.
+                // Configure a TextStamp for the current page
+                TextStamp stamp = new TextStamp(batesText)
+                {
+                    // Position the stamp at the bottom‑right corner
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment   = VerticalAlignment.Bottom,
+                    // Margins – use individual margin properties (no Margin object)
+                    RightMargin = 20,
+                    BottomMargin = 20,
+                    // Appearance settings
+                    Background = false,
+                    Opacity    = 0.5,
+                    // Use a cross‑platform color (avoid System.Drawing)
+                    TextState = { FontSize = 12, ForegroundColor = Aspose.Pdf.Color.DarkGray }
+                };
+
+                // Apply the stamp to the current page
+                doc.Pages[i].AddStamp(stamp);
+            }
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Bates-numbered PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Bates numbering applied and saved to '{outputPath}'.");
     }
 }

@@ -15,26 +15,28 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the original page count (1‑based indexing)
-            int originalCount = doc.Pages.Count;
+            // Aspose.Pdf uses 1‑based page indexing (see global rule)
+            int pageCount = doc.Pages.Count;
 
-            // Calculate the insertion start index (middle of the document)
-            // For even counts we insert after the first half; for odd counts after the middle page.
-            int startIndex = (originalCount / 2) + 1; // 1‑based index
+            // Calculate the middle index where new pages will be inserted.
+            // For an even number of pages we insert after the first half.
+            // Adding 1 makes the insertion point the first page of the second half.
+            int middleIndex = (pageCount / 2) + 1;
 
-            // Insert ten empty pages sequentially so they appear together
+            // Insert ten empty pages at the calculated position.
+            // Use the overload that creates a blank page automatically.
             for (int i = 0; i < 10; i++)
             {
-                doc.Pages.Insert(startIndex + i);
+                doc.Pages.Insert(middleIndex);
             }
 
-            // Save the modified document
+            // Save the modified document. The using block ensures the Document stays alive until Save completes.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Inserted 10 pages at the midpoint. Saved to '{outputPath}'.");
+        Console.WriteLine($"Inserted 10 empty pages at the midpoint. Saved to '{outputPath}'.");
     }
 }

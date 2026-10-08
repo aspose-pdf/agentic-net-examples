@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -7,46 +8,57 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_footer.pdf";
-        const string footerImg = "footer.png"; // path to the footer image
+        const string inputPdfPath = "input.pdf";
+        const string footerImagePath = "footer.png";
+        const string outputPdfPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(footerImg))
+        if (!File.Exists(footerImagePath))
         {
-            Console.Error.WriteLine($"Footer image not found: {footerImg}");
+            Console.Error.WriteLine($"Footer image not found: {footerImagePath}");
             return;
         }
 
-        // Load the PDF document (using block ensures proper disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the original image to obtain its dimensions.
+        using (System.Drawing.Image img = System.Drawing.Image.FromFile(footerImagePath))
         {
-            // Iterate over all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            const float scaleFactor = 0.5f; // 50% of original size
+            float scaledWidth = img.Width * scaleFactor;
+            float scaledHeight = img.Height * scaleFactor;
+
+            // Load the PDF document inside a using block for deterministic disposal.
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Create an Image object for the footer
-                Image img = new Image
+                // Create an ImageStamp for the footer image.
+                ImageStamp footerStamp = new ImageStamp(footerImagePath)
                 {
-                    File = footerImg,                 // load image file
-                    ImageScale = 0.5,                // scale to 50 % of original size
+                    // Position the stamp at the bottom center of each page.
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Bottom
+                    VerticalAlignment   = VerticalAlignment.Bottom,
+                    // YIndent works as a bottom margin when VerticalAlignment is Bottom.
+                    YIndent = 10, // distance from the bottom edge (points)
+                    Background = false,
+                    // Apply scaling via Width/Height.
+                    Width = scaledWidth,
+                    Height = scaledHeight
                 };
 
-                // Add the image to the page's paragraph collection.
-                // This places the image according to the alignment settings.
-                page.Paragraphs.Add(img);
-            }
+                // Apply the stamp to every page in the document.
+                foreach (Page page in pdfDoc.Pages)
+                {
+                    page.AddStamp(footerStamp);
+                }
 
-            // Save the modified PDF. No SaveOptions needed for PDF output.
-            doc.Save(outputPdf);
+                // Save the modified PDF.
+                pdfDoc.Save(outputPdfPath);
+            }
         }
 
-        Console.WriteLine($"PDF with image footer saved to '{outputPdf}'.");
+        Console.WriteLine($"Footer added and saved to '{outputPdfPath}'.");
     }
 }

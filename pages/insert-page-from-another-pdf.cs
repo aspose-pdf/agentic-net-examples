@@ -6,46 +6,34 @@ class Program
 {
     static void Main()
     {
-        const string targetPath = "target.pdf";      // PDF to receive the new page
-        const string sourcePath = "source.pdf";      // PDF containing the page to insert
-        const string outputPath = "merged.pdf";      // Resulting PDF
+        const string targetPath = "target.pdf";   // PDF to receive the new page
+        const string sourcePath = "source.pdf";   // PDF containing the page to insert
+        const string outputPath = "merged.pdf";   // Resulting PDF
 
-        // Verify files exist
-        if (!File.Exists(targetPath))
+        // Ensure input files exist
+        if (!File.Exists(targetPath) || !File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"Target file not found: {targetPath}");
-            return;
-        }
-        if (!File.Exists(sourcePath))
-        {
-            Console.Error.WriteLine($"Source file not found: {sourcePath}");
+            Console.Error.WriteLine("One or both input files are missing.");
             return;
         }
 
-        try
+        // Wrap both Document objects in using blocks for deterministic disposal
+        using (Document targetDoc = new Document(targetPath))
+        using (Document sourceDoc = new Document(sourcePath))
         {
-            // Load the target document (where the page will be inserted)
-            using (Document targetDoc = new Document(targetPath))
-            // Load the source document (containing the page to insert)
-            using (Document sourceDoc = new Document(sourcePath))
-            {
-                // Choose the page to insert from the source document.
-                // Here we take the first page; change the index if needed.
-                Page pageToInsert = sourceDoc.Pages[1];
+            // Aspose.Pdf uses 1‑based page indexing.
+            // Get the first page from the source PDF (adjust if a different page is needed)
+            Page pageToInsert = sourceDoc.Pages[1];
 
-                // Insert the page at position 2 in the target document.
-                // This preserves the page's original size, rotation, and other properties.
-                targetDoc.Pages.Insert(2, pageToInsert);
+            // Insert the page at index 2 in the target PDF.
+            // The Insert method also uses 1‑based indexing.
+            // The page's original size and rotation are preserved automatically.
+            targetDoc.Pages.Insert(2, pageToInsert);
 
-                // Save the modified target document.
-                targetDoc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Page inserted successfully. Output saved to '{outputPath}'.");
+            // Save the modified document
+            targetDoc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Page inserted and saved to '{outputPath}'.");
     }
 }

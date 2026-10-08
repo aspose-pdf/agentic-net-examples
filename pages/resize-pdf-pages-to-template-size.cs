@@ -6,49 +6,45 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string templatePath = "template.pdf";   // PDF whose page size will be used
-        const string inputPath    = "input.pdf";      // PDF whose pages will be resized
-        const string outputPath   = "output_resized.pdf";
+        const string templatePath = "template.pdf";
+        const string sourcePath   = "source.pdf";
+        const string outputPath   = "resized.pdf";
 
-        // Verify files exist
         if (!File.Exists(templatePath))
         {
             Console.Error.WriteLine($"Template not found: {templatePath}");
             return;
         }
-        if (!File.Exists(inputPath))
+        if (!File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Source not found: {sourcePath}");
             return;
         }
 
-        // Load the template PDF and read the size of its first page
-        double targetWidth, targetHeight;
+        // Load the reference PDF and obtain its first page dimensions.
+        double templateWidth, templateHeight;
         using (Document templateDoc = new Document(templatePath))
         {
-            // Aspose.Pdf uses 1‑based page indexing
+            // Assuming all template pages share the same size.
             Page templatePage = templateDoc.Pages[1];
-            // PageInfo provides the page dimensions
-            targetWidth  = templatePage.PageInfo.Width;
-            targetHeight = templatePage.PageInfo.Height;
+            templateWidth  = templatePage.PageInfo.Width;
+            templateHeight = templatePage.PageInfo.Height;
         }
 
-        // Load the PDF whose pages need to be resized
-        using (Document doc = new Document(inputPath))
+        // Load the PDF to be resized, adjust each page, and save the result.
+        using (Document sourceDoc = new Document(sourcePath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Aspose.Pdf uses 1‑based page indexing.
+            for (int i = 1; i <= sourceDoc.Pages.Count; i++)
             {
-                Page page = doc.Pages[i];
-                // Set each page size to match the template dimensions
-                page.SetPageSize(targetWidth, targetHeight);
+                Page page = sourceDoc.Pages[i];
+                // Resize the page to match the template dimensions.
+                page.SetPageSize(templateWidth, templateHeight);
             }
 
-            // Save the modified document – saving without explicit SaveOptions writes PDF
-            doc.Save(outputPath);
+            sourceDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"All pages resized to {targetWidth}×{targetHeight} and saved to '{outputPath}'.");
+        Console.WriteLine($"All pages resized and saved to '{outputPath}'.");
     }
 }

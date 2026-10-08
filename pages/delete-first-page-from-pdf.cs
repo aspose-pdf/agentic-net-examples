@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,13 +15,14 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Delete the first page (page numbers are 1‑based)
+            // Aspose.Pdf uses 1‑based page indexing.
+            // Delete the first page (page number 1) and shift remaining pages forward.
             doc.Pages.Delete(1);
 
-            // Save the modified PDF
+            // Save the modified document back to PDF.
             doc.Save(outputPath);
         }
 

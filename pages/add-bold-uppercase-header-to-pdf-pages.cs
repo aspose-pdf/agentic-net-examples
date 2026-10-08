@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_header.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,37 +16,37 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create a header/footer container
-                HeaderFooter header = new HeaderFooter();
+                // Create a bold, uppercase header text fragment
+                TextFragment header = new TextFragment("SECTION HEADING");
+                header.TextState.Font = FontRepository.FindFont("Arial");
+                header.TextState.FontSize = 14;
+                header.TextState.FontStyle = FontStyles.Bold;
+                header.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-                // Create a text fragment for the header (bold, uppercase)
-                TextFragment tf = new TextFragment("Section Heading".ToUpper());
+                // Position the header near the top of the page (20 points margin)
+                double marginTop = 20;
+                double pageHeight = page.PageInfo.Height;
+                header.Position = new Position(0, pageHeight - marginTop);
 
-                // Modify the existing TextState (do NOT assign a new TextState object)
-                tf.TextState.Font = FontRepository.FindFont("Helvetica-Bold");
-                tf.TextState.FontSize = 12;
-                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-                tf.TextState.FontStyle = FontStyles.Bold; // optional, redundant with bold font
+                // Center the header horizontally
+                header.HorizontalAlignment = HorizontalAlignment.Center;
 
-                // Add the text fragment to the header
-                header.Paragraphs.Add(tf);
-
-                // Assign the header to the page
-                page.Header = header;
+                // Add the header to the page's paragraph collection
+                page.Paragraphs.Add(header);
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with headers to '{outputPath}'.");
+        Console.WriteLine($"Header added and saved to '{outputPath}'.");
     }
 }

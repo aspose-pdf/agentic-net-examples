@@ -14,19 +14,26 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Optionally crop the first page (example values)
-            // Rectangle constructor: left, bottom, width, height
-            Aspose.Pdf.Rectangle newCrop = new Aspose.Pdf.Rectangle(50, 50, 500, 700);
-            doc.Pages[1].CropBox = newCrop;
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                // OPTIONAL: set a new TrimBox to demonstrate cropping
+                // Replace with your own rectangle if needed
+                Aspose.Pdf.Rectangle newTrim = new Aspose.Pdf.Rectangle(50, 50, 500, 700);
+                doc.Pages[i].TrimBox = newTrim;
 
-            // Retrieve the TrimBox after cropping
-            Aspose.Pdf.Rectangle trimBox = doc.Pages[1].TrimBox;
+                // Retrieve the TrimBox after any cropping operation
+                Aspose.Pdf.Rectangle trim = doc.Pages[i].TrimBox;
 
-            // Output TrimBox coordinates
-            Console.WriteLine($"TrimBox: LLX={trimBox.LLX}, LLY={trimBox.LLY}, URX={trimBox.URX}, URY={trimBox.URY}");
+                // Output the TrimBox coordinates for verification
+                Console.WriteLine($"Page {i} TrimBox: LLX={trim.LLX}, LLY={trim.LLY}, URX={trim.URX}, URY={trim.URY}");
+            }
+
+            // If you want to persist the changes, uncomment the line below
+            // doc.Save("output_cropped.pdf");
         }
     }
 }

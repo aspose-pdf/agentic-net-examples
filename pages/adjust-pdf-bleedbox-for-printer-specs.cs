@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_adjusted.pdf";
+        const string outputPath = "output_bleed_adjusted.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,34 +15,30 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Pages are 1‑based in Aspose.Pdf
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[i];
+                // Retrieve the current BleedBox (a Rectangle)
+                Aspose.Pdf.Rectangle bleed = doc.Pages[i].BleedBox;
 
-                // Retrieve the current BleedBox
-                Aspose.Pdf.Rectangle bleedBox = page.BleedBox;
-
-                // Example adjustment: increase each side by 5 points (printer spec)
-                double margin = 5.0;
-                Aspose.Pdf.Rectangle adjustedBleedBox = new Aspose.Pdf.Rectangle(
-                    bleedBox.LLX - margin, // left
-                    bleedBox.LLY - margin, // bottom
-                    bleedBox.URX + margin, // right
-                    bleedBox.URY + margin  // top
-                );
+                // Example adjustment: expand each side by 5 points to meet printer specs
+                // Ensure coordinates stay non‑negative
+                double left   = Math.Max(0, bleed.LLX - 5);
+                double bottom = Math.Max(0, bleed.LLY - 5);
+                double right  = bleed.URX + 5;
+                double top    = bleed.URY + 5;
 
                 // Apply the adjusted BleedBox back to the page
-                page.BleedBox = adjustedBleedBox;
+                doc.Pages[i].BleedBox = new Aspose.Pdf.Rectangle(left, bottom, right, top);
             }
 
-            // Save the modified document (PDF format)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Adjusted PDF saved to '{outputPath}'.");
+        Console.WriteLine($"BleedBox values adjusted and saved to '{outputPath}'.");
     }
 }

@@ -1,14 +1,13 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "reordered.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,30 +15,36 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // 1‑based indexing: pages 3‑6 are at positions 3,4,5,6
-            // Extract those pages into an array
-            Page[] pagesToMove = doc.Pages
-                                    .Skip(2)          // skip first two pages (0‑based for Skip)
-                                    .Take(4)          // take pages 3‑6
-                                    .ToArray();
+            // Temporary document to hold copies of pages 3‑6
+            using (Document temp = new Document())
+            {
+                // Copy pages 3‑6 from the original document into the temporary document
+                for (int i = 3; i <= 6; i++)
+                {
+                    // Pages.Add copies the page into the target document (deep copy)
+                    temp.Pages.Add(doc.Pages[i]);
+                }
 
-            // Insert the extracted pages at the end of the collection
-            // Insertion position is Count+1 because Insert expects a 1‑based index
-            int insertPosition = doc.Pages.Count + 1;
-            doc.Pages.Insert(insertPosition, pagesToMove);
+                // Remove the original pages 3‑6 from the source document (delete from highest index downwards)
+                for (int i = 6; i >= 3; i--)
+                {
+                    doc.Pages.Delete(i);
+                }
 
-            // Delete the original pages (3‑6) now that they have been copied to the end
-            // Delete accepts an array of 1‑based page numbers
-            int[] pagesToDelete = { 3, 4, 5, 6 };
-            doc.Pages.Delete(pagesToDelete);
+                // Append the copied pages to the end of the original document
+                foreach (Page copiedPage in temp.Pages)
+                {
+                    doc.Pages.Add(copiedPage);
+                }
+            }
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Pages 3‑6 moved to the end. Saved as '{outputPath}'.");
+        Console.WriteLine($"Pages 3‑6 have been moved to the end. Saved as '{outputPath}'.");
     }
 }

@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;   // required for FontRepository and TextState
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,31 +16,33 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: using for disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Build watermark text that includes the current year
-            string watermarkText = $"© {DateTime.Now.Year} Confidential";
-
-            // Create a TextStamp with the watermark text
-            TextStamp stamp = new TextStamp(watermarkText);
-
-            // Configure visual appearance of the stamp
-            stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-            stamp.TextState.FontSize = 48;
-            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-            stamp.Opacity = 0.3f;                         // semi‑transparent
-            stamp.HorizontalAlignment = HorizontalAlignment.Center;
-            stamp.VerticalAlignment   = VerticalAlignment.Center;
-            stamp.RotateAngle = 45;                       // optional rotation
-
-            // Apply the stamp to every page in the document
-            foreach (Page page in doc.Pages)
+            // Create a text stamp that includes the current year
+            string watermarkText = $"Confidential © {DateTime.Now.Year}";
+            TextStamp stamp = new TextStamp(watermarkText)
             {
-                page.AddStamp(stamp);
+                // Position the stamp in the center of the page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
+                // Make the stamp semi‑transparent and place it behind page content
+                Background          = true,
+                Opacity             = 0.3f
+            };
+
+            // Configure text appearance via the existing TextState instance
+            stamp.TextState.FontSize = 48;
+            stamp.TextState.FontStyle = FontStyles.Bold;
+            stamp.TextState.ForegroundColor = Color.Gray;
+
+            // Apply the stamp to every page (Page.AddStamp, not PageCollection)
+            for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
+            {
+                doc.Pages[i].AddStamp(stamp);
             }
 
-            // Save the modified PDF (lifecycle rule: save inside using block)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
