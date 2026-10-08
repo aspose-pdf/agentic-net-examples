@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,45 +16,31 @@ class Program
             return;
         }
 
-        // Use PdfFileMend (a Facades class) to bind the existing PDF,
-        // modify it with core API objects, and save the result.
-        using (PdfFileMend mend = new PdfFileMend())
+        // Load the PDF using the high‑level API (Document)
+        Document pdf = new Document(inputPath);
+
+        // Multi‑line text (use '\n' for line breaks)
+        string multiLineText = "First line of text\nSecond line of text\nThird line of text";
+
+        // Create a TextFragment and configure its appearance
+        TextFragment fragment = new TextFragment(multiLineText)
         {
-            // Bind the source PDF document.
-            mend.BindPdf(inputPath);
+            // Position the lower‑left corner of the fragment (left margin = 20 points)
+            Position = new Position(20, 750) // X = 20, Y = 750 points from bottom
+        };
 
-            // Access the underlying Document object.
-            Document doc = mend.Document;
+        // Set font, size, color and custom line spacing (leading)
+        fragment.TextState.Font = FontRepository.FindFont("Arial");
+        fragment.TextState.FontSize = 12;
+        fragment.TextState.ForegroundColor = Color.Black;
+        // Use LineSpacing instead of the non‑existent Leading property
+        fragment.TextState.LineSpacing = 18; // 1.5 × font size (12 pt) = 18 pt
 
-            // Page indexing in Aspose.Pdf is 1‑based.
-            Page page3 = doc.Pages[3];
+        // Add the fragment to page 3 (pages are 1‑based)
+        pdf.Pages[3].Paragraphs.Add(fragment);
 
-            // Create a multi‑line text paragraph.
-            TextParagraph paragraph = new TextParagraph();
-
-            // Position the paragraph at the left margin.
-            // Rectangle(left, bottom, right, top)
-            paragraph.Rectangle = new Aspose.Pdf.Rectangle(
-                0,                                 // left (margin edge)
-                0,                                 // bottom
-                200,                               // right (width of the text block)
-                page3.PageInfo.Height);           // top (full page height)
-
-            // Enable word wrapping (optional, based on needs).
-            paragraph.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
-
-            // Append lines with custom line spacing (additional spacing after each line).
-            paragraph.AppendLine("First line of text", 5f);   // 5 points extra spacing
-            paragraph.AppendLine("Second line of text", 10f); // 10 points extra spacing
-            paragraph.AppendLine("Third line of text", 0f);   // default spacing
-
-            // Append the paragraph to page three.
-            TextBuilder builder = new TextBuilder(page3);
-            builder.AppendParagraph(paragraph);
-
-            // Save the modified PDF using the facade.
-            mend.Save(outputPath);
-        }
+        // Save the modified PDF
+        pdf.Save(outputPath);
 
         Console.WriteLine($"Multi‑line text added to page 3 and saved as '{outputPath}'.");
     }

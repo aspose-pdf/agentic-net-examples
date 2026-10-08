@@ -1,47 +1,48 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "ExtractedImages";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "ExtractedImages";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // Use PdfExtractor (which implements IDisposable) inside a using block
-        using (PdfExtractor extractor = new PdfExtractor())
+        try
         {
-            // Bind the source PDF file
-            extractor.BindPdf(inputPdfPath);
-
-            // Extract images from the PDF
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-            // Iterate through all extracted images
-            while (extractor.HasNextImage())
+            // PdfExtractor implements IDisposable, so wrap it in a using block
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                // Build the output file name (PNG format)
-                string outputFile = Path.Combine(outputFolder, $"image-{imageIndex}.png");
+                // Load the PDF document
+                extractor.BindPdf(inputPdf);
 
-                // Save the current image as PNG
-                extractor.GetNextImage(outputFile, ImageFormat.Png);
+                // Extract all images from the PDF
+                extractor.ExtractImage();
 
-                imageIndex++;
+                int imageIndex = 1;
+                // Iterate through each extracted image
+                while (extractor.HasNextImage())
+                {
+                    string outPath = Path.Combine(outputDir, $"Image_{imageIndex}.png");
+                    // Save the current image as PNG
+                    extractor.GetNextImage(outPath);
+                    Console.WriteLine($"Saved {outPath}");
+                    imageIndex++;
+                }
             }
         }
-
-        Console.WriteLine("Image extraction completed.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
