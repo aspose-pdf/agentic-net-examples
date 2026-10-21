@@ -1,16 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class BatchReplace
+class Program
 {
     static void Main()
     {
-        // Folder that contains the PDF files to process
-        const string inputFolder = @"C:\PdfArchive";
-        // Optional: folder for the processed files (can be the same as inputFolder to overwrite)
-        const string outputFolder = @"C:\PdfArchive\Processed";
+        // Folder containing the source PDF files
+        const string inputFolder = "InputArchive";
+        // Folder where the processed PDFs will be saved
+        const string outputFolder = "OutputArchive";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -18,7 +17,7 @@ class BatchReplace
             return;
         }
 
-        // Ensure the output folder exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
         // Get all PDF files in the input folder (non‑recursive)
@@ -26,35 +25,22 @@ class BatchReplace
 
         foreach (string pdfPath in pdfFiles)
         {
-            try
-            {
-                // Load the PDF document inside a using block for deterministic disposal
-                using (Document doc = new Document(pdfPath))
-                {
-                    // Create a PdfContentEditor facade and bind it to the loaded document
-                    PdfContentEditor editor = new PdfContentEditor();
-                    editor.BindPdf(doc);
+            string fileName   = Path.GetFileName(pdfPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
 
-                    // Replace every occurrence of "Confidential" with "Public" on all pages
-                    // thePage = 0 means "all pages"
-                    editor.ReplaceText("Confidential", 0, "Public");
+            // Facade for content manipulation (no IDisposable)
+            PdfContentEditor editor = new PdfContentEditor();
 
-                    // Determine the output file path (overwrite in place or write to output folder)
-                    string fileName = Path.GetFileName(pdfPath);
-                    string outputPath = Path.Combine(outputFolder, fileName);
+            // Load the PDF
+            editor.BindPdf(pdfPath);
 
-                    // Save the modified document
-                    doc.Save(outputPath);
-                }
+            // Replace every occurrence of "Confidential" with "Public"
+            editor.ReplaceText("Confidential", "Public");
 
-                Console.WriteLine($"Processed: {pdfPath}");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+            // Save the modified PDF
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine("Batch replacement completed.");
+        Console.WriteLine("Batch text replacement completed.");
     }
 }

@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using System.Drawing;               // Rectangle and Color for the facade API
-using Aspose.Pdf.Facades;           // PdfContentEditor
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,25 +16,40 @@ class Program
             return;
         }
 
-        // Create the content editor and bind the existing PDF
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPath);
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
 
-        // Define the clickable rectangle (x, y, width, height) on page 1
-        Rectangle rect = new Rectangle(100, 500, 200, 100);
+            // Define the rectangle area for the annotation (llx, lly, urx, ury)
+            var rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-        // JavaScript code to be executed when the rectangle is clicked
-        string jsCode = "app.alert('Hello from Aspose.Pdf!');";
+            // Create a square (rectangular) annotation
+            var annot = new SquareAnnotation(page, rect)
+            {
+                Color = Aspose.Pdf.Color.Red
+            };
 
-        // Attach the JavaScript link; the rectangle will be highlighted in red
-        editor.CreateJavaScriptLink(jsCode, rect, 1, Color.Red);
+            // Set the border – the Border constructor requires the parent annotation
+            annot.Border = new Border(annot)
+            {
+                Width = 2,
+                Style = BorderStyle.Solid
+            };
 
-        // Save the modified PDF
-        editor.Save(outputPath);
+            // NOTE: Older Aspose.Pdf versions do not expose an Action property on
+            // SquareAnnotation nor the JavascriptAction class. If you need a JavaScript
+            // action attached to the annotation, upgrade to a newer Aspose.Pdf version
+            // that supports it, or use document/page level JavaScript actions instead.
 
-        // Release resources held by the editor
-        editor.Close();
+            // Add the annotation to the page's annotation collection
+            page.Annotations.Add(annot);
 
-        Console.WriteLine($"JavaScript link added and saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"PDF saved with rectangle annotation to '{outputPath}'.");
     }
 }

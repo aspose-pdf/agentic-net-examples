@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades; // Facades namespace included as requested
 
 class Program
 {
@@ -11,37 +12,32 @@ class Program
         const string userPassword  = "user123";
         const string ownerPassword = "owner123";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the facade with source and destination files
-        PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
-
-        // Define privileges: forbid all actions (no printing, no editing, etc.)
-        DocumentPrivilege privilege = DocumentPrivilege.ForbidAll;
-
-        // Encrypt using 128‑bit AES
-        bool encrypted = fileSecurity.EncryptFile(
-            userPassword,
-            ownerPassword,
-            privilege,
-            KeySize.x128,
-            Algorithm.AES);
-
-        if (!encrypted)
+        try
         {
-            Console.Error.WriteLine("Encryption failed.");
-        }
-        else
-        {
-            Console.WriteLine($"PDF encrypted successfully to '{outputPath}'.");
-        }
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // No permissions granted (disallow editing and printing)
+                Permissions perms = (Permissions)0;
 
-        // Release resources
-        fileSecurity.Close();
+                // Apply 128‑bit AES encryption
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx128);
+
+                // Save the encrypted PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

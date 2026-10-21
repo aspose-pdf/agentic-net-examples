@@ -1,47 +1,50 @@
 using System;
-using System.Drawing; // Required for System.Drawing.Color used by PdfContentEditor
-using Aspose.Pdf.Facades;
+using System.IO;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF
-        const string outputPdf = "output_highlighted.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "annotated.pdf";
 
-        // Ensure the source file exists
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the facade that works with annotations
-        PdfContentEditor editor = new PdfContentEditor();
+        // Define the annotation rectangle (example coordinates)
+        double llx = 100; // lower‑left X
+        double lly = 500; // lower‑left Y
+        double urx = 300; // upper‑right X
+        double ury = 550; // upper‑right Y
 
-        // Bind the existing PDF document
-        editor.BindPdf(inputPdf);
+        // Bright red border color (RGB 255,0,0) – Aspose.Pdf.Color uses 0‑1 range
+        Color redBorder = Color.FromRgb(1, 0, 0);
+        // Transparent fill (no background) – default is transparent, so no property needed
 
-        // Define the rectangle (in points) where the highlight will appear
-        // (left, top, width, height) – System.Drawing.Rectangle uses X,Y as top‑left corner
-        Rectangle highlightRect = new Rectangle(100, 500, 200, 50);
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPath);
+        // Get the first page (1‑based index)
+        Page page = pdfDoc.Pages[1];
 
-        // Create a Highlight markup annotation (type = 0) on page 1 with bright red color
-        // The color parameter sets the annotation's visual color (used for the border/highlight)
-        editor.CreateMarkup(
-            rect:        highlightRect,
-            contents:    "Important section",
-            type:        0,                 // 0 = Highlight
-            page:        1,                 // 1‑based page index
-            clr:         Color.FromArgb(255, 0, 0) // Bright red (RGB 255,0,0)
-        );
+        // Create a square annotation with the specified rectangle
+        Rectangle rect = new Rectangle(llx, lly, urx, ury);
+        SquareAnnotation square = new SquareAnnotation(page, rect)
+        {
+            Color = redBorder // border color
+            // No FillColor property in this version; omission leaves the interior transparent
+        };
+
+        // Add the annotation to the page
+        page.Annotations.Add(square);
 
         // Save the modified PDF
-        editor.Save(outputPdf);
+        pdfDoc.Save(outputPath);
 
-        // Release resources held by the facade
-        editor.Close();
-
-        Console.WriteLine($"Highlight annotation with red border saved to '{outputPdf}'.");
+        Console.WriteLine($"Annotation added. Saved to '{outputPath}'.");
     }
 }

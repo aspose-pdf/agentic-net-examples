@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "annotated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,35 +16,27 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least one page
-            Page page = doc.Pages[1];
+            // Define the annotation rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Define the annotation rectangle (fully qualified to avoid ambiguity)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
-
-            // Create a TextAnnotation (sticky note) on the specified page
-            TextAnnotation annotation = new TextAnnotation(page, rect)
+            // Create a text (markup) annotation on the first page
+            TextAnnotation annotation = new TextAnnotation(doc.Pages[1], rect)
             {
-                Contents = "Sample annotation",
-                // Set the creation and modification dates to the current UTC time
-                CreationDate = DateTime.UtcNow,
-                Modified     = DateTime.UtcNow,
-                // Optional visual settings
-                Icon   = TextIcon.Note,
-                Open   = true,
-                Color  = Aspose.Pdf.Color.Yellow
+                Title        = "Timestamp",
+                Contents     = "Annotation with UTC creation date.",
+                CreationDate = DateTime.UtcNow // set current UTC time
             };
 
-            // Add the annotation to the page's annotation collection
-            page.Annotations.Add(annotation);
+            // Add the annotation directly to the page's Annotations collection
+            doc.Pages[1].Annotations.Add(annotation);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotation added with UTC creation date. Saved to '{outputPath}'.");
+        Console.WriteLine($"Annotation added and saved to '{outputPath}'.");
     }
 }

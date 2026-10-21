@@ -1,82 +1,79 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
-class Program
+namespace AsposePdfApi
 {
-    static void Main()
+    // Simple DTO that describes an annotation to be added.
+    // All properties are required and set via the constructor to avoid nullable warnings.
+    public class AnnotationDefinition
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "annotated_output.pdf";
+        public Aspose.Pdf.Rectangle Bounds { get; }
+        public string Text { get; }
 
-        if (!File.Exists(inputPath))
+        public AnnotationDefinition(Aspose.Pdf.Rectangle bounds, string text)
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            Bounds = bounds ?? throw new ArgumentNullException(nameof(bounds));
+            Text = text ?? throw new ArgumentNullException(nameof(text));
         }
+    }
 
-        // Define a batch of annotation specifications
-        var annotationDefs = new[]
+    class Program
+    {
+        static void Main()
         {
-            new
+            const string inputPath = "input.pdf";
+            const string outputPath = "annotated_output.pdf";
+
+            if (!File.Exists(inputPath))
             {
-                Page = 1,
-                Rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550),
-                Contents = "First batch note",
-                Color = Aspose.Pdf.Color.Yellow
-            },
-            new
-            {
-                Page = 2,
-                Rect = new Aspose.Pdf.Rectangle(150, 400, 250, 450),
-                Contents = "Second batch note",
-                Color = Aspose.Pdf.Color.LightGreen
-            },
-            new
-            {
-                Page = 1,
-                Rect = new Aspose.Pdf.Rectangle(300, 600, 400, 650),
-                Contents = "Third batch note",
-                Color = Aspose.Pdf.Color.Pink
+                Console.Error.WriteLine($"File not found: {inputPath}");
+                return;
             }
-        };
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPath))
-        {
-            // Use PdfAnnotationEditor (facade) to work with annotations
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            // Define a batch of annotations.
+            var annotations = new List<AnnotationDefinition>
             {
-                editor.BindPdf(doc);
+                new AnnotationDefinition(new Aspose.Pdf.Rectangle(100, 700, 300, 750), "First note"),
+                new AnnotationDefinition(new Aspose.Pdf.Rectangle(100, 600, 300, 650), "Second note"),
+                new AnnotationDefinition(new Aspose.Pdf.Rectangle(100, 500, 300, 550), "Third note")
+            };
 
-                // Loop over the definitions and add each annotation
-                foreach (var def in annotationDefs)
+            // Open the PDF document.
+            using (Document doc = new Document(inputPath))
+            {
+                // Instantiate a Facades editor – required by the task specification.
+                // The editor works with the same Document instance.
+                PdfAnnotationEditor annotationEditor = new PdfAnnotationEditor(doc);
+
+                // For this example we add all annotations to the first page.
+                // Adjust the page index as needed (Aspose.Pdf uses 1‑based indexing).
+                Page page = doc.Pages[1];
+
+                foreach (AnnotationDefinition def in annotations)
                 {
-                    // Validate page number (Aspose.Pdf uses 1‑based indexing)
-                    if (def.Page < 1 || def.Page > doc.Pages.Count)
-                        continue;
-
-                    // Create a TextAnnotation for the current definition
-                    TextAnnotation txtAnn = new TextAnnotation(doc.Pages[def.Page], def.Rect)
+                    // Create a TextAnnotation using the rectangle bounds from the definition.
+                    TextAnnotation txtAnn = new TextAnnotation(page, def.Bounds)
                     {
-                        Contents = def.Contents,
-                        Color = def.Color,
-                        Title = "BatchNote",
-                        Open = true,
-                        Icon = TextIcon.Note
+                        Title    = "Note",
+                        Contents = def.Text,
+                        Open     = true,
+                        Icon     = TextIcon.Note
                     };
 
-                    // Add the annotation to the page's collection
-                    doc.Pages[def.Page].Annotations.Add(txtAnn);
+                    // Add the annotation to the page.
+                    page.Annotations.Add(txtAnn);
                 }
 
-                // Save the modified document
-                editor.Save(outputPath);
+                // Save the modified document.
+                doc.Save(outputPath);
             }
-        }
 
-        Console.WriteLine($"Batch annotations added and saved to '{outputPath}'.");
+            Console.WriteLine($"Annotations added and saved to '{outputPath}'.");
+        }
     }
 }

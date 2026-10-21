@@ -1,47 +1,59 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // retained for potential other Facade usage
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "input.pdf";
+        const string stampImg = "stamp.png";
         const string outputPdf = "output.pdf";
-        const string imagePath = "stampImage.png";
 
-        // Verify that the source PDF and image exist
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(imagePath))
+
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        // Initialize the facade with input and output files
-        PdfFileStamp fileStamp = new PdfFileStamp(inputPdf, outputPdf);
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
+        {
+            // Create a concrete ImageStamp (not the abstract Stamp class)
+            ImageStamp imgStamp = new ImageStamp(stampImg);
 
-        // Create a stamp, bind the image, and configure its appearance
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        stamp.BindImage(imagePath);   // use the specified image as stamp content
-        stamp.Rotation = 45;          // rotate the stamp by 45 degrees
-        stamp.Opacity = 0.8f;         // set opacity to 80%
-        stamp.SetOrigin(100, 200);    // place the stamp at (100,200) on the page
+            // Position the stamp at (100,200) – use left/bottom alignment with indents
+            imgStamp.HorizontalAlignment = HorizontalAlignment.Left;
+            imgStamp.VerticalAlignment   = VerticalAlignment.Bottom;
+            imgStamp.XIndent = 100f; // distance from the left edge
+            imgStamp.YIndent = 200f; // distance from the bottom edge
 
-        // Apply the stamp to all pages (null means all pages)
-        stamp.Pages = null;
+            // Rotate 45 degrees clockwise
+            imgStamp.RotateAngle = 45f;
 
-        // Add the configured stamp to the PDF
-        fileStamp.AddStamp(stamp);
+            // Set opacity to 80%
+            imgStamp.Opacity = 0.8f;
 
-        // Save changes and release resources
-        fileStamp.Close();
+            // Place the stamp in the foreground (over existing content)
+            imgStamp.Background = false;
 
-        Console.WriteLine($"Image stamp added and saved to '{outputPdf}'.");
+            // Apply the stamp to each page in the document
+            foreach (Page page in doc.Pages)
+            {
+                page.AddStamp(imgStamp);
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPdf);
+        }
+
+        Console.WriteLine($"Image stamp applied and saved to '{outputPdf}'.");
     }
 }

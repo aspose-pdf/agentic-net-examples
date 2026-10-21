@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -14,29 +15,32 @@ class Program
             return;
         }
 
-        // Create the facade and bind the source PDF
-        PdfViewer viewer = new PdfViewer();
-        try
+        // Load the PDF and apply a simple modification
+        using (Document doc = new Document(inputPath))
         {
-            viewer.BindPdf(inputPath);
-
-            // Example modification (optional)
-            // viewer.Zoom = 0.75f;
-
-            // Export the (modified) PDF to a memory stream
-            using (MemoryStream pdfStream = new MemoryStream())
+            // Add a text annotation on the first page
+            Page page = doc.Pages[1];
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            TextAnnotation annotation = new TextAnnotation(page, rect)
             {
-                viewer.Save(pdfStream);          // Save to stream
-                pdfStream.Position = 0;          // Reset for downstream use
+                Title    = "Note",
+                Contents = "Modified by Aspose.Pdf example",
+                Open     = true,
+                Icon     = TextIcon.Note
+            };
+            page.Annotations.Add(annotation);
 
-                Console.WriteLine($"Exported PDF size: {pdfStream.Length} bytes");
-                // pdfStream can now be passed to other parts of the application
+            // Export the modified PDF to a memory stream
+            using (MemoryStream ms = new MemoryStream())
+            {
+                // Explicitly specify the format for clarity (optional)
+                // The null‑forgiving operator (!) silences CS8600 warnings about possible null values.
+                doc.Save(ms!, SaveFormat.Pdf);
+                ms.Position = 0; // reset for downstream processing
+
+                // Example output – the stream can now be passed to other components
+                Console.WriteLine($"PDF exported to memory stream, length = {ms.Length} bytes");
             }
-        }
-        finally
-        {
-            // Release resources held by the facade
-            viewer.Close();
         }
     }
 }

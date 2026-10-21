@@ -7,62 +7,63 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // source PDF
-        const string stampImg  = "stamp.png";      // image to use as stamp
-        const string outputPdf = "output_centered_stamp.pdf";
+        const string inputPath = "input.pdf";
+        const string stampImagePath = "stamp.png";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
-        if (!File.Exists(stampImg))
+        if (!File.Exists(stampImagePath))
         {
-            Console.Error.WriteLine($"Aspose.Pdf.Facades.Stamp image not found: {stampImg}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        // Load the PDF to obtain page dimensions (page 8)
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Ensure the document has at least 8 pages
-            if (doc.Pages.Count < 8)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
             {
-                Console.Error.WriteLine("Document does not contain page 8.");
-                return;
+                // Verify that page 8 exists (pages are 1‑based)
+                if (doc.Pages.Count < 8)
+                {
+                    Console.Error.WriteLine("The document contains fewer than 8 pages.");
+                    return;
+                }
+
+                // Get page 8
+                Aspose.Pdf.Page page = doc.Pages[8];
+
+                // Create an image stamp from the specified image file
+                Aspose.Pdf.ImageStamp stamp = new Aspose.Pdf.ImageStamp(stampImagePath);
+
+                // Retrieve page dimensions
+                double pageWidth = page.PageInfo.Width;
+                double pageHeight = page.PageInfo.Height;
+
+                // Retrieve stamp dimensions (automatically set to the image size)
+                double stampWidth = stamp.Width;
+                double stampHeight = stamp.Height;
+
+                // Center the stamp horizontally and vertically
+                stamp.XIndent = (pageWidth - stampWidth) / 2;
+                stamp.YIndent = (pageHeight - stampHeight) / 2;
+
+                // Add the stamp to page 8
+                page.AddStamp(stamp);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Get width and height of page 8 (units are points, 1 inch = 72 points)
-            Page page8 = doc.Pages[8];
-            double pageWidth  = page8.PageInfo.Width;
-            double pageHeight = page8.PageInfo.Height;
-
-            // Desired stamp size (you can adjust as needed)
-            double stampWidth  = 100; // points
-            double stampHeight = 100; // points
-
-            // Compute coordinates to center the stamp on the page
-            double originX = (pageWidth  - stampWidth)  / 2.0;
-            double originY = (pageHeight - stampHeight) / 2.0;
-
-            // Initialize the PdfFileStamp facade and bind the source PDF
-            PdfFileStamp fileStamp = new PdfFileStamp();
-            fileStamp.BindPdf(inputPdf);
-
-            // Create a stamp, bind the image, set size and position, and limit it to page 8
-            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-            stamp.BindImage(stampImg);                       // use an image as the stamp
-            stamp.SetImageSize((float)stampWidth, (float)stampHeight);
-            stamp.SetOrigin((float)originX, (float)originY); // position the stamp
-            stamp.IsBackground = false;                     // draw on top of page content
-            stamp.Pages = new int[] { 8 };                  // apply only to page 8
-
-            // Add the stamp to the document and save
-            fileStamp.AddStamp(stamp);
-            fileStamp.Save(outputPdf);
-            fileStamp.Close();
-
-            Console.WriteLine($"Aspose.Pdf.Facades.Stamp centered on page 8 and saved to '{outputPdf}'.");
+            Console.WriteLine($"Stamp centered on page 8 saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

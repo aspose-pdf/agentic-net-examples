@@ -1,152 +1,115 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
-using System.Drawing; // System.Drawing.Rectangle and System.Drawing.Color are required by PdfContentEditor overloads
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
-// POCO that matches the JSON structure for annotation definitions
-public class AnnotationDefinition
+namespace PdfAnnotationImporter
 {
-    public string? Type { get; set; }          // e.g., "Text", "WebLink"
-    public double X1 { get; set; }            // lower‑left X
-    public double Y1 { get; set; }            // lower‑left Y
-    public double X2 { get; set; }            // upper‑right X
-    public double Y2 { get; set; }            // upper‑right Y
-    public string? Contents { get; set; }      // annotation text or URL
-    public string? ColorHex { get; set; }      // optional, e.g., "#FF0000"
-}
-
-class Program
-{
-    static void Main()
+    // Structure that matches the JSON annotation definition
+    public class AnnotationDefinition
     {
-        const string inputPdfPath = "input.pdf";
-        const string jsonPath = "annotations.json";
-        const string outputPdfPath = "output.pdf";
-
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-
-        if (!File.Exists(jsonPath))
-        {
-            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
-            return;
-        }
-
-        // Read and deserialize the JSON file containing annotation definitions
-        AnnotationDefinition[]? annotations;
-        try
-        {
-            string json = File.ReadAllText(jsonPath);
-            annotations = JsonSerializer.Deserialize<AnnotationDefinition[]>(json);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to read/parse JSON: {ex.Message}");
-            return;
-        }
-
-        if (annotations == null || annotations.Length == 0)
-        {
-            Console.Error.WriteLine("No annotation definitions were found in the JSON file.");
-            return;
-        }
-
-        // Initialize the PdfContentEditor facade and bind the source PDF
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPdfPath);
-
-        // Process each annotation definition and create the corresponding annotation
-        foreach (var def in annotations)
-        {
-            // Build the rectangle for the annotation (PdfContentEditor expects System.Drawing.Rectangle)
-            var sysRect = new System.Drawing.Rectangle(
-                (int)def.X1,
-                (int)def.Y1,
-                (int)(def.X2 - def.X1),
-                (int)(def.Y2 - def.Y1));
-
-            // Determine the color (default to Black if not supplied or parsing fails)
-            System.Drawing.Color sysColor = System.Drawing.Color.Black;
-            if (!string.IsNullOrWhiteSpace(def.ColorHex))
-            {
-                try
-                {
-                    sysColor = ParseHexColor(def.ColorHex);
-                }
-                catch
-                {
-                    // ignore parsing errors and keep default black
-                }
-            }
-
-            // Create the annotation based on its type
-            switch (def.Type?.Trim().ToLowerInvariant())
-            {
-                case "text":
-                    // Create a free‑text annotation. The overload expects System.Drawing.Rectangle.
-                    editor.CreateText(
-                        sysRect,
-                        def.Contents ?? string.Empty,
-                        Guid.NewGuid().ToString(),
-                        true,               // open flag
-                        string.Empty,       // subject (optional)
-                        1);                 // page number (1‑based)
-                    break;
-
-                case "weblink":
-                    // Create a web‑link annotation. This overload also expects System.Drawing.Rectangle.
-                    editor.CreateWebLink(sysRect, def.Contents ?? string.Empty, 1);
-                    break;
-
-                case "line":
-                    // Create a line annotation. Color must be System.Drawing.Color.
-                    editor.CreateLine(
-                        sysRect,
-                        string.Empty,
-                        0, 0, 0, 0, 0, 0,
-                        sysColor,
-                        string.Empty,
-                        null,
-                        null);
-                    break;
-
-                case "squarecircle":
-                    // Create a square‑circle (highlight) annotation.
-                    // The overload requires a border width as the last argument.
-                    editor.CreateSquareCircle(sysRect, string.Empty, sysColor, true, 1, 1);
-                    break;
-
-                default:
-                    Console.WriteLine($"Unsupported annotation type: {def.Type}");
-                    break;
-            }
-        }
-
-        // Save the modified PDF
-        editor.Save(outputPdfPath);
-        Console.WriteLine($"Annotations applied and saved to '{outputPdfPath}'.");
+        public int PageNumber { get; set; }          // 1‑based page index
+        public float X { get; set; }                // Lower‑left X coordinate (points)
+        public float Y { get; set; }                // Lower‑left Y coordinate (points)
+        public float Width { get; set; }            // Width of the annotation rectangle (points)
+        public float Height { get; set; }           // Height of the annotation rectangle (points)
+        public string? Title { get; set; }          // Optional title of the annotation (nullable)
+        public string? Contents { get; set; }       // Text shown when the annotation is opened (nullable)
+        public string? Icon { get; set; }           // Icon name (e.g., "Note", "Comment") (nullable)
     }
 
-    // Helper: converts a hex color string (e.g., "#RRGGBB") to System.Drawing.Color
-    private static System.Drawing.Color ParseHexColor(string hex)
+    class Program
     {
-        if (string.IsNullOrWhiteSpace(hex))
-            throw new ArgumentException("Invalid color string.");
+        static void Main()
+        {
+            const string inputPdfPath = "input.pdf";
+            const string jsonPath = "annotations.json";
+            const string outputPdfPath = "annotated_output.pdf";
 
-        // Remove leading '#', if present
-        hex = hex.TrimStart('#');
+            if (!File.Exists(inputPdfPath))
+            {
+                Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+                return;
+            }
 
-        if (hex.Length != 6)
-            throw new ArgumentException("Hex color must be 6 characters.");
+            if (!File.Exists(jsonPath))
+            {
+                Console.Error.WriteLine($"JSON file not found: {jsonPath}");
+                return;
+            }
 
-        int r = Convert.ToInt32(hex.Substring(0, 2), 16);
-        int g = Convert.ToInt32(hex.Substring(2, 2), 16);
-        int b = Convert.ToInt32(hex.Substring(4, 2), 16);
+            // ------------------------------------------------------------
+            // Load annotation definitions from the JSON file
+            // ------------------------------------------------------------
+            List<AnnotationDefinition> annotations;
+            try
+            {
+                string jsonContent = File.ReadAllText(jsonPath);
+                annotations = JsonSerializer.Deserialize<List<AnnotationDefinition>>(jsonContent,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (annotations == null)
+                {
+                    Console.Error.WriteLine("No annotations found in JSON.");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to read JSON: {ex.Message}");
+                return;
+            }
 
-        return System.Drawing.Color.FromArgb(r, g, b);
+            // ------------------------------------------------------------
+            // Load the PDF with the high‑level Document API.
+            // ------------------------------------------------------------
+            Document pdf = new Document(inputPdfPath);
+
+            foreach (var def in annotations)
+            {
+                // Validate page number (Aspose.Pdf uses 1‑based indexing)
+                if (def.PageNumber < 1 || def.PageNumber > pdf.Pages.Count)
+                {
+                    Console.Error.WriteLine($"Invalid page number {def.PageNumber} – skipping annotation.");
+                    continue;
+                }
+
+                // Build the rectangle (lower‑left X/Y, upper‑right X/Y)
+                double llx = def.X;
+                double lly = def.Y;
+                double urx = def.X + def.Width;
+                double ury = def.Y + def.Height;
+                Rectangle rect = new Rectangle(llx, lly, urx, ury);
+
+                // Resolve the icon – default to Note if parsing fails or is empty
+                TextIcon icon = TextIcon.Note;
+                if (!string.IsNullOrWhiteSpace(def.Icon) &&
+                    Enum.TryParse<TextIcon>(def.Icon, true, out TextIcon parsedIcon))
+                {
+                    icon = parsedIcon;
+                }
+
+                // Create the TextAnnotation and set optional properties
+                Page page = pdf.Pages[def.PageNumber];
+                TextAnnotation textAnnot = new TextAnnotation(page, rect)
+                {
+                    Icon = icon
+                };
+
+                if (!string.IsNullOrWhiteSpace(def.Title))
+                    textAnnot.Title = def.Title;
+
+                if (!string.IsNullOrWhiteSpace(def.Contents))
+                    textAnnot.Contents = def.Contents;
+
+                // Add the annotation to the page
+                page.Annotations.Add(textAnnot);
+            }
+
+            // Save the annotated PDF
+            pdf.Save(outputPdfPath);
+            Console.WriteLine($"Annotations applied and saved to '{outputPdfPath}'.");
+        }
     }
 }

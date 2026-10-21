@@ -1,21 +1,17 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input parameters
+        // Input PDF, output PDF and pages on which annotations should be edited
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string srcString  = "OldText";
-        const string destString = "NewText";
-        const int startPage = 1;   // first page to process (1‑based)
-        const int endPage   = 3;   // last page to process
+        int[] pagesToEdit = { 1, 3, 5 }; // example page numbers (1‑based)
 
         if (!File.Exists(inputPath))
         {
@@ -23,48 +19,41 @@ class Program
             return;
         }
 
-        try
+        // Facade instance – required by the task specification
+        PdfAnnotationEditor annotationEditor = new PdfAnnotationEditor();
+
+        // Load the document inside a using block (lifecycle rule)
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document (wrapped in using for deterministic disposal)
-            using (Document doc = new Document(inputPath))
+            // Iterate only the specified pages
+            foreach (int pageNumber in pagesToEdit)
             {
-                // Initialize the annotation editor on the loaded document
-                PdfAnnotationEditor editor = new PdfAnnotationEditor(doc);
+                // Guard against invalid page numbers
+                if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+                    continue;
 
-                // Iterate over the specified page range
-                for (int pageNum = startPage; pageNum <= endPage; pageNum++)
+                Page page = doc.Pages[pageNumber];
+
+                // Iterate all annotations on the current page
+                for (int i = 0; i < page.Annotations.Count; i++)
                 {
-                    // Extract all annotation types on the current page
-                    IList<Annotation> annotations = editor.ExtractAnnotations(
-                        pageNum, pageNum,
-                        (AnnotationType[])Enum.GetValues(typeof(AnnotationType)));
+                    Annotation ann = page.Annotations[i];
 
-                    // Process each annotation
-                    foreach (Annotation annot in annotations)
+                    // Process only text annotations (pop‑up notes)
+                    if (ann is TextAnnotation textAnn)
                     {
-                        // Only annotations that have a Contents string can be modified
-                        if (!string.IsNullOrEmpty(annot.Contents) &&
-                            annot.Contents.Contains(srcString))
-                        {
-                            // Replace the target text within the annotation's contents
-                            annot.Contents = annot.Contents.Replace(srcString, destString);
-
-                            // Apply the modification to the annotation on this page
-                            // ModifyAnnotations expects a single Annotation instance, not an array
-                            editor.ModifyAnnotations(pageNum, pageNum, annot);
-                        }
+                        // Example: replace the whole content or a substring
+                        string original = textAnn.Contents ?? string.Empty;
+                        string replaced = original.Replace("old text", "new text");
+                        textAnn.Contents = replaced;
                     }
                 }
-
-                // Save the modified document (PDF format)
-                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Annotations updated and saved to '{outputPath}'.");
+            // Save the modified PDF (lifecycle rule – save inside using)
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Annotations updated and saved to '{outputPath}'.");
     }
 }

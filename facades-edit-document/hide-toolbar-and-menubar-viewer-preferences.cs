@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Microsoft.CSharp.RuntimeBinder; // Needed for RuntimeBinderException
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "minimalistic.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,23 +16,33 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: using for disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Initialize the facade that works with viewer preferences
-            PdfContentEditor editor = new PdfContentEditor();
-            editor.BindPdf(doc); // bind the in‑memory document
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Use dynamic access to ViewerPreferences to stay compatible with older Aspose.Pdf versions.
+                // If the property does not exist, a RuntimeBinderException will be thrown and we fall back gracefully.
+                dynamic dDoc = doc;
+                try
+                {
+                    dDoc.ViewerPreferences.HideToolbar = true;
+                    dDoc.ViewerPreferences.HideMenubar = true;
+                }
+                catch (RuntimeBinderException)
+                {
+                    Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version. Skipping UI preferences.");
+                }
 
-            // Combine the two flags using bitwise OR
-            int prefs = ViewerPreference.HideToolbar | ViewerPreference.HideMenubar;
+                // Save the updated PDF
+                doc.Save(outputPath);
+            }
 
-            // Apply the viewer preferences (HideToolbar and HideMenubar)
-            editor.ChangeViewerPreference(prefs);
-
-            // Save the modified document (lifecycle rule: save within using)
-            doc.Save(outputPath);
+            Console.WriteLine($"Viewer preferences applied (if supported) and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Saved minimalistic PDF to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

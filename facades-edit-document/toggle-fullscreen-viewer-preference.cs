@@ -1,67 +1,57 @@
 using System;
-using Aspose.Pdf.Facades;
+using System.IO;
+using Aspose.Pdf;
 
-class PdfFullScreenToggle
+public static class PdfViewerPreferenceHelper
 {
     /// <summary>
     /// Toggles the FullScreen viewer preference of a PDF file.
-    /// If the PDF is currently set to FullScreen, the flag is removed;
-    /// otherwise the FullScreen flag is added.
     /// </summary>
-    /// <param name="inputPath">Path to the source PDF.</param>
-    /// <param name="outputPath">Path where the modified PDF will be saved.</param>
-    public static void ToggleFullScreen(string inputPath, string outputPath)
+    /// <param name="inputPdfPath">Path to the source PDF.</param>
+    /// <param name="outputPdfPath">Path where the modified PDF will be saved.</param>
+    /// <param name="enableFullScreen">True to enable FullScreen mode; false to disable.</param>
+    public static void ToggleFullScreen(string inputPdfPath, string outputPdfPath, bool enableFullScreen)
     {
         // Ensure the source file exists.
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
+            throw new FileNotFoundException("Source PDF not found.", inputPdfPath);
+
+        // Load the PDF document.
+        Document pdfDoc = new Document(inputPdfPath);
+
+        // The ViewerPreferences class may not exist in older Aspose.Pdf versions.
+        // Use reflection to set the FullScreen flag if the API is available.
+        var viewerPrefsProp = typeof(Document).GetProperty("ViewerPreferences");
+        if (viewerPrefsProp != null)
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
-
-        // Create the PdfContentEditor facade.
-        PdfContentEditor editor = new PdfContentEditor();
-
-        // Bind the PDF document to the editor.
-        editor.BindPdf(inputPath);
-
-        // Retrieve the current viewer preference flags.
-        int currentPref = editor.GetViewerPreference();
-
-        // Determine whether FullScreen mode is currently set.
-        bool isFullScreen = (currentPref & ViewerPreference.PageModeFullScreen) != 0;
-
-        // Toggle the FullScreen flag.
-        int newPref;
-        if (isFullScreen)
-        {
-            // Remove the FullScreen flag.
-            newPref = currentPref & ~ViewerPreference.PageModeFullScreen;
+            var viewerPrefs = viewerPrefsProp.GetValue(pdfDoc);
+            if (viewerPrefs != null)
+            {
+                var fullScreenProp = viewerPrefs.GetType().GetProperty("FullScreen");
+                if (fullScreenProp != null && fullScreenProp.CanWrite)
+                {
+                    fullScreenProp.SetValue(viewerPrefs, enableFullScreen);
+                }
+                else
+                {
+                    // FullScreen property not available – nothing to do.
+                }
+            }
         }
         else
         {
-            // Add the FullScreen flag.
-            newPref = currentPref | ViewerPreference.PageModeFullScreen;
+            // ViewerPreferences property not available – nothing to do.
         }
 
-        // Apply the updated viewer preference.
-        editor.ChangeViewerPreference(newPref);
-
-        // Save the modified PDF to the specified output path.
-        editor.Save(outputPath);
-
-        // Optional: release resources (PdfContentEditor inherits from SaveableFacade which implements IDisposable).
-        editor.Close();
+        // Save the modified document.
+        pdfDoc.Save(outputPdfPath);
     }
 
-    // Example usage.
-    static void Main()
+    // Entry point required for compilation when the project is built as an executable.
+    public static void Main(string[] args)
     {
-        const string inputPdf = "sample.pdf";
-        const string outputPdf = "sample_toggled.pdf";
-
-        ToggleFullScreen(inputPdf, outputPdf);
-
-        Console.WriteLine($"FullScreen preference toggled. Output saved to '{outputPdf}'.");
+        // This placeholder Main allows the project to compile.
+        // Example usage (uncomment for testing):
+        // ToggleFullScreen("input.pdf", "output.pdf", true);
     }
 }

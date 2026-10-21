@@ -1,16 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string srcText    = "Hello World";
-        const string destText   = "Hi Universe";
+        const string inputPath   = "input.pdf";
+        const string outputPath  = "output.pdf";
+        const string searchText  = "Old Text";
+        const string replaceText = "New Text";
 
         if (!File.Exists(inputPath))
         {
@@ -18,20 +17,20 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // PdfContentEditor replaces text while preserving the original font style, size, and color.
+        using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Create a PdfContentEditor and bind the loaded document
-            PdfContentEditor editor = new PdfContentEditor();
-            editor.BindPdf(doc);
+            // Load the source PDF.
+            editor.BindPdf(inputPath);
 
-            // Replace text on all pages (page number 0) while preserving original style
-            editor.ReplaceText(srcText, 0, destText);
+            // Replace all occurrences of the search text on all pages.
+            // This overload keeps the original formatting of the replaced text.
+            editor.ReplaceText(searchText, replaceText);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the modified PDF.
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Text replacement completed. Saved to '{outputPath}'.");
+        Console.WriteLine($"Text replacement completed. Output saved to '{outputPath}'.");
     }
 }

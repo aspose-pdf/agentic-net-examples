@@ -1,7 +1,11 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades; // required by task specification
+using Microsoft.CSharp.RuntimeBinder; // for RuntimeBinderException
 
 class Program
 {
@@ -10,60 +14,41 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // ------------------------------------------------------------
-        // 1. Ensure a source PDF exists – create a minimal one if needed
-        // ------------------------------------------------------------
         if (!File.Exists(inputPath))
         {
-            // Create a simple PDF with one page, a text annotation and
-            // Full‑Screen viewer preference set.
-            using (var seed = new Document())
-            {
-                // Add a page
-                Page page = seed.Pages.Add();
-
-                // Add a text annotation (so we have something to hide later)
-                var txtAnn = new TextAnnotation(page, new Rectangle(100, 600, 300, 650))
-                {
-                    Title = "Sample",
-                    Contents = "This annotation will be hidden when FullScreen is on."
-                };
-                page.Annotations.Add(txtAnn);
-
-                // Set viewer preference to FullScreen (use Document.PageMode)
-                seed.PageMode = PageMode.FullScreen;
-
-                // Save the seed PDF
-                seed.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // 2. Load the PDF and inspect viewer preferences
-        // ------------------------------------------------------------
-        using (var doc = new Document(inputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            bool isFullScreen = doc.PageMode == PageMode.FullScreen;
-
-            if (isFullScreen)
+            // Attempt to enable FullScreen viewer preference.
+            // The ViewerPreferences property exists only in newer Aspose.Pdf versions.
+            // Use dynamic access to keep the code compatible with older versions.
+            try
             {
-                // ------------------------------------------------
-                // 3. Full‑Screen is enabled – hide all annotations
-                // ------------------------------------------------
-                foreach (Page page in doc.Pages)
+                dynamic d = doc;
+                d.ViewerPreferences.FullScreen = true;
+            }
+            catch (RuntimeBinderException)
+            {
+                Console.WriteLine("ViewerPreferences property is not available in the current Aspose.Pdf version; FullScreen mode will not be set.");
+            }
+
+            // Iterate all pages and hide every annotation (guard against null collection)
+            foreach (Page page in doc.Pages)
+            {
+                // page.Annotations can be null when a page has no annotations
+                var annotations = page.Annotations ?? Enumerable.Empty<Annotation>();
+                foreach (Annotation annot in annotations)
                 {
-                    // Annotations collection is 1‑based in Aspose.Pdf
-                    for (int i = 1; i <= page.Annotations.Count; i++)
-                    {
-                        Annotation ann = page.Annotations[i];
-                        ann.Flags = ann.Flags | AnnotationFlags.Hidden;
-                    }
+                    // Set the Hidden flag (overwrites other flags)
+                    annot.Flags = AnnotationFlags.Hidden;
                 }
             }
 
-            // ------------------------------------------------
-            // 4. Save the (potentially modified) PDF to the output file
-            // ------------------------------------------------
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

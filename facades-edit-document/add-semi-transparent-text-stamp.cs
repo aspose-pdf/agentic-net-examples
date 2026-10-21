@@ -1,54 +1,48 @@
 using System;
 using System.IO;
-using System.Drawing;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades; // Facades namespace included as requested
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Ensure the source PDF exists – create a minimal one‑page PDF if it does not.
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            using (var placeholder = new Aspose.Pdf.Document())
-            {
-                placeholder.Pages.Add();
-                placeholder.Save(inputPdf);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Initialize the facade that works with PDF files
-        using (PdfFileStamp pdfStamp = new PdfFileStamp())
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the source PDF
-            pdfStamp.BindPdf(inputPdf);
+            // Ensure there is at least one page
+            Page page = doc.Pages[1];
 
-            // Create a formatted text object (text, color, font, encoding, embedded, size)
-            Aspose.Pdf.Facades.FormattedText formatted = new Aspose.Pdf.Facades.FormattedText(
-                "Confidential",                // text to display
-                System.Drawing.Color.Red,       // text color (fully‑qualified System.Drawing.Color)
-                "Helvetica",                  // font name
-                Aspose.Pdf.Facades.EncodingType.Winansi, // encoding (fully‑qualified)
-                false,                         // not embedded
-                36);                           // font size
+            // Define the annotation rectangle (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create a stamp, bind the formatted text, and set opacity to 0.5 (50% transparent)
-            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-            stamp.BindLogo(formatted);
-            stamp.Opacity = 0.5f;            // partial transparency (0 = fully transparent, 1 = opaque)
-            stamp.IsBackground = true;      // optional: place stamp behind page content
+            // Create a text annotation
+            TextAnnotation annotation = new TextAnnotation(page, rect);
+            annotation.Title    = "Note";
+            annotation.Contents = "This annotation is semi‑transparent.";
+            annotation.Open     = true;
+            annotation.Icon     = TextIcon.Note;
 
-            // Add the stamp to the PDF
-            pdfStamp.AddStamp(stamp);
+            // Set opacity to 50%
+            annotation.Opacity = 0.5f;
+
+            // Add the annotation to the page
+            page.Annotations.Add(annotation);
 
             // Save the modified PDF
-            pdfStamp.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotation with 0.5 opacity saved to '{outputPdf}'.");
+        Console.WriteLine($"Annotation with opacity saved to '{outputPath}'.");
     }
 }

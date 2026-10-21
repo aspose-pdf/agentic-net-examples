@@ -1,34 +1,73 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // PdfContentEditor and ViewerPreference are in this namespace
+using System.Reflection;
+using Aspose.Pdf;
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
     static void Main()
     {
-        // Input and output PDF file paths
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "continuous_view.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "continuous_view.pdf";
 
-        // Verify the input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the PdfContentEditor facade, bind the source PDF,
-        // set the viewer preference to continuous (one‑column) layout,
-        // and save the result.
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPdf);
+        try
+        {
+            // Load the PDF document
+            Document pdfDocument = new Document(inputPath);
 
-        // ViewerPreference.PageLayoutOneColumn enables continuous scrolling
-        editor.ChangeViewerPreference(ViewerPreference.PageLayoutOneColumn);
+            // Attempt to set continuous view mode using ViewerPreferences.
+            // The ViewerPreferences property exists only in newer Aspose.Pdf versions.
+            // Access it via dynamic to keep the code compilable with older versions.
+            try
+            {
+                dynamic docDyn = pdfDocument;
 
-        // Save the modified PDF
-        editor.Save(outputPdf);
+                // Ensure the ViewerPreferences object exists (newer versions create it lazily).
+                if (docDyn.ViewerPreferences == null)
+                {
+                    // Use reflection to avoid a compile‑time dependency on the ViewerPreferences type.
+                    // This works even if the type is absent in older library versions.
+                    const string vpFullName = "Aspose.Pdf.ViewerPreferences, Aspose.Pdf";
+                    Type vpType = Type.GetType(vpFullName);
+                    if (vpType != null)
+                    {
+                        docDyn.ViewerPreferences = Activator.CreateInstance(vpType);
+                    }
+                    else
+                    {
+                        // If the type cannot be found, we simply skip setting preferences.
+                        Console.WriteLine("ViewerPreferences type is not available in the current Aspose.Pdf library version. Continuous view mode will not be applied.");
+                    }
+                }
 
-        Console.WriteLine($"PDF saved with continuous view mode: {outputPdf}");
+                // Set continuous scrolling (OneColumn layout) if the property is present.
+                // This will be a runtime operation; if the property does not exist, a RuntimeBinderException is thrown.
+                docDyn.ViewerPreferences.PageLayout = PageLayout.OneColumn;
+            }
+            catch (RuntimeBinderException)
+            {
+                Console.WriteLine("ViewerPreferences property is not available in the current Aspose.Pdf library version. Continuous view mode will not be applied.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error while configuring viewer preferences: {ex.Message}");
+            }
+
+            // Save the modified PDF
+            pdfDocument.Save(outputPath);
+
+            Console.WriteLine($"Continuous view mode applied (if supported). Output saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

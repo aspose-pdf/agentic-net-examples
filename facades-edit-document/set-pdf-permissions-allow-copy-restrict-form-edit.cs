@@ -1,45 +1,46 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Security;
 
-class Program
+namespace AsposePdfDemo
 {
-    static void Main()
+    class Program
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "secured_output.pdf";
-
-        // Optional passwords – empty strings mean no password protection
-        const string userPassword  = "";
-        const string ownerPassword = "";
-
-        if (!File.Exists(inputPath))
+        static void Main()
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            const string inputPath = "input.pdf";
+            const string outputPath = "output_protected.pdf";
+
+            if (!File.Exists(inputPath))
+            {
+                Console.Error.WriteLine($"Input file not found: {inputPath}");
+                return;
+            }
+
+            try
+            {
+                // Load the existing PDF document
+                Document pdfDoc = new Document(inputPath);
+
+                // Allow copying (extracting) text but do NOT allow form editing or annotation changes.
+                // The ExtractContent flag enables text copying. No other flags are set, so form fields
+                // and annotations remain read‑only.
+                Permissions permissions = Permissions.ExtractContent;
+
+                // Apply encryption with an empty user password and a non‑empty owner password.
+                // The owner password enforces the permissions.
+                pdfDoc.Encrypt("", "ownerPassword", permissions, CryptoAlgorithm.AESx128);
+
+                // Save the PDF with the new permissions
+                pdfDoc.Save(outputPath);
+
+                Console.WriteLine($"Permissions set and saved to '{outputPath}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+            }
         }
-
-        // Create a privilege object based on the predefined "AllowAll"
-        // then disable form filling and annotation modification.
-        DocumentPrivilege privilege = DocumentPrivilege.AllowAll;
-        privilege.AllowCopy               = true;   // allow copying text/content
-        privilege.AllowFillIn             = false;  // prevent editing form fields
-        privilege.AllowModifyAnnotations = false;  // prevent adding/modifying annotations
-
-        // Initialize the PdfFileSecurity facade with input and output files
-        PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
-
-        // Apply the privilege settings (no passwords in this example)
-        bool success = fileSecurity.SetPrivilege(userPassword, ownerPassword, privilege);
-        if (!success)
-        {
-            Console.Error.WriteLine("Failed to set PDF permissions.");
-        }
-
-        // Close the facade to release resources
-        fileSecurity.Close();
-
-        Console.WriteLine($"PDF saved with updated permissions to '{outputPath}'.");
     }
 }

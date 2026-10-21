@@ -1,34 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const int pageToDelete = 5;
 
-        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfFileEditor does NOT implement IDisposable, so no using block is required
-        PdfFileEditor editor = new PdfFileEditor();
-
-        // Delete page 5 (Aspose.Pdf uses 1‑based page numbers)
-        bool result = editor.Delete(inputPath, new int[] { 5 }, outputPath);
-
-        if (result)
+        try
         {
-            Console.WriteLine($"Page 5 removed successfully. Output saved to '{outputPath}'.");
+            // Load the PDF document using the overload that accepts a file path.
+            Document pdfDoc = new Document(inputPath);
+
+            // Validate the requested page number.
+            if (pageToDelete < 1 || pageToDelete > pdfDoc.Pages.Count)
+            {
+                Console.Error.WriteLine($"Page {pageToDelete} is out of range. Document has {pdfDoc.Pages.Count} pages.");
+                return;
+            }
+
+            // Delete the specified page.
+            pdfDoc.Pages.Delete(pageToDelete);
+
+            // Save the modified PDF.
+            pdfDoc.Save(outputPath);
+
+            Console.WriteLine($"Page {pageToDelete} deleted. Saved to '{outputPath}'.");
         }
-        else
+        catch (Exception ex)
         {
-            Console.Error.WriteLine("Failed to delete the specified page.");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

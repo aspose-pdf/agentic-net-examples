@@ -1,22 +1,21 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades; // only needed if you still want to use PdfContentEditor for other edits
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";               // source PDF
-        const string attachmentFile = "sample.dat";        // file to attach
-        const string outputPdf = "output_with_attachment.pdf";
-        const string customMime = "application/custom-mime"; // desired MIME type (NOTE: Aspose.Pdf does not expose a MimeType property; this value is kept for documentation purposes only)
+        const string sourcePdf = "input.pdf";          // original PDF
+        const string attachmentFile = "data.bin";      // file to attach
+        const string outputPdf = "output.pdf";        // PDF with attachment
+        const string description = "Custom data attachment";
+        const string customMimeType = "application/x-custom-data"; // custom MIME type
 
-        // Ensure the source PDF and attachment exist
-        if (!File.Exists(inputPdf))
+        // Verify input files exist
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdf}");
             return;
         }
         if (!File.Exists(attachmentFile))
@@ -25,39 +24,22 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
-        Document doc = new Document(inputPdf);
-        Page page = doc.Pages[1]; // 1‑based indexing
+        // Load the source PDF using Document (PdfFileEditor does not support AddAttachment)
+        Document pdfDoc = new Document(sourcePdf);
 
-        // ---------------------------------------------------------------------
-        // Create a FileSpecification for the attachment. The constructor sets the
-        // file path and a description. Aspose.Pdf does not expose a public MimeType
-        // property, so the MIME type cannot be set directly via the API. If you need
-        // the MIME type to be present in the PDF, you would have to manipulate the
-        // underlying PDF objects manually (out of scope for this example).
-        // ---------------------------------------------------------------------
-        FileSpecification fileSpec = new FileSpecification(attachmentFile, "Sample attachment");
-        // Optional: you can set a custom display name if you do not want the file name
-        // to be used as the attachment name.
-        // fileSpec.Name = "my_custom_name.dat"; // uncomment if needed
-
-        // Create the file attachment annotation. The rectangle defines the icon
-        // location on the page (lower‑left X/Y, upper‑right X/Y).
-        var rect = new Aspose.Pdf.Rectangle(100, 500, 200, 600);
-        FileAttachmentAnnotation fileAnn = new FileAttachmentAnnotation(page, rect, fileSpec)
+        // Create a file specification for the attachment, set its contents and the custom MIME type
+        FileSpecification fileSpec = new FileSpecification(Path.GetFileName(attachmentFile), description)
         {
-            // Choose an icon – Graph, PushPin, Paperclip, Tag are valid values.
-            Icon = FileIcon.Graph,
-            // The annotation's contents (tooltip) can be set via the "Contents" property.
-            Contents = "Sample attachment"
+            Contents = new MemoryStream(File.ReadAllBytes(attachmentFile)),
+            MIMEType = customMimeType
         };
 
-        // Add the annotation to the page.
-        page.Annotations.Add(fileAnn);
+        // Add the attachment to the PDF via the EmbeddedFiles collection
+        pdfDoc.EmbeddedFiles.Add(fileSpec);
 
-        // Save the modified PDF.
-        doc.Save(outputPdf);
+        // Save the modified PDF to the output path
+        pdfDoc.Save(outputPdf);
 
-        Console.WriteLine($"PDF saved with attachment (custom MIME type noted in comments): {outputPdf}");
+        Console.WriteLine($"Attachment added with MIME type '{customMimeType}' to '{outputPdf}'.");
     }
 }

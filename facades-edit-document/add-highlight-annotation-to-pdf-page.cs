@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 using Aspose.Pdf.Annotations;
 
 class Program
@@ -9,6 +10,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "highlighted.pdf";
+        const string searchText = "SELECTED TEXT"; // replace with the exact text to highlight
 
         if (!File.Exists(inputPath))
         {
@@ -16,39 +18,32 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Search for the text on page 3 only (page index is 1‑based)
+        TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
+        doc.Pages[3].Accept(absorber);
+
+        // If nothing was found, exit gracefully
+        if (absorber.TextFragments.Count == 0)
         {
-            // Verify that page 3 exists (Aspose.Pdf uses 1‑based indexing)
-            if (doc.Pages.Count < 3)
-            {
-                Console.Error.WriteLine("The document has fewer than 3 pages.");
-                return;
-            }
-
-            // Get page 3
-            Page page = doc.Pages[3];
-
-            // Define the rectangle that covers the text to be highlighted.
-            // Coordinates are (llx, lly, urx, ury) in points.
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
-
-            // Create a highlight annotation on the specified page and rectangle.
-            HighlightAnnotation highlight = new HighlightAnnotation(page, rect)
-            {
-                // Use Aspose.Pdf.Color (cross‑platform) for the highlight color.
-                Color = Aspose.Pdf.Color.Yellow,
-                // Optional: add a comment that appears in the annotation popup.
-                Contents = "Highlighted text"
-            };
-
-            // Attach the annotation to the page.
-            page.Annotations.Add(highlight);
-
-            // Save the modified PDF.
-            doc.Save(outputPath);
+            Console.WriteLine("No matching text found on page 3.");
+            return;
         }
 
-        Console.WriteLine($"Highlight annotation added and saved to '{outputPath}'.");
+        // Add a highlight annotation for each found fragment
+        foreach (TextFragment fragment in absorber.TextFragments)
+        {
+            // Create a HighlightAnnotation on the same page using the fragment rectangle
+            HighlightAnnotation highlight = new HighlightAnnotation(doc.Pages[3], fragment.Rectangle);
+            highlight.Color = Color.Yellow; // set highlight color
+            doc.Pages[3].Annotations.Add(highlight);
+        }
+
+        // Save the modified PDF
+        doc.Save(outputPath);
+
+        Console.WriteLine($"Highlight annotation applied. Output saved to '{outputPath}'.");
     }
 }

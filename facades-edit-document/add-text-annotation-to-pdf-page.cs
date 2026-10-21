@@ -1,15 +1,14 @@
 using System;
 using System.IO;
-using System.Drawing;               // Required for Rectangle
-using Aspose.Pdf.Facades;          // Facade API for editing PDFs
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string annotationContent = "Custom annotation text";
+        const string inputPath = "input.pdf";
+        const string outputPath = "annotated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,24 +16,27 @@ class Program
             return;
         }
 
-        // PdfContentEditor implements IDisposable, so wrap in using for deterministic disposal
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the existing PDF
-            editor.BindPdf(inputPath);
+            // Define the annotation rectangle (lower‑left x,y and upper‑right x,y)
+            // Here we place the annotation at (100,200) with a size of 100x50 points
+            Rectangle rect = new Rectangle(100, 200, 200, 250);
 
-            // Define the annotation rectangle.
-            // Rectangle(x, y, width, height) where (x,y) is the lower‑left corner in PDF points.
-            Rectangle rect = new Rectangle(100, 200, 100, 100);
+            // Create a text annotation bound to the first page
+            TextAnnotation textAnn = new TextAnnotation(doc.Pages[1], rect)
+            {
+                Title = "Note",
+                Contents = "Custom annotation content"
+            };
 
-            // Create a text (sticky‑note) annotation.
-            // Parameters: rect, title, contents, open flag, icon name, page number (1‑based)
-            editor.CreateText(rect, "Note", annotationContent, true, "Note", 1);
+            // Add the annotation to page 1 (pages are 1‑based)
+            doc.Pages[1].Annotations.Add(textAnn);
 
-            // Save the modified PDF
-            editor.Save(outputPath);
+            // Save the modified document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Text annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Annotation added and saved to '{outputPath}'.");
     }
 }

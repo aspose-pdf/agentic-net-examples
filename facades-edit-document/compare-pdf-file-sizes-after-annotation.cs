@@ -1,8 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -13,37 +12,27 @@ class Program
 
         if (!File.Exists(originalPath))
         {
-            Console.Error.WriteLine($"File not found: {originalPath}");
+            Console.Error.WriteLine($"Original file not found: {originalPath}");
             return;
         }
 
-        // Load the original PDF, add a simple text annotation, and save as edited PDF
-        using (Document doc = new Document(originalPath))
-        {
-            // Add a text annotation on the first page
-            Page page = doc.Pages[1];
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-            TextAnnotation txtAnn = new TextAnnotation(page, rect)
-            {
-                Title    = "Note",
-                Contents = "Edited PDF",
-                Color    = Aspose.Pdf.Color.Yellow,
-                Open     = true,
-                Icon     = TextIcon.Note
-            };
-            page.Annotations.Add(txtAnn);
+        // Load the PDF with the high‑level Document API (PdfContentEditor does not expose AddText)
+        Document pdf = new Document(originalPath);
 
-            // Save the edited PDF
-            doc.Save(editedPath);
-        }
+        // Create a text fragment to act as a stamp
+        TextFragment tf = new TextFragment("Edited");
+        tf.TextState.FontSize = 24;
+        tf.TextState.ForegroundColor = Aspose.Pdf.Color.Red; // cross‑platform color
+        // Position is the lower‑left corner of the fragment
+        tf.Position = new Position(100, 500);
 
-        // Demonstrate usage of Aspose.Pdf.Facades (PdfFileInfo) on the edited PDF
-        using (PdfFileInfo info = new PdfFileInfo(editedPath))
-        {
-            Console.WriteLine($"Edited PDF pages: {info.NumberOfPages}");
-        }
+        // Add the fragment to the first page (pages are 1‑based)
+        pdf.Pages[1].Paragraphs.Add(tf);
 
-        // Compare file sizes of the original and edited PDFs
+        // Save the edited document
+        pdf.Save(editedPath);
+
+        // Compare file sizes to verify that changes were applied
         long originalSize = new FileInfo(originalPath).Length;
         long editedSize   = new FileInfo(editedPath).Length;
 
@@ -51,12 +40,8 @@ class Program
         Console.WriteLine($"Edited size:   {editedSize} bytes");
 
         if (originalSize != editedSize)
-        {
-            Console.WriteLine("File sizes differ – changes applied correctly.");
-        }
+            Console.WriteLine("File sizes differ – changes have been applied.");
         else
-        {
             Console.WriteLine("File sizes are identical – no changes detected.");
-        }
     }
 }

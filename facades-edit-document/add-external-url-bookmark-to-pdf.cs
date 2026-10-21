@@ -1,45 +1,38 @@
 using System;
 using System.IO;
-using System.Drawing;               // Required for System.Drawing.Color used by the facade
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations; // Added for GoToURIAction
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string bookmarkTitle = "Example Org";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_bookmark.pdf";
+        const string bookmarkTitle = "Example Site";
         const string url = "https://example.org";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Use the PdfContentEditor facade to add a bookmark that opens an external URL.
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Create a bookmark (outline item) that opens an external URL
+        OutlineItemCollection bookmark = new OutlineItemCollection(doc.Outlines)
         {
-            // Bind the existing PDF file.
-            editor.BindPdf(inputPath);
+            Title = bookmarkTitle,
+            Action = new GoToURIAction(url)
+        };
 
-            // Create a bookmark with a URI action.
-            // Parameters: title, color, boldFlag, italicFlag, file (null for URI), actionType, destination.
-            editor.CreateBookmarksAction(
-                bookmarkTitle,
-                System.Drawing.Color.Blue,   // Bookmark title color – must be System.Drawing.Color
-                false,        // not bold
-                false,        // not italic
-                null,         // no external file needed for URI action
-                "URI",        // action type for opening a URL
-                url);         // the external URL to open
+        // Add the bookmark to the document's outlines collection
+        doc.Outlines.Add(bookmark);
 
-            // Save the modified PDF.
-            editor.Save(outputPath);
-            editor.Close();
-        }
+        // Save the updated PDF
+        doc.Save(outputPath);
 
         Console.WriteLine($"Bookmark added and saved to '{outputPath}'.");
     }

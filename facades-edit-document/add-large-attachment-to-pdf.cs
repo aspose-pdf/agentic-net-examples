@@ -1,51 +1,81 @@
 using System;
 using System.IO;
+using System.Diagnostics;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Memory limit in bytes (e.g., 200 MB)
+    const long MemoryLimit = 200L * 1024 * 1024;
+
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_with_attachment.pdf";
-        const string largeFile = "large_attachment.bin"; // file >10 MB
+        const string pdfPath = "sample.pdf";
+        const string attachmentPath = "largeAttachment.bin";
+        const string outputPath = "sample_with_attachment.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Ensure a sample PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(largeFile))
-        {
-            Console.Error.WriteLine($"Attachment file not found: {largeFile}");
-            return;
-        }
-
-        // Increase the limit for loading whole files into memory if needed (default 210 MB)
-        Document.FileSizeLimitToMemoryLoading = 500; // MB
-
-        using (Document doc = new Document(inputPdf))
-        {
-            // Bind the document to the content editor facade
-            PdfContentEditor editor = new PdfContentEditor();
-            editor.BindPdf(doc);
-
-            // Add the large attachment using a stream to avoid loading it entirely into memory
-            using (FileStream attStream = File.OpenRead(largeFile))
+            using (Document doc = new Document())
             {
-                editor.AddDocumentAttachment(attStream, Path.GetFileName(largeFile), "Large attachment >10 MB");
+                // Add a blank page
+                doc.Pages.Add();
+                doc.Save(pdfPath);
             }
-
-            // Save the modified PDF
-            editor.Save(outputPdf);
-
-            // Release cached resources and check memory usage
-            doc.FreeMemory();
-            long memoryUsed = GC.GetTotalMemory(forceFullCollection: true);
-            Console.WriteLine($"Memory used after operation: {memoryUsed / (1024 * 1024)} MB");
         }
 
-        Console.WriteLine($"PDF with attachment saved to '{outputPdf}'.");
+        // Ensure a large attachment (>10 MB) exists
+        const long desiredSize = 12L * 1024 * 1024; // 12 MB
+        if (!File.Exists(attachmentPath) || new FileInfo(attachmentPath).Length < desiredSize)
+        {
+            // Create a dummy file filled with zeros
+            using (FileStream fs = new FileStream(attachmentPath, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                fs.SetLength(desiredSize);
+            }
+        }
+
+        // Record memory usage before the operation
+        long memoryBefore = GetCurrentProcessMemory();
+        Console.WriteLine($"Memory before attachment: {memoryBefore / (1024 * 1024)} MB");
+
+        // Add the attachment using Document (PdfFileEditor does not support AddAttachment)
+        using (Document pdfDoc = new Document(pdfPath))
+        {
+            FileSpecification fileSpec = new FileSpecification(attachmentPath, "Large binary attachment");
+            pdfDoc.EmbeddedFiles.Add(fileSpec);
+            pdfDoc.Save(outputPath);
+        }
+
+        // Record memory usage after the operation
+        long memoryAfter = GetCurrentProcessMemory();
+        Console.WriteLine($"Memory after attachment: {memoryAfter / (1024 * 1024)} MB");
+
+        // Verify memory usage is within the defined limit
+        if (memoryAfter - memoryBefore <= MemoryLimit)
+        {
+            Console.WriteLine("Memory usage is within acceptable limits.");
+        }
+        else
+        {
+            Console.WriteLine("Warning: Memory usage exceeded the defined limit.");
+        }
+
+        // Optional: verify that the attachment was added
+        using (Document resultDoc = new Document(outputPath))
+        {
+            // Attachments are stored in the Document's EmbeddedFiles collection
+            int attachmentCount = resultDoc.EmbeddedFiles.Count;
+            Console.WriteLine($"Number of attachments in the PDF: {attachmentCount}");
+        }
+    }
+
+    // Helper to get the current process's private memory size
+    static long GetCurrentProcessMemory()
+    {
+        Process proc = Process.GetCurrentProcess();
+        proc.Refresh();
+        return proc.PrivateMemorySize64;
     }
 }

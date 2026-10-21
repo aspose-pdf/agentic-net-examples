@@ -1,39 +1,40 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using System.Drawing; // Rectangle is required for the CreateWebLink method
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputPdf = "output_with_link.pdf"; // result PDF
+        const string inputPath = "input.pdf";
+        const string outputPath = "hyperlink_output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfContentEditor (facade) inside a using block for deterministic disposal
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Load the existing PDF document
+        Document pdfDoc = new Document(inputPath);
+
+        // Define the clickable area on page 2 (lower‑left X/Y, upper‑right X/Y)
+        // Aspose.Pdf.Rectangle uses (llx, lly, urx, ury)
+        Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+        // Create a link annotation that opens the specified URL when clicked
+        LinkAnnotation link = new LinkAnnotation(pdfDoc.Pages[2], linkRect)
         {
-            // Bind the existing PDF document
-            editor.BindPdf(inputPdf);
+            Action = new GoToURIAction("https://example.com")
+        };
 
-            // Define the clickable rectangle on page 2 (x, y, width, height)
-            // Adjust the coordinates as needed for your document
-            Rectangle linkRect = new Rectangle(100, 500, 200, 50);
+        // Add the annotation to page 2 (pages are 1‑based)
+        pdfDoc.Pages[2].Annotations.Add(link);
 
-            // Create a web link that opens the specified URL when clicked
-            // Overload without color avoids System.Drawing.Color usage
-            editor.CreateWebLink(linkRect, "https://example.com", 2);
+        // Save the modified PDF
+        pdfDoc.Save(outputPath);
 
-            // Save the modified PDF
-            editor.Save(outputPdf);
-        }
-
-        Console.WriteLine($"Hyperlink added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Hyperlink added and saved to '{outputPath}'.");
     }
 }

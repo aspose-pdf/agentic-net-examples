@@ -1,57 +1,62 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations; // required for GoToAction and other PDF actions
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF
-        const string outputPdf = "output_with_bookmarks.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "bookmarked_output.pdf";
 
-        // Ensure the source file exists
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Initialize the bookmark editor and bind the PDF
-        PdfBookmarkEditor editor = new PdfBookmarkEditor();
-        editor.BindPdf(inputPdf);
-
-        // ----- Build a three‑level bookmark hierarchy -----
-        // Level 3 (sub‑subsection)
-        Bookmark subSub = new Bookmark
+        try
         {
-            Title      = "Sub‑subsection 1.1.1",
-            PageNumber = 3
-        };
+            // Load the existing PDF document
+            Document doc = new Document(inputPath);
 
-        // Level 2 (subsection) – attach the level‑3 bookmark as a child
-        Bookmark sub = new Bookmark
+            // ---------- Create a three‑level bookmark hierarchy ----------
+            // Level 1 – Section (top‑level bookmark)
+            OutlineItemCollection section = new OutlineItemCollection(doc.Outlines)
+            {
+                Title = "Section 1",
+                Action = new GoToAction(1) // page numbers are 1‑based
+            };
+            doc.Outlines.Add(section);
+
+            // Level 2 – Subsection (child of Section)
+            OutlineItemCollection subsection = new OutlineItemCollection(doc.Outlines)
+            {
+                Title = "Subsection 1.1",
+                Action = new GoToAction(2)
+            };
+            // Add as child of the section
+            section.Add(subsection);
+
+            // Level 3 – Sub‑subsection (child of Subsection)
+            OutlineItemCollection subsubsection = new OutlineItemCollection(doc.Outlines)
+            {
+                Title = "Sub‑subsection 1.1.1",
+                Action = new GoToAction(3)
+            };
+            // Add as child of the subsection
+            subsection.Add(subsubsection);
+            // ------------------------------------------------------------
+
+            // Save the PDF with the new bookmark hierarchy
+            doc.Save(outputPath);
+
+            Console.WriteLine($"Bookmarks added and saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
         {
-            Title      = "Subsection 1.1",
-            PageNumber = 2,
-            ChildItems = new Bookmarks()
-        };
-        sub.ChildItems.Add(subSub);
-
-        // Level 1 (section) – attach the level‑2 bookmark as a child
-        Bookmark parent = new Bookmark
-        {
-            Title      = "Section 1",
-            PageNumber = 1,
-            ChildItems = new Bookmarks()
-        };
-        parent.ChildItems.Add(sub);
-
-        // Create the nested bookmarks in the document
-        editor.CreateBookmarks(parent);
-
-        // Save the modified PDF
-        editor.Save(outputPdf);
-
-        Console.WriteLine($"Nested bookmarks created and saved to '{outputPdf}'.");
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

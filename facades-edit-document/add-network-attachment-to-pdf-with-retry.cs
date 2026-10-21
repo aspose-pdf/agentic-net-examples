@@ -1,100 +1,83 @@
 using System;
 using System.IO;
 using System.Net.Http;
-using System.Threading.Tasks;
+using System.Threading;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Maximum number of retry attempts when downloading the attachment
-    private const int MaxRetryAttempts = 3;
-    // Delay between retries (in milliseconds)
-    private const int RetryDelayMs = 2000;
-
-    static async Task Main()
+    static void Main()
     {
-        const string inputPdfPath  = "input.pdf";          // PDF to which the attachment will be added
-        const string outputPdfPath = "output_with_attachment.pdf";
-        const string attachmentUrl = "https://example.com/attachment_file.pdf"; // Network URL of the file to attach
+        const string pdfPath = "input.pdf";
+        const string attachmentUrl = "https://example.com/file.bin";
+        const string attachmentName = "file.bin";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Download the attachment stream with retry logic
-        Stream attachmentStream = await DownloadWithRetryAsync(attachmentUrl, MaxRetryAttempts);
-        if (attachmentStream == null)
+        // Load the existing PDF document
+        using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(pdfPath))
         {
-            Console.Error.WriteLine("Failed to download attachment after retries.");
-            return;
-        }
+            // Retry parameters
+            const int maxRetries = 3;
+            const int delayMs = 2000;
+            int attempt = 0;
+            bool success = false;
 
-        // Use PdfContentEditor to add the attachment annotation
-        using (PdfContentEditor editor = new PdfContentEditor())
-        {
-            // Bind the existing PDF file
-            editor.BindPdf(inputPdfPath);
-
-            // Define the rectangle where the attachment icon will appear (System.Drawing.Rectangle)
-            var rect = new System.Drawing.Rectangle(0, 0, 100, 100);
-
-            // Add the file attachment annotation using the downloaded stream
-            // Parameters: rectangle, contents, stream, attachment name, page number (1‑based), icon name
-            editor.CreateFileAttachment(rect, "Network attachment", attachmentStream, "attachment_file.pdf", 1, "Paperclip");
-
-            // Save the modified PDF
-            editor.Save(outputPdfPath);
-        }
-
-        // Dispose the downloaded stream
-        attachmentStream.Dispose();
-
-        Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdfPath}'.");
-    }
-
-    // Downloads a stream from the given URL with retry on timeout-related exceptions
-    private static async Task<Stream> DownloadWithRetryAsync(string url, int maxAttempts)
-    {
-        using (HttpClient client = new HttpClient())
-        {
-            // Optional: set a per‑request timeout
-            client.Timeout = TimeSpan.FromSeconds(10);
-
-            for (int attempt = 1; attempt <= maxAttempts; attempt++)
+            while (attempt < maxRetries && !success)
             {
+                attempt++;
                 try
                 {
-                    // Get the response stream
-                    HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-                    response.EnsureSuccessStatusCode();
+                    // Download the attachment as a network stream
+                    using (HttpClient client = new HttpClient())
+                    {
+                        client.Timeout = TimeSpan.FromSeconds(10);
+                        using (Stream netStream = client.GetStreamAsync(attachmentUrl).Result)
+                        {
+                            // Aspose.Pdf requires a seekable stream, so copy to MemoryStream
+                            using (MemoryStream ms = new MemoryStream())
+                            {
+                                netStream.CopyTo(ms);
+                                ms.Position = 0;
 
-                    // Return a copy of the response stream that can be read multiple times if needed
-                    MemoryStream memory = new MemoryStream();
-                    await response.Content.CopyToAsync(memory);
-                    memory.Position = 0;
-                    return memory;
-                }
-                catch (TaskCanceledException ex) when (!ex.CancellationToken.IsCancellationRequested)
-                {
-                    // Timeout occurred
-                    Console.Error.WriteLine($"Attempt {attempt}: Request timed out. Retrying...");
-                }
-                catch (HttpRequestException ex)
-                {
-                    // Network error (could be timeout as well)
-                    Console.Error.WriteLine($"Attempt {attempt}: Network error - {ex.Message}. Retrying...");
-                }
+                                // Create a file specification for the attachment
+                                Aspose.Pdf.FileSpecification fileSpec = new Aspose.Pdf.FileSpecification(attachmentName);
+                                fileSpec.Contents = ms;
 
-                if (attempt < maxAttempts)
+                                // Add the file specification to the EmbeddedFiles collection
+                                pdfDoc.EmbeddedFiles.Add(fileSpec);
+                            }
+                        }
+                    }
+
+                    success = true; // attachment added successfully
+                }
+                catch (Exception ex) when (ex is TaskCanceledException || ex is TimeoutException || ex is HttpRequestException)
                 {
-                    await Task.Delay(RetryDelayMs);
+                    Console.Error.WriteLine($"Attempt {attempt} failed: {ex.Message}");
+                    if (attempt < maxRetries)
+                    {
+                        Thread.Sleep(delayMs);
+                        Console.WriteLine("Retrying...");
+                    }
                 }
             }
-        }
 
-        // All attempts failed
-        return null;
+            if (!success)
+            {
+                Console.Error.WriteLine("Failed to add attachment after all retries.");
+                return;
+            }
+
+            // Save the updated PDF
+            const string outputPath = "output.pdf";
+            pdfDoc.Save(outputPath);
+            Console.WriteLine($"Attachment added and PDF saved to '{outputPath}'.");
+        }
     }
 }

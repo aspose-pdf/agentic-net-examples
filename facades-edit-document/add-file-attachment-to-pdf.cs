@@ -1,35 +1,51 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string attachmentPath = "Terms.pdf";
-        const string description = "Contract Terms";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output_attached.pdf";
+        const string attachmentFilePath = "attachment.txt";
+        const string attachmentDescription = "Sample attachment";
 
-        // Verify that the source PDF and the attachment exist.
-        if (!File.Exists(inputPdf))
+        // Verify that all required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(attachmentPath))
+        if (!File.Exists(attachmentFilePath))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentFilePath}");
             return;
         }
 
-        // Bind the PDF, add the attachment (no visual annotation), and save.
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPdf);
-        editor.AddDocumentAttachment(attachmentPath, description);
-        editor.Save(outputPdf);
+        try
+        {
+            // Load the existing PDF document
+            Document pdfDoc = new Document(inputPdfPath);
 
-        Console.WriteLine($"Attachment '{attachmentPath}' added with description '{description}'.");
-        Console.WriteLine($"Result saved to '{outputPdf}'.");
+            // Create a file specification for the attachment
+            var fileSpec = new FileSpecification(attachmentFilePath, attachmentDescription)
+            {
+                // Optional: set MIME type based on the file type
+                MIMEType = "text/plain"
+            };
+
+            // Add the file specification to the EmbeddedFiles collection
+            pdfDoc.EmbeddedFiles.Add(fileSpec);
+
+            // Save the modified PDF to the desired output path
+            pdfDoc.Save(outputPdfPath);
+
+            Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdfPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

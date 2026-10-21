@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string stampText  = "UNDERLINED TEXT";
 
         if (!File.Exists(inputPath))
         {
@@ -17,51 +16,37 @@ class Program
             return;
         }
 
-        // Bind the source PDF using the Facades API
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        try
+        // Create a TextStamp with the desired appearance
+        TextStamp textStamp = new TextStamp("Your Text Here");
+        // Alignment (centered horizontally and vertically on the page)
+        textStamp.HorizontalAlignment = HorizontalAlignment.Center;
+        textStamp.VerticalAlignment   = VerticalAlignment.Center;
+        // Background fill (yellow) – use TextState.BackgroundColor for the fill color
+        textStamp.Background = true;
+        textStamp.TextState.BackgroundColor = Color.Yellow;
+        // Text formatting: underline, font, size, style, color
+        textStamp.TextState.Font = FontRepository.FindFont("Arial");
+        textStamp.TextState.FontSize = 14;
+        textStamp.TextState.FontStyle = FontStyles.Bold;
+        textStamp.TextState.ForegroundColor = Color.Black; // use ForegroundColor, not FontColor
+        textStamp.TextState.Underline = true;
+
+        // Apply the stamp to page 10 using the Document API (PdfContentEditor has no AddStamp method)
+        using (Document doc = new Document(inputPath))
         {
-            fileStamp.BindPdf(inputPath);
-
-            // Access the underlying Document object
-            Document doc = fileStamp.Document;
-
-            // Ensure the document has at least 10 pages
             if (doc.Pages.Count < 10)
             {
-                Console.Error.WriteLine("The document does not contain page 10.");
+                Console.Error.WriteLine("The PDF does not contain a page 10.");
                 return;
             }
 
-            // Create a TextStamp with the desired text
-            TextStamp textStamp = new TextStamp(stampText);
+            // Add the stamp to the 10th page (pages are 1‑based indexed)
+            doc.Pages[10].AddStamp(textStamp);
 
-            // Underline decoration
-            textStamp.TextState.Underline = true;
-
-            // Yellow background behind the text
-            textStamp.TextState.BackgroundColor = Aspose.Pdf.Color.Yellow;
-
-            // Centered alignment (both horizontal and vertical)
-            textStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            textStamp.VerticalAlignment   = VerticalAlignment.Center;
-
-            // Optional: make the stamp appear on top of page content
-            textStamp.Background = false;
-
-            // Add the stamp to page 10 only
-            Page pageTen = doc.Pages[10];
-            pageTen.AddStamp(textStamp);
-
-            // Save the modified PDF using the Facades API
-            fileStamp.Save(outputPath);
-        }
-        finally
-        {
-            // Ensure resources are released
-            fileStamp.Close();
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Text stamp added to page 10 and saved as '{outputPath}'.");
+        Console.WriteLine($"Text stamp added and saved to '{outputPath}'.");
     }
 }

@@ -1,61 +1,61 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // PdfFileStamp and Stamp classes
+using Aspose.Pdf;                 // Core API for PDF manipulation
+using Aspose.Pdf.Facades;        // Included as per task requirement (not used directly)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // source PDF
-        const string outputPdf = "output.pdf";     // stamped PDF
-        const string imageFile = "stampImage.png"; // image to use as stamp
+        const string inputPdfPath  = "input.pdf";
+        const string stampImgPath  = "stamp.png";
+        const string outputPdfPath = "output.pdf";
 
-        // Verify required files exist
-        if (!File.Exists(inputPdf))
+        // Verify that required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(imageFile))
-        {
-            Console.Error.WriteLine($"Image file not found: {imageFile}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // ------------------------------------------------------------
-        // Create the PdfFileStamp facade and configure input/output files
-        // ------------------------------------------------------------
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.InputFile  = inputPdf;
-        fileStamp.OutputFile = outputPdf;
+        if (!File.Exists(stampImgPath))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampImgPath}");
+            return;
+        }
 
-        // ------------------------------------------------------------
-        // Create a Stamp object, bind the image and set its properties
-        // ------------------------------------------------------------
-        Stamp stamp = new Stamp();
+        try
+        {
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPdfPath))
+            {
+                // Ensure the document has at least two pages
+                if (doc.Pages.Count < 2)
+                {
+                    Console.Error.WriteLine("The PDF does not contain a second page.");
+                    return;
+                }
 
-        // Bind the external image file to the stamp
-        stamp.BindImage(imageFile);
+                // Create an ImageStamp instance (core API) and configure its appearance
+                Aspose.Pdf.ImageStamp imgStamp = new Aspose.Pdf.ImageStamp(stampImgPath)
+                {
+                    Background          = false,                                   // Draw over page content
+                    HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center,   // Center horizontally
+                    VerticalAlignment   = Aspose.Pdf.VerticalAlignment.Center      // Center vertically
+                };
 
-        // Position the stamp on the page (origin is lower‑left corner)
-        stamp.SetOrigin(100, 500);          // X = 100, Y = 500 (points)
+                // Add the stamp to the second page (pages are 1‑based)
+                doc.Pages[2].AddStamp(imgStamp);
 
-        // Define the size of the image stamp
-        stamp.SetImageSize(150, 100);       // width = 150, height = 100 (points)
+                // Save the modified PDF
+                doc.Save(outputPdfPath);
+            }
 
-        // Make the stamp semi‑transparent
-        stamp.Opacity = 0.7f;
-
-        // Place the stamp in the foreground (false = on top of page content)
-        stamp.IsBackground = false;
-
-        // Apply the stamp only to the second page (pages are 1‑based)
-        stamp.PageNumber = 2;
-
-        // ------------------------------------------------------------
-        // Add the configured stamp to the PDF and save the result
-        // ------------------------------------------------------------
-        fileStamp.AddStamp(stamp);
-        fileStamp.Close();   // Persist changes and release resources
+            Console.WriteLine($"Stamp added to page 2 and saved as '{outputPdfPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

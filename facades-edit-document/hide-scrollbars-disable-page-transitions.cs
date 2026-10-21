@@ -1,6 +1,9 @@
 using System;
+using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
@@ -9,45 +12,51 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // ------------------------------------------------------------
-        // 0. Ensure a source PDF exists (self‑contained example)
-        // ------------------------------------------------------------
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
-            // Create a minimal one‑page PDF so the rest of the demo can work.
-            using (var placeholder = new Document())
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Load the PDF, remove any page transition effects, set viewer preferences and save.
+        using (Document doc = new Document(inputPath))
+        {
+            // ------------------------------------------------------------
+            // 1. Remove page transition effects.
+            //    The Page.Transition property does not exist in older
+            //    Aspose.Pdf versions. Use PdfPageEditor to clear the
+            //    transition by setting TransitionType to "None" (0).
+            // ------------------------------------------------------------
+            var editor = new PdfPageEditor(doc);
+            editor.ProcessPages = Enumerable.Range(1, doc.Pages.Count).ToArray();
+            editor.TransitionType = 0;          // 0 = TransitionType.None
+            editor.TransitionDuration = 0;      // no duration
+            editor.ApplyChanges();
+
+            // ------------------------------------------------------------
+            // 2. Set viewer preferences (hide UI elements & scrollbars).
+            //    ViewerPreferences was added in later library versions.
+            //    Access it via dynamic to keep the code compiling against
+            //    older versions; if the property is missing, the catch block
+            //    logs a friendly message and continues.
+            // ------------------------------------------------------------
+            dynamic dynDoc = doc;
+            try
             {
-                placeholder.Pages.Add();
-                placeholder.Save(inputPath);
+                dynDoc.ViewerPreferences.HideScrollbars = true;   // hide scrollbars
+                dynDoc.ViewerPreferences.HideToolbar   = true;   // hide toolbar (optional)
+                dynDoc.ViewerPreferences.HideMenubar   = true;   // hide menubar (optional)
+                dynDoc.ViewerPreferences.HideWindowUI = true;   // hide window UI (optional)
             }
+            catch (RuntimeBinderException)
+            {
+                Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version.");
+            }
+
+            // Save the final PDF.
+            doc.Save(outputPath);
         }
 
-        // ------------------------------------------------------------
-        // 1. Hide UI elements (scrollbars, navigation controls, etc.)
-        // ------------------------------------------------------------
-        using (var viewerEditor = new PdfContentEditor())
-        {
-            viewerEditor.BindPdf(inputPath);
-            // ViewerPreference.HideWindowUI hides scrollbars and other UI elements.
-            viewerEditor.ChangeViewerPreference(ViewerPreference.HideWindowUI);
-            viewerEditor.Save(outputPath);
-        }
-
-        // ------------------------------------------------------------
-        // 2. Disable page transition effects (set to none)
-        // ------------------------------------------------------------
-        using (var pageEditor = new PdfPageEditor())
-        {
-            pageEditor.BindPdf(outputPath);
-            // TransitionType = 0 means no transition.
-            pageEditor.TransitionType = 0;
-            // TransitionDuration = 0 removes any timing.
-            pageEditor.TransitionDuration = 0;
-            // Apply the changes to all pages.
-            pageEditor.ApplyChanges();
-            pageEditor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Viewer preferences applied and transitions disabled. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

@@ -1,41 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, the file to embed, and the resulting PDF
-        const string inputPdfPath      = "input.pdf";
-        const string attachmentFilePath = "attachment_file.pdf";
-        const string outputPdfPath     = "output_with_attachment.pdf";
+        const string sourcePdfPath   = "input.pdf";
+        const string attachmentPath  = "attachment.txt";
+        const string outputPdfPath   = "output_with_attachment.pdf";
 
-        // Verify that the required files exist
-        if (!File.Exists(inputPdfPath))
+        // Verify that source files exist
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(attachmentFilePath))
-        {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentFilePath}");
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
             return;
         }
 
-        // Create the PdfContentEditor facade (does NOT implement IDisposable)
-        PdfContentEditor editor = new PdfContentEditor();
+        if (!File.Exists(attachmentPath))
+        {
+            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
+            return;
+        }
 
-        // Load the existing PDF document into the editor
-        editor.BindPdf(inputPdfPath);
+        // Load the original PDF (Document class is the primary API for PDF manipulation)
+        Document pdfDoc = new Document(sourcePdfPath);
 
-        // Add the external file as an embedded attachment.
-        // This creates an embedded file entry in the PDF structure without a visible annotation.
-        editor.AddDocumentAttachment(attachmentFilePath, "Sample attachment description");
+        // Create a file specification for the attachment using the correct constructor
+        FileSpecification fileSpec = new FileSpecification(attachmentPath, "Sample attachment description");
+        // Optional: set a friendly display name (auto‑derived from the file name if not set)
+        fileSpec.Name = Path.GetFileName(attachmentPath);
+        // Optional: set a description (already supplied via constructor, but can be overridden)
+        fileSpec.Description = "Sample attachment description";
 
-        // Persist the changes to a new PDF file
-        editor.Save(outputPdfPath);
+        // Add the file specification to the EmbeddedFiles name tree – this defines the relationship as an embedded file
+        pdfDoc.EmbeddedFiles.Add(fileSpec);
 
-        Console.WriteLine($"Embedded attachment added successfully. Output saved to '{outputPdfPath}'.");
+        // Save the modified PDF to a new file so the original remains unchanged
+        pdfDoc.Save(outputPdfPath);
+
+        Console.WriteLine($"Attachment added successfully to '{outputPdfPath}'.");
     }
 }

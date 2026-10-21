@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
@@ -15,24 +15,20 @@ class Program
             return;
         }
 
-        // Load existing PDF and manipulate its XMP metadata
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            xmp.BindPdf(inputPath);
-
-            // Register a custom namespace for the project schema
+            // Define a prefix for the custom schema (the actual namespace URI is not required for the dictionary API)
             const string prefix = "proj";
-            const string uri    = "http://example.com/project";
-            xmp.RegisterNamespaceURI(prefix, uri);
 
-            // Add custom fields under the new namespace
-            xmp.Add($"{prefix}:ProjectID", "MyProject123");
-            xmp.Add($"{prefix}:Version",   "1.0.0");
+            // Add custom metadata entries using the document's Metadata dictionary
+            doc.Metadata[$"{prefix}:ProjectID"] = "MyProject123";
+            doc.Metadata[$"{prefix}:Version"]   = "1.0.0";
 
-            // Save the PDF with the updated XMP metadata
-            xmp.Save(outputPath);
+            // Save the updated PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Updated XMP metadata saved to '{outputPath}'.");
+        Console.WriteLine($"Updated metadata saved to '{outputPath}'.");
     }
 }

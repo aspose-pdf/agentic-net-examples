@@ -1,28 +1,39 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_none.pdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the facade, bind the PDF, set the viewer preference, and save
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPath);                                   // Load the PDF
-        editor.ChangeViewerPreference(ViewerPreference.PageModeUseNone); // Hide navigation panels
-        editor.Save(outputPath);                                     // Write the modified PDF
-        editor.Close();                                              // Release resources
+        try
+        {
+            // Load the PDF document inside a using block for deterministic disposal.
+            using (Document doc = new Document(inputPath))
+            {
+                // The PageMode property controls the initial view mode of the PDF.
+                // Setting it to UseNone hides all navigation panels when the document is opened.
+                // This property exists in all supported Aspose.Pdf versions, unlike ViewerPreferences.
+                doc.PageMode = PageMode.UseNone;
 
-        Console.WriteLine($"Viewer preference set to UseNone and saved to '{outputPath}'.");
+                // Save the modified PDF.
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF saved with PageMode.UseNone to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

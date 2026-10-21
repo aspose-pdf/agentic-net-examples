@@ -12,30 +12,29 @@ class Program
         // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Error: File not found – {inputPath}");
             return;
         }
 
-        // Create the bookmark editor facade
-        PdfBookmarkEditor editor = new PdfBookmarkEditor();
-
         try
         {
-            // Load the PDF into the facade
-            editor.BindPdf(inputPath);
+            // PdfBookmarkEditor provides bookmark manipulation without needing a Document instance
+            PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
 
-            // Remove all bookmarks from the document
-            editor.DeleteBookmarks();
+            // Load the PDF to be edited
+            bookmarkEditor.BindPdf(inputPath);
 
-            // Persist the changes to a new file
-            editor.Save(outputPath);
+            // Delete all existing bookmarks
+            bookmarkEditor.DeleteBookmarks();
+
+            // Save the modified PDF
+            bookmarkEditor.Save(outputPath);
+
+            Console.WriteLine($"All bookmarks removed. Saved to '{outputPath}'.");
         }
-        finally
+        catch (Exception ex)
         {
-            // Ensure resources are released
-            editor.Close();
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
-
-        Console.WriteLine($"All bookmarks removed. Output saved to '{outputPath}'.");
     }
 }

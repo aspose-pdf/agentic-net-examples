@@ -1,15 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                 // Core API for PDF creation
-using Aspose.Pdf.Facades;        // Facades namespace as required
+using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Input folder containing PNG images (adjust as needed)
+        // Folder containing the PNG images (ordered alphabetically)
         const string imagesFolder = "Images";
-        // Output PDF file path
+        // Output PDF file
         const string outputPdf = "Combined.pdf";
 
         // Validate input folder
@@ -19,9 +19,9 @@ class Program
             return;
         }
 
-        // Get PNG files sorted alphabetically (default order)
+        // Get all PNG files and sort them to preserve sequence
         string[] pngFiles = Directory.GetFiles(imagesFolder, "*.png");
-        Array.Sort(pngFiles, StringComparer.OrdinalIgnoreCase);
+        Array.Sort(pngFiles, StringComparer.InvariantCulture);
 
         if (pngFiles.Length == 0)
         {
@@ -29,29 +29,29 @@ class Program
             return;
         }
 
-        // Create a new PDF document (wrapped in using for deterministic disposal)
-        using (Document pdfDoc = new Document())
+        // Create a new PDF document
+        Document pdfDoc = new Document();
+
+        foreach (string imgPath in pngFiles)
         {
-            // Add a page for each PNG image
-            foreach (string pngPath in pngFiles)
+            // Add a new page for each image
+            Page page = pdfDoc.Pages.Add();
+
+            // Create an Aspose.Pdf.Drawing.Image and bind the PNG file
+            Image img = new Image
             {
-                // Add a new blank page (default size, default margins)
-                Page page = pdfDoc.Pages.Add();
+                File = imgPath,
+                // Fit the image to the page size (default margins are respected by using the page dimensions)
+                FixWidth = page.PageInfo.Width,
+                FixHeight = page.PageInfo.Height
+            };
 
-                // Create an Image object and set its source file
-                // Fully qualify to avoid ambiguity with System.Drawing.Image
-                Aspose.Pdf.Image img = new Aspose.Pdf.Image
-                {
-                    File = pngPath
-                };
-
-                // Add the image to the page's content
-                page.Paragraphs.Add(img);
-            }
-
-            // Save the assembled multi‑page PDF
-            pdfDoc.Save(outputPdf);
+            // Add the image to the page content
+            page.Paragraphs.Add(img);
         }
+
+        // Save the combined PDF
+        pdfDoc.Save(outputPdf);
 
         Console.WriteLine($"PDF created successfully: {outputPdf}");
     }

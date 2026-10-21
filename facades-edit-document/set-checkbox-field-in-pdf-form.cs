@@ -1,14 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName  = "TermsAccepted";
+        const string fieldName = "TermsAccepted";
 
         if (!File.Exists(inputPath))
         {
@@ -16,20 +17,30 @@ class Program
             return;
         }
 
-        // Load the PDF form
-        using (Form form = new Form(inputPath))
+        try
         {
-            // Set the checkbox field to true
-            bool success = form.FillField(fieldName, true);
-            if (!success)
+            // Load the PDF document
+            Document pdfDocument = new Document(inputPath);
+
+            // Retrieve the checkbox field by name
+            CheckboxField? field = pdfDocument.Form[fieldName] as CheckboxField;
+            if (field == null)
             {
-                Console.Error.WriteLine($"Field '{fieldName}' not found or could not be filled.");
+                Console.Error.WriteLine($"Checkbox field '{fieldName}' not found.");
+                return;
             }
 
-            // Save the modified PDF
-            form.Save(outputPath);
-        }
+            // Set the checkbox to checked (true)
+            field.Checked = true;
 
-        Console.WriteLine($"Checkbox '{fieldName}' set to true and saved to '{outputPath}'.");
+            // Save the modified PDF
+            pdfDocument.Save(outputPath);
+
+            Console.WriteLine($"Checkbox '{fieldName}' set to true and saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

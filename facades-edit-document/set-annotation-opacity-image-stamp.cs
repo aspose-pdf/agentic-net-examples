@@ -1,46 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string stampImage = "stamp.png"; // any image to use as stamp
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document using the standard Document lifecycle rule
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF, create a text annotation and set visual properties.
+        using (Document doc = new Document(inputPath))
         {
-            // Create a stamp via the Facades API
-            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+            // Define the rectangle for the annotation (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y).
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Bind an image to the stamp (any image can be used)
-            stamp.BindImage(stampImage);
+            // Create the markup annotation with opacity. BlendMode is not supported in the current Aspose.Pdf version.
+            TextAnnotation annotation = new TextAnnotation(doc.Pages[1], rect)
+            {
+                Title    = "Note",
+                Contents = "Sample annotation",
+                Open     = true,
+                Icon     = TextIcon.Note,
+                Opacity  = 0.75f // 75% opacity
+                // BlendMode = BlendMode.Multiply // <-- not available in this version
+            };
 
-            // Set the desired opacity (0.75 = 75% opaque). Use float literal.
-            stamp.Opacity = 0.75F;
+            // Add the annotation to the first page.
+            doc.Pages[1].Annotations.Add(annotation);
 
-            // NOTE: Aspose.Pdf.Facades.Stamp does NOT expose a BlendMode property.
-            // If a blend mode is required, use Aspose.Pdf.PdfPageStamp (from the Aspose.Pdf namespace)
-            // which supports the BlendMode property. For this example we keep only opacity.
-
-            // Use PdfFileStamp to apply the stamp to all pages
-            PdfFileStamp fileStamp = new PdfFileStamp();
-            fileStamp.BindPdf(doc);
-            fileStamp.AddStamp(stamp);
-            fileStamp.Save(outputPdf);
-            fileStamp.Close();
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotation opacity set to 0.75. Saved as '{outputPdf}'.");
+        Console.WriteLine($"Annotation with opacity saved to '{outputPath}'.");
     }
 }

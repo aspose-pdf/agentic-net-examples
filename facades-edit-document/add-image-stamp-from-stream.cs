@@ -1,47 +1,60 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";   // source PDF
-        const string outputPdfPath = "output.pdf";  // stamped PDF
-        const string imagePath     = "stamp.png";   // image to use as stamp
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        // Ensure source files exist
+        // ------------------------------------------------------------
+        // 1️⃣ Ensure the source PDF exists – create a simple placeholder
+        //    if it is missing. This makes the sample self‑contained.
+        // ------------------------------------------------------------
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(imagePath))
-        {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
-            return;
+            var placeholder = new Document();
+            placeholder.Pages.Add();
+            placeholder.Save(inputPdfPath);
         }
 
-        // Open the image as a stream – no intermediate file is created
-        using (FileStream imageStream = File.OpenRead(imagePath))
-        {
-            // Create a stamp and bind the image stream to it
-            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-            stamp.BindImage(imageStream);               // use the stream directly
-            stamp.SetOrigin(100, 500);                  // position (X, Y) from lower‑left corner
-            stamp.SetImageSize(200, 100);               // width, height in points
-            stamp.Opacity = 0.6f;                       // semi‑transparent
-            stamp.IsBackground = true;                  // place behind page content
+        // ------------------------------------------------------------
+        // 2️⃣ Prepare an image *in memory* – no file on disk is used.
+        //    The example uses a tiny 1×1 red PNG encoded as Base64.
+        //    Replace the Base64 string with any image you need.
+        // ------------------------------------------------------------
+        const string base64Png =
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+XK6cAAAAASUVORK5CYII="; // 1x1 red pixel
+        byte[] imageBytes = Convert.FromBase64String(base64Png);
+        using var imageStream = new MemoryStream(imageBytes);
 
-            // Use PdfFileStamp facade to apply the stamp to the PDF
-            using (PdfFileStamp pdfFileStamp = new PdfFileStamp())
-            {
-                pdfFileStamp.BindPdf(inputPdfPath);      // load source PDF
-                pdfFileStamp.AddStamp(stamp);            // add the prepared stamp
-                pdfFileStamp.Save(outputPdfPath);        // write result
-            }
+        // ------------------------------------------------------------
+        // 3️⃣ Create the ImageStamp directly from the stream.
+        // ------------------------------------------------------------
+        var imgStamp = new ImageStamp(imageStream)
+        {
+            Background = false,                     // place on top of page content
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Opacity = 0.7                           // semi‑transparent
+        };
+
+        // ------------------------------------------------------------
+        // 4️⃣ Load the PDF and apply the stamp to every page.
+        // ------------------------------------------------------------
+        using var pdfDoc = new Document(inputPdfPath);
+        foreach (Page page in pdfDoc.Pages)
+        {
+            page.AddStamp(imgStamp);
         }
+
+        // ------------------------------------------------------------
+        // 5️⃣ Save the modified PDF.
+        // ------------------------------------------------------------
+        pdfDoc.Save(outputPdfPath);
 
         Console.WriteLine($"Image stamp applied and saved to '{outputPdfPath}'.");
     }

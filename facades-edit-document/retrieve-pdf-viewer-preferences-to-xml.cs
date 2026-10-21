@@ -1,45 +1,56 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;          // PdfContentEditor, ViewerPreference
-using System.Xml.Linq;            // XDocument, XElement
+using System.Reflection;
+using System.Xml.Serialization;
+using Aspose.Pdf; // Document class
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputPdf = "output.pdf";         // PDF after processing (unchanged)
-        const string configXml = "viewer_preferences.xml"; // XML configuration file
+        const string inputPdf = "input.pdf";
+        const string outputXml = "viewerPreferences.xml";
 
-        // Verify source file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // PdfContentEditor implements IDisposable – use a using block for deterministic cleanup
-        using (PdfContentEditor editor = new PdfContentEditor())
+        try
         {
             // Load the PDF document
-            editor.BindPdf(inputPdf);
+            Document pdfDoc = new Document(inputPdf);
 
-            // Retrieve the current viewer preferences as an integer flag set
-            int prefValue = editor.GetViewerPreference();
+            // Try to obtain the ViewerPreferences property via reflection.
+            // This avoids compile‑time errors when the property is not present in the referenced Aspose.Pdf version.
+            PropertyInfo viewerPrefProp = pdfDoc.GetType().GetProperty("ViewerPreferences", BindingFlags.Public | BindingFlags.Instance);
+            if (viewerPrefProp == null)
+            {
+                Console.WriteLine("The current Aspose.Pdf library version does not expose a ViewerPreferences property.");
+                return;
+            }
 
-            // Serialize the preference value to a simple XML file
-            XDocument xmlDoc = new XDocument(
-                new XElement("ViewerPreferences",
-                    new XElement("Preference", prefValue)
-                )
-            );
-            xmlDoc.Save(configXml);
+            object viewerPreferences = viewerPrefProp.GetValue(pdfDoc);
+            if (viewerPreferences == null)
+            {
+                Console.WriteLine("ViewerPreferences property exists but returned null.");
+                return;
+            }
 
-            // Save the (unchanged) PDF to the output path
-            editor.Save(outputPdf);
+            // Serialize the retrieved preferences object to XML.
+            // The actual runtime type is used for the XmlSerializer constructor.
+            XmlSerializer serializer = new XmlSerializer(viewerPreferences.GetType());
+            using (FileStream fs = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
+            {
+                serializer.Serialize(fs, viewerPreferences);
+            }
+
+            Console.WriteLine($"Viewer preferences saved to '{outputXml}'.");
         }
-
-        Console.WriteLine($"Viewer preferences saved to '{configXml}'.");
-        Console.WriteLine($"PDF saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

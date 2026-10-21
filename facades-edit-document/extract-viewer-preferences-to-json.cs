@@ -1,69 +1,68 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Microsoft.CSharp.RuntimeBinder; // Needed for RuntimeBinderException when using dynamic
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "viewerConfig.json";
+        const string inputPdfPath = "input.pdf";
+        const string outputJsonPath = "viewerPreferences.json";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Retrieve viewer preference flags using PdfContentEditor
-        int prefValue;
-        using (PdfContentEditor editor = new PdfContentEditor())
+        try
         {
-            editor.BindPdf(inputPdf);
-            prefValue = editor.GetViewerPreference();
+            // Load the PDF document
+            Document pdfDocument = new Document(inputPdfPath);
+
+            // Use dynamic access to guard against older Aspose.Pdf versions that lack ViewerPreferences
+            string pageLayoutStr = "Unknown";
+            int zoom = 0;
+
+            try
+            {
+                dynamic docDyn = pdfDocument;
+                var prefs = docDyn.ViewerPreferences; // May throw RuntimeBinderException on older versions
+                // PageLayout is an enum; convert to string safely
+                pageLayoutStr = prefs.PageLayout != null ? prefs.PageLayout.ToString() : "Unknown";
+                // Zoom is typically an int (percentage). Cast to int safely.
+                zoom = prefs.Zoom != null ? (int)prefs.Zoom : 0;
+            }
+            catch (RuntimeBinderException)
+            {
+                Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version. Using default values.");
+            }
+            catch (Exception ex)
+            {
+                // Any other unexpected error while reading preferences
+                Console.WriteLine($"Unexpected error while accessing ViewerPreferences: {ex.Message}");
+            }
+
+            // Prepare a simple configuration object
+            var config = new
+            {
+                PageLayout = pageLayoutStr,
+                Zoom = zoom
+            };
+
+            // Serialize to indented JSON
+            string json = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true });
+
+            // Write JSON to file
+            File.WriteAllText(outputJsonPath, json);
+
+            Console.WriteLine($"Viewer preferences saved to '{outputJsonPath}'.");
         }
-
-        // Determine page layout from ViewerPreference flags
-        string pageLayout = GetPageLayout(prefValue);
-
-        // Retrieve current zoom (scale factor) using PdfViewer
-        float zoomFactor;
-        using (PdfViewer viewer = new PdfViewer())
+        catch (Exception ex)
         {
-            viewer.BindPdf(inputPdf);
-            zoomFactor = viewer.ScaleFactor; // default is 1.0 (100%)
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        // Prepare configuration object
-        var config = new
-        {
-            Layout = pageLayout,
-            Zoom = zoomFactor
-        };
-
-        // Serialize to JSON with indentation
-        string json = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true });
-
-        // Save JSON configuration file
-        File.WriteAllText(outputJson, json);
-        Console.WriteLine($"Viewer configuration saved to '{outputJson}'.");
-    }
-
-    // Helper method to map ViewerPreference flags to a readable layout string
-    private static string GetPageLayout(int prefValue)
-    {
-        // ViewerPreference flags are defined in Aspose.Pdf.Facades.ViewerPreference
-        if ((prefValue & ViewerPreference.PageLayoutOneColumn) != 0)
-            return "OneColumn";
-        if ((prefValue & ViewerPreference.PageLayoutSinglePage) != 0)
-            return "SinglePage";
-        if ((prefValue & ViewerPreference.PageLayoutTwoColumnLeft) != 0)
-            return "TwoColumnLeft";
-        if ((prefValue & ViewerPreference.PageLayoutTwoColumnRight) != 0)
-            return "TwoColumnRight";
-
-        // Default fallback if none of the layout flags are set
-        return "Unknown";
     }
 }

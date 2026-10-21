@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Printing;
 
@@ -8,6 +9,8 @@ class Program
     static void Main()
     {
         const string pdfPath = "input.pdf";
+        // Network printer UNC path (IP address based)
+        const string printerName = @"\\192.168.1.100\Printer";
 
         if (!File.Exists(pdfPath))
         {
@@ -15,30 +18,33 @@ class Program
             return;
         }
 
-        // Initialize the PdfViewer facade
-        using (PdfViewer viewer = new PdfViewer())
+        try
         {
-            // Load the PDF document
-            viewer.BindPdf(pdfPath);
+            // Load the PDF and print silently to the specified network printer
+            using (PdfViewer viewer = new PdfViewer())
+            {
+                // Bind directly from file path – no need to keep a Document instance
+                viewer.BindPdf(pdfPath);
 
-            // Configure viewer for silent printing (no dialogs)
-            viewer.AutoResize = true;      // fit to printable area
-            viewer.AutoRotate = true;      // auto‑rotate pages if needed
-            viewer.PrintPageDialog = false; // suppress the page‑range dialog
+                // Configure printer settings for the network printer
+                var printerSettings = new PrinterSettings
+                {
+                    PrinterName = printerName,
+                    PrintRange = PrintRange.AllPages // print all pages
+                };
 
-            // Set up printer settings for the network printer
-            PrinterSettings printerSettings = new PrinterSettings();
-            // Use the UNC path to the network printer; replace "printer" with the actual share name
-            printerSettings.PrinterName = @"\\192.168.1.100\printer";
-            printerSettings.Copies = 1;    // number of copies
+                // Page settings – use defaults (you can customise paper size, margins, etc.)
+                var pageSettings = new PageSettings(printerSettings);
 
-            // Send the print job silently
-            viewer.PrintDocumentWithSettings(printerSettings);
+                // Print the document silently
+                viewer.PrintDocumentWithSettings(pageSettings, printerSettings);
+            }
 
-            // Release resources
-            viewer.Close();
+            Console.WriteLine("Print job sent successfully.");
         }
-
-        Console.WriteLine("Print job sent to the network printer.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

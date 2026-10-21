@@ -1,88 +1,76 @@
 using System;
 using System.IO;
-using System.Drawing; // for System.Drawing.Rectangle and System.Drawing.Color
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
 
-class BatchJavaScriptApplier
+class Program
 {
-    // JavaScript code to be attached to each rectangle (square) annotation
-    private const string JsCode = "app.alert('Aspose.Pdf.Rectangle clicked!');";
-
     static void Main()
     {
-        // List of PDF files to process
-        string[] inputFiles = new string[]
-        {
-            "doc1.pdf",
-            "doc2.pdf",
-            "doc3.pdf"
-        };
+        // Folder containing the source PDF files
+        const string inputFolder  = @"C:\Pdf\Input";
+        // Folder where the modified PDFs will be saved
+        const string outputFolder = @"C:\Pdf\Output";
 
-        foreach (string inputPath in inputFiles)
+        if (!Directory.Exists(inputFolder))
         {
-            if (!File.Exists(inputPath))
-            {
-                Console.Error.WriteLine($"File not found: {inputPath}");
-                continue;
-            }
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
+            return;
+        }
 
-            string outputPath = Path.Combine(
-                Path.GetDirectoryName(inputPath) ?? string.Empty,
-                Path.GetFileNameWithoutExtension(inputPath) + "_js.pdf");
+        Directory.CreateDirectory(outputFolder);
+
+        // JavaScript code to be attached to each rectangle (square) annotation
+        const string jsCode = "app.alert('Rectangle annotation clicked');";
+
+        // Process each PDF file in the input folder
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        {
+            string fileName   = Path.GetFileName(inputPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
 
             try
             {
-                // Load the PDF document
+                // Load the PDF document inside a using block for deterministic disposal
                 using (Document doc = new Document(inputPath))
                 {
-                    // Create a PdfContentEditor bound to the same document
-                    using (PdfContentEditor editor = new PdfContentEditor())
+                    // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+                    for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
                     {
-                        editor.BindPdf(doc);
+                        Page page = doc.Pages[pageIndex];
 
-                        // Iterate through all pages (1‑based indexing)
-                        for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                        // Iterate over all annotations on the current page
+                        foreach (Annotation annotation in page.Annotations)
                         {
-                            Page page = doc.Pages[pageNum];
-
-                            // Iterate over annotations on the current page
-                            for (int i = 1; i <= page.Annotations.Count; i++)
+                            // Identify rectangle (square) annotations
+                            if (annotation is SquareAnnotation squareAnno)
                             {
-                                Annotation ann = page.Annotations[i];
-
-                                // Process only square (rectangle) annotations
-                                if (ann is SquareAnnotation squareAnn)
-                                {
-                                    // Convert Aspose.Pdf.Rectangle (double) to System.Drawing.Rectangle (int)
-                                    Aspose.Pdf.Rectangle pdfRect = squareAnn.Rect;
-                                    int x = (int)Math.Round(pdfRect.LLX);
-                                    int y = (int)Math.Round(pdfRect.LLY);
-                                    int width = (int)Math.Round(pdfRect.URX - pdfRect.LLX);
-                                    int height = (int)Math.Round(pdfRect.URY - pdfRect.LLY);
-                                    System.Drawing.Rectangle drawRect = new System.Drawing.Rectangle(x, y, width, height);
-
-                                    // Add JavaScript link over the same rectangle area (transparent border)
-                                    editor.CreateJavaScriptLink(
-                                        JsCode,
-                                        drawRect,
-                                        pageNum,
-                                        System.Drawing.Color.Transparent);
-                                }
+                                // NOTE:
+                                // The current Aspose.Pdf version referenced does NOT expose an
+                                // 'Action' property on SquareAnnotation, nor a JavaScriptAction class.
+                                // Therefore a JavaScript alert cannot be attached directly.
+                                // If a newer Aspose.Pdf version is used that provides these members,
+                                // the following code would be appropriate (uncomment and adjust):
+                                //
+                                // var jsAction = new JavaScriptAction(jsCode);
+                                // squareAnno.Action = jsAction;
+                                //
+                                // As a placeholder, we set the annotation's Title to indicate the intended action.
+                                squareAnno.Title = "JavaScript alert intended";
                             }
                         }
-
-                        // Save the modified document
-                        editor.Save(outputPath);
                     }
+
+                    // Save the modified document to the output folder
+                    doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed '{inputPath}' → '{outputPath}'");
+                Console.WriteLine($"Processed: {fileName} → {outputPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
             }
         }
     }

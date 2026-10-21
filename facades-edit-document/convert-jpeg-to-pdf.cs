@@ -1,40 +1,43 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core PDF API
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputImagePath = "Photo.jpg"; // JPEG source
-        const string outputPdfPath = "Photo.pdf";   // Resulting PDF
+        const string imagePath = "Photo.jpg";
+        const string pdfPath   = "Photo.pdf";
 
-        // Verify the JPEG file exists
-        if (!File.Exists(inputImagePath))
+        // Verify the source image exists
+        if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Input image not found: {inputImagePath}");
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
         // Create a new PDF document
         Document pdfDocument = new Document();
-        // Add a blank page (default margins are applied automatically)
+        // Add a page (default size and margins are applied automatically)
         Page page = pdfDocument.Pages.Add();
 
-        // Load the JPEG image and add it to the page
-        using (FileStream imageStream = new FileStream(inputImagePath, FileMode.Open, FileAccess.Read))
+        // Create an image object and bind the JPEG file
+        Aspose.Pdf.Image pdfImage = new Aspose.Pdf.Image
         {
-            Aspose.Pdf.Image pdfImage = new Aspose.Pdf.Image
-            {
-                ImageStream = imageStream
-            };
-            // The image is added as a paragraph; it will be placed respecting the page margins.
-            page.Paragraphs.Add(pdfImage);
-        }
+            File = imagePath,
+            // Fit the image to the page while preserving margins (optional)
+            // Width = page.PageInfo.Width - page.PageInfo.Margin.Left - page.PageInfo.Margin.Right,
+            // Height = page.PageInfo.Height - page.PageInfo.Margin.Top - page.PageInfo.Margin.Bottom,
+            // HorizontalAlignment = HorizontalAlignment.Center,
+            // VerticalAlignment = VerticalAlignment.Center
+        };
 
-        // Save the PDF document
-        pdfDocument.Save(outputPdfPath);
+        // Add the image to the page's paragraphs collection
+        page.Paragraphs.Add(pdfImage);
 
-        Console.WriteLine($"PDF created successfully at '{outputPdfPath}'.");
+        // Save the generated PDF
+        pdfDocument.Save(pdfPath);
+
+        Console.WriteLine($"Successfully created PDF: {pdfPath}");
     }
 }
