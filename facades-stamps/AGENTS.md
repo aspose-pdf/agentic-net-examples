@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - facades-stamps
 
-> **Facades stamps** in PDF using C# / .NET -- **48** verified, compile-tested examples for **Aspose.PDF for .NET** 26.8.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades stamps** in PDF using C# / .NET -- **49** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,66 +23,64 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf.Facades;` (37/48 files) ← category-specific
-- `using Aspose.Pdf;` (35/48 files) ← category-specific
-- `using Aspose.Pdf.Text;` (14/48 files)
-- `using Aspose.Pdf.Annotations;` (2/48 files)
-- `using Aspose.Pdf.Drawing;` (1/48 files)
-- `using Aspose.Pdf.Forms;` (1/48 files)
-- `using System;` (48/48 files)
-- `using System.IO;` (47/48 files)
-- `using System.Drawing;` (11/48 files)
-- `using System.Text;` (1/48 files)
+- `using Aspose.Pdf;` (46/49 files) ← category-specific
+- `using Aspose.Pdf.Text;` (25/49 files) ← category-specific
+- `using Aspose.Pdf.Facades;` (18/49 files)
+- `using Aspose.Pdf.Drawing;` (7/49 files)
+- `using Aspose.Pdf.Annotations;` (1/49 files)
+- `using System;` (49/49 files)
+- `using System.IO;` (49/49 files)
 
 ## Common Code Pattern
 
-Most files in this category use `PdfFileStamp` from `Aspose.Pdf.Facades`:
+Most files follow this pattern:
 
 ```csharp
-PdfFileStamp tool = new PdfFileStamp();
-tool.BindPdf("input.pdf");
-// ... PdfFileStamp operations ...
-tool.Save("output.pdf");
+using (Document doc = new Document("input.pdf"))
+{
+    // ... operations ...
+    doc.Save("output.pdf");
+}
 ```
 
 ## Files in this folder
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-background-watermark-to-specific-pdf-pages](./add-background-watermark-to-specific-pdf-pages.cs) | Add Background Watermark to Specific PDF Pages | `PdfFileStamp`, `Stamp`, `FormattedText` | Demonstrates how to apply a light‑gray background watermark to pages 2‑5 of a PDF using Aspose.Pd... |
-| [add-confidential-text-and-logo-stamp](./add-confidential-text-and-logo-stamp.cs) | Add Confidential Text and Logo Stamp to PDF | `PdfFileStamp`, `Stamp`, `FormattedText` | Demonstrates using Aspose.Pdf.Facades to place a combined formatted text stamp and a logo image o... |
-| [add-creation-date-stamp](./add-creation-date-stamp.cs) | Add Creation Date Stamp to PDF | `Document`, `DocumentInfo`, `TextStamp` | Shows how to read a PDF's creation date and place it as a text stamp in the top‑left corner of ev... |
-| [add-custom-border-stamp-to-pdf](./add-custom-border-stamp-to-pdf.cs) | Add Custom Border Stamp Annotation to PDF | `Document`, `StampAnnotation`, `Border` | Demonstrates how to load a PDF, create a rubber‑stamp annotation with a custom red border and thi... |
-| [add-dynamic-text-stamp-to-pdf](./add-dynamic-text-stamp-to-pdf.cs) | Add Dynamic Text Stamp to PDF | `Document`, `Page`, `TextStamp` | Demonstrates creating a TextStamp with interpolated author and date values, applying it to each p... |
-| [add-file-name-header-stamp-to-pdf](./add-file-name-header-stamp-to-pdf.cs) | Add File Name Header Stamp to PDF | `Document`, `TextStamp`, `FindFont` | Demonstrates creating a TextStamp that shows the PDF's file name in the header of each page and a... |
+| [add-background-watermark-to-specific-pdf-pages](./add-background-watermark-to-specific-pdf-pages.cs) | Add Background Text Watermark to Selected PDF Pages | `TextStamp`, `TextState`, `FontRepository` | Demonstrates how to create a semi‑transparent background text stamp and apply it to pages 2‑5 of ... |
+| [add-confidential-text-and-logo-stamp](./add-confidential-text-and-logo-stamp.cs) | Add Logo and Confidential Stamps to PDF | `Document`, `ImageStamp`, `TextStamp` | Loads a PDF, adds an image stamp for a company logo and a bold red "Confidential" text stamp to e... |
+| [add-creation-date-stamp](./add-creation-date-stamp.cs) | Add Creation Date Stamp to PDF | `Document`, `TextStamp`, `FontRepository` | Shows how to read a PDF's creation date and place it as a text stamp on the top‑left corner of ev... |
+| [add-custom-border-stamp-to-pdf](./add-custom-border-stamp-to-pdf.cs) | Apply Custom Border Stamp to PDF Pages | `Document`, `Page`, `Rectangle` | Shows how to add a text annotation with a custom border thickness and color to each page of a PDF... |
+| [add-dynamic-text-stamp-to-pdf](./add-dynamic-text-stamp-to-pdf.cs) | Add Dynamic Text Stamp to PDF | `Document`, `TextStamp`, `FontRepository` | Shows how to load a PDF, create a TextStamp with the current date and author using string interpo... |
+| [add-file-name-header-stamp-to-pdf](./add-file-name-header-stamp-to-pdf.cs) | Add File Name Header Stamp to PDF | `Document`, `HeaderFooter`, `TextFragment` | Demonstrates how to add a header stamp that displays the PDF's file name using the {file_name} pl... |
 | [add-footer-date-stamp-to-last-pdf-page](./add-footer-date-stamp-to-last-pdf-page.cs) | Add Footer Date Stamp to Last PDF Page | `Document`, `Page`, `TextStamp` | Demonstrates how to insert a footer stamp containing the current date (MM-dd-yyyy) on the last pa... |
-| [add-footer-stamp-10-points-above-bottom](./add-footer-stamp-10-points-above-bottom.cs) | Add Footer Stamp 10 Points Above Bottom Edge | `PdfFileStamp`, `BindPdf`, `AddFooter` | Demonstrates how to use PdfFileStamp to add a footer stamp positioned exactly 10 points above the... |
-| [add-footer-with-page-count](./add-footer-with-page-count.cs) | Add Footer with Page Count to PDF | `PdfFileStamp`, `BindPdf`, `AddPageNumber` | Shows how to use Aspose.Pdf.Facades.PdfFileStamp to add a footer that displays the current page n... |
-| [add-header-stamp-to-pdf-pages](./add-header-stamp-to-pdf-pages.cs) | Add Header Stamp to All PDF Pages | `Document`, `Page`, `TextStamp` | Shows how to load a PDF with Aspose.Pdf, iterate through its Pages collection, and add a centered... |
-| [add-image-stamp-to-pdfs-preserve-filenames](./add-image-stamp-to-pdfs-preserve-filenames.cs) | Add Image Stamp to PDFs and Preserve Filenames | `PdfFileStamp`, `Stamp`, `BindPdf` | Iterates over PDF files in a source folder, applies an image stamp to each page using the PdfFile... |
-| [add-lower-roman-page-numbers-odd-pages](./add-lower-roman-page-numbers-odd-pages.cs) | Add Lower‑Roman Page Numbers to Odd Pages | `Document`, `PageNumberStamp`, `NumberingStyle` | Demonstrates how to add page numbers in lower‑case Roman numerals to only the odd pages of a PDF ... |
-| [add-multi-line-colored-header-stamp](./add-multi-line-colored-header-stamp.cs) | Add Multi-Line Colored Header Stamp to PDF | `BindPdf`, `AddStamp`, `Save` | Demonstrates how to apply a multi‑line header stamp with different font colors to each line using... |
-| [add-multi-line-text-watermark-facade](./add-multi-line-text-watermark-facade.cs) | Add Multi-Line Text Watermark to PDF using Facades | `PdfFileStamp`, `FormattedText`, `AddNewLineText` | Shows how to create a multi-line text watermark with Aspose.Pdf.Facades by using FormattedText, a... |
-| [add-multi-line-text-watermark](./add-multi-line-text-watermark.cs) | Add Multi‑Line Text Watermark with Varying Font Sizes | `Document`, `Page`, `FindFont` | Demonstrates how to apply a multi‑line watermark to each page of a PDF, using different font size... |
-| [add-multi-line-watermark-custom-font](./add-multi-line-watermark-custom-font.cs) | Add Multi‑Line Watermark with Custom Font to PDF | `Document`, `FormattedText`, `BindLogo` | Demonstrates loading a PDF from a memory stream and applying a multi‑line, custom‑styled watermar... |
-| [add-page-number-stamp-leading-zeros](./add-page-number-stamp-leading-zeros.cs) | Add Page Number Stamp with Leading Zeros to PDF | `Document`, `PdfFileStamp`, `NumberingStyle` | Shows how to use Aspose.Pdf to stamp Arabic numeral page numbers with leading zeros on every page... |
-| [add-page-number-stamp-to-pdf](./add-page-number-stamp-to-pdf.cs) | Add Page Number Stamp to PDF | `PdfFileStamp`, `AddPageNumber`, `StartingNumber` | Shows how to use Aspose.Pdf.Facades.PdfFileStamp to add a dynamic page‑number stamp (using the "#... |
-| [add-qr-code-stamp-from-pdf-metadata](./add-qr-code-stamp-from-pdf-metadata.cs) | Add QR Code Stamp from PDF Metadata | `Document`, `Stamp`, `PdfFileStamp` | Demonstrates how to generate a QR code from a PDF's metadata and apply it as a stamp on the docum... |
-| [add-repeating-background-watermark-image](./add-repeating-background-watermark-image.cs) | Add Repeating Background Watermark Image to PDF Pages | `PdfFileStamp`, `Stamp`, `BindImage` | Shows how to use PdfFileStamp with a single Stamp instance to place a semi‑transparent background... |
-| [add-right-aligned-logo-stamp-to-pdf](./add-right-aligned-logo-stamp-to-pdf.cs) | Add Right-Aligned Logo Stamp to PDF | `Document`, `ImageStamp`, `AddStamp` | Shows how to place an image stamp (logo) at the right margin of each page in a PDF using Aspose.Pdf. |
-| [add-semi-transparent-background-stamp](./add-semi-transparent-background-stamp.cs) | Add Semi-Transparent Background Stamp to PDF | `PdfFileStamp`, `Stamp`, `BindPdf` | Demonstrates how to apply an image as a background stamp on all pages of a PDF with 30% opacity u... |
-| [add-transparent-confidential-text-stamp](./add-transparent-confidential-text-stamp.cs) | Add Transparent Confidential Text Stamp to Selected PDF Page... | `Document`, `PdfFileStamp`, `FormattedText` | Demonstrates applying a 70% opaque red "CONFIDENTIAL" text stamp to specific pages of a PDF using... |
-| [apply-custom-line-height-stamp](./apply-custom-line-height-stamp.cs) | Apply Custom Line-Height Stamp to PDF | `Stamp`, `PdfFileStamp`, `FormattedText` | Demonstrates how to create a multi‑line watermark with custom line spacing using a formatted text... |
-| [apply-external-pdf-template-stamp](./apply-external-pdf-template-stamp.cs) | Apply External PDF Template as Stamp on a Specific Page | `PdfFileStamp`, `Stamp`, `BindPdf` | Shows how to create a PdfFileStamp from an external template PDF and apply it only to the third p... |
-| [apply-image-stamp-to-all-pdf-pages](./apply-image-stamp-to-all-pdf-pages.cs) | Apply Image Stamp to All PDF Pages | `PdfFileStamp`, `Stamp`, `BindPdf` | Demonstrates using PdfFileStamp and Stamp to add a semi‑transparent image stamp to every page of ... |
-| [apply-pdf-page-stamp-as-background](./apply-pdf-page-stamp-as-background.cs) | Apply PDF Page Stamp as Background to All Pages | `PdfFileStamp`, `Stamp`, `BindPdf` | Demonstrates how to use Aspose.Pdf.Facades to stamp every page of a PDF with the first page of an... |
-| [apply-rotated-image-stamp-to-pdf-pages](./apply-rotated-image-stamp-to-pdf-pages.cs) | Apply Rotated Image Stamp to PDF Pages | `PdfFileStamp`, `Stamp`, `Document` | Demonstrates how to add an image stamp rotated by 30° to the bottom‑right corner of every page in... |
-| [apply-rotated-text-stamp-odd-pages](./apply-rotated-text-stamp-odd-pages.cs) | Apply Rotated Text Stamp to Odd Pages | `Document`, `TextStamp`, `FindFont` | Demonstrates adding a 30‑degree rotated text stamp to the left margin of every odd‑numbered page ... |
-| [apply-rotating-stamps-to-pdf-pages](./apply-rotating-stamps-to-pdf-pages.cs) | Apply Rotating Stamps to Each PDF Page | `Document`, `PdfFileStamp`, `Stamp` | Demonstrates how to add a text stamp to every page of a PDF and rotate each stamp based on the pa... |
-| ... | | | *and 18 more files* |
+| [add-footer-stamp-10-points-above-bottom](./add-footer-stamp-10-points-above-bottom.cs) | Add Footer Image Stamp 10 Points Above Bottom Edge | `Document`, `ImageStamp`, `AddStamp` | The example loads a PDF, creates an ImageStamp configured as a footer, sets its vertical alignmen... |
+| [add-footer-with-page-count](./add-footer-with-page-count.cs) | Add Footer Stamp with Page Count to PDF | `Document`, `Page`, `TextStamp` | Demonstrates how to add a footer text stamp that automatically displays the current page number a... |
+| [add-header-barcode-stamp-to-pdf-pages](./add-header-barcode-stamp-to-pdf-pages.cs) | Add Header Barcode Stamp to PDF Pages | `Document`, `Page`, `ImageStamp` | Shows how to generate a barcode image and place it as a header stamp on each page of a PDF using ... |
+| [add-header-stamp-to-pdf-pages](./add-header-stamp-to-pdf-pages.cs) | Add Header Stamp to All PDF Pages | `Document`, `Page`, `TextStamp` | Shows how to load a PDF, iterate through its Pages collection, and add a centered header TextStam... |
+| [add-image-stamp-to-pdfs-preserve-filenames](./add-image-stamp-to-pdfs-preserve-filenames.cs) | Apply Image Stamp to PDFs and Save to New Directory | `Document`, `ImageStamp`, `AddStamp` | Shows how to load PDF files from a folder, add an image stamp to every page, and write the stampe... |
+| [add-lower-roman-page-numbers-odd-pages](./add-lower-roman-page-numbers-odd-pages.cs) | Add Lower‑Roman Page Numbers to Odd Pages | `Document`, `TextStamp`, `TextState` | Demonstrates how to add lower‑case Roman numeral page numbers to only the odd pages of a PDF usin... |
+| [add-multi-line-colored-header-stamp](./add-multi-line-colored-header-stamp.cs) | Add Multi-Line Colored Header Stamp to PDF | `Document`, `TextStamp`, `AddStamp` | Shows how to apply a multi-line header stamp to each page of a PDF, with each line displayed in a... |
+| [add-multi-line-text-stamp-with-line-spacing](./add-multi-line-text-stamp-with-line-spacing.cs) | Add Multi-Line Text Stamp with 1.5 Line Spacing | `TextStamp`, `TextState`, `FindFont` | Loads a PDF, creates a multi-line TextStamp, configures font, size, style, color and a line spaci... |
+| [add-multi-line-text-watermark-facade](./add-multi-line-text-watermark-facade.cs) | Add Multi-Line Text Watermark to PDF Pages | `Document`, `WatermarkArtifact`, `TextState` | Shows how to create a multi-line text watermark using WatermarkArtifact and apply it to every pag... |
+| [add-multi-line-text-watermark](./add-multi-line-text-watermark.cs) | Add Multi-Line Watermark with Varying Font Sizes | `Document`, `Page`, `TextFragment` | Loads a PDF, iterates over each page, and adds three centered text fragments as a watermark, each... |
+| [add-multi-line-watermark-custom-font](./add-multi-line-watermark-custom-font.cs) | Add Multi‑Line Watermark with Custom Font to PDF | `Document`, `Page`, `WatermarkArtifact` | Demonstrates loading a PDF from a memory stream and applying a multi‑line watermark with a custom... |
+| [add-page-number-stamp-leading-zeros](./add-page-number-stamp-leading-zeros.cs) | Add Page Number Stamp with Leading Zeros to PDF | `Document`, `PageNumberStamp`, `AddStamp` | Demonstrates how to add a page‑number stamp formatted with leading zeros to every page of a PDF u... |
+| [add-page-number-stamp-to-pdf](./add-page-number-stamp-to-pdf.cs) | Add Dynamic Page Number Stamp to PDF | `Document`, `TextStamp`, `AddStamp` | Demonstrates how to create a TextStamp with the {page_number} placeholder, apply it to every page... |
+| [add-repeating-background-watermark-image](./add-repeating-background-watermark-image.cs) | Add Background Image Stamp to All PDF Pages | `Document`, `ImageStamp`, `AddStamp` | Demonstrates how to create a single ImageStamp and reuse it to apply a semi‑transparent backgroun... |
+| [add-right-aligned-logo-stamp-to-pdf](./add-right-aligned-logo-stamp-to-pdf.cs) | Add Right-Aligned Logo Stamp to PDF Pages | `ImageStamp`, `Document`, `AddStamp` | Demonstrates how to place an image stamp (logo) at the right‑hand side of each page in a PDF usin... |
+| [add-semi-transparent-background-stamp](./add-semi-transparent-background-stamp.cs) | Add Background Image Stamp with 30% Opacity | `ImageStamp`, `Document`, `AddStamp` | Demonstrates how to place an image stamp as a background on every page of a PDF using Aspose.Pdf,... |
+| [add-transparent-confidential-text-stamp](./add-transparent-confidential-text-stamp.cs) | Add Transparent Confidential Text Stamp to Selected PDF Page... | `Document`, `TextStamp`, `FindFont` | Demonstrates how to apply a semi‑transparent 'CONFIDENTIAL' text stamp with 70% opacity to specif... |
+| [apply-custom-line-height-stamp](./apply-custom-line-height-stamp.cs) | Apply Multi-Line Watermark with Custom Line Height | `Document`, `Page`, `TextStamp` | Shows how to add several TextStamp watermarks to a PDF page and control the vertical spacing betw... |
+| [apply-external-pdf-template-stamp](./apply-external-pdf-template-stamp.cs) | Apply External PDF Stamp to Page 3 | `Stamp`, `PdfFileStamp`, `BindPdf` | Demonstrates creating a stamp from an external PDF template and overlaying it on the third page o... |
+| [apply-image-stamp-to-all-pdf-pages](./apply-image-stamp-to-all-pdf-pages.cs) | Apply Image Stamp to All PDF Pages | `Document`, `ImageStamp`, `AddStamp` | Shows how to load a PDF, create a single ImageStamp, and efficiently add that stamp to every page... |
+| [apply-pdf-page-stamp-as-background](./apply-pdf-page-stamp-as-background.cs) | Apply Image Stamp as Background to All PDF Pages | `Document`, `ImageStamp`, `AddStamp` | Shows how to load a PDF, create an ImageStamp, set it as a background, and add it to every page b... |
+| [apply-rotated-image-stamp-to-pdf-pages](./apply-rotated-image-stamp-to-pdf-pages.cs) | Add Rotated Image Stamp to Bottom-Right of PDF Pages | `Document`, `ImageStamp`, `AddStamp` | Demonstrates loading a PDF with Aspose.Pdf, creating an ImageStamp, rotating it 30°, aligning it ... |
+| [apply-rotated-text-stamp-odd-pages](./apply-rotated-text-stamp-odd-pages.cs) | Apply Rotated Text Stamp to Odd Pages | `Document`, `TextStamp`, `FindFont` | Shows how to add a 30‑degree rotated text stamp to the left margin of every odd‑numbered page in ... |
+| ... | | | *and 19 more files* |
 
 ## Category Statistics
-- Total examples: 48
+- Total examples: 49
 
 ## Category-Specific Tips
 
@@ -124,5 +122,5 @@ tool.Save("output.pdf");
 - Review code examples in this folder for facades-stamps patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-08-20 | Run: `20260820_001147_12d7b3`
+Updated: 2026-10-21 | Run: `20261021_060620_83f0b8`
 <!-- AUTOGENERATED:END -->

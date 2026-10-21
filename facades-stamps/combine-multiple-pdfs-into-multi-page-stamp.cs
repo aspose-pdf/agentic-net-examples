@@ -8,60 +8,53 @@ class Program
 {
     static void Main()
     {
-        // ---------------------------------------------------------------------
-        // 1. Create sample stamp PDFs (stamp1.pdf, stamp2.pdf, stamp3.pdf).
-        // ---------------------------------------------------------------------
-        string[] stampSources = { "stamp1.pdf", "stamp2.pdf", "stamp3.pdf" };
-        for (int i = 0; i < stampSources.Length; i++)
+        // Input PDF files that will be combined into a single multi‑page stamp
+        string[] pdfFiles = { "stamp1.pdf", "stamp2.pdf", "stamp3.pdf" };
+        const string outputPath = "combined_stamp.pdf";
+
+        // Verify that all source files exist
+        foreach (string file in pdfFiles)
         {
-            using (Document doc = new Document())
+            if (!File.Exists(file))
             {
-                Page page = doc.Pages.Add();
-                page.Paragraphs.Add(new TextFragment($"Stamp page {i + 1}"));
-                doc.Save(stampSources[i]);
+                Console.Error.WriteLine($"Source file not found: {file}");
+                return;
             }
         }
 
-        // ---------------------------------------------------------------------
-        // 2. Create the target PDF that will receive the stamp.
-        // ---------------------------------------------------------------------
-        string targetPdfPath = "target.pdf";
-        using (Document targetDoc = new Document())
+        // Merge the PDFs into one Document (target)
+        // Use nested using blocks for deterministic disposal (lifecycle rule)
+        using (Aspose.Pdf.Document target = new Aspose.Pdf.Document(pdfFiles[0]))
         {
-            Page page = targetDoc.Pages.Add();
-            page.Paragraphs.Add(new TextFragment("Target PDF page 1"));
-            targetDoc.Save(targetPdfPath);
+            // Add remaining PDFs to the target document
+            for (int i = 1; i < pdfFiles.Length; i++)
+            {
+                using (Aspose.Pdf.Document source = new Aspose.Pdf.Document(pdfFiles[i]))
+                {
+                    target.Pages.Add(source.Pages);
+                }
+            }
+
+            // Create a header that will act as the stamp on every page
+            Aspose.Pdf.HeaderFooter stampHeader = new Aspose.Pdf.HeaderFooter();
+            // Add a text fragment to the header (you can customize font, size, color, etc.)
+            Aspose.Pdf.Text.TextFragment tf = new Aspose.Pdf.Text.TextFragment("Multi‑Page Stamp");
+            tf.TextState.FontSize = 12;
+            tf.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica");
+            tf.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0.2, 0.4, 0.8);
+            stampHeader.Paragraphs.Add(tf);
+
+            // Apply the header to every page in the merged document
+            for (int pageIndex = 1; pageIndex <= target.Pages.Count; pageIndex++)
+            {
+                Aspose.Pdf.Page page = target.Pages[pageIndex];
+                page.Header = stampHeader;
+            }
+
+            // Save the final PDF containing the multi‑page stamp
+            target.Save(outputPath);
         }
 
-        // ---------------------------------------------------------------------
-        // 3. Combine the stamp PDFs into a single multi‑page PDF.
-        // ---------------------------------------------------------------------
-        string combinedStampPath = "combinedStamp.pdf";
-        PdfFileEditor editor = new PdfFileEditor();
-        editor.Concatenate(stampSources, combinedStampPath);
-
-        // ---------------------------------------------------------------------
-        // 4. Prepare the PdfFileStamp facade for the target document.
-        // ---------------------------------------------------------------------
-        string outputPdfPath = "targetStamped.pdf";
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(targetPdfPath);
-
-        // ---------------------------------------------------------------------
-        // 5. Create a Stamp object bound to the first page of the combined PDF.
-        // ---------------------------------------------------------------------
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        stamp.BindPdf(combinedStampPath, 1); // first page of combined stamp PDF
-        stamp.IsBackground = true;           // place behind existing content
-        stamp.Pages = null;                  // apply to all pages of the target PDF
-
-        // ---------------------------------------------------------------------
-        // 6. Apply the stamp and save the result.
-        // ---------------------------------------------------------------------
-        fileStamp.AddStamp(stamp);
-        fileStamp.Save(outputPdfPath);
-        fileStamp.Close();
-
-        Console.WriteLine($"Stamped PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Combined stamp PDF saved to '{outputPath}'.");
     }
 }

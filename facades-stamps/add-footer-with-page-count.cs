@@ -1,38 +1,43 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_footer.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfFileStamp does not implement IDisposable, so we do not use a using block.
-        // Use the parameterless constructor and bind the source PDF via BindPdf().
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(inputPath);
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPath))
+        {
+            // Create a footer text stamp with placeholders for page number and total page count
+            TextStamp footer = new TextStamp("Page {page_number} of {page_count}");
+            footer.BottomMargin          = 10;                                   // distance from bottom edge
+            footer.HorizontalAlignment   = HorizontalAlignment.Center;            // center horizontally
+            footer.VerticalAlignment     = VerticalAlignment.Bottom;              // place at bottom
+            footer.TextState.FontSize    = 12;
+            footer.TextState.Font        = FontRepository.FindFont("Arial");
+            footer.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;            // use Aspose.Pdf.Color to avoid System.Drawing
 
-        // Add a footer that shows the current page number and total page count.
-        // The placeholder "#" is replaced with the current page number.
-        // The placeholder "{page_count}" is replaced with the total number of pages.
-        // Position the footer at the bottom middle of each page.
-        fileStamp.AddPageNumber("Page # of {page_count}", PdfFileStamp.PosBottomMiddle);
+            // Apply the stamp to every page
+            foreach (Page page in pdfDoc.Pages)
+            {
+                page.AddStamp(footer);
+            }
 
-        // Save the result to the specified output file.
-        fileStamp.Save(outputPath);
+            // Save the stamped PDF
+            pdfDoc.Save(outputPath);
+        }
 
-        // Close the facade to release resources.
-        fileStamp.Close();
-
-        Console.WriteLine($"Footer added and saved to '{outputPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

@@ -1,37 +1,37 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // TextStamp lives here
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
         const string companyName = "Acme Corporation";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF and add a header stamp to every page
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
+            // Iterate through each page and add a header text stamp
             foreach (Page page in doc.Pages)
             {
-                // Create a TextStamp that will act as the header
+                // Create a TextStamp with the company name
                 TextStamp headerStamp = new TextStamp(companyName);
-                headerStamp.TextState.Font = FontRepository.FindFont("Helvetica");
-                headerStamp.TextState.FontSize = 12;
-                headerStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-                headerStamp.HorizontalAlignment = HorizontalAlignment.Center;
-                headerStamp.VerticalAlignment = VerticalAlignment.Top;
-                headerStamp.YIndent = 20; // distance from the top edge
 
-                // Apply the stamp to the current page
+                // Position the stamp at the top center of the page
+                headerStamp.HorizontalAlignment = HorizontalAlignment.Center;
+                headerStamp.VerticalAlignment   = VerticalAlignment.Top;
+                headerStamp.TopMargin = 10; // distance from the top edge
+
+                // Add the stamp to the current page
                 page.AddStamp(headerStamp);
             }
 
@@ -39,6 +39,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Header stamp added to all pages. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Header stamp added to all pages. Saved as '{outputPath}'.");
     }
 }

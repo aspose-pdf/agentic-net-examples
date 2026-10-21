@@ -1,54 +1,50 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // Facade classes: PdfFileStamp, Stamp
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdf      = "input.pdf";      // PDF to be stamped
-        const string templatePdf   = "template.pdf";   // PDF whose page will be used as stamp
-        const string outputPdf     = "output.pdf";
+        // Paths for the source PDF, the external stamp template PDF, and the output PDF
+        const string sourcePdfPath = "input.pdf";
+        const string stampPdfPath  = "stamp_template.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        // Verify files exist
-        if (!File.Exists(inputPdf))
+        // Verify that the required files exist
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
             return;
         }
-        if (!File.Exists(templatePdf))
+        if (!File.Exists(stampPdfPath))
         {
-            Console.Error.WriteLine($"Template PDF not found: {templatePdf}");
+            Console.Error.WriteLine($"Stamp template PDF not found: {stampPdfPath}");
             return;
         }
 
-        // Initialize the facade for stamping
-        PdfFileStamp fileStamp = new PdfFileStamp();
-
-        // Bind the source PDF (the document that will receive the stamp)
-        fileStamp.BindPdf(inputPdf);
-
-        // Create a stamp that uses a page from the external template PDF
+        // ------------------------------------------------------------
+        // 1. Create a Stamp object that represents the external template
+        // ------------------------------------------------------------
         Stamp stamp = new Stamp();
+        // Bind the first page of the template PDF as the stamp content
+        stamp.BindPdf(stampPdfPath, 1);
+        // Position of the stamp on the target page (lower‑left corner, points)
+        stamp.SetOrigin(100, 100); // adjust X/Y as needed
+        // Apply the stamp only to page 3 (Aspose.Pdf uses 1‑based indexing)
+        stamp.Pages = new[] { 3 };
+        // Set to overlay (false) or background (true) – here we overlay
+        stamp.IsBackground = false;
 
-        // Use the first page of the template PDF as the stamp content
-        // (adjust the page number if a different page is required)
-        stamp.BindPdf(templatePdf, 1);
+        // ------------------------------------------------------------
+        // 2. Apply the stamp to the source PDF using PdfFileStamp
+        // ------------------------------------------------------------
+        PdfFileStamp pdfStamp = new PdfFileStamp();
+        pdfStamp.BindPdf(sourcePdfPath);
+        pdfStamp.AddStamp(stamp); // the only method that adds a stamp
+        pdfStamp.Save(outputPdfPath);
+        pdfStamp.Close();
 
-        // Apply the stamp only to page 3 of the target document
-        stamp.Pages = new int[] { 3 };
-
-        // Add the configured stamp to the facade
-        fileStamp.AddStamp(stamp);
-
-        // Save the result
-        fileStamp.Save(outputPdf);
-
-        // Release resources (PdfFileStamp does not implement IDisposable,
-        // so we call Close() explicitly)
-        fileStamp.Close();
-
-        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Stamp applied to page 3 and saved as '{outputPdfPath}'.");
     }
 }

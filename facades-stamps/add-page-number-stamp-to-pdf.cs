@@ -2,13 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // required for FontRepository
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "stamped_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,19 +17,32 @@ class Program
             return;
         }
 
-        // Initialize the facade with input and output files
-        PdfFileStamp fileStamp = new PdfFileStamp(inputPath, outputPath);
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Create a TextStamp with the {page_number} placeholder.
+            // Aspose.Pdf.Facades will replace this token with the actual page number at save time.
+            TextStamp pageNumberStamp = new TextStamp("Page {page_number}");
 
-        // Optional: set the starting page number (default is 1)
-        fileStamp.StartingNumber = 1;
+            // Optional visual formatting
+            pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
+            // Use XIndent/YIndent instead of the non‑existent Margin property
+            pageNumberStamp.XIndent = 0;          // centered, so no horizontal offset
+            pageNumberStamp.YIndent = 20;         // distance from bottom edge (points)
+            pageNumberStamp.TextState.Font      = FontRepository.FindFont("Arial");
+            pageNumberStamp.TextState.FontSize  = 12;
+            pageNumberStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-        // Add a page‑number stamp.
-        // Aspose.Pdf uses the '#' character as a placeholder that is replaced
-        // with the actual page number during stamping.
-        fileStamp.AddPageNumber("Page #");
+            // Apply the stamp to every page (Aspose.Pdf uses 1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                doc.Pages[i].AddStamp(pageNumberStamp);
+            }
 
-        // Persist changes and release resources
-        fileStamp.Close();
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
 
         Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }

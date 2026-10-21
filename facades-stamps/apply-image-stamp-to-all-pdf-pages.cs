@@ -1,46 +1,62 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // Facades namespace as requested (not directly used here)
 
 class Program
 {
     static void Main()
     {
         const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string stampImagePath = "stamp.png";
+        const string stampImg  = "stamp.png";
+        const string outputPdf = "stamped_output.pdf";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(stampImagePath))
+
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Aspose.Pdf.Facades.Stamp image not found: {stampImagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        // Initialize the facade and bind the source PDF.
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(inputPdf);               // Load source PDF
+        try
+        {
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
+            {
+                // Create a single stamp instance
+                ImageStamp stamp = new ImageStamp(stampImg)
+                {
+                    // Position the stamp (coordinates are in points; lower‑left origin)
+                    // Example: place stamp at (100, 100) with its original size
+                    BottomMargin = 100,
+                    LeftMargin   = 100,
+                    // Make the stamp appear on top of page content
+                    Background   = false,
+                    // Optional: set opacity (0.0 = fully transparent, 1.0 = opaque)
+                    Opacity      = 0.8
+                };
 
-        // Create a stamp that will be applied to all pages.
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        stamp.BindImage(stampImagePath);           // Use an image as the stamp
-        stamp.IsBackground = true;                // Place stamp behind page content
-        stamp.Opacity = 0.5f;                      // Semi‑transparent
-        stamp.SetOrigin(100, 500);                // Position (X, Y) from lower‑left corner
-        stamp.SetImageSize(150, 100);             // Desired width and height
+                // Apply the same stamp to every page efficiently
+                // Pages collection is 1‑based; foreach abstracts the indexing
+                foreach (Page page in doc.Pages)
+                {
+                    page.AddStamp(stamp);
+                }
 
-        // Leave stamp.Pages = null (default) so the stamp affects every page.
-        fileStamp.AddStamp(stamp);                 // Add the stamp to the document
+                // Save the modified document
+                doc.Save(outputPdf);
+            }
 
-        // Save the result and release resources.
-        fileStamp.Save(outputPdf);
-        fileStamp.Close();
-
-        Console.WriteLine($"Aspose.Pdf.Facades.Stamp applied to all pages. Output saved to '{outputPdf}'.");
+            Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

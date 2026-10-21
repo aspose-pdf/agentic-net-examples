@@ -1,66 +1,58 @@
 using System;
 using System.IO;
-using System.Drawing;                     // System.Drawing.Color, System.Drawing.Rectangle
-using Aspose.Pdf;                         // Aspose.Pdf.Color, Aspose.Pdf.Rectangle, etc.
-using Aspose.Pdf.Facades;                // PdfFileStamp, Stamp, FormattedText, EncodingType
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
-class Program
+class BatchWatermark
 {
     static void Main()
     {
         // Folder containing source PDFs
-        const string inputFolder = "input_pdfs";
-        // Folder where watermarked PDFs will be written
-        const string outputFolder = "output_pdfs";
+        const string inputFolder = @"C:\PdfInput";
+        // Folder where watermarked PDFs will be saved
+        const string outputFolder = @"C:\PdfOutput";
 
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
-        }
-
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Multi‑line watermark text
-        string watermarkText = "CONFIDENTIAL\nDo Not Distribute";
+        // Define the multi‑line watermark text
+        const string watermarkText = "Confidential\r\nDo Not Distribute\r\n© Company";
 
-        // Create a FormattedText object that defines the watermark appearance
-        // NOTE: use System.Drawing.Color for the color argument and a float for the font size
-        Aspose.Pdf.Facades.FormattedText ft = new Aspose.Pdf.Facades.FormattedText(
-            watermarkText,                 // text (supports line breaks)
-            System.Drawing.Color.Red,     // text color (System.Drawing.Color)
-            "Helvetica",                 // font name
-            Aspose.Pdf.Facades.EncodingType.Winansi, // text encoding
-            false,                        // embed font flag
-            48f);                         // font size (float)
-
-        // Process each PDF file in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Iterate over all PDF files in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(outputFolder, $"{fileNameWithoutExt}_watermarked.pdf");
+            // Build the output file path (same file name, different folder)
+            string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
 
-            // Initialize the PdfFileStamp facade and bind the source PDF
-            PdfFileStamp fileStamp = new PdfFileStamp();
-            fileStamp.BindPdf(inputPath);   // loads the PDF to be stamped
+            // Load the source PDF using the high‑level Document API
+            using (Document pdfDoc = new Document(pdfPath))
+            {
+                // Create a TextStamp with the multi‑line text
+                TextStamp textStamp = new TextStamp(watermarkText)
+                {
+                    RotateAngle = 45f,
+                    Opacity = 0.5,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
 
-            // Configure the stamp (watermark)
-            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-            stamp.BindLogo(ft);            // use the formatted text as the stamp content
-            stamp.IsBackground = true;    // place the watermark behind page content
-            stamp.Opacity = 0.5f;          // semi‑transparent appearance
-            // Optional: adjust position; (0,0) is bottom‑left of the page
-            stamp.SetOrigin(0, 0);
+                // Configure appearance of the watermark
+                textStamp.TextState.FontSize = 72;                                   // Large font
+                textStamp.TextState.ForegroundColor = Color.Gray;                    // Gray color (cross‑platform)
 
-            // Add the stamp to the document (applies to all pages by default)
-            fileStamp.AddStamp(stamp);
+                // Apply the stamp to every page of the PDF
+                foreach (Page page in pdfDoc.Pages)
+                {
+                    page.AddStamp(textStamp);
+                }
 
-            // Save the watermarked PDF and release resources
-            fileStamp.Save(outputPath);
-            fileStamp.Close();
+                // Save the watermarked PDF to the output location
+                pdfDoc.Save(outputPath);
+            }
 
-            Console.WriteLine($"Watermarked: {inputPath} → {outputPath}");
+            Console.WriteLine($"Watermarked: {outputPath}");
         }
+
+        Console.WriteLine("Batch processing completed.");
     }
 }

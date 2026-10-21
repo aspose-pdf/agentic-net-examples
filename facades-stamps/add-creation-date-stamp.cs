@@ -3,7 +3,7 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class AddCreationDateStamp
+class Program
 {
     static void Main()
     {
@@ -16,36 +16,39 @@ class AddCreationDateStamp
             return;
         }
 
-        // Load the source PDF (use using for deterministic disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the document creation date and format it as yyyy-MM-dd
-            string creationDate = doc.Info.CreationDate.ToString("yyyy-MM-dd");
+            // Determine the creation date (fallback to now if not set)
+            DateTime creationDate = doc.Info.CreationDate != DateTime.MinValue
+                ? doc.Info.CreationDate
+                : DateTime.Now;
+            string dateText = creationDate.ToString("yyyy-MM-dd");
 
-            // Create a TextStamp for the header
-            TextStamp stamp = new TextStamp(creationDate)
+            // Create a text stamp with the formatted date
+            TextStamp stamp = new TextStamp(dateText)
             {
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment   = VerticalAlignment.Top,
+                XIndent = 10, // left margin
+                YIndent = 10, // top margin
                 TextState = {
-                    Font = FontRepository.FindFont("Helvetica"),
+                    Font = FontRepository.FindFont("Arial"),
                     FontSize = 12,
                     ForegroundColor = Aspose.Pdf.Color.Black
-                },
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Top,
-                XIndent = 0,
-                YIndent = 20 // points from the top edge
+                }
             };
 
-            // Add the stamp to every page
+            // Apply the stamp to every page of the document
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(stamp);
             }
 
-            // Save the modified document
+            // Save the stamped document
             doc.Save(outputPath);
-
-            Console.WriteLine($"Creation date stamp added. Output saved to '{outputPath}'.");
         }
+
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

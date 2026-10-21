@@ -1,76 +1,63 @@
 using System;
-using System.Drawing;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "watermarked.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "watermarked.pdf";
 
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the document (only needed to obtain page size for centering)
-        Document doc = new Document(inputPdf);
-        Page firstPage = doc.Pages[1];
-        // PageInfo.Width/Height are double – cast to float for later calculations
-        float pageWidth = (float)firstPage.PageInfo.Width;
-        float pageHeight = (float)firstPage.PageInfo.Height;
-        doc.Dispose(); // we only needed the size information
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPath);
 
-        // ---------------------------------------------------------------------
-        // 1. Build a FormattedText that contains three lines.
-        //    The AddNewLineText method is used to append the extra lines.
-        //    NOTE: All lines share the same font settings in a single FormattedText
-        //    instance. To have truly different font styles per line you would need
-        //    separate FormattedText objects and separate stamps. The example below
-        //    demonstrates the required API usage while keeping the code simple.
-        // ---------------------------------------------------------------------
-        Aspose.Pdf.Facades.FormattedText formatted = new Aspose.Pdf.Facades.FormattedText(
-            "First line – Bold 24pt",
-            System.Drawing.Color.Blue,               // text colour (System.Drawing.Color)
-            "Helvetica-Bold",                       // bold variant of Helvetica
-            Aspose.Pdf.Facades.EncodingType.Winansi,
-            false,
-            24f);
+        // Common watermark appearance
+        const int fontSize = 48;
+        Color watermarkColor = Color.FromRgb(0.8, 0.8, 0.8); // light gray
 
-        // Append the remaining two lines. They inherit the same font settings.
-        formatted.AddNewLineText("Second line – Italic 18pt");
-        formatted.AddNewLineText("Third line – Regular 12pt");
+        // Define the three lines with their styles and positions
+        var lines = new[]
+        {
+            new { Text = "CONFIDENTIAL",          FontStyle = FontStyles.Bold,   X = 100.0, Y = 500.0 },
+            new { Text = "DO NOT DISTRIBUTE",    FontStyle = FontStyles.Italic, X = 100.0, Y = 450.0 },
+            new { Text = "FOR INTERNAL USE ONLY", FontStyle = FontStyles.Regular, X = 100.0, Y = 400.0 }
+        };
 
-        // ---------------------------------------------------------------------
-        // 2. Create a Stamp, bind the FormattedText and position it.
-        //    Stamp does NOT expose HorizontalAlignment/VerticalAlignment – we set
-        //    the origin manually so that the text appears centred.
-        // ---------------------------------------------------------------------
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        stamp.BindLogo(formatted);
+        // Apply the watermark to every page (or change to a specific page if required)
+        foreach (Page page in pdfDoc.Pages)
+        {
+            foreach (var line in lines)
+            {
+                // Create a TextFragment for the current line
+                TextFragment tf = new TextFragment(line.Text)
+                {
+                    Position = new Position(line.X, line.Y),
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Bottom
+                };
 
-        // Calculate centre position (approximate – the stamp origin is the lower‑left corner)
-        // The stamp’s width/height are not directly exposed, so we use a rough offset.
-        // Adjust these values as needed for precise centring.
-        float offsetX = pageWidth / 2f - 100f; // 100 pt left of centre (approx.)
-        float offsetY = pageHeight / 2f - 50f; // 50 pt below centre (approx.)
-        stamp.SetOrigin(offsetX, offsetY);
+                // Set font, size and color for this line
+                tf.TextState.Font = FontRepository.FindFont("Arial", line.FontStyle);
+                tf.TextState.FontSize = fontSize;
+                tf.TextState.ForegroundColor = watermarkColor;
 
-        stamp.IsBackground = true;   // draw behind page content (watermark effect)
-        stamp.Opacity = 0.5f;        // 50 % transparent
+                // Add the fragment to the page
+                page.Paragraphs.Add(tf);
+            }
+        }
 
-        // ---------------------------------------------------------------------
-        // 3. Apply the stamp to the whole document using PdfFileStamp.
-        // ---------------------------------------------------------------------
-        PdfFileStamp pdfStamp = new PdfFileStamp();
-        pdfStamp.BindPdf(inputPdf);
-        pdfStamp.AddStamp(stamp);
-        pdfStamp.Save(outputPdf);
-        pdfStamp.Close();
+        // Save the modified PDF
+        pdfDoc.Save(outputPath);
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Watermark applied successfully to '{outputPath}'.");
     }
 }
