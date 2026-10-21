@@ -1,7 +1,7 @@
 using System;
 using System.IO;
+using System.Security.Cryptography;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -10,7 +10,6 @@ class Program
         const string inputPath      = "input.pdf";
         const string encryptedPath  = "encrypted.pdf";
         const string decryptedPath  = "decrypted.pdf";
-
         const string userPassword   = "user123";
         const string ownerPassword  = "owner123";
 
@@ -20,33 +19,52 @@ class Program
             return;
         }
 
-        // ---------- Encrypt ----------
-        // Bind the source PDF, encrypt it, and save the encrypted version.
-        PdfFileSecurity encryptor = new PdfFileSecurity();
-        encryptor.BindPdf(inputPath);                                   // initialize with source file
-        encryptor.EncryptFile(userPassword, ownerPassword,
-                              DocumentPrivilege.Print,               // set desired privilege
-                              KeySize.x256);                         // 256‑bit AES encryption
-        encryptor.Save(encryptedPath);                                 // write encrypted PDF
-        encryptor.Close();                                             // release resources
-
-        // ---------- Decrypt ----------
-        // Bind the encrypted PDF, decrypt it using the owner password, and save the result.
-        PdfFileSecurity decryptor = new PdfFileSecurity();
-        decryptor.BindPdf(encryptedPath);
-        decryptor.DecryptFile(ownerPassword);
-        decryptor.Save(decryptedPath);
-        decryptor.Close();
-
-        // ---------- Verify round‑trip ----------
-        // Load original and decrypted PDFs and compare page counts as a simple integrity check.
-        using (Document originalDoc = new Document(inputPath))
-        using (Document decryptedDoc = new Document(decryptedPath))
+        try
         {
-            bool samePageCount = originalDoc.Pages.Count == decryptedDoc.Pages.Count;
-            Console.WriteLine(samePageCount
-                ? "Round‑trip successful: page count matches."
-                : "Round‑trip failed: page count differs.");
+            // ---------- Encrypt the PDF ----------
+            // Load the source PDF
+            Document doc = new Document(inputPath);
+            // Define permissions you want to allow after encryption
+            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+            // Apply AES‑256 encryption
+            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+            // Save the encrypted file
+            doc.Save(encryptedPath);
+
+            // ---------- Decrypt the PDF ----------
+            // Load the encrypted PDF providing the user password directly (no PdfLoadOptions needed)
+            Document encryptedDoc = new Document(encryptedPath, userPassword);
+            // Remove encryption (the document is now in clear text)
+            encryptedDoc.Decrypt();
+            // Save the decrypted copy
+            encryptedDoc.Save(decryptedPath);
+
+            // ---------- Verify round‑trip integrity ----------
+            string originalHash  = ComputeSha256(inputPath);
+            string decryptedHash = ComputeSha256(decryptedPath);
+
+            Console.WriteLine($"Original SHA‑256 : {originalHash}");
+            Console.WriteLine($"Decrypted SHA‑256: {decryptedHash}");
+
+            if (originalHash.Equals(decryptedHash, StringComparison.OrdinalIgnoreCase))
+                Console.WriteLine("Round‑trip verification succeeded: files are identical.");
+            else
+                Console.WriteLine("Round‑trip verification failed: files differ.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    // Helper to compute SHA‑256 hash of a file
+    static string ComputeSha256(string filePath)
+    {
+        using (FileStream stream = File.OpenRead(filePath))
+        using (SHA256 sha = SHA256.Create())
+        {
+            byte[] hash = sha.ComputeHash(stream);
+            return BitConverter.ToString(hash).Replace("-", string.Empty);
         }
     }
 }

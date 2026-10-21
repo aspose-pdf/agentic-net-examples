@@ -1,72 +1,75 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades; // Facades namespace is used as required
 
 class Program
 {
-    static void Main()
+    // CSV format: PdfPath,NewUserPassword,NewOwnerPassword
+    static void Main(string[] args)
     {
-        const string csvPath = "files.csv";
+        if (args.Length == 0)
+        {
+            Console.Error.WriteLine("Usage: ChangePdfPasswords <csvFilePath>");
+            return;
+        }
 
+        string csvPath = args[0];
         if (!File.Exists(csvPath))
         {
             Console.Error.WriteLine($"CSV file not found: {csvPath}");
             return;
         }
 
-        // Expected CSV columns: InputPdf,OutputPdf,OldOwnerPassword,NewUserPassword,NewOwnerPassword
-        foreach (var line in File.ReadLines(csvPath))
+        // Read all lines, ignore empty lines
+        var lines = File.ReadAllLines(csvPath);
+        foreach (var rawLine in lines)
         {
-            // Skip empty lines and header (assumes header starts with "InputPdf")
-            if (string.IsNullOrWhiteSpace(line) || line.StartsWith("InputPdf", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(rawLine))
                 continue;
 
-            var parts = line.Split(',');
-
-            if (parts.Length < 5)
+            // Split by comma – simple CSV handling (no quoted commas)
+            var parts = rawLine.Split(',');
+            if (parts.Length < 3)
             {
-                Console.Error.WriteLine($"Invalid CSV line (expected 5 columns): {line}");
+                Console.Error.WriteLine($"Invalid line (expected 3 columns): {rawLine}");
                 continue;
             }
 
-            string inputPdf   = parts[0].Trim();
-            string outputPdf  = parts[1].Trim();
-            string oldOwnerPw = parts[2].Trim();
-            string newUserPw  = parts[3].Trim();
-            string newOwnerPw = parts[4].Trim();
+            string pdfPath      = parts[0].Trim();
+            string newUserPwd   = parts[1].Trim();
+            string newOwnerPwd  = parts[2].Trim();
 
-            if (!File.Exists(inputPdf))
+            if (!File.Exists(pdfPath))
             {
-                Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+                Console.Error.WriteLine($"PDF not found: {pdfPath}");
                 continue;
             }
 
             try
             {
-                // Create the PdfFileSecurity facade
-                using (PdfFileSecurity security = new PdfFileSecurity())
+                // Load the PDF document first – this gives us page count and encryption status
+                using (Document doc = new Document(pdfPath))
                 {
-                    // Load the source PDF
-                    security.BindPdf(inputPdf);
+                    Console.WriteLine($"Processing: {pdfPath}");
+                    Console.WriteLine($"  Pages: {doc.Pages.Count}");
+                    Console.WriteLine($"  Encrypted: {doc.IsEncrypted}");
 
-                    // Change passwords (keeps original security settings)
-                    bool changed = security.ChangePassword(oldOwnerPw, newUserPw, newOwnerPw);
+                    // Define permissions you want to keep (example: allow printing and content extraction)
+                    Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                    if (!changed)
-                    {
-                        Console.Error.WriteLine($"Password change failed for: {inputPdf}");
-                        continue;
-                    }
+                    // Encrypt with the new passwords using AES-256 (recommended)
+                    doc.Encrypt(newUserPwd, newOwnerPwd, perms, CryptoAlgorithm.AESx256);
 
-                    // Save the result to the output path
-                    security.Save(outputPdf);
+                    // Overwrite the original file
+                    doc.Save(pdfPath);
                 }
 
-                Console.WriteLine($"Processed: {inputPdf} -> {outputPdf}");
+                Console.WriteLine("  Passwords updated successfully.");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPdf}': {ex.Message}");
+                Console.Error.WriteLine($"  Error processing '{pdfPath}': {ex.Message}");
             }
         }
     }

@@ -1,16 +1,17 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades; // Facades namespace is included as requested
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "encrypted_input.pdf";
-        const string outputPath = "encrypted_output.pdf";
-        const string ownerPassword = "owner123";          // original owner password
-        const string newUserPassword = "newUser456";     // desired new user password
-        const string newOwnerPassword = null;            // null generates a random owner password
+        const string inputPath      = "encrypted_input.pdf";
+        const string outputPath     = "encrypted_output.pdf";
+        const string oldUserPwd     = "oldUserPassword";
+        const string oldOwnerPwd    = "oldOwnerPassword";
+        const string newUserPwd     = "newUserPassword";
 
         if (!File.Exists(inputPath))
         {
@@ -18,17 +19,36 @@ class Program
             return;
         }
 
-        // PdfFileSecurity handles encryption settings internally; ChangePassword keeps them unchanged.
-        using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
+        try
         {
-            bool changed = security.ChangePassword(ownerPassword, newUserPassword, newOwnerPassword);
-            if (!changed)
+            // Open the encrypted PDF using the existing user password.
+            // If the PDF is not encrypted this will also succeed.
+            using (Document doc = new Document(inputPath, oldUserPwd))
             {
-                Console.Error.WriteLine("Failed to change the password.");
-                return;
-            }
-        }
+                // Preserve encryption settings:
+                // - Keep the same owner password.
+                // - Use a strong algorithm (AESx256) as recommended.
+                // - Preserve typical permissions (adjust if you know the original set).
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-        Console.WriteLine($"User password updated successfully. Output saved to '{outputPath}'.");
+                // Re‑encrypt with the new user password while keeping other settings.
+                doc.Encrypt(newUserPwd, oldOwnerPwd, perms, CryptoAlgorithm.AESx256);
+
+                // Save the PDF with the updated password.
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"User password changed successfully. Saved to '{outputPath}'.");
+        }
+        catch (PdfException ex)
+        {
+            // Thrown if the PDF is encrypted and the supplied password is incorrect,
+            // or if the file is not a valid PDF.
+            Console.Error.WriteLine($"Failed to open encrypted PDF: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

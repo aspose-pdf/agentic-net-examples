@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades; // Added for PdfFileInfo
 
 class Program
 {
@@ -10,7 +10,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string ownerPassword = "owner123"; // password used only if the PDF is encrypted
+        const string password = "userPassword"; // password for encrypted PDFs (if any)
 
         if (!File.Exists(inputPath))
         {
@@ -18,55 +18,39 @@ class Program
             return;
         }
 
-        Document doc = null;
-
-        // Try to open the PDF without a password.
-        // If it is encrypted an InvalidPasswordException will be thrown.
         try
         {
-            doc = new Document(inputPath);
+            // Determine whether the PDF is encrypted using the Facades namespace.
+            PdfFileInfo fileInfo = new PdfFileInfo(inputPath);
+            bool isEncrypted = fileInfo.IsEncrypted;
+
+            // Load the PDF using Document – it supports a password overload.
+            Document pdfDoc = isEncrypted
+                ? new Document(inputPath, password)
+                : new Document(inputPath);
+
+            // Example modification: add a text string at position (100, 500) on the first page.
+            TextFragment tf = new TextFragment("Document modified by Aspose.Pdf");
+            tf.Position = new Position(100, 500);
+            tf.TextState.Font = FontRepository.FindFont("Arial");
+            tf.TextState.FontSize = 12;
+            tf.TextState.ForegroundColor = Color.Black;
+
+            // Add the fragment to the first page (pages are 1‑based).
+            pdfDoc.Pages[1].Paragraphs.Add(tf);
+
+            // Save the modified PDF
+            pdfDoc.Save(outputPath);
+
+            Console.WriteLine($"PDF processed and saved to '{outputPath}'.");
         }
-        catch (InvalidPasswordException)
+        catch (InvalidPasswordException ex)
         {
-            // PDF is encrypted – use PdfFileSecurity to decrypt it.
-            // DecryptFile creates a new decrypted document which we save to a temporary file.
-            string tempDecrypted = Path.GetTempFileName();
-
-            using (var security = new PdfFileSecurity())
-            {
-                security.BindPdf(inputPath);
-                bool decrypted = security.DecryptFile(ownerPassword);
-                if (!decrypted)
-                {
-                    Console.Error.WriteLine("Failed to decrypt the PDF with the provided password.");
-                    return;
-                }
-
-                security.Save(tempDecrypted);
-            }
-
-            // Load the decrypted temporary file.
-            doc = new Document(tempDecrypted);
-
-            // Clean up the temporary file.
-            try { File.Delete(tempDecrypted); } catch { /* ignore */ }
+            Console.Error.WriteLine($"Invalid password: {ex.Message}");
         }
-
-        // Ensure the Document is disposed properly.
-        using (doc)
+        catch (Exception ex)
         {
-            // Example modification: add a text fragment to the first page.
-            Page page = doc.Pages[1];
-            TextFragment tf = new TextFragment("Modified by Aspose.Pdf");
-            tf.Position = new Position(100, 700);
-            tf.TextState.FontSize = 14;
-            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
-            page.Paragraphs.Add(tf);
-
-            // Save the modified PDF.
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

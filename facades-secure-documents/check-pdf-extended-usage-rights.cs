@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -9,25 +8,20 @@ class Program
     {
         const string inputPath = "input.pdf";
 
+        // Verify the file exists before processing
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (required for proper resource handling)
-        using (Document doc = new Document(inputPath))
-        {
-            // Initialize the PdfFileSignature facade and bind the PDF file
-            using (PdfFileSignature signature = new PdfFileSignature())
-            {
-                signature.BindPdf(inputPath); // alternatively: signature.BindPdf(doc);
+        // Bind the PDF before checking usage rights
+        PdfFileSignature signature = new PdfFileSignature();
+        signature.BindPdf(inputPath);
 
-                // Check for extended usage rights
-                bool hasUsageRights = signature.ContainsUsageRights();
+        // Detect extended usage rights in the PDF
+        bool hasUsageRights = signature.ContainsUsageRights();
 
-                Console.WriteLine($"Contains usage rights: {hasUsageRights}");
-            }
-        }
+        Console.WriteLine($"Extended usage rights present: {hasUsageRights}");
     }
 }
