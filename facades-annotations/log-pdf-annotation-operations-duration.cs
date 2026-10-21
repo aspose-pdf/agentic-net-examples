@@ -1,161 +1,94 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
 
-namespace AnnotationPerformanceMonitoring
+class AnnotationPerformanceLogger
 {
-    // Simple logger that records operation name and duration.
-    public class OperationLogger
+    // Executes an annotation operation and logs its duration.
+    public static void Execute(Action operation, string operationName)
     {
-        private readonly List<string> _entries = new List<string>();
-
-        public void Log(string operationName, TimeSpan duration)
-        {
-            string entry = $"{DateTime.UtcNow:u} | {operationName} | {duration.TotalMilliseconds} ms";
-            _entries.Add(entry);
-            Console.WriteLine(entry);
-        }
-
-        public IEnumerable<string> GetLog() => _entries;
+        var stopwatch = Stopwatch.StartNew();
+        operation();
+        stopwatch.Stop();
+        Console.WriteLine($"{operationName} completed in {stopwatch.ElapsedMilliseconds} ms");
     }
+}
 
-    // Wrapper around PdfAnnotationEditor that measures execution time of each annotation operation.
-    public class PdfAnnotationEditorWithTiming : IDisposable
+class Program
+{
+    static void Main()
     {
-        private readonly PdfAnnotationEditor _editor;
-        private readonly OperationLogger _logger;
+        const string inputPath = "input.pdf";
+        const string outputPath = "annotated_output.pdf";
 
-        public PdfAnnotationEditorWithTiming(OperationLogger logger)
+        if (!File.Exists(inputPath))
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _editor = new PdfAnnotationEditor();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Binds a PDF file to the editor using a stream overload (required by newer Aspose.Pdf versions).
-        public void Bind(string pdfPath)
-        {
-            if (string.IsNullOrEmpty(pdfPath))
-                throw new ArgumentException("PDF path must be provided", nameof(pdfPath));
+        // Load the PDF document – this is the object that supports annotations and stamps.
+        Document doc = new Document(inputPath);
 
-            var sw = Stopwatch.StartNew();
-            using (FileStream fs = new FileStream(pdfPath, FileMode.Open, FileAccess.Read))
+        // -------------------------------------------------
+        // Example 1: Add a text annotation (performance‑monitored)
+        // -------------------------------------------------
+        AnnotationPerformanceLogger.Execute(
+            () =>
             {
-                _editor.BindPdf(fs);
-            }
-            sw.Stop();
-            _logger.Log(nameof(Bind), sw.Elapsed);
-        }
+                // Rectangle that defines the annotation bounds.
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-        // Deletes a specific annotation by its name.
-        public void DeleteAnnotation(string annotationName)
-        {
-            var sw = Stopwatch.StartNew();
-            _editor.DeleteAnnotation(annotationName);
-            sw.Stop();
-            _logger.Log(nameof(DeleteAnnotation), sw.Elapsed);
-        }
-
-        // Deletes all annotations in the document.
-        public void DeleteAllAnnotations()
-        {
-            var sw = Stopwatch.StartNew();
-            _editor.DeleteAnnotations();
-            sw.Stop();
-            _logger.Log(nameof(DeleteAllAnnotations), sw.Elapsed);
-        }
-
-        // Exports all annotations to an XFDF file using the stream overload.
-        public void ExportAnnotations(string xfdfPath)
-        {
-            if (string.IsNullOrEmpty(xfdfPath))
-                throw new ArgumentException("XFDF path must be provided", nameof(xfdfPath));
-
-            var sw = Stopwatch.StartNew();
-            using (FileStream fs = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
-            {
-                _editor.ExportAnnotationsToXfdf(fs);
-            }
-            sw.Stop();
-            _logger.Log(nameof(ExportAnnotations), sw.Elapsed);
-        }
-
-        // Flattens all annotations.
-        public void FlattenAllAnnotations()
-        {
-            var sw = Stopwatch.StartNew();
-            _editor.FlatteningAnnotations();
-            sw.Stop();
-            _logger.Log(nameof(FlattenAllAnnotations), sw.Elapsed);
-        }
-
-        // Saves the modified PDF document using a stream overload (required by newer Aspose.Pdf versions).
-        public void Save(string outputPath)
-        {
-            if (string.IsNullOrEmpty(outputPath))
-                throw new ArgumentException("Output path must be provided", nameof(outputPath));
-
-            var sw = Stopwatch.StartNew();
-            using (FileStream fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-            {
-                _editor.Save(fs);
-            }
-            sw.Stop();
-            _logger.Log(nameof(Save), sw.Elapsed);
-        }
-
-        public void Dispose()
-        {
-            _editor?.Close();
-            _editor?.Dispose();
-        }
-    }
-
-    class Program
-    {
-        static void Main()
-        {
-            const string inputPdf = "input.pdf";
-            const string outputPdf = "output.pdf";
-            const string exportXfdf = "annotations.xfdf";
-
-            if (!File.Exists(inputPdf))
-            {
-                Console.Error.WriteLine($"Input file not found: {inputPdf}");
-                return;
-            }
-
-            OperationLogger logger = new OperationLogger();
-
-            // Load the PDF document using the recommended using pattern.
-            using (Document doc = new Document(inputPdf))
-            {
-                // Perform annotation operations via the timed wrapper.
-                using (PdfAnnotationEditorWithTiming editor = new PdfAnnotationEditorWithTiming(logger))
+                // Create and configure the text annotation. Note the constructor now receives the target page and the rectangle.
+                TextAnnotation textAnnotation = new TextAnnotation(doc.Pages[1], rect)
                 {
-                    editor.Bind(inputPdf);
+                    Title    = "Note",
+                    Contents = "This is a performance‑monitored text annotation.",
+                    Open     = true,
+                    Icon     = TextIcon.Note
+                };
 
-                    // Example operations.
-                    editor.DeleteAllAnnotations();
-                    editor.ExportAnnotations(exportXfdf);
-                    editor.FlattenAllAnnotations();
+                // Add the annotation to the first page.
+                doc.Pages[1].Annotations.Add(textAnnotation);
+            },
+            "AddTextAnnotation");
 
-                    // Save the modified document.
-                    editor.Save(outputPdf);
-                }
+        // -------------------------------------------------
+        // Example 2: Add an image stamp to every page (performance‑monitored)
+        // -------------------------------------------------
+        const string stampImagePath = "stamp.png";
+        if (File.Exists(stampImagePath))
+        {
+            AnnotationPerformanceLogger.Execute(
+                () =>
+                {
+                    // Create an image stamp.
+                    ImageStamp imageStamp = new ImageStamp(stampImagePath)
+                    {
+                        Background          = false,
+                        Opacity             = 0.7,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment   = VerticalAlignment.Center
+                    };
 
-                // If additional non‑annotation changes are needed, they can be done here.
-                // Ensure the document is saved using the standard save rule.
-                doc.Save(outputPdf);
-            }
-
-            Console.WriteLine("Annotation operations completed. Log entries:");
-            foreach (var entry in logger.GetLog())
-            {
-                // Already printed during logging; this is just for completeness.
-            }
+                    // Apply the stamp to every page.
+                    foreach (Page page in doc.Pages)
+                    {
+                        page.AddStamp(imageStamp);
+                    }
+                },
+                "AddImageStamp");
         }
+        else
+        {
+            Console.WriteLine($"Stamp image not found: {stampImagePath}. Skipping image stamp.");
+        }
+
+        // Save the modified PDF.
+        doc.Save(outputPath);
+        Console.WriteLine($"Annotated PDF saved to '{outputPath}'.");
     }
 }

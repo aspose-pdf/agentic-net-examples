@@ -1,13 +1,12 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_no_annotations.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,33 +15,72 @@ class Program
             return;
         }
 
-        // Bind the PDF to the annotation editor, then work with its Document.
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        int beforeCount = 0; // moved declaration outside the try block so it is visible later
+        try
         {
-            editor.BindPdf(inputPath);
-            Document doc = editor.Document;
+            // Load the source PDF
+            using (Document srcDoc = new Document(inputPath))
+            {
+                // Count annotations before deletion
+                beforeCount = GetAnnotationsCount(srcDoc);
+                Console.WriteLine($"Annotations before deletion: {beforeCount}");
 
-            // Count annotations before deletion.
-            int beforeCount = 0;
-            for (int i = 1; i <= doc.Pages.Count; i++)
-                beforeCount += doc.Pages[i].Annotations.Count;
+                // Delete all annotations
+                DeleteAllAnnotations(srcDoc);
 
-            Console.WriteLine($"Annotations before deletion: {beforeCount}");
-
-            // Delete all annotations in the document.
-            editor.DeleteAnnotations();
-
-            // Count annotations after deletion to verify.
-            int afterCount = 0;
-            for (int i = 1; i <= doc.Pages.Count; i++)
-                afterCount += doc.Pages[i].Annotations.Count;
-
-            Console.WriteLine($"Annotations after deletion: {afterCount}");
-
-            // Save the modified PDF.
-            editor.Save(outputPath);
+                // Save the result to a new file
+                srcDoc.Save(outputPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+            return; // exit if loading or processing fails
         }
 
-        Console.WriteLine($"Processed PDF saved as '{outputPath}'.");
+        // Load the resulting PDF to verify the count after deletion
+        using (Document outDoc = new Document(outputPath))
+        {
+            int afterCount = GetAnnotationsCount(outDoc);
+            Console.WriteLine($"Annotations after deletion: {afterCount}");
+
+            // Verify that the expected number of annotations were removed
+            if (afterCount == 0 && beforeCount > 0)
+            {
+                Console.WriteLine("All annotations successfully removed.");
+            }
+            else if (afterCount == beforeCount)
+            {
+                Console.WriteLine("No annotations were removed.");
+            }
+            else
+            {
+                Console.WriteLine($"Removed {beforeCount - afterCount} annotation(s).");
+            }
+        }
+    }
+
+    // Helper method to count all annotations in a document
+    private static int GetAnnotationsCount(Document doc)
+    {
+        int count = 0;
+        foreach (Page page in doc.Pages)
+        {
+            count += page.Annotations.Count;
+        }
+        return count;
+    }
+
+    // Helper method to delete all annotations from a document
+    private static void DeleteAllAnnotations(Document doc)
+    {
+        foreach (Page page in doc.Pages)
+        {
+            // Annotations collection is 1‑based; delete in reverse order to avoid index shift
+            for (int i = page.Annotations.Count; i >= 1; i--)
+            {
+                page.Annotations.Delete(i);
+            }
+        }
     }
 }

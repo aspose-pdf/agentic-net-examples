@@ -1,14 +1,16 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using System.Text.Json;
+using System.Collections.Generic;
+using Aspose.Pdf;                     // Core PDF classes
+using Aspose.Pdf.Annotations;        // Annotation classes
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string jsonLog  = "annotations_log.json";
+        const string logPath  = "annotations_log.json";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,34 +18,58 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
-        {
-            // Initialize the annotation editor facade
-            using (PdfAnnotationEditor annotEditor = new PdfAnnotationEditor())
-            {
-                annotEditor.BindPdf(doc);
+        // Load the PDF document using the high‑level Document API (no facade needed for reading)
+        Document pdfDoc = new Document(inputPdf);
 
-                // Export form fields (widget annotations) to JSON using the Form facade
-                using (Form form = new Form(doc))
+        // Prepare a list that will be serialized to JSON
+        List<object> annotationList = new List<object>();
+
+        int pageNumber = 1;
+        foreach (Page page in pdfDoc.Pages)
+        {
+            foreach (Annotation ann in page.Annotations)
+            {
+                // The Rectangle type is Aspose.Pdf.Rectangle – no ambiguity here
+                Aspose.Pdf.Rectangle rect = ann.Rect;
+
+                // Some annotation types (e.g., TextAnnotation) expose extra fields like Title/Subject.
+                // We safely cast to those types; if the cast fails the values stay null.
+                string title   = null;
+                string subject = null;
+                if (ann is TextAnnotation textAnn)
                 {
-                    using (FileStream jsonStream = new FileStream(jsonLog, FileMode.Create, FileAccess.Write))
-                    {
-                        // Export all form fields to JSON; indented for readability
-                        form.ExportJson(jsonStream, indented: true);
-                    }
+                    title   = textAnn.Title;
+                    subject = textAnn.Subject;
                 }
 
-                // Optional: export all annotations to XFDF (XML) if needed
-                // using (FileStream xfdfStream = new FileStream("annotations.xfdf", FileMode.Create, FileAccess.Write))
-                // {
-                //     annotEditor.ExportAnnotationsToXfdf(xfdfStream);
-                // }
+                annotationList.Add(new
+                {
+                    PageNumber = pageNumber,
+                    Type       = ann.AnnotationType.ToString(),
+                    Rect = new
+                    {
+                        LLX = rect.LLX,
+                        LLY = rect.LLY,
+                        URX = rect.URX,
+                        URY = rect.URY
+                    },
+                    Contents = ann.Contents,
+                    Title    = title,
+                    Subject  = subject
+                });
             }
-
-            // No modifications are made to the PDF, so no Save() call is required here.
+            pageNumber++;
         }
 
-        Console.WriteLine($"Annotation data exported to JSON log: {jsonLog}");
+        // Serialize the list to a pretty‑printed JSON string
+        string json = JsonSerializer.Serialize(
+            annotationList,
+            new JsonSerializerOptions { WriteIndented = true }
+        );
+
+        // Write the JSON to the specified log file
+        File.WriteAllText(logPath, json);
+
+        Console.WriteLine($"Annotation data has been written to '{logPath}'.");
     }
 }

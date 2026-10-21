@@ -1,18 +1,16 @@
 using System;
-using System.IO;
-using System.Text;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // for TextFragment, FontStyles
 
-class AnnotationSummaryExtractor
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";          // PDF with annotations
-        const string outputPdfPath  = "annotation_summary.pdf"; // Summary PDF
+        const string inputPdfPath = "input.pdf";
+        const string summaryPdfPath = "annotations_summary.pdf";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -20,78 +18,56 @@ class AnnotationSummaryExtractor
             return;
         }
 
-        // -----------------------------------------------------------------
-        // 1. Load the source PDF and extract annotation comments
-        // -----------------------------------------------------------------
-        string[] commentTexts;
+        // Load the source PDF document.
+        Document srcDoc = new Document(inputPdfPath);
 
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        // Collect all annotations from all pages.
+        List<Annotation> allAnnotations = new List<Annotation>();
+        foreach (Page page in srcDoc.Pages)
         {
-            // Bind the editor to the source PDF
-            editor.BindPdf(inputPdfPath);
-
-            // Get the underlying Document to know page count
-            Document sourceDoc = editor.Document;
-            int pageCount = sourceDoc.Pages.Count;
-
-            // Extract all text‑type annotations (e.g., sticky notes, free‑text)
-            // AnnotationType.Text covers typical comment annotations.
-            IList<Annotation> annotations = editor.ExtractAnnotations(
-                1,                                   // start page (1‑based)
-                pageCount,                           // end page
-                new AnnotationType[] { AnnotationType.Text });
-
-            // Collect the Contents of each annotation (the comment text)
-            commentTexts = new string[annotations.Count];
-            for (int i = 0; i < annotations.Count; i++)
+            foreach (Annotation ann in page.Annotations)
             {
-                // Some annotation types expose the comment via the Contents property
-                commentTexts[i] = annotations[i].Contents ?? string.Empty;
+                allAnnotations.Add(ann);
             }
-
-            // Close the editor (optional, as using will dispose it)
-            editor.Close();
         }
 
-        // -----------------------------------------------------------------
-        // 2. Build a single summary string
-        // -----------------------------------------------------------------
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine("Annotation Comments Summary");
-        sb.AppendLine("==========================");
-        sb.AppendLine();
-
-        for (int i = 0; i < commentTexts.Length; i++)
-        {
-            sb.AppendLine($"Comment {i + 1}:");
-            sb.AppendLine(commentTexts[i]);
-            sb.AppendLine();
-        }
-
-        string summaryText = sb.ToString();
-
-        // -----------------------------------------------------------------
-        // 3. Create a new PDF document and write the summary into it
-        // -----------------------------------------------------------------
+        // Prepare a new PDF document that will hold the summary.
         using (Document summaryDoc = new Document())
         {
-            // Add a blank page (Pages.Add creates a new page)
-            summaryDoc.Pages.Add();
+            // Add a single page to the summary document.
+            Page summaryPage = summaryDoc.Pages.Add();
 
-            // Create a TextFragment with the compiled summary
-            TextFragment fragment = new TextFragment(summaryText)
+            // Add a title for the summary.
+            TextFragment title = new TextFragment("Annotation Summary")
             {
-                // Optional styling
-                TextState = { FontSize = 12, Font = FontRepository.FindFont("Helvetica") }
+                TextState = { FontSize = 18, FontStyle = FontStyles.Bold }
             };
+            summaryPage.Paragraphs.Add(title);
+            summaryPage.Paragraphs.Add(new TextFragment(Environment.NewLine));
 
-            // Add the fragment to the first page
-            summaryDoc.Pages[1].Paragraphs.Add(fragment);
+            // Iterate over extracted annotations and write their details.
+            foreach (Annotation ann in allAnnotations)
+            {
+                // Only process text annotations (comments). Adjust as needed for other types.
+                if (ann.AnnotationType == AnnotationType.Text && ann is TextAnnotation textAnn)
+                {
+                    // Build a readable line: Title (if any) and Contents.
+                    string line = string.IsNullOrWhiteSpace(textAnn.Title)
+                        ? $"Comment: {ann.Contents}"
+                        : $"Comment ({textAnn.Title}): {ann.Contents}";
 
-            // Save the summary PDF
-            summaryDoc.Save(outputPdfPath);
+                    TextFragment fragment = new TextFragment(line)
+                    {
+                        TextState = { FontSize = 12 }
+                    };
+                    summaryPage.Paragraphs.Add(fragment);
+                }
+            }
+
+            // Save the summary PDF.
+            summaryDoc.Save(summaryPdfPath);
         }
 
-        Console.WriteLine($"Annotation summary saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Annotation summary saved to '{summaryPdfPath}'.");
     }
 }

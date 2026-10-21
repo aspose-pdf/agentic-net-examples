@@ -11,25 +11,31 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Log original file size
+        // Record original file size
         long originalSize = new FileInfo(inputPath).Length;
 
-        // Flatten all annotations using PdfAnnotationEditor
+        // Flatten all annotations using the correct API
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
+            // Bind the source PDF to the editor
             editor.BindPdf(inputPath);
-            editor.FlatteningAnnotations(); // flatten all annotations
+
+            // Flatten annotations (method name is FlatteningAnnotations)
+            editor.FlatteningAnnotations();
+
+            // Save the flattened PDF
             editor.Save(outputPath);
         }
 
-        // Log new file size after flattening
+        // Record new file size after flattening
         long newSize = new FileInfo(outputPath).Length;
 
-        Console.WriteLine($"Original size: {originalSize} bytes");
-        Console.WriteLine($"New size after flattening: {newSize} bytes");
+        // Log the sizes for audit purposes
+        Console.WriteLine($"Original file size: {originalSize} bytes");
+        Console.WriteLine($"New file size after flattening: {newSize} bytes");
     }
 }

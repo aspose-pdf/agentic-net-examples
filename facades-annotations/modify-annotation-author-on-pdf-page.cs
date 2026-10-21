@@ -1,70 +1,46 @@
 using System;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        // Input PDF containing the annotation
+        const string inputPath  = "input.pdf";
+        // Output PDF with the modified annotation author
+        const string outputPath = "output_modified.pdf";
 
-        // ------------------------------------------------------------
-        // 1. Create a self‑contained sample PDF with three pages.
-        //    Page 3 contains two text annotations whose author is
-        //    "Old Author". This guarantees the file exists for the
-        //    subsequent annotation‑editing step.
-        // ------------------------------------------------------------
-        using (var doc = new Document())
+        // Page number (1‑based) and annotation index (0‑based) to target
+        const int pageNumber      = 3; // third page
+        const int annotationIndex = 2; // second annotation on that page
+
+        // Original author of the annotation (empty string matches any author)
+        const string sourceAuthor = "";
+        // New author name to set
+        const string newAuthor    = "John Doe";
+
+        // Ensure the input file exists
+        if (!System.IO.File.Exists(inputPath))
         {
-            // Add three blank pages.
-            doc.Pages.Add(); // page 1
-            doc.Pages.Add(); // page 2
-            var page3 = doc.Pages.Add(); // page 3
-
-            // First annotation on page 3.
-            var annot1 = new TextAnnotation(page3, new Aspose.Pdf.Rectangle(100, 600, 200, 650))
-            {
-                Title = "Old Author",   // author (Title) to be replaced
-                Subject = "Sample",
-                Contents = "First annotation"
-            };
-            page3.Annotations.Add(annot1);
-
-            // Second annotation on page 3.
-            var annot2 = new TextAnnotation(page3, new Aspose.Pdf.Rectangle(100, 500, 200, 550))
-            {
-                Title = "Old Author",
-                Subject = "Sample",
-                Contents = "Second annotation"
-            };
-            page3.Annotations.Add(annot2);
-
-            // Save the seed PDF.
-            doc.Save(inputPath);
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // 2. Modify the author of annotations on page 3 using
-        //    PdfAnnotationEditor.ModifyAnnotationsAuthor.
-        // ------------------------------------------------------------
+        // Use PdfAnnotationEditor from Aspose.Pdf.Facades to modify the annotation author
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
+            // Bind the PDF document to the editor
             editor.BindPdf(inputPath);
 
-            // Replace "Old Author" with "New Author" on page 3.
-            editor.ModifyAnnotationsAuthor(
-                start: 3,               // start page (1‑based)
-                end:   3,               // end page   (1‑based)
-                srcAuthor: "Old Author",
-                desAuthor: "New Author"
-            );
+            // Modify the author of the specified annotation
+            // Signature: ModifyAnnotationsAuthor(int pageNumber, int annotationIndex, string srcAuthor, string desAuthor)
+            editor.ModifyAnnotationsAuthor(pageNumber, annotationIndex, sourceAuthor, newAuthor);
 
+            // Save the updated PDF
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Author modified and saved to '{outputPath}'.");
+        Console.WriteLine($"Annotation author updated and saved to '{outputPath}'.");
     }
 }

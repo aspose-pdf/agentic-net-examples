@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -19,37 +17,30 @@ class Program
             return;
         }
 
-        // Collect the names of annotations whose Title (author) matches the target
-        List<string> namesToDelete = new List<string>();
+        // Load the PDF document (Aspose.Pdf Document API provides full annotation access)
+        Document pdfDoc = new Document(inputPath);
 
-        using (Document doc = new Document(inputPath))
+        // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+        for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
         {
-            foreach (Page page in doc.Pages)
+            Page page = pdfDoc.Pages[pageNum];
+            // Iterate backwards so that removal does not affect the remaining indices
+            for (int i = page.Annotations.Count - 1; i >= 0; i--)
             {
-                foreach (Annotation annot in page.Annotations)
+                Annotation annot = page.Annotations[i];
+                // The author information is stored in the Subject property of MarkupAnnotation
+                if (annot is MarkupAnnotation markup &&
+                    !string.IsNullOrEmpty(markup.Subject) &&
+                    markup.Subject.Equals(targetAuthor, StringComparison.OrdinalIgnoreCase))
                 {
-                    // Title is defined only on markup annotations (e.g., TextAnnotation, FreeTextAnnotation, etc.)
-                    if (annot is MarkupAnnotation markup && markup.Title == targetAuthor && !string.IsNullOrEmpty(annot.Name))
-                    {
-                        namesToDelete.Add(annot.Name);
-                    }
+                    // Delete the matching annotation
+                    page.Annotations.Delete(i);
                 }
             }
         }
 
-        // Delete the collected annotations using PdfAnnotationEditor
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-        {
-            editor.BindPdf(inputPath);
-
-            foreach (string name in namesToDelete)
-            {
-                editor.DeleteAnnotation(name);
-            }
-
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Annotations authored by \"{targetAuthor}\" have been removed. Output saved to '{outputPath}'.");
+        // Save the modified PDF
+        pdfDoc.Save(outputPath);
+        Console.WriteLine($"Annotations authored by '{targetAuthor}' have been removed. Saved to '{outputPath}'.");
     }
 }

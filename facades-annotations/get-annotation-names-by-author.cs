@@ -2,67 +2,57 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
 public static class PdfAnnotationHelper
 {
     /// <summary>
-    /// Returns a list of annotation names whose author (stored in the Subject property of markup annotations) matches the specified value.
+    /// Returns the names of all annotations in the specified PDF whose Author matches the given string.
     /// </summary>
-    /// <param name="pdfPath">Path to the PDF file.</param>
-    /// <param name="author">Author string to filter annotations.</param>
+    /// <param name="pdfPath">Full path to the PDF file.</param>
+    /// <param name="author">Author name to filter annotations by (case‑sensitive).</param>
     /// <returns>List of annotation names.</returns>
     public static List<string> GetAnnotationNamesByAuthor(string pdfPath, string author)
     {
         // Validate input
         if (string.IsNullOrEmpty(pdfPath))
             throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
-
         if (!File.Exists(pdfPath))
             throw new FileNotFoundException("PDF file not found.", pdfPath);
+        if (author == null)
+            throw new ArgumentNullException(nameof(author));
 
-        // Initialize the facade and bind the PDF document
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        // Load the PDF document using Aspose.Pdf.Document
+        Document doc = new Document(pdfPath);
+        List<string> matchingNames = new List<string>();
+
+        // Iterate through each page and collect matching annotations
+        foreach (Page page in doc.Pages)
         {
-            editor.BindPdf(pdfPath);
-
-            // Determine the total number of pages in the document
-            int pageCount = editor.Document.Pages.Count;
-
-            // Extract all annotations from the whole document.
-            // Cast null to AnnotationType[] to avoid overload ambiguity.
-            IList<Annotation> allAnnotations = editor.ExtractAnnotations(1, pageCount, (AnnotationType[])null);
-
-            List<string> matchingNames = new List<string>();
-
-            // Filter annotations by the author (Subject) and collect their names.
-            foreach (Annotation annot in allAnnotations)
+            // Annotations collection may contain different types; we are interested in markup annotations
+            foreach (Annotation ann in page.Annotations)
             {
-                // Only markup annotations expose the Subject property that is used for the author.
-                if (annot is MarkupAnnotation markup &&
-                    !string.IsNullOrEmpty(markup.Subject) &&
-                    markup.Subject.Equals(author, StringComparison.OrdinalIgnoreCase))
+                // Only markup annotations have a Title property that stores the author information
+                if (ann is MarkupAnnotation markup && markup.Title != null &&
+                    markup.Title.Equals(author, StringComparison.Ordinal))
                 {
-                    // Annotation.Name can be null; handle gracefully.
-                    if (!string.IsNullOrEmpty(markup.Name))
-                        matchingNames.Add(markup.Name);
+                    // The Name property holds the annotation's identifier (may be null/empty)
+                    if (!string.IsNullOrEmpty(ann.Name))
+                        matchingNames.Add(ann.Name);
                 }
             }
-
-            return matchingNames;
         }
+
+        return matchingNames;
     }
 
-    // A minimal entry point to satisfy the compiler when the project is built as an executable.
-    // In a library project this method can be removed.
+    // ---------------------------------------------------------------------
+    // A minimal entry point is required for the project to compile as an
+    // executable. It does not perform any work; it simply satisfies the
+    // compiler's expectation of a static Main method.
+    // ---------------------------------------------------------------------
     public static void Main(string[] args)
     {
-        // Example usage (can be removed or replaced by unit tests).
-        if (args.Length == 2)
-        {
-            var result = GetAnnotationNamesByAuthor(args[0], args[1]);
-            Console.WriteLine(string.Join(", ", result));
-        }
+        // No‑op – the library method can be called from other code or unit tests.
     }
 }

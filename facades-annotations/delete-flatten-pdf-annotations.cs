@@ -1,13 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,20 +15,13 @@ class Program
             return;
         }
 
-        // Use PdfAnnotationEditor (facade) to manipulate annotations.
+        // Use PdfAnnotationEditor to delete all annotations, flatten the remaining ones, and save.
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Load the PDF document.
-            editor.BindPdf(inputPath);
-
-            // Delete all existing annotations.
-            editor.DeleteAnnotations();
-
-            // Flatten any remaining annotations (if any were added later).
-            editor.FlatteningAnnotations();
-
-            // Save the processed PDF.
-            editor.Save(outputPath);
+            editor.BindPdf(inputPath);          // load the PDF
+            editor.DeleteAnnotations();         // remove all annotations
+            editor.FlatteningAnnotations();    // flatten remaining annotations (e.g., form fields)
+            editor.Save(outputPath);            // write the result
         }
 
         Console.WriteLine($"Processed PDF saved to '{outputPath}'.");

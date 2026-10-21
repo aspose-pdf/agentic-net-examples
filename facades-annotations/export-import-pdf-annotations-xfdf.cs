@@ -1,70 +1,50 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string sourcePdf = "source.pdf";                     // PDF with original annotations
-        const string targetPdf = "target.pdf";                     // PDF to receive annotations
-        const string outputPdf = "target_with_annotations.pdf";   // Resulting PDF
-        const string xfdfFile = "annotations.xfdf";                // Temporary XFDF file
+        const string sourcePdf = "source.pdf";
+        const string targetPdf = "target.pdf";
+        const string xfdfPath  = "annotations.xfdf";
+        const string outputPdf = "output.pdf";
 
-        // ------------------------------------------------------------
-        // Create a sample source PDF with at least one annotation
-        // ------------------------------------------------------------
-        using (Document srcDoc = new Document())
+        // Verify input files exist
+        if (!File.Exists(sourcePdf))
         {
-            Page srcPage = srcDoc.Pages.Add();
-            // Add a simple text annotation so there is something to export
-            var annRect = new Aspose.Pdf.Rectangle(100, 600, 200, 650);
-            TextAnnotation txtAnn = new TextAnnotation(srcPage, annRect)
-            {
-                Title = "Sample",
-                Contents = "This is a sample annotation",
-                Color = Aspose.Pdf.Color.Yellow
-            };
-            srcPage.Annotations.Add(txtAnn);
-            srcDoc.Save(sourcePdf);
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdf}");
+            return;
+        }
+        if (!File.Exists(targetPdf))
+        {
+            Console.Error.WriteLine($"Target PDF not found: {targetPdf}");
+            return;
         }
 
         // ------------------------------------------------------------
-        // Create a target PDF (empty) that will receive the annotations
+        // Export annotations from the source PDF to an XFDF file
         // ------------------------------------------------------------
-        using (Document tgtDoc = new Document())
+        using (var srcDoc = new Document(sourcePdf))
+        using (var xfdfStream = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
         {
-            tgtDoc.Pages.Add();
-            tgtDoc.Save(targetPdf);
+            // Aspose.Pdf provides ExportAnnotationsToXfdf on Document
+            srcDoc.ExportAnnotationsToXfdf(xfdfStream);
         }
+        Console.WriteLine($"Annotations exported to '{xfdfPath}'.");
 
         // ------------------------------------------------------------
-        // Export all annotations from the source PDF to an XFDF file
+        // Import the XFDF annotations into the target PDF and save
         // ------------------------------------------------------------
-        using (PdfAnnotationEditor exporter = new PdfAnnotationEditor())
+        using (var tgtDoc = new Document(targetPdf))
         {
-            exporter.BindPdf(sourcePdf);
-            using (FileStream exportStream = new FileStream(xfdfFile, FileMode.Create, FileAccess.Write, FileShare.None))
-            {
-                exporter.ExportAnnotationsToXfdf(exportStream);
-            }
-        }
+            // Import the previously exported annotations
+            tgtDoc.ImportAnnotationsFromXfdf(xfdfPath);
 
-        // ------------------------------------------------------------
-        // Import the XFDF annotations into the target PDF and save the result
-        // ------------------------------------------------------------
-        using (PdfAnnotationEditor importer = new PdfAnnotationEditor())
-        {
-            importer.BindPdf(targetPdf);
-            using (FileStream importStream = new FileStream(xfdfFile, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                importer.ImportAnnotationsFromXfdf(importStream);
-            }
-            importer.Save(outputPdf);
+            // Save the resulting PDF with duplicated annotation layout
+            tgtDoc.Save(outputPdf);
         }
-
-        Console.WriteLine("Annotations duplicated successfully.");
+        Console.WriteLine($"Annotations imported and saved to '{outputPdf}'.");
     }
 }

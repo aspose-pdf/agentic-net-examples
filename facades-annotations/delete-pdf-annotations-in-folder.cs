@@ -4,46 +4,68 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Entry point: expects one argument – the folder containing PDF files
     static void Main(string[] args)
     {
-        // Expected arguments: <SourceFolder> [DestinationFolder]
-        if (args.Length < 1 || args.Length > 2)
+        if (args.Length != 1)
         {
-            Console.WriteLine("Usage: Program.exe <SourceFolder> [DestinationFolder]");
+            Console.Error.WriteLine("Usage: DeleteAnnotations.exe <folderPath>");
             return;
         }
 
-        string sourceFolder = args[0];
-        string destinationFolder = args.Length == 2 ? args[1] : sourceFolder;
+        string folderPath = args[0];
 
-        // Verify source folder exists
-        if (!Directory.Exists(sourceFolder))
+        if (!Directory.Exists(folderPath))
         {
-            Console.Error.WriteLine($"Source folder '{sourceFolder}' does not exist.");
+            Console.Error.WriteLine($"Folder not found: {folderPath}");
             return;
         }
 
-        // Ensure destination folder exists
-        if (!Directory.Exists(destinationFolder))
+        // Get all PDF files in the specified folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(folderPath, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        if (pdfFiles.Length == 0)
         {
-            Directory.CreateDirectory(destinationFolder);
+            Console.WriteLine("No PDF files found in the folder.");
+            return;
         }
 
-        // Process each PDF file in the source folder
-        foreach (string inputFile in Directory.GetFiles(sourceFolder, "*.pdf"))
+        // Process each PDF file
+        foreach (string pdfPath in pdfFiles)
         {
-            string fileName = Path.GetFileName(inputFile);
-            string outputFile = Path.Combine(destinationFolder, fileName);
-
-            // Use PdfAnnotationEditor to delete all annotations
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            try
             {
-                editor.BindPdf(inputFile);
-                editor.DeleteAnnotations();
-                editor.Save(outputFile);
-            }
+                // Create a temporary file to hold the result without annotations
+                string tempPath = Path.Combine(folderPath, Path.GetFileNameWithoutExtension(pdfPath) + "_noann.pdf");
 
-            Console.WriteLine($"Processed: {fileName} -> {outputFile}");
+                // Use PdfAnnotationEditor to delete all annotations
+                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                {
+                    // Bind the source PDF
+                    editor.BindPdf(pdfPath);
+
+                    // Delete every annotation in the document
+                    editor.DeleteAnnotations();
+
+                    // Optionally flatten remaining annotation objects (e.g., form fields) to plain content
+                    editor.FlatteningAnnotations();
+
+                    // Save the cleaned PDF to the temporary location
+                    editor.Save(tempPath);
+                }
+
+                // Replace the original file with the annotation‑free version
+                File.Delete(pdfPath);
+                File.Move(tempPath, pdfPath);
+
+                Console.WriteLine($"Annotations removed: {Path.GetFileName(pdfPath)}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{Path.GetFileName(pdfPath)}': {ex.Message}");
+            }
         }
+
+        Console.WriteLine("Processing completed.");
     }
 }

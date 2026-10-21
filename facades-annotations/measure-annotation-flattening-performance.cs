@@ -7,28 +7,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input_500_pages.pdf";
         const string outputPath = "flattened_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Start timing
-        Stopwatch sw = Stopwatch.StartNew();
-
-        // Use PdfAnnotationEditor to flatten all annotations
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        try
         {
-            editor.BindPdf(inputPath);               // Load the PDF
-            editor.FlatteningAnnotations();          // Flatten all annotations
-            editor.Save(outputPath);                  // Save the result
-        }
+            // Measure the flattening operation
+            Stopwatch sw = Stopwatch.StartNew();
 
-        // Stop timing
-        sw.Stop();
-        Console.WriteLine($"Flattening completed in {sw.Elapsed.TotalSeconds:F2} seconds.");
+            // PdfAnnotationEditor implements IDisposable, use a using block
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            {
+                // Load the PDF
+                editor.BindPdf(inputPath);
+
+                // Flatten all annotations (correct method name)
+                editor.FlatteningAnnotations();
+
+                // Save the modified PDF
+                editor.Save(outputPath);
+            }
+
+            sw.Stop();
+
+            Console.WriteLine($"Flattening annotations completed in {sw.Elapsed.TotalSeconds:F2} seconds.");
+            Console.WriteLine($"Output saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during processing: {ex.Message}");
+        }
     }
 }

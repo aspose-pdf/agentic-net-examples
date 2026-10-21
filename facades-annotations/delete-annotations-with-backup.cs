@@ -1,51 +1,59 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the original PDF, the backup copy, and the output PDF after annotation deletion
-        const string inputPdfPath   = "input.pdf";
-        const string backupPdfPath  = "input_backup.pdf";
-        const string outputPdfPath  = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string backupPath = "input_backup.pdf";
 
-        // Set to true to keep a backup of the original PDF before modifications
+        // Option to keep a backup of the original PDF before modifying it
         bool retainBackup = true;
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Optionally create a backup copy of the original PDF
+        // Create a backup copy if requested
         if (retainBackup)
         {
-            // Overwrite any existing backup file
-            File.Copy(inputPdfPath, backupPdfPath, overwrite: true);
-            Console.WriteLine($"Backup created at: {backupPdfPath}");
+            try
+            {
+                File.Copy(inputPath, backupPath, overwrite: true);
+                Console.WriteLine($"Backup created at '{backupPath}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to create backup: {ex.Message}");
+                return;
+            }
         }
 
-        // Load the PDF document within a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        // Delete all annotations using the Facades API
+        try
         {
-            // Initialize the annotation editor with the loaded document
-            PdfAnnotationEditor editor = new PdfAnnotationEditor(doc);
+            // PdfAnnotationEditor does NOT implement IDisposable, so no using block
+            PdfAnnotationEditor editor = new PdfAnnotationEditor();
 
-            // Delete all annotations in the document
+            // Load the source PDF
+            editor.BindPdf(inputPath);
+
+            // Remove all annotations from all pages
             editor.DeleteAnnotations();
 
-            // Save the modified document to the desired output path
-            editor.Save(outputPdfPath);
+            // Save the modified PDF
+            editor.Save(outputPath);
 
-            // Close the editor (releases the bound document resources)
-            editor.Close();
+            Console.WriteLine($"Annotations removed. Result saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Annotations removed. Result saved to: {outputPdfPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during annotation deletion: {ex.Message}");
+        }
     }
 }

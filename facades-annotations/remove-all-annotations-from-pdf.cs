@@ -1,28 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_no_annotations.pdf";
-
-        if (!File.Exists(inputPath))
+        // Validate command‑line arguments
+        if (args.Length < 2)
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine("Usage: RemoveAnnotations <input.pdf> <output.pdf>");
             return;
         }
 
-        // Initialize the annotation editor, bind the PDF, delete all annotations, and save.
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        string inputPath  = args[0];
+        string outputPath = args[1];
+
+        if (!File.Exists(inputPath))
         {
-            editor.BindPdf(inputPath);          // Load the PDF into the editor.
-            editor.DeleteAnnotations();         // Remove every annotation in the document.
-            editor.Save(outputPath);            // Persist the cleaned PDF.
+            Console.Error.WriteLine($"Error: Input file not found – {inputPath}");
+            return;
         }
 
-        Console.WriteLine($"All annotations removed. Saved to '{outputPath}'.");
+        try
+        {
+            // Load the PDF document
+            Document pdfDoc = new Document(inputPath);
+
+            // Remove all annotations from every page
+            foreach (Page page in pdfDoc.Pages)
+            {
+                page.Annotations.Delete();
+            }
+
+            // Save the cleaned PDF
+            pdfDoc.Save(outputPath);
+
+            Console.WriteLine($"All annotations removed. Output saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+        }
     }
 }

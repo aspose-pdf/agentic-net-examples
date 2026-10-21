@@ -1,45 +1,47 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Facades namespace included as required
+using Aspose.Pdf; // Document API provides flattening support
 
 class Program
 {
     static void Main()
     {
-        // Input directory containing PDFs to be flattened
-        const string inputDirectory = @"C:\InputPdfs";
-        // Custom output directory where flattened PDFs will be saved
-        const string outputDirectory = @"C:\FlattenedPdfs";
+        // Input PDF to be flattened
+        const string inputPdf = "input.pdf";
+
+        // Custom output directory for flattened PDFs
+        const string outputDir = "FlattenedOutputs";
+
+        // Validate input file
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
+        }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputDirectory);
+        Directory.CreateDirectory(outputDir);
 
-        // Process each PDF file in the input directory
-        foreach (string inputFilePath in Directory.GetFiles(inputDirectory, "*.pdf"))
+        // Build the output file path (preserve original name with a suffix)
+        string outputPdf = Path.Combine(outputDir,
+            Path.GetFileNameWithoutExtension(inputPdf) + "_flattened.pdf");
+
+        try
         {
-            // Derive the output file path preserving the original file name
-            string fileName = Path.GetFileName(inputFilePath);
-            string outputFilePath = Path.Combine(outputDirectory, fileName);
+            // Load the PDF using Document (Aspose.Pdf) – this class supports flattening.
+            Document pdfDoc = new Document(inputPdf);
 
-            try
-            {
-                // Load the PDF document
-                using (Document pdfDoc = new Document(inputFilePath))
-                {
-                    // Flatten the document (remove form fields and replace with their values)
-                    pdfDoc.Flatten();
+            // Flatten the PDF: removes interactive elements (annotations, form fields)
+            pdfDoc.Flatten();
 
-                    // Save the flattened PDF to the custom output directory
-                    pdfDoc.Save(outputFilePath);
-                }
+            // Save the flattened PDF to the custom output directory.
+            pdfDoc.Save(outputPdf);
 
-                Console.WriteLine($"Flattened PDF saved to: {outputFilePath}");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{inputFilePath}': {ex.Message}");
-            }
+            Console.WriteLine($"Flattened PDF saved to '{outputPdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during flattening: {ex.Message}");
         }
     }
 }

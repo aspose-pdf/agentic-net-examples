@@ -1,17 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations; // Added for AnnotationType enum
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main(string[] args)
     {
-        // Expected arguments:
-        //   args[0] - input PDF file path
-        //   args[1] - output PDF file path
-        //   optional "--verbose" flag enables detailed logging
+        // Expect at least input and output paths; optional --verbose flag
         if (args.Length < 2)
         {
             Console.Error.WriteLine("Usage: program <input.pdf> <output.pdf> [--verbose]");
@@ -24,47 +20,45 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document (lifecycle rule: use Document constructor inside a using block)
+            // Load PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Initialize the annotation editor (facade) and bind the loaded document
-                PdfAnnotationEditor editor = new PdfAnnotationEditor();
-                editor.BindPdf(doc);
-                if (verbose) Console.WriteLine("PdfAnnotationEditor bound to document.");
-
-                // Example operation 1: Flatten all annotations
-                editor.FlatteningAnnotations();
-                if (verbose) Console.WriteLine("FlatteningAnnotations() executed.");
-
-                // Example operation 2: Export all annotations to XFDF (in-memory stream)
-                using (MemoryStream xfdfStream = new MemoryStream())
+                // Pages are 1‑based in Aspose.Pdf
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    doc.ExportAnnotationsToXfdf(xfdfStream);
-                    if (verbose) Console.WriteLine($"ExportAnnotationsToXfdf() wrote {xfdfStream.Length} bytes to memory stream.");
+                    // Define annotation rectangle (llx, lly, urx, ury)
+                    var rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-                    // Reset stream position before importing back
-                    xfdfStream.Position = 0;
+                    // Create a text annotation
+                    var txtAnn = new TextAnnotation(doc.Pages[i], rect)
+                    {
+                        Title = "Note",
+                        Contents = $"Annotation on page {i}",
+                        Open = true,
+                        Icon = TextIcon.Note
+                    };
 
-                    // Example operation 3: Import annotations from XFDF back into the document
-                    doc.ImportAnnotationsFromXfdf(xfdfStream);
-                    if (verbose) Console.WriteLine("ImportAnnotationsFromXfdf() completed.");
+                    // Add the annotation directly to the page's annotation collection
+                    doc.Pages[i].Annotations.Add(txtAnn);
+
+                    if (verbose)
+                    {
+                        Console.WriteLine($"Added text annotation to page {i} at {rect}");
+                    }
                 }
 
-                // Example operation 4: Delete all annotations of a specific type (e.g., FreeText)
-                // Note: AnnotationType enum is in Aspose.Pdf.Annotations namespace
-                AnnotationType[] typesToDelete = { AnnotationType.FreeText };
-                editor.FlatteningAnnotations(1, doc.Pages.Count, typesToDelete);
-                if (verbose) Console.WriteLine("FlatteningAnnotations(start, end, types) executed for FreeText annotations.");
-
-                // Save the modified PDF (lifecycle rule: use Document.Save inside the using block)
+                // Save the modified PDF
                 doc.Save(outputPath);
-                if (verbose) Console.WriteLine($"Document saved to '{outputPath}'.");
+                if (verbose)
+                {
+                    Console.WriteLine($"Document saved to {outputPath}");
+                }
             }
         }
         catch (Exception ex)

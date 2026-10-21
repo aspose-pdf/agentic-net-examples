@@ -2,63 +2,61 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations; // Needed for AnnotationType
 
 class Program
 {
     static void Main()
     {
-        // Path to the XFDF file containing reviewer comments
-        const string xfdfPath = "comments.xfdf";
+        // Path to the XFDF file that contains the reviewer comments.
+        const string xfdfPath = "reviewer_notes.xfdf";
 
-        // List of PDF files to which the comments will be applied
-        string[] pdfFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
+        // Input PDF files that should receive the same comments.
+        string[] inputPdfs = {
+            "Document1.pdf",
+            "Document2.pdf",
+            "Document3.pdf"
+        };
 
-        // Directory where annotated PDFs will be saved
-        const string outputDir = "Output";
+        // Directory where the annotated PDFs will be saved.
+        const string outputDir = "AnnotatedPdfs";
 
+        // Validate XFDF file existence.
         if (!File.Exists(xfdfPath))
         {
             Console.Error.WriteLine($"XFDF file not found: {xfdfPath}");
             return;
         }
 
+        // Ensure the output directory exists.
         Directory.CreateDirectory(outputDir);
 
-        foreach (string pdfPath in pdfFiles)
+        // Create a single PdfAnnotationEditor instance (it does not implement IDisposable).
+        PdfAnnotationEditor annotationEditor = new PdfAnnotationEditor();
+
+        foreach (string inputPath in inputPdfs)
         {
-            if (!File.Exists(pdfPath))
+            if (!File.Exists(inputPath))
             {
-                Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+                Console.Error.WriteLine($"Input PDF not found: {inputPath}");
                 continue;
             }
 
-            string outputPath = Path.Combine(outputDir,
-                Path.GetFileNameWithoutExtension(pdfPath) + "_annotated.pdf");
-
-            try
+            // Load the PDF inside a using block for deterministic disposal.
+            using (Document pdfDoc = new Document(inputPath))
             {
-                // Load the PDF document
-                using (Document doc = new Document(pdfPath))
-                {
-                    // Initialize the annotation editor facade
-                    using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-                    {
-                        // Bind the PDF document to the editor
-                        editor.BindPdf(doc);
+                // Import all annotations from the XFDF file into the current PDF.
+                // The ImportAnnotations overload in Aspose.Pdf.Facades expects an array of XFDF file paths
+                // and an optional array of AnnotationType to filter. Passing null for the second argument
+                // imports all annotation types.
+                annotationEditor.ImportAnnotations(new string[] { xfdfPath }, null);
 
-                        // Import all annotations from the XFDF file
-                        editor.ImportAnnotationsFromXfdf(xfdfPath);
+                // Build the output file path (same file name, different folder).
+                string outputPath = Path.Combine(outputDir, Path.GetFileName(inputPath));
 
-                        // Save the annotated PDF
-                        editor.Save(outputPath);
-                    }
-                }
-
+                // Save the modified PDF.
+                pdfDoc.Save(outputPath);
                 Console.WriteLine($"Annotated PDF saved: {outputPath}");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
     }

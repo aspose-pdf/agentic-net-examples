@@ -1,56 +1,64 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class BatchAnnotationAuthorUpdater
+class Program
 {
     static void Main()
     {
-        // Folder containing source PDFs
-        const string inputFolder = @"C:\PdfInput";
-        // Folder where updated PDFs will be saved
-        const string outputFolder = @"C:\PdfOutput";
-
-        // Author names – replace as needed
-        const string sourceAuthor = "Old Author";
-        const string destinationAuthor = "New Author";
+        // Folder containing the PDFs to process
+        const string inputFolder = @"C:\PdfFiles";
+        // Folder where the updated PDFs will be saved
+        const string outputFolder = @"C:\PdfFiles\Updated";
+        // New author name to set for all annotations
+        const string newAuthor = "John Doe";
 
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
             return;
         }
 
         Directory.CreateDirectory(outputFolder);
 
+        // Get all PDF files in the input folder (non‑recursive)
         string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
         foreach (string inputPath in pdfFiles)
         {
             try
             {
-                // Prepare output path with same file name
-                string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
+                string fileName = Path.GetFileNameWithoutExtension(inputPath);
+                string outputPath = Path.Combine(outputFolder, $"{fileName}_updated.pdf");
 
-                // Initialize the annotation editor facade
-                PdfAnnotationEditor editor = new PdfAnnotationEditor();
+                // Load the document to obtain page and annotation counts
+                Document doc = new Document(inputPath);
+                int pageCount = doc.Pages.Count;
 
-                // Bind the PDF document
-                editor.BindPdf(inputPath);
+                // Use PdfAnnotationEditor to modify the author of every annotation
+                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                {
+                    // Bind the same PDF to the editor (the editor works on the file on disk)
+                    editor.BindPdf(inputPath);
 
-                // Determine the page range (Aspose.Pdf uses 1‑based indexing)
-                int startPage = 1;
-                int endPage = editor.Document.Pages.Count;
+                    for (int pageIndex = 1; pageIndex <= pageCount; pageIndex++)
+                    {
+                        // Annotations collection is 0‑based, but ModifyAnnotationsAuthor expects 1‑based index
+                        int annotCount = doc.Pages[pageIndex].Annotations.Count;
+                        for (int annotIndex = 1; annotIndex <= annotCount; annotIndex++)
+                        {
+                            // The overload expects: pageIndex, annotIndex, sourceAuthor, destinationAuthor
+                            // Passing an empty string for sourceAuthor updates any existing author.
+                            editor.ModifyAnnotationsAuthor(pageIndex, annotIndex, string.Empty, newAuthor);
+                        }
+                    }
 
-                // Modify the author of all matching annotations in the range
-                editor.ModifyAnnotationsAuthor(startPage, endPage, sourceAuthor, destinationAuthor);
+                    // Save the modified PDF
+                    editor.Save(outputPath);
+                }
 
-                // Save the modified PDF
-                editor.Save(outputPath);
-
-                // Close the facade (releases the bound document)
-                editor.Close();
-
-                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {outputPath}");
+                Console.WriteLine($"Processed: {inputPath} -> {outputPath}");
             }
             catch (Exception ex)
             {
@@ -58,6 +66,6 @@ class BatchAnnotationAuthorUpdater
             }
         }
 
-        Console.WriteLine("Batch update completed.");
+        Console.WriteLine("Batch annotation author update completed.");
     }
 }

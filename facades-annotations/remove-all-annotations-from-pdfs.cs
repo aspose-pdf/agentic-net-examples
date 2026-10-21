@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing PDF files
-        const string folderPath = @"C:\PdfFolder";
+        // Folder containing the PDFs to process
+        const string folderPath = @"C:\PDFs";
 
         if (!Directory.Exists(folderPath))
         {
@@ -15,24 +15,24 @@ class Program
             return;
         }
 
-        // Get all PDF files in the folder (non‑recursive)
+        // Get all PDF files in the specified folder (non‑recursive)
         string[] pdfFiles = Directory.GetFiles(folderPath, "*.pdf", SearchOption.TopDirectoryOnly);
 
         foreach (string pdfPath in pdfFiles)
         {
             try
             {
-                // Use PdfAnnotationEditor to edit annotations
-                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                // Load the PDF document
+                using (Document pdfDoc = new Document(pdfPath))
                 {
-                    // Bind the existing PDF file
-                    editor.BindPdf(pdfPath);
+                    // Remove every annotation from every page
+                    foreach (Page page in pdfDoc.Pages)
+                    {
+                        page.Annotations.Clear();
+                    }
 
-                    // Delete all annotations in the document
-                    editor.DeleteAnnotations();
-
-                    // Overwrite the original file with the cleaned version
-                    editor.Save(pdfPath);
+                    // Overwrite the original file with the cleaned document
+                    pdfDoc.Save(pdfPath);
                 }
 
                 Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");

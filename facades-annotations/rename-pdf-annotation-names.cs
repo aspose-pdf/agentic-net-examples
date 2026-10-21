@@ -2,47 +2,68 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
 
-class Program
+class BatchAnnotationRenamer
 {
+    // Standardized prefix for all annotation names
+    private const string Prefix = "StdPrefix_";
+
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "renamed_annotations.pdf";
-        const string prefix    = "StdPrefix_";
+        // Folder containing PDFs to process
+        const string inputFolder = @"C:\InputPdfs";
+        // Folder where modified PDFs will be saved
+        const string outputFolder = @"C:\OutputPdfs";
 
-        if (!File.Exists(inputPdf))
+        if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
             return;
         }
 
-        // Initialize the annotation editor and bind the source PDF
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        Directory.CreateDirectory(outputFolder);
+
+        // Process each PDF file in the input folder
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            editor.BindPdf(inputPdf);
+            string fileName = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputFolder, $"{fileName}_renamed.pdf");
 
-            // Access the underlying Document to iterate pages and annotations
-            Document doc = editor.Document;
-
-            // Rename each annotation by adding the standardized prefix
-            foreach (Page page in doc.Pages)
+            try
             {
-                foreach (Annotation annot in page.Annotations)
+                // Load the PDF document
+                Document pdfDoc = new Document(inputPath);
+                int pageCount = pdfDoc.Pages.Count;
+                int globalCounter = 1; // ensures unique names across pages
+
+                for (int pageIndex = 1; pageIndex <= pageCount; pageIndex++)
                 {
-                    // Only rename if the annotation already has a name
-                    if (!string.IsNullOrEmpty(annot.Name))
+                    Page page = pdfDoc.Pages[pageIndex];
+                    // Retrieve all annotations on the current page
+                    var annotations = page.Annotations;
+                    if (annotations == null) continue;
+
+                    foreach (Annotation annotation in annotations)
                     {
-                        annot.Name = prefix + annot.Name;
+                        // Build new name: Prefix + original name (if any) + counter
+                        string baseName = string.IsNullOrEmpty(annotation.Name) ? "Anno" : annotation.Name;
+                        string newName = $"{Prefix}{baseName}_{globalCounter++}";
+
+                        // Assign the new name
+                        annotation.Name = newName;
                     }
                 }
-            }
 
-            // Save the modified PDF
-            editor.Save(outputPdf);
+                // Save the modified PDF to the output location
+                pdfDoc.Save(outputPath);
+                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {Path.GetFileName(outputPath)}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+            }
         }
 
-        Console.WriteLine($"Annotations renamed and saved to '{outputPdf}'.");
+        Console.WriteLine("Batch annotation renaming completed.");
     }
 }

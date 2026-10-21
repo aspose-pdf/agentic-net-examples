@@ -2,13 +2,12 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,39 +16,35 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Work on a copy so the original file remains unchanged
+        File.Copy(inputPath, outputPath, true);
+
+        // Load the PDF document
+        Document pdfDoc = new Document(outputPath);
+
+        // Iterate through all pages and their annotations
+        foreach (Page page in pdfDoc.Pages)
         {
-            // Initialize the annotation editor facade and bind the document
-            PdfAnnotationEditor editor = new PdfAnnotationEditor();
-            editor.BindPdf(doc);
-
-            // Iterate all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            foreach (Annotation annot in page.Annotations)
             {
-                Page page = doc.Pages[pageIndex];
-
-                // Iterate all annotations on the current page
-                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
+                // The Open flag exists only on specific annotation types (e.g., TextAnnotation, PopupAnnotation).
+                // Cast to the appropriate derived type before setting the property.
+                switch (annot)
                 {
-                    Annotation annotation = page.Annotations[annIndex];
-
-                    // Set Open flag for annotations that expose the property
-                    if (annotation is TextAnnotation textAnn)
-                    {
+                    case TextAnnotation textAnn:
                         textAnn.Open = true;
-                    }
-                    else if (annotation is PopupAnnotation popupAnn)
-                    {
+                        break;
+                    case PopupAnnotation popupAnn:
                         popupAnn.Open = true;
-                    }
+                        break;
+                    // Add other annotation types that expose an Open property if needed.
                 }
             }
-
-            // Save the modified PDF via the facade
-            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"All annotation Open flags set to true → '{outputPath}'");
+        // Save the modified document
+        pdfDoc.Save(outputPath);
+
+        Console.WriteLine($"All applicable annotation Open flags set to true and saved to '{outputPath}'.");
     }
 }
