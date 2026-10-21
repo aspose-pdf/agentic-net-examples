@@ -1,106 +1,148 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades; // Facades namespace as requested
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 
-// -----------------------------------------------------------------------------
-// Minimal stubs for Azure SDK types to allow compilation without adding NuGet
-// packages. In a real project, reference the following packages instead:
+// ---------------------------------------------------------------------------
+// Minimal Azure SDK stubs – only the members used in this sample are defined.
+// In a real project you should reference the official NuGet packages:
 //   Azure.Identity
 //   Azure.Security.KeyVault.Secrets
-// -----------------------------------------------------------------------------
-namespace Azure.Identity
+// ---------------------------------------------------------------------------
+namespace Azure
 {
-    /// <summary>
-    /// Stub for Azure.Identity.DefaultAzureCredential. In production, use the real
-    /// implementation from the Azure.Identity NuGet package.
-    /// </summary>
-    public class DefaultAzureCredential { }
-}
-
-namespace Azure.Security.KeyVault.Secrets
-{
-    /// <summary>
-    /// Represents a secret retrieved from Azure Key Vault.
-    /// </summary>
-    public class KeyVaultSecret
+    namespace Identity
     {
-        public string Value { get; }
-        public KeyVaultSecret(string value) => Value = value;
-    }
-
-    /// <summary>
-    /// Stub for Azure.Security.KeyVault.Secrets.SecretClient. The real client
-    /// communicates with Azure Key Vault; this stub simply reads an environment
-    /// variable with the secret name or returns a placeholder value.
-    /// </summary>
-    public class SecretClient
-    {
-        private readonly Uri _vaultUri;
-        private readonly DefaultAzureCredential _credential;
-
-        public SecretClient(Uri vaultUri, DefaultAzureCredential credential)
+        /// <summary>
+        /// Stub for Azure.Identity.DefaultAzureCredential.
+        /// </summary>
+        public class DefaultAzureCredential
         {
-            _vaultUri = vaultUri;
-            _credential = credential;
-        }
-
-        public KeyVaultSecret GetSecret(string secretName)
-        {
-            // Attempt to read the secret from an environment variable for demo.
-            // In real usage the SDK contacts Azure Key Vault.
-            string value = Environment.GetEnvironmentVariable(secretName);
-            if (string.IsNullOrEmpty(value))
-                value = "placeholder-owner-password"; // fallback for demo purposes
-            return new KeyVaultSecret(value);
+            // No implementation needed for the stub.
         }
     }
+
+    namespace Security.KeyVault.Secrets
+    {
+        /// <summary>
+        /// Represents a secret stored in Azure Key Vault.
+        /// </summary>
+        public class KeyVaultSecret
+        {
+            public string Name { get; }
+            public string Value { get; }
+
+            public KeyVaultSecret(string name, string value)
+            {
+                Name = name;
+                Value = value;
+            }
+        }
+
+        /// <summary>
+        /// Wrapper that mimics the Azure.Response<T> type used by the real SDK.
+        /// Only the Value property is required for this sample.
+        /// </summary>
+        public class SecretResponse
+        {
+            public KeyVaultSecret Value { get; }
+
+            public SecretResponse(KeyVaultSecret secret)
+            {
+                Value = secret;
+            }
+        }
+
+        /// <summary>
+        /// Stub for Azure.Security.KeyVault.Secrets.SecretClient.
+        /// In production this client talks to Azure Key Vault; the stub returns a placeholder.
+        /// </summary>
+        public class SecretClient
+        {
+            private readonly Uri _vaultUri;
+            private readonly Azure.Identity.DefaultAzureCredential _credential;
+
+            public SecretClient(Uri vaultUri, Azure.Identity.DefaultAzureCredential credential)
+            {
+                _vaultUri = vaultUri;
+                _credential = credential;
+            }
+
+            /// <summary>
+            /// Returns a dummy secret. Replace with real secret retrieval logic when using the real SDK.
+            /// </summary>
+            public SecretResponse GetSecret(string name)
+            {
+                // For demonstration we return the secret name as the value.
+                // In a real scenario the secret value would be fetched from Key Vault.
+                var secret = new KeyVaultSecret(name, "<owner-password-from-key-vault>");
+                return new SecretResponse(secret);
+            }
+        }
+    }
 }
 
-class PdfDecryptor
+class Program
 {
-    // Decrypts an encrypted PDF using the owner password stored in Azure Key Vault.
     static void Main()
     {
-        // Paths to the input (encrypted) and output (decrypted) PDF files.
-        const string inputPdfPath = @"C:\Files\encrypted.pdf";
-        const string outputPdfPath = @"C:\Files\decrypted.pdf";
+        // Paths
+        const string encryptedPdfPath = "encrypted.pdf";
+        const string decryptedPdfPath = "decrypted.pdf";
 
-        // Azure Key Vault configuration.
-        const string keyVaultUrl = "https://myvault.vault.azure.net/"; // Replace with your vault URL.
-        const string secretName = "PdfOwnerPassword";               // Name of the secret containing the owner password.
+        // Azure Key Vault configuration (set these environment variables before running)
+        string keyVaultUrl = Environment.GetEnvironmentVariable("KEYVAULT_URL");
+        string secretName   = Environment.GetEnvironmentVariable("KEYVAULT_SECRET_NAME");
 
-        // Validate input file existence.
-        if (!File.Exists(inputPdfPath))
+        if (string.IsNullOrEmpty(keyVaultUrl) || string.IsNullOrEmpty(secretName))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine("Key Vault URL or secret name not set in environment variables.");
+            return;
+        }
+
+        // Retrieve the owner password securely from Azure Key Vault
+        string ownerPassword;
+        try
+        {
+            var secretClient = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
+            // The stub returns a SecretResponse whose Value property holds the KeyVaultSecret.
+            ownerPassword = secretClient.GetSecret(secretName).Value.Value;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to retrieve secret from Key Vault: {ex.Message}");
+            return;
+        }
+
+        if (!File.Exists(encryptedPdfPath))
+        {
+            Console.Error.WriteLine($"Encrypted PDF not found: {encryptedPdfPath}");
             return;
         }
 
         try
         {
-            // Retrieve the owner password from Azure Key Vault.
-            var client = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
-            KeyVaultSecret secret = client.GetSecret(secretName);
-            string ownerPassword = secret.Value;
+            // Open the encrypted PDF using the owner password
+            using (Document doc = new Document(encryptedPdfPath, ownerPassword))
+            {
+                // Decrypt the document (no parameters)
+                doc.Decrypt();
 
-            // Initialize PdfFileSecurity with source and destination files.
-            // This follows Aspose.Pdf.Facades lifecycle: constructor creates the facade,
-            // DecryptFile performs the operation, and the facade handles saving internally.
-            var fileSecurity = new PdfFileSecurity(inputPdfPath, outputPdfPath);
+                // Save the decrypted PDF
+                doc.Save(decryptedPdfPath);
+            }
 
-            // Decrypt the PDF using the retrieved owner password.
-            bool success = fileSecurity.DecryptFile(ownerPassword);
-
-            if (success)
-                Console.WriteLine($"Decryption succeeded. Decrypted file saved to '{outputPdfPath}'.");
-            else
-                Console.Error.WriteLine("Decryption failed. Check the owner password and file permissions.");
+            Console.WriteLine($"Decrypted PDF saved to '{decryptedPdfPath}'.");
+        }
+        catch (InvalidPasswordException)
+        {
+            Console.Error.WriteLine("The provided password is invalid.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during decryption: {ex.Message}");
         }
     }
 }

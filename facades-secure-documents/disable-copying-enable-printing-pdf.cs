@@ -1,34 +1,34 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "protected.pdf";
+        const string userPassword = "";          // No user password (openable without password)
+        const string ownerPassword = "owner123"; // Owner password to control permissions
 
-        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfFileSecurity works with source and destination file paths.
-        // It will apply the specified privilege and write the result to outputPath.
-        using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
-        {
-            // DocumentPrivilege.Print allows printing and disables copying.
-            bool result = security.SetPrivilege(DocumentPrivilege.Print);
-            if (!result)
-            {
-                Console.Error.WriteLine("Failed to set document privileges.");
-                return;
-            }
-        }
+        // Load the source PDF
+        Document doc = new Document(inputPath);
 
-        Console.WriteLine($"Successfully saved '{outputPath}' with copying disabled and printing enabled.");
+        // Enable printing, disable copying (do NOT include ExtractContent permission)
+        Permissions permissions = Permissions.PrintDocument;
+
+        // Encrypt using AES‑256 algorithm
+        doc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.AESx256);
+
+        // Save the protected PDF
+        doc.Save(outputPath);
+
+        Console.WriteLine($"PDF saved with printing enabled and copying disabled: {outputPath}");
     }
 }

@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "encrypted_output.pdf";
-        const string userPassword = "user123";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "encrypted.pdf";
+        const string userPassword  = "user123";
         const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
@@ -18,24 +17,25 @@ class Program
             return;
         }
 
-        // Define custom privileges: allow printing and copying, forbid modifications
-        DocumentPrivilege privilege = DocumentPrivilege.AllowAll;
-        privilege.AllowModifyContents = false;
-        privilege.AllowModifyAnnotations = false;
-
-        // Initialize the facade with source and destination files
-        PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
-
-        // Encrypt using AES‑256 (KeySize.x256) and the custom privilege
-        bool encrypted = fileSecurity.EncryptFile(userPassword, ownerPassword, privilege, KeySize.x256, Algorithm.AES);
-
-        if (encrypted)
+        try
         {
-            Console.WriteLine($"Encryption succeeded. Output saved to '{outputPath}'.");
+            // Load the PDF document
+            Document pdfDoc = new Document(inputPath);
+
+            // Define custom permissions (allow printing and content extraction, deny modifications)
+            Permissions permissions = Permissions.PrintDocument | Permissions.ExtractContent;
+
+            // Apply AES‑256 encryption with the specified passwords and permissions
+            pdfDoc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.AESx256);
+
+            // Save the encrypted PDF
+            pdfDoc.Save(outputPath);
+
+            Console.WriteLine($"Encryption successful: {outputPath}");
         }
-        else
+        catch (Exception ex)
         {
-            Console.Error.WriteLine("Encryption failed.");
+            Console.Error.WriteLine($"Encryption failed: {ex.Message}");
         }
     }
 }

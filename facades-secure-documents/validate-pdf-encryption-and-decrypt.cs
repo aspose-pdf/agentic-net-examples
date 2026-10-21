@@ -1,14 +1,15 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "encrypted.pdf";
         const string outputPath = "decrypted.pdf";
-        const string password   = "ownerpass"; // owner or user password
+        const string password = "user123";
 
         if (!File.Exists(inputPath))
         {
@@ -16,35 +17,24 @@ class Program
             return;
         }
 
-        // Check whether the PDF is encrypted
+        // Use PdfFileInfo (Facades API) to determine if the PDF is encrypted
         PdfFileInfo fileInfo = new PdfFileInfo(inputPath);
-        bool isEncrypted = fileInfo.IsEncrypted;
-
-        if (!isEncrypted)
+        if (!fileInfo.IsEncrypted)
         {
-            // No encryption – simply copy the file
-            File.Copy(inputPath, outputPath, overwrite: true);
-            Console.WriteLine("File is not encrypted. Copied without decryption.");
+            // If not encrypted, simply copy the file (no decryption needed)
+            File.Copy(inputPath, outputPath, true);
+            Console.WriteLine("PDF was not encrypted; copied without decryption.");
             return;
         }
 
-        // PDF is encrypted – attempt decryption using PdfFileSecurity
-        PdfFileSecurity security = new PdfFileSecurity();
-        security.BindPdf(inputPath);                     // initialize with source file
-        bool decrypted = security.TryDecryptFile(password);
-
-        if (decrypted)
+        // Load the encrypted document with the user password and decrypt it
+        using (Document doc = new Document(inputPath, password))
         {
-            // Save the decrypted PDF to the output path
-            security.Save(outputPath);
-            Console.WriteLine($"Decryption succeeded. Saved to '{outputPath}'.");
-        }
-        else
-        {
-            Console.Error.WriteLine("Decryption failed. Incorrect password or unsupported encryption.");
+            // Decrypt() takes no parameters
+            doc.Decrypt();
+            doc.Save(outputPath);
         }
 
-        // Release resources held by the facade
-        security.Close();
+        Console.WriteLine($"Decrypted PDF saved to '{outputPath}'.");
     }
 }

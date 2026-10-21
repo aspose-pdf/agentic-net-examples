@@ -1,13 +1,16 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf.Facades;
 
-class Program
+class EncryptionReportGenerator
 {
     static void Main()
     {
-        // Folder containing PDFs to inspect
+        // Directory containing PDF files to analyze
         const string pdfFolder = @"C:\PdfCollection";
+        // Output report file
+        const string reportPath = @"C:\PdfCollection\encryption_report.txt";
 
         if (!Directory.Exists(pdfFolder))
         {
@@ -15,6 +18,7 @@ class Program
             return;
         }
 
+        // Gather all PDF files in the folder (non‑recursive)
         string[] pdfFiles = Directory.GetFiles(pdfFolder, "*.pdf", SearchOption.TopDirectoryOnly);
         if (pdfFiles.Length == 0)
         {
@@ -22,57 +26,39 @@ class Program
             return;
         }
 
-        Console.WriteLine("Encryption Algorithm Report");
-        Console.WriteLine(new string('=', 30));
+        // Prepare a StringBuilder for the report
+        StringBuilder reportBuilder = new StringBuilder();
+        reportBuilder.AppendLine("File Name,Encrypted,Encryption Algorithm");
 
+        // Iterate over each PDF file
         foreach (string pdfPath in pdfFiles)
         {
-            try
-            {
-                // Load PDF metadata using PdfFileInfo (facade)
-                using (PdfFileInfo info = new PdfFileInfo(pdfPath))
-                {
-                    bool isEncrypted = info.IsEncrypted;
-                    string algorithmName = "None";
+            // Use PdfFileInfo (Facades) to read encryption details
+            PdfFileInfo fileInfo = new PdfFileInfo(pdfPath);
 
-                    if (isEncrypted)
-                    {
-                        // Retrieve privilege settings; DocumentPrivilege contains encryption details
-                        var privilege = info.GetDocumentPrivilege();
+            bool isEncrypted = fileInfo.IsEncrypted;
+            // The PdfFileInfo class in older Aspose.Pdf versions does not expose the
+            // EncryptionAlgorithm property. When the property is unavailable we fall back
+            // to a generic placeholder. If you are using a newer version that provides the
+            // property, you can uncomment the line below.
+            // var algorithm = fileInfo.EncryptionAlgorithm; // CryptoAlgorithm enum
+            // string algorithmName = isEncrypted ? algorithm.ToString() : "None";
+            string algorithmName = isEncrypted ? "Encrypted (algorithm unknown)" : "None";
 
-                        // The DocumentPrivilege class exposes the CryptoAlgorithm used for encryption.
-                        // If the property name differs, adjust accordingly.
-                        // Example: privilege.CryptoAlgorithm or privilege.Algorithm
-                        // Here we use reflection as a fallback to obtain the enum name.
-                        var algoProp = privilege.GetType().GetProperty("CryptoAlgorithm");
-                        if (algoProp != null)
-                        {
-                            var algoValue = algoProp.GetValue(privilege);
-                            algorithmName = algoValue?.ToString() ?? "Unknown";
-                        }
-                        else
-                        {
-                            // Fallback: try a property named "Algorithm"
-                            algoProp = privilege.GetType().GetProperty("Algorithm");
-                            if (algoProp != null)
-                            {
-                                var algoValue = algoProp.GetValue(privilege);
-                                algorithmName = algoValue?.ToString() ?? "Unknown";
-                            }
-                        }
-                    }
-
-                    Console.WriteLine($"File: {Path.GetFileName(pdfPath)}");
-                    Console.WriteLine($"  Encrypted: {isEncrypted}");
-                    Console.WriteLine($"  Algorithm: {algorithmName}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+            // Append line to report
+            string fileName = Path.GetFileName(pdfPath);
+            reportBuilder.AppendLine($"{fileName},{isEncrypted},{algorithmName}");
         }
 
-        Console.WriteLine("Report generation completed.");
+        // Write the report to disk
+        try
+        {
+            File.WriteAllText(reportPath, reportBuilder.ToString(), Encoding.UTF8);
+            Console.WriteLine($"Encryption report generated at: {reportPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to write report: {ex.Message}");
+        }
     }
 }

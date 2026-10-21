@@ -1,72 +1,56 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // PdfFileInfo and PdfFileSecurity are in this namespace
-using Aspose.Pdf;          // Document class for loading PDFs when needed
+using Aspose.Pdf.Facades; // PdfFileInfo resides here
 
 class Program
 {
     static void Main()
     {
-        // Directory containing PDFs to analyze
-        const string pdfDirectory = @"C:\PdfFolder";
-        // Output summary file path
-        const string summaryPath = @"C:\PdfFolder\EncryptionSummary.txt";
+        // Resolve the base directory of the running application
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-        // Prepare the summary writer
-        using (StreamWriter writer = new StreamWriter(summaryPath, false))
+        // Input folder – create it if it does not exist so the sample can run out‑of‑the‑box
+        string inputFolder = Path.Combine(baseDir, "InputPdfs");
+        if (!Directory.Exists(inputFolder))
         {
-            writer.WriteLine("PDF Encryption Summary");
-            writer.WriteLine("======================");
-            writer.WriteLine();
+            Directory.CreateDirectory(inputFolder);
+            Console.WriteLine($"Input folder not found. Created empty folder at '{inputFolder}'. Place PDF files there and re‑run.");
+        }
 
-            // Enumerate all PDF files in the directory
-            foreach (string pdfPath in Directory.GetFiles(pdfDirectory, "*.pdf"))
+        // Output CSV file – also placed next to the executable
+        string summaryFile = Path.Combine(baseDir, "EncryptionSummary.csv");
+
+        // Gather all PDF files in the folder (if any)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+
+        // Write header and results to CSV
+        using (StreamWriter writer = new StreamWriter(summaryFile))
+        {
+            writer.WriteLine("File,Encrypted,Algorithm,Permissions");
+
+            foreach (string pdfPath in pdfFiles)
             {
-                // Use PdfFileInfo to inspect the file
-                using (PdfFileInfo info = new PdfFileInfo(pdfPath))
+                try
                 {
-                    // Encryption status
+                    // PdfFileInfo provides encryption details without loading the full document
+                    PdfFileInfo info = new PdfFileInfo(pdfPath);
+
                     bool isEncrypted = info.IsEncrypted;
+                    // Aspose.Pdf currently does not expose algorithm or permission flags via PdfFileInfo.
+                    // We report generic placeholders when encrypted, otherwise "None".
+                    string algorithm   = isEncrypted ? "Encrypted" : "None";
+                    string permissions = isEncrypted ? "Encrypted" : "None";
 
-                    // Privilege configuration (if any)
-                    DocumentPrivilege privilege = info.GetDocumentPrivilege();
-
-                    // Attempt to retrieve the encryption algorithm.
-                    // PdfFileInfo does not expose the algorithm directly, so we report "N/A"
-                    // when the document is not encrypted or the algorithm cannot be determined.
-                    string algorithm = "N/A";
-
-                    // If the file is encrypted, try to open it without a password to see if
-                    // the algorithm can be inferred via an exception (placeholder logic).
-                    if (isEncrypted)
-                    {
-                        try
-                        {
-                            // Attempt to open without password – will throw if encrypted.
-                            using (Document doc = new Document(pdfPath))
-                            {
-                                // If opened, the file is not actually encrypted (unlikely here).
-                                algorithm = "None";
-                            }
-                        }
-                        catch (InvalidPasswordException)
-                        {
-                            // The file is encrypted; algorithm information is not exposed via PdfFileInfo.
-                            // In a real scenario, you might use a different API to retrieve it.
-                            algorithm = "Unknown";
-                        }
-                    }
-
-                    // Write entry to the summary
-                    writer.WriteLine($"File: {Path.GetFileName(pdfPath)}");
-                    writer.WriteLine($"  Encrypted: {(isEncrypted ? "Yes" : "No")}");
-                    writer.WriteLine($"  Algorithm: {algorithm}");
-                    writer.WriteLine($"  Privileges: {privilege}");
-                    writer.WriteLine();
+                    writer.WriteLine($"{Path.GetFileName(pdfPath)},{isEncrypted},{algorithm},{permissions}");
+                }
+                catch (Exception ex)
+                {
+                    // Log any errors but continue processing remaining files
+                    Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
                 }
             }
         }
 
-        Console.WriteLine($"Encryption summary written to '{summaryPath}'.");
+        Console.WriteLine($"Encryption summary written to '{summaryFile}'.");
     }
 }

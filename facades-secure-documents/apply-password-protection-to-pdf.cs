@@ -1,41 +1,34 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // DocumentPrivilege, KeySize enums
-using Aspose.Pdf.Facades;      // PdfFileSecurity facade
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";      // source PDF
-        const string outputPath = "protected.pdf";  // encrypted PDF
-        const string userPassword  = "user123";    // password required to open
-        const string ownerPassword = "owner123";   // password required to change permissions
+        const string inputPath = "input.pdf";
+        const string outputPath = "protected.pdf";
+        const string userPassword = "user123";
+        const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfFileSecurity works directly on file paths; no Document object is created.
-        // Wrap it in a using block because it implements IDisposable.
-        using (PdfFileSecurity security = new PdfFileSecurity(inputPath, outputPath))
-        {
-            // Encrypt the PDF: allow only printing, use 256‑bit AES encryption.
-            bool encrypted = security.EncryptFile(
-                userPassword,
-                ownerPassword,
-                DocumentPrivilege.Print,   // allowed operation
-                KeySize.x256);             // 256‑bit key size
+        // Load the existing PDF document.
+        Document doc = new Document(inputPath);
 
-            if (!encrypted)
-            {
-                Console.Error.WriteLine("Failed to encrypt the PDF.");
-                return;
-            }
-        }
+        // Define the permissions you want to allow.
+        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+        // Apply password protection using AES‑256 encryption.
+        doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
+        // Save the encrypted PDF to a new file.
+        doc.Save(outputPath);
+
+        Console.WriteLine($"Password‑protected PDF saved to '{outputPath}'.");
     }
 }

@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "signed_input.pdf";
-        const string outputPath = "usage_rights_removed.pdf";
+        const string inputPath  = "signed.pdf";
+        const string outputPath = "signed_without_usage_rights.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,27 +15,25 @@ class Program
             return;
         }
 
-        // Initialize the PdfFileSignature facade
-        using (PdfFileSignature pdfSign = new PdfFileSignature())
+        try
         {
-            // Load the signed PDF
-            pdfSign.BindPdf(inputPath);
+            // PdfFileSignature is a facade class; it does not implement IDisposable.
+            PdfFileSignature signature = new PdfFileSignature();
 
-            // Remove usage rights if present
-            if (pdfSign.ContainsUsageRights())
-            {
-                pdfSign.RemoveUsageRights();
-                Console.WriteLine("Extended usage rights removed.");
-            }
-            else
-            {
-                Console.WriteLine("No extended usage rights found.");
-            }
+            // Load the signed PDF.
+            signature.BindPdf(inputPath);
 
-            // Save the resulting PDF
-            pdfSign.Save(outputPath);
+            // Remove any extended usage rights that were added to the document.
+            signature.RemoveUsageRights();
+
+            // Save the modified PDF.
+            signature.Save(outputPath);
+
+            Console.WriteLine($"Extended usage rights removed. Output saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Processed file saved as '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

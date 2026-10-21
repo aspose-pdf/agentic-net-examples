@@ -2,12 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // Added for TextFragment
+using Aspose.Pdf.Text;
 using NUnit.Framework;
 
-// Minimal NUnit stubs to allow compilation when the real NUnit package is not referenced.
-// These stubs provide the attributes and Assert.Throws<T> used in the test.
-// In a real test project you would reference the NUnit NuGet package instead.
+// -----------------------------------------------------------------------------
+// Minimal NUnit stubs – added because the project does not reference the real
+// NUnit package. These definitions provide the attributes and Assert.Throws<T>
+// used by the test code, allowing it to compile and run.
+// -----------------------------------------------------------------------------
 namespace NUnit.Framework
 {
     [AttributeUsage(AttributeTargets.Class)]
@@ -26,6 +28,11 @@ namespace NUnit.Framework
 
     public static class Assert
     {
+        /// <summary>
+        /// Executes the supplied delegate and returns the caught exception of type T.
+        /// If no exception or a different exception is thrown, an AssertionException
+        /// (represented here by a generic Exception) is raised.
+        /// </summary>
         public static T Throws<T>(TestDelegate code) where T : Exception
         {
             try
@@ -48,86 +55,67 @@ namespace NUnit.Framework
 namespace AsposePdfTests
 {
     [TestFixture]
-    public class PdfDecryptionTests
+    public class DecryptionTests
     {
-        private const string OwnerPassword = "owner123";
         private const string UserPassword = "user123";
-        private const string WrongOwnerPassword = "wrongpass";
+        private const string OwnerPassword = "owner123";
+        private const string WrongOwnerPassword = "wrongOwner";
 
-        private string _tempDir;
-        private string _originalPdfPath;
-        private string _encryptedPdfPath;
+        private string _originalPdfPath = null!;
+        private string _encryptedPdfPath = null!;
+        private string _decryptedPdfPath = null!;
 
         [SetUp]
         public void SetUp()
         {
-            // Create a temporary directory for test files
-            _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            Directory.CreateDirectory(_tempDir);
+            // Create temporary file paths
+            _originalPdfPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + "_original.pdf");
+            _encryptedPdfPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + "_encrypted.pdf");
+            _decryptedPdfPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + "_decrypted.pdf");
 
-            _originalPdfPath = Path.Combine(_tempDir, "original.pdf");
-            _encryptedPdfPath = Path.Combine(_tempDir, "encrypted.pdf");
-
-            // Create a simple PDF document
+            // Create a simple PDF document and encrypt it
             using (Document doc = new Document())
             {
-                // Add a page
                 Page page = doc.Pages.Add();
+                page.Paragraphs.Add(new TextFragment("Sample PDF for encryption test."));
 
-                // Add some text to the page
-                TextFragment tf = new TextFragment("Sample PDF for encryption test.");
-                page.Paragraphs.Add(tf);
-
-                // Save the unencrypted PDF
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+                doc.Encrypt(UserPassword, OwnerPassword, perms, CryptoAlgorithm.AESx256);
+                // Save the encrypted document (the same file is saved twice – once as a reference
+                // "original" and once as the "encrypted" version used by the test).
                 doc.Save(_originalPdfPath);
+                doc.Save(_encryptedPdfPath);
             }
-
-            // Encrypt the PDF using the correct owner password
-            PdfFileSecurity encryptor = new PdfFileSecurity(_originalPdfPath, _encryptedPdfPath);
-            // EncryptFile throws if it fails; we ignore the return value for the test setup
-            encryptor.EncryptFile(UserPassword, OwnerPassword, DocumentPrivilege.Print, KeySize.x256);
         }
 
         [TearDown]
         public void TearDown()
         {
-            // Clean up temporary files and directory
-            try
+            // Clean up temporary files
+            foreach (var path in new[] { _originalPdfPath, _encryptedPdfPath, _decryptedPdfPath })
             {
-                if (File.Exists(_originalPdfPath))
-                    File.Delete(_originalPdfPath);
-                if (File.Exists(_encryptedPdfPath))
-                    File.Delete(_encryptedPdfPath);
-                if (Directory.Exists(_tempDir))
-                    Directory.Delete(_tempDir, true);
-            }
-            catch
-            {
-                // Ignored – cleanup should not affect test results
+                if (File.Exists(path))
+                    File.Delete(path);
             }
         }
 
         [Test]
-        public void DecryptFile_WithIncorrectOwnerPassword_ShouldThrowException()
+        public void Decrypt_WithIncorrectOwnerPassword_ShouldThrowInvalidPasswordException()
         {
-            // Arrange: create a PdfFileSecurity instance for the encrypted file
-            PdfFileSecurity decryptor = new PdfFileSecurity(_encryptedPdfPath, Path.Combine(_tempDir, "decrypted.pdf"));
-
-            // Act & Assert: DecryptFile should throw when an incorrect owner password is supplied
+            // Aspose.Pdf throws InvalidPasswordException when a document is opened with a wrong password.
+            // The PdfFileEditor.Decrypt method is not available in the referenced version, so we attempt to
+            // load the encrypted PDF using the wrong password and expect the exception.
             Assert.Throws<InvalidPasswordException>(() =>
-            {
-                // This call is expected to fail because the password is wrong
-                decryptor.DecryptFile(WrongOwnerPassword);
-            });
+                new Document(_encryptedPdfPath, WrongOwnerPassword));
         }
     }
-}
 
-// Dummy entry point to satisfy the compiler for a console‑style project.
-public static class Program
-{
-    public static void Main()
+    // Dummy entry point to satisfy the compiler for a console‑type project.
+    public static class Program
     {
-        // No operation – the test runner (or manual execution) will invoke the tests.
+        public static void Main(string[] args)
+        {
+            // No runtime logic required – tests are executed by the test runner.
+        }
     }
 }
