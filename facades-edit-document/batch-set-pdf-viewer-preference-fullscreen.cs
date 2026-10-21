@@ -1,50 +1,47 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input directory containing PDF files
-        const string inputDir = "pdfs";
-        // Output directory for PDFs with full‑screen viewer preference
-        const string outputDir = "pdfs_fullscreen";
+        // Directory containing the PDF files to process
+        string directoryPath = @"C:\PdfFolder";
 
-        if (!Directory.Exists(inputDir))
+        if (!Directory.Exists(directoryPath))
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDir}");
+            Console.Error.WriteLine($"Directory not found: {directoryPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Instantiate a Facades class as required (no IDisposable, so no using)
+        PdfFileEditor editor = new PdfFileEditor();
 
-        // Process each PDF file in the input directory
-        foreach (string filePath in Directory.GetFiles(inputDir, "*.pdf"))
+        // Get all PDF files in the directory
+        string[] pdfFiles = Directory.GetFiles(directoryPath, "*.pdf");
+
+        foreach (string pdfPath in pdfFiles)
         {
             try
             {
-                // Initialize the facade and bind the source PDF
-                PdfContentEditor editor = new PdfContentEditor();
-                editor.BindPdf(filePath);
+                // Load each PDF, modify viewer preference, and save
+                using (Document doc = new Document(pdfPath))
+                {
+                    // Set the PDF to open in full‑screen mode
+                    doc.PageMode = PageMode.FullScreen;
 
-                // Set the viewer preference to full‑screen mode
-                editor.ChangeViewerPreference(ViewerPreference.PageModeFullScreen);
+                    // Overwrite the original file with the updated version
+                    doc.Save(pdfPath);
+                }
 
-                // Build the output file path (original name with "_full" suffix)
-                string fileName = Path.GetFileNameWithoutExtension(filePath);
-                string outPath = Path.Combine(outputDir, fileName + "_full.pdf");
-
-                // Save the modified PDF
-                editor.Save(outPath);
+                Console.WriteLine($"Updated: {Path.GetFileName(pdfPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{filePath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
-
-        Console.WriteLine("Batch viewer‑preference update completed.");
     }
 }

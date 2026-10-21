@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Net.Http;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -12,42 +11,39 @@ class Program
         const string outputPdf = "output.pdf";
         const string imageUrl = "https://example.com/logo.png";
 
-        // Verify source PDF exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Download the image safely
+        // Download the image from the external URL into a memory stream
         using (HttpClient httpClient = new HttpClient())
+        using (Stream imageStream = httpClient.GetStreamAsync(imageUrl).Result)
         {
-            HttpResponseMessage response = httpClient.GetAsync(imageUrl).Result;
-            if (!response.IsSuccessStatusCode)
+            // Load the PDF document
+            Document pdfDocument = new Document(inputPdf);
+
+            // Create an ImageStamp from the downloaded stream
+            ImageStamp stamp = new ImageStamp(imageStream)
             {
-                Console.Error.WriteLine($"Failed to download image. Status code: {response.StatusCode}");
-                return;
-            }
+                // Position the stamp (distance from left and bottom edges)
+                XIndent = 100,
+                YIndent = 500,
+                // Set desired size of the stamp
+                Width = 150,
+                Height = 50,
+                // Place the stamp over existing content
+                Background = false
+            };
 
-            using (Stream imageStream = response.Content.ReadAsStreamAsync().Result)
-            using (PdfFileStamp fileStamp = new PdfFileStamp())
-            {
-                // Initialize the facade with the source PDF (new API)
-                fileStamp.BindPdf(inputPdf);
+            // Apply the stamp to page 2 (pages are 1‑based)
+            pdfDocument.Pages[2].AddStamp(stamp);
 
-                // Create a stamp and bind the downloaded image
-                Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-                stamp.BindImage(imageStream);
-                stamp.SetOrigin(100, 500);          // X, Y position on the page
-                stamp.SetImageSize(150, 100);       // Width, Height of the stamp
-                stamp.IsBackground = false;        // Overlay the stamp
-                stamp.Pages = new int[] { 2 };      // Apply only to page 2
-
-                // Add the stamp and save the result (new API)
-                fileStamp.AddStamp(stamp);
-                fileStamp.Save(outputPdf);
-                fileStamp.Close(); // optional, Dispose will also close
-            }
+            // Save the modified PDF
+            pdfDocument.Save(outputPdf);
         }
+
+        Console.WriteLine($"Image stamp added to page 2 and saved as '{outputPdf}'.");
     }
 }

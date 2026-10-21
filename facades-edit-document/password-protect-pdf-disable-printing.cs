@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Security;
 
 class Program
 {
@@ -8,27 +9,29 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "protected.pdf";
-        const string userPassword = "user123";
-        const string ownerPassword = "admin456";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Load the PDF document
         Document doc = new Document(inputPath);
 
-        // Disable all privileged actions (including printing) by using no permission flags
-        Permissions perms = (Permissions)0; // equivalent to "no permissions"
+        // Define permissions – allow typical operations but disable printing.
+        // Use only enum members that exist in older Aspose.Pdf versions.
+        Permissions perms = Permissions.ModifyContent |
+                             Permissions.ExtractContent |
+                             Permissions.AssembleDocument;
+        // Note: Do NOT include Permissions.PrintDocument or Permissions.HighQualityPrint to keep printing disabled.
 
-        // Encrypt with 256‑bit AES algorithm
-        doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+        // Apply password protection (user password: user123, owner password: admin456)
+        doc.Encrypt("user123", "admin456", perms, CryptoAlgorithm.RC4x128);
 
         // Save the protected PDF
         doc.Save(outputPath);
 
-        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Password protection applied. Output saved to '{outputPath}'.");
     }
 }

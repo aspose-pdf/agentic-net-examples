@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -16,32 +17,50 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
-        using (Document doc = new Document(inputPath))
+        PdfContentEditor editor = null;
+        try
         {
-            PdfContentEditor editor = null;
-            try
-            {
-                // Create the facade and bind the loaded document
-                editor = new PdfContentEditor();
-                editor.BindPdf(doc);
+            // Create the PdfContentEditor instance (will be disposed in finally)
+            editor = new PdfContentEditor();
+            editor.BindPdf(inputPath);
 
-                // Example operation: replace all occurrences of "old" with "new"
-                editor.ReplaceText("old", "new");
+            // Load the PDF document using the high‑level Document API
+            Document doc = new Document(inputPath);
 
-                // Save the edited document
-                editor.Save(outputPath);
-            }
-            finally
+            // Create a text stamp to demonstrate editing
+            TextStamp textStamp = new TextStamp("Confidential")
             {
-                // Ensure the facade releases all resources, even if an exception occurs
-                if (editor != null)
-                {
-                    editor.Close(); // Disposes the bound Document within the facade
+                Background          = false,
+                Opacity             = 0.5,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
+                TextState = {
+                    FontSize   = 24,
+                    FontStyle  = FontStyles.Bold,
+                    Font       = FontRepository.FindFont("Arial")
                 }
+            };
+
+            // Apply the stamp to every page in the document
+            foreach (Page page in doc.Pages)
+            {
+                page.AddStamp(textStamp);
             }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            // Ensure the editor is disposed to free native resources
+            if (editor != null)
+                editor.Dispose();
         }
 
-        Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

@@ -1,69 +1,69 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF, attachment file, and output paths
-        const string inputPdf   = "input.pdf";
-        const string attachFile = "attachment.txt";
-        const string tempPdf    = "temp_with_attachments.pdf";
-        const string encryptedPdf = "encrypted_output.pdf";
+        const string inputPath      = "input.pdf";
+        const string outputPath     = "encrypted.pdf";
+        const string attachmentPath = "attachment.pdf";
+        const string userPassword   = "user123";
+        const string ownerPassword  = "owner123";
 
-        // Passwords and security settings
-        const string userPassword  = "user123";
-        const string ownerPassword = "owner123";
-
-        // Ensure input files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
-        if (!File.Exists(attachFile))
+        if (!File.Exists(attachmentPath))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachFile}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
-        // -------------------------------------------------
-        // 1. Add attachment and set viewer preferences
-        // -------------------------------------------------
-        using (PdfContentEditor editor = new PdfContentEditor())
+        try
         {
-            // Load the source PDF
-            editor.BindPdf(inputPdf);
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // ----- Add an attachment using EmbeddedFiles -----
+                var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath));
+                fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentPath));
+                doc.EmbeddedFiles.Add(fileSpec);
 
-            // Add a document attachment (no annotation)
-            editor.AddDocumentAttachment(attachFile, "Sample attachment");
+                // ----- Set viewer preferences (if supported by the library version) -----
+                try
+                {
+                    dynamic dynDoc = doc; // bypass compile‑time check
+                    var prefs = dynDoc.ViewerPreferences;
+                    prefs.HideToolbar      = true;
+                    prefs.HideMenubar      = true;
+                    prefs.FitWindow       = true;
+                    prefs.CenterWindow    = true;
+                    prefs.DisplayDocTitle = true;
+                }
+                catch (RuntimeBinderException)
+                {
+                    // ViewerPreferences property is not available in the referenced Aspose.Pdf version.
+                    Console.WriteLine("ViewerPreferences not supported by the current Aspose.Pdf library version; skipping this step.");
+                }
 
-            // Change viewer preferences (e.g., hide toolbar)
-            // ViewerPreference enum is in Aspose.Pdf.Facades namespace
-            editor.ChangeViewerPreference((int)ViewerPreference.HideToolbar);
+                // ----- Encrypt the document with a user password -----
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // Save the modified PDF to a temporary file
-            editor.Save(tempPdf);
+                // ----- Save the encrypted PDF -----
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
         }
-
-        // -------------------------------------------------
-        // 2. Encrypt the PDF with a user password
-        // -------------------------------------------------
-        using (PdfFileSecurity security = new PdfFileSecurity(tempPdf, encryptedPdf))
+        catch (Exception ex)
         {
-            // Encrypt using AES 256-bit with print permission
-            security.EncryptFile(
-                userPassword,
-                ownerPassword,
-                DocumentPrivilege.Print,
-                KeySize.x256);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        // Optional: clean up the intermediate file
-        try { File.Delete(tempPdf); } catch { /* ignore cleanup errors */ }
-
-        Console.WriteLine($"Encrypted PDF saved to '{encryptedPdf}'.");
     }
 }

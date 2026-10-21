@@ -1,12 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,16 +15,17 @@ class Program
             return;
         }
 
-        // Initialize the XMP metadata facade, bind the source PDF,
-        // add author and title fields, and save the result.
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            xmp.BindPdf(inputPath);                     // Load the PDF
-            xmp.Add("dc:creator", "John Doe");          // Author field
-            xmp.Add("dc:title", "Project Plan");        // Title field
-            xmp.Save(outputPath);                       // Write updated PDF
+            // Set author and title – these values are written to the XMP metadata automatically.
+            doc.Info.Author = "John Doe";
+            doc.Info.Title  = "Project Plan";
+
+            // Save the updated PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"XMP metadata added and saved to '{outputPath}'.");
+        Console.WriteLine($"XMP metadata (author, title) added and saved to '{outputPath}'.");
     }
 }

@@ -1,49 +1,58 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // for FormattedText, EncodingType
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string outputPdf = "output_with_header.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Insert a blank page at position 3 (pages are 1‑based)
-            // If the document has fewer than 2 pages, Insert will add at the end.
-            doc.Pages.Insert(3);
+            // -------------------------------------------------
+            // 1. Load the document and insert a blank page at position 3
+            // -------------------------------------------------
+            Document pdfDoc = new Document(inputPdf);
+            // Insert a new blank page before page 3 (1‑based index)
+            pdfDoc.Pages.Insert(3);
 
-            // Prepare header text using FormattedText (requires System.Drawing.Color)
-            FormattedText header = new FormattedText(
-                "Document Header",                     // text
-                System.Drawing.Color.DarkBlue,         // text color
-                "Helvetica",                           // font name
-                EncodingType.Winansi,                  // encoding
-                false,                                 // embed font?
-                14);                                   // font size
+            // -------------------------------------------------
+            // 2. Add a header text annotation on the newly inserted page
+            // -------------------------------------------------
+            // Aspose.Pdf uses a rectangle defined by lower‑left (llx,lly) and upper‑right (urx,ury)
+            // The original example used a 500pt wide × 30pt high box starting 50pt from the left
+            // and 800pt from the bottom. Convert that to the required coordinates:
+            //   llx = 50
+            //   lly = 800
+            //   urx = 50 + 500 = 550
+            //   ury = 800 + 30  = 830
+            var headerRect = new Aspose.Pdf.Rectangle(50, 800, 550, 830);
 
-            // Use PdfFileStamp facade to add the header to all pages
-            // (constructor with Document follows the provided creation pattern)
-            PdfFileStamp stamp = new PdfFileStamp(doc);
-            // Add header with a top margin of 20 points
-            stamp.AddHeader(header, 20);
-            // Save the modified PDF (facade handles saving)
-            stamp.Save(outputPath);
-            // Close the facade (releases internal resources)
-            stamp.Close();
+            var headerAnnotation = new TextAnnotation(pdfDoc.Pages[3], headerRect)
+            {
+                Title    = "Header",
+                Contents = "Document Header Text"
+            };
+            pdfDoc.Pages[3].Annotations.Add(headerAnnotation);
+
+            // -------------------------------------------------
+            // 3. Save the final PDF
+            // -------------------------------------------------
+            pdfDoc.Save(outputPdf);
+            Console.WriteLine($"Successfully created PDF with a blank page and header annotation: {outputPdf}");
         }
-
-        Console.WriteLine($"PDF saved with new page and header: '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

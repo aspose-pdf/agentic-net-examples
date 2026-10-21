@@ -1,13 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_popup.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "popup_annotated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,28 +16,33 @@ class Program
             return;
         }
 
-        // PdfContentEditor implements IDisposable, so use a using block for deterministic cleanup.
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Bind the existing PDF file to the editor.
-            editor.BindPdf(inputPath);
+            // Get the target page (1‑based index)
+            Page page = doc.Pages[1];
 
-            // Create a popup annotation.
-            // Rectangle(x, y, width, height) – coordinates are in points.
-            // Contents: text shown inside the popup.
-            // open: false – the popup is not displayed initially; it appears when the user hovers/clicks.
-            // page: 1‑based page number where the annotation will be placed.
-            editor.CreatePopup(
-                new System.Drawing.Rectangle(100, 500, 200, 100),
-                "This is a note that appears when you hover over the annotation.",
-                false,
-                1);
+            // Define the rectangle where the annotation icon will be placed
+            // (lower‑left X,Y, upper‑right X,Y) – coordinates are in points
+            var rect = new Rectangle(100, 700, 120, 720);
 
-            // Save the modified PDF.
-            editor.Save(outputPath);
-            // editor.Close() is called automatically by Dispose().
+            // Create a popup annotation. The PopupAnnotation class belongs to
+            // Aspose.Pdf.Annotations and is added directly to the page's Annotations collection.
+            // NOTE: PopupAnnotation does NOT expose a Title property (it is defined on MarkupAnnotation).
+            // Therefore we only set the Contents property here.
+            PopupAnnotation popup = new PopupAnnotation(page, rect)
+            {
+                Contents = "This is a hover note displayed in the popup."
+                // Title = "Note" // <-- removed: not available on PopupAnnotation
+            };
+
+            // Add the annotation to the page
+            page.Annotations.Add(popup);
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Popup annotation added. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Popup annotation added. Saved to '{outputPath}'.");
     }
 }

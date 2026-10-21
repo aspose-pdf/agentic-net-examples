@@ -10,48 +10,47 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Ensure the input PDF exists with at least four pages.
         if (!File.Exists(inputPath))
         {
-            using (Document placeholder = new Document())
-            {
-                // Add four blank pages.
-                for (int i = 0; i < 4; i++)
-                {
-                    placeholder.Pages.Add();
-                }
-                placeholder.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Load the source PDF.
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Multiline stamp content – use newline characters for separate lines.
-            string multilineText = "First line of stamp\nSecond line of stamp\nThird line of stamp";
-
-            // Create a TextStamp with the multiline text.
-            TextStamp stamp = new TextStamp(multilineText)
+            // Ensure the document has at least four pages
+            if (doc.Pages.Count < 4)
             {
+                Console.Error.WriteLine("The document contains fewer than 4 pages.");
+                return;
+            }
+
+            // Create a TextStamp with multiline content
+            TextStamp textStamp = new TextStamp("First line\r\nSecond line\r\nThird line")
+            {
+                // Align the stamp to the right side of the page
                 HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                BottomMargin = 10 // points from the bottom edge
+                // Align the stamp to the bottom of the page
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                // Optional margin from the bottom edge (in points)
+                BottomMargin        = 10,
+                // Optional margin from the right edge (in points)
+                RightMargin         = 10
             };
 
-            // Add the stamp only to page 4 (1‑based index).
-            if (doc.Pages.Count >= 4)
-            {
-                doc.Pages[4].AddStamp(stamp);
-            }
-            else
-            {
-                Console.Error.WriteLine("The document has fewer than 4 pages.");
-            }
+            // Configure the appearance of the text
+            textStamp.TextState.Font = FontRepository.FindFont("Arial");
+            textStamp.TextState.FontSize = 12;
+            textStamp.TextState.ForegroundColor = Color.Black;
 
-            // Save the modified PDF.
+            // Apply the stamp to page 4 (pages are 1‑based)
+            doc.Pages[4].AddStamp(textStamp);
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Text stamp applied to page 4 and saved as '{outputPath}'.");
+        Console.WriteLine($"Text stamp added to page 4 and saved as '{outputPath}'.");
     }
 }

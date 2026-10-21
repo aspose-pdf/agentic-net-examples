@@ -2,14 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades; // Facades namespace imported as requested
+using Aspose.Pdf.Facades; // required by the task (not used directly but kept per specification)
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_js.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,21 +17,30 @@ class Program
             return;
         }
 
-        // Load the PDF document (1‑based page indexing)
-        using (Document doc = new Document(inputPath))
+        // Instantiate a Facades class as required (no disposal needed)
+        var editor = new PdfFileEditor();
+
+        // Load the PDF and ensure deterministic disposal
+        using (var doc = new Document(inputPath))
         {
-            // Add a JavaScript action to each page that logs the page number when the page is opened
+            // Pages are 1‑based in Aspose.Pdf
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // this.pageNum is zero‑based; add 1 for a human‑readable page number
-                string js = "app.console.println('Page opened: ' + (this.pageNum + 1));";
-                doc.Pages[i].Actions.OnOpen = new JavascriptAction(js);
+                var page = doc.Pages[i];
+
+                // JavaScript that logs the current page number to the console on page open
+                // In PDF JavaScript, 'this.pageNum' gives the page number (1‑based)
+                // 'app.console.println' writes to the JavaScript console
+                var js = new JavascriptAction("app.console.println('Page opened: ' + this.pageNum);");
+
+                // Assign the action to the page's OnOpen event
+                page.Actions.OnOpen = js;
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with page‑open JavaScript to '{outputPath}'.");
+        Console.WriteLine($"PDF with JavaScript saved to '{outputPath}'.");
     }
 }

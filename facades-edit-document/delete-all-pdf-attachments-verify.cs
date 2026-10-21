@@ -1,46 +1,54 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_no_attachments.pdf";
 
+        // Ensure the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Delete all attachments using PdfContentEditor
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPath);
-        editor.DeleteAttachments();
-        editor.Save(outputPath);
-        Console.WriteLine($"Attachments deleted and saved to '{outputPath}'.");
+        // Work on a copy to keep the original file unchanged
+        File.Copy(inputPath, outputPath, true);
 
-        // Verify that the attachment count is zero using PdfExtractor
-        PdfExtractor extractor = new PdfExtractor();
-        extractor.BindPdf(outputPath);
-        // Extraction must be performed before retrieving attachment info
-        extractor.ExtractAttachment();
-        List<FileSpecification> attachmentInfo = extractor.GetAttachmentInfo();
+        // Load the PDF. Attachments are accessed via the EmbeddedFiles collection.
+        Document pdfDoc = new Document(outputPath);
 
-        int attachmentCount = attachmentInfo?.Count ?? 0;
-        Console.WriteLine($"Attachment count after deletion: {attachmentCount}");
-
-        if (attachmentCount == 0)
+        // Delete all embedded files (attachments) if any exist
+        if (pdfDoc.EmbeddedFiles != null && pdfDoc.EmbeddedFiles.Count > 0)
         {
-            Console.WriteLine("Verification succeeded: no attachments remain.");
+            // EmbeddedFileCollection uses 1‑based indexing. Iterate backwards and delete by name.
+            for (int i = pdfDoc.EmbeddedFiles.Count; i >= 1; i--)
+            {
+                var fileSpec = pdfDoc.EmbeddedFiles[i];
+                if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
+                {
+                    pdfDoc.EmbeddedFiles.Delete(fileSpec.Name);
+                }
+            }
+
+            // Save the document after removals
+            pdfDoc.Save(outputPath);
+        }
+
+        // Verify that no attachments remain
+        Document verifyDoc = new Document(outputPath);
+        int remaining = verifyDoc.EmbeddedFiles != null ? verifyDoc.EmbeddedFiles.Count : 0;
+        if (remaining == 0)
+        {
+            Console.WriteLine("All attachments deleted successfully. Count = 0.");
         }
         else
         {
-            Console.WriteLine("Verification failed: some attachments are still present.");
+            Console.WriteLine($"Deletion failed. Remaining attachments: {remaining}");
         }
     }
 }

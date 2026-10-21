@@ -1,12 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,20 +15,18 @@ class Program
             return;
         }
 
-        // Load the PDF and manipulate its XMP metadata using the Facades API
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-        {
-            // Bind the existing PDF document
-            xmp.BindPdf(inputPath);
+        // Load the PDF document
+        Document pdf = new Document(inputPath);
 
-            // Add a custom XMP field "Department" with the value "Finance"
-            // The "xmp:" prefix places the entry in the standard XMP namespace
-            xmp.Add("xmp:Department", "Finance");
+        // Register the PDF namespace (http://ns.adobe.com/pdf/1.3/) with a prefix
+        pdf.Metadata.RegisterNamespaceUri("pdf", "http://ns.adobe.com/pdf/1.3/");
 
-            // Save the updated PDF; the new XMP field will appear in the document properties
-            xmp.Save(outputPath);
-        }
+        // Add or replace the custom XMP property Department with value Finance
+        pdf.Metadata["pdf:Department"] = "Finance";
 
-        Console.WriteLine($"PDF saved with XMP metadata at '{outputPath}'.");
+        // Save the updated PDF
+        pdf.Save(outputPath);
+
+        Console.WriteLine($"XMP metadata 'Department=Finance' added. Output saved to '{outputPath}'.");
     }
 }

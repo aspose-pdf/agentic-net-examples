@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Text;                // For TextStamp and TextState
 
 class Program
 {
@@ -17,36 +16,44 @@ class Program
             return;
         }
 
-        // Load the source PDF
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the PdfFileStamp facade with the loaded document
-            PdfFileStamp fileStamp = new PdfFileStamp();
-            fileStamp.BindPdf(doc);
+            // Create a TextStamp that will act as the rotated annotation
+            TextStamp txtStamp = new TextStamp("Diagonal Note");
 
-            // Create a text stamp
-            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+            // -----------------------------------------------------------------
+            // Positioning – you can adjust XIndent/YIndent or use alignment flags.
+            // Here we place the stamp roughly at the centre of the first page.
+            // -----------------------------------------------------------------
+            txtStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            txtStamp.VerticalAlignment   = VerticalAlignment.Center;
+            // Optional fine‑tuning offsets (in points)
+            txtStamp.XIndent = 0;   // no extra horizontal offset
+            txtStamp.YIndent = 0;   // no extra vertical offset
 
-            // FormattedText requires System.Drawing.Color for the text color
-            FormattedText ft = new FormattedText(
-                "Rotated Text",                 // text
-                System.Drawing.Color.Black,     // text color
-                "Helvetica",                    // font name
-                EncodingType.Winansi,           // encoding
-                false,                          // embed font?
-                12);                            // font size
+            // -----------------------------------------------------------------
+            // Rotation – use RotateAngle (degrees) instead of the non‑existent
+            // Rotation property.
+            // -----------------------------------------------------------------
+            txtStamp.RotateAngle = 90f; // rotates 90 degrees clockwise
 
-            stamp.BindLogo(ft);
+            // -----------------------------------------------------------------
+            // Visual appearance – TextState is read‑only, so we modify the
+            // existing instance rather than assigning a new one.
+            // -----------------------------------------------------------------
+            txtStamp.TextState.FontSize   = 12;
+            txtStamp.TextState.FontStyle  = FontStyles.Bold;
+            txtStamp.TextState.Font       = FontRepository.FindFont("Arial");
+            txtStamp.Opacity               = 0.5;   // semi‑transparent background
+            txtStamp.Background            = true; // draw background rectangle
 
-            // Rotate the stamp 90 degrees
-            stamp.Rotation = 90f;
-
-            // Add the stamp to the document (default page is the first page)
-            fileStamp.AddStamp(stamp);
+            // Add the stamp to the first page (or iterate over pages as needed)
+            Page targetPage = doc.Pages[1];
+            targetPage.AddStamp(txtStamp);
 
             // Save the modified PDF
-            fileStamp.Save(outputPath);
-            fileStamp.Close();
+            doc.Save(outputPath);
         }
 
         Console.WriteLine($"Rotated text annotation saved to '{outputPath}'.");

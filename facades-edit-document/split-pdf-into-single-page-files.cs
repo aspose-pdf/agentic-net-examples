@@ -1,37 +1,52 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Path to the edited PDF that contains annotations
-        const string editedPdfPath = "edited.pdf";
+        const string inputPath = "edited.pdf";          // PDF that already contains annotations
+        const string outputDir = "SplitPages";          // folder for the single‑page PDFs
 
-        // Folder where the single‑page PDFs will be saved
-        const string outputFolder = "Pages";
-
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Template for the output files – %NUM% will be replaced by the page number
-        string fileNameTemplate = Path.Combine(outputFolder, "page%NUM%.pdf");
-
-        // Verify the source file exists
-        if (!File.Exists(editedPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {editedPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfFileEditor does not implement IDisposable, so we instantiate it directly
-        PdfFileEditor editor = new PdfFileEditor();
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Split the PDF into single‑page documents; each page (with its annotations) is saved
-        // to a separate file according to the template above.
-        editor.SplitToPages(editedPdfPath, fileNameTemplate);
+        try
+        {
+            // Split the source PDF into an array of MemoryStream, one per page.
+            // PdfFileEditor does not have a Split method; use SplitToPages instead.
+            PdfFileEditor editor = new PdfFileEditor();
+            MemoryStream[] pageStreams = editor.SplitToPages(inputPath);
 
-        Console.WriteLine("PDF has been split into individual pages.");
+            for (int i = 0; i < pageStreams.Length; i++)
+            {
+                // Reset stream position before reading
+                pageStreams[i].Position = 0;
+
+                // Load the individual page stream into a Document.
+                // This preserves any annotations that were on the page.
+                using (Document pageDoc = new Document(pageStreams[i]))
+                {
+                    string outPath = Path.Combine(outputDir, $"Page_{i + 1}.pdf");
+                    pageDoc.Save(outPath);
+                    Console.WriteLine($"Saved page {i + 1} → {outPath}");
+                }
+
+                // Dispose the stream now that we're done with it
+                pageStreams[i].Dispose();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

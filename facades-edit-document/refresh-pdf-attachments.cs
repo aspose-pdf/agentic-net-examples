@@ -1,58 +1,72 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPdf = "input.pdf";   // original PDF
+        const string outputPdf = "output.pdf"; // final PDF with new attachments
 
-        // Define the new attachments to add (file path and description)
-        var attachments = new[]
-        {
-            new { Path = "file1.txt", Description = "First attachment" },
-            new { Path = "file2.jpg", Description = "Second attachment" }
-        };
+        // Files to be attached to the PDF
+        string[] newAttachments = { "file1.txt", "image.png", "data.xml" };
 
-        // Verify the source PDF exists
+        // Verify that the source PDF exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Verify each attachment file exists before proceeding
-        foreach (var att in attachments)
+        // Verify that each attachment file exists
+        foreach (string att in newAttachments)
         {
-            if (!File.Exists(att.Path))
+            if (!File.Exists(att))
             {
-                Console.Error.WriteLine($"Attachment file not found: {att.Path}");
+                Console.Error.WriteLine($"Attachment file not found: {att}");
                 return;
             }
         }
 
-        // Create a PdfContentEditor facade to manipulate attachments
-        PdfContentEditor editor = new PdfContentEditor();
+        // Load the PDF document using Aspose.Pdf.Document
+        Document pdfDoc = new Document(inputPdf);
 
-        // Bind the existing PDF document
-        editor.BindPdf(inputPdf);
-
-        // Remove all existing attachments from the PDF
-        editor.DeleteAttachments();
-
-        // Add the new set of attachments
-        foreach (var att in attachments)
+        // -----------------------------------------------------------------
+        // 1. Remove all existing embedded files (if any).
+        // -----------------------------------------------------------------
+        if (pdfDoc.EmbeddedFiles != null && pdfDoc.EmbeddedFiles.Count > 0)
         {
-            editor.AddDocumentAttachment(att.Path, att.Description);
+            // EmbeddedFileCollection uses 1‑based indexing. Delete by name starting from the end.
+            for (int i = pdfDoc.EmbeddedFiles.Count; i >= 1; i--)
+            {
+                var existingSpec = pdfDoc.EmbeddedFiles[i];
+                if (existingSpec != null && !string.IsNullOrEmpty(existingSpec.Name))
+                {
+                    pdfDoc.EmbeddedFiles.Delete(existingSpec.Name);
+                }
+            }
         }
 
-        // Save the updated PDF to a new file
-        editor.Save(outputPdf);
+        // -----------------------------------------------------------------
+        // 2. Add the fresh set of attachments as embedded files.
+        // -----------------------------------------------------------------
+        foreach (string attPath in newAttachments)
+        {
+            // Create a FileSpecification for the file (name only constructor).
+            var fileSpec = new FileSpecification(Path.GetFileName(attPath));
+            // Load the file content into a memory stream.
+            fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attPath));
+            // Optionally set MIME type (helps some PDF viewers).
+            // fileSpec.MIMEType = MimeMapping.GetMimeMapping(attPath);
+            // Add to the EmbeddedFiles collection.
+            pdfDoc.EmbeddedFiles.Add(fileSpec);
+        }
 
-        // Close the facade (releases resources)
-        editor.Close();
+        // Save the updated PDF
+        if (File.Exists(outputPdf))
+            File.Delete(outputPdf);
+        pdfDoc.Save(outputPdf);
 
         Console.WriteLine($"All attachments refreshed. Output saved to '{outputPdf}'.");
     }

@@ -1,90 +1,78 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging; // for ImageFormat
+using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades;          // PdfExtractor lives here
+using Aspose.Pdf.Drawing;          // ImageStamp lives here
 
 class ImageCatalogGenerator
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "catalog.pdf";
-        const string tempFolderPath = "extracted_images";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "catalog.pdf";
 
-        // Validate input
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure temporary folder exists
-        Directory.CreateDirectory(tempFolderPath);
+        // -----------------------------------------------------------------
+        // 1. Extract all images from the source PDF using PdfExtractor.
+        // -----------------------------------------------------------------
+        List<byte[]> extractedImages = new List<byte[]>();
 
-        // -----------------------------------------------------------------
-        // Step 1: Extract all images from the source PDF using PdfExtractor
-        // -----------------------------------------------------------------
         using (PdfExtractor extractor = new PdfExtractor())
         {
             extractor.BindPdf(inputPdfPath);
             extractor.ExtractImage();
 
-            int imageIndex = 1;
             while (extractor.HasNextImage())
             {
-                // Save each image as PNG (you can choose other formats)
-                string imageFile = Path.Combine(tempFolderPath, $"image_{imageIndex}.png");
-                extractor.GetNextImage(imageFile, ImageFormat.Png);
-                imageIndex++;
-            }
-        }
-
-        // -----------------------------------------------------------------
-        // Step 2: Build a new PDF catalog with thumbnail previews
-        // -----------------------------------------------------------------
-        using (Document catalogDoc = new Document())
-        {
-            // Get list of extracted image files
-            string[] imageFiles = Directory.GetFiles(tempFolderPath, "*.png");
-
-            foreach (string imgPath in imageFiles)
-            {
-                // Add a new page for each thumbnail
-                Page page = catalogDoc.Pages.Add();
-
-                // Create an Aspose.Pdf.Image and point it to the extracted file
-                Aspose.Pdf.Image pdfImage = new Aspose.Pdf.Image
+                // Get the next image into a memory stream (newer API requires a stream).
+                using (MemoryStream imgStream = new MemoryStream())
                 {
-                    File = imgPath,
-                    // Set a reasonable thumbnail size (e.g., 200x200 points)
-                    FixWidth = 200,
-                    FixHeight = 200,
-                    // Center the image on the page
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Center
-                };
+                    extractor.GetNextImage(imgStream);
+                    extractedImages.Add(imgStream.ToArray());
+                }
+            }
+        }
 
-                // Add the image to the page's content
-                page.Paragraphs.Add(pdfImage);
+        // -----------------------------------------------------------------
+        // 2. Create a new PDF document that will serve as the image catalog.
+        // -----------------------------------------------------------------
+        using (Document catalog = new Document())
+        {
+            // For each extracted image, add a new page with a thumbnail.
+            foreach (byte[] imgData in extractedImages)
+            {
+                // Add a blank page to the catalog.
+                Page page = catalog.Pages.Add();
+
+                // Create a memory stream for the image data.
+                using (MemoryStream imgStream = new MemoryStream(imgData))
+                {
+                    // Create an ImageStamp from the stream (Aspose.Pdf.Drawing namespace).
+                    ImageStamp stamp = new ImageStamp(imgStream)
+                    {
+                        // Set thumbnail width; height scales proportionally.
+                        Width = 200,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        // Ensure the stamp is placed over page content.
+                        Background = false
+                    };
+
+                    // Place the stamp on the page.
+                    page.AddStamp(stamp);
+                }
             }
 
-            // Save the catalog PDF
-            catalogDoc.Save(outputPdfPath);
+            // Save the catalog PDF.
+            catalog.Save(outputPdfPath);
         }
 
-        // -----------------------------------------------------------------
-        // Optional: Clean up temporary extracted images
-        // -----------------------------------------------------------------
-        try
-        {
-            Directory.Delete(tempFolderPath, recursive: true);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to delete temporary folder: {ex.Message}");
-        }
-
-        Console.WriteLine($"Image catalog created at '{outputPdfPath}'.");
+        Console.WriteLine($"Image catalog created: {outputPdfPath}");
     }
 }

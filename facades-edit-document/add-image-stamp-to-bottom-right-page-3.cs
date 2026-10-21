@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string inputPdf  = "input.pdf";
+        const string logoImage = "logo.png";
         const string outputPdf = "output.pdf";
-        const string logoPath  = "logo.png";
 
         if (!File.Exists(inputPdf))
         {
@@ -17,49 +16,40 @@ class Program
             return;
         }
 
-        if (!File.Exists(logoPath))
+        if (!File.Exists(logoImage))
         {
-            Console.Error.WriteLine($"Logo image not found: {logoPath}");
+            Console.Error.WriteLine($"Logo image not found: {logoImage}");
             return;
         }
 
-        // Load the PDF to obtain the size of page 3
+        // Load the PDF document inside a using block for deterministic disposal.
         using (Document doc = new Document(inputPdf))
         {
+            // Ensure the document has at least three pages.
             if (doc.Pages.Count < 3)
             {
                 Console.Error.WriteLine("The PDF does not contain a third page.");
                 return;
             }
 
-            Page page3 = doc.Pages[3];
-            double pageWidth  = page3.PageInfo.Width;
-            double pageHeight = page3.PageInfo.Height;
+            // Create an image stamp from the logo file.
+            ImageStamp logoStamp = new ImageStamp(logoImage)
+            {
+                // Align the stamp to the bottom‑right corner.
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                // Optional margins from the page edges.
+                BottomMargin = 10,
+                RightMargin  = 10
+            };
 
-            // Desired stamp dimensions (adjust as needed)
-            double stampWidth  = 100; // points
-            double stampHeight = 50;  // points
+            // Add the stamp to page 3 using the high‑level Document API.
+            doc.Pages[3].AddStamp(logoStamp);
 
-            // Origin for bottom‑right corner (lower‑left corner of the stamp)
-            double originX = pageWidth - stampWidth; // right edge minus stamp width
-            double originY = 0;                       // bottom edge
-
-            // Create and configure the image stamp
-            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-            stamp.BindImage(logoPath);                                 // set image source
-            stamp.SetImageSize((float)stampWidth, (float)stampHeight); // set size
-            stamp.SetOrigin((float)originX, (float)originY);           // set position
-            stamp.IsBackground = false;                               // place on top (default)
-            stamp.Pages = new int[] { 3 };                            // affect only page 3
-
-            // Apply the stamp using the PdfFileStamp facade
-            PdfFileStamp fileStamp = new PdfFileStamp();
-            fileStamp.InputFile  = inputPdf;
-            fileStamp.OutputFile = outputPdf;
-            fileStamp.AddStamp(stamp);
-            fileStamp.Close(); // finalize and save
+            // Save the modified PDF.
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image stamp added to page 3 and saved as '{outputPdf}'.");
+        Console.WriteLine($"Stamp applied and saved to '{outputPdf}'.");
     }
 }

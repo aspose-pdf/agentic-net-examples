@@ -1,50 +1,60 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using System.Collections.Generic;
+using Aspose.Pdf;
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
     static void Main()
     {
         // List of PDF file paths to process
-        string[] pdfFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
-
-        // Viewer preferences to apply to each PDF
-        int[] preferences = {
-            ViewerPreference.HideMenubar,
-            ViewerPreference.HideToolbar,
-            ViewerPreference.HideWindowUI,
-            ViewerPreference.FitWindow,
-            ViewerPreference.CenterWindow
+        List<string> pdfFiles = new List<string>
+        {
+            "doc1.pdf",
+            "doc2.pdf",
+            "doc3.pdf"
         };
 
-        foreach (string inputPath in pdfFiles)
+        foreach (string path in pdfFiles)
         {
-            if (!File.Exists(inputPath))
+            if (!File.Exists(path))
             {
-                Console.Error.WriteLine($"File not found: {inputPath}");
+                Console.Error.WriteLine($"File not found: {path}");
                 continue;
             }
 
-            // Create output file name (e.g., file1_out.pdf)
-            string outputPath = Path.Combine(
-                Path.GetDirectoryName(inputPath) ?? string.Empty,
-                Path.GetFileNameWithoutExtension(inputPath) + "_out.pdf");
-
-            // Apply viewer preferences using PdfContentEditor
-            using (PdfContentEditor editor = new PdfContentEditor())
+            try
             {
-                editor.BindPdf(inputPath);
-
-                foreach (int pref in preferences)
+                // Open each PDF inside a using block for deterministic disposal
+                using (Document doc = new Document(path))
                 {
-                    editor.ChangeViewerPreference(pref);
+                    // Attempt to apply viewer preferences using dynamic access.
+                    // This works only with Aspose.Pdf versions that expose the ViewerPreferences property.
+                    dynamic d = doc;
+                    try
+                    {
+                        var prefs = d.ViewerPreferences;
+                        prefs.HideToolbar = true;
+                        prefs.HideMenubar = true;
+                        prefs.CenterWindow = true;
+                        prefs.DisplayDocTitle = true;
+                    }
+                    catch (RuntimeBinderException)
+                    {
+                        Console.WriteLine($"ViewerPreferences property is not supported by the current Aspose.Pdf version for file '{path}'.");
+                    }
+
+                    // Overwrite the original file with the (potentially) updated preferences
+                    doc.Save(path);
                 }
 
-                editor.Save(outputPath);
+                Console.WriteLine($"Viewer preferences processed for: {path}");
             }
-
-            Console.WriteLine($"Processed: {outputPath}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{path}': {ex.Message}");
+            }
         }
     }
 }

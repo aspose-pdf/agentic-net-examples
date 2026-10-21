@@ -1,43 +1,51 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations; // Needed for JavascriptAction
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_js.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the PDF content editor facade
-        PdfContentEditor editor = new PdfContentEditor();
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // JavaScript that recalculates Total = Quantity * Price whenever Quantity changes
+            string js = @"
+                var qty   = this.getField('Quantity').value;
+                var price = this.getField('Price').value;
+                // Ensure numeric calculation
+                qty   = parseFloat(qty)   || 0;
+                price = parseFloat(price) || 0;
+                this.getField('Total').value = qty * price;
+            ";
 
-        // Bind the existing PDF document
-        editor.BindPdf(inputPdf);
+            // Attach the script to the Quantity field's calculation event (value change)
+            var quantityField = doc.Form["Quantity"] as TextBoxField;
+            if (quantityField != null)
+            {
+                // Use a JavascriptAction and a supported action property (OnCalculate)
+                quantityField.Actions.OnCalculate = new JavascriptAction(js);
+            }
+            else
+            {
+                Console.Error.WriteLine("Quantity field not found or is not a TextBoxField.");
+            }
 
-        // JavaScript that assigns a Calculate action to the "Quantity" field.
-        // It multiplies the value of the "Price" field by the value of the "Quantity" field
-        // and stores the result in the "Total" field (or updates the same field).
-        string jsCode = @"
-            var qtyField = this.getField('Quantity');
-            qtyField.setAction('Calculate', 
-                'var price = this.getField(""Price"").value; ' +
-                'var quantity = this.getField(""Quantity"").value; ' +
-                'event.value = price * quantity;');
-        ";
+            // Persist the changes
+            doc.Save(outputPath);
+        }
 
-        // Add the JavaScript to be executed when the document is opened.
-        editor.AddDocumentAdditionalAction(PdfContentEditor.DocumentOpen, jsCode);
-
-        // Save the modified PDF
-        editor.Save(outputPdf);
-
-        Console.WriteLine($"PDF saved with JavaScript action: {outputPdf}");
+        Console.WriteLine($"PDF with JavaScript saved to '{outputPath}'.");
     }
 }

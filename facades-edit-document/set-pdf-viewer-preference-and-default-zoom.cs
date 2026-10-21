@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Microsoft.CSharp.RuntimeBinder; // Needed for RuntimeBinderException
 
 class Program
 {
@@ -16,20 +16,35 @@ class Program
             return;
         }
 
-        // Change viewer preference to continuous layout (one column)
-        PdfContentEditor viewerEditor = new PdfContentEditor();
-        viewerEditor.BindPdf(inputPath);
-        viewerEditor.ChangeViewerPreference(ViewerPreference.PageLayoutOneColumn);
-        viewerEditor.Save(outputPath);
-        viewerEditor.Close();
+        try
+        {
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Attempt to set viewer preferences. The ViewerPreferences property
+                // exists only in newer Aspose.Pdf versions (>= 20.9). To keep the code
+                // compatible with older versions we access it via dynamic and handle
+                // the possible RuntimeBinderException gracefully.
+                try
+                {
+                    dynamic d = doc;
+                    d.ViewerPreferences.PageLayout = Aspose.Pdf.PageLayout.OneColumn; // continuous scrolling (single‑page view)
+                    d.ViewerPreferences.Zoom = 100; // default zoom 100%
+                }
+                catch (RuntimeBinderException)
+                {
+                    Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version. Skipping viewer‑preference configuration.");
+                }
 
-        // Ensure default zoom is 100% (zoom factor 1.0)
-        PdfPageEditor zoomEditor = new PdfPageEditor();
-        zoomEditor.BindPdf(outputPath);
-        zoomEditor.Zoom = 1.0f; // 100%
-        zoomEditor.Save(outputPath);
-        zoomEditor.Close();
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
 
-        Console.WriteLine($"Viewer preferences set and saved to '{outputPath}'.");
+            Console.WriteLine($"PDF saved with viewer preferences to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

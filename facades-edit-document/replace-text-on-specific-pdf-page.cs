@@ -1,16 +1,17 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string srcText    = "TextToReplace";   // text to find
-        const string destText   = "NewText";         // replacement text
+        const string oldText = "OldText";
+        const string newText = "NewText";
+        const int targetPage = 3; // 1‑based page number
 
         if (!File.Exists(inputPath))
         {
@@ -18,20 +19,42 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Initialize the PdfContentEditor facade and bind the document
-            PdfContentEditor editor = new PdfContentEditor();
-            editor.BindPdf(doc);
+            // Load the PDF document using the high‑level API (Document)
+            Document pdf = new Document(inputPath);
 
-            // Replace text only on page 3 (Aspose.Pdf uses 1‑based page indexing)
-            editor.ReplaceText(srcText, 3, destText);
+            // Ensure the requested page exists
+            if (targetPage < 1 || targetPage > pdf.Pages.Count)
+            {
+                Console.Error.WriteLine($"Page {targetPage} is out of range. Document has {pdf.Pages.Count} pages.");
+                return;
+            }
+
+            // Create a TextFragmentAbsorber that will find the text to replace
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber(oldText);
+            // (Optional) make the search case‑sensitive or enable other options here
+            // absorber.TextSearchOptions = new TextSearchOptions(true);
+
+            // Search only on the specified page
+            pdf.Pages[targetPage].Accept(absorber);
+
+            // Replace each found fragment with the new text
+            int replaceCount = 0;
+            foreach (TextFragment fragment in absorber.TextFragments)
+            {
+                fragment.Text = newText;
+                replaceCount++;
+            }
 
             // Save the modified document
-            doc.Save(outputPath);
-        }
+            pdf.Save(outputPath);
 
-        Console.WriteLine($"Replacement completed. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Replaced '{oldText}' with '{newText}' on page {targetPage} ({replaceCount} occurrence(s)). Saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"An error occurred: {ex.Message}");
+        }
     }
 }

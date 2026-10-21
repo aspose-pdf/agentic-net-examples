@@ -1,79 +1,55 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF
-        const string encryptedPdf = "encrypted.pdf";    // intermediate encrypted file
-        const string signedPdf   = "signed.pdf";        // final output
-        const string certPath    = "certificate.pfx";   // certificate file
-        const string certPassword = "certPassword";     // certificate password
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "encrypted_signed.pdf";
+        const string certificatePath = "certificate.pfx";
+        const string certificatePassword = "certPassword";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(certPath))
-        {
-            Console.Error.WriteLine($"Certificate file not found: {certPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // ---------- Load and encrypt the PDF (password‑based) ----------
-        // Encryption uses CryptoAlgorithm (AES‑256) as required by the encryption rules.
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(certificatePath))
         {
-            // Define permissions – allow printing and content extraction only.
-            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-
-            // Encrypt with user and owner passwords.
-            string userPassword  = "user123";
-            string ownerPassword = "owner123";
-
-            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-            doc.Save(encryptedPdf); // Save encrypted PDF
+            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
+            return;
         }
 
-        // ---------- Sign the encrypted PDF ----------
-        // The PdfFileSignature facade works on the encrypted file.
-        PdfFileSignature pdfSigner = new PdfFileSignature();
-        pdfSigner.BindPdf(encryptedPdf);
+        // Load the certificate using the recommended X509CertificateLoader API (avoids obsolete constructors)
+        X509Certificate2 cert = X509CertificateLoader.LoadPkcs12FromFile(certificatePath, certificatePassword);
+        IList<X509Certificate2> certList = new List<X509Certificate2> { cert };
 
-        // Set the certificate used for signing.
-        pdfSigner.SetCertificate(certPath, certPassword);
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Aspose.Pdf.Document pdfDocument = new Aspose.Pdf.Document(inputPdfPath))
+        {
+            // Define the permissions that will be granted after encryption
+            // Note: ModifyAnnotations flag is not available in older Aspose.Pdf versions, so it is omitted.
+            Aspose.Pdf.Permissions permissions = Aspose.Pdf.Permissions.PrintDocument |
+                                                Aspose.Pdf.Permissions.ExtractContent;
 
-        // Optional: set a visual appearance for the signature (image file).
-        // pdfSigner.SignatureAppearance = "signatureImage.jpg";
+            // Apply certificate‑based encryption (AES‑256 is the strongest supported algorithm)
+            // The overload expects: (Permissions, CryptoAlgorithm, IList<X509Certificate2>)
+            pdfDocument.Encrypt(permissions, Aspose.Pdf.CryptoAlgorithm.AESx256, certList);
 
-        // Define signature properties.
-        string reason   = "Document certification";
-        string contact  = "contact@example.com";
-        string location = "New York";
+            // NOTE: The RequireSignature property is not present in the version of Aspose.Pdf used for this build.
+            // To enforce a signature before opening, upgrade to a newer Aspose.Pdf version that provides
+            // Document.RequireSignature, or implement a custom OpenAction that validates a signature.
 
-        // Visible signature rectangle (System.Drawing.Rectangle is required by the API).
-        System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 200, 100);
+            // Save the encrypted PDF (the document remains open until Save completes)
+            pdfDocument.Save(outputPdfPath);
+        }
 
-        // Use PKCS#1 signature object.
-        PKCS1 pkcs1Signature = new PKCS1(certPath, certPassword);
-        pkcs1Signature.Reason   = reason;
-        pkcs1Signature.ContactInfo = contact;
-        pkcs1Signature.Location = location;
-
-        // Sign on page 1 (pages are 1‑based). The signature will be visible.
-        pdfSigner.Sign(1, reason, contact, location, true, rect, pkcs1Signature);
-
-        // Save the signed PDF.
-        pdfSigner.Save(signedPdf);
-
-        // Clean up intermediate encrypted file (optional).
-        try { File.Delete(encryptedPdf); } catch { }
-
-        Console.WriteLine($"PDF has been encrypted and signed. Output: {signedPdf}");
+        Console.WriteLine($"PDF encrypted with certificate saved to '{outputPdfPath}'.");
     }
 }

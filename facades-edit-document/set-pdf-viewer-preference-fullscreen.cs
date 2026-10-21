@@ -1,44 +1,66 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
+// The Microsoft.CSharp.RuntimeBinder namespace is required only if you reference the RuntimeBinderException type explicitly.
+// It is safe to include it; the compiler will ignore it if the assembly is not referenced.
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_fullscreen.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "fullscreen_output.pdf";
 
-        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Create the facade for content editing
-            PdfContentEditor editor = new PdfContentEditor();
+            bool preferenceSet = false;
 
-            // Load the PDF document into the editor
-            editor.BindPdf(inputPath);
+            // Attempt to use the ViewerPreferences property (available in newer Aspose.Pdf versions).
+            // If the property does not exist (older versions), fall back to a JavaScript OpenAction that forces full‑screen.
+            try
+            {
+                // "dynamic" bypasses compile‑time member checking.
+                dynamic dynDoc = doc;
+                dynDoc.ViewerPreferences.FullScreen = true;
+                preferenceSet = true;
+            }
+            catch (RuntimeBinderException)
+            {
+                // ViewerPreferences is not supported – use JavaScript as an alternative.
+                try
+                {
+                    doc.OpenAction = new JavascriptAction("this.fullScreen = true;");
+                    preferenceSet = true;
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Failed to set full‑screen via JavaScript: {ex.Message}");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Any other unexpected exception while accessing ViewerPreferences.
+                Console.Error.WriteLine($"Unexpected error when setting ViewerPreferences: {ex.Message}");
+            }
 
-            // Activate full‑screen viewer preference (no UI elements)
-            editor.ChangeViewerPreference(ViewerPreference.PageModeFullScreen);
+            if (!preferenceSet)
+            {
+                Console.Error.WriteLine("Full‑screen preference could not be applied. The PDF will be saved without it.");
+            }
 
             // Save the modified PDF
-            editor.Save(outputPath);
-
-            // Release resources held by the facade
-            editor.Close();
-
-            Console.WriteLine($"PDF saved with full‑screen mode: '{outputPath}'.");
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF saved{(File.Exists(outputPath) ? " with" : " without")} FullScreen preference: {outputPath}");
     }
 }

@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using System.Drawing; // required for Color in PdfContentEditor
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -10,39 +9,30 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string url = "https://docs.aspose.com/pdf/net/";
+        const string helpUrl = "https://example.com/documentation";
 
+        // Ensure the input PDF exists – create a minimal one if it does not.
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            using var placeholder = new Document();
+            placeholder.Pages.Add(); // at least one page
+            placeholder.Save(inputPath);
         }
 
-        // Load the PDF document (lifecycle: create, load, save)
-        using (Document doc = new Document(inputPath))
+        // Load the existing PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        // Create a bookmark (outline item) that opens an external URL
+        var helpBookmark = new OutlineItemCollection(pdfDocument.Outlines)
         {
-            // Initialize the Facade editor
-            using (PdfContentEditor editor = new PdfContentEditor())
-            {
-                // Bind the loaded document to the editor
-                editor.BindPdf(doc);
+            Title = "Help",
+            Action = new GoToURIAction(helpUrl)
+        };
 
-                // Create a bookmark named "Help" that opens the specified URL
-                // Parameters: title, color (System.Drawing.Color), bold, italic, file (null for URI), action type, destination URL
-                editor.CreateBookmarksAction(
-                    title: "Help",
-                    color: System.Drawing.Color.Black,
-                    boldFlag: true,
-                    italicFlag: false,
-                    file: null,
-                    actionType: "URI",
-                    destination: url);
+        // Add the bookmark to the document's outline tree
+        pdfDocument.Outlines.Add(helpBookmark);
 
-                // Save the modified PDF (lifecycle: save)
-                editor.Save(outputPath);
-            }
-        }
-
-        Console.WriteLine($"Bookmark added and saved to '{outputPath}'.");
+        // Save the modified PDF
+        pdfDocument.Save(outputPath);
     }
 }

@@ -8,27 +8,46 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string attachmentName = "OldReport.pdf";
+        const string attachmentToRemove = "OldReport.pdf";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
         try
         {
             // Load the PDF document
-            using (Document doc = new Document(inputPath))
-            {
-                // Remove the specific attachment (if it exists)
-                doc.EmbeddedFiles.Delete(attachmentName);
+            Document pdfDoc = new Document(inputPath);
 
-                // Save the updated PDF
-                doc.Save(outputPath);
+            // Remove the embedded file (attachment) if it exists
+            bool removed = false;
+            if (pdfDoc.EmbeddedFiles != null && pdfDoc.EmbeddedFiles.Count > 0)
+            {
+                // EmbeddedFileCollection uses 1‑based indexing
+                for (int i = pdfDoc.EmbeddedFiles.Count; i >= 1; i--)
+                {
+                    FileSpecification fileSpec = pdfDoc.EmbeddedFiles[i];
+                    if (fileSpec != null &&
+                        string.Equals(fileSpec.Name, attachmentToRemove, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Delete by name – there is no RemoveAt method
+                        pdfDoc.EmbeddedFiles.Delete(fileSpec.Name);
+                        removed = true;
+                        break;
+                    }
+                }
             }
 
-            Console.WriteLine($"Attachment '{attachmentName}' removed. Saved to '{outputPath}'.");
+            Console.WriteLine(removed
+                ? $"Attachment '{attachmentToRemove}' removed."
+                : $"Attachment '{attachmentToRemove}' not found.");
+
+            // Save the modified PDF to a new file
+            pdfDoc.Save(outputPath);
+            Console.WriteLine($"Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

@@ -16,38 +16,38 @@ class Program
             return;
         }
 
-        // Load the PDF document.
-        Document pdf = new Document(inputPath);
-
-        // Define rectangle bounds (lower‑left X/Y and upper‑right X/Y) in points.
-        int x = 100;
-        int y = 500;
-        int width = 200;
-        int height = 100;
-        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(x, y, x + width, y + height);
-
-        // Create a square (rectangle) annotation on the first page.
-        SquareAnnotation square = new SquareAnnotation(pdf.Pages[1], rect)
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            Contents = "Dashed rectangle",          // Tooltip text
-            Color = Aspose.Pdf.Color.Blue           // Border color
-        };
+            // Get the first page where the annotation will be placed
+            Page page = doc.Pages[1];
 
-        // Configure a dashed border: width = 2 points, dash pattern = {3,2}.
-        // In recent Aspose.PDF versions the BorderStyle property was removed.
-        // A dashed appearance is achieved by setting the Dash array.
-        square.Border = new Border(square)
-        {
-            Width = 2
-        };
-        square.Border.Dash = new Dash(new int[] { 3, 2 });
+            // Define rectangle coordinates (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
 
-        // Add the annotation to the page.
-        pdf.Pages[1].Annotations.Add(square);
+            // Use SquareAnnotation (the correct class for rectangular annotations)
+            SquareAnnotation square = new SquareAnnotation(page, rect)
+            {
+                Title = "Note",
+                Contents = "Dashed border example",
+                // Border color is set via the annotation's Color property
+                Color = Aspose.Pdf.Color.Blue
+            };
 
-        // Save the modified PDF.
-        pdf.Save(outputPath);
+            // Configure a dashed border. Border requires the parent annotation in its constructor.
+            square.Border = new Border(square)
+            {
+                Style = BorderStyle.Dashed,
+                Width = 2
+            };
 
-        Console.WriteLine($"Dashed rectangle annotation saved to '{outputPath}'.");
+            // Attach the annotation to the page
+            page.Annotations.Add(square);
+
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Saved PDF with dashed rectangle annotation to '{outputPath}'.");
     }
 }

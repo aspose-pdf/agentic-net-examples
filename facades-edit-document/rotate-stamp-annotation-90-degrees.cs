@@ -1,50 +1,47 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string stampImage = "stamp.jpg";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(stampImage))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImage}");
-            return;
-        }
+            // Choose the page where the stamp will be placed (first page in this example)
+            Page page = doc.Pages[1];
 
-        // Initialize the facade and bind the source PDF
-        using (PdfFileStamp fileStamp = new PdfFileStamp())
-        {
-            fileStamp.BindPdf(inputPdf);
+            // Define the rectangle that matches the underlying image position.
+            // Fully qualified type name avoids ambiguity with System.Drawing.Rectangle.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create a stamp, bind the image, and rotate it 90 degrees clockwise
-            Stamp stamp = new Stamp();
-            stamp.BindImage(stampImage);
-            stamp.Rotation = 90f; // clockwise rotation
+            // Create a TextStamp – we only need the annotation box, so the text is empty.
+            TextStamp stamp = new TextStamp(" ");
+            stamp.Width = rect.Width;          // set stamp width
+            stamp.Height = rect.Height;        // set stamp height
+            stamp.XIndent = rect.LLX;          // horizontal position (left)
+            stamp.YIndent = rect.LLY;          // vertical position (bottom)
+            stamp.RotateAngle = 90f;           // rotate 90° clockwise around the stamp centre
+            stamp.Opacity = 0;                 // make the visual part invisible (only the annotation remains)
 
-            // Optional: set position and size of the stamp
-            stamp.SetOrigin(100, 100);
-            stamp.SetImageSize(200, 200);
-            stamp.IsBackground = false; // place stamp above page content
-
-            // Add the configured stamp to the PDF
-            fileStamp.AddStamp(stamp);
+            // Add the stamp to the page – this creates a StampAnnotation internally.
+            page.AddStamp(stamp);
 
             // Save the modified PDF
-            fileStamp.Save(outputPdf);
-            fileStamp.Close();
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Stamp annotation rotated and saved to '{outputPath}'.");
     }
 }

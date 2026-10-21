@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -9,36 +8,38 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "reordered.pdf";
-        const string tempExtract = "lastpage_temp.pdf";
-        const string tempInserted = "inserted_temp.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Determine total number of pages in the source PDF
-        int pageCount;
-        using (Document srcDoc = new Document(inputPath))
+        // Load the document inside a using block (lifecycle rule)
+        using (Document doc = new Document(inputPath))
         {
-            pageCount = srcDoc.Pages.Count; // 1‑based indexing
+            int pageCount = doc.Pages.Count;
+
+            // If the document has 0 or 1 pages, just copy it to the output path
+            if (pageCount <= 1)
+            {
+                // Ensure the original file is copied unchanged
+                File.Copy(inputPath, outputPath, overwrite: true);
+                Console.WriteLine("Document has zero or one page; copied without changes.");
+                return;
+            }
+
+            // Reorder: move the last page to the beginning
+            // 1‑based indexing: Pages[pageCount] is the last page
+            Page lastPage = doc.Pages[pageCount];
+            // Remove the last page from its original position
+            doc.Pages.Delete(pageCount);
+            // Insert it at position 1 (the beginning)
+            doc.Pages.Insert(1, lastPage);
+
+            // Save the reordered document
+            doc.Save(outputPath);
         }
-
-        // Step 1: Extract the last page to a temporary PDF
-        PdfFileEditor editor = new PdfFileEditor();
-        editor.Extract(inputPath, new int[] { pageCount }, tempExtract);
-
-        // Step 2: Insert the extracted page at the beginning of the original PDF
-        // InsertLocation = 0 inserts before the first page
-        editor.Insert(inputPath, 0, tempExtract, new int[] { 1 }, tempInserted);
-
-        // Step 3: Delete the original last page (now at position pageCount + 1)
-        editor.Delete(tempInserted, new int[] { pageCount + 1 }, outputPath);
-
-        // Clean up temporary files
-        try { File.Delete(tempExtract); } catch { }
-        try { File.Delete(tempInserted); } catch { }
 
         Console.WriteLine($"Reordered PDF saved to '{outputPath}'.");
     }

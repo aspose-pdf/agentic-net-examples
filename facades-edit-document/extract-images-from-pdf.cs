@@ -1,56 +1,67 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                 // For ExtractImageMode enum
-using Aspose.Pdf.Facades;        // PdfExtractor facade
-using System.Drawing.Imaging;    // ImageFormat for PNG output
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file
-        const string pdfPath = "input.pdf";
+        // Input PDF file path
+        const string inputPdf = "input.pdf";
 
         // Folder where extracted images will be saved
         const string outputFolder = "ExtractedImages";
 
         // Validate input file existence
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Use PdfExtractor within a using block for deterministic disposal
-        using (PdfExtractor extractor = new PdfExtractor())
+        try
         {
-            // Bind the PDF document to the extractor
-            extractor.BindPdf(pdfPath);
-
-            // Optional: extract only images actually shown on pages
-            // extractor.ExtractImageMode = ExtractImageMode.ActuallyUsed;
-
-            // Prepare the extractor to retrieve images
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-
-            // Iterate through all images in the PDF
-            while (extractor.HasNextImage())
+            // Initialize the PDF extractor (Facades API) inside a using block for proper disposal
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                // Build the output file name (PNG format)
-                string imagePath = Path.Combine(outputFolder, $"image-{imageIndex}.png");
+                // Bind the source PDF document
+                extractor.BindPdf(inputPdf);
 
-                // Save the current image as PNG
-                extractor.GetNextImage(imagePath, ImageFormat.Png);
+                // NOTE: The ExtractImageMode property is not available in the current Aspose.Pdf.Facades version.
+                // Image extraction is performed by calling ExtractImage(), which extracts all images by default.
+                // extractor.ExtractImageMode = ExtractImageMode.DefinedInResources; // removed for compatibility
 
-                imageIndex++;
+                // Extract all images from the document
+                extractor.ExtractImage();
+
+                int imageIndex = 1;
+                // Iterate through each extracted image using HasNextImage / GetNextImage
+                while (extractor.HasNextImage())
+                {
+                    string imagePath = Path.Combine(outputFolder, $"image_{imageIndex}.png");
+
+                    // Save the image to the file system
+                    using (FileStream imageStream = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
+                    {
+                        extractor.GetNextImage(imageStream);
+                    }
+
+                    Console.WriteLine($"Saved image {imageIndex} to '{imagePath}'.");
+                    imageIndex++;
+                }
+
+                if (imageIndex == 1)
+                {
+                    Console.WriteLine("No images were found in the PDF.");
+                }
             }
         }
-
-        Console.WriteLine($"All images have been extracted to '{outputFolder}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during image extraction: {ex.Message}");
+        }
     }
 }

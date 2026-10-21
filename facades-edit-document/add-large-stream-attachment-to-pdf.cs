@@ -1,42 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string attachmentPath = "largefile.bin";
+        const string sourcePdfPath = "input.pdf";
+        const string attachmentPath = "largeAttachment.bin";
+        const string outputPdfPath = "output_with_attachment.pdf";
 
-        // Verify required files exist
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
             return;
         }
+
         if (!File.Exists(attachmentPath))
         {
             Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
-        // Bind the existing PDF for editing using the Facade API
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(pdfPath);
+        // Define a buffer size (e.g., 4 MB) to limit memory usage while reading the attachment.
+        const int bufferSize = 4 * 1024 * 1024;
 
-        // Open the large attachment as a buffered stream.
-        // BufferedStream reads data in chunks (here 80 KB) instead of loading the whole file into memory.
+        // Load the PDF document.
+        Document pdfDoc = new Document(sourcePdfPath);
+
+        // Open the attachment file as a buffered stream so that only chunks are kept in memory.
         using (FileStream fileStream = new FileStream(attachmentPath, FileMode.Open, FileAccess.Read, FileShare.Read))
-        using (BufferedStream bufferedStream = new BufferedStream(fileStream, 81920))
+        using (BufferedStream bufferedStream = new BufferedStream(fileStream, bufferSize))
         {
-            // Add the attachment to the PDF. The stream is consumed lazily, keeping memory usage low.
-            editor.AddDocumentAttachment(bufferedStream, Path.GetFileName(attachmentPath), "Large attachment");
+            // Create a FileSpecification from the buffered stream. The name shown in the PDF is the file name.
+            var fileSpec = new FileSpecification(bufferedStream, Path.GetFileName(attachmentPath), "Embedded attachment");
+            // Add the file specification to the EmbeddedFiles collection.
+            pdfDoc.EmbeddedFiles.Add(fileSpec);
         }
 
-        // Save the modified PDF. No additional SaveOptions are needed for PDF output.
-        editor.Save(outputPath);
-        Console.WriteLine($"Attachment added and PDF saved to '{outputPath}'.");
+        // Save the modified PDF.
+        pdfDoc.Save(outputPdfPath);
+
+        Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdfPath}'.");
     }
 }

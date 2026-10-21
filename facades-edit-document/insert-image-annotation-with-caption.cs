@@ -1,69 +1,59 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Facade APIs for stamping
-using Aspose.Pdf.Text;   // Required for TextFragment
-using System.Drawing;   // Required for color definitions (System.Drawing.Color)
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";   // source PDF
-        const string outputPdf  = "output.pdf";  // result PDF
-        const string imagePath  = "image.jpg";   // image to insert
-        const string caption    = "Sample Caption";
+        // Paths – adjust as needed
+        const string inputPdf   = "input.pdf";
+        const string imageFile  = "picture.jpg";
+        const string outputPdf  = "output.pdf";
 
-        // Ensure input files exist
+        // Verify files exist
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(imagePath))
+        if (!File.Exists(imageFile))
         {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            Console.Error.WriteLine($"Image file not found: {imageFile}");
             return;
         }
 
-        // Use PdfFileStamp to add the image as a stamp annotation
-        using (PdfFileStamp fileStamp = new PdfFileStamp())
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
+        // Work with the first page (1‑based index)
+        Page page = pdfDocument.Pages[1];
+
+        // -----------------------------------------------------------------
+        // 1) Add the image to the page.
+        //    Rectangle constructor expects (llx, lly, urx, ury).
+        //    Here we place the lower‑left corner at (50,150) and give the
+        //    image a width of 150 points and a height of 100 points.
+        // -----------------------------------------------------------------
+        var imageRect = new Rectangle(50, 150, 200, 250); // 50+150 = 200, 150+100 = 250
+        using (FileStream imgStream = File.OpenRead(imageFile))
         {
-            // Bind the source PDF
-            fileStamp.BindPdf(inputPdf);
-
-            // Create a stamp, bind the image, and position it at (50,150)
-            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-            stamp.BindImage(imagePath);
-            stamp.SetOrigin(50, 150);          // lower‑left corner of the stamp
-            stamp.SetImageSize(100, 100);      // width and height of the image
-            stamp.Opacity = 0.9f;              // semi‑transparent
-            stamp.IsBackground = false;        // appear above page content
-
-            // Add the image stamp to the document
-            fileStamp.AddStamp(stamp);
-
-            // -----------------------------------------------------------------
-            // Add a caption underneath the image.
-            // Instead of PdfAnnotationEditor (which has no CreateText method),
-            // we add a TextFragment directly to the page.
-            // -----------------------------------------------------------------
-            Document doc = fileStamp.Document; // the underlying Aspose.Pdf.Document
-            TextFragment tf = new TextFragment(caption);
-            tf.Position = new Position(50, 130); // place slightly below the image
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf.TextState.FontSize = 12;
-            // Fully qualify the Color to avoid ambiguity between System.Drawing.Color and Aspose.Pdf.Color
-            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-            // Add the text fragment to the first page
-            doc.Pages[1].Paragraphs.Add(tf);
-
-            // Save the modified PDF
-            fileStamp.Save(outputPdf);
-
-            // Clean up facades (optional, using statement will dispose)
-            fileStamp.Close();
+            page.AddImage(imgStream, imageRect);
         }
+
+        // -----------------------------------------------------------------
+        // 2) Add a caption (text annotation) underneath the image.
+        // -----------------------------------------------------------------
+        var captionRect = new Rectangle(50, 130, 200, 145); // 20 points below image, height ~15
+        var captionAnnotation = new TextAnnotation(page, captionRect)
+        {
+            Contents = "Sample caption text",
+            Title    = "Caption"
+        };
+        page.Annotations.Add(captionAnnotation);
+
+        // Save the modified PDF
+        pdfDocument.Save(outputPdf);
 
         Console.WriteLine($"Image annotation with caption saved to '{outputPdf}'.");
     }

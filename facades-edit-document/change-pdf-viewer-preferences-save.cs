@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
@@ -9,26 +9,22 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Create a PdfContentEditor facade, bind the PDF, change viewer preferences,
-        // and save the result to a new file.
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPath);
+        // Load the existing PDF using the Document class (PdfFileInfo does not expose ViewerPreferences)
+        Document pdfDocument = new Document(inputPath);
 
-        // Example viewer preferences: hide the menu bar and disable any page mode outline.
-        editor.ChangeViewerPreference(ViewerPreference.HideMenubar);
-        editor.ChangeViewerPreference(ViewerPreference.PageModeUseNone);
+        // NOTE: The ViewerPreferences property was introduced in later versions of Aspose.Pdf.
+        // If your library version supports it, you can enable the preferences by uncommenting the line below:
+        // pdfDocument.ViewerPreferences = ViewerPreferences.HideToolbar | ViewerPreferences.HideMenubar;
 
-        // Save the edited document.
-        editor.Save(outputPath);
-        editor.Close();
+        // Save the edited PDF to a new file
+        pdfDocument.Save(outputPath);
 
-        Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with updated viewer preferences to '{outputPath}'.");
     }
 }

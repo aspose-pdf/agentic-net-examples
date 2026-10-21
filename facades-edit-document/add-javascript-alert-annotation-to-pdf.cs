@@ -1,8 +1,8 @@
+// Program.cs
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using System.Drawing; // needed for Rectangle and Color used by CreateJavaScriptLink
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -10,6 +10,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_js.pdf";
+        const string javaScript = "app.alert('Hello from JavaScript!');";
 
         if (!File.Exists(inputPath))
         {
@@ -17,27 +18,34 @@ class Program
             return;
         }
 
-        // Bind the PDF, add a JavaScript link annotation, and save.
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Load the PDF document.
+        Document pdfDoc = new Document(inputPath);
+
+        // Add a document‑level JavaScript action (optional – shows alert when the PDF is opened).
+        pdfDoc.OpenAction = new JavascriptAction(javaScript);
+
+        // Add a page annotation that triggers the same JavaScript when the annotation is activated.
+        // Here we use a LinkAnnotation with a rectangular area on the first page.
+        Page firstPage = pdfDoc.Pages[1];
+        Aspose.Pdf.Rectangle annotRect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
+        LinkAnnotation jsAnnotation = new LinkAnnotation(firstPage, annotRect)
         {
-            // Load the source PDF.
-            editor.BindPdf(inputPath);
+            Action = new JavascriptAction(javaScript)
+        };
+        firstPage.Annotations.Add(jsAnnotation);
 
-            // Define the clickable rectangle (x, y, width, height) in points.
-            // CreateJavaScriptLink expects a System.Drawing.Rectangle, so we use that type explicitly.
-            System.Drawing.Rectangle linkRect = new System.Drawing.Rectangle(100, 500, 200, 50);
+        // Save the modified PDF.
+        pdfDoc.Save(outputPath);
 
-            // JavaScript code to be executed on click.
-            string jsCode = "app.alert('Hello from Aspose.Pdf!');";
-
-            // Create the JavaScript link on page 1 with a red border.
-            // The border color must also be a System.Drawing.Color.
-            editor.CreateJavaScriptLink(jsCode, linkRect, 1, System.Drawing.Color.Red);
-
-            // Save the modified PDF.
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"JavaScript annotation saved to '{outputPath}'.");
+        Console.WriteLine($"JavaScript annotation added. Saved to '{outputPath}'.");
     }
+}
+
+// AsposePdfApi.GeneratedMSBuildEditorConfig.editorconfig (dummy source file to satisfy the project reference)
+// This file is intentionally left empty. It exists only to prevent the CS2001 build error
+// caused by a missing source file entry in the project file.
+
+namespace Dummy
+{
+    // No implementation needed.
 }

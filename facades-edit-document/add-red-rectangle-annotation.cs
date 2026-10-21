@@ -1,52 +1,53 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF (will be created if missing)
-        const string outputPdf = "output.pdf";  // result PDF with annotation
-        const int    pageIndex = 1;             // 1‑based page number to annotate
+        const string inputPath = "input.pdf";
+        const string outputPath = "annotated.pdf";
+        const int pageNumber = 1; // target page (1‑based)
 
-        // ---------------------------------------------------------------------
-        // Ensure a PDF file exists for the editor to bind. In the sandbox there is
-        // no pre‑existing file, so we generate a minimal one‑page PDF on‑the‑fly.
-        // ---------------------------------------------------------------------
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            using (var placeholder = new Document())
-            {
-                placeholder.Pages.Add();
-                placeholder.Save(inputPdf);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Define the annotation rectangle (X, Y, Width, Height) using System.Drawing.Rectangle
-        // because PdfContentEditor.CreateSquareCircle expects a System.Drawing.Rectangle.
-        System.Drawing.Rectangle annotRect = new System.Drawing.Rectangle(100, 100, 100, 100);
+        // 2 mm → points (1 pt = 1/72 in, 1 in = 25.4 mm)
+        const float mmToPt = 72f / 25.4f;
+        float borderThicknessPt = 2f * mmToPt; // ≈5.67 pt
+        // Border.Width expects an integer (points). Round to the nearest whole point.
+        int borderWidth = (int)Math.Round(borderThicknessPt);
 
-        // Border width: 2 mm ≈ 5.67 points → round to 6 points (int parameter).
-        const int borderWidthPoints = 6;
+        // Load the PDF document.
+        Document doc = new Document(inputPath);
 
-        // Create the content editor, bind the PDF, add a red square (rectangle) annotation,
-        // and save the modified document.
-        using (PdfContentEditor editor = new PdfContentEditor())
+        if (pageNumber < 1 || pageNumber > doc.Pages.Count)
         {
-            editor.BindPdf(inputPdf);                                   // Load PDF
-            editor.CreateSquareCircle(
-                annotRect,                     // location and size (System.Drawing.Rectangle)
-                string.Empty,                 // contents (optional)
-                System.Drawing.Color.Red,     // border color (System.Drawing.Color)
-                true,                         // true = square (rectangle), false = circle
-                pageIndex,                    // target page (1‑based)
-                borderWidthPoints             // border thickness in points
-            );
-            editor.Save(outputPdf);                                      // Persist changes
+            Console.Error.WriteLine($"Invalid page number {pageNumber}. Document has {doc.Pages.Count} pages.");
+            return;
         }
 
-        Console.WriteLine($"Red rectangle annotation added to page {pageIndex} and saved as '{outputPdf}'.");
+        // Define rectangle coordinates (llx, lly, urx, ury) in points.
+        // Adjust these values as needed for your PDF.
+        Rectangle rect = new Rectangle(100, 100, 200, 200);
+
+        // Create a square (rectangle) annotation.
+        SquareAnnotation square = new SquareAnnotation(doc.Pages[pageNumber], rect);
+        square.Color = Color.Red;
+        // Set border thickness (integer value).
+        square.Border = new Border(square) { Width = borderWidth };
+
+        // Add the annotation to the page.
+        doc.Pages[pageNumber].Annotations.Add(square);
+
+        // Save the modified document.
+        doc.Save(outputPath);
+
+        Console.WriteLine($"Red rectangle annotation added to page {pageNumber} and saved as '{outputPath}'.");
     }
 }

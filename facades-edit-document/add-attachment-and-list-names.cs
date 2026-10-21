@@ -1,67 +1,51 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // <-- added namespace for TextFragment
 
 class Program
 {
     static void Main()
     {
-        // -----------------------------------------------------------------
-        // 1. Prepare sample files (self‑contained – no external files required)
-        // -----------------------------------------------------------------
-        const string inputPdfPath = "input.pdf";
-        const string attachmentPdfPath = "attachment_file.pdf";
+        // Paths for the source PDF, the file to embed, and the output PDF
+        const string sourcePdfPath = "input.pdf";
+        const string attachmentFilePath = "attachment.txt";
         const string outputPdfPath = "output_with_attachment.pdf";
 
-        // Create a minimal source PDF if it does not exist
-        if (!File.Exists(inputPdfPath))
+        // Verify that the source PDF exists
+        if (!File.Exists(sourcePdfPath))
         {
-            using (var doc = new Document())
-            {
-                doc.Pages.Add(); // add a blank page
-                doc.Save(inputPdfPath);
-            }
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            return;
         }
 
-        // Create a minimal attachment PDF if it does not exist
-        if (!File.Exists(attachmentPdfPath))
+        // Verify that the attachment file exists
+        if (!File.Exists(attachmentFilePath))
         {
-            using (var attDoc = new Document())
-            {
-                attDoc.Pages.Add();
-                // Add a simple paragraph so the file is not completely empty
-                attDoc.Pages[1].Paragraphs.Add(new TextFragment("Attachment PDF"));
-                attDoc.Save(attachmentPdfPath);
-            }
+            Console.Error.WriteLine($"Attachment file not found: {attachmentFilePath}");
+            return;
         }
 
-        // -----------------------------------------------------------------
-        // 2. Add the attachment to the source PDF (no visual annotation)
-        // -----------------------------------------------------------------
-        using (var editor = new PdfContentEditor())
-        {
-            editor.BindPdf(inputPdfPath);
-            editor.AddDocumentAttachment(attachmentPdfPath, "Sample attachment");
-            editor.Save(outputPdfPath);
-        }
+        // Create a working copy of the PDF
+        File.Copy(sourcePdfPath, outputPdfPath, true);
 
-        // -----------------------------------------------------------------
-        // 3. Extract and list attachment names to verify the addition
-        // -----------------------------------------------------------------
-        using (var extractor = new PdfExtractor())
-        {
-            extractor.BindPdf(outputPdfPath);
-            extractor.ExtractAttachment(); // required before GetAttachNames()
-            IList<string> attachmentNames = extractor.GetAttachNames();
+        // Load the PDF document
+        Document pdfDoc = new Document(outputPdfPath);
 
-            Console.WriteLine("Attachments in the PDF:");
-            foreach (string name in attachmentNames)
-            {
-                Console.WriteLine("- " + name);
-            }
+        // ---------------------------------------------------------------------
+        // Add the file as an embedded file (the correct way in Aspose.PDF).
+        // ---------------------------------------------------------------------
+        var fileSpec = new FileSpecification(Path.GetFileName(attachmentFilePath));
+        fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentFilePath));
+        pdfDoc.EmbeddedFiles.Add(fileSpec);
+
+        // Save the changes back to the output file.
+        pdfDoc.Save(outputPdfPath);
+
+        // Retrieve all embedded file names from the updated PDF
+        Console.WriteLine("Embedded files present in the PDF:");
+        foreach (FileSpecification fs in pdfDoc.EmbeddedFiles)
+        {
+            Console.WriteLine($"- {fs.Name}");
         }
     }
 }
