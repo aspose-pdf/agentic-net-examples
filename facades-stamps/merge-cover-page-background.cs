@@ -6,11 +6,11 @@ class Program
 {
     static void Main()
     {
-        const string coverPath  = "cover.pdf";   // PDF to be used as background (cover page)
-        const string mainPath   = "main.pdf";    // Main document
-        const string outputPath = "merged.pdf";  // Resulting PDF
+        const string coverPath   = "cover.pdf";   // PDF containing the cover page (used as background)
+        const string mainPath    = "main.pdf";    // Main document to which the cover will be applied
+        const string outputPath  = "merged.pdf"; // Resulting PDF
 
-        // Verify that source files exist
+        // Verify input files exist
         if (!File.Exists(coverPath))
         {
             Console.Error.WriteLine($"Cover file not found: {coverPath}");
@@ -18,27 +18,45 @@ class Program
         }
         if (!File.Exists(mainPath))
         {
-            Console.Error.WriteLine($"Main file not found: {mainPath}");
+            Console.Error.WriteLine($"Main document not found: {mainPath}");
             return;
         }
 
-        // Initialize the facade with the main document as the target
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.InputFile  = mainPath;    // document to receive the stamp
-        fileStamp.OutputFile = outputPath;  // where the merged PDF will be saved
+        try
+        {
+            // ------------------------------------------------------------
+            // 1. Create a Stamp that represents the cover PDF page.
+            //    The Stamp class (Aspose.Pdf.Facades) is the object that
+            //    PdfFileStamp.AddStamp expects.
+            // ------------------------------------------------------------
+            var coverStamp = new Aspose.Pdf.Facades.Stamp();
+            // Bind the first page of the cover PDF as the stamp content.
+            coverStamp.BindPdf(coverPath, 1);
+            // Place the stamp behind existing page content.
+            coverStamp.IsBackground = true;
+            // By default the stamp is applied to all pages of the bound PDF.
+            // If you need a specific subset, assign an int[] to coverStamp.Pages.
 
-        // Create a stamp that uses the first page of the cover PDF
-        Stamp stamp = new Stamp();
-        stamp.BindPdf(coverPath, 1);   // bind page 1 of cover.pdf as stamp content
-        stamp.IsBackground = true;    // place the cover page behind existing content
-        // By default stamp.Pages is null, meaning the stamp applies to all pages
+            // ------------------------------------------------------------
+            // 2. Apply the stamp to the main document.
+            // ------------------------------------------------------------
+            using (PdfFileStamp pdfStamp = new PdfFileStamp())
+            {
+                // Bind the main PDF that will receive the stamp.
+                pdfStamp.BindPdf(mainPath);
 
-        // Add the stamp to the document
-        fileStamp.AddStamp(stamp);
+                // Add the prepared stamp. The method accepts a single Stamp argument.
+                pdfStamp.AddStamp(coverStamp);
 
-        // Persist changes and release resources
-        fileStamp.Close();
+                // Save the merged document.
+                pdfStamp.Save(outputPath);
+            }
 
-        Console.WriteLine($"Merged PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Cover merged successfully. Output saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during stamping: {ex.Message}");
+        }
     }
 }

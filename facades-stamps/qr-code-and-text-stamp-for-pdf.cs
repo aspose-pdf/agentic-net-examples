@@ -1,59 +1,73 @@
 using System;
 using System.IO;
-using System.Drawing; // for System.Drawing.Color
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // for FontRepository
+using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "product.pdf";
-        const string outputPdf = "product_verified.pdf";
-        const string qrImage = "qr.png";
-        const string description = "Product Verification";
+        const string inputPdfPath = "product.pdf";          // source PDF
+        const string outputPdfPath = "product_verified.pdf"; // stamped PDF
+        const string qrImagePath = "qr_code.png";          // QR code image file
+        const string verificationText = "Verify product authenticity at https://example.com/verify";
 
-        // Verify required files exist
-        if (!File.Exists(inputPdf) || !File.Exists(qrImage))
+        // Ensure required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("Input PDF or QR image not found.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(qrImagePath))
+        {
+            Console.Error.WriteLine($"QR image not found: {qrImagePath}");
             return;
         }
 
-        // ---------- QR CODE IMAGE STAMP ----------
-        // Use the Facades Stamp class (fully qualified) to avoid ambiguity.
-        Aspose.Pdf.Facades.Stamp imageStamp = new Aspose.Pdf.Facades.Stamp();
-        imageStamp.BindImage(qrImage);
-        imageStamp.SetOrigin(100, 500);          // position (x, y) from bottom‑left
-        imageStamp.SetImageSize(100, 100);       // size of the image stamp
-        imageStamp.Opacity = 0.9f;               // semi‑transparent
-        imageStamp.IsBackground = false;        // draw on top of page content
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdfPath);
 
-        // ---------- TEXT STAMP ----------
-        // FormattedText lives in the Facades namespace; use font name string, not FontStyle enum.
-        Aspose.Pdf.Facades.FormattedText txt = new Aspose.Pdf.Facades.FormattedText(
-            description,
-            System.Drawing.Color.Black,               // System.Drawing.Color is accepted
-            "Helvetica",                            // font name
-            Aspose.Pdf.Facades.EncodingType.Winansi,
-            false,
-            12);
+        // ---------- Create QR code image stamp ----------
+        ImageStamp qrStamp = new ImageStamp(qrImagePath)
+        {
+            // Position the QR code at the bottom‑right corner of the page
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment   = VerticalAlignment.Bottom,
+            // Optional margins from the page edges
+            XIndent = 20, // points from the right edge
+            YIndent = 20, // points from the bottom edge
+            // Scale the image to a reasonable size (e.g., 100x100 points)
+            Width  = 100,
+            Height = 100,
+            // Ensure the image is placed above existing content
+            Background = false
+        };
 
-        Aspose.Pdf.Facades.Stamp textStamp = new Aspose.Pdf.Facades.Stamp();
-        textStamp.BindLogo(txt);
-        textStamp.SetOrigin(210, 540);            // place to the right of the QR code
-        textStamp.IsBackground = false;
-        textStamp.Opacity = 0.9f;
+        // ---------- Create descriptive text stamp ----------
+        TextStamp textStamp = new TextStamp(verificationText)
+        {
+            // Position the text just above the QR code
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment   = VerticalAlignment.Bottom,
+            XIndent = 20,
+            YIndent = 130, // QR height (100) + some padding
+            Background = false
+        };
+        // Configure font and appearance
+        textStamp.TextState.Font = FontRepository.FindFont("Arial");
+        textStamp.TextState.FontSize = 12;
+        textStamp.TextState.ForegroundColor = Color.DarkBlue;
 
-        // ---------- APPLY STAMPS ----------
-        Aspose.Pdf.Facades.PdfFileStamp fileStamp = new Aspose.Pdf.Facades.PdfFileStamp();
-        fileStamp.BindPdf(inputPdf);
-        fileStamp.AddStamp(imageStamp);
-        fileStamp.AddStamp(textStamp);
-        fileStamp.Save(outputPdf);
-        fileStamp.Close();
+        // Add the stamps to every page
+        foreach (Page page in pdfDocument.Pages)
+        {
+            page.AddStamp(qrStamp);
+            page.AddStamp(textStamp);
+        }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
+        // Save the stamped PDF
+        pdfDocument.Save(outputPdfPath);
+        Console.WriteLine($"Stamped PDF saved to '{outputPdfPath}'.");
     }
 }

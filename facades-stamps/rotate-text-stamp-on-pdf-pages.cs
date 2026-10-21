@@ -1,54 +1,58 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // PdfFileStamp, Stamp, FormattedText, EncodingType
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_rotated_stamp.pdf";
+        // Paths – adjust as needed
+        const string inputPdfPath = "input.pdf";
+        const string stampImagePath = "stamp.png";
+        const string outputPdfPath = "stamped_output.pdf";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(stampImagePath))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        // Initialize the PdfFileStamp facade and bind the source PDF
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(inputPdf);
+        // Create an ImageStamp (concrete class) and configure it
+        ImageStamp stamp = new ImageStamp(stampImagePath);
+        stamp.Background = false;          // appear on top of page content
+        stamp.RotateAngle = 90;            // rotate 90 degrees clockwise
+        stamp.XIndent = 0;                 // lower‑left corner X offset
+        stamp.YIndent = 0;                 // lower‑left corner Y offset
 
-        // Create a text stamp with formatted text
-        // FormattedText constructor requires System.Drawing.Color for the text color
-        FormattedText formatted = new FormattedText(
-            "Rotated Stamp",                     // text
-            System.Drawing.Color.Black,          // text color
-            "Helvetica",                         // font name
-            EncodingType.Winansi,                // encoding
-            false,                               // embed font flag
-            36);                                 // font size
+        // Load the source PDF, apply the stamp to every page, and save
+        using (Document doc = new Document(inputPdfPath))
+        {
+            foreach (Page page in doc.Pages)
+            {
+                page.AddStamp(stamp);
+            }
+            doc.Save(outputPdfPath);
+        }
 
-        // Create the stamp and bind the formatted text
-        Stamp stamp = new Stamp();
-        stamp.BindLogo(formatted);
+        // Verify that the text in the stamped PDF is still readable
+        using (Document doc = new Document(outputPdfPath))
+        {
+            var absorber = new TextAbsorber();
+            doc.Pages.Accept(absorber);
+            string extractedText = absorber.Text ?? string.Empty;
 
-        // Set rotation to 90 degrees (clockwise)
-        stamp.Rotation = 90f;
-
-        // Position the stamp on the page (optional)
-        stamp.SetOrigin(100f, 500f);
-
-        // Add the stamp to all pages of the document
-        fileStamp.AddStamp(stamp);
-
-        // Save the stamped PDF
-        fileStamp.Save(outputPdf);
-        fileStamp.Close();
-
-        // Verification: output the rotation value that was set
-        Console.WriteLine($"Stamp rotation set to: {stamp.Rotation} degrees");
-        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
+            Console.WriteLine($"Extracted text length after stamping: {extractedText.Length}");
+            if (extractedText.Length > 0)
+                Console.WriteLine("Text remains readable.");
+            else
+                Console.WriteLine("No text extracted – verification failed.");
+        }
     }
 }

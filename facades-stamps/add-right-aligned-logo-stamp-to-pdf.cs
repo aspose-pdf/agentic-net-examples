@@ -1,48 +1,46 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string logoPath = "logo.png";
+        const string inputPdfPath = "input.pdf";
+        const string logoImagePath = "logo.png";
+        const string outputPdfPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Verify input files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(logoImagePath))
+        {
+            Console.Error.WriteLine($"Logo image not found: {logoImagePath}");
             return;
         }
 
-        if (!File.Exists(logoPath))
+        // Create an ImageStamp for the logo and set its alignment/opacity
+        ImageStamp logoStamp = new ImageStamp(logoImagePath)
         {
-            Console.Error.WriteLine($"Logo image not found: {logoPath}");
-            return;
-        }
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment   = VerticalAlignment.Top,
+            Opacity = 1.0
+        };
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPath))
+        // Load the PDF, apply the stamp to every page, and save the result
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Create an image stamp from the logo file and configure alignment
-            ImageStamp stamp = new ImageStamp(logoPath)
+            foreach (Page page in pdfDoc.Pages)
             {
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment   = VerticalAlignment.Center,
-                Opacity             = 0.8f // 80% opacity
-            };
-
-            // Apply the stamp to every page in the document
-            foreach (Page page in doc.Pages)
-            {
-                page.AddStamp(stamp);
+                page.AddStamp(logoStamp);
             }
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Logo stamp applied and saved to '{outputPdfPath}'.");
     }
 }

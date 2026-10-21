@@ -1,52 +1,74 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // Facade APIs for stamping
+using Aspose.Pdf;
+using Aspose.Pdf.Facades; // Facades namespace as required
 
 class Program
 {
     static void Main()
     {
-        // Folder containing the original PDFs
-        const string sourceFolder = @"C:\InputPdfs";
-        // Folder where stamped PDFs will be saved
-        const string targetFolder = @"C:\StampedPdfs";
+        // Input directory containing original PDFs
+        const string inputDirectory = @"C:\InputPdfs";
+        // Output directory where stamped PDFs will be saved
+        const string outputDirectory = @"C:\StampedPdfs";
         // Path to the image that will be used as a stamp
         const string stampImagePath = @"C:\Stamp\stamp.png";
 
-        // Ensure the target directory exists
-        Directory.CreateDirectory(targetFolder);
-
-        // Process each PDF file in the source folder
-        foreach (string inputPath in Directory.GetFiles(sourceFolder, "*.pdf"))
+        // Validate paths
+        if (!Directory.Exists(inputDirectory))
         {
-            // Preserve the original file name
-            string fileName = Path.GetFileName(inputPath);
-            string outputPath = Path.Combine(targetFolder, fileName);
-
-            // Create the PdfFileStamp facade
-            PdfFileStamp fileStamp = new PdfFileStamp();
-
-            // Bind the source PDF (no output file property – we will save explicitly)
-            fileStamp.BindPdf(inputPath);
-
-            // Configure the stamp (image based)
-            Stamp stamp = new Stamp();
-            stamp.BindImage(stampImagePath);          // Use the image as stamp content
-            stamp.IsBackground = true;                // Place stamp behind page content
-            stamp.Opacity = 0.5f;                     // Semi‑transparent
-            stamp.SetOrigin(100, 100);                // Position of the stamp on each page
-            stamp.SetImageSize(150, 150);             // Size of the stamp image
-
-            // Add the stamp to the PDF
-            fileStamp.AddStamp(stamp);
-
-            // Save the stamped PDF to the target location
-            fileStamp.Save(outputPath);
-
-            // Close the facade (releases resources)
-            fileStamp.Close();
+            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
+            return;
         }
 
-        Console.WriteLine("All PDFs have been stamped and saved.");
+        if (!File.Exists(stampImagePath))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            return;
+        }
+
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDirectory);
+
+        // Process each PDF file in the input directory
+        foreach (string pdfPath in Directory.GetFiles(inputDirectory, "*.pdf"))
+        {
+            string fileName = Path.GetFileName(pdfPath);
+            string outputPath = Path.Combine(outputDirectory, fileName);
+
+            try
+            {
+                // Load the PDF document inside a using block for deterministic disposal
+                using (Document doc = new Document(pdfPath))
+                {
+                    // Configure the image stamp
+                    ImageStamp stamp = new ImageStamp(stampImagePath)
+                    {
+                        // Position the stamp at the bottom‑right corner of each page
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        VerticalAlignment   = VerticalAlignment.Bottom,
+                        // Make the stamp semi‑transparent
+                        Opacity = 0.5,
+                        // Do not place the stamp behind page content
+                        Background = false
+                    };
+
+                    // Apply the stamp to every page individually
+                    foreach (Page page in doc.Pages)
+                    {
+                        page.AddStamp(stamp);
+                    }
+
+                    // Save the modified PDF to the output directory, preserving the original file name
+                    doc.Save(outputPath);
+                }
+
+                Console.WriteLine($"Stamped PDF saved: {outputPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
+            }
+        }
     }
 }

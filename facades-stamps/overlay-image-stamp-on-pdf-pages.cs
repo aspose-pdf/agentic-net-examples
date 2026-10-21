@@ -1,50 +1,51 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // Facade API for stamping
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF
-        const string outputPath = "output.pdf";  // stamped PDF
-        const string imagePath  = "stamp.png";   // image to use as stamp
+        const string inputPath  = "input.pdf";
+        const string stampPath  = "stamp.png";
+        const string outputPath = "output.pdf";
 
-        // Verify required files exist
+        // Verify input files exist
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-        if (!File.Exists(imagePath))
+        if (!File.Exists(stampPath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {imagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
             return;
         }
 
-        // Initialize PdfFileStamp with input and output file paths
-        PdfFileStamp fileStamp = new PdfFileStamp(inputPath, outputPath);
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPath))
+        {
+            // Create an ImageStamp (Aspose.Pdf.Facades) from the image file
+            ImageStamp imgStamp = new ImageStamp(stampPath);
 
-        // Create a Stamp object from the Facades namespace
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+            // Set Background to false so the stamp overlays existing page content
+            imgStamp.Background = false;
 
-        // Bind an image to the stamp (you could also use BindLogo for text)
-        stamp.BindImage(imagePath);
+            // Optional: set alignment or position as needed
+            imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            imgStamp.VerticalAlignment   = VerticalAlignment.Center;
 
-        // Explicitly set IsBackground to false so the stamp overlays existing content
-        stamp.IsBackground = false;
+            // Apply the stamp to each page individually (Page.AddStamp)
+            foreach (Page page in pdfDoc.Pages)
+            {
+                page.AddStamp(imgStamp);
+            }
 
-        // Optional: configure position, size, and opacity of the stamp
-        stamp.SetOrigin(100, 200);          // X and Y coordinates
-        stamp.SetImageSize(150, 100);       // Width and height
-        stamp.Opacity = 0.8f;               // 80% opacity
+            // Save the modified PDF
+            pdfDoc.Save(outputPath);
+        }
 
-        // Add the stamp to the document (Pages = null means all pages)
-        fileStamp.AddStamp(stamp);
-
-        // Finalize and write the output PDF
-        fileStamp.Close();
-
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Stamp applied and saved to '{outputPath}'.");
     }
 }

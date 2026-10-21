@@ -2,13 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades; // included as requested
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "stamped_output.pdf";
+        const string outputPath = "highlighted.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,32 +17,43 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle where the stamp will appear (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle stampRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            // Create a rubber‑stamp annotation on the first page
-            StampAnnotation stamp = new StampAnnotation(doc.Pages[1], stampRect)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Optional text shown when the annotation is selected
-                Contents = "Important Section"
-            };
+                Page page = doc.Pages[i];
 
-            // Set the border color
-            stamp.Color = Aspose.Pdf.Color.Red;
+                // Define the rectangle where the stamp will be placed
+                // (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+                // Example positions the stamp near the top‑left corner
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
+                    llx: 50,
+                    lly: page.PageInfo.Height - 100,
+                    urx: 300,
+                    ury: page.PageInfo.Height - 50);
 
-            // Set custom border thickness (requires a Border instance with the parent annotation)
-            stamp.Border = new Border(stamp) { Width = 3 };
+                // Create a TextAnnotation which will act as the visual stamp
+                TextAnnotation ann = new TextAnnotation(page, rect)
+                {
+                    Title    = "Important",
+                    Contents = "Review this section",
+                    // Background color of the annotation (highlight color)
+                    Color = Aspose.Pdf.Color.Yellow
+                };
 
-            // Add the annotation to the page
-            doc.Pages[1].Annotations.Add(stamp);
+                // Set border thickness; border color is taken from the annotation's Color
+                ann.Border = new Border(ann) { Width = 2 };
+
+                // Attach the annotation to the page
+                page.Annotations.Add(ann);
+            }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Highlighted PDF saved to '{outputPath}'.");
     }
 }

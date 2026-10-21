@@ -1,53 +1,55 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // optional, kept for consistency
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "stamped_even_pages.pdf";
+        const string stampImg = "stamp.png";
 
-        if (!File.Exists(inputPath))
+        // Verify required files exist
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(stampImg))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        // Determine total number of pages in the source PDF.
-        int pageCount;
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
+        int totalPages = pdfDocument.Pages.Count;
+
+        // Create an ImageStamp that will be applied to pages
+        ImageStamp imgStamp = new ImageStamp(stampImg)
         {
-            pageCount = doc.Pages.Count; // 1‑based page count
+            // Position the stamp (example: bottom‑right corner)
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment   = VerticalAlignment.Bottom,
+            // Make the stamp semi‑transparent
+            Opacity = 0.5,
+            // Do not place the stamp behind page content
+            Background = false
+        };
+
+        // Apply the stamp only to even‑numbered pages using Page.AddStamp
+        for (int pageNum = 1; pageNum <= totalPages; pageNum++)
+        {
+            if (pageNum % 2 == 0)
+            {
+                pdfDocument.Pages[pageNum].AddStamp(imgStamp);
+            }
         }
 
-        // Build an array containing only even page numbers.
-        int evenCount = pageCount / 2;
-        int[] evenPages = new int[evenCount];
-        int idx = 0;
-        for (int i = 2; i <= pageCount; i += 2)
-        {
-            evenPages[idx++] = i;
-        }
-
-        // Configure PdfFileStamp facade.
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.InputFile  = inputPath;
-        fileStamp.OutputFile = outputPath;
-
-        // Create a stamp (e.g., a simple text stamp) and assign even pages.
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        // Example: bind a text logo as the stamp content.
-        stamp.BindLogo(new FormattedText("CONFIDENTIAL", System.Drawing.Color.Red, "Helvetica", EncodingType.Winansi, false, 48));
-        stamp.IsBackground = true; // place stamp behind page content
-        stamp.Pages = evenPages;   // apply only to even pages
-
-        // Add the stamp to the document and finalize.
-        fileStamp.AddStamp(stamp);
-        fileStamp.Close(); // saves the output file
-
-        Console.WriteLine($"Stamp applied to even pages. Output saved to '{outputPath}'.");
+        // Save the modified PDF
+        pdfDocument.Save(outputPdf);
+        Console.WriteLine($"Even‑page stamping completed. Output saved to '{outputPdf}'.");
     }
 }

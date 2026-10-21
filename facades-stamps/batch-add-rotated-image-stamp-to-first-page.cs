@@ -1,55 +1,58 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Directory containing the PDFs to process
-        string inputDirectory = @"C:\PdfFolder";
+        // Directory containing source PDFs
+        const string inputDir = @"C:\PdfInput";
         // Directory where stamped PDFs will be saved
-        string outputDirectory = Path.Combine(inputDirectory, "Stamped");
-        Directory.CreateDirectory(outputDirectory);
+        const string outputDir = @"C:\PdfOutput";
+        // Path to the image that will be used as a stamp
+        const string stampImagePath = @"C:\stamp.png";
+        // Rotation angle for the stamp (in degrees)
+        const float rotationAngle = 45f;
 
-        // Get all PDF files in the input directory
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf");
-
-        foreach (string pdfPath in pdfFiles)
+        // Validate input folder and stamp image
+        if (!Directory.Exists(inputDir))
         {
-            // Build output file name (original name with "_stamped" suffix)
+            Console.Error.WriteLine($"Input directory not found: {inputDir}");
+            return;
+        }
+        if (!File.Exists(stampImagePath))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            return;
+        }
+
+        // Ensure output folder exists
+        Directory.CreateDirectory(outputDir);
+
+        // Process each PDF file in the input directory
+        foreach (string pdfPath in Directory.GetFiles(inputDir, "*.pdf"))
+        {
             string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-            string outputPath = Path.Combine(outputDirectory, fileNameWithoutExt + "_stamped.pdf");
+            string outputPath = Path.Combine(outputDir, $"{fileNameWithoutExt}_stamped.pdf");
 
-            // Initialize the PdfFileStamp facade (does NOT implement IDisposable)
-            PdfFileStamp fileStamp = new PdfFileStamp();
+            // Load the PDF using Document (PdfFileEditor does not support BindPdf/AddStamp/Save)
+            using (Document pdfDoc = new Document(pdfPath))
+            {
+                // Create an image stamp and configure its rotation and alignment
+                ImageStamp stamp = new ImageStamp(stampImagePath)
+                {
+                    RotateAngle = rotationAngle,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
 
-            // Bind the source PDF file
-            fileStamp.BindPdf(pdfPath);
+                // Add the stamp to the first page (pages are 1‑based)
+                pdfDoc.Pages[1].AddStamp(stamp);
 
-            // Create a stamp object
-            Stamp stamp = new Stamp();
-
-            // Bind an image to be used as the stamp (provide a valid image path)
-            stamp.BindImage("stampImage.png");
-
-            // Rotate the stamp by the desired angle (e.g., 45 degrees)
-            stamp.Rotation = 45f;
-
-            // Apply the stamp only to the first page
-            stamp.Pages = new int[] { 1 };
-
-            // Optionally place the stamp behind page content
-            stamp.IsBackground = true;
-
-            // Add the configured stamp to the PDF
-            fileStamp.AddStamp(stamp);
-
-            // Save the stamped PDF to the output path
-            fileStamp.Save(outputPath);
-
-            // Close the facade to release resources
-            fileStamp.Close();
+                // Save the modified PDF to the output location
+                pdfDoc.Save(outputPath);
+            }
         }
 
         Console.WriteLine("Batch stamping completed.");

@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_footer.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,29 +16,35 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-        // Get the last page
-        Page lastPage = doc.Pages[doc.Pages.Count];
+        // Load the PDF document using Document (lifecycle managed via using)
+        using (Document doc = new Document(inputPath))
+        {
+            // Determine the last page (1‑based indexing)
+            int lastPageNumber = doc.Pages.Count;
 
-        // Create a text stamp with the current date (MM-dd-yyyy)
-        TextStamp stamp = new TextStamp(DateTime.Now.ToString("MM-dd-yyyy"));
-        stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-        stamp.TextState.FontSize = 12;
-        // Use Aspose.Pdf.Color to avoid ambiguity with System.Drawing.Color
-        stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-        stamp.HorizontalAlignment = HorizontalAlignment.Center;
-        stamp.VerticalAlignment = VerticalAlignment.Bottom;
-        stamp.YIndent = 10; // distance from the bottom edge
+            // Create a TextStamp with the current date formatted as MM-dd-yyyy
+            string dateText = DateTime.Now.ToString("MM-dd-yyyy");
+            TextStamp dateStamp = new TextStamp(dateText)
+            {
+                BottomMargin = 10,                     // distance from bottom edge
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
 
-        // Add the stamp to the last page only
-        lastPage.AddStamp(stamp);
+            // TextStamp.TextState is read‑only; modify its members directly
+            dateStamp.TextState.FontSize = 12;
+            dateStamp.TextState.FontStyle = FontStyles.Bold;
+            // Optional styling (uncomment if needed)
+            // dateStamp.TextState.Font = FontRepository.FindFont("Arial");
+            // dateStamp.TextState.ForegroundColor = Color.Black;
 
-        // Save the modified PDF
-        doc.Save(outputPath);
-        // Document does not have a Close() method; dispose if desired
-        doc.Dispose();
+            // Apply the stamp only to the last page
+            Page lastPage = doc.Pages[lastPageNumber];
+            lastPage.AddStamp(dateStamp);
 
-        Console.WriteLine($"Footer added to last page: {outputPath}");
+            // Save the modified document
+            doc.Save(outputPath);
+
+            Console.WriteLine($"Footer stamp added to page {lastPageNumber}. Saved as '{outputPath}'.");
+        }
     }
 }
