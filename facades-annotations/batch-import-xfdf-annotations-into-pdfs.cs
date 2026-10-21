@@ -3,73 +3,99 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
+// Wrapper that uses the Form facade to import XFDF data.
+public class PdfXfdfForm : IDisposable
+{
+    private Document? _document;
+    private Form? _formFacade;
+
+    // Binds the PDF file to the wrapper and prepares the Form facade.
+    public void BindPdf(string pdfPath)
+    {
+        _document = new Document(pdfPath);
+        _formFacade = new Form();
+        _formFacade.BindPdf(_document);
+    }
+
+    // Imports XFDF data into the PDF's form fields using the facade.
+    public void ImportXfdf(string xfdfPath)
+    {
+        if (_formFacade == null)
+            throw new InvalidOperationException("PDF has not been bound. Call BindPdf first.");
+
+        // The ImportXfdf overload expects a Stream in recent Aspose.Pdf versions.
+        using (FileStream xfdfStream = File.OpenRead(xfdfPath))
+        {
+            _formFacade.ImportXfdf(xfdfStream);
+        }
+    }
+
+    // Saves the modified PDF to the specified path.
+    public void Save(string outputPath)
+    {
+        _document?.Save(outputPath);
+    }
+
+    // Clean up unmanaged resources.
+    public void Dispose()
+    {
+        _formFacade?.Dispose();
+        _document?.Dispose();
+    }
+}
+
 class Program
 {
     static void Main()
     {
-        // ---------------------------------------------------------------------
-        // Resolve input / output folders.
-        // Use the application base directory as a safe fallback so the sample can
-        // run on any machine without requiring the user to create "C:\Input" etc.
-        // ---------------------------------------------------------------------
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string pdfInputDir   = Path.Combine(baseDir, "Input", "Pdf");
-        string xfdfInputDir  = Path.Combine(baseDir, "Input", "Xfdf");
-        string pdfOutputDir  = Path.Combine(baseDir, "Output", "Pdf");
+        // Folder containing PDFs and corresponding XFDF files
+        const string inputFolder = "BatchInput";
+        // Folder where processed PDFs will be saved
+        const string outputFolder = "BatchOutput";
 
-        // Ensure the directories exist – if they do not, create them so the
-        // program does not throw a DirectoryNotFoundException.
-        Directory.CreateDirectory(pdfInputDir);
-        Directory.CreateDirectory(xfdfInputDir);
-        Directory.CreateDirectory(pdfOutputDir);
-
-        // ---------------------------------------------------------------------
-        // Validate that there is at least one PDF to process.  This gives a clear
-        // message instead of silently doing nothing.
-        // ---------------------------------------------------------------------
-        string[] pdfFiles = Directory.GetFiles(pdfInputDir, "*.pdf");
-        if (pdfFiles.Length == 0)
+        if (!Directory.Exists(inputFolder))
         {
-            Console.WriteLine($"No PDF files found in '{pdfInputDir}'. Place PDFs there and rerun the program.");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        // ---------------------------------------------------------------------
-        // Process each PDF – import the matching XFDF file (same name, .xfdf).
-        // All I/O is wrapped in try/catch so a single bad file does not abort the
-        // whole batch.
-        // ---------------------------------------------------------------------
+        Directory.CreateDirectory(outputFolder);
+
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
         foreach (string pdfPath in pdfFiles)
         {
+            // Determine base file name without extension
             string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-            string xfdfPath = Path.Combine(xfdfInputDir, baseName + ".xfdf");
+            // Expected XFDF file with the same base name
+            string xfdfPath = Path.Combine(inputFolder, baseName + ".xfdf");
 
             if (!File.Exists(xfdfPath))
             {
-                Console.WriteLine($"[Skip] No XFDF found for '{baseName}'. Expected at '{xfdfPath}'.");
+                Console.WriteLine($"No matching XFDF for '{baseName}.pdf' – skipping.");
                 continue;
             }
 
             try
             {
-                using (Document pdfDoc = new Document(pdfPath))
-                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                using (PdfXfdfForm xfdfForm = new PdfXfdfForm())
                 {
-                    editor.BindPdf(pdfDoc);
-                    editor.ImportAnnotationsFromXfdf(xfdfPath);
+                    xfdfForm.BindPdf(pdfPath);
+                    xfdfForm.ImportXfdf(xfdfPath);
 
-                    string outputPath = Path.Combine(pdfOutputDir, Path.GetFileName(pdfPath));
-                    editor.Save(outputPath);
+                    string outputPdfPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
+                    xfdfForm.Save(outputPdfPath);
 
-                    Console.WriteLine($"[Success] Imported XFDF into '{outputPath}'.");
+                    Console.WriteLine($"Imported XFDF into PDF: {outputPdfPath}");
                 }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"[Error] Failed to process '{pdfPath}'. Exception: {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{baseName}': {ex.Message}");
             }
         }
 
-        Console.WriteLine("Batch import completed.");
+        Console.WriteLine("Batch XFDF import completed.");
     }
 }

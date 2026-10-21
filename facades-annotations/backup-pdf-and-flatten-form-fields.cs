@@ -1,51 +1,55 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the original, backup, and flattened PDF files
-        const string inputPath  = "input.pdf";
-        const string backupPath = "input_backup.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "flattened.pdf";
 
-        // Verify that the source PDF exists
+        // Verify source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
+        // ---------- Backup the original PDF ----------
+        // Backup file name: original name with "_backup" suffix
+        string backupPath = Path.Combine(
+            Path.GetDirectoryName(inputPath) ?? string.Empty,
+            Path.GetFileNameWithoutExtension(inputPath) + "_backup.pdf");
+
         try
         {
-            // Load the original PDF document (lifecycle rule: use using)
-            using (Document doc = new Document(inputPath))
-            {
-                // ---------- Backup ----------
-                // Save a copy of the original PDF before any modifications
-                doc.Save(backupPath);
-                Console.WriteLine($"Backup created at '{backupPath}'.");
-
-                // ---------- Flatten ----------
-                // Use Aspose.Pdf.Facades.Form to flatten all form fields.
-                // The Form facade works on the same Document instance.
-                using (Form form = new Form(doc))
-                {
-                    form.FlattenAllFields(); // Removes all interactive fields
-                }
-
-                // ---------- Save flattened PDF ----------
-                // Save the modified document to the desired output location
-                doc.Save(outputPath);
-                Console.WriteLine($"Flattened PDF saved at '{outputPath}'.");
-            }
+            // Overwrite any existing backup
+            File.Copy(inputPath, backupPath, true);
+            Console.WriteLine($"Backup created at '{backupPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Failed to create backup: {ex.Message}");
+            return;
+        }
+
+        // ---------- Flatten the PDF ----------
+        try
+        {
+            // PdfAnnotationEditor provides the FlatteningAnnotations method.
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            {
+                editor.BindPdf(inputPath);          // Load the source PDF
+                editor.FlatteningAnnotations();    // Correct method to flatten annotations
+                editor.Save(outputPath);            // Save the flattened result
+            }
+
+            Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Flattening operation failed: {ex.Message}");
         }
     }
 }

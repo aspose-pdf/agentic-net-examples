@@ -1,22 +1,17 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_filtered.pdf";
+        const string outputPath = "output.pdf";
 
-        // Target RGB color to match (example: pure red)
-        const int targetR = 255;
-        const int targetG = 0;
-        const int targetB = 0;
-        // Aspose.Pdf.Color.FromRgb expects values in the range 0..1, so normalize the 0‑255 components
-        Aspose.Pdf.Color targetColor = Aspose.Pdf.Color.FromRgb(targetR / 255.0, targetG / 255.0, targetB / 255.0);
+        // Target RGB color (values 0‑1 for Aspose.Pdf.Color)
+        // Example: pure red (1.0, 0.0, 0.0)
+        Aspose.Pdf.Color targetColor = Aspose.Pdf.Color.FromRgb(1.0, 0.0, 0.0);
 
         if (!File.Exists(inputPath))
         {
@@ -24,38 +19,33 @@ class Program
             return;
         }
 
-        // Use PdfAnnotationEditor (Facades) for loading and saving
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        // Load the PDF with the core API (Document) for color inspection and modification
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            editor.BindPdf(inputPath);
-
-            // Access the underlying Document object
-            Document doc = editor.Document;
-
-            // Iterate through all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                Page page = doc.Pages[pageIndex];
+                // Get the annotation collection for the current page
+                var pageAnnotations = doc.Pages[pageNum].Annotations;
 
-                // Iterate annotations in reverse order to allow safe deletion
-                for (int annIndex = page.Annotations.Count; annIndex >= 1; annIndex--)
+                // Iterate backwards so that removal does not affect the loop index
+                for (int i = pageAnnotations.Count; i >= 1; i--)
                 {
-                    Annotation annotation = page.Annotations[annIndex];
+                    var annotation = pageAnnotations[i];
 
-                    // Compare the annotation's color with the target RGB value
+                    // Compare the annotation's color with the target color
                     if (annotation.Color != null && annotation.Color.Equals(targetColor))
                     {
-                        // Delete the matching annotation
-                        page.Annotations.Delete(annIndex);
+                        // Delete the annotation directly from the collection (1‑based index)
+                        pageAnnotations.Delete(i);
                     }
                 }
             }
 
             // Save the modified PDF
-            editor.Save(outputPath);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Filtered PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Annotations with the specified color have been removed. Output saved to '{outputPath}'.");
     }
 }

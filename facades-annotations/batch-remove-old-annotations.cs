@@ -5,77 +5,86 @@ using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
-class AnnotationCleanup
+class BatchAnnotationCleaner
 {
-    // Removes annotations older than the specified number of days from all PDFs in a folder.
-    static void Main()
+    static void Main(string[] args)
     {
-        const string inputFolder  = @"C:\PdfBatch\Input";
-        const string outputFolder = @"C:\PdfBatch\Cleaned";
-        const int    daysThreshold = 30; // annotations older than 30 days will be removed
-
-        if (!Directory.Exists(inputFolder))
+        // Expect: args[0] = folder containing PDFs, args[1] = age in days
+        if (args.Length < 2)
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine("Usage: BatchAnnotationCleaner <folderPath> <days>");
             return;
         }
 
-        Directory.CreateDirectory(outputFolder);
-
-        // Process each PDF file in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        string folderPath = args[0];
+        if (!Directory.Exists(folderPath))
         {
-            string fileName   = Path.GetFileName(inputPath);
-            string outputPath = Path.Combine(outputFolder, fileName);
+            Console.Error.WriteLine($"Folder not found: {folderPath}");
+            return;
+        }
 
-            // Bind the PDF to the annotation editor facade
-            PdfAnnotationEditor editor = new PdfAnnotationEditor();
-            editor.BindPdf(inputPath);
+        if (!int.TryParse(args[1], out int days))
+        {
+            Console.Error.WriteLine("Invalid days value.");
+            return;
+        }
 
-            // Access the underlying Document to iterate pages and annotations
-            Document doc = editor.Document;
+        DateTime cutoffDate = DateTime.Now.AddDays(-days);
 
-            // Calculate the cutoff date
-            DateTime cutoff = DateTime.Now.AddDays(-daysThreshold);
+        foreach (string pdfFile in Directory.GetFiles(folderPath, "*.pdf"))
+        {
+            string tempFile = Path.Combine(folderPath,
+                Path.GetFileNameWithoutExtension(pdfFile) + "_cleaned.pdf");
 
-            // Iterate through all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Load the PDF to inspect annotations (Document must be disposed)
+            using (Document doc = new Document(pdfFile))
             {
-                Page page = doc.Pages[pageIndex];
-                AnnotationCollection annCollection = page.Annotations;
+                List<string> namesToDelete = new List<string>();
 
-                // Collect indexes of annotations that are older than the cutoff
-                List<int> indexesToDelete = new List<int>();
-
-                // AnnotationCollection uses 1‑based indexing as well
-                for (int annIndex = 1; annIndex <= annCollection.Count; annIndex++)
+                // Pages are 1‑based in Aspose.Pdf
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    Annotation annotation = annCollection[annIndex];
-
-                    // The property that stores the modification date is called 'Modified'.
-                    // If the annotation has never been modified, its value may be DateTime.MinValue.
-                    DateTime modifiedDate = annotation.Modified;
-
-                    if (modifiedDate != DateTime.MinValue && modifiedDate < cutoff)
+                    Page page = doc.Pages[i];
+                    foreach (Annotation annot in page.Annotations)
                     {
-                        indexesToDelete.Add(annIndex);
+                        // Modified is a non‑nullable DateTime, so use it directly.
+                        DateTime modDate = annot.Modified;
+
+                        if (modDate < cutoffDate)
+                        {
+                            // The editor deletes annotations by their Name (or empty string if not set).
+                            // If Name is null, we cannot delete it via the editor, so we skip it.
+                            if (!string.IsNullOrEmpty(annot.Name))
+                                namesToDelete.Add(annot.Name);
+                        }
                     }
                 }
 
-                // Delete collected annotations in reverse order to keep indexes valid
-                for (int i = indexesToDelete.Count - 1; i >= 0; i--)
+                if (namesToDelete.Count > 0)
                 {
-                    annCollection.Delete(indexesToDelete[i]);
+                    // Use Facade API to delete annotations by Name
+                    using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                    {
+                        editor.BindPdf(pdfFile);
+
+                        foreach (string name in namesToDelete)
+                            editor.DeleteAnnotation(name);
+
+                        // Save the cleaned PDF
+                        editor.Save(tempFile);
+                    }
+                }
+                else
+                {
+                    // No annotations to remove; copy original
+                    File.Copy(pdfFile, tempFile, true);
                 }
             }
 
-            // Save the cleaned PDF
-            editor.Save(outputPath);
-            editor.Close(); // Release resources held by the facade
-
-            Console.WriteLine($"Processed '{fileName}' → '{outputPath}'");
+            // Replace original file with cleaned version
+            File.Delete(pdfFile);
+            File.Move(tempFile, pdfFile);
+            Console.WriteLine($"Processed: {Path.GetFileName(pdfFile)}");
         }
-
-        Console.WriteLine("Annotation cleanup completed.");
     }
 }

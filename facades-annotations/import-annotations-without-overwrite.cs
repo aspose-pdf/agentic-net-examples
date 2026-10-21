@@ -1,53 +1,42 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations; // needed for AnnotationType
 
 class Program
 {
     static void Main()
     {
-        // Paths for the target PDF (which already contains annotations) and the output PDF.
-        const string targetPdfPath = "target.pdf";
-        const string outputPdfPath = "target_with_added_annotations.pdf";
+        const string sourcePdf = "newAnnotations.pdf";   // PDF containing annotations to import
+        const string destinationPdf = "existing.pdf";   // PDF that already has annotations
+        const string outputPdf = "mergedAnnotations.pdf";
 
-        // Paths of source PDFs that contain the annotations you want to import.
-        string[] sourcePdfPaths = { "source1.pdf", "source2.pdf" };
-
-        // Verify that all files exist before proceeding.
-        if (!File.Exists(targetPdfPath))
+        // Verify that both PDFs exist
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
+            return;
+        }
+        if (!File.Exists(destinationPdf))
+        {
+            Console.Error.WriteLine($"Destination file not found: {destinationPdf}");
             return;
         }
 
-        foreach (string src in sourcePdfPaths)
-        {
-            if (!File.Exists(src))
-            {
-                Console.Error.WriteLine($"Source PDF not found: {src}");
-                return;
-            }
-        }
+        // Copy the destination PDF to a new file so the original remains unchanged
+        File.Copy(destinationPdf, outputPdf, true);
 
-        // Use PdfAnnotationEditor (a facade) to work with annotations.
-        // The facade implements IDisposable, so wrap it in a using block.
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-        {
-            // Bind the existing PDF that already has annotations.
-            editor.BindPdf(targetPdfPath);
+        // Create the annotation editor and bind it to the copied PDF
+        PdfAnnotationEditor annotationEditor = new PdfAnnotationEditor();
+        annotationEditor.BindPdf(outputPdf);
 
-            // Import annotations from the source PDFs.
-            // The ImportAnnotations method adds annotations; it does NOT overwrite existing ones,
-            // so the original annotations in the target PDF are preserved automatically.
-            // If you need to import only specific types, use the overload that accepts
-            // Aspose.Pdf.AnnotationType[] (e.g., Highlight, Text, etc.).
-            editor.ImportAnnotations(sourcePdfPaths);
+        // Import annotations from the source PDF while preserving existing ones.
+        // Pass a string array with the source file and a null AnnotationType array.
+        annotationEditor.ImportAnnotations(new string[] { sourcePdf }, null);
 
-            // Save the resulting PDF. Existing annotations remain, and new ones are added.
-            editor.Save(outputPdfPath);
-        }
+        // Save the changes back to the output file
+        annotationEditor.Save(outputPdf);
 
-        Console.WriteLine($"Annotations imported successfully. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Annotations imported successfully. Output saved to '{outputPdf}'.");
     }
 }

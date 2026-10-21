@@ -1,86 +1,83 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-public static class AnnotationCloner
+public static class AnnotationHelper
 {
     /// <summary>
-    /// Clones an annotation from a source page, changes its color, and adds the clone to a target page.
+    /// Clones an annotation from a source page, changes its color, and adds the clone to a destination page.
     /// </summary>
-    /// <param name="inputPdf">Path to the source PDF file.</param>
-    /// <param name="sourcePage">1‑based index of the page containing the annotation to clone.</param>
-    /// <param name="annotationIndex">1‑based index of the annotation on the source page.</param>
-    /// <param name="targetPage">1‑based index of the page where the cloned annotation will be placed.</param>
-    /// <param name="newColor">The new color to apply to the cloned annotation.</param>
-    /// <param name="outputPdf">Path where the resulting PDF will be saved.</param>
-    public static void CloneAnnotation(
-        string inputPdf,
-        int sourcePage,
+    /// <param name="sourcePdfPath">Path to the PDF containing the original annotation.</param>
+    /// <param name="sourcePageNumber">1‑based page number where the original annotation resides.</param>
+    /// <param name="annotationIndex">Zero‑based index of the annotation on the source page to clone.</param>
+    /// <param name="newColor">The new color to apply to the cloned annotation (Aspose.Pdf.Color).</param>
+    /// <param name="destPdfPath">Path to the PDF where the cloned annotation will be added.</param>
+    /// <param name="destPageNumber">1‑based page number in the destination PDF where the clone will be placed.</param>
+    public static void CloneAnnotationChangeColor(
+        string sourcePdfPath,
+        int sourcePageNumber,
         int annotationIndex,
-        int targetPage,
-        Aspose.Pdf.Color newColor,
-        string outputPdf)
+        Color newColor,
+        string destPdfPath,
+        int destPageNumber)
     {
-        // Load the PDF document (use using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        // Validate input files
+        if (!File.Exists(sourcePdfPath))
+            throw new FileNotFoundException($"Source PDF not found: {sourcePdfPath}");
+        if (!File.Exists(destPdfPath))
+            throw new FileNotFoundException($"Destination PDF not found: {destPdfPath}");
+
+        // -----------------------------------------------------------------
+        // Step 1: Load source PDF and retrieve the requested annotation
+        // -----------------------------------------------------------------
+        Document sourceDoc = new Document(sourcePdfPath);
+        if (sourcePageNumber < 1 || sourcePageNumber > sourceDoc.Pages.Count)
+            throw new ArgumentOutOfRangeException(nameof(sourcePageNumber), "Page number out of range in source PDF.");
+
+        Page srcPage = sourceDoc.Pages[sourcePageNumber];
+        if (annotationIndex < 0 || annotationIndex >= srcPage.Annotations.Count)
+            throw new ArgumentOutOfRangeException(nameof(annotationIndex), "Invalid annotation index on source page.");
+
+        // Deep clone the annotation
+        Annotation originalAnnotation = srcPage.Annotations[annotationIndex];
+        Annotation clonedAnnotation = (Annotation)originalAnnotation.Clone();
+
+        // -----------------------------------------------------------------
+        // Step 2: Change the color of the cloned annotation
+        // -----------------------------------------------------------------
+        // Most annotation types expose a Color property. Use reflection as a safety net for types that may not.
+        var colorProp = clonedAnnotation.GetType().GetProperty("Color");
+        if (colorProp != null && colorProp.CanWrite)
         {
-            // Retrieve the source annotation (pages and annotation collections are 1‑based)
-            Annotation srcAnnotation = doc.Pages[sourcePage].Annotations[annotationIndex];
-
-            // Prepare a clone based on the concrete type of the source annotation.
-            // Only a few common types are handled explicitly; others fall back to a TextAnnotation.
-            Annotation clonedAnnotation;
-
-            if (srcAnnotation is TextAnnotation textAnn)
-            {
-                // Clone a TextAnnotation
-                clonedAnnotation = new TextAnnotation(doc.Pages[targetPage], textAnn.Rect)
-                {
-                    Contents = textAnn.Contents,
-                    Color = newColor,
-                    Title = textAnn.Title,
-                    Subject = textAnn.Subject,
-                    // The 'Open' property exists on TextAnnotation, keep it if present.
-                    Open = textAnn.Open
-                };
-            }
-            else if (srcAnnotation is StampAnnotation stampAnn)
-            {
-                // Clone a StampAnnotation (StampAnnotation does NOT have an 'Open' property)
-                clonedAnnotation = new StampAnnotation(doc.Pages[targetPage], stampAnn.Rect)
-                {
-                    Contents = stampAnn.Contents,
-                    Color = newColor,
-                    Icon = stampAnn.Icon,
-                    Title = stampAnn.Title,
-                    Subject = stampAnn.Subject
-                };
-            }
-            else
-            {
-                // Generic fallback – use TextAnnotation as a concrete type.
-                clonedAnnotation = new TextAnnotation(doc.Pages[targetPage], srcAnnotation.Rect)
-                {
-                    Contents = srcAnnotation.Contents,
-                    Color = newColor
-                };
-            }
-
-            // Add the cloned annotation to the target page
-            doc.Pages[targetPage].Annotations.Add(clonedAnnotation);
-
-            // Save the modified document. Using Document.Save is sufficient; no need for PdfAnnotationEditor.
-            doc.Save(outputPdf);
+            colorProp.SetValue(clonedAnnotation, newColor);
         }
+        else
+        {
+            // If the specific annotation type does not have a Color property, ignore the change.
+            // This keeps the method functional across Aspose.Pdf versions.
+        }
+
+        // -----------------------------------------------------------------
+        // Step 3: Load destination PDF and add the cloned annotation
+        // -----------------------------------------------------------------
+        Document destDoc = new Document(destPdfPath);
+        if (destPageNumber < 1 || destPageNumber > destDoc.Pages.Count)
+            throw new ArgumentOutOfRangeException(nameof(destPageNumber), "Page number out of range in destination PDF.");
+
+        Page dstPage = destDoc.Pages[destPageNumber];
+        dstPage.Annotations.Add(clonedAnnotation);
+
+        // Persist changes
+        destDoc.Save(destPdfPath);
     }
 }
 
-// Dummy entry point to satisfy the compiler when building an executable.
+// A minimal entry point so the project compiles as a console application.
 public class Program
 {
     public static void Main(string[] args)
     {
-        // Example usage (can be removed or replaced in real scenarios)
-        // AnnotationCloner.CloneAnnotation("input.pdf", 1, 1, 2, Aspose.Pdf.Color.Red, "output.pdf");
+        // No operation – the library method can be called from external code or unit tests.
     }
 }

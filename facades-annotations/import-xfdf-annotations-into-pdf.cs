@@ -1,41 +1,47 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdf  = "input.pdf";
-        const string xfdfFile  = "annotations.xfdf";
-        const string outputPdf = "output.pdf";
+        const string pdfPath = "input.pdf";
+        const string xfdfPath = "annotations.xfdf";
+        const string outputPath = "output.pdf";
 
-        // Verify files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(xfdfFile))
-        {
-            Console.Error.WriteLine($"XFDF file not found: {xfdfFile}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Use PdfAnnotationEditor (facade) to bind the PDF, import XFDF annotations, and save.
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        if (!File.Exists(xfdfPath))
         {
-            // Load the target PDF document.
-            editor.BindPdf(inputPdf);
-
-            // Import all annotations from the XFDF file.
-            editor.ImportAnnotationsFromXfdf(xfdfFile);
-
-            // Save the resulting PDF with imported annotations.
-            editor.Save(outputPdf);
+            Console.Error.WriteLine($"XFDF file not found: {xfdfPath}");
+            return;
         }
 
-        Console.WriteLine($"Annotations imported and saved to '{outputPdf}'.");
+        try
+        {
+            // PdfAnnotationEditor does not implement IDisposable, so no using block is needed.
+            var editor = new PdfAnnotationEditor();
+
+            // Bind the existing PDF document.
+            editor.BindPdf(pdfPath);
+
+            // Import annotations from the XFDF file. The method expects a string array.
+            editor.ImportAnnotations(new[] { xfdfPath });
+
+            // Save the PDF with imported annotations.
+            editor.Save(outputPath);
+
+            Console.WriteLine($"Annotations imported successfully to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

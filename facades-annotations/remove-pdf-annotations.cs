@@ -2,57 +2,59 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-namespace PdfAnnotationCleaner
+class Program
 {
-    public static class PdfProcessor
+    static void Main(string[] args)
     {
-        /// <summary>
-        /// Removes all annotations from a PDF supplied as a stream.
-        /// The returned MemoryStream contains the cleaned PDF and is positioned at the beginning.
-        /// </summary>
-        /// <param name="pdfInput">Stream that holds the original PDF.</param>
-        /// <returns>A MemoryStream with the annotation‑free PDF.</returns>
-        public static MemoryStream RemoveAnnotations(Stream pdfInput)
+        // Simple console usage: PdfCleaner <input.pdf> [output.pdf]
+        if (args.Length == 0)
         {
-            if (pdfInput == null) throw new ArgumentNullException(nameof(pdfInput));
-
-            // Ensure the input stream is ready for reading.
-            if (pdfInput.CanSeek)
-                pdfInput.Position = 0;
-
-            // Bind the PDF to the annotation editor and delete all annotations.
-            using var editor = new PdfAnnotationEditor();
-            editor.BindPdf(pdfInput);
-            editor.DeleteAnnotations();
-
-            // Save the cleaned document into a new memory stream.
-            var output = new MemoryStream();
-            editor.Save(output);
-            output.Position = 0; // reset for the caller
-            return output;
+            Console.WriteLine("Usage: PdfCleaner <input.pdf> [output.pdf]");
+            return;
         }
+
+        string inputPath = args[0];
+        string outputPath = args.Length > 1 ? args[1] : Path.Combine(Path.GetDirectoryName(inputPath) ?? ".", "cleaned.pdf");
+
+        // Open the source PDF, clean it, and write the result.
+        using (FileStream inputFile = File.OpenRead(inputPath))
+        using (MemoryStream cleanedStream = CleanPdf(inputFile))
+        using (FileStream outputFile = File.Create(outputPath))
+        {
+            cleanedStream.CopyTo(outputFile);
+        }
+
+        Console.WriteLine($"Cleaned PDF saved to {outputPath}");
     }
 
-    // Simple console demonstration – not an ASP.NET endpoint.
-    class Program
+    /// <summary>
+    /// Removes all annotations from a PDF stream and returns a new stream containing the cleaned PDF.
+    /// </summary>
+    /// <param name="pdfStream">A readable stream that contains the original PDF.</param>
+    /// <returns>A MemoryStream positioned at the beginning, holding the cleaned PDF.</returns>
+    public static MemoryStream CleanPdf(Stream pdfStream)
     {
-        static void Main(string[] args)
+        // Aspose.Pdf.Facades requires a seek‑able stream, so copy the incoming stream into a MemoryStream.
+        MemoryStream inputMemory = new MemoryStream();
+        pdfStream.CopyTo(inputMemory);
+        inputMemory.Position = 0;
+
+        // PdfAnnotationEditor implements IDisposable, so use a using block.
+        using (PdfAnnotationEditor annotationEditor = new PdfAnnotationEditor())
         {
-            if (args.Length != 2)
-            {
-                Console.WriteLine("Usage: PdfAnnotationCleaner <input.pdf> <output.pdf>");
-                return;
-            }
+            annotationEditor.BindPdf(inputMemory);
 
-            var inputPath = args[0];
-            var outputPath = args[1];
+            // Delete every annotation in the document. The Facade provides DeleteAnnotations() for this purpose.
+            annotationEditor.DeleteAnnotations();
 
-            using var inputStream = File.OpenRead(inputPath);
-            using var cleanedStream = PdfProcessor.RemoveAnnotations(inputStream);
-            using var outputStream = File.Create(outputPath);
-            cleanedStream.CopyTo(outputStream);
+            // Optionally flatten any remaining annotation appearance (not required for pure removal).
+            // annotationEditor.FlatteningAnnotations();
 
-            Console.WriteLine("Annotations removed successfully.");
+            // Save the cleaned document into a new MemoryStream.
+            MemoryStream outputMemory = new MemoryStream();
+            annotationEditor.Save(outputMemory);
+            outputMemory.Position = 0; // Reset for the caller.
+            return outputMemory;
         }
     }
 }

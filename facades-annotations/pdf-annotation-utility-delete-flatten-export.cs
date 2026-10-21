@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using System.Linq;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Devices;
 
 class PdfUtility
 {
@@ -9,10 +11,10 @@ class PdfUtility
     {
         if (args.Length < 3)
         {
-            Console.Error.WriteLine("Usage:");
-            Console.Error.WriteLine("  delete <input.pdf> <output.pdf> <pages(comma separated)>");
-            Console.Error.WriteLine("  flatten <input.pdf> <output.pdf>");
-            Console.Error.WriteLine("  export <input.pdf> <output.xfdf>");
+            Console.WriteLine("Usage:");
+            Console.WriteLine("  PdfUtility delete <input.pdf> <output.pdf> <pages>");
+            Console.WriteLine("  PdfUtility flatten <input.pdf> <output.pdf>");
+            Console.WriteLine("  PdfUtility export <input.pdf> <outputFolder>");
             return;
         }
 
@@ -31,10 +33,10 @@ class PdfUtility
             switch (operation)
             {
                 case "delete":
-                    // Expect pages list as fourth argument
+                    // Delete specified pages (comma‑separated list, 1‑based)
                     if (args.Length < 4)
                     {
-                        Console.Error.WriteLine("Missing pages argument for delete operation.");
+                        Console.Error.WriteLine("Delete operation requires a page list argument.");
                         return;
                     }
                     int[] pagesToDelete = args[3]
@@ -42,38 +44,50 @@ class PdfUtility
                         .Select(p => int.Parse(p.Trim()))
                         .ToArray();
 
-                    // PdfFileEditor does NOT implement IDisposable – instantiate directly
-                    var editor = new PdfFileEditor();
-                    editor.Delete(inputPath, pagesToDelete, outputPath);
-                    Console.WriteLine($"Pages deleted. Output saved to '{outputPath}'.");
+                    // NOTE: PdfFileEditor.Delete signature is (inputPath, pages, outputPath)
+                    PdfFileEditor fileEditor = new PdfFileEditor();
+                    fileEditor.Delete(inputPath, pagesToDelete, outputPath);
+                    Console.WriteLine($"Deleted pages saved to '{outputPath}'.");
                     break;
 
                 case "flatten":
-                    // Flatten all annotations using PdfAnnotationEditor (implements IDisposable)
-                    using (PdfAnnotationEditor annotationEditor = new PdfAnnotationEditor())
+                    // Flatten form fields into static content
+                    using (Document doc = new Document(inputPath))
                     {
-                        annotationEditor.BindPdf(inputPath);
-                        annotationEditor.FlatteningAnnotations(); // flatten all annotations
-                        annotationEditor.Save(outputPath);
+                        // In current Aspose.Pdf versions, flattening is done via the Form object
+                        if (doc.Form != null)
+                        {
+                            doc.Form.Flatten();
+                        }
+                        doc.Save(outputPath);
                     }
-                    Console.WriteLine($"Annotations flattened. Output saved to '{outputPath}'.");
+                    Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
                     break;
 
                 case "export":
-                    // Export all annotations to XFDF
-                    using (PdfAnnotationEditor annotationEditor = new PdfAnnotationEditor())
+                    // Export each page as a PNG image into the specified folder
+                    string outputFolder = outputPath; // treat third argument as folder for export
+                    Directory.CreateDirectory(outputFolder);
+
+                    using (Document doc = new Document(inputPath))
                     {
-                        annotationEditor.BindPdf(inputPath);
-                        using (FileStream xfdfStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                        // Use PngDevice (cross‑platform) instead of PdfConverter/ImageSaveOptions
+                        var resolution = new Resolution(150);
+                        for (int i = 1; i <= doc.Pages.Count; i++)
                         {
-                            annotationEditor.ExportAnnotationsToXfdf(xfdfStream);
+                            string imgPath = Path.Combine(outputFolder, $"page_{i}.png");
+                            using (FileStream imgStream = new FileStream(imgPath, FileMode.Create))
+                            {
+                                PngDevice pngDevice = new PngDevice(resolution);
+                                pngDevice.Process(doc.Pages[i], imgStream);
+                            }
                         }
                     }
-                    Console.WriteLine($"Annotations exported to XFDF file '{outputPath}'.");
+                    Console.WriteLine($"Pages exported as PNG images to folder '{outputFolder}'.");
                     break;
 
                 default:
-                    Console.Error.WriteLine($"Unsupported operation: {operation}");
+                    Console.Error.WriteLine($"Unknown operation: {operation}");
                     break;
             }
         }

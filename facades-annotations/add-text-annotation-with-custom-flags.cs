@@ -1,15 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_modified.pdf";
+        const string outputPath = "output_custom_flags.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,31 +17,24 @@ class Program
             return;
         }
 
-        // Bind the PDF to the annotation editor
-        PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        editor.BindPdf(inputPath);
-
-        // Get a reference page (any page will do – we use the first one for the constructor)
-        Page referencePage = editor.Document.Pages[1];
-        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-        // Create a new text annotation using the (Page, Rectangle) constructor
-        TextAnnotation annotation = new TextAnnotation(referencePage, rect)
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            Title    = "Custom Flag",
-            Contents = "Annotation with custom flags",
-            Color    = Aspose.Pdf.Color.Yellow,
-            // Combine custom flags (e.g., Invisible and NoZoom)
-            Flags    = AnnotationFlags.Invisible | AnnotationFlags.NoZoom
-        };
+            // Get the first page (1‑based indexing)
+            Page page = doc.Pages[1];
 
-        // Apply the annotation to all pages (1‑based indexing)
-        editor.ModifyAnnotations(1, editor.Document.Pages.Count, annotation);
+            // Iterate through all annotations on the page and set custom flags
+            foreach (Annotation ann in page.Annotations)
+            {
+                // Extend the annotation flags – example adds the NoView flag
+                // (combine with existing flags using bitwise OR)
+                ann.Flags = ann.Flags | AnnotationFlags.NoView;
+            }
 
-        // Save the modified document
-        editor.Save(outputPath);
-        editor.Close();
+            // Save the document – the modified flags are persisted automatically.
+            doc.Save(outputPath);
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Annotations updated with custom flags and saved to '{outputPath}'.");
+        }
     }
 }

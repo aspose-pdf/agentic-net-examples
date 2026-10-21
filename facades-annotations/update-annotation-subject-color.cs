@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,29 +16,40 @@ class Program
             return;
         }
 
-        // Load the document to obtain a Page object required for the TextAnnotation constructor
+        // Load the PDF document
         Document doc = new Document(inputPath);
-        Page page = doc.Pages[1]; // target page (1‑based index)
 
-        // Create a TextAnnotation using the (Page, Rectangle) constructor.
-        // An empty rectangle is sufficient when we only want to modify existing annotation properties.
-        TextAnnotation newAnnotation = new TextAnnotation(page, new Aspose.Pdf.Rectangle(0, 0, 0, 0))
+        // Ensure the document has at least one page and one annotation
+        if (doc.Pages.Count == 0 || doc.Pages[1].Annotations.Count == 0)
+        {
+            Console.WriteLine("No annotations found to modify.");
+            return;
+        }
+
+        // Get the first annotation on the first page (assumed to be a TextAnnotation)
+        Page page = doc.Pages[1];
+        TextAnnotation existing = page.Annotations[1] as TextAnnotation;
+        if (existing == null)
+        {
+            Console.WriteLine("The first annotation is not a TextAnnotation.");
+            return;
+        }
+
+        // Remove the old annotation
+        page.Annotations.Delete(1);
+
+        // Create a new TextAnnotation with the same rectangle but new subject and color
+        TextAnnotation newAnno = new TextAnnotation(page, existing.Rect)
         {
             Subject = "Updated Subject",
-            Color   = Aspose.Pdf.Color.Red
+            Color   = Aspose.Pdf.Color.FromRgb(255, 0, 0) // red
         };
 
-        // Bind the PDF to the annotation editor
-        PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        editor.BindPdf(inputPath);
+        // Add the new annotation to the page
+        page.Annotations.Add(newAnno);
 
-        // Apply the changes to annotations on the target page range (page 1)
-        editor.ModifyAnnotations(start: 1, end: 1, annotation: newAnnotation);
-
-        // Save the modified PDF and release resources
-        editor.Save(outputPath);
-        editor.Close();
-
-        Console.WriteLine($"Annotation subject and color updated. Saved to '{outputPath}'.");
+        // Save the modified document
+        doc.Save(outputPath);
+        Console.WriteLine($"Annotation updated and saved to '{outputPath}'.");
     }
 }

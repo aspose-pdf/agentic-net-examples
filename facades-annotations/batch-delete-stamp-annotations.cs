@@ -1,54 +1,69 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Directory containing PDF files
-        const string inputFolder = @"C:\PdfFolder";
-        // Optional: output folder (can be same as input to overwrite)
-        const string outputFolder = @"C:\PdfFolder\Processed";
+        // Directory containing PDFs
+        const string inputDirectory = @"C:\PdfFolder";
+        // Optional: output directory (overwrites original files)
+        const string outputDirectory = @"C:\PdfFolder\Processed";
 
-        if (!Directory.Exists(inputFolder))
+        if (!Directory.Exists(inputDirectory))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
             return;
         }
 
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDirectory);
 
-        // Process each PDF file in the folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Process each PDF file in the directory
+        foreach (string filePath in Directory.GetFiles(inputDirectory, "*.pdf"))
         {
             try
             {
-                // Initialize the annotation editor facade
-                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                // Load the PDF document
+                using (Document pdfDoc = new Document(filePath))
                 {
-                    // Load the PDF document
-                    editor.BindPdf(pdfPath);
+                    // Iterate through all pages (1‑based indexing)
+                    for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
+                    {
+                        Page page = pdfDoc.Pages[pageIndex];
 
-                    // Delete all stamp annotations in the document
-                    editor.DeleteAnnotations("Stamp");
+                        // Collect stamp annotations to remove
+                        var stampsToRemove = new System.Collections.Generic.List<StampAnnotation>();
 
-                    // Determine output path (overwrite or separate folder)
-                    string fileName = Path.GetFileName(pdfPath);
-                    string outputPath = Path.Combine(outputFolder, fileName);
+                        foreach (Annotation annotation in page.Annotations)
+                        {
+                            if (annotation is StampAnnotation stamp)
+                            {
+                                stampsToRemove.Add(stamp);
+                            }
+                        }
 
-                    // Save the modified PDF
-                    editor.Save(outputPath);
+                        // Remove collected stamp annotations
+                        foreach (StampAnnotation stamp in stampsToRemove)
+                        {
+                            page.Annotations.Delete(stamp);
+                        }
+                    }
+
+                    // Save the modified PDF (overwrite or place in output folder)
+                    string outputPath = Path.Combine(outputDirectory, Path.GetFileName(filePath));
+                    pdfDoc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed: {pdfPath}");
+                Console.WriteLine($"Processed: {Path.GetFileName(filePath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{filePath}': {ex.Message}");
             }
         }
 
-        Console.WriteLine("Batch stamp deletion completed.");
+        Console.WriteLine("Batch stamp annotation removal completed.");
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Aspose.Pdf.Facades;
 
@@ -7,62 +8,49 @@ class Program
 {
     static void Main()
     {
-        // Base directory of the application (works for both Windows and Linux)
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // Directory containing PDFs to process
+        const string inputFolder = @"C:\PdfFiles";
 
-        // Resolve input and output folders relative to the base directory
-        string inputFolder = Path.Combine(baseDir, "InputPdfs");
-        string outputFolder = Path.Combine(baseDir, "OutputPdfs");
-
-        // Ensure the input folder exists – if it does not, create it and inform the user.
-        // This prevents a DirectoryNotFoundException when the sample is run out‑of‑the‑box.
         if (!Directory.Exists(inputFolder))
         {
-            Directory.CreateDirectory(inputFolder);
-            Console.WriteLine($"Input folder not found. Created empty folder at '{inputFolder}'. Place PDF files there and re‑run the program.");
-            return; // Nothing to process yet.
-        }
-
-        // Ensure the output folder exists.
-        Directory.CreateDirectory(outputFolder);
-
-        // Get all PDF files in the input folder.
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine($"No PDF files found in '{inputFolder}'. Add PDFs and re‑run the program.");
+            Console.Error.WriteLine($"Folder not found: {inputFolder}");
             return;
         }
 
-        // Use a degree of parallelism equal to the number of logical processors.
-        ParallelOptions parallelOptions = new ParallelOptions
+        // Gather all PDF file paths
+        List<string> pdfFiles = new List<string>(Directory.GetFiles(inputFolder, "*.pdf", SearchOption.AllDirectories));
+
+        if (pdfFiles.Count == 0)
         {
-            MaxDegreeOfParallelism = Environment.ProcessorCount
+            Console.WriteLine("No PDF files found.");
+            return;
+        }
+
+        // Parallel options – limit degree of parallelism if needed
+        ParallelOptions options = new ParallelOptions
+        {
+            // MaxDegreeOfParallelism = Environment.ProcessorCount
         };
 
-        // Process each PDF file concurrently.
-        Parallel.ForEach(pdfFiles, parallelOptions, pdfPath =>
+        // Process each PDF concurrently
+        Parallel.ForEach(pdfFiles, options, pdfPath =>
         {
             try
             {
-                // Determine the output file path (same file name, different folder).
-                string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
+                // Each thread uses its own PdfAnnotationEditor instance (not IDisposable)
+                PdfAnnotationEditor editor = new PdfAnnotationEditor();
 
-                // Use PdfAnnotationEditor from Aspose.Pdf.Facades to delete all annotations.
-                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-                {
-                    editor.BindPdf(pdfPath);          // Load the PDF.
-                    editor.DeleteAnnotations();       // Remove all annotations.
-                    editor.Save(outputPath);          // Save the cleaned PDF.
-                }
+                // Delete all annotations from the PDF file
+                editor.DeleteAnnotations(pdfPath);
 
-                Console.WriteLine($"Processed: {pdfPath}");
+                Console.WriteLine($"Annotations removed: {Path.GetFileName(pdfPath)}");
             }
             catch (Exception ex)
             {
-                // Log any errors for the specific file without stopping other tasks.
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{Path.GetFileName(pdfPath)}': {ex.Message}");
             }
         });
+
+        Console.WriteLine("Processing complete.");
     }
 }

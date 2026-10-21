@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf;                 // Document, Page
+using Aspose.Pdf.Annotations;   // Annotation
 
 class Program
 {
@@ -10,35 +9,29 @@ class Program
     {
         const string inputPath = "input.pdf";
 
+        // Verify the PDF file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Bind the PDF to the annotation editor
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        int totalAnnotations = 0;
+        // Iterate through each page and collect annotations
+        foreach (Page page in pdfDocument.Pages)
         {
-            editor.BindPdf(inputPath);
-
-            // Access the underlying document to enumerate pages
-            Document doc = editor.Document;
-            int pageCount = doc.Pages.Count; // 1‑based indexing
-
-            // Iterate through each page and its annotations
-            for (int pageIndex = 1; pageIndex <= pageCount; pageIndex++)
+            foreach (Annotation annotation in page.Annotations)
             {
-                Page page = doc.Pages[pageIndex];
-                AnnotationCollection annotations = page.Annotations;
-
-                // AnnotationCollection also uses 1‑based indexing
-                for (int annIndex = 1; annIndex <= annotations.Count; annIndex++)
-                {
-                    Annotation annotation = annotations[annIndex];
-                    // Output the annotation name for debugging
-                    Console.WriteLine($"Page {pageIndex}, Annotation Name: {annotation.Name}");
-                }
+                totalAnnotations++;
+                // The Name property holds the annotation's identifier (may be empty for some types)
+                Console.WriteLine($"Annotation Name: {annotation.Name}");
             }
         }
+
+        // Output the number of annotations found
+        Console.WriteLine($"Annotations found: {totalAnnotations}");
     }
 }

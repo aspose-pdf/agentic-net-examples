@@ -2,45 +2,59 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_modified.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF and bind it to the annotation editor facade
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        // Load the PDF to inspect its annotations
+        using (Document doc = new Document(inputPath))
         {
-            editor.BindPdf(inputPdf);
-
-            // TextAnnotation does not have a parameter‑less constructor.
-            // Use the (Page, Rectangle) constructor. A zero‑size rectangle is sufficient
-            // because we only need the object to carry the Modified value for ModifyAnnotations.
-            var dummyRect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
-            Page firstPage = editor.Document.Pages[1];
-            TextAnnotation tempAnnot = new TextAnnotation(firstPage, dummyRect)
+            // Ensure the document has at least one page
+            if (doc.Pages.Count == 0)
             {
-                Modified = DateTime.Now
-            };
+                Console.Error.WriteLine("The PDF contains no pages.");
+                return;
+            }
 
-            // Apply the modification to all pages (1‑based indexing)
-            int startPage = 1;
-            int endPage   = editor.Document.Pages.Count;
-            editor.ModifyAnnotations(startPage, endPage, tempAnnot);
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
 
-            // Save the updated PDF
-            editor.Save(outputPdf);
+            // If there are no annotations, simply copy the source file
+            if (page.Annotations.Count == 0)
+            {
+                File.Copy(inputPath, outputPath, true);
+                Console.WriteLine("No annotations found – file copied unchanged.");
+                return;
+            }
+
+            // Retrieve the first annotation on the page
+            Annotation annotation = page.Annotations[1];
+
+            // Update its Modified date (only markup annotations expose this property)
+            if (annotation is MarkupAnnotation markup)
+            {
+                markup.Modified = DateTime.Now;
+                Console.WriteLine("Modified date updated for markup annotation.");
+            }
+            else
+            {
+                Console.WriteLine("First annotation is not a markup annotation; Modified date cannot be set.");
+            }
+
+            // Save the updated document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotation Modified date updated and saved to '{outputPdf}'.");
+        Console.WriteLine($"Annotation ModifiedDate updated and saved to '{outputPath}'.");
     }
 }

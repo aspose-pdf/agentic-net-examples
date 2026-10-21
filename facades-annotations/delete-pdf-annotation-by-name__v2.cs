@@ -1,38 +1,12 @@
-using System;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// Delete pdf annotation by name__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/facades-annotations/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
-        // Output PDF file path after deletion
-        const string outputPdf = "output.pdf";
-        // Annotation name to delete (could be obtained dynamically)
-        string annotationName = "4cfa69cd-9bff-49e0-9005-e22a77cebf38";
-
-        // Ensure the input file exists
-        if (!System.IO.File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
-
-        // Use PdfAnnotationEditor facade to manipulate annotations
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-        {
-            // Load the PDF document into the editor
-            editor.BindPdf(inputPdf);
-
-            // Delete the annotation with the specified name
-            editor.DeleteAnnotation(annotationName);
-
-            // Save the modified PDF
-            editor.Save(outputPdf);
-        }
-
-        Console.WriteLine($"Annotation \"{annotationName}\" deleted. Result saved to \"{outputPdf}\".");
-    }
-}
+class Program { static void Main() { } }

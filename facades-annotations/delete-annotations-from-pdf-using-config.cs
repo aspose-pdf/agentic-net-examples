@@ -1,64 +1,101 @@
 using System;
 using System.IO;
-using System.Linq;
+using System.Text.Json;
 using System.Collections.Generic;
-using Aspose.Pdf.Facades;
+using System.Linq;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath   = "input.pdf";
-        const string configFilePath = "annotations_to_delete.txt"; // one annotation type per line
-        const string outputPdfPath  = "output.pdf";
+        // Paths for the source PDF, the output PDF and the annotation configuration file
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string configPath    = "annotations.json";
 
-        // Validate input files
+        // Verify that the required files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(configFilePath))
+        if (!File.Exists(configPath))
         {
-            Console.Error.WriteLine($"Configuration file not found: {configFilePath}");
+            Console.Error.WriteLine($"Configuration file not found: {configPath}");
             return;
         }
 
-        // Read annotation types from the configuration file.
-        // Empty lines or whitespace are ignored.
-        List<string> annotationTypes = File.ReadAllLines(configFilePath)
-                                           .Where(line => !string.IsNullOrWhiteSpace(line))
-                                           .Select(line => line.Trim())
-                                           .ToList();
-
-        // Use PdfAnnotationEditor to manipulate annotations.
-        // The class implements IDisposable via SaveableFacade, so wrap it in a using block.
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        try
         {
-            // Bind the source PDF.
-            editor.BindPdf(inputPdfPath);
+            // ------------------------------------------------------------
+            // 1. Read the configuration file.
+            //    Expected format (JSON array of annotation type names):
+            //    ["Text", "Highlight", "Stamp"]
+            // ------------------------------------------------------------
+            string json = File.ReadAllText(configPath);
+            string[]? typeNames = JsonSerializer.Deserialize<string[]>(json);
 
-            if (annotationTypes.Count == 0)
+            if (typeNames == null || typeNames.Length == 0)
             {
-                // No specific types provided – delete all annotations.
-                editor.DeleteAnnotations();
+                Console.WriteLine("Configuration file does not contain any annotation types. No changes made.");
+                return;
             }
-            else
+
+            // ------------------------------------------------------------
+            // 2. Convert the string names to the Aspose.Pdf.Annotations.AnnotationType enum.
+            //    Invalid names are ignored.
+            // ------------------------------------------------------------
+            var annotationTypes = new List<AnnotationType>();
+            foreach (string name in typeNames)
             {
-                // Delete annotations of each specified type.
-                foreach (string annotType in annotationTypes)
+                if (Enum.TryParse<AnnotationType>(name, ignoreCase: true, out var parsed))
                 {
-                    // The DeleteAnnotations(string) overload removes all annotations of the given type.
-                    editor.DeleteAnnotations(annotType);
+                    annotationTypes.Add(parsed);
+                }
+                else
+                {
+                    Console.WriteLine($"Warning: Unknown annotation type '{name}' – ignored.");
                 }
             }
 
-            // Save the modified PDF.
-            editor.Save(outputPdfPath);
-        }
+            // If no valid types were found, nothing to delete.
+            if (annotationTypes.Count == 0)
+            {
+                Console.WriteLine("No valid annotation types specified. No changes made.");
+                return;
+            }
 
-        Console.WriteLine($"Annotations processed. Output saved to '{outputPdfPath}'.");
+            // ------------------------------------------------------------
+            // 3. Delete the specified annotations using the Document API.
+            // ------------------------------------------------------------
+            Document pdfDoc = new Document(inputPdfPath);
+
+            foreach (Page page in pdfDoc.Pages)
+            {
+                // Iterate backwards because we will be removing items.
+                for (int i = page.Annotations.Count; i >= 1; i--)
+                {
+                    var annotation = page.Annotations[i];
+                    if (annotationTypes.Contains(annotation.AnnotationType))
+                    {
+                        page.Annotations.Delete(i);
+                    }
+                }
+            }
+
+            pdfDoc.Save(outputPdfPath);
+            Console.WriteLine($"Annotations deleted. Result saved to '{outputPdfPath}'.");
+        }
+        catch (JsonException je)
+        {
+            Console.Error.WriteLine($"Error parsing configuration file: {je.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+        }
     }
 }

@@ -3,8 +3,9 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
+using NUnit.Framework;
 
-// Minimal NUnit stubs to allow compilation when the NUnit package is not referenced.
+// Minimal NUnit stubs to allow compilation when the NUnit package is not referenced
 namespace NUnit.Framework
 {
     [AttributeUsage(AttributeTargets.Class)]
@@ -13,101 +14,104 @@ namespace NUnit.Framework
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class TestAttribute : Attribute { }
 
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class OneTimeSetUpAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class OneTimeTearDownAttribute : Attribute { }
+
     public static class Assert
     {
-        // Allow null for the optional message in a nullable‑aware project.
         public static void AreEqual<T>(T expected, T actual, string? message = null)
         {
             if (!object.Equals(expected, actual))
-            {
                 throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
-            }
         }
     }
 }
 
 namespace AsposePdfTests
 {
-    [NUnit.Framework.TestFixture]
-    public class PdfAnnotationEditorTests
+    [TestFixture]
+    public class AnnotationDeletionTests
     {
-        // Helper to create a simple PDF with a given number of text annotations
-        private static string CreatePdfWithAnnotations(int annotationCount)
-        {
-            // Create a temporary file path for the source PDF
-            string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
+        private const string TempFolder = "TempTestFiles";
 
-            // Create a new PDF document and add a single page
+        [OneTimeSetUp]
+        public void GlobalSetup()
+        {
+            // Ensure a clean temporary folder for test files
+            if (Directory.Exists(TempFolder))
+                Directory.Delete(TempFolder, true);
+            Directory.CreateDirectory(TempFolder);
+        }
+
+        [OneTimeTearDown]
+        public void GlobalTeardown()
+        {
+            // Remove temporary files after all tests run
+            if (Directory.Exists(TempFolder))
+                Directory.Delete(TempFolder, true);
+        }
+
+        [Test]
+        public void DeleteAnnotations_RemovesAllAnnotationsFromPage()
+        {
+            // Arrange: create a PDF with three text annotations on page 1
+            string pdfPath = Path.Combine(TempFolder, "sample.pdf");
             using (Document doc = new Document())
             {
+                // Add a single page
                 Page page = doc.Pages.Add();
 
-                // Add the requested number of TextAnnotations
-                for (int i = 0; i < annotationCount; i++)
+                // Helper to create a TextAnnotation
+                TextAnnotation CreateAnnotation(string title, string contents, double llx, double lly, double urx, double ury)
                 {
-                    // Fully qualify Rectangle to avoid ambiguity with System.Drawing
-                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100 + i * 10, 500 + i * 10, 200 + i * 10, 550 + i * 10);
-                    TextAnnotation txtAnn = new TextAnnotation(page, rect)
+                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+                    TextAnnotation annot = new TextAnnotation(page, rect)
                     {
-                        Title = $"Note {i + 1}",
-                        Contents = $"This is annotation {i + 1}",
-                        Color = Aspose.Pdf.Color.Yellow,
-                        Open = true
+                        Title = title,
+                        Contents = contents,
+                        Open = true,
+                        Icon = TextIcon.Note
                     };
-                    page.Annotations.Add(txtAnn);
+                    return annot;
                 }
 
-                // Save the PDF to the temporary location
-                doc.Save(tempPath);
+                // Add three annotations
+                page.Annotations.Add(CreateAnnotation("Note1", "First note", 100, 700, 200, 750));
+                page.Annotations.Add(CreateAnnotation("Note2", "Second note", 100, 600, 200, 650));
+                page.Annotations.Add(CreateAnnotation("Note3", "Third note", 100, 500, 200, 550));
+
+                // Verify that annotations were added
+                Assert.AreEqual(3, page.Annotations.Count, "Setup failed: expected 3 annotations before deletion.");
+
+                // Save the PDF to disk
+                doc.Save(pdfPath);
             }
 
-            return tempPath;
-        }
+            // Act: delete all annotations on page 1 using PdfAnnotationEditor
+            PdfAnnotationEditor editor = new PdfAnnotationEditor();
+            editor.BindPdf(pdfPath);
+            editor.DeleteAnnotations("1"); // page numbers are 1‑based and method expects a string
+            editor.Save(pdfPath); // persist changes
 
-        [NUnit.Framework.Test]
-        public void DeleteAnnotations_RemovesAllAnnotations()
-        {
-            // Arrange: create a PDF with 3 annotations
-            string sourcePdf = CreatePdfWithAnnotations(3);
-            string outputPdf = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + "_out.pdf");
-
-            // Verify initial annotation count using a Document instance
-            int initialCount;
-            using (Document verifyDoc = new Document(sourcePdf))
+            // Assert: reload the document and ensure no annotations remain on page 1
+            using (Document resultDoc = new Document(pdfPath))
             {
-                // Annotations collection uses 1‑based indexing; Count property gives total number
-                initialCount = verifyDoc.Pages[1].Annotations.Count;
-            }
-            NUnit.Framework.Assert.AreEqual(3, initialCount, "Initial PDF should contain 3 annotations.");
-
-            // Act: delete all annotations via PdfAnnotationEditor
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-            {
-                editor.BindPdf(sourcePdf);
-                editor.DeleteAnnotations(); // removes all annotations
-                editor.Save(outputPdf);
+                Page resultPage = resultDoc.Pages[1];
+                Assert.AreEqual(0, resultPage.Annotations.Count, "All annotations should have been removed from page 1.");
             }
 
-            // Assert: the resulting PDF should have zero annotations
-            int finalCount;
-            using (Document resultDoc = new Document(outputPdf))
-            {
-                finalCount = resultDoc.Pages[1].Annotations.Count;
-            }
-            NUnit.Framework.Assert.AreEqual(0, finalCount, "All annotations should have been removed.");
-
-            // Cleanup temporary files
-            File.Delete(sourcePdf);
-            File.Delete(outputPdf);
+            // Cleanup: delete the temporary PDF file
+            if (File.Exists(pdfPath))
+                File.Delete(pdfPath);
         }
     }
-}
 
-// Dummy entry point to satisfy the compiler when the project expects an executable.
-public static class Program
-{
-    public static void Main()
+    // Dummy entry point to satisfy the console‑application project type.
+    public static class Program
     {
-        // No runtime logic required – tests are discovered and run by the test runner.
+        public static void Main() { }
     }
 }

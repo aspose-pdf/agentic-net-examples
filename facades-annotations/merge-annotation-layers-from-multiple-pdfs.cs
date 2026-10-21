@@ -1,56 +1,60 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Facades;
 
-namespace PdfUtilities
+class Program
 {
-    public static class PdfAnnotationMerger
+    static void Main()
     {
-        /// <summary>
-        /// Merges annotation layers from multiple source PDFs into a target PDF.
-        /// The resulting PDF contains all annotations from the source documents
-        /// combined with the original content of the target PDF.
-        /// </summary>
-        /// <param name="targetPdfPath">Path to the PDF that will receive the annotations.</param>
-        /// <param name="sourcePdfPaths">Array of PDF file paths whose annotations will be imported.</param>
-        /// <param name="outputPdfPath">Path where the merged PDF will be saved.</param>
-        public static void MergeAnnotationLayers(string targetPdfPath, string[] sourcePdfPaths, string outputPdfPath)
+        // Input PDFs – each file may contain its own annotation layer
+        string[] inputFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
+        string outputFile = "merged_annotations.pdf";
+
+        // Verify that all input files exist
+        foreach (string f in inputFiles)
         {
-            // Validate input files
-            if (!File.Exists(targetPdfPath))
-                throw new FileNotFoundException($"Target PDF not found: {targetPdfPath}");
-
-            foreach (string src in sourcePdfPaths)
+            if (!File.Exists(f))
             {
-                if (!File.Exists(src))
-                    throw new FileNotFoundException($"Source PDF not found: {src}");
-            }
-
-            // Use PdfAnnotationEditor to bind the target PDF and import annotations
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-            {
-                // Bind the target PDF document
-                editor.BindPdf(targetPdfPath);
-
-                // Import all annotations from the source PDFs (all annotation types)
-                editor.ImportAnnotations(sourcePdfPaths);
-
-                // Save the combined document to the specified output path
-                editor.Save(outputPdfPath);
+                Console.Error.WriteLine($"File not found: {f}");
+                return;
             }
         }
-    }
 
-    // Minimal entry point required for a console‑application build.
-    internal class Program
-    {
-        private static void Main(string[] args)
+        // Use the first PDF as the base document
+        using (Document target = new Document(inputFiles[0]))
         {
-            // Example usage (commented out – replace with real file paths to run).
-            // string target = "target.pdf";
-            // string[] sources = { "source1.pdf", "source2.pdf" };
-            // string output = "merged.pdf";
-            // PdfAnnotationMerger.MergeAnnotationLayers(target, sources, output);
+            // Process remaining PDFs and copy their annotations onto the target
+            for (int i = 1; i < inputFiles.Length; i++)
+            {
+                using (Document source = new Document(inputFiles[i]))
+                {
+                    // Iterate through pages – Aspose.Pdf uses 1‑based indexing
+                    int pageCount = Math.Min(target.Pages.Count, source.Pages.Count);
+                    for (int p = 1; p <= pageCount; p++)
+                    {
+                        Page targetPage = target.Pages[p];
+                        Page sourcePage = source.Pages[p];
+
+                        // Copy each annotation from the source page to the target page
+                        for (int a = 0; a < sourcePage.Annotations.Count; a++)
+                        {
+                            // Retrieve the annotation from the source document
+                            Aspose.Pdf.Annotations.Annotation srcAnnotation = sourcePage.Annotations[a];
+
+                            // Add the same annotation instance to the target page.
+                            // The annotation is detached from the source document and attached to the target.
+                            targetPage.Annotations.Add(srcAnnotation);
+                        }
+                    }
+                }
+            }
+
+            // Save the merged PDF containing all annotation layers
+            target.Save(outputFile);
         }
+
+        Console.WriteLine($"Merged PDF with combined annotations saved to '{outputFile}'.");
     }
 }

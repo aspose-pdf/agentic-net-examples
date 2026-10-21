@@ -6,12 +6,11 @@ class Program
 {
     static void Main()
     {
-        // Input folder containing PDFs to process
-        const string inputFolder  = "InputPdfs";
-        // Output folder where cleaned PDFs will be saved
-        const string outputFolder = "OutputPdfs";
+        // Folder containing PDFs to process
+        const string inputFolder  = @"C:\PdfBatch\Input";
+        // Folder where processed PDFs will be saved
+        const string outputFolder = @"C:\PdfBatch\Output";
 
-        // Validate folders
         if (!Directory.Exists(inputFolder))
         {
             Console.Error.WriteLine($"Input folder not found: {inputFolder}");
@@ -21,34 +20,44 @@ class Program
         Directory.CreateDirectory(outputFolder);
 
         // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        int totalFiles = pdfFiles.Length;
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        int total = pdfFiles.Length;
 
-        if (totalFiles == 0)
+        if (total == 0)
         {
             Console.WriteLine("No PDF files found to process.");
             return;
         }
 
-        // Process each PDF and display progress
-        for (int i = 0; i < totalFiles; i++)
+        // Process each PDF and delete all annotations
+        for (int i = 0; i < total; i++)
         {
             string sourcePath = pdfFiles[i];
-            string destPath   = Path.Combine(outputFolder, Path.GetFileName(sourcePath));
+            string fileName   = Path.GetFileName(sourcePath);
+            string destPath   = Path.Combine(outputFolder, fileName);
 
-            // Use PdfAnnotationEditor to delete all annotations
+            // PdfAnnotationEditor implements IDisposable, so use a using block
             using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                editor.BindPdf(sourcePath);          // Load the PDF
-                editor.DeleteAnnotations();          // Remove all annotations
-                editor.Save(destPath);               // Save the cleaned PDF
+                // Load the PDF
+                editor.BindPdf(sourcePath);
+
+                // Delete every annotation in the document
+                editor.DeleteAnnotations();
+
+                // Optional: flatten any remaining annotation objects (makes them part of the page content)
+                editor.FlatteningAnnotations();
+
+                // Save the modified PDF
+                editor.Save(destPath);
             }
 
             // Calculate and display progress percentage
-            int percent = (i + 1) * 100 / totalFiles;
-            Console.WriteLine($"Processed {i + 1}/{totalFiles} ({percent}%)");
+            int percent = (i + 1) * 100 / total;
+            Console.Write($"\rProcessed {i + 1}/{total} PDFs ({percent}%)");
         }
 
+        Console.WriteLine(); // Move to next line after progress bar
         Console.WriteLine("Batch annotation deletion completed.");
     }
 }

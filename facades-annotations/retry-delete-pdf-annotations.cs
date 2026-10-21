@@ -1,41 +1,80 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+// Note: Annotation types are in the Aspose.Pdf.Annotations namespace.
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const int maxAttempts = 2;
-        int attempt = 0;
-        bool success = false;
 
-        while (attempt < maxAttempts && !success)
+        if (!File.Exists(inputPath))
         {
-            attempt++;
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        bool deletionSucceeded = false;
+        int attemptCount = 0;
+        const int maxAttempts = 2; // initial try + one retry
+
+        while (!deletionSucceeded && attemptCount < maxAttempts)
+        {
             try
             {
-                // Bind the PDF, delete all annotations, and save.
-                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                // Iterate over all pages and delete their annotations
+                foreach (Page page in doc.Pages)
                 {
-                    editor.BindPdf(inputPath);          // Initialize with the source PDF
-                    editor.DeleteAnnotations();         // Remove all annotations
-                    editor.Save(outputPath);            // Persist the changes
+                    // The Annotations property returns an AnnotationCollection defined in Aspose.Pdf.Annotations
+                    Aspose.Pdf.Annotations.AnnotationCollection annotations = page.Annotations;
+
+                    // Collect annotations to delete (example: delete all)
+                    List<Aspose.Pdf.Annotations.Annotation> toRemove = new List<Aspose.Pdf.Annotations.Annotation>();
+                    foreach (Aspose.Pdf.Annotations.Annotation ann in annotations)
+                    {
+                        toRemove.Add(ann);
+                    }
+
+                    // Delete collected annotations
+                    foreach (Aspose.Pdf.Annotations.Annotation ann in toRemove)
+                    {
+                        annotations.Delete(ann);
+                    }
                 }
 
-                success = true;
-                Console.WriteLine($"Annotations deleted successfully on attempt {attempt}.");
+                deletionSucceeded = true; // no exception, operation succeeded
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Attempt {attempt} failed: {ex.Message}");
-                // If not the last attempt, the loop will retry by rebinding the PDF.
-                if (attempt >= maxAttempts)
-                {
-                    Console.Error.WriteLine("All retry attempts exhausted.");
-                }
+                // Log the failure and attempt to rebind (reload) the document
+                Console.Error.WriteLine($"Attempt {attemptCount + 1} failed: {ex.Message}");
+                attemptCount++;
+
+                // Rebind the PDF by reloading it from the original file
+                doc.Dispose();
+                doc = new Document(inputPath);
             }
         }
+
+        if (!deletionSucceeded)
+        {
+            Console.Error.WriteLine("Failed to delete annotations after retry.");
+        }
+        else
+        {
+            // Save the modified PDF
+            doc.Save(outputPath);
+            Console.WriteLine($"Annotations deleted and PDF saved to '{outputPath}'.");
+        }
+
+        // Ensure the document is disposed
+        doc.Dispose();
     }
 }

@@ -1,77 +1,89 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using System.Collections.Generic;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations; // AnnotationType enum
+using System.Linq;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
+    // Configuration model matching the JSON structure
+    private class Config
+    {
+        // Initialise the collection to satisfy non‑nullable analysis
+        public List<string> RetainAnnotationTypes { get; set; } = new();
+    }
+
     static void Main()
     {
-        // Paths for input PDF, output PDF and JSON configuration
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string configPath = "config.json";
+        // Paths for the source PDF, the output PDF and the JSON config file
+        const string inputPdfPath = "source.pdf";
+        const string outputPdfPath = "cleaned.pdf";
+        const string configPath = "annotationConfig.json";
 
-        // Validate file existence
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
+
         if (!File.Exists(configPath))
         {
-            Console.Error.WriteLine($"Configuration file not found: {configPath}");
+            Console.Error.WriteLine($"Config file not found: {configPath}");
             return;
         }
 
-        // ----- Load JSON configuration -----
-        // Expected format: { "retainTypes": [ "Text", "Highlight" ] }
+        // Load the JSON configuration that lists annotation types to keep
+        // Example JSON:
+        // {
+        //   "RetainAnnotationTypes": [ "Highlight", "Underline", "Text" ]
+        // }
         string json = File.ReadAllText(configPath);
         Config cfg = JsonSerializer.Deserialize<Config>(json);
 
-        // Build a case‑insensitive set of annotation type names to retain
-        HashSet<string> retain = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        if (cfg?.RetainTypes != null)
+        if (cfg == null || cfg.RetainAnnotationTypes == null)
         {
-            foreach (var t in cfg.RetainTypes) retain.Add(t);
+            Console.Error.WriteLine("Invalid configuration.");
+            return;
         }
 
-        // ----- Process PDF with PdfAnnotationEditor -----
-        // PdfAnnotationEditor follows the create‑load‑save lifecycle:
-        //   1. Create new instance
-        //   2. BindPdf (load)
-        //   3. Save (persist)
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        // Normalise the retain list for case‑insensitive comparison
+        var retainSet = new HashSet<string>(cfg.RetainAnnotationTypes, StringComparer.OrdinalIgnoreCase);
+
+        try
         {
             // Load the PDF document
-            editor.BindPdf(inputPath);
+            Document pdfDoc = new Document(inputPdfPath);
 
-            // Iterate over all possible annotation types defined in the enum
-            foreach (AnnotationType type in Enum.GetValues(typeof(AnnotationType)))
+            // Iterate through each page and remove annotations that are NOT in the retain list
+            foreach (Page page in pdfDoc.Pages)
             {
-                string typeName = type.ToString();
-
-                // Delete the annotation type only if it is NOT in the retain list
-                if (!retain.Contains(typeName))
+                // Collect annotations to delete (cannot modify collection while iterating)
+                var toDelete = new List<Annotation>();
+                foreach (Annotation ann in page.Annotations)
                 {
-                    // DeleteAnnotations(string) removes all annotations of the given type
-                    editor.DeleteAnnotations(typeName);
+                    // ann.AnnotationType is an enum; compare its name with the retain list
+                    if (!retainSet.Contains(ann.AnnotationType.ToString()))
+                    {
+                        toDelete.Add(ann);
+                    }
+                }
+
+                // Delete the collected annotations
+                foreach (var ann in toDelete)
+                {
+                    page.Annotations.Delete(ann);
                 }
             }
 
-            // Save the modified PDF
-            editor.Save(outputPath);
+            // Save the cleaned PDF
+            pdfDoc.Save(outputPdfPath);
+            Console.WriteLine($"Annotations cleaned. Output saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"PDF processed. Output saved to '{outputPath}'.");
-        Console.WriteLine($"Retained annotation types: {string.Join(", ", retain)}");
-    }
-
-    // POCO class matching the JSON structure
-    private class Config
-    {
-        public string[] RetainTypes { get; set; }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during annotation processing: {ex.Message}");
+        }
     }
 }

@@ -1,112 +1,80 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using System.Threading;
 using Aspose.Pdf.Facades;
 
-class PdfFlattenerService
+class Program
 {
-    private readonly string _watchFolder;
-    private readonly string _outputFolder;
-    private FileSystemWatcher _watcher;
+    // Folder to watch – change as needed
+    private const string WatchFolder = @"C:\PdfWatchFolder";
 
-    public PdfFlattenerService(string watchFolder, string outputFolder)
+    static void Main()
     {
-        _watchFolder = watchFolder;
-        _outputFolder = outputFolder;
-    }
-
-    public void Start()
-    {
-        // Ensure the output directory exists
-        Directory.CreateDirectory(_outputFolder);
-
-        // Watch for new PDF files
-        _watcher = new FileSystemWatcher(_watchFolder, "*.pdf");
-        _watcher.Created += OnCreated;
-        _watcher.EnableRaisingEvents = true;
-
-        Console.WriteLine($"Monitoring folder: {_watchFolder}");
-    }
-
-    private void OnCreated(object sender, FileSystemEventArgs e)
-    {
-        try
+        if (!Directory.Exists(WatchFolder))
         {
-            // Wait until the file is ready for reading
-            for (int i = 0; i < 5; i++)
-            {
-                if (IsFileReady(e.FullPath))
-                    break;
-                System.Threading.Thread.Sleep(500);
-            }
-
-            ProcessPdf(e.FullPath);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error processing file '{e.Name}': {ex.Message}");
-        }
-    }
-
-    private bool IsFileReady(string path)
-    {
-        try
-        {
-            using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.None))
-            {
-                return stream.Length > 0;
-            }
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    private void ProcessPdf(string inputPath)
-    {
-        string fileName = Path.GetFileNameWithoutExtension(inputPath);
-        string outputPath = Path.Combine(_outputFolder, $"{fileName}_flattened.pdf");
-
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Flatten annotations using PdfAnnotationEditor
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-            {
-                editor.BindPdf(doc);
-                editor.FlatteningAnnotations(); // flatten all annotations
-                editor.Save(outputPath);
-            }
-        }
-
-        Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
-    }
-
-    public void Stop()
-    {
-        if (_watcher != null)
-        {
-            _watcher.EnableRaisingEvents = false;
-            _watcher.Dispose();
-        }
-    }
-
-    static void Main(string[] args)
-    {
-        // Expect two arguments: watch folder and output folder
-        if (args.Length < 2)
-        {
-            Console.WriteLine("Usage: PdfFlattenerService <watchFolder> <outputFolder>");
+            Console.Error.WriteLine($"Folder does not exist: {WatchFolder}");
             return;
         }
 
-        PdfFlattenerService service = new PdfFlattenerService(args[0], args[1]);
-        service.Start();
+        using (var watcher = new FileSystemWatcher(WatchFolder, "*.pdf"))
+        {
+            watcher.Created += OnCreated;
+            watcher.EnableRaisingEvents = true;
 
-        Console.WriteLine("Press Enter to exit...");
-        Console.ReadLine();
+            Console.WriteLine($"Monitoring folder: {WatchFolder}");
+            Console.WriteLine("Press ENTER to exit.");
+            Console.ReadLine(); // keep the process alive
+        }
+    }
 
-        service.Stop();
+    private static void OnCreated(object sender, FileSystemEventArgs e)
+    {
+        // Run processing on a separate thread to avoid blocking the watcher
+        ThreadPool.QueueUserWorkItem(_ => ProcessPdf(e.FullPath));
+    }
+
+    private static void ProcessPdf(string inputPath)
+    {
+        // Wait until the file is fully written and accessible
+        const int maxAttempts = 10;
+        int attempt = 0;
+        while (attempt < maxAttempts)
+        {
+            try
+            {
+                using (FileStream fs = File.Open(inputPath, FileMode.Open, FileAccess.Read, FileShare.None))
+                {
+                    // File is ready
+                    break;
+                }
+            }
+            catch (IOException)
+            {
+                attempt++;
+                Thread.Sleep(500);
+            }
+        }
+
+        string outputPath = Path.Combine(
+            Path.GetDirectoryName(inputPath),
+            Path.GetFileNameWithoutExtension(inputPath) + "_flattened.pdf");
+
+        try
+        {
+            // Flatten annotations using PdfAnnotationEditor
+            using (Aspose.Pdf.Facades.PdfAnnotationEditor editor = new Aspose.Pdf.Facades.PdfAnnotationEditor())
+            {
+                editor.BindPdf(inputPath);
+                editor.DeleteAnnotations();               // optional: remove all annotations
+                editor.FlatteningAnnotations();           // flatten remaining annotations
+                editor.Save(outputPath);
+            }
+
+            Console.WriteLine($"Processed and saved: {outputPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+        }
     }
 }

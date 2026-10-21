@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -7,34 +8,50 @@ class Program
     static void Main()
     {
         // UNC path to the network share containing PDFs
-        const string networkPath = @"\\server\share\pdfs";
+        const string sourceFolder = @"\\server\share\pdfs";
 
-        if (!Directory.Exists(networkPath))
+        // Folder where flattened PDFs will be written (can be the same as source)
+        const string destinationRoot = @"\\server\share\pdfs\flattened";
+
+        if (!Directory.Exists(sourceFolder))
         {
-            Console.Error.WriteLine($"Directory not found: {networkPath}");
+            Console.Error.WriteLine($"Source folder not found: {sourceFolder}");
             return;
         }
 
-        // Get all PDF files in the share (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(networkPath, "*.pdf", SearchOption.TopDirectoryOnly);
+        // Ensure the destination root exists
+        Directory.CreateDirectory(destinationRoot);
 
-        foreach (string pdfPath in pdfFiles)
+        // Retrieve all PDF files recursively
+        string[] pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf", SearchOption.AllDirectories);
+
+        foreach (string inputPath in pdfFiles)
         {
             try
             {
-                // Overwrite the original file after flattening annotations
+                // Preserve relative folder structure in the destination
+                string relativePath = Path.GetRelativePath(sourceFolder, inputPath);
+                string outputPath = Path.Combine(destinationRoot, relativePath);
+                Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+
+                // Flatten annotations using PdfAnnotationEditor
                 using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
                 {
-                    editor.BindPdf(pdfPath);               // Load the PDF
-                    editor.FlatteningAnnotations();        // Flatten all annotations
-                    editor.Save(pdfPath);                  // Save back to the same file
+                    // Bind the source PDF
+                    editor.BindPdf(inputPath);
+
+                    // Flatten remaining annotations (method name is FlatteningAnnotations)
+                    editor.FlatteningAnnotations();
+
+                    // Save the flattened PDF
+                    editor.Save(outputPath);
                 }
 
-                Console.WriteLine($"Flattened annotations in: {pdfPath}");
+                Console.WriteLine($"Flattened: {inputPath} -> {outputPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
     }

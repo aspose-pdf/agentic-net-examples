@@ -1,70 +1,53 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
 
-public static class AnnotationReport
+class AnnotationReporter
 {
-    // Returns a dictionary where key = page number (1‑based) and value = annotation count on that page
+    // Returns a dictionary where the key is the page number (1‑based) and the value is the annotation count on that page.
     public static Dictionary<int, int> GetAnnotationsCountPerPage(string pdfPath)
     {
+        if (!File.Exists(pdfPath))
+            throw new FileNotFoundException($"PDF file not found: {pdfPath}");
+
         var counts = new Dictionary<int, int>();
-        // Use a using‑statement to guarantee disposal of the facade
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+
+        // Load the PDF once and iterate through its pages.
+        // Document implements IDisposable, so we wrap it in a using block for deterministic cleanup.
+        using (Document doc = new Document(pdfPath))
         {
-            editor.BindPdf(pdfPath);
-            Document doc = editor.Document;
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            int pageCount = doc.Pages.Count;
+            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
             {
-                Page page = doc.Pages[i];
-                counts[i] = page.Annotations.Count;
+                // Each Page object exposes an Annotations collection.
+                // The collection may be null, but in current Aspose.Pdf versions it is always instantiated.
+                int annotationCount = doc.Pages[pageNumber].Annotations?.Count ?? 0;
+                counts[pageNumber] = annotationCount;
             }
-            editor.Close();
         }
+
         return counts;
     }
-}
 
-class Program
-{
+    // Example usage
     static void Main()
     {
-        const string samplePath = "sample.pdf";
+        const string inputPdf = "sample.pdf";
 
-        // ------------------------------------------------------------
-        // Create a self‑contained sample PDF with a few pages/annotations
-        // ------------------------------------------------------------
-        using (Document doc = new Document())
+        try
         {
-            // Page 1 – two text annotations
-            Page page1 = doc.Pages.Add();
-            var rect1 = new Aspose.Pdf.Rectangle(100, 600, 200, 650);
-            var ann1 = new TextAnnotation(page1, rect1) { Title = "Note1", Contents = "First note" };
-            page1.Annotations.Add(ann1);
+            Dictionary<int, int> pageAnnotationCounts = GetAnnotationsCountPerPage(inputPdf);
 
-            var rect2 = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
-            var ann2 = new TextAnnotation(page1, rect2) { Title = "Note2", Contents = "Second note" };
-            page1.Annotations.Add(ann2);
-
-            // Page 2 – one text annotation
-            Page page2 = doc.Pages.Add();
-            var rect3 = new Aspose.Pdf.Rectangle(100, 600, 200, 650);
-            var ann3 = new TextAnnotation(page2, rect3) { Title = "Note3", Contents = "Third note" };
-            page2.Annotations.Add(ann3);
-
-            // Persist the PDF so the reporting method can open it
-            doc.Save(samplePath);
+            Console.WriteLine($"Annotation counts for '{inputPdf}':");
+            foreach (var kvp in pageAnnotationCounts)
+            {
+                Console.WriteLine($"Page {kvp.Key}: {kvp.Value} annotation(s)");
+            }
         }
-
-        // ------------------------------------------------------------
-        // Retrieve annotation counts per page
-        // ------------------------------------------------------------
-        Dictionary<int, int> pageAnnotationCounts = AnnotationReport.GetAnnotationsCountPerPage(samplePath);
-
-        foreach (var kvp in pageAnnotationCounts)
+        catch (Exception ex)
         {
-            Console.WriteLine($"Page {kvp.Key}: {kvp.Value} annotation(s)");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }
