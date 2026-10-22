@@ -7,36 +7,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "encrypted_output.pdf";
-
-        // Passwords and permissions for encryption
-        const string userPassword  = "user123";
+        const string inputPath = "input.pdf";
+        const string outputPath = "encrypted.pdf";
+        const string userPassword = "user123";
         const string ownerPassword = "owner123";
-        Permissions permissions = Permissions.PrintDocument | Permissions.ExtractContent;
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the existing PDF
+            // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Add simple text to the first page
-                Page firstPage = doc.Pages[1]; // 1‑based indexing
-                TextFragment tf = new TextFragment("Confidential – Do not distribute");
-                tf.Position = new Position(100, 700); // place near top-left
-                tf.TextState.FontSize = 14;
-                tf.TextState.Font = FontRepository.FindFont("Helvetica");
-                tf.TextState.ForegroundColor = Color.Red;
-                firstPage.Paragraphs.Add(tf);
+                // Add a text fragment to the first page (pages are 1‑based)
+                Page page = doc.Pages[1];
+                TextFragment tf = new TextFragment("Confidential document");
+                tf.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0.8, 0.0, 0.0); // cross‑platform color
+                tf.Position = new Position(100, 750); // place near top-left
+                page.Paragraphs.Add(tf);
 
-                // Encrypt the document with a user password
-                doc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.AESx256);
+                // Encrypt the document with a user password (AES‑256)
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF
                 doc.Save(outputPath);

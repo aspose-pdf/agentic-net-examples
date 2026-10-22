@@ -16,26 +16,34 @@ class Program
             return;
         }
 
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Find every occurrence of "Confidential"
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber("Confidential");
-            // Optional: make the search case‑sensitive (true) or case‑insensitive (false)
-            absorber.TextSearchOptions = new TextSearchOptions(true);
-
-            // Apply the absorber to all pages
-            doc.Pages.Accept(absorber);
-
-            // Replace the found text with "Public"
-            foreach (TextFragment fragment in absorber.TextFragments)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                fragment.Text = "Public";
+                // Create an absorber that searches for the text "Confidential"
+                TextFragmentAbsorber absorber = new TextFragmentAbsorber("Confidential");
+                // Optional: make the search case‑sensitive (true) or case‑insensitive (false)
+                absorber.TextSearchOptions = new TextSearchOptions(true);
+
+                // Apply the absorber to all pages of the document
+                doc.Pages.Accept(absorber);
+
+                // Replace each found fragment with the new text "Public"
+                foreach (TextFragment fragment in absorber.TextFragments)
+                {
+                    fragment.Text = "Public";
+                }
+
+                // Save the modified document
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Replacement completed. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Replaced text saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

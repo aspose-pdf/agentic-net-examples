@@ -4,54 +4,61 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class BatchStringReplacer
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        // Folder containing source PDFs
+        const string inputFolder = @"C:\Pdf\Input";
+        // Folder where modified PDFs will be saved
+        const string outputFolder = @"C:\Pdf\Output";
 
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Define old‑new string pairs
+        // Dictionary of old string => new string replacements
         var replacements = new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            { "OldString1", "NewString1" },
-            { "OldString2", "NewString2" },
-            { "Sample Text", "Replaced Text" }
+            { "OldCompany", "NewCompany" },
+            { "Confidential", "Public" },
+            { "2022", "2023" }
             // add more pairs as needed
         };
 
-        // Load the PDF, process replacements, and save
-        using (Document doc = new Document(inputPath))
+        // Process each PDF file in the input folder
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            foreach (var kvp in replacements)
-            {
-                // Search for the old string across all pages
-                TextFragmentAbsorber absorber = new TextFragmentAbsorber(kvp.Key)
-                {
-                    // Use the constructor that accepts the Scope enum to replace all occurrences
-                    TextReplaceOptions = new TextReplaceOptions(TextReplaceOptions.Scope.REPLACE_ALL)
-                };
+            string fileName = Path.GetFileName(inputPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
 
-                // Apply absorber to the whole document
+            // Load PDF using the core Document API (no Facades)
+            using (Document doc = new Document(inputPath))
+            {
+                // Absorb all text fragments in the document
+                TextFragmentAbsorber absorber = new TextFragmentAbsorber();
                 doc.Pages.Accept(absorber);
 
-                // Replace each found fragment with the new string
+                // Iterate over each fragment and apply all replacements
                 foreach (TextFragment fragment in absorber.TextFragments)
                 {
-                    fragment.Text = kvp.Value;
+                    string text = fragment.Text;
+                    foreach (var kvp in replacements)
+                    {
+                        if (text.Contains(kvp.Key))
+                        {
+                            text = text.Replace(kvp.Key, kvp.Value);
+                        }
+                    }
+                    fragment.Text = text;
                 }
+
+                // Save the modified PDF (same format, so no SaveOptions needed)
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Processed: {fileName}");
         }
 
-        Console.WriteLine($"Replacements completed. Output saved to '{outputPath}'.");
+        Console.WriteLine("Batch replacement completed.");
     }
 }

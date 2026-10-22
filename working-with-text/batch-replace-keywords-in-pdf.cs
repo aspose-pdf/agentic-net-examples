@@ -1,17 +1,17 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class BatchKeywordReplacer
+class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF and configuration file paths
         const string inputPdfPath = "input.pdf";
         const string outputPdfPath = "output.pdf";
-        const string configPath = "replacements.txt";
+        const string configPath = "replacements.json";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -21,59 +21,65 @@ class BatchKeywordReplacer
 
         if (!File.Exists(configPath))
         {
-            Console.Error.WriteLine($"Configuration file not found: {configPath}");
+            Console.Error.WriteLine($"Config file not found: {configPath}");
             return;
         }
 
-        // Load replacement mappings (format: oldString=newString per line)
-        var replacements = new Dictionary<string, string>(StringComparer.Ordinal);
-        foreach (var line in File.ReadAllLines(configPath))
+        // Load replacement map from JSON file: { "old1": "new1", "old2": "new2", ... }
+        Dictionary<string, string> replacements;
+        try
         {
-            // Skip empty or comment lines
-            if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("#"))
-                continue;
-
-            var parts = line.Split(new[] { '=' }, 2);
-            if (parts.Length != 2)
-                continue; // malformed line – ignore
-
-            var oldText = parts[0];
-            var newText = parts[1];
-            replacements[oldText] = newText;
-        }
-
-        if (replacements.Count == 0)
-        {
-            Console.WriteLine("No valid replacement entries found.");
-            return;
-        }
-
-        // Open the PDF document (wrapped in using for deterministic disposal)
-        using (Document doc = new Document(inputPdfPath))
-        {
-            // Iterate over each replacement pair
-            foreach (var kvp in replacements)
+            string json = File.ReadAllText(configPath);
+            replacements = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            if (replacements == null || replacements.Count == 0)
             {
-                string oldValue = kvp.Key;
-                string newValue = kvp.Value;
+                Console.Error.WriteLine("Replacement map is empty.");
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to read config: {ex.Message}");
+            return;
+        }
 
-                // Create an absorber that searches for the current old value
-                TextFragmentAbsorber absorber = new TextFragmentAbsorber(oldValue);
-
-                // Accept the absorber for all pages
-                doc.Pages.Accept(absorber);
-
-                // Replace every found fragment with the new value
-                foreach (TextFragment fragment in absorber.TextFragments)
+        try
+        {
+            // Load PDF document
+            using (Document pdfDoc = new Document(inputPdfPath))
+            {
+                // Iterate over each page (1‑based indexing)
+                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
                 {
-                    fragment.Text = newValue;
+                    Page page = pdfDoc.Pages[pageNum];
+
+                    // Apply each replacement on the current page
+                    foreach (var kvp in replacements)
+                    {
+                        string oldText = kvp.Key;
+                        string newText = kvp.Value;
+
+                        // Search for the old text
+                        TextFragmentAbsorber absorber = new TextFragmentAbsorber(oldText);
+                        page.Accept(absorber);
+
+                        // Replace all occurrences found
+                        foreach (TextFragment fragment in absorber.TextFragments)
+                        {
+                            fragment.Text = newText;
+                        }
+                    }
                 }
+
+                // Save the modified PDF
+                pdfDoc.Save(outputPdfPath);
             }
 
-            // Save the modified document
-            doc.Save(outputPdfPath);
+            Console.WriteLine($"Replacements applied. Output saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Batch replacement completed. Output saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Processing error: {ex.Message}");
+        }
     }
 }

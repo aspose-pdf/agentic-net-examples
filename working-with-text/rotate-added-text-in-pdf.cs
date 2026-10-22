@@ -9,6 +9,8 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "rotated_text.pdf";
+        const string text = "Rotated Text Example";
+        const float angleDegrees = 45f;
 
         if (!File.Exists(inputPath))
         {
@@ -16,32 +18,29 @@ class Program
             return;
         }
 
-        // Open the existing PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
-            Aspose.Pdf.Page page = doc.Pages[1];
-
             // Create a text fragment with the desired content
-            Aspose.Pdf.Text.TextFragment textFragment = new Aspose.Pdf.Text.TextFragment("Rotated Text");
+            TextFragment fragment = new TextFragment(text);
 
-            // Set the baseline position where the text will be placed
-            textFragment.Position = new Aspose.Pdf.Text.Position(100, 500);
+            // Set font, size, and color
+            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
+            fragment.TextState.FontSize = 24F; // float literal
+            fragment.TextState.ForegroundColor = Color.FromRgb(0, 0, 255); // Blue
 
-            // Rotate the text by specifying an angle (in degrees) via the TextState
-            textFragment.TextState.Rotation = 45; // 45° clockwise rotation
+            // Rotate the text – TextState has a Rotation property (degrees)
+            fragment.TextState.Rotation = angleDegrees;
 
-            // Optional visual styling
-            textFragment.TextState.FontSize = 24;
-            textFragment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+            // Position the text fragment on the page (lower‑left corner of the text)
+            fragment.Position = new Position(100, 500);
 
-            // Add the text fragment to the page's paragraph collection
-            page.Paragraphs.Add(textFragment);
+            // Add the fragment to the first page
+            doc.Pages[1].Paragraphs.Add(fragment);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved to '{outputPath}'.");
+        Console.WriteLine($"Rotated text added and saved to '{outputPath}'.");
     }
 }

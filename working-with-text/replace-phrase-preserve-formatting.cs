@@ -1,56 +1,67 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class ReplacePhraseWithFormatting
+class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Phrase to search for and its replacement
-        const string searchPhrase = "hello world";
-        const string replacementPhrase = "hi universe";
-
+        // Verify that the input PDF exists before attempting to load it.
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Define the phrases to replace: key = text to find, value = replacement text
+        var replacements = new Dictionary<string, string>
         {
-            // Create a TextFragmentAbsorber that searches for the specified phrase
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchPhrase);
+            { "Old Phrase 1", "New Phrase A" },
+            { "Sample text", "Replaced text" }
+            // Add additional pairs as needed
+        };
 
-            // Accept the absorber on each page (you can also target a single page)
-            foreach (Page page in doc.Pages)
+        try
+        {
+            // Load the PDF document. The Aspose.Pdf assembly must be referenced (e.g., via NuGet).
+            using (Document doc = new Document(inputPath))
             {
-                page.Accept(absorber);
+                // Iterate over each phrase pair
+                foreach (var pair in replacements)
+                {
+                    string searchText  = pair.Key;
+                    string replacement = pair.Value;
+
+                    // Locate all occurrences of the search text
+                    TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
+                    doc.Pages.Accept(absorber);
+
+                    // Replace each found fragment while keeping its original TextState
+                    foreach (TextFragment fragment in absorber.TextFragments)
+                    {
+                        // Changing the Text property preserves the original formatting (font, size, color, etc.).
+                        fragment.Text = replacement;
+                    }
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Iterate over all found text fragments
-            foreach (TextFragment fragment in absorber.TextFragments)
-            {
-                // Preserve the original formatting by copying its TextState
-                TextState originalState = new TextState();
-                originalState.ApplyChangesFrom(fragment.TextState);
-
-                // Replace the text
-                fragment.Text = replacementPhrase;
-
-                // Re‑apply the original formatting to the modified fragment
-                fragment.TextState.ApplyChangesFrom(originalState);
-            }
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"All replacements applied. Output saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Phrase replacement completed. Output saved to '{outputPath}'.");
+        catch (FileNotFoundException ex) when (ex.FileName != null && ex.FileName.EndsWith("Aspose.PDF.dll", StringComparison.OrdinalIgnoreCase))
+        {
+            Console.Error.WriteLine("The Aspose.PDF.dll assembly could not be found. Ensure the Aspose.Pdf NuGet package is installed and the assembly is available at runtime.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"An unexpected error occurred: {ex.Message}");
+        }
     }
 }

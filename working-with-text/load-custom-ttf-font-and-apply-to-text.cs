@@ -7,46 +7,48 @@ class Program
 {
     static void Main()
     {
-        // ---------------------------------------------------------------------
-        // Create a sample input PDF because the sandbox does not contain any files.
-        // ---------------------------------------------------------------------
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
+        // Paths to the custom TrueType font file and the output PDF
+        const string fontPath   = "custom.ttf";
+        const string outputPath = "output.pdf";
 
-        // Create a minimal PDF with a single blank page.
-        using (Document seed = new Document())
+        // Verify that the font file exists
+        if (!File.Exists(fontPath))
         {
-            seed.Pages.Add();
-            seed.Save(inputPdfPath);
+            Console.Error.WriteLine($"Font file not found: {fontPath}");
+            return;
         }
 
-        // ---------------------------------------------------------------
-        // Load a TrueType font. Instead of reading an external .ttf file we
-        // obtain a built‑in font (e.g., Arial) from the Aspose.Pdf font cache.
-        // ---------------------------------------------------------------
-        Font customFont = FontRepository.FindFont("Arial");
-        // Ensure the font will be embedded in the resulting PDF.
-        customFont.IsEmbedded = true;
+        // Register the custom font with the FontRepository using a substitution.
+        // The name "CustomFont" can be any identifier you prefer.
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("CustomFont", fontPath));
 
-        // ---------------------------------------------------------------
-        // Open the source PDF, add text using the custom font, and save.
-        // ---------------------------------------------------------------
-        using (Document doc = new Document(inputPdfPath))
+        // Retrieve the registered font instance.
+        Font customFont = FontRepository.FindFont("CustomFont");
+
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            // Create a text fragment with the desired content.
-            TextFragment fragment = new TextFragment("Hello with custom font!");
+            // Add a blank page
+            Page page = doc.Pages.Add();
 
-            // Assign the custom font to the fragment's TextState.
+            // Create a TextFragment with the desired content
+            TextFragment fragment = new TextFragment("Hello, world with a custom TrueType font!");
+
+            // Modify the existing TextState (the property is read‑only)
             fragment.TextState.Font = customFont;
-            fragment.TextState.FontSize = 16; // optional size adjustment
+            fragment.TextState.FontSize = 14;
+            fragment.TextState.ForegroundColor = Color.Black;
 
-            // Add the fragment to the first page.
-            doc.Pages[1].Paragraphs.Add(fragment);
+            // Position the fragment on the page
+            fragment.Position = new Position(100, 700); // X=100, Y=700
 
-            // Save the modified PDF.
-            doc.Save(outputPdfPath);
+            // Add the fragment to the page's paragraphs collection
+            page.Paragraphs.Add(fragment);
+
+            // Save the PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPdfPath}' with custom font applied.");
+        Console.WriteLine($"PDF created successfully at '{outputPath}'.");
     }
 }

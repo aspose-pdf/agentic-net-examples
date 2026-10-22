@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string phrase = "your specific phrase";
+        const string phrase    = "specific phrase";
 
         if (!File.Exists(inputPath))
         {
@@ -16,29 +16,30 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TextAbsorber to extract all text from the document
-            TextAbsorber absorber = new TextAbsorber();
-
-            // Extract text from all pages
-            doc.Pages.Accept(absorber);
-            string fullText = absorber.Text;
-
-            // Locate every occurrence of the specified phrase (case‑insensitive)
-            int startIndex = 0;
-            int occurrence = 0;
-            while ((startIndex = fullText.IndexOf(phrase, startIndex, StringComparison.OrdinalIgnoreCase)) >= 0)
+            // Iterate through each page and use TextFragmentAbsorber to locate the phrase
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                occurrence++;
-                Console.WriteLine($"Occurrence {occurrence}: character position {startIndex}");
-                startIndex += phrase.Length; // Move past the current match
-            }
+                var page = doc.Pages[pageIndex];
 
-            if (occurrence == 0)
-            {
-                Console.WriteLine("Phrase not found in the document.");
+                // TextFragmentAbsorber extracts text fragments from the current page
+                var absorber = new TextFragmentAbsorber();
+                absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+                page.Accept(absorber);
+
+                foreach (TextFragment fragment in absorber.TextFragments)
+                {
+                    if (fragment.Text != null && fragment.Text.IndexOf(phrase, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        // Use the fragment's rectangle to obtain coordinates (lower‑left corner)
+                        double x = fragment.Rectangle.LLX; // left‑most X coordinate
+                        double y = fragment.Rectangle.LLY; // lower‑most Y coordinate
+
+                        Console.WriteLine($"Found on page {pageIndex} at ({x}, {y}): \"{fragment.Text}\"");
+                    }
+                }
             }
         }
     }

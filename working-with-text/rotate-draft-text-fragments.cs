@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "rotated_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,22 +16,20 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF with the core Document API (no Facades)
         using (Document doc = new Document(inputPath))
         {
-            // Create a TextFragmentAbsorber to find all occurrences of the word "Draft"
+            // Locate every text fragment that contains the word "Draft"
             TextFragmentAbsorber absorber = new TextFragmentAbsorber("Draft");
+            doc.Pages.Accept(absorber);
 
-            // Search the entire document
-            absorber.Visit(doc);
-
-            // Apply a 15-degree rotation to each found text fragment
+            // Apply a 15‑degree rotation to each matching fragment
             foreach (TextFragment fragment in absorber.TextFragments)
             {
-                fragment.TextState.Rotation = 15;
+                fragment.TextState.Rotation = 15; // degrees
             }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

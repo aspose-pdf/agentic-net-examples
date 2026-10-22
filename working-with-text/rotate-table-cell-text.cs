@@ -12,36 +12,45 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a TableAbsorber to locate tables on the first page
-            TableAbsorber tableAbsorber = new TableAbsorber();
-            tableAbsorber.Visit(doc.Pages[1]);
+            // Load the existing PDF document
+            Document doc = new Document(inputPath);
 
-            // Verify that at least one table, row, cell, and text fragment exist
-            if (tableAbsorber.TableList.Count > 0 &&
-                tableAbsorber.TableList[0].RowList.Count > 0 &&
-                tableAbsorber.TableList[0].RowList[0].CellList.Count > 0)
-            {
-                // Access the first cell of the first table
-                var cell = tableAbsorber.TableList[0].RowList[0].CellList[0];
+            // Create a table with a single column of width 200 points
+            Table table = new Table { ColumnWidths = "200" };
 
-                // Rotate each text fragment inside the cell by 60 degrees
-                foreach (TextFragment fragment in cell.TextFragments)
-                {
-                    fragment.TextState.Rotation = 60; // Rotation in degrees
-                }
-            }
+            // Add a row and a cell to the table
+            Row row = table.Rows.Add();
+            Cell cell = row.Cells.Add();
 
-            // Save the modified PDF (PDF format, no extra SaveOptions needed)
+            // Create a TextFragment and rotate it by 60 degrees
+            TextFragment tf = new TextFragment("Rotated Text");
+            tf.TextState.FontSize = 12;
+            tf.TextState.Rotation = 60; // rotation in degrees
+
+            // Optional: give the cell a small margin so the rotated text is not clipped
+            cell.Margin = new MarginInfo { Top = 5, Bottom = 5, Left = 5, Right = 5 };
+
+            // Insert the rotated text into the cell
+            cell.Paragraphs.Add(tf);
+
+            // Add the table to the first page of the document
+            Page page = doc.Pages[1];
+            page.Paragraphs.Add(table);
+
+            // Save the modified PDF
             doc.Save(outputPath);
-        }
 
-        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+            Console.WriteLine($"PDF saved with rotated text in table cell: {outputPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

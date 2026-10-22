@@ -3,42 +3,37 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class SuperscriptExample
+class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "superscript.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and ensure it is disposed properly
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
+            // Add a blank page to the document
+            Page page = doc.Pages.Add();
 
-        // Load the existing PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPath))
-        {
-            // Choose the first page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[1];
-
-            // Normal text fragment (baseline)
-            TextFragment normal = new TextFragment("E=mc");
-            normal.Position = new Position(100, 500);               // X,Y coordinates
-            normal.TextState.FontSize = 12;                         // base font size
+            // Normal text fragment
+            TextFragment normal = new TextFragment("E = mc");
+            normal.Position = new Position(100, 700);
+            // Optionally set a base font size (default is 12)
+            normal.TextState.FontSize = 12f;
             page.Paragraphs.Add(normal);
 
-            // Superscript fragment – raise its Y coordinate instead of using Rise (which does not exist)
+            // Superscript text fragment
             TextFragment superscript = new TextFragment("2");
-            superscript.Position = new Position(150, 505);          // raise Y to appear as superscript
-            superscript.TextState.FontSize = 8;                     // smaller than base
+            // Reduce font size for a typical superscript look
+            superscript.TextState.FontSize = (float)(normal.TextState.FontSize * 0.7);
+            // Position the superscript slightly higher than the baseline of the normal text
+            superscript.Position = new Position(150, 720); // Y coordinate increased to raise the text
             page.Paragraphs.Add(superscript);
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Superscript rendered and saved to '{outputPath}'.");
+        Console.WriteLine($"Superscript PDF saved to '{outputPath}'.");
     }
 }

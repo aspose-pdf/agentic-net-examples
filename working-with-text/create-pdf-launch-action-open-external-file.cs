@@ -8,44 +8,49 @@ class Program
 {
     static void Main()
     {
-        // Output PDF file
-        const string outputPdf = "launch_action.pdf";
-        // External file to be opened when the text is clicked
-        const string externalFile = "example.txt";
+        const string outputPath = "LaunchActionExample.pdf";
+        const string externalFilePath = @"C:\Temp\example.txt"; // file to open on click
 
-        // Optional: create the external file for demonstration purposes
-        // File.WriteAllText(externalFile, "Sample content for the external file.");
+        // Ensure the external file exists for demonstration purposes
+        if (!File.Exists(externalFilePath))
+        {
+            File.WriteAllText(externalFilePath, "This is the external file opened by the PDF link.");
+        }
 
-        // Create a new PDF document inside a using block for proper disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a single page
-            Page page = doc.Pages.Add();
+            // Add a blank page (pages are 1‑based)
+            doc.Pages.Add();
+            Page page = doc.Pages[1];
 
             // Add visible text that the user will click
-            TextFragment text = new TextFragment("Click here to open the external file");
-            text.Position = new Position(100, 700); // place near top-left
-            text.TextState.FontSize = 14;
-            text.TextState.ForegroundColor = Aspose.Pdf.Color.Blue; // make it look like a link
-            page.Paragraphs.Add(text);
+            TextFragment tf = new TextFragment("Click here to open the external file");
+            tf.Position = new Position(100, 700); // place the text near the top of the page
+            tf.TextState.FontSize = 14;
+            page.Paragraphs.Add(tf);
 
-            // Define a rectangle that roughly covers the displayed text
-            // Fully qualify Rectangle to avoid ambiguity with System.Drawing
+            // Define a rectangle that covers the text (left, bottom, right, top)
+            // Use fully qualified type to avoid ambiguity with System.Drawing.Rectangle
             Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 680, 350, 720);
 
-            // Create a link annotation and assign a LaunchAction to open the external file
+            // Create a link annotation with a Launch action
             LinkAnnotation link = new LinkAnnotation(page, linkRect);
-            link.Action = new LaunchAction(externalFile);
-            // Make the annotation border invisible
-            link.Color = Aspose.Pdf.Color.Transparent;
+            // LaunchAction opens an external file when the annotation is activated
+            link.Action = new LaunchAction(externalFilePath);
+
+            // Optionally set the appearance of the link (e.g., underline)
+            link.Border = new Border(link);
+            link.Border.Width = 0; // no visible border
+            link.Color = Color.Transparent; // make the annotation invisible
 
             // Add the annotation to the page
             page.Annotations.Add(link);
 
             // Save the PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with launch action saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with launch action saved to '{outputPath}'.");
     }
 }

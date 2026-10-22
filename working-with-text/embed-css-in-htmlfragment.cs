@@ -1,54 +1,57 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core PDF API
-using Aspose.Pdf.Text;                // For TextState if needed (not used here)
+using Aspose.Pdf;               // Core PDF classes
+using Aspose.Pdf.Text;          // Required for HtmlFragment
 
-class EmbedCssInHtmlFragment
+class Program
 {
     static void Main()
     {
-        // Path for the output PDF
-        const string outputPath = "HtmlWithCss.pdf";
+        const string outputPath = "styled_html.pdf";
 
-        // HTML content with embedded CSS to control font, color, and spacing
-        string html = @"
-            <html>
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
+        {
+            // Add a blank page to the document
+            Aspose.Pdf.Page page = doc.Pages.Add();
+
+            // HTML content with embedded CSS to control font, color, and spacing
+            string html = @"
+                <html>
                 <head>
                     <style>
-                        /* CSS rules applied to the paragraph */
-                        p {
-                            font-family: Arial, Helvetica, sans-serif;   /* Font */
-                            color: #FF0000;                               /* Text color (red) */
-                            margin-top: 15px;                             /* Top margin */
-                            margin-bottom: 15px;                          /* Bottom margin */
-                            line-height: 1.5;                             /* Line spacing */
+                        .title {
+                            font-family: Arial;
+                            font-size: 24pt;
+                            color: #2E86C1;
+                            margin-bottom: 10px;
+                        }
+                        .paragraph {
+                            font-family: Verdana;
+                            font-size: 12pt;
+                            color: #555555;
+                            line-height: 1.5;
                         }
                     </style>
                 </head>
                 <body>
-                    <p>This paragraph is styled using embedded CSS.</p>
+                    <div class='title'>Sample Title</div>
+                    <div class='paragraph'>
+                        This is a paragraph styled with CSS. It demonstrates font, color, and spacing control.
+                    </div>
                 </body>
-            </html>";
+                </html>";
 
-        // Create a new PDF document
-        using (Document doc = new Document())
-        {
-            // Add a blank page to the document
-            Page page = doc.Pages.Add();
-
-            // Create an HtmlFragment from the HTML string
-            HtmlFragment htmlFragment = new HtmlFragment(html);
-
-            // Optional: set horizontal alignment of the fragment (centered)
-            htmlFragment.HorizontalAlignment = HorizontalAlignment.Center;
+            // Create an HtmlFragment using the HTML string
+            Aspose.Pdf.HtmlFragment htmlFragment = new Aspose.Pdf.HtmlFragment(html);
 
             // Add the HtmlFragment to the page's paragraph collection
             page.Paragraphs.Add(htmlFragment);
 
-            // Save the PDF document
+            // Save the PDF to the specified path
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with embedded CSS saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with styled HTML saved to '{outputPath}'.");
     }
 }

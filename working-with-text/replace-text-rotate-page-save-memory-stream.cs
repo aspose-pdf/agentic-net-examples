@@ -3,48 +3,54 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+namespace AsposePdfSample
 {
-    static void Main()
+    class Program
     {
-        // ------------------------------------------------------------
-        // 1. Create a minimal PDF in memory that contains the text we
-        //    will replace. This makes the example self‑contained and
-        //    eliminates the need for an external "input.pdf" file.
-        // ------------------------------------------------------------
-        Document doc = new Document();
-        Page page = doc.Pages.Add();
-        page.Paragraphs.Add(new TextFragment("old text"));
-
-        // ------------------------------------------------------------
-        // 2. Replace all occurrences of "old text" with "new text".
-        // ------------------------------------------------------------
-        TextFragmentAbsorber absorber = new TextFragmentAbsorber("old text");
-        doc.Pages.Accept(absorber);
-        foreach (TextFragment fragment in absorber.TextFragments)
+        static void Main()
         {
-            fragment.Text = "new text";
-        }
+            const string inputPath   = "input.pdf";
+            const string searchText  = "Hello";
+            const string replaceText = "Hi";
 
-        // ------------------------------------------------------------
-        // 3. Rotate the first page 90 degrees clockwise using the
-        //    Rotation enum (core Aspose.Pdf API).
-        // ------------------------------------------------------------
-        if (doc.Pages.Count >= 1)
-        {
-            doc.Pages[1].Rotate = Rotation.on90;
-        }
+            if (!File.Exists(inputPath))
+            {
+                Console.Error.WriteLine($"File not found: {inputPath}");
+                return;
+            }
 
-        // ------------------------------------------------------------
-        // 4. Save the modified PDF into a MemoryStream for downstream
-        //    consumption. Reset the stream position so callers can read
-        //    from the beginning.
-        // ------------------------------------------------------------
-        using (MemoryStream outputStream = new MemoryStream())
-        {
-            doc.Save(outputStream);
-            outputStream.Position = 0; // rewind
-            Console.WriteLine($"PDF saved to memory stream (size: {outputStream.Length} bytes).");
+            // Load the PDF document with deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // ----- Text replacement -----
+                // Find all occurrences of the target text
+                TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
+                doc.Pages.Accept(absorber);
+                // Replace each found fragment
+                foreach (TextFragment fragment in absorber.TextFragments)
+                {
+                    fragment.Text = replaceText;
+                }
+
+                // ----- Page rotation -----
+                // Aspose.Pdf uses 1‑based page indexing
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    Page page = doc.Pages[i];
+                    page.Rotate = Rotation.on90; // rotate 90° clockwise
+                }
+
+                // ----- Save to MemoryStream -----
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    // Saving to a stream defaults to PDF format
+                    doc.Save(ms);
+                    ms.Position = 0; // reset for downstream consumers
+
+                    Console.WriteLine($"Modified PDF saved to memory stream (size: {ms.Length} bytes).");
+                    // The MemoryStream 'ms' now contains the updated PDF.
+                }
+            }
         }
     }
 }

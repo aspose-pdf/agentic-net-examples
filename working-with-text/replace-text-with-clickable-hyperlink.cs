@@ -8,11 +8,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string searchPhrase = "click here";
-        const string replacementText = "Visit Site";
-        const string hyperlinkUrl = "https://www.example.com";
+        const string phrase     = "Aspose";                     // phrase to search
+        const string url        = "https://www.aspose.com";     // hyperlink target
 
         if (!File.Exists(inputPath))
         {
@@ -20,34 +19,33 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Find the target phrase
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchPhrase);
+            // Find all occurrences of the phrase
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber(phrase);
+            absorber.TextSearchOptions = new TextSearchOptions(true); // case‑insensitive
             doc.Pages.Accept(absorber);
 
-            // Replace each occurrence and add a clickable hyperlink
+            // Convert each found fragment into a clickable hyperlink
             foreach (TextFragment fragment in absorber.TextFragments)
             {
-                // Replace visible text
-                fragment.Text = replacementText;
+                // Visual styling to indicate a link
+                fragment.TextState.Underline = true;
+                fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
 
-                // Create a link annotation that covers the fragment rectangle
-                Page page = fragment.Page;
-                var rect = fragment.Rectangle;
-                var link = new LinkAnnotation(page, rect);
-                link.Action = new GoToURIAction(hyperlinkUrl);
-                link.Contents = replacementText; // optional tooltip
-
-                // Add the annotation to the page
-                page.Annotations.Add(link);
+                // Create a link annotation that covers the fragment's rectangle
+                // NOTE: LinkAnnotation requires both the owning Page and the rectangle bounds.
+                LinkAnnotation link = new LinkAnnotation(fragment.Page, fragment.Rectangle);
+                link.Action = new GoToURIAction(url);
+                // Add the annotation to the page that contains the fragment
+                fragment.Page.Annotations.Add(link);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (Document.Save writes PDF regardless of extension)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Hyperlinked PDF saved to '{outputPath}'.");
     }
 }

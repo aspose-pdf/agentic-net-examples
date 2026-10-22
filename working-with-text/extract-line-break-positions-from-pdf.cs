@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
@@ -10,43 +9,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string outputJsonPath = "linePositions.json";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document with a single page
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            Page page = doc.Pages.Add();
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Extract all text fragments from the document
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber();
-            doc.Pages.Accept(absorber);
+            // Multi‑line text (explicit line breaks)
+            string multiLineText = "First line\nSecond line\nThird line";
 
-            // Prepare a collection to hold line‑break Y positions for each fragment
-            List<List<double>> fragmentsLineBreaks = new List<List<double>>();
+            // Create a TextFragment and set its position and font size
+            TextFragment fragment = new TextFragment(multiLineText);
+            fragment.Position = new Position(50, 750); // start position on the page
+            fragment.TextState.FontSize = 12;
 
-            foreach (TextFragment fragment in absorber.TextFragments)
+            // Add the fragment to the page
+            page.Paragraphs.Add(fragment);
+
+            // After layout, each line is represented by a TextSegment
+            List<double> lineYPositions = new List<double>();
+            foreach (TextSegment segment in fragment.Segments)
             {
-                // Gather baseline Y positions of all segments belonging to the fragment
-                List<double> yPositions = fragment.Segments
-                                                   .Select(seg => seg.Position.YIndent)
-                                                   .ToList();
-
-                // Distinct Y positions represent separate lines (tolerance can be added if needed)
-                List<double> distinctLines = yPositions
-                                             .Distinct()
-                                             .OrderBy(y => y) // optional: sort from top to bottom
-                                             .ToList();
-
-                fragmentsLineBreaks.Add(distinctLines);
+                // Use the lower‑left Y coordinate of the segment rectangle as the line position
+                Aspose.Pdf.Rectangle rect = segment.Rectangle;
+                lineYPositions.Add(rect.LLY);
             }
 
-            // Serialize the result to JSON
-            string json = JsonSerializer.Serialize(fragmentsLineBreaks, new JsonSerializerOptions { WriteIndented = true });
-            Console.WriteLine(json);
+            // Serialize the Y positions to a JSON array
+            string json = JsonSerializer.Serialize(lineYPositions, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(outputJsonPath, json);
+
+            Console.WriteLine($"Line break positions saved to '{outputJsonPath}'.");
         }
     }
 }

@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // for Stamp base class
-using Aspose.Pdf.Text;   // for TextFragment if needed
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_footer.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_footer.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,36 +16,42 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load PDF and ensure deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[i];
+                int pageCount = doc.Pages.Count;
 
-                // Create a page‑number stamp. The default format "#" will be replaced
-                // with the actual page number when the stamp is applied.
-                PageNumberStamp pageNumberStamp = new PageNumberStamp();
+                // Pages are 1‑based
+                for (int i = 1; i <= pageCount; i++)
+                {
+                    Page page = doc.Pages[i];
 
-                // Position the stamp at the bottom centre of the page
-                pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
-                pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
+                    // Create a footer with page number placeholder
+                    TextFragment footer = new TextFragment($"Page {i} of {pageCount}");
+                    footer.TextState.FontSize = 10;
+                    footer.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
+                    footer.TextState.HorizontalAlignment = HorizontalAlignment.Center;
 
-                // Optional: adjust margins or font size
-                pageNumberStamp.BottomMargin = 20; // 20 points from the bottom edge
-                pageNumberStamp.TextState.FontSize = 10;
-                pageNumberStamp.TextState.Font = FontRepository.FindFont("Helvetica");
-                pageNumberStamp.TextState.ForegroundColor = Color.Gray;
+                    // Position near bottom center of the page
+                    double x = page.PageInfo.Width / 2;
+                    double y = 30; // 30 units from bottom edge
+                    footer.Position = new Position(x, y);
 
-                // Add the stamp to the current page
-                page.AddStamp(pageNumberStamp);
+                    // Add footer to the page
+                    page.Paragraphs.Add(footer);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Footer added and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Footer with page numbers added: {outputPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -16,30 +16,28 @@ class Program
             return;
         }
 
-        // Load the PDF document (disposal handled by using)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the last page (1‑based indexing)
+            // Get the last page (Aspose.Pdf uses 1‑based indexing)
             Page lastPage = doc.Pages[doc.Pages.Count];
 
-            // Margin from the page edges
-            double margin = 20;
-
-            // Create a text fragment
+            // Create the text fragment to be placed
             TextFragment fragment = new TextFragment("Rotated Text");
-
-            // Position the fragment at the bottom‑right corner (baseline point)
-            fragment.Position = new Position(lastPage.PageInfo.Width - margin, margin);
-
-            // Rotate the text (angle in degrees)
-            fragment.TextState.Rotation = 45;
-
-            // Set text appearance via TextState
-            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
+            fragment.TextState.Font = FontRepository.FindFont("Arial");
             fragment.TextState.FontSize = 12;
             fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
 
-            // Append the fragment to the page using TextBuilder
+            // Rotate the text (degrees clockwise)
+            fragment.TextState.Rotation = 45;
+
+            // Position at the bottom‑right corner with a small margin
+            const double margin = 20;
+            double x = lastPage.PageInfo.Width - margin;   // right side
+            double y = margin;                             // bottom side (origin is bottom‑left)
+            fragment.Position = new Position(x, y);
+
+            // Use TextBuilder to add the fragment to the page
             TextBuilder builder = new TextBuilder(lastPage);
             builder.AppendText(fragment);
 

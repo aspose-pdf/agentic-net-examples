@@ -2,15 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_header.pdf";
-        const string headerText = "My Document Header";
+        const string outputPath = "output.pdf";
+        const string headerText = "Confidential Document";
 
         if (!File.Exists(inputPath))
         {
@@ -18,37 +17,34 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Loop through all pages (1‑based indexing)
+            // Pages are 1‑based; iterate through each page
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create a text stamp that will act as a header
-                TextStamp headerStamp = new TextStamp(headerText)
+                // Create a text fragment for the header
+                TextFragment header = new TextFragment(headerText)
                 {
-                    // Position the stamp at the top centre of the page
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Top,
-                    TopMargin           = 10 // distance from the top edge
+                    Position = new Position(50, 800), // adjust X/Y as needed
+                    TextState =
+                    {
+                        FontSize = 12,
+                        FontStyle = FontStyles.Bold,
+                        ForegroundColor = Aspose.Pdf.Color.DarkGray
+                    }
                 };
 
-                // Configure font and appearance via the existing TextState instance
-                headerStamp.TextState.Font = FontRepository.FindFont("Helvetica");
-                headerStamp.TextState.FontSize = 12;
-                headerStamp.TextState.FontStyle = FontStyles.Regular;
-                headerStamp.TextState.ForegroundColor = Color.Black;
-
-                // Add the stamp to the current page
-                page.AddStamp(headerStamp);
+                // Insert the header at the beginning of the page's paragraph collection
+                page.Paragraphs.Insert(0, header);
             }
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with header to '{outputPath}'.");
+        Console.WriteLine($"Header added to all pages. Saved as '{outputPath}'.");
     }
 }
