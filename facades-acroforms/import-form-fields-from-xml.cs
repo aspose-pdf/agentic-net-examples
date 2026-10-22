@@ -6,34 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "template.pdf";   // PDF with form fields
-        const string inputXml  = "data.xml";       // XML containing field values
-        const string outputPdf = "filled.pdf";     // Resulting PDF
+        const string pdfPath = "form.pdf";
+        const string xmlPath = "data.xml";
+        const string outputPath = "filled_form.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(inputXml))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML not found: {inputXml}");
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
             return;
         }
 
-        // Initialize the Form facade with the source PDF
-        using (Form form = new Form(inputPdf))
+        // Use the Form facade to bind the PDF and import XML data
+        using (Form form = new Form())
         {
-            // Import field values from the XML stream
-            using (FileStream xmlStream = new FileStream(inputXml, FileMode.Open, FileAccess.Read))
+            // Bind the source PDF
+            form.BindPdf(pdfPath);
+
+            // Import field values from the XML stream using the correct API
+            using (FileStream xmlStream = File.OpenRead(xmlPath))
             {
                 form.ImportXml(xmlStream);
             }
 
-            // Save the updated PDF to a new file
-            form.Save(outputPdf);
+            // Save the updated PDF to the desired output path
+            form.Save(outputPath);
         }
 
-        Console.WriteLine($"Form fields imported and saved to '{outputPdf}'.");
+        Console.WriteLine($"Form fields imported and saved to '{outputPath}'.");
     }
 }

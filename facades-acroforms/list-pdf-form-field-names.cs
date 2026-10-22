@@ -2,55 +2,41 @@ using System;
 using System.IO;
 using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        // ------------------------------------------------------------
-        // Ensure a PDF with at least one form field exists.
-        // If the file is missing, create a minimal PDF and add a
-        // TextBox form field named "SampleTextBox".
-        // ------------------------------------------------------------
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            var doc = new Document();
-            var page = doc.Pages.Add();
-
-            // Define the rectangle for the form field (left, bottom, right, top).
-            var fieldRect = new Rectangle(100, 600, 200, 650);
-            var textBox = new TextBoxField(page, fieldRect)
-            {
-                PartialName = "SampleTextBox",
-                Value = "Default"
-            };
-            doc.Form.Add(textBox);
-            doc.Save(inputPdf);
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // Load the PDF with FormEditor and list all form field names.
-        // ------------------------------------------------------------
-        using (var formEditor = new FormEditor())
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Retrieve all form fields from the document's Form collection
+        var fields = doc.Form?.Fields;
+
+        Console.WriteLine("Form field names:");
+        if (fields != null && fields.Count() > 0)
         {
-            formEditor.BindPdf(inputPdf);
-
-            // Access the underlying Document.
-            var doc = formEditor.Document;
-
-            // Retrieve field names via the Form.Fields collection.
-            string[] fieldNames = doc?.Form?.Fields?
-                .Select(f => f.Name)
-                .ToArray() ?? Array.Empty<string>();
-
-            foreach (var name in fieldNames)
+            foreach (var field in fields)
             {
-                Console.WriteLine(name);
+                // The field name is stored in the PartialName property
+                Console.WriteLine(field.PartialName);
             }
         }
+        else
+        {
+            Console.WriteLine("No form fields found.");
+        }
+
+        // No modifications are made, so no need to save the document.
+        // The Document instance will be released when the program ends.
     }
 }

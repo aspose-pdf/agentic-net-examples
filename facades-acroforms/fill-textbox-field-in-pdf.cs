@@ -6,34 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF with a textbox field
-        const string outputPath = "filled.pdf";  // destination PDF after filling
-        const string fieldName  = "TextBox1";    // exact field name (case‑sensitive)
-        const string fieldValue = "Hello World"; // value to set
+        const string inputPath  = "input.pdf";
+        const string outputPath = "filled.pdf";
+        const string fieldName  = "TextBox1";          // name of the textbox field in the PDF
+        const string fieldValue = "Hello, World!";    // value to set
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Initialize the Form facade on the source PDF
-            using (Form form = new Form(inputPath))
+            // Form implements IDisposable, so wrap it in a using block
+            using (Form form = new Form())
             {
-                // Fill the specified textbox field
-                bool success = form.FillField(fieldName, fieldValue);
-                if (!success)
-                {
-                    Console.Error.WriteLine($"Field '{fieldName}' not found or could not be filled.");
-                }
+                // Load the existing PDF document
+                form.BindPdf(inputPath);
 
-                // Save the updated PDF to the output path
+                // Fill the specified textbox field with the desired value
+                form.FillField(fieldName, fieldValue);
+
+                // Save the updated PDF to a new file
                 form.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF with filled field saved to '{outputPath}'.");
+            Console.WriteLine($"Field '{fieldName}' filled and saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

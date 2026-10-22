@@ -1,53 +1,68 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";      // source PDF with form fields
-        const string outputCsvPath = "form_fields.csv"; // CSV report file
+        // Input PDF containing form fields
+        const string inputPdf = "form_document.pdf";
+        // Output CSV report
+        const string outputCsv = "form_fields_report.csv";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document and bind it to FormEditor (required by the task)
-        using (Document doc = new Document(inputPdfPath))
-        using (FormEditor formEditor = new FormEditor(doc))
+        try
         {
-            // FormEditor works on the same Document instance; we can use Form facade to query fields
-            Form formFacade = new Form(doc);
-
-            // Retrieve all field names
-            string[] fieldNames = formFacade.FieldNames;
-
-            // Write the report to a CSV file
-            using (StreamWriter writer = new StreamWriter(outputCsvPath, false))
+            // Load the PDF document.
+            using (Document pdfDocument = new Document(inputPdf))
             {
-                // CSV header
-                writer.WriteLine("FieldName,FieldType");
-
-                // Iterate over each field, obtain its type, and write a line to the CSV
-                foreach (string fieldName in fieldNames)
+                // Ensure the document actually contains a form.
+                if (pdfDocument.Form == null || pdfDocument.Form.Fields == null)
                 {
-                    // Get the field type using the Form facade
-                    FieldType fieldType = formFacade.GetFieldType(fieldName);
-
-                    // Write CSV line (field name and its type as string)
-                    writer.WriteLine($"{fieldName},{fieldType}");
+                    Console.WriteLine("No form fields found in the PDF.");
+                    return;
                 }
+
+                // Prepare the CSV file.
+                using (StreamWriter writer = new StreamWriter(outputCsv, false))
+                {
+                    // Write CSV header.
+                    writer.WriteLine("FieldName,FieldType");
+
+                    // Iterate over each field and write its name and type.
+                    foreach (Field field in pdfDocument.Form.Fields)
+                    {
+                        string fieldName = field.PartialName ?? string.Empty;
+                        string fieldType = field.GetType().Name; // e.g., TextBoxField, CheckBoxField, etc.
+                        string line = $"{EscapeCsv(fieldName)},{EscapeCsv(fieldType)}";
+                        writer.WriteLine(line);
+                    }
+                }
+
+                Console.WriteLine($"Form field report written to '{outputCsv}'.");
             }
-
-            // Save the (unchanged) PDF if needed; here we just ensure proper disposal
-            // (FormEditor inherits SaveableFacade, but no modifications were made)
-            // formEditor.Save(); // not required for this read‑only operation
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
 
-        Console.WriteLine($"Form field report generated: {outputCsvPath}");
+    // Helper to escape CSV values that may contain commas or quotes.
+    static string EscapeCsv(string value)
+    {
+        if (value == null) return string.Empty;
+        if (value.Contains('"'))
+            value = value.Replace("\"", "\"\"");
+        if (value.Contains(',') || value.Contains('"') || value.Contains('\n') || value.Contains('\r'))
+            return $"\"{value}\"";
+        return value;
     }
 }

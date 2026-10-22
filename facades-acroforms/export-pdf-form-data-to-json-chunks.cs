@@ -1,95 +1,80 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Collections.Generic;
 using System.Text.Json;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms; // Added for direct form field access
 
 class Program
 {
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputDirectory = "JsonChunks";
-        const int maxFieldsPerFile = 100;
+        const string outputFolder = "FormDataParts";
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output folder exists
-        Directory.CreateDirectory(outputDirectory);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF form using the Form facade
-        using (Form form = new Form(inputPdfPath))
+        // Load the PDF document inside a using block (lifecycle rule)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Export all form fields to a JSON stream
-            using (MemoryStream fullJsonStream = new MemoryStream())
+            // -----------------------------------------------------------------
+            // NOTE: The original code used FormDataExtractor which is not available
+            // in the referenced Aspose.Pdf version.  Instead we extract the form
+            // fields directly via the Aspose.Pdf.Forms namespace.
+            // -----------------------------------------------------------------
+            var form = pdfDoc.Form;
+            if (form == null || form.Fields == null || form.Fields.Count() == 0)
             {
-                // indented = true for readability
-                form.ExportJson(fullJsonStream, true);
-                fullJsonStream.Position = 0;
+                Console.WriteLine("No form fields found in the PDF.");
+                return;
+            }
 
-                // Read the exported JSON as a string
-                string fullJson;
-                using (StreamReader reader = new StreamReader(fullJsonStream))
+            // Build a dictionary of field name -> field value (as JsonElement compatible objects)
+            var allFields = new Dictionary<string, object>(form.Fields.Count());
+            foreach (var field in form.Fields)
+            {
+                // Most field types expose a "Value" property that can be directly used.
+                // For safety we convert nulls to empty strings.
+                object value = field?.Value ?? string.Empty;
+                allFields[field?.FullName ?? string.Empty] = value;
+            }
+
+            // -----------------------------------------------------------------
+            // Split the dictionary into batches of at most 100 fields each.
+            // -----------------------------------------------------------------
+            const int batchSize = 100;
+            var fieldEntries = new List<KeyValuePair<string, object>>(allFields);
+            int totalBatches = (fieldEntries.Count + batchSize - 1) / batchSize;
+
+            for (int batchIndex = 0; batchIndex < totalBatches; batchIndex++)
+            {
+                int start = batchIndex * batchSize;
+                int count = Math.Min(batchSize, fieldEntries.Count - start);
+
+                var batchDict = new Dictionary<string, object>(count);
+                for (int i = 0; i < count; i++)
                 {
-                    fullJson = reader.ReadToEnd();
+                    var kv = fieldEntries[start + i];
+                    batchDict[kv.Key] = kv.Value;
                 }
 
-                // Parse the JSON document
-                using (JsonDocument jsonDoc = JsonDocument.Parse(fullJson))
-                {
-                    // The exported JSON is an object where each property represents a field
-                    JsonElement root = jsonDoc.RootElement;
-                    if (root.ValueKind != JsonValueKind.Object)
-                    {
-                        Console.Error.WriteLine("Unexpected JSON format: root element is not an object.");
-                        return;
-                    }
+                // Serialize the batch to JSON with indentation for readability
+                string batchJson = JsonSerializer.Serialize(batchDict, new JsonSerializerOptions { WriteIndented = true });
 
-                    // Collect all field properties
-                    List<JsonProperty> allFields = root.EnumerateObject().ToList();
-
-                    // Split the fields into chunks of at most maxFieldsPerFile
-                    int chunkCount = (allFields.Count + maxFieldsPerFile - 1) / maxFieldsPerFile;
-                    for (int chunkIndex = 0; chunkIndex < chunkCount; chunkIndex++)
-                    {
-                        IEnumerable<JsonProperty> chunkFields = allFields
-                            .Skip(chunkIndex * maxFieldsPerFile)
-                            .Take(maxFieldsPerFile);
-
-                        // Write the chunk to a new JSON file
-                        string chunkFilePath = Path.Combine(
-                            outputDirectory,
-                            $"form_chunk_{chunkIndex + 1}.json");
-
-                        using (MemoryStream chunkStream = new MemoryStream())
-                        using (Utf8JsonWriter jsonWriter = new Utf8JsonWriter(
-                            chunkStream,
-                            new JsonWriterOptions { Indented = true }))
-                        {
-                            jsonWriter.WriteStartObject();
-
-                            foreach (JsonProperty field in chunkFields)
-                            {
-                                jsonWriter.WritePropertyName(field.Name);
-                                field.Value.WriteTo(jsonWriter);
-                            }
-
-                            jsonWriter.WriteEndObject();
-                            jsonWriter.Flush();
-
-                            // Save the chunk to disk
-                            File.WriteAllBytes(chunkFilePath, chunkStream.ToArray());
-                        }
-
-                        Console.WriteLine($"Created chunk file: {chunkFilePath}");
-                    }
-                }
+                // Write the batch to a file
+                string batchFilePath = Path.Combine(outputFolder, $"formdata_part{batchIndex + 1}.json");
+                File.WriteAllText(batchFilePath, batchJson);
+                Console.WriteLine($"Created: {batchFilePath}");
             }
         }
+
+        Console.WriteLine("Form data export and splitting completed.");
     }
 }

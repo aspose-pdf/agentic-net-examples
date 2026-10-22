@@ -6,45 +6,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";   // source PDF with form fields
-        const string outputPdfPath = "output.pdf";  // PDF after importing JSON data
-        const string jsonFilePath  = "data.json";   // JSON file containing field values
+        const string pdfPath = "form.pdf";
+        const string fdfPath = "data.fdf";
+        const string outputPath = "filled_form.pdf";
 
-        // Verify that required files exist before proceeding
-        if (!File.Exists(inputPdfPath))
+        // Verify input files exist
+        if (!File.Exists(pdfPath) || !File.Exists(fdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(jsonFilePath))
-        {
-            Console.Error.WriteLine($"Error: JSON file not found – {jsonFilePath}");
+            Console.Error.WriteLine("Required input files not found.");
             return;
         }
 
         try
         {
-            // Initialize the Form facade and bind it to the source PDF
-            using (Form form = new Form())
+            // Use Aspose.Pdf.Facades.Form to work with PDF forms
+            using (Form form = new Form(pdfPath))
             {
-                form.BindPdf(inputPdfPath);
-
-                // Open the JSON stream and import the data into the PDF form fields
-                using (FileStream jsonStream = new FileStream(jsonFilePath, FileMode.Open, FileAccess.Read))
+                // Import form data (e.g., FDF). Missing fields throw an exception with a FieldName property.
+                try
                 {
-                    form.ImportJson(jsonStream);
+                    using (FileStream fdfStream = File.OpenRead(fdfPath))
+                    {
+                        form.ImportFdf(fdfStream);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Attempt to read the optional FieldName property via reflection.
+                    var fieldProp = ex.GetType().GetProperty("FieldName");
+                    var missingField = fieldProp?.GetValue(ex) as string;
+                    Console.Error.WriteLine($"Missing form field: {missingField ?? "<unknown>"}");
                 }
 
-                // Save the modified PDF to the output path
-                form.Save(outputPdfPath);
+                // Save the updated PDF with imported data
+                form.Save(outputPath);
             }
-
-            Console.WriteLine($"Form data imported successfully. Output saved to '{outputPdfPath}'.");
         }
         catch (Exception ex)
         {
-            // Handle any unexpected errors (e.g., malformed JSON, I/O issues)
-            Console.Error.WriteLine($"An error occurred: {ex.Message}");
+            // General error handling
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

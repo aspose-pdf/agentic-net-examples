@@ -1,56 +1,80 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";   // source PDF with form fields
-        const string xmlPath   = "data.xml";    // XML containing form data
-        const string outputPath = "filled.pdf"; // destination PDF after import
+        const string pdfPath = "input.pdf";
+        const string xmlDataPath = "data.xml";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-
-        if (!File.Exists(xmlPath))
+        if (!File.Exists(xmlDataPath))
         {
-            Console.Error.WriteLine($"XML not found: {xmlPath}");
+            Console.Error.WriteLine($"XML data not found: {xmlDataPath}");
             return;
         }
 
         try
         {
-            // Initialize the Form facade on the source PDF
-            using (Form form = new Form(pdfPath))
+            // Load the PDF document
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                // Import the XML data into the PDF form fields
-                using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Open, FileAccess.Read))
+                // Bind the PDF to the Form facade and import XML data
+                using (Form formFacade = new Form(pdfDoc))
                 {
-                    form.ImportXml(xmlStream);
+                    // Import form data from the XML file – Form.ImportXml expects a Stream
+                    using (FileStream xmlStream = File.OpenRead(xmlDataPath))
+                    {
+                        formFacade.ImportXml(xmlStream);
+                    }
                 }
 
-                // Validate required fields – log any that are empty
-                foreach (string fieldName in form.FieldNames)
+                // Validate required fields
+                bool hasViolations = false;
+                var fields = pdfDoc.Form?.Fields;
+                if (fields != null)
                 {
-                    if (form.IsRequiredField(fieldName))
+                    foreach (var field in fields)
                     {
-                        string fieldValue = form.GetField(fieldName);
-                        if (string.IsNullOrWhiteSpace(fieldValue))
+                        // Determine if the field is marked as required (via reflection, as not all field types expose it directly)
+                        bool isRequired = false;
+                        var requiredProp = field.GetType().GetProperty("Required");
+                        if (requiredProp != null && requiredProp.PropertyType == typeof(bool))
                         {
-                            Console.WriteLine($"Required field '{fieldName}' is empty.");
+                            var propValue = requiredProp.GetValue(field);
+                            if (propValue != null)
+                                isRequired = (bool)propValue;
+                        }
+
+                        if (isRequired)
+                        {
+                            string value = field.Value?.ToString() ?? string.Empty;
+                            if (string.IsNullOrWhiteSpace(value))
+                            {
+                                hasViolations = true;
+                                Console.WriteLine($"Validation error: Required field '{field.Name}' is empty.");
+                            }
                         }
                     }
                 }
 
-                // Save the updated PDF to a new file
-                form.Save(outputPath);
-            }
+                if (!hasViolations)
+                {
+                    Console.WriteLine("All required fields are filled.");
+                }
 
-            Console.WriteLine($"Form data imported and saved to '{outputPath}'.");
+                // Save the updated PDF
+                pdfDoc.Save(outputPath);
+                Console.WriteLine($"PDF saved to '{outputPath}'.");
+            }
         }
         catch (Exception ex)
         {

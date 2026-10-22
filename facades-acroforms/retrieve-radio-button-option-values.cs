@@ -8,34 +8,42 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "PdfForm.pdf";
+        const string inputPath = "input.pdf";          // PDF containing the radio button group
+        const string radioFieldName = "RadioGroup1";   // Name of the radio button field
 
-        // Verify the PDF file exists
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Open the PDF form using the Form facade (IDisposable, so wrap in using)
-        using (Form form = new Form(pdfPath))
+        // Form is a Facade for working with AcroForm fields.
+        // It implements IDisposable, so wrap it in a using block.
+        using (Form form = new Form())
         {
-            // Retrieve the radio button option values for the specified field name
-            // The method returns a Dictionary<string, string>
-            Dictionary<string, string> dict = form.GetButtonOptionValues("Color");
+            // Bind the PDF document to the Form object.
+            form.BindPdf(inputPath);
 
-            // Convert the Dictionary to a Hashtable as required
-            Hashtable values = new Hashtable();
-            foreach (KeyValuePair<string, string> kvp in dict)
+            // Retrieve all option values of the specified radio button group.
+            // GetButtonOptionValues returns a Dictionary<string,string> where the key is the option name
+            // and the value is the export value.
+            Dictionary<string, string> optionValues = form.GetButtonOptionValues(radioFieldName);
+
+            // Store the values in a Hashtable (key = index, value = option export string).
+            Hashtable optionsTable = new Hashtable();
+            int index = 0;
+            foreach (KeyValuePair<string, string> kvp in optionValues)
             {
-                values.Add(kvp.Key, kvp.Value);
+                optionsTable[index++] = kvp.Value; // you could also store kvp.Key if you need the option name
             }
 
-            // Example: display the retrieved option values
-            foreach (object key in values.Keys)
+            // Example: display the collected options.
+            foreach (DictionaryEntry entry in optionsTable)
             {
-                Console.WriteLine($"{key}: {values[key]}");
+                Console.WriteLine($"Option {entry.Key}: {entry.Value}");
             }
+
+            // No explicit UnbindPdf call is required – disposing the Form object releases resources.
         }
     }
 }

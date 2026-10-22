@@ -2,14 +2,13 @@ using System;
 using System.IO;
 using System.Text.Json;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "form.pdf";
-        const string jsonPath = "form_fields.json";
+        const string outputJson = "form_data.json";
 
         if (!File.Exists(inputPdf))
         {
@@ -19,32 +18,34 @@ class Program
 
         try
         {
-            // Load the PDF document (lifecycle rule: using block for disposal)
-            using (Document doc = new Document(inputPdf))
+            // Load the PDF document
+            using (var document = new Document(inputPdf))
             {
-                // Initialize the Form facade with the loaded document
-                using (Form form = new Form(doc))
+                // Export form fields to JSON using the correct API
+                using (var jsonStream = new FileStream(outputJson, FileMode.Create, FileAccess.Write))
                 {
-                    // Export all form fields to a JSON file (ExportJson writes to a stream)
-                    using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
-                    {
-                        form.ExportJson(jsonStream); // indented = true by default
-                    }
-
-                    Console.WriteLine($"Form fields exported to '{jsonPath}'.");
+                    document.Form.ExportToJson(jsonStream);
                 }
             }
 
-            // Verify the JSON structure by reading it back
-            string jsonContent = File.ReadAllText(jsonPath);
-            using (JsonDocument jsonDoc = JsonDocument.Parse(jsonContent))
+            // Verify the JSON structure
+            string jsonText = File.ReadAllText(outputJson);
+            using JsonDocument doc = JsonDocument.Parse(jsonText);
+            JsonElement root = doc.RootElement;
+
+            if (root.ValueKind != JsonValueKind.Array)
             {
-                Console.WriteLine("Exported JSON structure:");
-                // Aspose exports a JSON object where each property is a field name
-                foreach (JsonProperty prop in jsonDoc.RootElement.EnumerateObject())
-                {
-                    Console.WriteLine($"Field: {prop.Name}, Value: {prop.Value}");
-                }
+                Console.WriteLine("Unexpected JSON format: root element is not an array.");
+                return;
+            }
+
+            Console.WriteLine("Exported form fields:");
+            foreach (JsonElement field in root.EnumerateArray())
+            {
+                // Each field is expected to have "name" and "value" properties
+                string name = field.TryGetProperty("name", out JsonElement nameProp) ? nameProp.GetString() ?? string.Empty : string.Empty;
+                string value = field.TryGetProperty("value", out JsonElement valueProp) ? valueProp.GetString() ?? string.Empty : string.Empty;
+                Console.WriteLine($"- {name}: {value}");
             }
         }
         catch (Exception ex)
