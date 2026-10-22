@@ -16,23 +16,24 @@ class Program
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber to locate tables in the document
+            // Create a TableAbsorber to find tables
             TableAbsorber absorber = new TableAbsorber();
 
-            // Extract tables from the entire document
-            absorber.Visit(doc);
+            // Absorb tables from each page (pages are 1‑based)
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                absorber.Visit(doc.Pages[i]);
+            }
 
-            // If at least one table was found, remove the first one
+            // Remove the first table found, if any
             if (absorber.TableList.Count > 0)
             {
-                // The first absorbed table on the page
-                AbsorbedTable table = absorber.TableList[0];
-
-                // Remove the table from its page
-                absorber.Remove(table);
+                // TableAbsorber.Remove expects an AbsorbedTable instance
+                absorber.Remove(absorber.TableList[0]);
+                Console.WriteLine("A table was removed.");
             }
             else
             {
@@ -43,6 +44,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table removed, saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

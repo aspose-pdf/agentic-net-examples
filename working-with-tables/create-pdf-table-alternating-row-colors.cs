@@ -1,58 +1,56 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for Color definitions if needed
+using Aspose.Pdf.Text; // for Color definitions
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "table_alternating.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Document lifecycle must be managed with using
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a table with three equal columns
-            Table table = new Table
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Attempt to locate the first Table on the first page
+            Table table = doc.Pages[1].Paragraphs
+                                 .OfType<Table>()
+                                 .FirstOrDefault();
+
+            if (table == null)
             {
-                ColumnWidths = "100 100 100",
-                Border = new BorderInfo(BorderSide.All, 0.5f) // thin border around cells
-            };
-
-            // Add a header row with a distinct background
-            Row header = table.Rows.Add();
-            header.BackgroundColor = Color.LightGray;
-            header.Cells.Add("Header 1");
-            header.Cells.Add("Header 2");
-            header.Cells.Add("Header 3");
-
-            // Add data rows and apply alternating background colors
-            for (int i = 0; i < 10; i++)
-            {
-                Row row = table.Rows.Add();
-
-                // Even rows get a light gray background, odd rows stay white
-                if (i % 2 == 0)
-                    row.BackgroundColor = Color.FromRgb(0.9f, 0.9f, 0.9f); // light gray
-                else
-                    row.BackgroundColor = Color.White;
-
-                // Populate cells in the current row
-                row.Cells.Add($"Row {i + 1} Col 1");
-                row.Cells.Add($"Row {i + 1} Col 2");
-                row.Cells.Add($"Row {i + 1} Col 3");
+                Console.Error.WriteLine("No table found on the first page.");
+                return;
             }
 
-            // Add the table to the page's paragraph collection
-            page.Paragraphs.Add(table);
+            // Iterate over rows and apply alternating background colors
+            for (int rowIndex = 0; rowIndex < table.Rows.Count; rowIndex++)
+            {
+                Row row = table.Rows[rowIndex];
+                // Choose background color based on parity of the row index
+                Aspose.Pdf.Color bgColor = (rowIndex % 2 == 0)
+                                            ? Aspose.Pdf.Color.LightGray   // even rows
+                                            : Aspose.Pdf.Color.White;      // odd rows
 
-            // Save the PDF (uses the standard Document.Save method)
+                // Apply the chosen color to every cell in the current row
+                foreach (Cell cell in row.Cells)
+                {
+                    cell.BackgroundColor = bgColor;
+                }
+            }
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved PDF with alternating row colors to '{outputPath}'.");
+        Console.WriteLine($"Alternating row colors applied and saved to '{outputPath}'.");
     }
 }

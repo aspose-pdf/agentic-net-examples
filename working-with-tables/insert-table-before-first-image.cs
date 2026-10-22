@@ -16,13 +16,13 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Process each page (or a specific page if desired)
+            // Iterate over all pages
             foreach (Page page in doc.Pages)
             {
-                // Locate the first image in the page's paragraph collection
+                // Find the first Image element in the page's paragraph collection
                 int imageIndex = -1;
                 for (int i = 0; i < page.Paragraphs.Count; i++)
                 {
@@ -36,26 +36,28 @@ class Program
                 // If an image was found, insert a table before it
                 if (imageIndex != -1)
                 {
-                    // Create a simple 2x2 table
+                    // Create a simple 2‑column table
                     Table table = new Table
                     {
-                        // Optional visual settings
-                        Border = new BorderInfo(BorderSide.All, 0.5f, Color.Black),
-                        DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Color.Gray),
-                        DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
+                        // Set column widths (percentage of page width)
+                        ColumnWidths = "50% 50%",
+                        // Optional: add a border to make the table visible
+                        Border = new BorderInfo(BorderSide.All, 0.5f)
                     };
 
-                    // Add two rows with two cells each
-                    for (int r = 0; r < 2; r++)
-                    {
-                        Row row = table.Rows.Add();
-                        for (int c = 0; c < 2; c++)
-                        {
-                            // Each cell contains a TextFragment
-                            TextFragment tf = new TextFragment($"R{r + 1}C{c + 1}");
-                            row.Cells.Add(tf);
-                        }
-                    }
+                    // Add a header row
+                    Row header = table.Rows.Add();
+                    Cell headerCell1 = header.Cells.Add();
+                    headerCell1.Paragraphs.Add(new TextFragment("Header 1"));
+                    Cell headerCell2 = header.Cells.Add();
+                    headerCell2.Paragraphs.Add(new TextFragment("Header 2"));
+
+                    // Add a data row
+                    Row data = table.Rows.Add();
+                    Cell dataCell1 = data.Cells.Add();
+                    dataCell1.Paragraphs.Add(new TextFragment("Value A"));
+                    Cell dataCell2 = data.Cells.Add();
+                    dataCell2.Paragraphs.Add(new TextFragment("Value B"));
 
                     // Insert the table at the image's index, pushing the image forward
                     page.Paragraphs.Insert(imageIndex, table);

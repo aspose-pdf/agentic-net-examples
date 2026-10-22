@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // needed for TextState, FontRepository, MarginInfo
+using Aspose.Pdf.Text; // kept for possible future use
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_with_table.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,39 +16,41 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (1‑based indexing)
+            // Access the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Create a new table (use Aspose.Pdf.Table, not the one from Aspose.Pdf.Text)
-            Table table = new Table();
+            // Create a new table. Position it using MarginInfo (coordinates are measured from the bottom‑left corner).
+            Table table = new Table
+            {
+                ColumnWidths = "30% 70%"
+            };
 
-            // Set absolute positioning using MarginInfo (Table inherits from Paragraph)
-            // Left = 100 points, Bottom = 500 points from the bottom of the page
-            table.Margin = new MarginInfo(100, 0, 0, 500);
-
-            // Define column widths (optional)
-            table.ColumnWidths = "200 200";
+            // Desired absolute coordinates (e.g., 100 points from the left, 200 points from the top)
+            float x = 100f;
+            float yFromTop = 200f;
+            // Convert page height (double) to float and calculate Y from bottom.
+            float y = (float)page.PageInfo.Height - yFromTop;
+            // Apply the margin to position the table.
+            table.Margin = new MarginInfo(x, y, 0, 0);
 
             // Add a header row
             Row header = table.Rows.Add();
-            Cell cell1 = header.Cells.Add("Header 1");
-            Cell cell2 = header.Cells.Add("Header 2");
-            // Apply simple styling to header cells
-            cell1.DefaultCellTextState = new TextState { FontSize = 12, Font = FontRepository.FindFont("Helvetica-Bold") };
-            cell2.DefaultCellTextState = new TextState { FontSize = 12, Font = FontRepository.FindFont("Helvetica-Bold") };
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
+            header.BackgroundColor = Aspose.Pdf.Color.LightGray;
 
             // Add a data row
-            Row dataRow = table.Rows.Add();
-            dataRow.Cells.Add("Value A");
-            dataRow.Cells.Add("Value B");
+            Row data = table.Rows.Add();
+            data.Cells.Add("Value A");
+            data.Cells.Add("Value B");
 
             // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the modified PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 

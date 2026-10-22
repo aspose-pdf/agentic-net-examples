@@ -1,94 +1,80 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";      // existing PDF (can be empty)
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF document (lifecycle rule: load)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure there is at least one page to host the tables
-            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
+            // Ensure we have at least one page to place the tables
+            if (doc.Pages.Count == 0)
+                doc.Pages.Add();
 
-            // ------------------------------------------------------------
-            // Table 1 – AutoFit to content (ColumnAdjustment.AutoFitToContent)
-            // ------------------------------------------------------------
-            Table tableFitToContent = new Table
+            // -----------------------------------------------------------------
+            // First table – fit to page width (AutoFitToWindow)
+            // -----------------------------------------------------------------
+            Table table1 = new Table
             {
-                // Position the table on the page
-                Left = 50,
-                Top = 500,
-                // Apply the desired auto‑fit behavior
-                ColumnAdjustment = ColumnAdjustment.AutoFitToContent,
-                // Optional visual styling
-                Border = new BorderInfo(BorderSide.All, 1, Aspose.Pdf.Color.Black),
-                // Define columns (two equal columns) – ColumnWidths is a string, not a collection
-                ColumnWidths = "200 200"
+                // ColumnAdjustment controls how the table sizes itself
+                ColumnAdjustment = ColumnAdjustment.AutoFitToWindow,
+                Border = new BorderInfo(BorderSide.All, 0.5f)
             };
 
             // Add a header row
-            Row headerRow = tableFitToContent.Rows.Add();
-            headerRow.Cells.Add(new Cell { Paragraphs = { new TextFragment("Header 1") } });
-            headerRow.Cells.Add(new Cell { Paragraphs = { new TextFragment("Header 2") } });
+            Row header1 = table1.Rows.Add();
+            header1.Cells.Add("Header A");
+            header1.Cells.Add("Header B");
+            header1.BackgroundColor = Color.LightGray;
 
-            // Add a data row with longer content to demonstrate auto‑fit
-            Row dataRow = tableFitToContent.Rows.Add();
-            dataRow.Cells.Add(new Cell { Paragraphs = { new TextFragment("This is a very long piece of text that should cause the column to expand to fit its content.") } });
-            dataRow.Cells.Add(new Cell { Paragraphs = { new TextFragment("Short") } });
+            // Add a data row
+            Row data1 = table1.Rows.Add();
+            data1.Cells.Add("Row1 Col1");
+            data1.Cells.Add("Row1 Col2");
 
-            // Add the first table to the page
-            page.Paragraphs.Add(tableFitToContent);
+            // Place the first table on the first page
+            doc.Pages[1].Paragraphs.Add(table1);
 
-            // ------------------------------------------------------------
-            // Table 2 – AutoFit to window (ColumnAdjustment.AutoFitToWindow)
-            // ------------------------------------------------------------
-            Table tableFitToWindow = new Table
+            // -----------------------------------------------------------------
+            // Second table – size to content (AutoFitToContent)
+            // -----------------------------------------------------------------
+            Table table2 = new Table
             {
-                Left = 50,
-                Top = 300,
-                ColumnAdjustment = ColumnAdjustment.AutoFitToWindow,
-                Border = new BorderInfo(BorderSide.All, 1, Aspose.Pdf.Color.DarkGray),
-                // Define columns (three columns) – again use a space‑separated string
-                ColumnWidths = "150 150 150"
+                ColumnAdjustment = ColumnAdjustment.AutoFitToContent,
+                Border = new BorderInfo(BorderSide.All, 0.5f)
             };
 
-            // Header row
-            Row headerRow2 = tableFitToWindow.Rows.Add();
-            headerRow2.Cells.Add(new Cell { Paragraphs = { new TextFragment("Col A") } });
-            headerRow2.Cells.Add(new Cell { Paragraphs = { new TextFragment("Col B") } });
-            headerRow2.Cells.Add(new Cell { Paragraphs = { new TextFragment("Col C") } });
+            // Add a header row
+            Row header2 = table2.Rows.Add();
+            header2.Cells.Add("Long Header Column 1");
+            header2.Cells.Add("Long Header Column 2");
+            header2.BackgroundColor = Color.LightBlue;
 
-            // Data rows
-            Row dataRow2 = tableFitToWindow.Rows.Add();
-            dataRow2.Cells.Add(new Cell { Paragraphs = { new TextFragment("Item A1") } });
-            dataRow2.Cells.Add(new Cell { Paragraphs = { new TextFragment("Item B1") } });
-            dataRow2.Cells.Add(new Cell { Paragraphs = { new TextFragment("Item C1") } });
+            // Add a data row with longer text to demonstrate content‑based sizing
+            Row data2 = table2.Rows.Add();
+            data2.Cells.Add("This is a much longer piece of text that will expand the column width.");
+            data2.Cells.Add("Short");
 
-            Row dataRow3 = tableFitToWindow.Rows.Add();
-            dataRow3.Cells.Add(new Cell { Paragraphs = { new TextFragment("Item A2 with a considerably longer text that will be forced to fit within the window width.") } });
-            dataRow3.Cells.Add(new Cell { Paragraphs = { new TextFragment("Item B2") } });
-            dataRow3.Cells.Add(new Cell { Paragraphs = { new TextFragment("Item C2") } });
+            // Place the second table below the first one (add a blank line first)
+            doc.Pages[1].Paragraphs.Add(new TextFragment("\n"));
+            doc.Pages[1].Paragraphs.Add(table2);
 
-            // Add the second table to the page
-            page.Paragraphs.Add(tableFitToWindow);
-
-            // Save the modified PDF (lifecycle rule: save)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with tables having different AutoFit behaviors: {outputPath}");
+        Console.WriteLine($"PDF saved with varied ColumnAdjustment settings: {outputPath}");
     }
 }

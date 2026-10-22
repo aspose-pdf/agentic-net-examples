@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
@@ -9,34 +8,32 @@ class Program
     {
         const string outputPath = "table_fixed_width.pdf";
 
-        // Create a new PDF document inside a using block for proper disposal
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
             // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table instance
-            Table table = new Table();
+            // Create a table with a single column whose width is fixed at 500 points
+            Table table = new Table
+            {
+                // ColumnWidths accepts a space‑separated list; a single value defines the table width
+                ColumnWidths = "500",
+                // Optional: add a thin border so the table is visible
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f)
+            };
 
-            // Set the table's total width to 500 points.
-            // ColumnWidths expects a string; a single value defines the overall width.
-            table.ColumnWidths = "500";
-
-            // Optional: center the table on the page
-            table.Alignment = HorizontalAlignment.Center;
-
-            // Add a single row with one cell containing some text
+            // Add a row with one cell containing some text
             Row row = table.Rows.Add();
-            Cell cell = row.Cells.Add();
-            cell.Paragraphs.Add(new TextFragment("This table has a fixed width of 500 points."));
+            row.Cells.Add("This table has a fixed width of 500 points.");
 
-            // Add the table to the page's paragraph collection
+            // Insert the table into the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF to the specified file
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with fixed-width table saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

@@ -1,69 +1,80 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "table_with_numbers.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_table.pdf";
 
-        // Document lifecycle must be wrapped in a using block
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to host the table
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a table with three columns (first column will hold numbers)
-            Table table = new Table
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Obtain the tagged content interface (creates structure if missing)
+            ITaggedContent tagged = doc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle("Document with Auto‑Numbered Table");
+
+            // Root element of the logical structure tree
+            StructureElement root = tagged.RootElement;
+
+            // Create a table element and attach it to the root
+            TableElement table = tagged.CreateTableElement();
+            table.AlternativeText = "Sample data table with auto‑numbered first column";
+            root.AppendChild(table);
+
+            // ----- Table Header -----
+            TableTHeadElement thead = tagged.CreateTableTHeadElement();
+            table.AppendChild(thead);
+
+            TableTRElement headerRow = tagged.CreateTableTRElement();
+            thead.AppendChild(headerRow);
+
+            // Header cell for the auto‑numbered column
+            TableTHElement thNumber = tagged.CreateTableTHElement();
+            thNumber.SetText("No.");
+            headerRow.AppendChild(thNumber);
+
+            // Header cell for a data column
+            TableTHElement thData = tagged.CreateTableTHElement();
+            thData.SetText("Data");
+            headerRow.AppendChild(thData);
+
+            // ----- Table Body -----
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+            table.AppendChild(tbody);
+
+            // Insert rows with sequential numbers in the first cell
+            for (int i = 1; i <= 10; i++)
             {
-                // Column widths: 50 units for the number column, 150 for each data column
-                ColumnWidths = "50 150 150",
-                // Optional styling for cells – use BorderInfo constructor (no Width property)
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f),
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
-            };
+                TableTRElement row = tagged.CreateTableTRElement();
+                tbody.AppendChild(row);
 
-            // Header row (no number in the first cell)
-            Row header = table.Rows.Add();
-            header.Cells.Add("");               // placeholder for number column
-            header.Cells.Add("Name");
-            header.Cells.Add("Value");
-            // Header text style
-            header.DefaultCellTextState = new TextState
-            {
-                FontSize = 12,
-                FontStyle = FontStyles.Bold
-            };
+                // First cell: auto‑numbered value
+                TableTDElement tdNumber = tagged.CreateTableTDElement();
+                tdNumber.SetText(i.ToString());
+                row.AppendChild(tdNumber);
 
-            // Sample data rows (placeholders for numbers)
-            string[] names  = { "Alpha", "Beta", "Gamma" };
-            string[] values = { "10", "20", "30" };
-
-            for (int i = 0; i < names.Length; i++)
-            {
-                Row row = table.Rows.Add();
-                row.Cells.Add("");               // placeholder for auto‑number
-                row.Cells.Add(names[i]);
-                row.Cells.Add(values[i]);
+                // Second cell: placeholder data
+                TableTDElement tdData = tagged.CreateTableTDElement();
+                tdData.SetText($"Row {i} data");
+                row.AppendChild(tdData);
             }
 
-            // Build an array with sequential numbers (skip header row)
-            object[] numbers = new object[table.Rows.Count];
-            for (int i = 0; i < numbers.Length; i++)
-            {
-                numbers[i] = (i == 0) ? "" : i.ToString(); // header stays empty, rows start at 1
-            }
-
-            // Import the numbers into the first column of the table
-            // firstFilledRow = 0, firstFilledColumn = 0, isLeftColumnsFilled = false
-            table.ImportArray(numbers, 0, 0, false);
-
-            // Add the table to the page and save the document
-            page.Paragraphs.Add(table);
+            // Save the modified PDF (no PreSave call required)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table with auto‑numbered column saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with auto‑numbered table: {outputPath}");
     }
 }

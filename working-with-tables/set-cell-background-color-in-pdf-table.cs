@@ -7,35 +7,43 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document inside a using block for proper disposal
-        using (Document doc = new Document())
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        // Load existing PDF if present; otherwise create a new document with a blank page.
+        Document doc = File.Exists(inputPath) ? new Document(inputPath) : new Document();
+        if (doc.Pages.Count == 0)
+            doc.Pages.Add();
+
+        // Work with the first page.
+        Page page = doc.Pages[1];
+
+        // Create a table with two equal‑width columns.
+        Table table = new Table
         {
-            // Add a blank page to the document
-            Page page = doc.Pages.Add();
+            ColumnWidths = "200 200",
+            Border = new BorderInfo(BorderSide.All, 0.5f)
+        };
 
-            // Create a table with one column
-            Table table = new Table
-            {
-                ColumnWidths = "200" // width of the single column
-            };
+        // ----- Header row -----
+        Row headerRow = table.Rows.Add();
+        Cell headerCell1 = headerRow.Cells.Add("Item");
+        Cell headerCell2 = headerRow.Cells.Add("Value");
+        headerCell1.BackgroundColor = Color.LightGray;
+        headerCell2.BackgroundColor = Color.LightGray;
 
-            // Add a row to the table
-            Row row = table.Rows.Add();
+        // ----- Data row -----
+        Row dataRow = table.Rows.Add();
+        Cell dataCell1 = dataRow.Cells.Add("Widget A");
+        Cell dataCell2 = dataRow.Cells.Add("$50,000");
+        // Set background colour of the second cell as required by the task.
+        dataCell2.BackgroundColor = Color.LightGray;
 
-            // Create a cell, set its background color, and add some text
-            Cell cell = row.Cells.Add();
-            cell.BackgroundColor = Aspose.Pdf.Color.LightGray; // set desired background color
-            // Add a text fragment to the cell
-            TextFragment tf = new TextFragment("Cell with gray background");
-            cell.Paragraphs.Add(tf);
+        // Add the table to the page.
+        page.Paragraphs.Add(table);
 
-            // Add the table to the page
-            page.Paragraphs.Add(table);
-
-            // Save the PDF to disk
-            doc.Save("CellBackgroundColor.pdf");
-        }
-
-        Console.WriteLine("PDF with colored cell saved as 'CellBackgroundColor.pdf'.");
+        // Save the PDF.
+        doc.Save(outputPath);
+        Console.WriteLine($"Saved PDF with colored cell to '{outputPath}'.");
     }
 }

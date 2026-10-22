@@ -1,55 +1,84 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "table_double_border.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_table.pdf";
 
-        // Create a new PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
-
-            // Create a table with three columns
-            Table table = new Table
-            {
-                // Define column widths (in points)
-                ColumnWidths = "100 100 100"
-            };
-
-            // Populate the table with sample data (3 rows x 3 columns)
-            for (int r = 0; r < 3; r++)
-            {
-                Row row = table.Rows.Add();
-                for (int c = 0; c < 3; c++)
-                {
-                    // Each cell contains simple text
-                    row.Cells.Add($"R{r + 1}C{c + 1}");
-                }
-            }
-
-            // ------------------------------------------------------------
-            // Apply a double border style to the table
-            // ------------------------------------------------------------
-            // Create a BorderInfo instance using the constructor that sets side, width and color.
-            // Aspose.Pdf does not expose a separate "Style" property; a double line effect is achieved
-            // by using an appropriate width (e.g., 2 points) and the desired color.
-            BorderInfo doubleBorder = new BorderInfo(BorderSide.All, 2f, Color.Blue);
-
-            // Assign the configured BorderInfo to the table
-            table.Border = doubleBorder;
-
-            // Add the table to the page's paragraph collection
-            page.Paragraphs.Add(table);
-
-            // Save the PDF (save rule: use Document.Save with a path)
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
         }
 
-        Console.WriteLine($"PDF with double‑border table saved to '{outputPath}'.");
+        try
+        {
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Access tagged content (creates if missing) and set basic properties
+                ITaggedContent tagged = doc.TaggedContent;
+                tagged.SetLanguage("en-US");
+                tagged.SetTitle("Document with Double-Bordered Table");
+
+                // Root element of the logical structure tree
+                StructureElement root = tagged.RootElement;
+
+                // Create a table element and set its description
+                TableElement table = tagged.CreateTableElement();
+                table.AlternativeText = "Sample data table with double border";
+
+                // Apply double‑border like appearance by using a thick border on all sides
+                // BorderInfo does not expose a Style property; a double border can be mimicked
+                // with a wider line. Use the constructor to set side, width and (optional) color.
+                table.Border = new BorderInfo(BorderSide.All, 2f);
+
+                // Attach the table to the root element
+                root.AppendChild(table);
+
+                // ----- Header row -----
+                TableTHeadElement thead = tagged.CreateTableTHeadElement();
+                table.AppendChild(thead);
+                TableTRElement headerRow = tagged.CreateTableTRElement();
+                thead.AppendChild(headerRow);
+
+                TableTHElement th1 = tagged.CreateTableTHElement();
+                th1.SetText("Product");
+                headerRow.AppendChild(th1);
+
+                TableTHElement th2 = tagged.CreateTableTHElement();
+                th2.SetText("Price");
+                headerRow.AppendChild(th2);
+
+                // ----- Body row -----
+                TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+                table.AppendChild(tbody);
+                TableTRElement dataRow = tagged.CreateTableTRElement();
+                tbody.AppendChild(dataRow);
+
+                TableTDElement td1 = tagged.CreateTableTDElement();
+                td1.SetText("Widget A");
+                dataRow.AppendChild(td1);
+
+                TableTDElement td2 = tagged.CreateTableTDElement();
+                td2.SetText("$25.00");
+                dataRow.AppendChild(td2);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF saved with double‑bordered table: '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

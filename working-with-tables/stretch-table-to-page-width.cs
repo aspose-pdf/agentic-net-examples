@@ -1,54 +1,56 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core PDF API
-using Aspose.Pdf.Text;                // For text fragments (optional)
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Output PDF path
-        const string outputPath = "table_autofit.pdf";
+        const string outputPath = "table_output.pdf";
 
-        // Create a new PDF document
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a single page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table and set it to stretch across the page width
+            // Create a table that will stretch to the full page width.
+            // Setting ColumnWidths to a percentage string makes the table auto‑fit.
             Table table = new Table
             {
-                // Use ColumnAdjustment to make the table fit the page width
-                ColumnAdjustment = ColumnAdjustment.AutoFitToWindow,
-
-                // Optional: set table position and margins
-                Left = 0,
-                Top = 0
+                // Example with three columns that together occupy 100% of the page width
+                ColumnWidths = "33% 34% 33%"
             };
 
-            // Define three columns (widths will be auto‑adjusted and stretched to the page width)
-            table.ColumnWidths = "100 100 100";
+            // Optional: add a border to make the table visible
+            table.Border = new BorderInfo(BorderSide.All, 0.5f);
 
             // Add a header row
             Row header = table.Rows.Add();
-            header.Cells.Add("Header 1");
-            header.Cells.Add("Header 2");
-            header.Cells.Add("Header 3");
+            Cell h1 = header.Cells.Add();
+            h1.Paragraphs.Add(new TextFragment("Header 1"));
+            Cell h2 = header.Cells.Add();
+            h2.Paragraphs.Add(new TextFragment("Header 2"));
+            Cell h3 = header.Cells.Add();
+            h3.Paragraphs.Add(new TextFragment("Header 3"));
 
             // Add a data row
             Row data = table.Rows.Add();
-            data.Cells.Add("Cell 1");
-            data.Cells.Add("Cell 2");
-            data.Cells.Add("Cell 3");
+            Cell d1 = data.Cells.Add();
+            d1.Paragraphs.Add(new TextFragment("Data 1"));
+            Cell d2 = data.Cells.Add();
+            d2.Paragraphs.Add(new TextFragment("Data 2"));
+            Cell d3 = data.Cells.Add();
+            d3.Paragraphs.Add(new TextFragment("Data 3"));
 
-            // Add the table to the page's paragraphs collection
+            // Insert the table into the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with stretched table saved to '{outputPath}'.");
     }
 }

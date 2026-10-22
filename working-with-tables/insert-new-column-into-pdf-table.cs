@@ -1,17 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF containing a table
         const string inputPath = "input.pdf";
-        // Output PDF with the new column inserted
         const string outputPath = "output.pdf";
-        // Zero‑based index where the new column should be inserted
-        const int columnIndex = 2; // insert as the third column
+        const int columnIndex = 2; // zero‑based position where the new column will be inserted
 
         if (!File.Exists(inputPath))
         {
@@ -19,36 +17,55 @@ class Program
             return;
         }
 
-        // Load the document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate through all pages to find tables
-            foreach (Page page in doc.Pages)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Paragraphs collection may contain Table objects
-                for (int i = 1; i <= page.Paragraphs.Count; i++)
+                // Locate the first table on the first page (adjust as needed for your PDF)
+                Table table = null;
+                foreach (var paragraph in doc.Pages[1].Paragraphs)
                 {
-                    if (page.Paragraphs[i] is Table table)
+                    if (paragraph is Table tbl)
                     {
-                        // For each row in the table, insert a new cell at the desired index
-                        foreach (Row row in table.Rows)
-                        {
-                            // Create an empty cell (you can add a Paragraph/TextFragment here if needed)
-                            Cell newCell = new Cell();
-                            // Example of adding an empty paragraph (optional)
-                            // newCell.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment(""));
-
-                            // Insert the cell at the specified column index
-                            row.Cells.Insert(columnIndex, newCell);
-                        }
+                        table = tbl;
+                        break;
                     }
                 }
+
+                if (table == null)
+                {
+                    Console.WriteLine("No table found in the document.");
+                    return;
+                }
+
+                // Insert a new column at the specified index for every row in the table
+                foreach (Row row in table.Rows)
+                {
+                    // Create an empty cell (you can add default content if desired)
+                    Cell newCell = new Cell();
+
+                    // Example: add a placeholder space so the cell is not completely empty
+                    TextFragment placeholder = new TextFragment(" ");
+                    newCell.Paragraphs.Add(placeholder);
+
+                    // Clamp the index to a valid range
+                    int insertPos = columnIndex;
+                    if (insertPos < 0) insertPos = 0;
+                    if (insertPos > row.Cells.Count) insertPos = row.Cells.Count;
+
+                    // Insert the new cell into the row at the desired position
+                    row.Cells.Insert(insertPos, newCell);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+                Console.WriteLine($"Column inserted and PDF saved to '{outputPath}'.");
             }
-
-            // Save the modified document
-            doc.Save(outputPath);
         }
-
-        Console.WriteLine($"Column inserted at index {columnIndex}. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

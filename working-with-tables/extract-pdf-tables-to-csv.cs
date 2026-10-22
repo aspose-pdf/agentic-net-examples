@@ -1,90 +1,87 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class TableToCsvExtractor
+class Program
 {
     static void Main()
     {
-        // Input PDF path
-        const string inputPdf = "input.pdf";
-        // Output folder for CSV files
+        const string inputPdfPath = "input.pdf";
         const string outputFolder = "ExtractedTables";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Load PDF document (using rule: wrap Document in using)
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                Page page = doc.Pages[pageIndex];
+                // TableAbsorber extracts tables from the document
+                TableAbsorber tableAbsorber = new TableAbsorber();
 
-                // Create TableAbsorber to find tables on the current page
-                TableAbsorber absorber = new TableAbsorber();
-
-                // Extract tables from the page
-                absorber.Visit(page);
-
-                // If no tables were found, continue to next page
-                if (absorber.TableList == null || absorber.TableList.Count == 0)
-                    continue;
-
-                // Process each found table
-                for (int tableIndex = 0; tableIndex < absorber.TableList.Count; tableIndex++)
+                // Apply the absorber to all pages using Visit (not Accept)
+                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
                 {
-                    // Build CSV file name: Table_page{page}_index{table}.csv
-                    string csvFileName = $"table_page{pageIndex}_table{tableIndex + 1}.csv";
-                    string csvPath = Path.Combine(outputFolder, csvFileName);
+                    tableAbsorber.Visit(pdfDoc.Pages[pageNum]);
+                }
 
-                    using (StreamWriter writer = new StreamWriter(csvPath, false, Encoding.UTF8))
+                // Iterate over each detected table
+                int tableIndex = 1;
+                foreach (var table in tableAbsorber.TableList)
+                {
+                    string csvPath = Path.Combine(outputFolder, $"Table_{tableIndex}.csv");
+
+                    using (StreamWriter writer = new StreamWriter(csvPath))
                     {
-                        // Iterate rows of the absorbed table
-                        var absorbedTable = absorber.TableList[tableIndex];
-                        foreach (var absorbedRow in absorbedTable.RowList)
+                        // Write each row
+                        foreach (var row in table.RowList)
                         {
-                            // Build a CSV line for the current row
-                            StringBuilder lineBuilder = new StringBuilder();
-
-                            // Iterate cells in the row
-                            for (int cellIdx = 0; cellIdx < absorbedRow.CellList.Count; cellIdx++)
+                            var cellTexts = new List<string>();
+                            foreach (var cell in row.CellList)
                             {
-                                var cell = absorbedRow.CellList[cellIdx];
-
                                 // Concatenate all text fragments inside the cell
-                                StringBuilder cellTextBuilder = new StringBuilder();
+                                string cellText = string.Empty;
                                 foreach (var fragment in cell.TextFragments)
                                 {
-                                    cellTextBuilder.Append(fragment.Text);
+                                    cellText += fragment.Text;
                                 }
+                                cellText = cellText.Trim();
 
-                                // Escape double quotes by doubling them and wrap the field in quotes
-                                string cellText = cellTextBuilder.ToString().Replace("\"", "\"\"");
-                                lineBuilder.Append('\"').Append(cellText).Append('\"');
-
-                                // Add comma separator if not the last cell
-                                if (cellIdx < absorbedRow.CellList.Count - 1)
-                                    lineBuilder.Append(',');
+                                // Escape CSV special characters
+                                if (cellText.Contains('"') || cellText.Contains(','))
+                                {
+                                    cellText = $"\"{cellText.Replace("\"", "\"\"")}\"";
+                                }
+                                cellTexts.Add(cellText);
                             }
 
-                            // Write the constructed CSV line
-                            writer.WriteLine(lineBuilder.ToString());
+                            // Join cells with commas and write the CSV line
+                            writer.WriteLine(string.Join(",", cellTexts));
                         }
                     }
 
-                    Console.WriteLine($"Extracted table saved to: {csvPath}");
+                    Console.WriteLine($"Extracted Table {tableIndex} to '{csvPath}'.");
+                    tableIndex++;
+                }
+
+                if (tableAbsorber.TableList.Count == 0)
+                {
+                    Console.WriteLine("No tables were found in the PDF.");
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
         }
     }
 }

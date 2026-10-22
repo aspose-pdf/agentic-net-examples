@@ -1,55 +1,42 @@
 using System;
 using System.Data;
-using System.Collections.Generic;
-using System.Globalization;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Create an in‑memory DataTable with sample data (no SqlClient required)
+        // Create an in‑memory DataTable with sample data (replaces the unavailable SqlClient code)
         DataTable dataTable = new DataTable();
-        dataTable.Columns.Add("Id", typeof(int));
-        dataTable.Columns.Add("Name", typeof(string));
-        dataTable.Columns.Add("Quantity", typeof(int));
+        dataTable.Columns.Add("Column1", typeof(string));
+        dataTable.Columns.Add("Column2", typeof(int));
+        dataTable.Columns.Add("Column3", typeof(DateTime));
 
-        dataTable.Rows.Add(1, "Apple", 10);
-        dataTable.Rows.Add(2, "Banana", 20);
-        dataTable.Rows.Add(3, "Cherry", 30);
+        dataTable.Rows.Add("Row A", 10, DateTime.Today);
+        dataTable.Rows.Add("Row B", 20, DateTime.Today.AddDays(1));
+        dataTable.Rows.Add("Row C", 30, DateTime.Today.AddDays(2));
 
-        const string outputPdfPath = "output.pdf";
-
-        // Create a new PDF document and add a page
-        using (Document pdfDocument = new Document())
+        // Create PDF and import the DataTable as a table
+        using (Document pdfDoc = new Document())
         {
-            Page page = pdfDocument.Pages.Add();
+            // Add a new page (pages are 1‑based)
+            Page page = pdfDoc.Pages.Add();
 
-            // Create a table and set equal column widths (integer percentages to avoid culture‑specific parsing issues)
-            Table table = new Table();
-            int columnCount = dataTable.Columns.Count;
-            if (columnCount > 0)
-            {
-                // Use integer percentages – Aspose.Pdf parses the widths with the current culture, so we avoid decimal points.
-                int baseWidth = 100 / columnCount;               // integer division
-                int remainder = 100 % columnCount;               // distribute the leftover percentage
-                List<string> widths = new List<string>();
-                for (int i = 0; i < columnCount; i++)
-                {
-                    int width = baseWidth + (i == columnCount - 1 ? remainder : 0);
-                    widths.Add(width.ToString(CultureInfo.InvariantCulture));
-                }
-                table.ColumnWidths = string.Join(",", widths);
-            }
+            // Create a PDF table and import the DataTable
+            Table pdfTable = new Table();
+            // Optional: set column widths (adjust as needed)
+            pdfTable.ColumnWidths = "100 100 100";
 
-            // Import the DataTable into the PDF table (first row = column names)
-            table.ImportDataTable(dataTable, true, 0, 0);
+            // Import data: include header row, start at first row/column
+            pdfTable.ImportDataTable(dataTable, true, 0, 0);
 
-            // Add the table to the page and save the document
-            page.Paragraphs.Add(table);
-            pdfDocument.Save(outputPdfPath);
+            // Add the table to the page
+            page.Paragraphs.Add(pdfTable);
+
+            // Save the PDF
+            pdfDoc.Save("output.pdf");
         }
 
-        Console.WriteLine($"PDF table generated and saved to '{outputPdfPath}'.");
+        Console.WriteLine("PDF generated successfully.");
     }
 }

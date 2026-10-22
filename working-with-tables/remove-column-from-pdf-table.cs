@@ -1,16 +1,17 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-
-        // Index of the column to remove (zero‑based)
-        const int columnIndexToRemove = 2;
+        const int columnToRemove = 1; // zero‑based index of the column to delete
 
         if (!File.Exists(inputPath))
         {
@@ -18,50 +19,64 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Assume the table is on the first page; adjust as needed
-            Page page = doc.Pages[1];
-
-            // Locate the first Table object on the page
-            Table table = null;
-            foreach (var paragraph in page.Paragraphs)
+            using (Document doc = new Document(inputPath))
             {
-                if (paragraph is Table t)
+                // Access tagged content (creates one if the document is not already tagged)
+                ITaggedContent tagged = doc.TaggedContent;
+
+                // Find all tables in the document
+                var tables = tagged.RootElement.FindElements<TableElement>(true);
+                if (tables.Count == 0)
                 {
-                    table = t;
-                    break;
+                    Console.WriteLine("No table found in the document.");
                 }
-            }
-
-            if (table == null)
-            {
-                Console.WriteLine("No table found on the first page.");
-            }
-            else
-            {
-                // Iterate over each row and delete the cell at the specified column index
-                foreach (Row row in table.Rows)
+                else
                 {
-                    // Ensure the column index is within the current row's cell count
-                    if (columnIndexToRemove >= 0 && columnIndexToRemove < row.Cells.Count)
+                    foreach (TableElement table in tables)
                     {
-                        // Retrieve the cell to be removed
-                        var cellToRemove = row.Cells[columnIndexToRemove];
+                        // Helper to process rows inside a container (thead, tbody, tfoot)
+                        void ProcessRows(StructureElement container)
+                        {
+                            foreach (Element rowElem in container.ChildElements)
+                            {
+                                if (rowElem is TableTRElement row)
+                                {
+                                    // Convert cells to a list for indexed access
+                                    var cells = row.ChildElements.Cast<Element>().ToList();
+                                    if (columnToRemove >= 0 && columnToRemove < cells.Count)
+                                    {
+                                        // Remove the cell at the specified column index
+                                        row.RemoveChild(columnToRemove);
+                                    }
+                                }
+                            }
+                        }
 
-                        // Remove the cell from the row's cell collection
-                        row.Cells.Remove(cellToRemove);
+                        // Header rows
+                        var thead = table.ChildElements.OfType<TableTHeadElement>().FirstOrDefault();
+                        if (thead != null) ProcessRows(thead);
+
+                        // Body rows
+                        var tbody = table.ChildElements.OfType<TableTBodyElement>().FirstOrDefault();
+                        if (tbody != null) ProcessRows(tbody);
+
+                        // Footer rows (optional)
+                        var tfoot = table.ChildElements.OfType<TableTFootElement>().FirstOrDefault();
+                        if (tfoot != null) ProcessRows(tfoot);
                     }
                 }
 
-                Console.WriteLine($"Column {columnIndexToRemove} removed from the table.");
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            Console.WriteLine($"Column removed and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

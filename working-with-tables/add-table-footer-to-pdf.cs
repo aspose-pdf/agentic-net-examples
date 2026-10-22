@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_footer.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "accessible_table_with_footer.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,76 +17,69 @@ class Program
             return;
         }
 
-        // Load the source PDF
+        // Load the PDF and work with its tagged content
         using (Document doc = new Document(inputPath))
         {
-            // -------------------------------------------------
-            // 1. Create a visual Table and add it to the first page
-            // -------------------------------------------------
-            Table visualTable = new Table
-            {
-                ColumnWidths = "100 200", // two columns
-                Border = new BorderInfo(BorderSide.All, 0.5f, Color.Black)
-            };
+            ITaggedContent taggedContent = doc.TaggedContent;
+            taggedContent.SetLanguage("en-US");
+            taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Header row (visual)
-            Row headerRow = new Row();
-            headerRow.Cells.Add("Header 1");
-            headerRow.Cells.Add("Header 2");
-            visualTable.Rows.Add(headerRow);
+            // Root element of the structure tree
+            StructureElement root = taggedContent.RootElement;
 
-            // Body row (visual)
-            Row bodyRow = new Row();
-            bodyRow.Cells.Add("Data 1");
-            bodyRow.Cells.Add("Data 2");
-            visualTable.Rows.Add(bodyRow);
+            // Create a table element and attach it to the root
+            TableElement table = taggedContent.CreateTableElement();
+            table.AlternativeText = "Sample data table with footer";
+            root.AppendChild(table);
 
-            // Footer row (visual) – this will appear at the bottom of each page when the table splits
-            Row footerRow = new Row();
-            footerRow.Cells.Add("Footer left");
-            footerRow.Cells.Add("Footer right");
-            visualTable.Rows.Add(footerRow);
+            // ----- Header -----
+            TableTHeadElement thead = taggedContent.CreateTableTHeadElement();
+            table.AppendChild(thead);
+            TableTRElement headerRow = taggedContent.CreateTableTRElement();
+            thead.AppendChild(headerRow);
 
-            // Add the table to the first page
-            doc.Pages[1].Paragraphs.Add(visualTable);
+            TableTHElement th1 = taggedContent.CreateTableTHElement();
+            th1.SetText("Product");
+            headerRow.AppendChild(th1);
 
-            // -------------------------------------------------
-            // 2. Create logical structure for the table and its footer
-            // -------------------------------------------------
-            ITaggedContent tagged = doc.TaggedContent;
+            TableTHElement th2 = taggedContent.CreateTableTHElement();
+            th2.SetText("Revenue");
+            headerRow.AppendChild(th2);
 
-            // Root element of the tagged content
-            StructureElement root = tagged.RootElement;
+            // ----- Body -----
+            TableTBodyElement tbody = taggedContent.CreateTableTBodyElement();
+            table.AppendChild(tbody);
+            TableTRElement dataRow = taggedContent.CreateTableTRElement();
+            tbody.AppendChild(dataRow);
 
-            // Table element in the logical structure
-            TableElement tableStruct = tagged.CreateTableElement();
-            root.AppendChild(tableStruct); // attach table to the root
+            TableTDElement td1 = taggedContent.CreateTableTDElement();
+            td1.SetText("Widget A");
+            dataRow.AppendChild(td1);
 
-            // Create the TFoot (table footer) element
-            TableTFootElement tFoot = tagged.CreateTableTFootElement();
-            tableStruct.AppendChild(tFoot); // attach footer to the table
+            TableTDElement td2 = taggedContent.CreateTableTDElement();
+            td2.SetText("$50,000");
+            dataRow.AppendChild(td2);
 
-            // Create a row inside the TFoot
-            TableTRElement footRowStruct = tFoot.CreateTR();
+            // ----- Footer -----
+            TableTFootElement tfoot = taggedContent.CreateTableTFootElement();
+            // In the current Aspose.Pdf version the TableTFootElement does not expose a Repeat property.
+            // Footers are automatically rendered on each page when the table spans multiple pages.
+            table.AppendChild(tfoot);
+            TableTRElement footerRow = taggedContent.CreateTableTRElement();
+            tfoot.AppendChild(footerRow);
 
-            // Create cells for the footer row
-            TableTDElement footCell1 = tagged.CreateTableTDElement();
-            footCell1.SetText("Footer left");
-            footRowStruct.AppendChild(footCell1);
+            TableTDElement footCell1 = taggedContent.CreateTableTDElement();
+            footCell1.SetText("Total");
+            footerRow.AppendChild(footCell1);
 
-            TableTDElement footCell2 = tagged.CreateTableTDElement();
-            footCell2.SetText("Footer right");
-            footRowStruct.AppendChild(footCell2);
+            TableTDElement footCell2 = taggedContent.CreateTableTDElement();
+            footCell2.SetText("$50,000");
+            footerRow.AppendChild(footCell2);
 
-            // Optional: set alternative text for accessibility
-            tFoot.AlternativeText = "Table footer repeated on each page";
-
-            // -------------------------------------------------
-            // 3. Save the modified PDF
-            // -------------------------------------------------
+            // Save the modified PDF (no PreSave required)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with table footer: {outputPath}");
+        Console.WriteLine($"Tagged PDF with table footer saved to '{outputPath}'.");
     }
 }

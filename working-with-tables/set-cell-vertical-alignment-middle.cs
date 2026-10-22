@@ -1,42 +1,75 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for TextFragment
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "cell_alignment.pdf";
+        const string outputPath = "table_output.pdf";
 
-        // Document lifecycle must be wrapped in a using block (see document-disposal-with-using rule)
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a new page (page indexing is 1‑based)
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a simple table with one column
-            Table table = new Table();
-            table.ColumnWidths = "200"; // width of the single column
+            // Create a table with three equal-width columns and a thin border
+            Table table = new Table
+            {
+                ColumnWidths = "100 100 100",
+                Border = new BorderInfo(BorderSide.All, 0.5f)
+            };
 
-            // Add a row to the table
-            Row row = table.Rows.Add();
+            // Add a header row
+            Row header = table.Rows.Add();
+            Cell headerCell1 = header.Cells.Add("Header 1");
+            Cell headerCell2 = header.Cells.Add("Header 2");
+            Cell headerCell3 = header.Cells.Add("Header 3");
 
-            // Create a cell, add some text, and set vertical alignment to middle (center)
-            Cell cell = new Cell();
-            cell.Paragraphs.Add(new TextFragment("Centered Text"));
-            cell.VerticalAlignment = VerticalAlignment.Center; // Middle alignment
+            // Set vertical and horizontal alignment for header cells
+            SetCellAlignment(headerCell1);
+            SetCellAlignment(headerCell2);
+            SetCellAlignment(headerCell3);
 
-            // Add the cell to the row
-            row.Cells.Add(cell);
+            // Add three data rows
+            for (int i = 1; i <= 3; i++)
+            {
+                Row row = table.Rows.Add();
+                Cell c1 = row.Cells.Add($"R{i}C1");
+                Cell c2 = row.Cells.Add($"R{i}C2");
+                Cell c3 = row.Cells.Add($"R{i}C3");
 
-            // Add the table to the page
+                // Set vertical and horizontal alignment for each data cell
+                SetCellAlignment(c1);
+                SetCellAlignment(c2);
+                SetCellAlignment(c3);
+            }
+
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF (saving to a .pdf path writes PDF format)
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Table PDF saved to '{outputPath}'.");
+    }
+
+    /// <summary>
+    /// Applies vertical centre alignment and horizontal centre alignment to a cell.
+    /// Horizontal alignment is set via the cell's DefaultCellTextState because the Cell class
+    /// does not expose a direct HorizontalAlignment property.
+    /// </summary>
+    private static void SetCellAlignment(Cell cell)
+    {
+        // Vertical alignment is directly supported on the Cell class.
+        cell.VerticalAlignment = Aspose.Pdf.VerticalAlignment.Center;
+
+        // Horizontal alignment must be defined through the TextState associated with the cell.
+        cell.DefaultCellTextState = new TextState
+        {
+            HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center
+        };
     }
 }

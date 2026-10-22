@@ -7,44 +7,55 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "table_with_centered_paragraph.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
+        // If the input file does not exist, create a simple empty PDF.
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Aspose.Pdf.Page page = doc.Pages.Add();
+            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
+            {
+                doc.Pages.Add();
+                doc.Save(inputPath);
+            }
+        }
 
-            // Create a table and set its column widths
+        // Open the PDF and add a table with a centered paragraph inside a cell.
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        {
+            // Ensure there is at least one page.
+            if (doc.Pages.Count == 0)
+                doc.Pages.Add();
+
+            // Create a table with a single column.
             Aspose.Pdf.Table table = new Aspose.Pdf.Table
             {
-                // Position the table on the page
-                Left = 50,
-                Top = 700,
-                // Define two equal-width columns
-                ColumnWidths = "200 200"
+                ColumnWidths = "200"
             };
 
-            // Add a row to the table
+            // Add a row to the table.
             Aspose.Pdf.Row row = table.Rows.Add();
 
-            // Add a cell to the row
+            // Add a cell to the row.
             Aspose.Pdf.Cell cell = row.Cells.Add();
 
-            // Create a text fragment (paragraph) with centered alignment
-            Aspose.Pdf.Text.TextFragment paragraph = new Aspose.Pdf.Text.TextFragment("Centered text");
-            paragraph.HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center;
+            // Create a text fragment, set its text and center alignment.
+            // TextFragment derives from Paragraph, so it can be added to cell.Paragraphs.
+            Aspose.Pdf.Text.TextFragment fragment = new Aspose.Pdf.Text.TextFragment("Centered text")
+            {
+                HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center
+            };
 
-            // Add the paragraph to the cell's paragraph collection
-            cell.Paragraphs.Add(paragraph);
+            // Insert the fragment into the cell.
+            cell.Paragraphs.Add(fragment);
 
-            // Add the table to the page
-            page.Paragraphs.Add(table);
+            // Add the table to the first page of the document.
+            doc.Pages[1].Paragraphs.Add(table);
 
-            // Save the PDF document
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Table with centered paragraph saved to '{outputPath}'.");
     }
 }

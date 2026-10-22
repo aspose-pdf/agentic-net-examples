@@ -1,62 +1,56 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core PDF classes (Document, Page, Table, Row, Cell)
+using Aspose.Pdf;
+using Aspose.Pdf.Text; // for TextFragment if needed
 
-class RenderTableExample
+class Program
 {
     static void Main()
     {
-        // Output PDF path
-        const string outputPath = "RenderedTable.pdf";
+        const string outputPath = "table_page.pdf";
 
         // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a new blank page (pages are 1‑based)
+            // Add a new blank page to the document
             Page page = doc.Pages.Add();
 
-            // Create a Table object (inherits BaseParagraph, can be added to page.Paragraphs)
-            Table table = new Table();
+            // Create a table with three columns
+            Table table = new Table
+            {
+                // Define column widths (in points)
+                ColumnWidths = "100 150 200",
+                // Add a thin border around the table
+                Border = new BorderInfo(BorderSide.All, 0.5f)
+            };
 
-            // Optional: set table appearance
-            table.Border = new BorderInfo(BorderSide.All, 1f);               // thin border around the table
-            table.DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f);   // thin border for each cell
-            table.DefaultCellPadding = new MarginInfo(5, 5, 5, 5);          // padding inside cells
-
-            // Define three columns (optional – widths are auto‑calculated if not set)
-            // table.ColumnWidths.Add(100); // Uncomment to set explicit column widths
-
-            // Add header row
+            // ----- Header row -----
             Row header = table.Rows.Add();
-            // Mark header visually (Row has no IsHeader property in recent versions)
-            header.BackgroundColor = Color.LightGray;
+            // Set background color for the header (use Aspose.Pdf.Color to avoid System.Drawing)
+            header.BackgroundColor = Aspose.Pdf.Color.LightGray;
             header.Cells.Add("Product");
             header.Cells.Add("Quantity");
             header.Cells.Add("Price");
 
-            // Add a few data rows
+            // ----- First data row -----
             Row row1 = table.Rows.Add();
             row1.Cells.Add("Widget A");
             row1.Cells.Add("10");
-            row1.Cells.Add("$15.00");
+            row1.Cells.Add("$5.00");
 
+            // ----- Second data row -----
             Row row2 = table.Rows.Add();
             row2.Cells.Add("Widget B");
-            row2.Cells.Add("5");
-            row2.Cells.Add("$25.00");
+            row2.Cells.Add("7");
+            row2.Cells.Add("$7.50");
 
-            Row row3 = table.Rows.Add();
-            row3.Cells.Add("Widget C");
-            row3.Cells.Add("12");
-            row3.Cells.Add("$9.99");
-
-            // Add the table to the page's paragraph collection
+            // Add the table to the page's paragraph collection so it gets rendered
             page.Paragraphs.Add(table);
 
-            // Save the document as PDF
+            // Save the PDF document (PDF format by default)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table rendered and saved to '{Path.GetFullPath(outputPath)}'.");
+        Console.WriteLine($"PDF with table saved to '{outputPath}'.");
     }
 }

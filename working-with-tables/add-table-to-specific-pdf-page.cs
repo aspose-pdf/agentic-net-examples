@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_table.pdf";
-        const int    targetPage = 2;               // 1‑based page number
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const int targetPageNumber = 2; // 1‑based page index
 
         if (!File.Exists(inputPath))
         {
@@ -17,66 +17,51 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF inside a using block (lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
             // Validate page number
-            if (targetPage < 1 || targetPage > doc.Pages.Count)
+            if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
             {
-                Console.Error.WriteLine($"Page {targetPage} is out of range. Document has {doc.Pages.Count} pages.");
+                Console.Error.WriteLine($"Invalid page number {targetPageNumber}. Document has {doc.Pages.Count} pages.");
                 return;
             }
 
-            // Access the specific page (page indexing is 1‑based)
-            Page page = doc.Pages[targetPage];
+            // Access the required page (1‑based indexing)
+            Page page = doc.Pages[targetPageNumber];
 
-            // Create a table
+            // Create a simple table with 2 columns and 2 rows (header + data)
             Table table = new Table
             {
-                // Optional visual settings
-                Border = new BorderInfo(BorderSide.All, 0.5f, Color.Black),
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Color.Gray),
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5),
-                Alignment = HorizontalAlignment.Center
+                Border = new BorderInfo(BorderSide.All, 0.5f), // thin border around cells
+                ColumnWidths = "50% 50%" // equal column widths
             };
 
-            // Define column widths (percentage of the page width)
-            table.ColumnWidths = "50 50";
-
-            // ----- Header row -----
+            // Header row
             Row header = table.Rows.Add();
-            // First header cell
-            Cell cell1 = header.Cells.Add();
-            cell1.BackgroundColor = Color.LightGray;
-            cell1.Paragraphs.Add(new TextFragment("Product"));
-            // Second header cell
-            Cell cell2 = header.Cells.Add();
-            cell2.BackgroundColor = Color.LightGray;
-            cell2.Paragraphs.Add(new TextFragment("Price"));
+            Cell headerCell1 = header.Cells.Add("Name");
+            Cell headerCell2 = header.Cells.Add("Value");
 
-            // ----- Data rows -----
-            // Row 1
-            Row row1 = table.Rows.Add();
-            row1.Cells.Add().Paragraphs.Add(new TextFragment("Widget A"));
-            row1.Cells.Add().Paragraphs.Add(new TextFragment("$10.00"));
+            // Make header cells bold
+            headerCell1.DefaultCellTextState = new TextState { FontStyle = FontStyles.Bold };
+            headerCell2.DefaultCellTextState = new TextState { FontStyle = FontStyles.Bold };
 
-            // Row 2
-            Row row2 = table.Rows.Add();
-            row2.Cells.Add().Paragraphs.Add(new TextFragment("Widget B"));
-            row2.Cells.Add().Paragraphs.Add(new TextFragment("$15.50"));
+            // Optional: background color for header cells
+            headerCell1.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            headerCell2.BackgroundColor = Aspose.Pdf.Color.LightGray;
 
-            // Position the table on the page (optional)
-            // The Table inherits from BaseParagraph, so we can set its position via the MarginInfo
-            // Here we place it 100 points from the top of the page.
-            table.Margin = new MarginInfo(0, 0, 100, 0); // Left, Right, Top, Bottom
+            // Data row
+            Row data = table.Rows.Add();
+            data.Cells.Add("Item A");
+            data.Cells.Add("42");
 
-            // Add the table to the page's paragraph collection
+            // Add the table to the page's paragraphs collection
             page.Paragraphs.Add(table);
 
-            // Save the modified document (lifecycle rule: save inside using block)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table added to page {targetPage}. Saved as '{outputPath}'.");
+        Console.WriteLine($"Table added to page {targetPageNumber} and saved as '{outputPath}'.");
     }
 }

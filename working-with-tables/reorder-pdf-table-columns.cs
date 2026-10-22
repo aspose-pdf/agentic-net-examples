@@ -1,18 +1,17 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
-    // Desired column order – zero‑based indices of the original columns.
-    // Example: {2,0,1} will move the original 3rd column to first, then 1st, then 2nd.
-    static readonly int[] DesiredColumnOrder = new int[] { 2, 0, 1 };
-
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "reordered.pdf";
+        const string outputPath = "reordered_table.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -20,62 +19,85 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
+        // Desired column order (zero‑based indices). Example: move column 3 to first, then 1, then 2, then 0.
+        int[] newOrder = { 2, 0, 1, 3 };
+
         using (Document doc = new Document(inputPath))
         {
-            // Find all tables in the whole document.
-            TableAbsorber absorber = new TableAbsorber();
-            absorber.Visit(doc);
-
-            // Work on a copy of the TableList because Replace modifies the collection.
-            var tablesCopy = new System.Collections.Generic.List<AbsorbedTable>(absorber.TableList);
-
-            foreach (AbsorbedTable absorbedTable in tablesCopy)
+            // Ensure the PDF is tagged; otherwise create a tagged structure.
+            ITaggedContent tagged = doc.TaggedContent;
+            if (tagged == null)
             {
-                // Create a new Table that will replace the absorbed one.
-                Table newTable = new Table();
+                Console.Error.WriteLine("Document is not tagged. Tagged content is required for table manipulation.");
+                return;
+            }
 
-                // Preserve the original position. Cast double to float as Table.Left/Top expect float.
-                newTable.Left = (float)absorbedTable.Rectangle.LLX;
-                // Top coordinate is the upper‑right Y value.
-                newTable.Top = (float)absorbedTable.Rectangle.URY;
+            // Locate the first table in the document.
+            TableElement originalTable = tagged.RootElement
+                                                .FindElements<TableElement>(true)
+                                                .FirstOrDefault();
 
-                // Iterate over each row of the absorbed table.
-                foreach (AbsorbedRow absorbedRow in absorbedTable.RowList)
+            if (originalTable == null)
+            {
+                Console.Error.WriteLine("No table found in the document.");
+                return;
+            }
+
+            // Extract cell texts from each row.
+            var rows = originalTable.FindElements<TableTRElement>(true);
+            var tableData = new List<List<string>>();
+
+            foreach (TableTRElement row in rows)
+            {
+                var cellTexts = new List<string>();
+                foreach (Element cell in row.ChildElements)
                 {
-                    // Add a new row to the new table.
-                    Row newRow = newTable.Rows.Add();
+                    // All cell types inherit from StructureElement; ActualText holds the displayed text.
+                    if (cell is StructureElement se)
+                        cellTexts.Add(se.ActualText ?? string.Empty);
+                    else
+                        cellTexts.Add(string.Empty);
+                }
+                tableData.Add(cellTexts);
+            }
 
-                    // Reorder cells according to DesiredColumnOrder.
-                    foreach (int srcIndex in DesiredColumnOrder)
+            // Remove the original table (optional). Here we simply add a new table after it.
+            // Create a new table with reordered columns.
+            TableElement newTable = tagged.CreateTableElement();
+            newTable.AlternativeText = "Table with reordered columns";
+            tagged.RootElement.AppendChild(newTable);
+
+            for (int rowIndex = 0; rowIndex < tableData.Count; rowIndex++)
+            {
+                bool isHeaderRow = rowIndex == 0; // assume first row is the header
+                TableTRElement newRow = tagged.CreateTableTRElement();
+                newTable.AppendChild(newRow);
+
+                List<string> originalCells = tableData[rowIndex];
+
+                // Ensure the newOrder does not exceed the number of columns.
+                int columnCount = Math.Min(newOrder.Length, originalCells.Count);
+
+                for (int i = 0; i < columnCount; i++)
+                {
+                    int srcIdx = newOrder[i];
+                    if (srcIdx >= originalCells.Count) continue; // safety check
+
+                    string cellText = originalCells[srcIdx];
+
+                    if (isHeaderRow)
                     {
-                        // Guard against out‑of‑range indices (in case the source table has fewer columns).
-                        if (srcIndex < 0 || srcIndex >= absorbedRow.CellList.Count)
-                            continue;
-
-                        AbsorbedCell srcCell = absorbedRow.CellList[srcIndex];
-
-                        // Add a new cell to the new row.
-                        Cell newCell = newRow.Cells.Add();
-
-                        // Copy all text fragments from the source cell to the new cell.
-                        foreach (TextFragment fragment in srcCell.TextFragments)
-                        {
-                            // Preserve the text and its formatting.
-                            TextFragment newFragment = new TextFragment(fragment.Text);
-                            newFragment.TextState.Font = fragment.TextState.Font;
-                            newFragment.TextState.FontSize = fragment.TextState.FontSize;
-                            newFragment.TextState.ForegroundColor = fragment.TextState.ForegroundColor;
-                            newFragment.TextState.FontStyle = fragment.TextState.FontStyle;
-
-                            newCell.Paragraphs.Add(newFragment);
-                        }
+                        TableTHElement th = tagged.CreateTableTHElement();
+                        th.SetText(cellText);
+                        newRow.AppendChild(th);
+                    }
+                    else
+                    {
+                        TableTDElement td = tagged.CreateTableTDElement();
+                        td.SetText(cellText);
+                        newRow.AppendChild(td);
                     }
                 }
-
-                // Replace the original table with the newly built one.
-                Page page = doc.Pages[absorbedTable.PageNum];
-                absorber.Replace(page, absorbedTable, newTable);
             }
 
             // Save the modified document.

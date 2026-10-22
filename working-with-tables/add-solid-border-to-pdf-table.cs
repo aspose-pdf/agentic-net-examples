@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for BorderSide enum if needed (actually BorderSide is in Aspose.Pdf namespace)
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_with_table.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,43 +16,39 @@ class Program
             return;
         }
 
-        // Load the existing PDF document (lifecycle rule: use using for disposal)
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a new table (lifecycle rule: use default constructor)
-            Aspose.Pdf.Table table = new Aspose.Pdf.Table
+            // Create a simple table with two columns and apply a solid border to the whole table
+            Table table = new Table
             {
-                // Apply a solid black border of 1 point to all sides
+                // Define column widths (percentage or absolute units)
+                ColumnWidths = "200 200",
+
+                // Apply a solid black border of 1 point thickness to the entire table
                 Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black),
-
-                // Optional: include border width in column calculations
-                IsBordersIncluded = true,
-
-                // Set some basic layout properties
-                ColumnWidths = "100 100 100", // three columns of equal width
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
+                // Optionally set the default cell border as well
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black)
             };
 
             // Add a header row
             Row header = table.Rows.Add();
             header.Cells.Add("Header 1");
             header.Cells.Add("Header 2");
-            header.Cells.Add("Header 3");
 
             // Add a data row
             Row data = table.Rows.Add();
             data.Cells.Add("Cell A1");
-            data.Cells.Add("Cell A2");
-            data.Cells.Add("Cell A3");
+            data.Cells.Add("Cell B1");
 
-            // Position the table on the first page
-            Page page = doc.Pages[1];
-            page.Paragraphs.Add(table);
+            // Insert the table into the first page's paragraph collection
+            Page firstPage = doc.Pages[1];
+            firstPage.Paragraphs.Add(table);
 
-            // Save the modified PDF (lifecycle rule: use Save inside using)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table with solid border saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with bordered table saved to '{outputPath}'.");
     }
 }

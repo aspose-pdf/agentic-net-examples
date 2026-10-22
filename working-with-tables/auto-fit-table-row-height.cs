@@ -7,47 +7,54 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document
-        using (Document doc = new Document())
-        {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_auto_row.pdf";
 
-            // Create a table and set its position on the page
+        // Create a simple PDF if the input does not exist
+        if (!File.Exists(inputPath))
+        {
+            using (Document doc = new Document())
+            {
+                doc.Pages.Add();
+                doc.Save(inputPath);
+            }
+        }
+
+        // Load the PDF
+        using (Document doc = new Document(inputPath))
+        {
+            // Add a page if the document is empty
+            if (doc.Pages.Count == 0)
+                doc.Pages.Add();
+
+            // Create a table and add it to the first page
             Table table = new Table
             {
-                // Position the table (llx, lly, urx, ury)
-                // Adjust as needed for your layout
-                ColumnWidths = "100 200 150"
+                // Define two columns with relative widths
+                ColumnWidths = "200 300",
+                // Optional: set border for visual clarity
+                Border = new BorderInfo(BorderSide.All, 0.5f)
             };
-            page.Paragraphs.Add(table);
 
-            // Add a row to the table
-            Row row = table.Rows.Add();
+            // Build the header row
+            Row headerRow = table.Rows.Add();
+            headerRow.BackgroundColor = Color.LightGray;
+            headerRow.Cells.Add("Description");
+            headerRow.Cells.Add("Details");
 
-            // *** Auto‑fit row height ***
-            // Do NOT set FixedRowHeight – leaving it unset (default 0) lets the row
-            // height be determined by its content (intrinsic height).
-            // Optionally, ensure MinRowHeight is zero so there is no minimum constraint.
-            row.MinRowHeight = 0; // Auto‑fit (no minimum height)
+            // Build the body row. Row height auto‑fits by default; no explicit Height property exists.
+            Row bodyRow = table.Rows.Add();
+            // If you need a minimum height you can set it, e.g., bodyRow.MinRowHeight = 20;
+            bodyRow.Cells.Add("Short text.");
+            bodyRow.Cells.Add("This is a much longer piece of text that should cause the row to expand automatically to fit all the content without clipping.");
 
-            // Add cells with content that may require multiple lines
-            Cell cell1 = row.Cells.Add();
-            cell1.Paragraphs.Add(new TextFragment("Short text"));
+            // Add the table to the page's paragraphs collection
+            doc.Pages[1].Paragraphs.Add(table);
 
-            Cell cell2 = row.Cells.Add();
-            // This cell contains a longer paragraph; the row height will expand automatically.
-            cell2.Paragraphs.Add(new TextFragment(
-                "This is a longer piece of text that should cause the row to increase its height " +
-                "automatically to accommodate the wrapped content without any manual height settings."));
-
-            Cell cell3 = row.Cells.Add();
-            cell3.Paragraphs.Add(new TextFragment("Another cell"));
-
-            // Save the PDF
-            string outputPath = "AutoFitRowHeight.pdf";
+            // Save the modified PDF
             doc.Save(outputPath);
-            Console.WriteLine($"PDF saved to '{outputPath}'.");
         }
+
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

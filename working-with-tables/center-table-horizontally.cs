@@ -1,66 +1,67 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // TextState is defined here
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";   // existing PDF to modify (can be empty)
-        const string outputPath = "centered_table.pdf";
+        // Paths for the output PDF
+        const string outputPath = "table_centered.pdf";
 
-        // Ensure the input file exists; if not, create a blank PDF to work with
-        if (!File.Exists(inputPath))
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            using (Document emptyDoc = new Document())
-            {
-                emptyDoc.Pages.Add(); // add a single blank page
-                emptyDoc.Save(inputPath);
-            }
-        }
+            // Add a page to the document
+            Page page = doc.Pages.Add();
 
-        // Open the document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Get the first page (1‑based indexing)
-            Page page = doc.Pages[1];
-
-            // Create a table and center it horizontally on the page
+            // Create a table
             Table table = new Table
             {
-                // HorizontalAlignment.Center aligns the whole table to the page center
-                HorizontalAlignment = HorizontalAlignment.Center
+                // Set column widths (example: three equal columns)
+                ColumnWidths = "100 100 100",
+
+                // Center the table horizontally on the page
+                HorizontalAlignment = HorizontalAlignment.Center,
+
+                // Optional: set default border and padding for all cells
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f),
+                DefaultCellPadding = new MarginInfo(5, 5, 5, 5),
+
+                // Optional: set default text formatting for all cells
+                DefaultCellTextState = new TextState
+                {
+                    FontSize = 12,
+                    Font = FontRepository.FindFont("Arial")
+                }
             };
 
-            // Optional: define column widths (e.g., two equal columns)
-            // table.ColumnWidths = "100 100"; // or new float[] { 100, 100 };
+            // Add header row
+            Row header = table.Rows.Add();
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
+            header.Cells.Add("Header 3");
 
-            // First row (header)
-            Row row1 = table.Rows.Add();
-            Cell cell11 = row1.Cells.Add();
-            cell11.DefaultCellTextState = new TextState { FontSize = 12 };
-            cell11.Paragraphs.Add(new TextFragment("Header 1"));
-            Cell cell12 = row1.Cells.Add();
-            cell12.DefaultCellTextState = new TextState { FontSize = 12 };
-            cell12.Paragraphs.Add(new TextFragment("Header 2"));
+            // Add a data row
+            Row data = table.Rows.Add();
+            data.Cells.Add("Cell A1");
+            data.Cells.Add("Cell A2");
+            data.Cells.Add("Cell A3");
 
-            // Second row (data)
-            Row row2 = table.Rows.Add();
-            Cell cell21 = row2.Cells.Add();
-            cell21.DefaultCellTextState = new TextState { FontSize = 10 };
-            cell21.Paragraphs.Add(new TextFragment("Data A"));
-            Cell cell22 = row2.Cells.Add();
-            cell22.DefaultCellTextState = new TextState { FontSize = 10 };
-            cell22.Paragraphs.Add(new TextFragment("Data B"));
+            // Add another data row
+            Row data2 = table.Rows.Add();
+            data2.Cells.Add("Cell B1");
+            data2.Cells.Add("Cell B2");
+            data2.Cells.Add("Cell B3");
 
-            // Add the table to the page's paragraph collection
+            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the modified PDF
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table centered and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with centered table saved to '{outputPath}'.");
     }
 }

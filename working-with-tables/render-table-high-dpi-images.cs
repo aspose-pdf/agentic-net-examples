@@ -1,19 +1,22 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Drawing; // Image lives here
 
-class HighDpiTableExample
+class Program
 {
     static void Main()
     {
-        // Input image files (ensure they exist)
-        string[] imagePaths = { "image1.png", "image2.png", "image3.png", "image4.png" };
-        foreach (var path in imagePaths)
+        // Input high‑DPI image files (ensure they exist)
+        string[] imagePaths = { "highdpi1.jpg", "highdpi2.jpg", "highdpi3.jpg", "highdpi4.jpg" };
+        const string outputPdf = "TableWithHighDpiImages.pdf";
+
+        // Verify all images are present
+        foreach (var imgPath in imagePaths)
         {
-            if (!File.Exists(path))
+            if (!File.Exists(imgPath))
             {
-                Console.Error.WriteLine($"Missing image: {path}");
+                Console.Error.WriteLine($"Image not found: {imgPath}");
                 return;
             }
         }
@@ -21,57 +24,52 @@ class HighDpiTableExample
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a page to host the table
+            // Add a single page
             Page page = doc.Pages.Add();
 
-            // Create a table with 2 columns
+            // Create a table with 2 columns and 2 rows
             Table table = new Table
             {
-                ColumnWidths = "200 200", // set column widths (points)
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Color.Black)
+                // Define column widths (percentage of page width)
+                ColumnWidths = "50 50",
+                // Optional: set border for visual clarity
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f)
             };
 
             // Add rows and cells, inserting high‑DPI images
+            int imgIndex = 0;
             for (int row = 0; row < 2; row++)
             {
-                // Create a new row
                 Row tableRow = table.Rows.Add();
-
                 for (int col = 0; col < 2; col++)
                 {
                     // Create a new cell
                     Cell cell = tableRow.Cells.Add();
 
-                    // Load the image (Aspose.Pdf.Image) and add it to the cell
-                    Image img = new Image
+                    // Load the image and add it to the cell
+                    using (FileStream imgStream = new FileStream(imagePaths[imgIndex], FileMode.Open, FileAccess.Read))
                     {
-                        File = imagePaths[row * 2 + col] // select image for this cell
-                    };
+                        Image img = new Image
+                        {
+                            ImageStream = imgStream,
+                            // Set a fixed width (points). Height will be scaled proportionally.
+                            // The original DPI of the image is preserved, so the rendered quality remains high.
+                            FixWidth = 200
+                        };
+                        cell.Paragraphs.Add(img);
+                    }
 
-                    // Optionally set image scaling to fit the cell
-                    img.FixWidth = 180;   // width in points
-                    img.FixHeight = 120;  // height in points
-
-                    // Add the image to the cell's paragraph collection
-                    cell.Paragraphs.Add(img);
+                    imgIndex++;
                 }
             }
 
             // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Prepare HTML save options with a higher image resolution (e.g., 600 DPI)
-            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
-            {
-                ImageResolution = 600, // high‑DPI rendering for images
-                RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
-                PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml
-            };
-
-            // Save the document as HTML using the high‑DPI settings
-            doc.Save("HighDpiTable.html", htmlOpts);
+            // Save the PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine("PDF with high‑DPI images rendered as HTML table saved to 'HighDpiTable.html'.");
+        Console.WriteLine($"PDF with high‑DPI images saved to '{outputPdf}'.");
     }
 }

@@ -1,14 +1,13 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class ReplaceTableExample
+class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -18,42 +17,57 @@ class ReplaceTableExample
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate over each page to locate and replace tables
+            foreach (Aspose.Pdf.Page page in doc.Pages)
             {
-                Page page = doc.Pages[pageIndex];
+                Aspose.Pdf.Table oldTable = null;
+                int oldIndex = -1;
 
-                // Find all tables on the current page
-                TableAbsorber absorber = new TableAbsorber();
-                absorber.Visit(page);
-
-                // Work on a copy of the TableList because Replace modifies the collection
-                var absorbedTables = absorber.TableList.ToList();
-
-                foreach (AbsorbedTable oldTable in absorbedTables)
+                // Find the first Table in the page's Paragraphs collection
+                for (int i = 0; i < page.Paragraphs.Count; i++)
                 {
-                    // Create a new Table that will replace the old one
-                    Table newTable = new Table();
+                    if (page.Paragraphs[i] is Aspose.Pdf.Table tbl)
+                    {
+                        oldTable = tbl;
+                        oldIndex = i;
+                        break;
+                    }
+                }
 
-                    // Position the new table at the same rectangle as the old table
-                    // Rectangle coordinates: LLX, LLY, URX, URY
-                    newTable.Left = (float)oldTable.Rectangle.LLX;
-                    newTable.Top  = (float)oldTable.Rectangle.URY;
+                // If a table was found, replace it
+                if (oldTable != null && oldIndex >= 0)
+                {
+                    // Remove the existing table
+                    page.Paragraphs.Remove(oldTable);
 
-                    // Optionally copy column widths if they exist – AbsorbedTable does not expose ColumnWidths,
-                    // so this step is omitted. You can set custom widths here if needed.
+                    // Create a new table (example: 2 columns, 2 rows)
+                    Aspose.Pdf.Table newTable = new Aspose.Pdf.Table();
+                    newTable.ColumnWidths = "200 200";
 
-                    // Add a single row with a single cell containing placeholder text
-                    Row row = new Row();
-                    Cell cell = new Cell();
-                    cell.Paragraphs.Add(new TextFragment("Replaced table"));
-                    row.Cells.Add(cell);
-                    newTable.Rows.Add(row);
+                    // First row
+                    Aspose.Pdf.Row row1 = new Aspose.Pdf.Row();
+                    Aspose.Pdf.Cell cell11 = new Aspose.Pdf.Cell();
+                    cell11.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("New Cell 1"));
+                    Aspose.Pdf.Cell cell12 = new Aspose.Pdf.Cell();
+                    cell12.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("New Cell 2"));
+                    row1.Cells.Add(cell11);
+                    row1.Cells.Add(cell12);
+                    newTable.Rows.Add(row1);
 
-                    // Replace the absorbed table with the newly created table
-                    absorber.Replace(page, oldTable, newTable);
+                    // Second row
+                    Aspose.Pdf.Row row2 = new Aspose.Pdf.Row();
+                    Aspose.Pdf.Cell cell21 = new Aspose.Pdf.Cell();
+                    cell21.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("New Cell 3"));
+                    Aspose.Pdf.Cell cell22 = new Aspose.Pdf.Cell();
+                    cell22.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("New Cell 4"));
+                    row2.Cells.Add(cell21);
+                    row2.Cells.Add(cell22);
+                    newTable.Rows.Add(row2);
+
+                    // Insert the new table at the original position
+                    page.Paragraphs.Insert(oldIndex, newTable);
                 }
             }
 
@@ -61,6 +75,6 @@ class ReplaceTableExample
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table replacement completed. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Table replaced and saved to '{outputPath}'.");
     }
 }

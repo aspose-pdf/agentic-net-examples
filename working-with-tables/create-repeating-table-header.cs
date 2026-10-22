@@ -8,68 +8,82 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_header.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_header_table.pdf";
 
-        // Load existing PDF or create a new one
-        using (Document doc = File.Exists(inputPath) ? new Document(inputPath) : new Document())
+        if (!File.Exists(inputPath))
         {
-            // Ensure at least one page exists
-            if (doc.Pages.Count == 0)
-                doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Access tagged content API
+        // Load the PDF and work with its tagged content
+        using (Document doc = new Document(inputPath))
+        {
             ITaggedContent tagged = doc.TaggedContent;
+            // Set language and title (optional)
             tagged.SetLanguage("en-US");
-            tagged.SetTitle("Document with Table Header");
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Root element of the logical structure tree
+            // Root element of the structure tree
             StructureElement root = tagged.RootElement;
 
-            // Create a table element and attach it to the root
+            // Create a table element
             TableElement table = tagged.CreateTableElement();
-            table.AlternativeText = "Sample data table";
+            table.AlternativeText = "Sample data table with repeating header row";
+            // Set the first row to repeat on each new page
+            table.RepeatingRowsCount = 1;
             root.AppendChild(table);
 
-            // Create the table header (THead) group
+            // ----- Header row (repeats on each new page) -----
             TableTHeadElement thead = tagged.CreateTableTHeadElement();
             table.AppendChild(thead);
 
-            // Create a header row inside the THead
+            // Create a table row for the header
             TableTRElement headerRow = tagged.CreateTableTRElement();
             thead.AppendChild(headerRow);
 
-            // Add header cells (TH) to the header row
-            TableTHElement th1 = tagged.CreateTableTHElement();
-            th1.SetText("Column 1");
-            headerRow.AppendChild(th1);
+            // Header cells
+            TableTHElement thName = tagged.CreateTableTHElement();
+            thName.SetText("Name");
+            headerRow.AppendChild(thName);
 
-            TableTHElement th2 = tagged.CreateTableTHElement();
-            th2.SetText("Column 2");
-            headerRow.AppendChild(th2);
+            TableTHElement thValue = tagged.CreateTableTHElement();
+            thValue.SetText("Value");
+            headerRow.AppendChild(thValue);
 
-            // Instruct the table to repeat the first row on each new page
-            table.RepeatingRowsCount = 1;
-
-            // Optional: add a body row to demonstrate the repeating header
+            // ----- Body rows (example data) -----
             TableTBodyElement tbody = tagged.CreateTableTBodyElement();
             table.AppendChild(tbody);
 
-            TableTRElement bodyRow = tagged.CreateTableTRElement();
-            tbody.AppendChild(bodyRow);
+            // First data row
+            TableTRElement row1 = tagged.CreateTableTRElement();
+            tbody.AppendChild(row1);
 
-            TableTDElement td1 = tagged.CreateTableTDElement();
-            td1.SetText("Data A");
-            bodyRow.AppendChild(td1);
+            TableTDElement td1a = tagged.CreateTableTDElement();
+            td1a.SetText("Item A");
+            row1.AppendChild(td1a);
 
-            TableTDElement td2 = tagged.CreateTableTDElement();
-            td2.SetText("Data B");
-            bodyRow.AppendChild(td2);
+            TableTDElement td1b = tagged.CreateTableTDElement();
+            td1b.SetText("123");
+            row1.AppendChild(td1b);
+
+            // Second data row
+            TableTRElement row2 = tagged.CreateTableTRElement();
+            tbody.AppendChild(row2);
+
+            TableTDElement td2a = tagged.CreateTableTDElement();
+            td2a.SetText("Item B");
+            row2.AppendChild(td2a);
+
+            TableTDElement td2b = tagged.CreateTableTDElement();
+            td2b.SetText("456");
+            row2.AppendChild(td2b);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with repeating table header saved.");
+        Console.WriteLine($"PDF with repeating table header saved to '{outputPath}'.");
     }
 }

@@ -7,58 +7,62 @@ class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string outputPath = "table_fixed_row_height.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_table.pdf";
 
-        // Fixed height (in points) to be applied to every row
-        const double fixedRowHeight = 30.0;
-
-        // Create a new PDF document
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
-
-            // Create a table and set its position on the page
-            Table table = new Table
-            {
-                // Position the table (left, top)
-                // Coordinates are measured from the bottom-left corner of the page
-                // Adjust as needed for your layout
-                // Here we place the table 50 points from the left and 700 points from the bottom
-                // (i.e., near the top of a standard A4 page)
-                // Note: Table does not have a DefaultRowHeight property, so we set the height per row.
-                // The FixedRowHeight property of each Row will enforce the desired height.
-                // We'll apply this setting when rows are created.
-                // No additional table properties are required for this example.
-            };
-
-            // Add the table to the page's paragraphs collection
-            page.Paragraphs.Add(table);
-
-            // Example: create 5 rows with 3 columns each
-            for (int i = 0; i < 5; i++)
-            {
-                // Add a new row to the table
-                Row row = table.Rows.Add();
-
-                // Set the fixed row height before adding cells
-                row.FixedRowHeight = fixedRowHeight;
-
-                // Add three cells to the row
-                for (int j = 0; j < 3; j++)
-                {
-                    // Create a text fragment for the cell content
-                    TextFragment tf = new TextFragment($"R{i + 1}C{j + 1}");
-                    // Add the cell to the row
-                    row.Cells.Add(tf);
-                }
-            }
-
-            // Save the PDF document
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
         }
 
-        Console.WriteLine($"PDF with fixed row height saved to '{outputPath}'.");
+        try
+        {
+            // Load the existing PDF
+            using (Document doc = new Document(inputPath))
+            {
+                // Ensure there is at least one page to host the table
+                Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
+
+                // Create a visual table (not a tagged structure table)
+                Table table = new Table
+                {
+                    // Define two equal columns (widths in points)
+                    ColumnWidths = "200 200",
+                    // Optional: set a default border for all cells
+                    DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5F, Color.Black)
+                };
+
+                // ----- Header row -----
+                Row header = table.Rows.Add();
+                header.Cells.Add("Column A");
+                header.Cells.Add("Column B");
+                header.BackgroundColor = Color.LightGray;
+                // Fixed height for the header row (points)
+                header.FixedRowHeight = 20F;
+
+                // ----- Data rows -----
+                for (int i = 1; i <= 5; i++)
+                {
+                    Row dataRow = table.Rows.Add();
+                    dataRow.Cells.Add($"Row {i} - A");
+                    dataRow.Cells.Add($"Row {i} - B");
+                    // Apply the same fixed height to every data row
+                    dataRow.FixedRowHeight = 20F;
+                }
+
+                // Add the table to the page's paragraph collection
+                page.Paragraphs.Add(table);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF with table saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

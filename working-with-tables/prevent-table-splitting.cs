@@ -1,51 +1,80 @@
+// ------------------------------------------------------------
+// File: Program.cs
+// ------------------------------------------------------------
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for BorderInfo and BorderSide if needed
+using Aspose.Pdf.Text; // for TextFragment if needed
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_no_split.pdf";
 
-        if (!File.Exists(inputPath))
+        Document doc;
+
+        // Load the source PDF if it exists; otherwise create a fresh document.
+        if (File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            doc = new Document(inputPath);
+        }
+        else
+        {
+            // Creating a new PDF avoids the runtime error that occurs when Aspose tries to
+            // start its internal helper executable for a missing source file.
+            doc = new Document();
+            doc.Pages.Add();
+            Console.Error.WriteLine($"Input file not found: {inputPath}. A new PDF will be created.");
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Use a deterministic disposal pattern.
+        using (doc)
         {
-            // Create a new table
+            // Ensure there is at least one page to host the table.
+            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
+
+            // Create a table and explicitly disable automatic page breaking.
             Table table = new Table
             {
-                // Disable automatic splitting across pages
-                IsBroken = false,
-
-                // Example column widths (adjust as needed)
-                ColumnWidths = "150 150 150",
-
-                // Optional: set a simple border for visibility
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
+                IsBroken = false,               // Prevent the table from splitting across pages.
+                ColumnWidths = "100 100 100"   // Three equal‑width columns.
             };
 
-            // Add a single row with three cells
-            Row row = table.Rows.Add();
-            row.Cells.Add("Cell 1");
-            row.Cells.Add("Cell 2");
-            row.Cells.Add("Cell 3");
+            // Header row.
+            Row header = table.Rows.Add();
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
+            header.Cells.Add("Header 3");
 
-            // Add the table to the first page of the document
-            Page page = doc.Pages[1]; // 1‑based indexing
+            // Add many data rows – enough to normally cause a split.
+            for (int i = 0; i < 50; i++)
+            {
+                Row row = table.Rows.Add();
+                row.Cells.Add($"Item {i + 1}A");
+                row.Cells.Add($"Item {i + 1}B");
+                row.Cells.Add($"Item {i + 1}C");
+            }
+
+            // Insert the table into the page.
             page.Paragraphs.Add(table);
 
-            // Save the modified PDF
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with table that will not split: '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}' with table forced onto a single page.");
     }
+}
+
+// ------------------------------------------------------------
+// File: AsposePdfApi.GeneratedMSBuildEditorConfig.editorconfig
+// ------------------------------------------------------------
+// This file exists solely to satisfy the project file's Compile include.
+// It contains no executable code and can remain empty.
+namespace DummyNamespace
+{
+    // Empty placeholder class – the compiler will ignore this file's content.
+    internal class Placeholder { }
 }

@@ -9,45 +9,43 @@ class Program
     {
         const string outputPath = "output.pdf";
 
-        // Ensure deterministic disposal of the Document
+        // Create a PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a new page to the document
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table with three equal-width columns
-            Table table = new Table
-            {
-                ColumnWidths = "100 100 100",
-                Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
-            };
-            page.Paragraphs.Add(table);
+            // Create a table with three columns (150 points each)
+            Table table = new Table { ColumnWidths = "150 150 150" };
 
-            // Populate the table with five rows
-            for (int i = 1; i <= 5; i++)
+            // Add five rows to the table
+            for (int rowIndex = 1; rowIndex <= 5; rowIndex++)
             {
+                // Create a new row (Aspose.Pdf uses the Row class)
                 Row row = table.Rows.Add();
 
-                // Add three cells to each row with sample text
-                for (int j = 1; j <= 3; j++)
+                // Populate the row with three cells
+                for (int colIndex = 1; colIndex <= 3; colIndex++)
                 {
-                    Cell cell = row.Cells.Add();
-                    cell.Paragraphs.Add(new TextFragment($"R{i}C{j}"));
+                    row.Cells.Add($"Row {rowIndex}, Col {colIndex}");
                 }
 
-                // After the third row, insert a page break
-                if (i == 3)
+                // Insert a page break after the third row
+                if (rowIndex == 3)
                 {
-                    // Add a placeholder row that will start on a new page
-                    Row breakRow = table.Rows.Add();
-                    breakRow.IsInNewPage = true; // forces this row onto the next page
+                    // NewPageFragment is a Paragraph that forces a page break.
+                    // Adding a TextFragment with a form‑feed character ("\f") works as a simple alternative.
+                    row.Cells.Add(new TextFragment("\f"));
                 }
             }
 
-            // Save the resulting PDF
+            // Add the table to the page's paragraph collection
+            page.Paragraphs.Add(table);
+
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with page break saved to '{outputPath}'.");
     }
 }

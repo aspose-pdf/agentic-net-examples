@@ -1,61 +1,84 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        // Output PDF path
-        const string outputPath = "table_with_background.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "accessible_table_with_bg.pdf";
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
-
-            // Create a table and add it to the page
-            Table table = new Table
-            {
-                // Set table position (optional)
-                Left = 50,
-                Top = 500,
-                // Set desired background color with opacity (e.g., semi‑transparent blue)
-                // Aspose.Pdf.Color.FromArgb(alpha, red, green, blue) where alpha 0‑255
-                BackgroundColor = Color.FromArgb(128, 0, 0, 255)
-            };
-
-            // Define three columns
-            table.ColumnWidths = "100 150 100";
-
-            // Add a header row
-            Row header = table.Rows.Add();
-            header.BackgroundColor = Color.FromRgb(0.8, 0.8, 0.8); // light gray for header
-            header.Cells.Add("ID");
-            header.Cells.Add("Name");
-            header.Cells.Add("Quantity");
-
-            // Add a data row
-            Row data = table.Rows.Add();
-            data.Cells.Add("1");
-            data.Cells.Add("Apples");
-            data.Cells.Add("10");
-
-            // Add another data row
-            Row data2 = table.Rows.Add();
-            data2.Cells.Add("2");
-            data2.Cells.Add("Oranges");
-            data2.Cells.Add("20");
-
-            // Add the table to the page's paragraphs collection
-            page.Paragraphs.Add(table);
-
-            // Save the PDF
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        try
+        {
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Access the tagged content API
+                ITaggedContent taggedContent = doc.TaggedContent;
+                taggedContent.SetLanguage("en-US");
+                taggedContent.SetTitle("Accessible Table PDF");
+
+                // Get the root structure element (no cast needed)
+                StructureElement root = taggedContent.RootElement;
+
+                // Create a Table element via the ITaggedContent factory
+                TableElement table = taggedContent.CreateTableElement();
+
+                // Set a semi‑transparent background color (50% opacity, light gray)
+                // FromArgb expects integer values (0‑255). 128 = 50% opacity.
+                table.BackgroundColor = Aspose.Pdf.Color.FromArgb(128, 230, 230, 230);
+
+                // Attach the table to the root element
+                root.AppendChild(table);
+
+                // ----- Header row -----
+                TableTHeadElement thead = taggedContent.CreateTableTHeadElement();
+                table.AppendChild(thead);
+
+                TableTRElement headerRow = taggedContent.CreateTableTRElement();
+                thead.AppendChild(headerRow);
+
+                TableTHElement th1 = taggedContent.CreateTableTHElement();
+                th1.SetText("Name");
+                headerRow.AppendChild(th1);
+
+                TableTHElement th2 = taggedContent.CreateTableTHElement();
+                th2.SetText("Value");
+                headerRow.AppendChild(th2);
+
+                // ----- Body rows -----
+                TableTBodyElement tbody = taggedContent.CreateTableTBodyElement();
+                table.AppendChild(tbody);
+
+                TableTRElement dataRow = taggedContent.CreateTableTRElement();
+                tbody.AppendChild(dataRow);
+
+                TableTDElement td1 = taggedContent.CreateTableTDElement();
+                td1.SetText("Item A");
+                dataRow.AppendChild(td1);
+
+                TableTDElement td2 = taggedContent.CreateTableTDElement();
+                td2.SetText("42");
+                dataRow.AppendChild(td2);
+
+                // Save the modified PDF (no PreSave call required)
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Tagged PDF with table background saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

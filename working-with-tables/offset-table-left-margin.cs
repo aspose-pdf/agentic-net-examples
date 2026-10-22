@@ -1,48 +1,66 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // for any device-specific options if needed
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const string asposeDll = "Aspose.Pdf.dll";
 
+        // Verify that the Aspose.PDF assembly is available at runtime.
+        string asposeDllPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, asposeDll);
+        if (!File.Exists(asposeDllPath))
+        {
+            Console.Error.WriteLine($"Required assembly not found: {asposeDllPath}\nPlease ensure Aspose.PDF for .NET is referenced and the DLL is present.");
+            return;
+        }
+
+        // Verify the input PDF exists before constructing the Document.
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF inside a using block (document-disposal-with-using rule)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Access the first page (page-indexing-one-based rule)
-            Page page = doc.Pages[1];
+            using (Document doc = new Document(inputPath))
+            {
+                // Create a table and offset it from the left margin (e.g., 50 points)
+                Table table = new Table();
+                table.Margin.Left = 50; // points
 
-            // Create a new table
-            Table table = new Table();
+                // Add a header row
+                Row header = table.Rows.Add();
+                header.Cells.Add("Header 1");
+                header.Cells.Add("Header 2");
 
-            // Offset the table from the left margin by setting Margin.Left
-            // MarginInfo.Left expects a double value representing points
-            table.Margin = new MarginInfo { Left = 50.0 }; // 50 points offset
+                // Add a data row
+                Row data = table.Rows.Add();
+                data.Cells.Add("Value A");
+                data.Cells.Add("Value B");
 
-            // Optionally add some content to the table for demonstration
-            // (e.g., a single row with two cells)
-            table.ColumnWidths = "200 200"; // two columns, each 200 points wide
-            Row row = table.Rows.Add();
-            row.Cells.Add("Cell 1");
-            row.Cells.Add("Cell 2");
+                // Insert the table into the first page
+                Page page = doc.Pages[1];
+                page.Paragraphs.Add(table);
 
-            // Add the table to the page's paragraph collection
-            page.Paragraphs.Add(table);
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
 
-            // Save the modified PDF (document-disposal-with-using rule ensures proper disposal)
-            doc.Save(outputPath);
+            Console.WriteLine($"Table with left offset saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Table offset applied and saved to '{outputPath}'.");
+        catch (FileNotFoundException fnfEx) when (fnfEx.Message.Contains("Aspose.Pdf.dll"))
+        {
+            Console.Error.WriteLine("Aspose.PDF assembly could not be loaded. Ensure the Aspose.PDF for .NET library is referenced and the DLL is present.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

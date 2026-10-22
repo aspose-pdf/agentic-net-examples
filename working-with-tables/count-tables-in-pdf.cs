@@ -9,26 +9,24 @@ class Program
     {
         const string inputPath = "input.pdf";
 
-        // Verify the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for proper disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber instance to search for tables
+            // TableAbsorber extracts tables from the document
             TableAbsorber absorber = new TableAbsorber();
 
-            // Extract tables from the entire document
+            // Apply the absorber to the whole document (or you can call absorber.Visit(doc.Pages[i]) per page)
             absorber.Visit(doc);
 
-            // The TableList collection contains all found tables
+            // The TableList collection holds all detected tables
             int tableCount = absorber.TableList.Count;
 
-            // Output the number of tables found
             Console.WriteLine($"Number of tables found: {tableCount}");
         }
     }
