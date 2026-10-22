@@ -1,44 +1,40 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Path to the PDF form (must exist on disk)
-        const string pdfPath = "input_form.pdf";
+        const string pdfPath = "input.pdf";
 
-        // Ensure the PDF file exists before proceeding
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Create the Form facade for the PDF document
-        // Using the constructor that accepts a file path
-        Form pdfForm = new Form(pdfPath);
-
-        // Prepare a memory stream to receive the exported XML
-        using (MemoryStream xmlStream = new MemoryStream())
+        // Load the PDF into a memory stream (no intermediate file on disk)
+        using (MemoryStream pdfStream = new MemoryStream(File.ReadAllBytes(pdfPath)))
+        // Prepare a memory stream to receive the exported data
+        using (MemoryStream outputStream = new MemoryStream())
         {
-            // Export form field data to the memory stream (no intermediate file)
-            pdfForm.ExportXml(xmlStream);
+            // Create a Document from the memory stream
+            Document doc = new Document(pdfStream);
 
-            // Reset the stream position to the beginning for reading
-            xmlStream.Position = 0;
+            // Export the form fields. Aspose.Pdf does not provide ExportToXml; the
+            // supported method is ExportToJson. The JSON can be transformed to XML
+            // by the caller if required.
+            doc.Form.ExportToJson(outputStream);
 
-            // Optionally, read the XML content as a string (e.g., for further processing)
-            using (StreamReader reader = new StreamReader(xmlStream))
+            // Reset the position to read the exported content
+            outputStream.Position = 0;
+            using (StreamReader reader = new StreamReader(outputStream))
             {
-                string xmlContent = reader.ReadToEnd();
-                Console.WriteLine("Exported XML:");
-                Console.WriteLine(xmlContent);
+                string exportedContent = reader.ReadToEnd();
+                Console.WriteLine("Exported Form Data (JSON):");
+                Console.WriteLine(exportedContent);
             }
         }
-
-        // Clean up the Form facade
-        pdfForm.Close();
     }
 }

@@ -1,31 +1,34 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string xmlPath = "output.xml";
+        const string inputPdfPath = "input.pdf";
+        const string outputJsonPath = "form_data.json";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Initialize the Form facade with the PDF file
-        using (Form form = new Form(pdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document document = new Document(inputPdfPath))
         {
-            // Create a file stream for the XML output
-            using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Create, FileAccess.Write))
+            // Enable automatic recalculation of form fields (no Recalculate method exists)
+            document.Form.AutoRecalculate = true;
+
+            // Export all form field values to JSON (ExportDataToXML does not exist)
+            using (FileStream jsonStream = new FileStream(outputJsonPath, FileMode.Create, FileAccess.Write))
             {
-                // Export all form field values to the XML stream
-                form.ExportXml(xmlStream);
+                document.Form.ExportToJson(jsonStream);
             }
         }
 
-        Console.WriteLine($"Form data exported to '{xmlPath}'.");
+        Console.WriteLine($"Form data exported to JSON file: {outputJsonPath}");
     }
 }

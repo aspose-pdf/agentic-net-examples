@@ -1,62 +1,67 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf.Facades;
+using System.Collections.Generic;
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades; // Included as per requirement
 
 class Program
 {
     static void Main()
     {
-        // Input PDF files whose JSON data will be combined
-        string[] pdfFiles = new string[]
-        {
-            "input1.pdf",
-            "input2.pdf",
-            "input3.pdf"
-        };
+        // Input PDF files whose data will be exported to JSON
+        string[] pdfFiles = { "input1.pdf", "input2.pdf", "input3.pdf" };
+        // Output JSON file that will contain a single JSON array
+        const string outputJsonPath = "combined.json";
 
-        // Collect each PDF's exported JSON object as a string
-        List<string> jsonObjects = new List<string>();
-
+        // Validate input files
         foreach (string pdfPath in pdfFiles)
         {
-            // Ensure the source PDF exists
             if (!File.Exists(pdfPath))
             {
                 Console.Error.WriteLine($"File not found: {pdfPath}");
-                continue;
-            }
-
-            // Use the Facades Form class to export form fields to JSON
-            using (Form form = new Form(pdfPath))
-            {
-                using (MemoryStream jsonStream = new MemoryStream())
-                {
-                    // Export JSON (indented for readability)
-                    form.ExportJson(jsonStream, true);
-                    jsonStream.Position = 0; // Reset stream for reading
-
-                    using (StreamReader reader = new StreamReader(jsonStream))
-                    {
-                        string json = reader.ReadToEnd().Trim();
-
-                        // The exported JSON is an object (enclosed in { })
-                        // Add it directly to the collection
-                        jsonObjects.Add(json);
-                    }
-                }
+                return;
             }
         }
 
-        // Combine all JSON objects into a single JSON array
-        string combinedJson = "[" + string.Join(",", jsonObjects) + "]";
+        // List to hold individual JSON objects as strings
+        List<string> jsonObjects = new List<string>();
 
-        // Output file path
-        string outputPath = "combined.json";
+        try
+        {
+            // Extract text from each PDF and build a JSON object
+            foreach (string pdfPath in pdfFiles)
+            {
+                using (Document doc = new Document(pdfPath))
+                {
+                    // Extract all text from the document
+                    TextAbsorber absorber = new TextAbsorber();
+                    doc.Pages.Accept(absorber);
+                    string rawText = absorber.Text ?? string.Empty;
 
-        // Write the combined JSON array to the file
-        File.WriteAllText(outputPath, combinedJson);
+                    // Escape characters for valid JSON string values
+                    string escapedText = rawText
+                        .Replace("\\", "\\\\")
+                        .Replace("\"", "\\\"")
+                        .Replace("\r", "")
+                        .Replace("\n", "\\n");
 
-        Console.WriteLine($"Combined JSON written to '{outputPath}'.");
+                    // Build a simple JSON object containing the file name and its text
+                    string jsonObject = $"{{\"file\":\"{Path.GetFileName(pdfPath)}\",\"text\":\"{escapedText}\"}}";
+                    jsonObjects.Add(jsonObject);
+                }
+            }
+
+            // Combine all objects into a single JSON array
+            string combinedJson = "[" + string.Join(",", jsonObjects) + "]";
+
+            // Write the combined JSON array to the output file
+            File.WriteAllText(outputJsonPath, combinedJson);
+            Console.WriteLine($"Combined JSON written to '{outputJsonPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during processing: {ex.Message}");
+        }
     }
 }

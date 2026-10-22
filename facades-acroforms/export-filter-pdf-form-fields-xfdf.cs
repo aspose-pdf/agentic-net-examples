@@ -1,59 +1,64 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Xml.Linq;
+using System.Text;
+using System.Xml;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // source PDF with form fields
-        const string outputXml = "filtered_fields.xfdf"; // destination XML (XFDF)
+        const string inputPdf = "input.pdf";
+        const string outputXml = "filtered_fields.xml";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document and bind it to a Form facade
-        using (Document pdfDoc = new Document(inputPdf))
-        using (Form form = new Form(pdfDoc))
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
+
+        // Retrieve all form fields via the Document's Form collection
+        var fields = pdfDocument.Form?.Fields;
+        if (fields == null)
         {
-            // Export all form fields to a memory stream in XFDF (XML) format
-            using (MemoryStream exportStream = new MemoryStream())
-            {
-                form.ExportXfdf(exportStream);
-                exportStream.Position = 0; // rewind for reading
-
-                // Load the exported XFDF into an XDocument for manipulation
-                XDocument xfdfDoc = XDocument.Load(exportStream);
-
-                // XFDF structure: <xfdf><fields><field name="...">...</field>...</fields></xfdf>
-                // Keep only fields whose name starts with "Customer"
-                var fieldsElement = xfdfDoc.Root?.Element("fields");
-                if (fieldsElement != null)
-                {
-                    var filteredFields = fieldsElement.Elements("field")
-                        .Where(f => ((string)f.Attribute("name"))?.StartsWith("Customer") == true)
-                        .ToList();
-
-                    // Remove all existing field elements and add back the filtered ones
-                    fieldsElement.RemoveAll();
-                    foreach (var field in filteredFields)
-                        fieldsElement.Add(field);
-                }
-
-                // Save the filtered XFDF to the output file
-                using (FileStream fileOut = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
-                {
-                    xfdfDoc.Save(fileOut);
-                }
-            }
+            Console.WriteLine("No form fields found in the PDF.");
+            return;
         }
 
-        Console.WriteLine($"Filtered XFDF saved to '{outputXml}'.");
+        // Prepare XML writer
+        XmlWriterSettings settings = new XmlWriterSettings
+        {
+            Indent = true,
+            Encoding = Encoding.UTF8
+        };
+
+        using (XmlWriter writer = XmlWriter.Create(outputXml, settings))
+        {
+            writer.WriteStartDocument();
+            writer.WriteStartElement("Fields"); // root element
+
+            // Write only fields whose names start with "Customer"
+            foreach (Field field in fields)
+            {
+                string name = field.Name ?? field.FullName;
+                if (!string.IsNullOrEmpty(name) &&
+                    name.StartsWith("Customer", StringComparison.Ordinal))
+                {
+                    writer.WriteStartElement("Field");
+                    writer.WriteAttributeString("Name", name);
+                    writer.WriteString(field.Value?.ToString() ?? string.Empty);
+                    writer.WriteEndElement(); // Field
+                }
+            }
+
+            writer.WriteEndElement(); // Fields
+            writer.WriteEndDocument();
+        }
+
+        Console.WriteLine($"Filtered form fields saved to '{outputXml}'.");
     }
 }

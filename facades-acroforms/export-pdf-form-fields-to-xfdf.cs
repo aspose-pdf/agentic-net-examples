@@ -1,40 +1,40 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "PdfForm.pdf";
-        const string xfdfPath = "export.xfdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.xfdf";
 
-        // Verify the source PDF exists
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Initialize the Form facade for the PDF
-            using (Form form = new Form(pdfPath))
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
+            // Create a stream for the XFDF output
+            using (FileStream xfdfStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
-                // Create the output XFDF file stream
-                using (FileStream xfdfStream = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
-                {
-                    // Export form fields to XFDF
-                    form.ExportXfdf(xfdfStream);
-                }
-                // Form is disposed automatically by the using block
+                // Use the Form facade to export form data to XFDF
+                Form formFacade = new Form();
+                formFacade.BindPdf(doc);
+                // Export the form data to the XFDF stream
+                formFacade.ExportXfdf(xfdfStream);
             }
 
-            Console.WriteLine($"Form fields exported successfully to '{xfdfPath}'.");
+            Console.WriteLine($"Form data successfully exported to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during export: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

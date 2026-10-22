@@ -1,43 +1,46 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source PDF, XFDF data file and the output PDF
-        const string pdfPath   = "input_form.pdf";
-        const string xfdfPath  = "data.xfdf";
-        const string outputPdf = "filled_form.pdf";
+        const string inputPdfPath = "input.pdf";   // source PDF with form fields
+        const string xfdfPath = "data.xfdf";       // XFDF file containing field values
+        const string outputPdfPath = "output.pdf"; // PDF after importing data
 
-        // Verify that the required files exist
-        if (!File.Exists(pdfPath))
+        // Verify that required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Error: PDF file not found – {inputPdfPath}");
             return;
         }
         if (!File.Exists(xfdfPath))
         {
-            Console.Error.WriteLine($"XFDF file not found: {xfdfPath}");
+            Console.Error.WriteLine($"Error: XFDF file not found – {xfdfPath}");
             return;
         }
 
-        // Use the Form facade to import XFDF data into the PDF
-        // The Form constructor takes the source PDF and the destination PDF file name
-        using (Form form = new Form(pdfPath, outputPdf))
+        // Form is a Facade class that works with PDF documents.
+        // It implements IDisposable, so wrap it in a using block for deterministic cleanup.
+        using (Form form = new Form())
         {
-            // Open the XFDF file as a read‑only stream
-            using (FileStream xfdfStream = new FileStream(xfdfPath, FileMode.Open, FileAccess.Read))
+            // Bind the existing PDF document to the Form object.
+            form.BindPdf(inputPdfPath);
+
+            // Import form field values from the XFDF file.
+            // The ImportXfdf overload expects a Stream, so open the XFDF file as a read‑only stream.
+            using (FileStream xfdfStream = File.OpenRead(xfdfPath))
             {
-                // Import the field values from the XFDF stream
                 form.ImportXfdf(xfdfStream);
             }
 
-            // Persist the changes to the output PDF
-            form.Save();
+            // Save the updated PDF to a new file.
+            form.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Form fields imported successfully. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Form data imported successfully. Output saved to '{outputPdfPath}'.");
     }
 }

@@ -2,9 +2,8 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Facades; // Ensure the Form facade namespace is available
-using Aspose.Pdf.Facades; // FieldType enum resides here
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -19,31 +18,25 @@ class Program
             return;
         }
 
-        // Initialize the Form facade for the PDF
-        using (Form form = new Form(inputPdf))
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
+
+        // Collect only text field names
+        List<string> textFieldNames = new List<string>();
+        foreach (Field field in pdfDocument.Form.Fields)
         {
-            // Retrieve all field names in the document
-            string[] allFieldNames = form.FieldNames;
-            List<string> textFieldNames = new List<string>();
-
-            // Filter only fields whose type is Text
-            foreach (string fieldName in allFieldNames)
+            // TextBoxField represents a text form field
+            if (field is TextBoxField)
             {
-                // GetFieldType returns a FieldType enum, not a string
-                var fieldType = form.GetFieldType(fieldName);
-                if (fieldType == FieldType.Text)
-                {
-                    textFieldNames.Add(fieldName);
-                }
+                // PartialName returns the field's name (without hierarchy prefixes)
+                textFieldNames.Add(field.PartialName);
             }
-
-            // Serialize the list of text field names to a JSON array
-            string json = JsonSerializer.Serialize(textFieldNames, new JsonSerializerOptions { WriteIndented = true });
-
-            // Write the JSON output to a file
-            File.WriteAllText(outputJson, json);
         }
 
-        Console.WriteLine($"Text field names exported to '{outputJson}'.");
+        // Serialize the list to a JSON array
+        string json = JsonSerializer.Serialize(textFieldNames, new JsonSerializerOptions { WriteIndented = true });
+        File.WriteAllText(outputJson, json);
+
+        Console.WriteLine($"Exported {textFieldNames.Count} text field names to '{outputJson}'.");
     }
 }
