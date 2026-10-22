@@ -9,6 +9,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string fieldName  = "FooterNote";
 
         if (!File.Exists(inputPath))
         {
@@ -16,32 +17,45 @@ class Program
             return;
         }
 
-        // Load the source PDF to obtain page dimensions (if needed for calculations)
-        using (Document srcDoc = new Document(inputPath))
+        // Load the PDF to obtain page dimensions.
+        using (Document doc = new Document(inputPath))
         {
-            // Initialize FormEditor with source and destination files
-            using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
+            // FormEditor works on the PDF document directly.
+            FormEditor formEditor = new FormEditor();
+            formEditor.BindPdf(doc); // bind the loaded document
+
+            // Iterate over all pages and reposition the field.
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Define margins in points (1 inch = 72 points)
-                float leftMargin   = 50f; // distance from the left edge
-                float bottomMargin = 20f; // distance from the bottom edge
+                Page page = doc.Pages[i];
 
-                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-                for (int pageNum = 1; pageNum <= srcDoc.Pages.Count; pageNum++)
-                {
-                    // Create a unique field name for each page to avoid name collisions
-                    string newFieldName = $"FooterNote_{pageNum}";
+                // Page size (points)
+                double pageWidth  = page.PageInfo.Width;
+                double pageHeight = page.PageInfo.Height;
 
-                    // Copy the existing field "FooterNote" to the current page at the calculated coordinates
-                    // Parameters: source field name, new field name, target page number, X (abscissa), Y (ordinate)
-                    formEditor.CopyInnerField("FooterNote", newFieldName, pageNum, leftMargin, bottomMargin);
-                }
+                // Bottom‑margin rectangle for the field.
+                double margin      = 20.0;   // 20 points from left/right and bottom
+                double fieldHeight = 30.0;   // desired field height
 
-                // Persist the changes to the output file
-                formEditor.Save();
+                double llx = margin;                     // lower‑left X
+                double lly = margin;                     // lower‑left Y (from bottom)
+                double urx = pageWidth - margin;         // upper‑right X
+                double ury = margin + fieldHeight;       // upper‑right Y
+
+                // MoveField(name, llx, lly, urx, ury) repositions the field.
+                // The method applies to the current page context; because we iterate
+                // through each page, the field will be placed on every page.
+                formEditor.MoveField(fieldName,
+                                     (float)llx,
+                                     (float)lly,
+                                     (float)urx,
+                                     (float)ury);
             }
+
+            // Save the modified PDF.
+            formEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"Field \"FooterNote\" moved to bottom margin and saved as '{outputPath}'.");
+        Console.WriteLine($"Field '{fieldName}' moved to bottom margin on each page and saved to '{outputPath}'.");
     }
 }

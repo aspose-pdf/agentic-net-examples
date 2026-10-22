@@ -1,53 +1,44 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms; // Needed for FieldFlag if used in future extensions
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_version.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the existing PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        // Create a zero‑size rectangle for the hidden field (page 1 is used as a container)
+        Rectangle fieldRect = new Rectangle(0, 0, 0, 0);
+
+        // Create a numeric (textbox) field named "Version" with value "2"
+        TextBoxField versionField = new TextBoxField(pdfDocument.Pages[1], fieldRect)
         {
-            // Initialize the FormEditor facade with the loaded document
-            using (FormEditor formEditor = new FormEditor())
-            {
-                formEditor.BindPdf(doc);
+            PartialName = "Version",
+            Value = "2"
+        };
 
-                // Add a hidden numeric field named "Version" with initial value "2"
-                // Placed at (0,0)-(0,0) so it is not visible on the page
-                // FieldType.Text is used for a simple numeric field
-                bool added = formEditor.AddField(FieldType.Text, "Version", "2", 1, 0, 0, 0, 0);
-                if (!added)
-                {
-                    Console.Error.WriteLine("Failed to add the Version field.");
-                }
-                else
-                {
-                    // Mark the field as hidden. In recent Aspose.PDF versions the
-                    // PropertyFlag enum does not contain a "Hidden" member. The
-                    // closest equivalent that prevents the field from appearing in
-                    // the UI is the NoExport flag, which hides the field from the
-                    // viewer while still keeping it in the form data.
-                    formEditor.SetFieldAttribute("Version", PropertyFlag.NoExport);
-                }
+        // Mark the field as hidden by setting the widget annotation flag directly
+        versionField.Flags = AnnotationFlags.Hidden;
 
-                // Save the modified PDF
-                formEditor.Save(outputPath);
-            }
-        }
+        // Add the field to the PDF form
+        pdfDocument.Form.Add(versionField);
 
-        Console.WriteLine($"PDF saved with hidden Version field: {outputPath}");
+        // Save the updated PDF
+        pdfDocument.Save(outputPath);
+
+        Console.WriteLine($"Hidden numeric field 'Version' added. Saved to '{outputPath}'.");
     }
 }

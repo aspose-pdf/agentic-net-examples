@@ -1,54 +1,44 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // for JavascriptAction
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Load the PDF document
-        Document doc = new Document(inputPdf);
+        Document doc = new Document(inputPath);
 
-        // Retrieve the required form fields
-        var quantityField = doc.Form["Quantity"];
-        var totalPriceField = doc.Form["TotalPrice"];
-        if (quantityField == null || totalPriceField == null)
+        // JavaScript that calculates TotalPrice = Quantity * UnitPrice
+        string js = "var qty = this.getField('Quantity').value;" +
+                    "var unit = this.getField('UnitPrice').value;" +
+                    "this.getField('TotalPrice').value = qty * unit;";
+
+        // Retrieve the Quantity field (assumed to be a TextBoxField)
+        if (doc.Form["Quantity"] is TextBoxField quantityField)
         {
-            Console.Error.WriteLine("Required fields 'Quantity' or 'TotalPrice' not found in the PDF.");
-            return;
+            // Attach the script to the field's Calculate action
+            quantityField.Actions.OnCalculate = new JavascriptAction(js);
+        }
+        else
+        {
+            Console.Error.WriteLine("Quantity field not found or not a TextBoxField.");
         }
 
-        // JavaScript that recalculates TotalPrice whenever Quantity or UnitPrice changes.
-        // The script is attached to the TotalPrice field's OnCalculate action.
-        string jsCode = @"
-            var qty = this.getField('Quantity').value;
-            var price = this.getField('UnitPrice').value;
-            var q = parseFloat(qty);
-            var p = parseFloat(price);
-            if (!isNaN(q) && !isNaN(p)) {
-                event.value = (q * p).toString();
-            } else {
-                event.value = '';
-            }
-        ";
+        // Save the updated PDF
+        doc.Save(outputPath);
 
-        // Attach the script to the TotalPrice field's OnCalculate action (valid property).
-        totalPriceField.Actions.OnCalculate = new JavascriptAction(jsCode);
-
-        // Save the modified PDF
-        doc.Save(outputPdf);
-
-        Console.WriteLine($"PDF with JavaScript saved to '{outputPdf}'.");
+        Console.WriteLine($"JavaScript attached and saved to '{outputPath}'.");
     }
 }

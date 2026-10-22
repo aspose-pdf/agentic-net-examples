@@ -15,15 +15,18 @@ class Program
             return;
         }
 
-        // Initialize FormEditor with source and destination PDFs
-        using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
+        // Use FormEditor (Aspose.Pdf.Facades) to modify form fields.
+        using (FormEditor editor = new FormEditor())
         {
-            // Add a new option "Option A" to the combo box (dropdown) named "Choices"
-            // For combo boxes the overload expects an array: { label, exportValue }
-            formEditor.AddListItem("Choices", new string[] { "Option A", "Option A" });
+            // Load the existing PDF.
+            editor.BindPdf(inputPath);
 
-            // Persist changes to the output file
-            formEditor.Save();
+            // Add a new list item "Option A" to the dropdown field named "Choices".
+            // The AddListItem overload accepts only the field name and the item value.
+            editor.AddListItem("Choices", "Option A");
+
+            // Save the updated PDF.
+            editor.Save(outputPath);
         }
 
         Console.WriteLine($"Dropdown field updated and saved to '{outputPath}'.");

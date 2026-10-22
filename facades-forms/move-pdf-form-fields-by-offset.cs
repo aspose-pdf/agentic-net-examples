@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
 
 class Program
@@ -18,45 +17,31 @@ class Program
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        Document doc = new Document(inputPath);
+
+        // Define the offset to apply to each field
+        const double offsetX = 10; // horizontal offset
+        const double offsetY = 15; // vertical offset
+
+        // Iterate over each form field and adjust its rectangle
+        foreach (Field field in doc.Form.Fields)
         {
-            // Bind a FormEditor to the loaded document
-            using (FormEditor editor = new FormEditor())
-            {
-                editor.BindPdf(doc);
+            // Get the current rectangle (position) of the field.
+            Aspose.Pdf.Rectangle rect = field.Rect;
 
-                // Offset to apply to each field (10 points right, 15 points up)
-                const float offsetX = 10f;
-                const float offsetY = 15f;
+            // Apply the offset to all sides of the rectangle.
+            rect.LLX += offsetX;
+            rect.LLY += offsetY;
+            rect.URX += offsetX;
+            rect.URY += offsetY;
 
-                // Iterate over all form fields in the document
-                foreach (Field field in doc.Form.Fields)
-                {
-                    // Full name of the field (required by MoveField)
-                    string fieldName = field.FullName;
-
-                    // Current rectangle of the field (LLX, LLY, URX, URY are doubles)
-                    Aspose.Pdf.Rectangle rect = field.Rect;
-
-                    // Compute new rectangle coordinates with the offset, casting doubles to float
-                    float newLlx = (float)rect.LLX + offsetX;
-                    float newLly = (float)rect.LLY + offsetY;
-                    float newUrx = (float)rect.URX + offsetX;
-                    float newUry = (float)rect.URY + offsetY;
-
-                    // Move the field to the new position
-                    editor.MoveField(fieldName, newLlx, newLly, newUrx, newUry);
-                }
-
-                // Save changes made by the FormEditor back to the document
-                // The parameter‑less Save() is obsolete; using the overload that saves to the bound document.
-                editor.Save();
-            }
-
-            // Save the updated PDF
-            doc.Save(outputPath);
+            // Update the field's rectangle with the new coordinates.
+            field.Rect = rect;
         }
 
-        Console.WriteLine($"Form fields moved and saved to '{outputPath}'.");
+        // Save the modified PDF.
+        doc.Save(outputPath);
+
+        Console.WriteLine($"All form fields moved by ({offsetX},{offsetY}) and saved to '{outputPath}'.");
     }
 }

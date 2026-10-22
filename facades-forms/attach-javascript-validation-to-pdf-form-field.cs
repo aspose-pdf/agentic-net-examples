@@ -1,43 +1,42 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_js.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Bind the PDF, attach JavaScript to the "Age" field, and save.
-        using (FormEditor formEditor = new FormEditor())
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // JavaScript that shows a warning if the value is less than 18
+        string js = "if (Number(event.value) < 18) { app.alert('You must be at least 18 years old.'); }";
+
+        // Retrieve the form field named "Age"
+        TextBoxField ageField = doc.Form["Age"] as TextBoxField;
+        if (ageField == null)
         {
-            // Initialize the facade with the source PDF.
-            formEditor.BindPdf(inputPdf);
-
-            // JavaScript that shows a warning if the entered value is less than 18.
-            string js = @"
-                if (event.value < 18) {
-                    app.alert('Age must be at least 18 years old.');
-                }
-            ";
-
-            // Attach the script to the field named "Age".
-            // SetFieldScript works for any field; the script will be executed on field validation.
-            formEditor.SetFieldScript("Age", js);
-
-            // Save the modified PDF.
-            formEditor.Save(outputPdf);
+            Console.Error.WriteLine("Field 'Age' not found or is not a TextBox.");
+            return;
         }
 
-        Console.WriteLine($"PDF saved with JavaScript attached: {outputPdf}");
+        // Attach the script to the field's OnValidate action (executed when the field is validated)
+        ageField.Actions.OnValidate = new JavascriptAction(js);
+
+        // Save the modified PDF
+        doc.Save(outputPath);
+
+        Console.WriteLine($"JavaScript attached to field 'Age' and saved as '{outputPath}'.");
     }
 }

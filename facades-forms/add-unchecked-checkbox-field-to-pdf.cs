@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades; // included as requested
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,30 +17,42 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Add a checkbox field named "AgreeTerms" on page 2
-            // Rectangle coordinates: lower‑left x, lower‑left y, upper‑right x, upper‑right y
-            FormEditor formEditor = new FormEditor(doc);
-            formEditor.AddField(FieldType.CheckBox, "AgreeTerms", 2, 100, 500, 120, 520);
-
-            // Explicitly set the checkbox to unchecked (default is unchecked)
-            // Access the field through Document.Form collection.
-            if (doc.Form["AgreeTerms"] is CheckboxField checkBox)
+            // Wrap Document in a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // The CheckboxField class provides a Checked property (bool).
-                checkBox.Checked = false; // ensures the box is unchecked
-            }
-            else
-            {
-                Console.Error.WriteLine("Checkbox field 'AgreeTerms' was not found after creation.");
+                // Ensure the document has at least two pages (Aspose.Pdf uses 1‑based indexing)
+                if (doc.Pages.Count < 2)
+                {
+                    Console.Error.WriteLine("The PDF has fewer than 2 pages.");
+                    return;
+                }
+
+                // Get page 2
+                Page page2 = doc.Pages[2];
+
+                // Define the rectangle where the checkbox will appear
+                // (lower‑left X,Y, upper‑right X,Y) – fully qualified type to avoid ambiguity
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
+
+                // Create the checkbox field (class name is CheckboxField, not CheckBoxField)
+                CheckboxField checkBox = new CheckboxField(page2, rect);
+                checkBox.PartialName = "AgreeTerms";
+                checkBox.Checked = false; // default unchecked state
+
+                // Add the field to the document's form collection
+                doc.Form.Add(checkBox);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the updated PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Checkbox field 'AgreeTerms' added on page 2. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Checkbox field added and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

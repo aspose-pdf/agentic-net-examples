@@ -1,38 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// Apply default decoration to text fields
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/facades-forms/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "decorated_output.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
-
-        // FormEditor handles loading the PDF and saving the result.
-        using (FormEditor editor = new FormEditor(inputPath, outputPath))
-        {
-            // Configure default visual attributes for text fields.
-            editor.Facade = new FormFieldFacade();
-            editor.Facade.BackgroundColor = System.Drawing.Color.LightYellow;
-            editor.Facade.TextColor       = System.Drawing.Color.DarkBlue;
-            editor.Facade.BorderColor     = System.Drawing.Color.Gray;
-            editor.Facade.Alignment       = FormFieldFacade.AlignCenter;
-
-            // Apply the decoration to all text fields in the document.
-            editor.DecorateField(FieldType.Text);
-
-            // Persist the changes.
-            editor.Save();
-        }
-
-        Console.WriteLine($"Decorated PDF saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

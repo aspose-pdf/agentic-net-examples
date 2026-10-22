@@ -1,63 +1,58 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Base directory of the application (works for both Windows and Linux)
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // Folder containing source PDFs
+        const string inputFolder = "InputPdfs";
+        // Folder where modified PDFs will be saved
+        const string outputFolder = "OutputPdfs";
 
-        // Resolve input / output folders relative to the base directory
-        string inputFolder = Path.Combine(baseDir, "InputPdfs");
-        string outputFolder = Path.Combine(baseDir, "OutputPdfs");
-
-        // Ensure the folders exist – if the input folder is missing we create it and inform the user.
         if (!Directory.Exists(inputFolder))
         {
-            Directory.CreateDirectory(inputFolder);
-            Console.WriteLine($"[Info] Input folder not found. Created empty folder at '{inputFolder}'. Place PDF files there and re‑run the program.");
-            return; // Nothing to process yet.
-        }
-        Directory.CreateDirectory(outputFolder);
-
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine($"[Info] No PDF files found in '{inputFolder}'. Add PDFs and run again.");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        foreach (string inputPath in pdfFiles)
+        Directory.CreateDirectory(outputFolder);
+
+        // Process each PDF file in the input folder
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
+            string fileName = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputFolder, $"{fileName}_SelectAll.pdf");
+
             try
             {
-                // Build the output file path (adds a suffix to avoid overwriting the original)
-                string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                string outputPath = Path.Combine(outputFolder, $"{fileName}_with_checkbox.pdf");
+                // Load the PDF document
+                Document doc = new Document(inputPath);
 
-                // Use FormEditor (a Facades class) to add a checkbox field
-                using (FormEditor formEditor = new FormEditor())
+                // Define the checkbox rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+                Rectangle rect = new Rectangle(100, 700, 120, 720);
+
+                // Create a checkbox field on the first page (pages are 1‑based)
+                CheckboxField checkBox = new CheckboxField(doc.Pages[1], rect)
                 {
-                    // Bind the source PDF file
-                    formEditor.BindPdf(inputPath);
+                    PartialName = "SelectAll",
+                    // Optional: set the default state (checked/unchecked)
+                    Checked = false
+                };
 
-                    // Add a checkbox named "SelectAll" on the first page.
-                    // Coordinates are in points (lower‑left x, lower‑left y, upper‑right x, upper‑right y).
-                    // Example rectangle: (50,750) to (70,770) places the box near the top‑left corner.
-                    formEditor.AddField(FieldType.CheckBox, "SelectAll", 1, 50, 750, 70, 770);
+                // Add the field to the document's form (page index is 1‑based)
+                doc.Form.Add(checkBox, 1);
 
-                    // Save the modified PDF to the designated output path
-                    formEditor.Save(outputPath);
-                }
+                // Save the updated PDF
+                doc.Save(outputPath);
 
-                Console.WriteLine($"[Success] Processed: {outputPath}");
+                Console.WriteLine($"Processed: {inputPath} → {outputPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"[Error] Failed to process '{inputPath}'. Exception: {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
     }

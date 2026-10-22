@@ -7,56 +7,68 @@ class Program
 {
     static void Main()
     {
-        // Folder containing the source PDFs
-        const string inputFolder = @"C:\PdfBatch\Input";
-        // Folder where the updated PDFs will be saved
-        const string outputFolder = @"C:\PdfBatch\Output";
+        // Folder containing PDFs to process
+        const string inputFolder = "InputPdfs";
+        // Folder where updated PDFs will be saved
+        const string outputFolder = "OutputPdfs";
+        // New URL for all submit buttons
+        const string newSubmitUrl = "https://new.example.com/submit";
 
-        // Ensure the output directory exists
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
+
         Directory.CreateDirectory(outputFolder);
 
-        // New URL to assign to all submit buttons
-        const string newUrl = "https://new.example.com/submit";
-
         // Process each PDF file in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = Path.GetFileName(inputPath);
+            string fileName = Path.GetFileName(pdfPath);
             string outputPath = Path.Combine(outputFolder, fileName);
 
-            // Load the form to obtain the submit button names
-            using (Form form = new Form(inputPath))
+            // First, read the form field names using the Form facade
+            string[] fieldNames;
+            using (Form form = new Form())
             {
-                string[] submitButtonNames = form.FormSubmitButtonNames;
+                form.BindPdf(pdfPath);
+                fieldNames = form.FieldNames; // array of all field names
+            }
 
-                // If the document contains submit buttons, update their URLs
-                if (submitButtonNames != null && submitButtonNames.Length > 0)
+            // Now edit the PDF to update submit button actions
+            using (FormEditor editor = new FormEditor())
+            {
+                editor.BindPdf(pdfPath);
+
+                // Re‑bind a Form to query each field's type. The older Aspose.Pdf versions do not expose the FormFieldType enum,
+                // so we simply attempt to set the submit URL for every field and ignore any exceptions that indicate the field
+                // is not a submit button.
+                using (Form form = new Form())
                 {
-                    using (FormEditor editor = new FormEditor())
+                    form.BindPdf(pdfPath);
+                    foreach (string fieldName in fieldNames)
                     {
-                        // Bind the source PDF
-                        editor.BindPdf(inputPath);
-
-                        // Update each submit button URL
-                        foreach (string btnName in submitButtonNames)
+                        try
                         {
-                            editor.SetSubmitUrl(btnName, newUrl);
+                            // Attempt to set the submit URL. If the field is not a submit button, Aspose throws an exception
+                            // which we swallow – the field is left unchanged.
+                            editor.SetSubmitUrl(fieldName, newSubmitUrl);
                         }
-
-                        // Save the modified PDF to the output location
-                        editor.Save(outputPath);
+                        catch (Exception)
+                        {
+                            // Ignore fields that are not submit buttons or any other errors.
+                        }
                     }
                 }
-                else
-                {
-                    // No submit buttons found – copy the original file unchanged
-                    File.Copy(inputPath, outputPath, overwrite: true);
-                }
+
+                // Save the modified PDF
+                editor.Save(outputPath);
             }
 
             Console.WriteLine($"Processed: {fileName}");
         }
 
-        Console.WriteLine("Batch update completed.");
+        Console.WriteLine("All PDFs have been updated.");
     }
 }

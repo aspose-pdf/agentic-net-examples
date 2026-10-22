@@ -1,41 +1,37 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName  = "ObsoleteField";
+        const string fieldName = "ObsoleteField";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        // The Form indexer returns a WidgetAnnotation; cast it to Field to work with field‑specific members
+        Field? field = pdfDocument.Form[fieldName] as Field;
+        if (field != null)
         {
-            // Use FormEditor to edit the PDF form
-            using (FormEditor editor = new FormEditor())
-            {
-                // Load the source PDF
-                editor.BindPdf(inputPath);
-
-                // Remove the unwanted field
-                editor.RemoveField(fieldName);
-
-                // Save the result to a new file
-                editor.Save(outputPath);
-            }
-
-            Console.WriteLine($"Field \"{fieldName}\" removed. Output saved to \"{outputPath}\".");
+            // Delete the field using the Form API
+            pdfDocument.Form.Delete(fieldName);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        // Save the updated PDF
+        pdfDocument.Save(outputPath);
+
+        Console.WriteLine($"Removed field '{fieldName}' and saved to '{outputPath}'.");
     }
 }

@@ -1,40 +1,56 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF containing both fields
-        const string outputPdf = "output.pdf";  // PDF with updated TargetNotes field
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Form facade works with an input and an output file.
-        // It loads the PDF, allows field manipulation, and saves the result.
-        Form form = new Form(inputPdf, outputPdf);
-
-        // Retrieve the current value of the source field.
-        string sourceValue = form.GetField("SourceNotes");
-
-        // If the source field exists, copy its value to the target field.
-        if (sourceValue != null)
+        try
         {
-            form.FillField("TargetNotes", sourceValue);
+            // Load the PDF document
+            Document doc = new Document(inputPath);
+
+            // Access the form fields collection
+            var form = doc.Form;
+
+            // Get the source field (assumed to be a text box)
+            TextBoxField sourceField = form["SourceNotes"] as TextBoxField;
+            if (sourceField == null)
+            {
+                Console.Error.WriteLine("Source field 'SourceNotes' not found or is not a text box field.");
+                return;
+            }
+
+            // Get the target field (assumed to be a text box)
+            TextBoxField targetField = form["TargetNotes"] as TextBoxField;
+            if (targetField == null)
+            {
+                Console.Error.WriteLine("Target field 'TargetNotes' not found or is not a text box field.");
+                return;
+            }
+
+            // Copy the inner content/value
+            targetField.Value = sourceField.Value;
+
+            // Save the updated PDF
+            doc.Save(outputPath);
+
+            Console.WriteLine($"Content copied from 'SourceNotes' to 'TargetNotes'. Saved as '{outputPath}'.");
         }
-        else
+        catch (Exception ex)
         {
-            Console.Error.WriteLine("Source field 'SourceNotes' not found or empty.");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        // Persist the changes to the output PDF.
-        form.Save();
-
-        Console.WriteLine($"Field content copied. Output saved to '{outputPdf}'.");
     }
 }
