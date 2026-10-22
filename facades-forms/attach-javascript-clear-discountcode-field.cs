@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
@@ -8,36 +9,44 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string fieldName = "DiscountCode";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_js.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Try to get the field "DiscountCode" as a TextBoxField.
+        // The indexer returns a generic Field; we cast to TextBoxField.
+        // If the cast fails, the field either does not exist or is of a different type.
+        if (doc.Form == null)
         {
-            // Retrieve the field by its fully qualified name. The Form indexer returns a WidgetAnnotation,
-            // so we cast it to the base Field type.
-            Field field = doc.Form[fieldName] as Field;
-            if (field == null)
-            {
-                Console.Error.WriteLine($"Field '{fieldName}' not found.");
-                return;
-            }
-
-            // Attach JavaScript that clears the field when it receives focus.
-            // The correct action property for focus is OnReceiveFocus.
-            field.Actions.OnReceiveFocus = new JavascriptAction("event.target.value='';");
-
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            Console.Error.WriteLine("The document does not contain a form.");
+            return;
         }
 
-        Console.WriteLine($"JavaScript attached and saved to '{outputPdf}'.");
+        TextBoxField discountField = doc.Form["DiscountCode"] as TextBoxField;
+        if (discountField == null)
+        {
+            Console.Error.WriteLine("Form field 'DiscountCode' not found or is not a TextBoxField.");
+            return;
+        }
+
+        // JavaScript that clears the field when it receives focus.
+        // Using the 'event' object is the recommended way in Acrobat JavaScript.
+        string focusClearJs = "event.target.value='';";
+
+        // Attach the JavaScript to the field's OnEnter action (focus event).
+        discountField.Actions.OnEnter = new JavascriptAction(focusClearJs);
+
+        // Save the modified PDF
+        doc.Save(outputPath);
+
+        Console.WriteLine($"JavaScript attached and saved to '{outputPath}'.");
     }
 }

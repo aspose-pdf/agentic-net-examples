@@ -1,13 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms; // Required for Field class
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_moved_fields.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,21 +16,30 @@ class Program
             return;
         }
 
-        // Use PdfPageEditor to shift the content (including form fields) on page 2
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document.
+        Document pdfDocument = new Document(inputPath);
+
+        // Iterate over all form fields in the document.
+        // The Form collection contains Field objects.
+        foreach (Field field in pdfDocument.Form.Fields)
         {
-            // Load the source PDF
-            editor.BindPdf(inputPath);
+            // PageIndex is zero‑based. Page 2 => index 1.
+            if (field.PageIndex == 1)
+            {
+                // Get the current rectangle that defines the field's position.
+                Aspose.Pdf.Rectangle rect = field.Rect;
 
-            // Specify that only page 2 should be processed
-            editor.ProcessPages = new int[] { 2 };
+                // Shift the field 5 points to the right.
+                rect.LLX += 5; // lower‑left X
+                rect.URX += 5; // upper‑right X (keep width unchanged)
 
-            // Move the origin 5 points to the right (X axis), Y stays unchanged
-            editor.MovePosition(5f, 0f);
-
-            // Save the modified PDF
-            editor.Save(outputPath);
+                // Assign the modified rectangle back to the field.
+                field.Rect = rect;
+            }
         }
+
+        // Save the modified PDF.
+        pdfDocument.Save(outputPath);
 
         Console.WriteLine($"Fields on page 2 moved 5 points right. Saved to '{outputPath}'.");
     }

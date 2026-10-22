@@ -1,40 +1,49 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF
-        const string outputPdf = "output.pdf";  // PDF with added text field
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Rectangle coordinates for the new field (lower‑left X/Y and upper‑right X/Y)
-        float llx = 100f; // lower‑left X
-        float lly = 500f; // lower‑left Y
-        float urx = 300f; // upper‑right X
-        float ury = 530f; // upper‑right Y
-
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use FormEditor (facade) to edit the form.
-        using (FormEditor formEditor = new FormEditor())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the existing PDF.
-            formEditor.BindPdf(inputPdf);
+            // Define rectangle coordinates for the text field (replace with actual values)
+            double llx = 100; // lower‑left X
+            double lly = 500; // lower‑left Y
+            double urx = 300; // upper‑right X
+            double ury = 550; // upper‑right Y
 
-            // Add a text field named "CustomerName" on page 1.
-            // Page numbers are 1‑based in Aspose.Pdf.
-            formEditor.AddField(FieldType.Text, "CustomerName", 1, llx, lly, urx, ury);
+            // Create a rectangle that Aspose.Pdf expects (llx, lly, urx, ury)
+            Rectangle rect = new Rectangle(llx, lly, urx, ury);
 
-            // Save the modified PDF.
-            formEditor.Save(outputPdf);
+            // Create a text box field (TextBoxField) on page 1
+            TextBoxField txtField = new TextBoxField(doc.Pages[1], rect)
+            {
+                PartialName = "CustomerName",
+                // Optional: set default value, font, etc.
+                // Value = "",
+                // TextState = new TextState { Font = FontRepository.FindFont("Helvetica"), FontSize = 12 }
+            };
+
+            // Add the field to the document form (page numbers are 1‑based)
+            doc.Form.Add(txtField, 1);
+
+            // Save the modified document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Text field \"CustomerName\" added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Text field added and saved to '{outputPath}'.");
     }
 }

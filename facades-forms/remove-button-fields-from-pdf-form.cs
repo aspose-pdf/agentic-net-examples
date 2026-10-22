@@ -1,6 +1,7 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq; // Added for Count() extension method
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -9,7 +10,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_simplified.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,27 +18,37 @@ class Program
             return;
         }
 
-        // Load the PDF document.
-        Document pdfDocument = new Document(inputPath);
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPath);
 
-        // Collect button fields first because the collection cannot be modified while iterating.
-        List<Field> buttonsToRemove = new List<Field>();
-        foreach (Field field in pdfDocument.Form.Fields)
+        // Ensure the document contains a form with at least one field
+        var form = pdfDoc.Form;
+        if (form == null || form.Fields == null || form.Fields.Count() == 0) // Fixed Count usage
         {
+            Console.WriteLine("No form fields found. Nothing to remove.");
+            pdfDoc.Save(outputPath);
+            return;
+        }
+
+        // Collect the names of all button‑type fields (ButtonField)
+        List<string> buttonFieldNames = new List<string>();
+        foreach (var field in form.Fields)
+        {
+            // In Aspose.PDF the class representing a push button is ButtonField.
             if (field is ButtonField)
-                buttonsToRemove.Add(field);
+            {
+                buttonFieldNames.Add(field.PartialName);
+            }
         }
 
-        // Remove the collected button fields using the Form.Delete method (by field name).
-        foreach (Field btn in buttonsToRemove)
+        // Delete the collected button fields
+        foreach (string name in buttonFieldNames)
         {
-            // The Delete method expects the field's partial name.
-            pdfDocument.Form.Delete(btn.PartialName);
+            form.Delete(name);
         }
 
-        // Save the modified PDF.
-        pdfDocument.Save(outputPath);
-
-        Console.WriteLine($"All button fields removed. Output saved to '{outputPath}'.");
+        // Save the modified PDF
+        pdfDoc.Save(outputPath);
+        Console.WriteLine($"All button fields removed. Saved to '{outputPath}'.");
     }
 }

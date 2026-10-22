@@ -1,44 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdf  = "input.pdf";   // existing PDF with at least 3 pages
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // FormEditor is a Facades class that works with AcroForm fields.
-        // It implements IDisposable, so wrap it in a using block (document‑disposal‑with‑using rule).
-        using (FormEditor formEditor = new FormEditor(inputPdf, outputPdf))
+        // Load the existing PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        // Page 3 where the radio button group will be placed
+        Page page = pdfDocument.Pages[3];
+
+        // Create a radio button field (group) named "PaymentMethod"
+        RadioButtonField paymentMethod = new RadioButtonField(page)
         {
-            // Define the radio button options.
-            formEditor.Items = new string[] { "Credit", "PayPal" };
+            PartialName = "PaymentMethod",
+            // Set a default selected value if desired
+            Value = "Credit"
+        };
 
-            // Optional visual settings.
-            formEditor.RadioGap  = 8;   // gap between the two radio buttons (pixels)
-            formEditor.RadioHoriz = true; // arrange horizontally (default)
+        // Add the individual options to the group using AddOption (export value + rectangle)
+        paymentMethod.AddOption("Credit", new Rectangle(100, 700, 120, 720));   // Credit option
+        paymentMethod.AddOption("PayPal", new Rectangle(150, 700, 170, 720)); // PayPal option
 
-            // Add the radio button group on page 3.
-            // Parameters: field type, field name, page number (1‑based), lower‑left x, lower‑left y,
-            // upper‑right x, upper‑right y.
-            // Choose a rectangle that fits the desired layout.
-            formEditor.AddField(FieldType.Radio, "PaymentMethod", 3, 100, 500, 200, 520);
+        // Add the radio button field to the PDF form
+        pdfDocument.Form.Add(paymentMethod);
 
-            // Persist the changes (save‑to‑non‑pdf‑always‑use‑save‑options rule does not apply here
-            // because we are saving a PDF; the Save() method writes PDF by default).
-            formEditor.Save();
-        }
+        // Save the modified PDF
+        pdfDocument.Save(outputPath);
 
-        Console.WriteLine($"Radio button group 'PaymentMethod' added to page 3 and saved as '{outputPdf}'.");
+        Console.WriteLine($"Radio button group added and saved to '{outputPath}'.");
     }
 }

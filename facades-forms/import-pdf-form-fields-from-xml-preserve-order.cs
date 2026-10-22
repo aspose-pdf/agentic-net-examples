@@ -1,41 +1,48 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string sourcePdf = "input.pdf";      // PDF with form fields
-        const string outputPdf = "output.pdf";     // Resulting PDF after import
-        const string xmlFile   = "fields.xml";     // XML containing field values
+        // Paths – adjust as needed
+        const string inputPdfPath   = "input.pdf";
+        const string formDataXmlPath = "formdata.xml";
+        const string outputPdfPath  = "output.pdf";
 
-        // Verify that required files exist
-        if (!File.Exists(sourcePdf))
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(xmlFile))
+        if (!File.Exists(formDataXmlPath))
         {
-            Console.Error.WriteLine($"XML data file not found: {xmlFile}");
+            Console.Error.WriteLine($"Form data XML not found: {formDataXmlPath}");
             return;
         }
 
-        // Create the Form facade, binding the source PDF and specifying the output file.
-        // This follows the required lifecycle: creation via constructor, internal loading, later saving.
-        Form form = new Form(sourcePdf, outputPdf);
-
-        // Import the XML data. The second argument (ignoreFormTemplateChanges) is set to false
-        // to keep the original field order and layout unchanged.
-        using (FileStream xmlStream = new FileStream(xmlFile, FileMode.Open, FileAccess.Read))
+        try
         {
-            form.ImportXml(xmlStream, false);
+            // Use the Form facade to import XML data into the PDF form.
+            // The Form facade preserves the original field order defined in the PDF.
+            using (Form pdfForm = new Form(inputPdfPath, outputPdfPath))
+            {
+                using (FileStream xmlStream = new FileStream(formDataXmlPath, FileMode.Open, FileAccess.Read))
+                {
+                    pdfForm.ImportXml(xmlStream);
+                }
+                // Save the updated PDF. The Save call writes to the output path supplied in the constructor.
+                pdfForm.Save();
+            }
+
+            Console.WriteLine($"Form fields imported and saved to '{outputPdfPath}'.");
         }
-
-        // Persist the changes to the output PDF.
-        form.Save();
-
-        Console.WriteLine($"Form fields imported from '{xmlFile}' and saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

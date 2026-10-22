@@ -1,51 +1,66 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using System.Reflection;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string fieldName = "PhoneNumber";
-        const string mask      = "(###) ###-####";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize FormEditor with source and destination PDFs
-        FormEditor formEditor = new FormEditor(inputPdf, outputPdf);
+        // Load the PDF document
+        var document = new Document(inputPath);
 
-        // Add JavaScript to enforce the input mask.
-        // The script runs on the field's Keystroke event and formats the value.
-        // This is a simple example; a more robust script may be required for production use.
-        string js = @"
-            var re = /\D/g;
-            var clean = event.value.replace(re, '');
-            if (clean.length > 0) {
-                var formatted = '';
-                if (clean.length >= 1) formatted += '(' + clean.substring(0, Math.min(3, clean.length));
-                if (clean.length >= 4) formatted += ') ' + clean.substring(3, Math.min(6, clean.length));
-                if (clean.length >= 7) formatted += '-' + clean.substring(6, Math.min(10, clean.length));
-                event.value = formatted;
-            }
-        ";
-        // Attach the script to the field. The second parameter is the JavaScript code.
-        formEditor.SetFieldScript(fieldName, js);
+        // Retrieve the field named "PhoneNumber"
+        if (document.Form["PhoneNumber"] is TextBoxField phoneField)
+        {
+            // Aspose.Pdf's TextBoxField does not expose a public SetOption method in recent versions.
+            // Use reflection to invoke the internal SetOption(string, object) method, which allows us to
+            // add custom attributes such as an input mask.
+            SetCustomOption(phoneField, "InputMask", "(###) ###-####");
+        }
+        else
+        {
+            Console.Error.WriteLine("Field 'PhoneNumber' not found or is not a text box field.");
+        }
 
-        // Optionally, set the field as required or read‑only using SetFieldAttribute.
-        // Here we keep the field editable, so no flag is set.
+        // Save the modified PDF
+        document.Save(outputPath);
 
-        // Save the modified PDF.
-        formEditor.Save();
+        Console.WriteLine($"PhoneNumber field updated with input mask. Saved to '{outputPath}'.");
+    }
 
-        // Clean up resources.
-        formEditor.Close();
+    /// <summary>
+    /// Invokes the internal SetOption method on a form field via reflection.
+    /// This works for all field types that inherit from Aspose.Pdf.Forms.Field.
+    /// </summary>
+    /// <param name="field">The form field instance.</param>
+    /// <param name="optionName">The name of the option (e.g., "InputMask").</param>
+    /// <param name="optionValue">The value to assign to the option.</param>
+    private static void SetCustomOption(Field field, string optionName, object optionValue)
+    {
+        // Look for a method named "SetOption" that takes (string, object).
+        const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        MethodInfo? setOptionMethod = field.GetType().GetMethod("SetOption", flags, null, new[] { typeof(string), typeof(object) }, null);
 
-        Console.WriteLine($"PhoneNumber field updated with input mask and saved to '{outputPdf}'.");
+        if (setOptionMethod != null)
+        {
+            setOptionMethod.Invoke(field, new[] { optionName, optionValue });
+        }
+        else
+        {
+            // If the method does not exist (unlikely in supported versions), fall back to the
+            // field's "CustomData" dictionary if available, or simply log a warning.
+            Console.Error.WriteLine($"Unable to set custom option '{optionName}'. The SetOption method is not available on type {field.GetType().FullName}.");
+        }
     }
 }

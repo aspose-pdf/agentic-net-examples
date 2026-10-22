@@ -1,58 +1,66 @@
 using System;
 using System.IO;
+using System.Drawing; // needed for System.Drawing.Color
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms; // needed for FieldType enum
 
 class Program
 {
     static void Main()
     {
-        // Base directory of the running application
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // Directory containing the PDF files to process
+        const string inputDirectory = @"C:\PdfFolder";
+        // Optional: output directory (can be same as input for in‑place update)
+        const string outputDirectory = @"C:\PdfFolder\Processed";
 
-        // Directories for input and output PDFs (created if missing)
-        string inputDirectory  = Path.Combine(baseDir, "InputPdfs");
-        string outputDirectory = Path.Combine(baseDir, "OutputPdfs");
-        Directory.CreateDirectory(inputDirectory);
-        Directory.CreateDirectory(outputDirectory);
-
-        // Verify that there is at least one PDF to process
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf");
-        if (pdfFiles.Length == 0)
+        if (!Directory.Exists(inputDirectory))
         {
-            Console.WriteLine($"No PDF files found in '{inputDirectory}'. Place PDFs there and rerun the program.");
+            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
             return;
         }
 
-        foreach (string inputPath in pdfFiles)
-        {
-            string fileName   = Path.GetFileName(inputPath);
-            string outputPath = Path.Combine(outputDirectory, fileName);
+        Directory.CreateDirectory(outputDirectory);
 
+        // Enumerate all PDF files in the directory
+        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
+        foreach (string pdfPath in pdfFiles)
+        {
             try
             {
-                // Bind the PDF to a FormEditor instance (non‑obsolete overload)
-                using (FormEditor editor = new FormEditor())
+                // Load the PDF document inside a using block for deterministic disposal
+                using (Document doc = new Document(pdfPath))
                 {
-                    editor.BindPdf(inputPath);
+                    // Bind the document to the FormEditor facade
+                    using (FormEditor editor = new FormEditor())
+                    {
+                        editor.BindPdf(doc);
 
-                    // Configure visual attributes for the fields
-                    editor.Facade = new FormFieldFacade();
-                    editor.Facade.Alignment = FormFieldFacade.AlignCenter;
+                        // ----- Consistent decoration for checkbox fields -----
+                        // The appearance is configured on the editor's Facade (FormFieldFacade)
+                        editor.Facade.BorderColor = System.Drawing.Color.Blue;               // fully qualified
+                        editor.Facade.BackgroundColor = System.Drawing.Color.LightGray;      // fully qualified
+                        // Optional: set border width and style for a clearer look
+                        editor.Facade.BorderWidth = FormFieldFacade.BorderWidthThin; // float constant
+                        editor.Facade.BorderStyle = FormFieldFacade.BorderStyleSolid; // int constant
 
-                    // Apply the visual attributes to all checkbox fields in the document
-                    editor.DecorateField(FieldType.CheckBox);
+                        // Apply the decoration to every checkbox field in the document
+                        editor.DecorateField(FieldType.CheckBox);
 
-                    // Save the modified PDF to the output location
-                    editor.Save(outputPath);
+                        // Save the modified PDF to the output location
+                        string outputPath = Path.Combine(outputDirectory, Path.GetFileName(pdfPath));
+                        editor.Save(outputPath);
+                    }
                 }
 
-                Console.WriteLine($"Decorated: {fileName}");
+                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("All PDFs have been processed.");
     }
 }

@@ -1,14 +1,16 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using System.Linq;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName  = "TempField";
+        const string fieldName = "TempField";
 
         if (!File.Exists(inputPath))
         {
@@ -16,34 +18,43 @@ class Program
             return;
         }
 
-        // Read the current value of the field using the Form facade
-        string fieldValue;
-        using (Form form = new Form(inputPath))
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
+        Form pdfForm = pdfDocument.Form;
+
+        if (pdfForm == null)
         {
-            // GetField returns null if the field does not exist
-            fieldValue = form.GetField(fieldName);
+            Console.WriteLine("The PDF does not contain a form.");
+            pdfDocument.Save(outputPath);
+            return;
         }
 
-        // Remove the field only when it is empty or missing
-        if (string.IsNullOrEmpty(fieldValue))
+        // Locate the field by its partial name (or full name)
+        Field targetField = pdfForm.Fields
+                                   .FirstOrDefault(f => string.Equals(f.PartialName, fieldName, StringComparison.Ordinal));
+
+        if (targetField != null)
         {
-            using (FormEditor editor = new FormEditor())
+            string fieldValue = targetField.Value?.ToString() ?? string.Empty;
+
+            // Remove the field only if it contains no user input (null or empty)
+            if (string.IsNullOrEmpty(fieldValue))
             {
-                // Bind the source PDF
-                editor.BindPdf(inputPath);
-
-                // Remove the specified field
-                editor.RemoveField(fieldName);
-
-                // Save the modified PDF
-                editor.Save(outputPath);
+                pdfForm.Delete(fieldName);
+                Console.WriteLine($"Field '{fieldName}' removed because it is empty.");
             }
-
-            Console.WriteLine($"Field \"{fieldName}\" removed. Output saved to \"{outputPath}\".");
+            else
+            {
+                Console.WriteLine($"Field '{fieldName}' retained (value: '{fieldValue}').");
+            }
         }
         else
         {
-            Console.WriteLine($"Field \"{fieldName}\" contains data. No removal performed.");
+            Console.WriteLine($"Field '{fieldName}' not found in the PDF.");
         }
+
+        // Save the modified PDF
+        pdfDocument.Save(outputPath);
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

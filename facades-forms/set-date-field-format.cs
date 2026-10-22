@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms; // DateField resides here
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,31 +16,30 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Attempt to retrieve the field named "Date"
-            // The Form indexer returns a generic Field; cast to DateField to access DateFormat
-            var field = doc.Form["Date"];
-            if (field is DateField dateField)
-            {
-                // Set the desired date format
-                dateField.DateFormat = "MM/dd/yyyy";
+            // Retrieve the form field named "Date"
+            // The field collection returns a generic FormField, so cast to DateField
+            Aspose.Pdf.Forms.DateField dateField = doc.Form["Date"] as Aspose.Pdf.Forms.DateField;
 
-                // Optional: set a default appearance (font, size, color) if needed
-                // DefaultAppearance ctor expects System.Drawing.Color for the third argument
-                // Uncomment and adjust as required:
-                // dateField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
-            }
-            else
+            if (dateField == null)
             {
-                Console.WriteLine("Date field not found or is not a DateField.");
+                Console.Error.WriteLine("Date field not found or is not a DateField.");
+                return;
             }
 
-            // Save the modified document
+            // Set the desired display format for the date field
+            // The format string follows .NET custom date format patterns
+            dateField.DateFormat = "MM/dd/yyyy";
+
+            // Optionally set a value to verify the format (e.g., current date)
+            dateField.Value = DateTime.Now;
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Date field format updated and saved to '{outputPath}'.");
     }
 }

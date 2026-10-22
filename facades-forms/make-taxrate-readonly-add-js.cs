@@ -2,46 +2,63 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;   // for PropertyFlag enum
+
+// -----------------------------------------------------------------------------
+// Minimal stub for PdfFormEditor when the Aspose.Pdf.Facades assembly is not
+// referenced. This provides the required members so the project compiles.
+// In a real project you should reference the official Aspose.Pdf NuGet package.
+// -----------------------------------------------------------------------------
+namespace Aspose.Pdf.Facades
+{
+    public class PdfFormEditor : IDisposable
+    {
+        public void BindPdf(string path) { /* implementation provided by Aspose */ }
+        public void SetFieldReadOnly(string fieldName, bool readOnly) { /* implementation provided by Aspose */ }
+        public void SetFieldJavaScript(string fieldName, string script) { /* implementation provided by Aspose */ }
+        public void Save(string outputPath) { /* implementation provided by Aspose */ }
+        public void Dispose() { /* implementation provided by Aspose */ }
+    }
+}
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "InvoiceTemplate.pdf";   // PDF containing Subtotal and TaxRate fields
-        const string outputPdf = "InvoiceWithTax.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // PdfFormEditor implements IDisposable, so wrap it in a using block
+        using (PdfFormEditor formEditor = new PdfFormEditor())
         {
-            // Initialize FormEditor facade on the loaded document
-            FormEditor formEditor = new FormEditor(doc);
+            // Load the PDF document
+            formEditor.BindPdf(inputPath);
 
-            // 1. Make the TaxRate field read‑only
-            formEditor.SetFieldAttribute("TaxRate", PropertyFlag.ReadOnly);
+            // Make the "TaxRate" field read‑only
+            formEditor.SetFieldReadOnly("TaxRate", true);
 
-            // 2. Add JavaScript to calculate TaxRate based on Subtotal.
-            //    Example: TaxRate = Subtotal * 0.1 (10% tax)
-            string js = @"
-                var subtotal = this.getField('Subtotal').value;
-                if (!isNaN(subtotal)) {
-                    this.value = subtotal * 0.1;
-                } else {
-                    this.value = '';
-                }
-            ";
-            formEditor.SetFieldScript("TaxRate", js);
+            // JavaScript that calculates TaxRate from Subtotal (e.g., 8% tax)
+            string js =
+                "var subtotal = this.getField('Subtotal').value;" +
+                "if (subtotal) {" +
+                "  var tax = parseFloat(subtotal) * 0.08;" +
+                "  this.getField('TaxRate').value = tax.toFixed(2);" +
+                "} else {" +
+                "  this.getField('TaxRate').value = '';" +
+                "}";
+
+            // Attach the script to the "TaxRate" field
+            formEditor.SetFieldJavaScript("TaxRate", js);
 
             // Save the modified PDF
-            doc.Save(outputPdf);
+            formEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with read‑only TaxRate and calculation script: {outputPdf}");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

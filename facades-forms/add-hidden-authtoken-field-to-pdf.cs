@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_token.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,41 +17,38 @@ class Program
             return;
         }
 
-        // Generate a secure random token (256‑bit, Base64 encoded)
-        string authToken;
+        // Generate a cryptographically‑secure token
+        string token = GenerateSecureToken();
+
+        // Load the source PDF
+        Document doc = new Document(inputPath);
+
+        // Create a hidden text box field named "AuthToken"
+        // Zero‑size rectangle makes the field invisible in the viewer
+        var rect = new Rectangle(0, 0, 0, 0);
+        TextBoxField authField = new TextBoxField(doc.Pages[1], rect)
         {
-            byte[] tokenBytes = new byte[32]; // 256 bits
-            RandomNumberGenerator.Fill(tokenBytes);
-            authToken = Convert.ToBase64String(tokenBytes);
-        }
+            PartialName = "AuthToken",
+            Value = token
+        };
 
-        // Open the PDF, add a hidden field, and save
-        using (Document doc = new Document(inputPath))
-        {
-            // Ensure there is at least one page
-            if (doc.Pages.Count == 0)
-            {
-                Console.Error.WriteLine("PDF has no pages.");
-                return;
-            }
+        // Add the field to the form (page numbers are 1‑based)
+        doc.Form.Add(authField, 1);
 
-            // Zero‑size rectangle makes the field invisible
-            Rectangle rect = new Rectangle(0, 0, 0, 0);
-
-            // Create the hidden text box field
-            TextBoxField hiddenField = new TextBoxField(doc.Pages[1], rect)
-            {
-                PartialName = "AuthToken",
-                Value = authToken
-            };
-
-            // Add the field to the form (the field itself is an annotation)
-            doc.Form.Add(hiddenField, 1);
-
-            // Save the modified PDF
-            doc.Save(outputPath);
-        }
+        // Save the modified PDF
+        doc.Save(outputPath);
 
         Console.WriteLine($"Hidden AuthToken field added and saved to '{outputPath}'.");
+    }
+
+    static string GenerateSecureToken()
+    {
+        // 256‑bit random token
+        byte[] data = new byte[32];
+        using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(data);
+        }
+        return Convert.ToBase64String(data);
     }
 }
