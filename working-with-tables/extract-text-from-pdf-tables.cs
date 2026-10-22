@@ -15,39 +15,37 @@ class Program
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
+        // Load the PDF document inside a using block for deterministic disposal.
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber to locate tables in the document
+            // TableAbsorber extracts tables from the document.
             TableAbsorber absorber = new TableAbsorber();
 
-            // Extract tables from the entire document
+            // Run the absorber on the whole document (or on specific pages).
             absorber.Visit(doc);
 
-            // Iterate over each absorbed table
-            for (int t = 0; t < absorber.TableList.Count; t++)
+            Console.WriteLine($"Tables found: {absorber.TableList.Count}");
+
+            // Iterate over each absorbed table.
+            foreach (AbsorbedTable table in absorber.TableList)
             {
-                var table = absorber.TableList[t];
-                Console.WriteLine($"Table {t + 1} on page {table.PageNum}:");
+                Console.WriteLine("--- Table found ---");
 
-                // Iterate over rows in the current table
-                for (int r = 0; r < table.RowList.Count; r++)
+                int rowIndex = 0;
+                // Each table contains rows; iterate them.
+                foreach (AbsorbedRow row in table.RowList)
                 {
-                    var row = table.RowList[r];
-
-                    // Iterate over cells in the current row
-                    for (int c = 0; c < row.CellList.Count; c++)
+                    rowIndex++;
+                    int colIndex = 0;
+                    // Each row contains cells; iterate them.
+                    foreach (AbsorbedCell cell in row.CellList)
                     {
-                        var cell = row.CellList[c];
-
-                        // Concatenate all text fragments inside the cell
-                        string cellText = string.Empty;
+                        colIndex++;
+                        // A cell does not expose a direct Text property; its content is a collection of TextFragments.
                         foreach (TextFragment fragment in cell.TextFragments)
                         {
-                            cellText += fragment.Text;
+                            Console.WriteLine($"Cell [{rowIndex},{colIndex}]: {fragment.Text}");
                         }
-
-                        Console.WriteLine($"  Row {r + 1}, Cell {c + 1}: \"{cellText}\"");
                     }
                 }
             }

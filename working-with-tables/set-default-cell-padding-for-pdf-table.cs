@@ -1,53 +1,65 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;   // needed for Table and MarginInfo
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "table_padding.pdf";
+        const string outputPath = "table_with_padding.pdf";
 
-        // Document must be disposed via using (rule: document-disposal-with-using)
+        // Ensure the output directory exists
+        string outDir = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))
+            Directory.CreateDirectory(outDir);
+
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a new page to the document
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table with three equal-width columns
-            Table table = new Table();
-            table.ColumnWidths = "100 100 100";
-
-            // Define default cell padding for the entire table
-            MarginInfo padding = new MarginInfo();
-            padding.Left   = 5;   // left padding
-            padding.Right  = 5;   // right padding
-            padding.Top    = 3;   // top padding
-            padding.Bottom = 3;   // bottom padding
-            table.DefaultCellPadding = padding; // apply to all cells
+            // Create a Table and set default cell padding for all cells
+            Table table = new Table
+            {
+                // MarginInfo defines padding on each side of a cell
+                DefaultCellPadding = new MarginInfo
+                {
+                    Left   = 5,   // 5 points left padding
+                    Right  = 5,   // 5 points right padding
+                    Top    = 2,   // 2 points top padding
+                    Bottom = 2    // 2 points bottom padding
+                },
+                // Optional: set column widths (percentage of page width)
+                ColumnWidths = "30% 70%"
+            };
 
             // Add a header row
             Row header = table.Rows.Add();
-            header.Cells.Add("Header 1");
-            header.Cells.Add("Header 2");
-            header.Cells.Add("Header 3");
+            Cell headerCell1 = header.Cells.Add("Item");
+            Cell headerCell2 = header.Cells.Add("Description");
+            // Header cells can have their own style if needed
+            headerCell1.BackgroundColor = Color.LightGray;
+            headerCell2.BackgroundColor = Color.LightGray;
 
-            // Add some data rows
-            for (int i = 1; i <= 5; i++)
-            {
-                Row row = table.Rows.Add();
-                row.Cells.Add($"Row {i} - Col 1");
-                row.Cells.Add($"Row {i} - Col 2");
-                row.Cells.Add($"Row {i} - Col 3");
-            }
+            // Add a data row
+            Row data = table.Rows.Add();
+            data.Cells.Add("Apple");
+            data.Cells.Add("A sweet red fruit.");
 
-            // Place the table on the page
+            // Add another data row
+            Row data2 = table.Rows.Add();
+            data2.Cells.Add("Banana");
+            data2.Cells.Add("A long yellow fruit.");
+
+            // Add the table to the page's paragraphs collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF (rule: save-to-non-pdf-always-use-save-options not needed for PDF)
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with table padding saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

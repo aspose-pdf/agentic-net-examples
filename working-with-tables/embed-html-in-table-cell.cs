@@ -1,27 +1,26 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for HtmlFragment (inherits FormattedFragment)
+using Aspose.Pdf.Text; // HtmlFragment resides here
 
 class Program
 {
     static void Main()
     {
-        // Input and output paths
-        const string outputPath = "TableWithHtmlCell.pdf";
+        const string outputPath = "table_with_html.pdf";
 
-        // Create a new PDF document
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a page (first page is at index 1)
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table and add it to the page
+            // Create a table with a single column (width 200 points)
             Table table = new Table
             {
-                // Optional: set table border and column widths
-                Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black),
-                ColumnWidths = "200 200"
+                ColumnWidths = "200"
             };
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
             // Add a row to the table
@@ -30,16 +29,16 @@ class Program
             // Add a cell to the row
             Cell cell = row.Cells.Add();
 
-            // Create an HtmlFragment with the desired markup
-            HtmlFragment html = new HtmlFragment("<b>Hello <i>World</i> from <u>HTML</u></b>");
-
-            // Optionally, set HtmlLoadOptions if you need custom settings (e.g., BasePath)
-            // html.HtmlLoadOptions = new HtmlLoadOptions { BasePath = "path/to/resources" };
-
-            // Add the HtmlFragment to the cell's paragraph collection
+            // Embed HTML markup inside the cell using HtmlFragment
+            HtmlFragment html = new HtmlFragment(
+                "<p>This is <b>bold</b> and <i>italic</i> text inside a table cell.</p>"
+            );
             cell.Paragraphs.Add(html);
 
-            // Save the document as PDF
+            // Optional: add a visible border to the cell for demonstration
+            cell.Border = new BorderInfo(BorderSide.All, 1f);
+
+            // Save the PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -11,40 +12,57 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Use the first page (or add a new page if needed)
-            Page page = doc.Pages[1];
-
-            // Create a table and set it to auto‑fit its columns to the content
-            Table table = new Table
+            // Load the source PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                ColumnAdjustment = ColumnAdjustment.AutoFitToContent,
-                // Example: set a simple border for visual clarity
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
-            };
+                // Ensure there is at least one page to place the table
+                Page page = doc.Pages[1]; // 1‑based indexing
 
-            // Define column widths (optional; can be omitted for auto‑fit)
-            table.ColumnWidths = "100 150 200";
+                // Create a table and define column widths (string format required)
+                Table table = new Table
+                {
+                    ColumnWidths = "150 150 150"
+                };
 
-            // Add a row with sample cells
-            Row row = table.Rows.Add();
-            row.Cells.Add("Short");
-            row.Cells.Add("A much longer piece of text that should cause the column to auto‑fit");
-            row.Cells.Add("Medium length");
+                // Add a header row
+                Row header = table.Rows.Add();
+                header.Cells.Add("Product");
+                header.Cells.Add("Quantity");
+                header.Cells.Add("Price");
 
-            // Add the table to the page's paragraph collection
-            page.Paragraphs.Add(table);
+                // Add a data row
+                Row data = table.Rows.Add();
+                data.Cells.Add("Widget A");
+                data.Cells.Add("10");
+                data.Cells.Add("$25.00");
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+                // Add another data row
+                Row data2 = table.Rows.Add();
+                data2.Cells.Add("Gadget B");
+                data2.Cells.Add("5");
+                data2.Cells.Add("$40.00");
+
+                // Auto‑fit columns to the content
+                table.ColumnAdjustment = ColumnAdjustment.AutoFitToContent;
+
+                // Insert the table into the page's paragraph collection
+                page.Paragraphs.Add(table);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Table with AutoFitBehavior saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Saved PDF with auto‑fit table to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

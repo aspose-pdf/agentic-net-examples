@@ -1,6 +1,10 @@
 using System;
-using System.Collections.Generic;
+using System.IO;
+using System.Globalization;
+using System.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
@@ -9,97 +13,84 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // ------------------------------------------------------------
-        // Create a sample PDF with a simple table if it does not exist
-        // ------------------------------------------------------------
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
-            using (Document seed = new Document())
-            {
-                // Add a page
-                Page page = seed.Pages.Add();
-
-                // Create a table with three columns
-                Table table = new Table
-                {
-                    // Initial absolute widths (points). This will be converted to percentages.
-                    ColumnWidths = "120 80 100",
-                    // Optional: set border for visibility
-                    Border = new BorderInfo(BorderSide.All, 0.5f)
-                };
-
-                // Add a header row
-                Row header = table.Rows.Add();
-                header.Cells.Add("Header 1");
-                header.Cells.Add("Header 2");
-                header.Cells.Add("Header 3");
-
-                // Add a data row
-                Row data = table.Rows.Add();
-                data.Cells.Add("Cell A");
-                data.Cells.Add("Cell B");
-                data.Cells.Add("Cell C");
-
-                // Add the table to the page
-                page.Paragraphs.Add(table);
-
-                // Save the seed PDF
-                seed.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // Load the PDF and adjust column widths proportionally
-        // ------------------------------------------------------------
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            foreach (Page page in doc.Pages)
+            // Access tagged content (creates it if missing) and set basic metadata
+            ITaggedContent tagged = doc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+
+            // Root element of the structure tree
+            StructureElement root = tagged.RootElement;
+
+            // Create a table element and attach it to the root
+            TableElement table = tagged.CreateTableElement();
+            root.AppendChild(table);
+
+            // Initial column widths (as a space‑separated string, the API expects a string)
+            table.ColumnWidths = "120 80 200";
+
+            // ----- Proportional width adjustment -----
+            // Parse the string into a float array
+            float[] originalWidths = table.ColumnWidths
+                .Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => float.Parse(s, CultureInfo.InvariantCulture))
+                .ToArray();
+
+            float totalWidth = originalWidths.Sum();
+
+            // Guard against division by zero
+            if (totalWidth > 0f)
             {
-                foreach (var paragraph in page.Paragraphs)
+                float[] percentWidths = new float[originalWidths.Length];
+                for (int i = 0; i < originalWidths.Length; i++)
                 {
-                    if (paragraph is Table table)
-                    {
-                        string widthsStr = table.ColumnWidths;
-                        if (string.IsNullOrWhiteSpace(widthsStr))
-                            continue; // No widths defined, skip
-
-                        string[] tokens = widthsStr.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        double[] values = new double[tokens.Length];
-                        double total = 0;
-
-                        for (int i = 0; i < tokens.Length; i++)
-                        {
-                            string token = tokens[i].TrimEnd('%');
-                            if (double.TryParse(token, out double val))
-                            {
-                                values[i] = val;
-                                total += val;
-                            }
-                            else
-                            {
-                                values[i] = 0;
-                            }
-                        }
-
-                        if (total <= 0)
-                            continue; // Avoid division by zero
-
-                        List<string> percentWidths = new List<string>();
-                        foreach (double val in values)
-                        {
-                            double pct = (val / total) * 100.0;
-                            percentWidths.Add(pct.ToString("0.##") + "%");
-                        }
-
-                        table.ColumnWidths = string.Join(" ", percentWidths);
-                        table.ColumnAdjustment = Aspose.Pdf.ColumnAdjustment.AutoFitToWindow;
-                    }
+                    // Convert each width to a percentage of the total
+                    percentWidths[i] = (originalWidths[i] / totalWidth) * 100f;
                 }
+                // Convert back to the string format expected by the API
+                string percentString = string.Join(" ", percentWidths.Select(p => p.ToString(CultureInfo.InvariantCulture)));
+                table.ColumnWidths = percentString;
             }
 
+            // Use the final column count for building rows
+            int columnCount = originalWidths.Length;
+
+            // Build a simple header row
+            TableTHeadElement thead = tagged.CreateTableTHeadElement();
+            table.AppendChild(thead);
+            TableTRElement headerRow = tagged.CreateTableTRElement();
+            thead.AppendChild(headerRow);
+            for (int i = 0; i < columnCount; i++)
+            {
+                TableTHElement th = tagged.CreateTableTHElement();
+                th.SetText($"Header {i + 1}");
+                headerRow.AppendChild(th);
+            }
+
+            // Build a single data row
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+            table.AppendChild(tbody);
+            TableTRElement dataRow = tagged.CreateTableTRElement();
+            tbody.AppendChild(dataRow);
+            for (int i = 0; i < columnCount; i++)
+            {
+                TableTDElement td = tagged.CreateTableTDElement();
+                td.SetText($"Cell {i + 1}");
+                dataRow.AppendChild(td);
+            }
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Proportional column widths applied and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

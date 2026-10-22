@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,49 +6,44 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document
-        using (Document doc = new Document())
-        {
-            // Add a blank page
-            Page page = doc.Pages.Add();
+        const string outputPath = "multiline_cell.pdf";
 
-            // Create a table with two columns (adjust widths as needed)
-            Table table = new Table
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (var doc = new Document())
+        {
+            // Add a new page (first page)
+            var page = doc.Pages.Add();
+
+            // Create a table with a single column of width 300 points
+            var table = new Table
             {
-                ColumnWidths = "200 200"
+                ColumnWidths = "300"
             };
-            page.Paragraphs.Add(table);
 
             // Add a row to the table
-            Row row = table.Rows.Add();
+            var row = table.Rows.Add();
 
             // Add a cell to the row
-            Cell cell = row.Cells.Add();
+            var cell = row.Cells.Add();
 
-            // Create first text fragment
-            TextFragment tf1 = new TextFragment("First line of text");
-            tf1.TextState.FontSize = 12;
-            tf1.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf1.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            // First line of text
+            cell.Paragraphs.Add(new TextFragment("This is the first line."));
+            // Insert a line break fragment
+            cell.Paragraphs.Add(new TextFragment("\n"));
+            // Second line of text
+            cell.Paragraphs.Add(new TextFragment("This is the second line."));
+            // Insert another line break fragment
+            cell.Paragraphs.Add(new TextFragment("\n"));
+            // Third line of text
+            cell.Paragraphs.Add(new TextFragment("Third line goes here."));
 
-            // Create a line‑break fragment (a TextFragment containing a newline)
-            TextFragment lineBreak = new TextFragment("\n");
+            // Add the table to the page's paragraph collection
+            page.Paragraphs.Add(table);
 
-            // Create second text fragment
-            TextFragment tf2 = new TextFragment("Second line of text");
-            tf2.TextState.FontSize = 12;
-            tf2.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf2.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-            // Add the fragments to the cell's Paragraphs collection in order
-            cell.Paragraphs.Add(tf1);
-            cell.Paragraphs.Add(lineBreak); // inserts a line break
-            cell.Paragraphs.Add(tf2);
-
-            // Save the PDF (using the lifecycle rule for disposal)
-            doc.Save("MultilineCell.pdf");
+            // Save the PDF (PDF format does not require explicit SaveOptions)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with multiline cell created successfully.");
+        Console.WriteLine($"PDF with multiline cell saved to '{outputPath}'.");
     }
 }

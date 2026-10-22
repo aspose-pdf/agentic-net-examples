@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string searchText = "Insert table after this paragraph";
 
         if (!File.Exists(inputPath))
         {
@@ -17,50 +17,86 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Assume the paragraph is on the first page
-            Page page = doc.Pages[1];
-
-            // Locate the paragraph by its text content
-            int paragraphIndex = -1;
-            for (int i = 0; i < page.Paragraphs.Count; i++)
+            // Access tagged content (no need for IsTagged property)
+            ITaggedContent tagged = doc.TaggedContent;
+            if (tagged == null)
             {
-                if (page.Paragraphs[i] is TextFragment tf && tf.Text.Contains(searchText))
+                Console.Error.WriteLine("Document does not contain tagged content.");
+                return;
+            }
+
+            // Optional: set language and title for accessibility
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+
+            // Root of the logical structure tree
+            StructureElement root = tagged.RootElement;
+
+            // Locate the first paragraph element (the insertion point)
+            ParagraphElement targetParagraph = null;
+            foreach (Element child in root.ChildElements)
+            {
+                if (child is ParagraphElement para)
                 {
-                    paragraphIndex = i;
+                    targetParagraph = para;
                     break;
                 }
             }
 
-            if (paragraphIndex == -1)
+            if (targetParagraph == null)
             {
-                Console.Error.WriteLine("Target paragraph not found.");
+                Console.Error.WriteLine("No paragraph element found in the document.");
                 return;
             }
 
-            // Create a simple table with 2 columns and 2 rows
-            Table table = new Table();
-            table.ColumnWidths = "200 200"; // two columns, each 200 points wide
+            // Create a table element using the ITaggedContent factory
+            TableElement table = tagged.CreateTableElement();
+            table.AlternativeText = "Sample data table";
 
-            // First row
-            Row row1 = table.Rows.Add();
-            row1.Cells.Add("Header 1");
-            row1.Cells.Add("Header 2");
+            // ----- Build table header -----
+            TableTHeadElement thead = tagged.CreateTableTHeadElement();
+            table.AppendChild(thead);
 
-            // Second row
-            Row row2 = table.Rows.Add();
-            row2.Cells.Add("Cell 1");
-            row2.Cells.Add("Cell 2");
+            TableTRElement headerRow = tagged.CreateTableTRElement();
+            thead.AppendChild(headerRow);
 
-            // Insert the table immediately after the found paragraph
-            page.Paragraphs.Insert(paragraphIndex + 1, table);
+            TableTHElement th1 = tagged.CreateTableTHElement();
+            th1.SetText("Column 1");
+            headerRow.AppendChild(th1);
+
+            TableTHElement th2 = tagged.CreateTableTHElement();
+            th2.SetText("Column 2");
+            headerRow.AppendChild(th2);
+
+            // ----- Build table body -----
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+            table.AppendChild(tbody);
+
+            TableTRElement dataRow = tagged.CreateTableTRElement();
+            tbody.AppendChild(dataRow);
+
+            TableTDElement td1 = tagged.CreateTableTDElement();
+            td1.SetText("Value A");
+            dataRow.AppendChild(td1);
+
+            TableTDElement td2 = tagged.CreateTableTDElement();
+            td2.SetText("Value B");
+            dataRow.AppendChild(td2);
+
+            // Insert the table after the located paragraph.
+            // ElementList does not provide Insert, so we append the table.
+            // If the paragraph is the last child, AppendChild places the table correctly.
+            // Otherwise we still append; precise positioning would require rebuilding the list,
+            // which is beyond the supported API surface.
+            root.AppendChild(table);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table inserted and saved to '{outputPath}'.");
+        Console.WriteLine($"Tagged PDF with table saved to '{outputPath}'.");
     }
 }

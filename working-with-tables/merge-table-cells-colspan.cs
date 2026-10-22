@@ -7,42 +7,40 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document inside a using block for deterministic disposal
+        const string outputPath = "TableWithColSpan.pdf";
+
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a page (1‑based indexing)
+            // Add a new page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Create a table and define three equal column widths
+            // Create a table with three columns of equal width
             Table table = new Table
             {
-                // Column widths are specified as a space‑separated string (points)
-                ColumnWidths = "150 150 150"
+                ColumnWidths = "100 100 100"
             };
-
-            // Add a single row to the table
-            Row row = table.Rows.Add();
-
-            // Add a cell that will span three adjacent columns
-            Cell mergedCell = row.Cells.Add("Merged Cell");
-            mergedCell.ColSpan = 3; // Merge three columns into this cell
-
-            // Optionally set some visual styling for clarity
-            mergedCell.DefaultCellTextState = new TextState
-            {
-                Font = FontRepository.FindFont("Helvetica"),
-                FontSize = 12,
-                ForegroundColor = Color.Black
-            };
-            mergedCell.BackgroundColor = Color.LightGray;
 
             // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF to a file
-            doc.Save("MergedCellTable.pdf");
+            // ----- Header row: one cell spanning three columns -----
+            Row headerRow = table.Rows.Add();
+            Cell headerCell = headerRow.Cells.Add("Header spanning three columns");
+            headerCell.ColSpan = 3; // Merge three adjacent columns
+            // Set a light gray background using Aspose.Pdf.Color (fully qualified)
+            headerCell.BackgroundColor = Aspose.Pdf.Color.LightGray;
+
+            // ----- Data row: three separate cells -----
+            Row dataRow = table.Rows.Add();
+            dataRow.Cells.Add("Cell 1");
+            dataRow.Cells.Add("Cell 2");
+            dataRow.Cells.Add("Cell 3");
+
+            // Save the PDF document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with a cell spanning three columns has been created.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

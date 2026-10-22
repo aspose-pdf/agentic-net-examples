@@ -1,46 +1,78 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "table_rowspan.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a table with three equal-width columns and a thin black border
-            Table table = new Table
-            {
-                ColumnWidths = "100 100 100",
-                Border = new BorderInfo(BorderSide.All, 0.5f, Color.Black) // float literal for width
-            };
-            page.Paragraphs.Add(table);
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Access tagged content and set basic metadata
+            ITaggedContent tagged = doc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle("Table with RowSpan");
 
-            // First row
-            Row row1 = table.Rows.Add();
-            // Add three cells to the first row
-            Cell cellA = row1.Cells.Add("A1");
-            Cell cellB = row1.Cells.Add("B1");
-            Cell cellC = row1.Cells.Add("C1");
+            // Root element of the structure tree
+            StructureElement root = tagged.RootElement;
 
-            // Merge cellA with the cell directly below by setting RowSpan to 2
-            cellA.RowSpan = 2;
+            // Create a table and attach it to the root
+            TableElement table = tagged.CreateTableElement();
+            table.AlternativeText = "Sample table with merged cells";
+            root.AppendChild(table);
 
-            // Second row (cellA is spanning, so only two cells are needed here)
-            Row row2 = table.Rows.Add();
-            Cell cellB2 = row2.Cells.Add("B2");
-            Cell cellC2 = row2.Cells.Add("C2");
+            // Header row
+            TableTHeadElement thead = tagged.CreateTableTHeadElement();
+            table.AppendChild(thead);
+            TableTRElement headerRow = tagged.CreateTableTRElement();
+            thead.AppendChild(headerRow);
+            TableTHElement th1 = tagged.CreateTableTHElement();
+            th1.SetText("Header 1");
+            headerRow.AppendChild(th1);
+            TableTHElement th2 = tagged.CreateTableTHElement();
+            th2.SetText("Header 2");
+            headerRow.AppendChild(th2);
 
-            // Save the PDF document
+            // Body of the table
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+            table.AppendChild(tbody);
+
+            // First data row
+            TableTRElement row1 = tagged.CreateTableTRElement();
+            tbody.AppendChild(row1);
+            TableTDElement cellA = tagged.CreateTableTDElement();
+            cellA.SetText("Cell A1");
+            row1.AppendChild(cellA);
+            TableTDElement cellB = tagged.CreateTableTDElement();
+            cellB.SetText("Cell B1");
+            // Merge this cell with the cell directly below
+            cellB.RowSpan = 2;
+            row1.AppendChild(cellB);
+
+            // Second data row (column B is omitted because of the RowSpan)
+            TableTRElement row2 = tagged.CreateTableTRElement();
+            tbody.AppendChild(row2);
+            TableTDElement cellC = tagged.CreateTableTDElement();
+            cellC.SetText("Cell A2");
+            row2.AppendChild(cellC);
+            // No cell for column B – it is merged with the cell above
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Saved merged table PDF to '{outputPath}'.");
     }
 }

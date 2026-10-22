@@ -1,81 +1,69 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;   // for Color
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document and ensure deterministic disposal
-        using (Document doc = new Document())
-        {
-            // Add a page to host the table
-            Page page = doc.Pages.Add();
+        const string inputPath  = "input.pdf";
+        const string outputPath = "conditional_formatted.pdf";
+        const double threshold  = 50.0; // cells with value > 50 will be highlighted
 
-            // Create a table with three columns of equal width
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+
+        // Load the source PDF
+        using (Document doc = new Document(inputPath))
+        {
+            // Ensure we work with the first page (1‑based indexing)
+            Page page = doc.Pages[1];
+
+            // Create a table with two columns
             Table table = new Table
             {
-                ColumnWidths = "100 100 100"
+                ColumnWidths = "100 100",
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f)
             };
 
-            // ----- Header row -----
-            var header = table.Rows.Add();
+            // Header row
+            Row header = table.Rows.Add();
             header.Cells.Add("Item");
-            header.Cells.Add("Quantity");
-            header.Cells.Add("Price");
+            header.Cells.Add("Value");
 
-            // ----- Sample data rows -----
-            var data = new object[,] {
-                { "Apple",  10, 0.5 },
-                { "Banana", 25, 0.3 },
-                { "Cherry", 5,  1.2 }
-            };
+            // Sample data rows
+            string[] items  = { "A", "B", "C", "D", "E" };
+            double[] values = { 23.5, 67.2, 45.0, 89.1, 12.3 };
 
-            // Add data rows to the table
-            for (int r = 0; r < data.GetLength(0); r++)
+            for (int i = 0; i < items.Length; i++)
             {
-                var row = table.Rows.Add();
-                row.Cells.Add(data[r, 0].ToString());               // Item
-                row.Cells.Add(data[r, 1].ToString());               // Quantity
-                row.Cells.Add(data[r, 2].ToString());               // Price
-            }
+                Row row = table.Rows.Add();
+                // First cell: item name (text)
+                row.Cells.Add(items[i]);
 
-            // ----- Conditional formatting -----
-            // Define thresholds
-            double quantityThreshold = 20;   // Highlight quantities > 20
-            double priceThreshold    = 1.0; // Highlight prices > 1.0
+                // Second cell: numeric value (as string)
+                string valueStr = values[i].ToString();
+                Cell valueCell = row.Cells.Add(valueStr);
 
-            // Table.Rows and TableCell collections are 0‑based. Header row is at index 0.
-            // Data rows therefore start at index 1.
-            for (int r = 0; r < data.GetLength(0); r++)
-            {
-                // Row in the table that corresponds to the current data record
-                var row = table.Rows[r + 1]; // +1 skips the header row (index 0)
-
-                // Quantity is the second column (cell index 1)
-                var qtyCell = row.Cells[1];
-                double qty = Convert.ToDouble(data[r, 1]);
-                if (qty > quantityThreshold)
+                // Conditional formatting: set background color if value exceeds threshold
+                if (values[i] > threshold)
                 {
-                    // LightGoldenrodYellow background for high quantities
-                    qtyCell.BackgroundColor = Color.LightGoldenrodYellow;
-                }
-
-                // Price is the third column (cell index 2)
-                var priceCell = row.Cells[2];
-                double price = Convert.ToDouble(data[r, 2]);
-                if (price > priceThreshold)
-                {
-                    // LemonChiffon background for high prices
-                    priceCell.BackgroundColor = Color.LemonChiffon;
+                    // Use Aspose.Pdf.Color to avoid System.Drawing ambiguity
+                    valueCell.BackgroundColor = Aspose.Pdf.Color.LightSalmon;
                 }
             }
 
-            // Add the table to the page
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF (no SaveOptions needed for PDF output)
-            doc.Save("ConditionalFormatting.pdf");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF saved with conditional formatting: {outputPath}");
     }
 }

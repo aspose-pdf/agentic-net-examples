@@ -3,76 +3,115 @@ using System.Data;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class PdfReportGenerator
 {
     static void Main()
     {
-        const string outputPath = "Report.pdf";
+        // Create sample DataTables (replace with actual DB queries)
+        DataTable dtCustomers = GetCustomersDataTable();
+        DataTable dtOrders = GetOrdersDataTable();
 
-        // Simulate first database table
-        DataTable dt1 = new DataTable("Employees");
-        dt1.Columns.Add("ID", typeof(int));
-        dt1.Columns.Add("Name", typeof(string));
-        dt1.Columns.Add("Department", typeof(string));
-        dt1.Rows.Add(1, "Alice", "HR");
-        dt1.Rows.Add(2, "Bob", "IT");
-        dt1.Rows.Add(3, "Charlie", "Finance");
-
-        // Simulate second database table
-        DataTable dt2 = new DataTable("Products");
-        dt2.Columns.Add("SKU", typeof(string));
-        dt2.Columns.Add("ProductName", typeof(string));
-        dt2.Columns.Add("Price", typeof(decimal));
-        dt2.Rows.Add("A001", "Widget", 19.99m);
-        dt2.Rows.Add("A002", "Gadget", 29.99m);
-        dt2.Rows.Add("A003", "Doohickey", 9.99m);
-
-        // Create PDF document
-        using (Document doc = new Document())
+        // Create a new PDF document
+        using (Document pdfDoc = new Document())
         {
-            // Add a page
-            Page page = doc.Pages.Add();
+            // Add first table on first page
+            AddDataTableToPdf(pdfDoc, dtCustomers, "Customers");
 
-            // Title for first table
-            TextFragment title1 = new TextFragment("Employee List");
-            title1.TextState.FontSize = 14;
-            title1.TextState.Font = FontRepository.FindFont("Helvetica");
-            title1.TextState.ForegroundColor = Aspose.Pdf.Color.DarkBlue;
-            title1.Position = new Position(0, 800);
-            page.Paragraphs.Add(title1);
+            // Add second table on second page
+            AddDataTableToPdf(pdfDoc, dtOrders, "Orders");
 
-            // First table
-            Table table1 = new Table();
-            table1.ColumnWidths = "100 150 150";
-            // Use BorderInfo constructor instead of non‑existent Border class
-            table1.DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Gray);
-            table1.ImportDataTable(dt1, true, 0, 0);
-            table1.Margin = new MarginInfo { Top = 20 };
-            page.Paragraphs.Add(table1);
-
-            // Spacer
-            page.Paragraphs.Add(new TextFragment("\n"));
-
-            // Title for second table
-            TextFragment title2 = new TextFragment("Product Catalog");
-            title2.TextState.FontSize = 14;
-            title2.TextState.Font = FontRepository.FindFont("Helvetica");
-            title2.TextState.ForegroundColor = Aspose.Pdf.Color.DarkGreen;
-            title2.Position = new Position(0, 500);
-            page.Paragraphs.Add(title2);
-
-            // Second table
-            Table table2 = new Table();
-            table2.ColumnWidths = "80 200 80";
-            table2.DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Gray);
-            table2.ImportDataTable(dt2, true, 0, 0);
-            table2.Margin = new MarginInfo { Top = 20 };
-            page.Paragraphs.Add(table2);
-
-            // Save the PDF
-            doc.Save(outputPath);
+            // Save the PDF report
+            pdfDoc.Save("Report.pdf");
         }
 
-        Console.WriteLine($"PDF report generated: {outputPath}");
+        Console.WriteLine("PDF report generated: Report.pdf");
+    }
+
+    // Adds a DataTable as a PDF table on a new page with a title
+    static void AddDataTableToPdf(Document doc, DataTable dataTable, string title)
+    {
+        // Add a new page
+        Page page = doc.Pages.Add();
+
+        // Add title as a paragraph
+        TextFragment titleFragment = new TextFragment(title);
+        titleFragment.TextState.FontSize = 16;
+        titleFragment.TextState.FontStyle = FontStyles.Bold;
+        titleFragment.TextState.Font = FontRepository.FindFont("Arial");
+        page.Paragraphs.Add(titleFragment);
+
+        // Create a PDF table
+        Table pdfTable = new Table();
+
+        // Set table border and cell padding
+        pdfTable.Border = new BorderInfo(BorderSide.All, 0.5f);
+        pdfTable.DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f);
+        pdfTable.DefaultCellPadding = new MarginInfo(5, 5, 5, 5);
+
+        // Add header row
+        Row headerRow = pdfTable.Rows.Add();
+        foreach (DataColumn column in dataTable.Columns)
+        {
+            Cell headerCell = headerRow.Cells.Add(column.ColumnName);
+            headerCell.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            // Use DefaultCellTextState to format header text (TextInfo is not available in this version)
+            headerCell.DefaultCellTextState = new TextState
+            {
+                FontSize = 12,
+                FontStyle = FontStyles.Bold,
+                Font = FontRepository.FindFont("Arial"),
+                ForegroundColor = Aspose.Pdf.Color.Black
+            };
+        }
+
+        // Add data rows
+        foreach (DataRow dr in dataTable.Rows)
+        {
+            Row dataRow = pdfTable.Rows.Add();
+            foreach (object item in dr.ItemArray)
+            {
+                dataRow.Cells.Add(item?.ToString() ?? string.Empty);
+            }
+        }
+
+        // Adjust column widths (simple fixed width; customize as needed)
+        int colCount = dataTable.Columns.Count;
+        string[] widths = new string[colCount];
+        for (int i = 0; i < colCount; i++)
+        {
+            widths[i] = "100";
+        }
+        pdfTable.ColumnWidths = string.Join(" ", widths);
+
+        // Add the table to the page
+        page.Paragraphs.Add(pdfTable);
+    }
+
+    // Sample DataTable for customers
+    static DataTable GetCustomersDataTable()
+    {
+        DataTable dt = new DataTable("Customers");
+        dt.Columns.Add("CustomerID", typeof(int));
+        dt.Columns.Add("Name", typeof(string));
+        dt.Columns.Add("Country", typeof(string));
+
+        dt.Rows.Add(1, "Alice", "USA");
+        dt.Rows.Add(2, "Bob", "UK");
+        dt.Rows.Add(3, "Charlie", "Canada");
+        return dt;
+    }
+
+    // Sample DataTable for orders
+    static DataTable GetOrdersDataTable()
+    {
+        DataTable dt = new DataTable("Orders");
+        dt.Columns.Add("OrderID", typeof(int));
+        dt.Columns.Add("CustomerID", typeof(int));
+        dt.Columns.Add("Amount", typeof(decimal));
+
+        dt.Rows.Add(1001, 1, 250.00m);
+        dt.Rows.Add(1002, 2, 150.50m);
+        dt.Rows.Add(1003, 1, 300.75m);
+        return dt;
     }
 }

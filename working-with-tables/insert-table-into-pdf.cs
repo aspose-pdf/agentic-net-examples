@@ -1,90 +1,81 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text;          // Required for Position
+using Aspose.Pdf.Annotations;   // Kept for completeness
 
-class InsertTableExample
+class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        // Input PDF path, output PDF path, target page number (1‑based) and insertion coordinates
+        const string inputPath   = "input.pdf";
+        const string outputPath  = "output.pdf";
+        const int    targetPage  = 2;          // Insert table on page 2
+        const double insertX      = 100;      // X coordinate (points) from left
+        const double insertY      = 500;      // Y coordinate (points) from bottom
 
-        // Page number where the table will be inserted (1‑based indexing)
-        const int targetPageNumber = 2;
-
-        // Table position on the page (coordinates in points)
-        const float tableLeft = 100f;   // distance from the left edge (float, not double)
-        const float tableTop  = 500f;   // distance from the bottom edge (float, not double)
-
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPdf))
+        // Open the existing PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Validate the target page number
-            if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
+            // Validate the requested page exists (pages are 1‑based)
+            if (targetPage < 1 || targetPage > doc.Pages.Count)
             {
-                Console.Error.WriteLine($"Invalid page number: {targetPageNumber}");
+                Console.Error.WriteLine($"Invalid page number: {targetPage}");
                 return;
             }
 
-            // Get the target page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[targetPageNumber];
+            Page page = doc.Pages[targetPage];
 
-            // -------------------------------------------------
-            // Construct a simple table with 3 columns and 2 rows
-            // -------------------------------------------------
+            // ------------------------------------------------------------
+            // Construct a visual Table
+            // ------------------------------------------------------------
             Table table = new Table
             {
-                // Position the table on the page (float values)
-                Left = tableLeft,
-                Top  = tableTop,
+                // Use Margin to position the table (Aspose.Pdf.Table does not expose a Position property)
+                Margin = new MarginInfo(insertX, insertY, 0, 0),
 
-                // Optional visual styling
-                Border = new BorderInfo(BorderSide.All, 1, Aspose.Pdf.Color.Black),
+                // Optional visual settings
+                Border = new BorderInfo(BorderSide.All, 0.5f),
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f),
                 DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
             };
 
-            // Define column widths (optional)
-            table.ColumnWidths = "100 150 200";
+            // Define column widths (space‑separated string)
+            table.ColumnWidths = "150 150";
 
-            // First row (header)
-            Row headerRow = table.Rows.Add();
-            Cell headerCell1 = headerRow.Cells.Add("Header 1");
-            Cell headerCell2 = headerRow.Cells.Add("Header 2");
-            Cell headerCell3 = headerRow.Cells.Add("Header 3");
+            // Header row
+            Row header = table.Rows.Add();
+            header.Cells.Add("Product");
+            header.Cells.Add("Price");
 
-            // Apply bold style to header cells
-            TextState headerStyle = new TextState
-            {
-                FontSize = 12,
-                Font = FontRepository.FindFont("Helvetica-Bold"),
-                ForegroundColor = Aspose.Pdf.Color.White
-            };
-            headerCell1.DefaultCellTextState = headerStyle;
-            headerCell2.DefaultCellTextState = headerStyle;
-            headerCell3.DefaultCellTextState = headerStyle;
-            headerRow.BackgroundColor = Aspose.Pdf.Color.DarkGray;
+            // Mark the first row as a repeating header (Aspose.Pdf.Table uses RepeatingRowsCount)
+            table.RepeatingRowsCount = 1;
 
-            // Second row (data)
-            Row dataRow = table.Rows.Add();
-            dataRow.Cells.Add("Row 1, Col 1");
-            dataRow.Cells.Add("Row 1, Col 2");
-            dataRow.Cells.Add("Row 1, Col 3");
+            // Data rows
+            Row row1 = table.Rows.Add();
+            row1.Cells.Add("Widget A");
+            row1.Cells.Add("$25.00");
 
-            // Add the table to the page's paragraph collection
+            Row row2 = table.Rows.Add();
+            row2.Cells.Add("Widget B");
+            row2.Cells.Add("$40.00");
+
+            // ------------------------------------------------------------
+            // Insert the table into the page content
+            // ------------------------------------------------------------
             page.Paragraphs.Add(table);
 
             // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table inserted on page {targetPageNumber} and saved to '{outputPdf}'.");
+        Console.WriteLine($"Table inserted and saved to '{outputPath}'.");
     }
 }

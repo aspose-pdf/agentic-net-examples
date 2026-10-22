@@ -6,54 +6,62 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string imagePath     = "image.png";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string imagePath = "image.png";
 
-        if (!File.Exists(inputPdfPath) || !File.Exists(imagePath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine("Input PDF or image file not found.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPdfPath))
+        if (!File.Exists(imagePath))
         {
-            // Ensure there is at least one page to work with
-            Page page = doc.Pages[1];
-
-            // Create a table with a single column
-            Table table = new Table();
-            table.ColumnWidths = "200"; // width of the column in points
-
-            // Add a row to the table
-            Row row = table.Rows.Add();
-
-            // Add a cell to the row
-            Cell cell = row.Cells.Add();
-
-            // Load the image into a memory stream and place it into the cell
-            using (FileStream imgStream = File.OpenRead(imagePath))
-            {
-                Image img = new Image
-                {
-                    ImageStream = imgStream, // assign the stream directly
-                    // Optional: set explicit dimensions
-                    FixWidth  = 180,
-                    FixHeight = 120
-                };
-
-                // Add the image to the cell's paragraph collection
-                cell.Paragraphs.Add(img);
-            }
-
-            // Add the table to the page
-            page.Paragraphs.Add(table);
-
-            // Save the modified PDF
-            doc.Save(outputPdfPath);
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            return;
         }
 
-        Console.WriteLine($"Image inserted into table cell and saved to '{outputPdfPath}'.");
+        // Load the image into a memory stream
+        byte[] imageBytes = File.ReadAllBytes(imagePath);
+        using (MemoryStream imgStream = new MemoryStream(imageBytes))
+        {
+            // Open the PDF document
+            using (Document doc = new Document(inputPdf))
+            {
+                // Ensure the document has at least one page
+                Page page = doc.Pages[1]; // 1‑based indexing
+
+                // Create a table with a single column that spans the page width
+                Table table = new Table
+                {
+                    ColumnWidths = "100%" // full page width
+                };
+
+                // Add a row and a cell
+                Row row = table.Rows.Add();
+                Cell cell = row.Cells.Add();
+
+                // Create an Image object from the memory stream
+                Image img = new Image
+                {
+                    ImageStream = imgStream,
+                    // Optional: set explicit dimensions
+                    FixWidth = 200,
+                    FixHeight = 150
+                };
+
+                // Insert the image into the cell
+                cell.Paragraphs.Add(img);
+
+                // Add the table to the page
+                page.Paragraphs.Add(table);
+
+                // Save the modified PDF
+                doc.Save(outputPdf);
+            }
+        }
+
+        Console.WriteLine($"Image inserted and saved to '{outputPdf}'.");
     }
 }

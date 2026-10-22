@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -18,28 +16,30 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a TableAbsorber to find tables in the document
-            TableAbsorber absorber = new TableAbsorber();
-
-            // Extract tables from all pages
-            absorber.Visit(doc);
-
-            // Copy the TableList because Remove modifies the collection
-            List<AbsorbedTable> tables = absorber.TableList.Cast<AbsorbedTable>().ToList();
-
-            // Remove each absorbed table from its page
-            foreach (AbsorbedTable table in tables)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                absorber.Remove(table);
+                // Locate all tables in the document
+                TableAbsorber tableAbsorber = new TableAbsorber();
+                tableAbsorber.Visit(doc);
+
+                // Remove each detected table using the absorber's Remove method
+                foreach (var table in tableAbsorber.TableList)
+                {
+                    tableAbsorber.Remove(table);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            Console.WriteLine($"All tables removed. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Tables removed and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

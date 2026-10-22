@@ -1,9 +1,10 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for text-related types if needed
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -17,46 +18,49 @@ class Program
             new Person { Id = 3, Name = "Charlie", Age = 35 }
         };
 
-        // LINQ query to select and order data
+        // LINQ query: select Id, Name, Age where Age > 28
         var query = from p in people
-                    where p.Age >= 25
-                    orderby p.Name
+                    where p.Age > 28
                     select new { p.Id, p.Name, p.Age };
 
-        // Convert the query result to a DataTable
-        DataTable dataTable = ToDataTable(query);
+        // Convert query result to a DataTable
+        DataTable dt = QueryToDataTable(query);
 
-        // Create a new PDF document (lifecycle: create)
+        const string outputPath = "output.pdf";
+
+        // Create PDF document and add a table populated from the DataTable
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a new page
             Page page = doc.Pages.Add();
 
-            // Create a table and configure basic appearance
+            // Create a Table layout object
             Table table = new Table
             {
-                // Define three column widths (adjust as needed)
-                ColumnWidths = "100 200 100",
-                // Add a thin black border around each cell
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
+                // Define column widths (adjust as needed)
+                ColumnWidths = "80 200 60",
+                // Optional: set a default border for all cells
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f)
             };
 
-            // Import the DataTable into the Aspose.Pdf.Table
-            // Parameters: DataTable, import column names as first row, start at row 0, column 0
-            table.ImportDataTable(dataTable, true, 0, 0);
+            // Import the DataTable into the Table (include header row)
+            table.ImportDataTable(dt, true, 0, 0);
 
-            // Add the populated table to the page's paragraph collection
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF (lifecycle: save)
-            doc.Save("output.pdf");
+            // Save the PDF
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF with table saved to '{outputPath}'.");
     }
 
-    // Helper method: converts an IEnumerable<T> to a DataTable
-    static DataTable ToDataTable<T>(IEnumerable<T> data)
+    // Helper: converts any IEnumerable<T> to a DataTable using reflection
+    static DataTable QueryToDataTable<T>(IEnumerable<T> data)
     {
         DataTable table = new DataTable();
+
         var properties = typeof(T).GetProperties();
 
         // Create columns based on the properties of T
@@ -81,11 +85,11 @@ class Program
         return table;
     }
 
-    // Simple POCO representing a person
+    // Simple POCO used for the example
     class Person
     {
-        public int Id { get; set; }
+        public int    Id   { get; set; }
         public string Name { get; set; }
-        public int Age { get; set; }
+        public int    Age  { get; set; }
     }
 }

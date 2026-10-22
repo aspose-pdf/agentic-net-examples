@@ -15,28 +15,28 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for proper disposal
+        // Load the PDF document with deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber to find tables in the document
+            // Create a TableAbsorber to extract tables
             TableAbsorber absorber = new TableAbsorber();
 
-            // Extract tables from the whole document
-            absorber.Visit(doc);
-
-            // Iterate over all found tables
-            for (int i = 0; i < absorber.TableList.Count; i++)
+            // Visit each page to collect tables
+            foreach (Page page in doc.Pages)
             {
-                AbsorbedTable table = absorber.TableList[i];
-                // The Rectangle property describes the table position on the page
+                absorber.Visit(page);
+            }
+
+            // Iterate over each absorbed table and output its rectangle coordinates
+            int tableIndex = 1;
+            foreach (var table in absorber.TableList)
+            {
+                // Rectangle provides the table bounds (points)
                 Aspose.Pdf.Rectangle rect = table.Rectangle;
 
-                Console.WriteLine($"Table {i + 1} on page {table.PageNum}:");
-                Console.WriteLine($"  Lower‑Left X: {rect.LLX}");
-                Console.WriteLine($"  Lower‑Left Y: {rect.LLY}");
-                Console.WriteLine($"  Upper‑Right X: {rect.URX}");
-                Console.WriteLine($"  Upper‑Right Y: {rect.URY}");
-                Console.WriteLine();
+                Console.WriteLine(
+                    $"Table {tableIndex}: LLX={rect.LLX}, LLY={rect.LLY}, URX={rect.URX}, URY={rect.URY}");
+                tableIndex++;
             }
         }
     }

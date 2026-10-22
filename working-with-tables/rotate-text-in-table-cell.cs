@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,38 +7,59 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "rotated_cell.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "rotated_table.pdf";
 
-        // Ensure the Document is disposed properly
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
-
-            // Create a table and add it to the page
-            Table table = new Table();
-            // Define column width (Cell.Width is read‑only, use Table.ColumnWidths instead)
-            table.ColumnWidths = "200"; // width in points for the single column
-            page.Paragraphs.Add(table);
-
-            // Add a single row to the table
-            Row row = table.Rows.Add();
-
-            // Add a cell to the row
-            Cell cell = row.Cells.Add();
-
-            // Create a TextFragment, set its rotation, and add it to the cell
-            TextFragment tf = new TextFragment("Rotated Text");
-            tf.TextState.Rotation = 45; // rotates the text 45 degrees
-            cell.Paragraphs.Add(tf);
-
-            // Optional: set row height if needed (Cell height is controlled via Row)
-            // row.FixedRowHeight = 50;
-
-            // Save the PDF document
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        try
+        {
+            // Load the existing PDF document
+            using (Document doc = new Document(inputPath))
+            {
+                // Ensure there is at least one page to place the table on
+                Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
+
+                // Create a table with a single column (adjust widths as needed)
+                Table table = new Table();
+                table.ColumnWidths = "200"; // width of the single column
+
+                // ---------- Header Row ----------
+                Row headerRow = table.Rows.Add();
+                Cell headerCell = headerRow.Cells.Add("Header");
+                // Optional styling for header
+                headerCell.BackgroundColor = Color.LightGray;
+                headerCell.DefaultCellTextState = new TextState
+                {
+                    FontSize = 12,
+                    FontStyle = FontStyles.Bold
+                };
+
+                // ---------- Body Row with Rotated Text ----------
+                Row bodyRow = table.Rows.Add();
+                Cell bodyCell = bodyRow.Cells.Add(); // add an empty cell first
+                // Create a TextFragment, set its rotation, and add it to the cell
+                TextFragment rotatedFragment = new TextFragment("Rotated Text");
+                rotatedFragment.TextState.Rotation = 45; // rotate 45 degrees
+                rotatedFragment.TextState.FontSize = 12;
+                bodyCell.Paragraphs.Add(rotatedFragment);
+
+                // Add the table to the page
+                page.Paragraphs.Add(table);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF saved with rotated cell text to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,81 +1,103 @@
 using System;
+using System.IO;
 using System.Data;
 using System.Collections.Generic;
-using System.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Prepare sample DataTable
-        DataTable dataTable = new DataTable();
-        dataTable.Columns.Add("Id", typeof(int));
-        dataTable.Columns.Add("Name", typeof(string));
-        dataTable.Columns.Add("Age", typeof(int));
-        dataTable.Columns.Add("Country", typeof(string));
+        const string inputPdfPath  = "template.pdf";   // existing PDF to host the table
+        const string outputPdfPath = "output.pdf";
 
-        dataTable.Rows.Add(1, "Alice", 30, "USA");
-        dataTable.Rows.Add(2, "Bob",   25, "UK");
-        dataTable.Rows.Add(3, "Carol", 28, "Canada");
-
-        // Mapping: DataTable column name -> target Table column index
-        // Example: map "Name" to column 0, "Age" to column 1, "Country" to column 2
-        var columnMapping = new Dictionary<string, int>
+        if (!File.Exists(inputPdfPath))
         {
-            { "Name",    0 },
-            { "Age",     1 },
-            { "Country", 2 }
-        };
-
-        // Determine the number of target columns (max index + 1)
-        int targetColumnCount = columnMapping.Values.Max() + 1;
-
-        // Build source column list ordered by target column index
-        int[] sourceColumnList = columnMapping
-                                    .OrderBy(kv => kv.Value)                     // sort by target index
-                                    .Select(kv => dataTable.Columns[kv.Key]!.Ordinal) // get DataTable column ordinal (null‑forgiving)
-                                    .ToArray();
-
-        // Build source row list (all rows)
-        int[] sourceRowList = Enumerable.Range(0, dataTable.Rows.Count).ToArray();
-
-        // Create PDF document
-        using (Document doc = new Document())
-        {
-            // Add a page
-            Page page = doc.Pages.Add();
-
-            // Create a table and define column widths (optional)
-            Table table = new Table();
-            // Table.ColumnWidths expects a string like "100 100 100" – create a simple equal‑width definition
-            table.ColumnWidths = string.Join(" ", Enumerable.Repeat("100", targetColumnCount));
-
-            // Import data using the mapping
-            // Parameters:
-            //   dataTable          - source DataTable
-            //   sourceRowList      - rows to import
-            //   sourceColumnList   - columns to import in the order defined by mapping
-            //   firstFilledRow     - start at first row of the table (0‑based)
-            //   firstFilledColumn  - start at first column of the table (0‑based)
-            //   showColumnNamesAsFirstRow - import column names as header row
-            //   isHtmlSupported    - false (plain text)
-            table.ImportDataTable(
-                dataTable,
-                sourceRowList,
-                sourceColumnList,
-                firstFilledRow: 0,
-                firstFilledColumn: 0,
-                showColumnNamesAsFirstRow: true,
-                isHtmlSupported: false);
-
-            // Add the table to the page
-            page.Paragraphs.Add(table);
-
-            // Save the PDF
-            doc.Save("MappedTable.pdf");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            return;
         }
 
-        Console.WriteLine("PDF with mapped table saved as 'MappedTable.pdf'.");
+        // Prepare a sample DataTable
+        DataTable dataTable = new DataTable();
+        dataTable.Columns.Add("Product", typeof(string));
+        dataTable.Columns.Add("Quantity", typeof(int));
+        dataTable.Columns.Add("Price", typeof(decimal));
+
+        dataTable.Rows.Add("Apple",  10, 0.5m);
+        dataTable.Rows.Add("Banana", 20, 0.3m);
+        dataTable.Rows.Add("Cherry", 15, 1.2m);
+
+        // Define a column‑to‑table mapping (DataTable column name -> Table column index)
+        Dictionary<string, int> columnMapping = new Dictionary<string, int>
+        {
+            { "Product",  0 },   // maps to first column of the table
+            { "Quantity", 1 },   // maps to second column
+            { "Price",    2 }    // maps to third column
+        };
+
+        // Load the PDF and insert the table
+        using (Document doc = new Document(inputPdfPath))
+        {
+            // Create a table with three columns (the number of columns must match the highest index in the mapping + 1)
+            Table table = new Table();
+            table.ColumnWidths = "150 100 100"; // optional: set column widths
+
+            // ---- Add header row (optional) ----
+            Row headerRow = table.Rows.Add();
+            // Ensure cells are created for each column index in order
+            int columnCount = columnMapping.Count;
+            for (int i = 0; i < columnCount; i++)
+            {
+                Cell headerCell = headerRow.Cells.Add();
+                // Find the column name that maps to this index
+                string headerText = null;
+                foreach (var kvp in columnMapping)
+                {
+                    if (kvp.Value == i)
+                    {
+                        headerText = kvp.Key;
+                        break;
+                    }
+                }
+                headerCell.Paragraphs.Add(new TextFragment(headerText ?? string.Empty) { TextState = { FontStyle = FontStyles.Bold } });
+            }
+
+            // ---- Populate table rows using the mapping ----
+            foreach (DataRow dr in dataTable.Rows)
+            {
+                Row row = table.Rows.Add();
+                // Create empty cells first to guarantee correct order
+                for (int i = 0; i < columnCount; i++)
+                {
+                    row.Cells.Add();
+                }
+
+                foreach (var map in columnMapping)
+                {
+                    string dtColumnName = map.Key;
+                    int tableColumnIndex = map.Value;
+                    object value = dr[dtColumnName];
+                    string text = value?.ToString() ?? string.Empty;
+                    // The cell at the required index already exists
+                    Cell cell = row.Cells[tableColumnIndex];
+                    cell.Paragraphs.Add(new TextFragment(text));
+                }
+            }
+
+            // Add a title above the table (optional)
+            TextFragment title = new TextFragment("Sales Report");
+            title.TextState.FontSize = 14;
+            title.TextState.FontStyle = FontStyles.Bold;
+            doc.Pages[1].Paragraphs.Add(title);
+
+            // Add the table to the first page
+            doc.Pages[1].Paragraphs.Add(table);
+
+            // Save the modified PDF
+            doc.Save(outputPdfPath);
+        }
+
+        Console.WriteLine($"PDF with mapped table saved to '{outputPdfPath}'.");
     }
 }
