@@ -3,47 +3,52 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class RenderSubscriptExample
+class Program
 {
     static void Main()
     {
-        // Paths for the output PDF
+        const string inputPath = "input.pdf";
         const string outputPath = "subscript_output.pdf";
 
-        // Create a new PDF document inside a using block for proper disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a normal text fragment for the base text "H"
-            TextFragment baseFragment = new TextFragment("H");
-            // Optionally set font and size
-            baseFragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            baseFragment.TextState.FontSize = 48;
+        // Load the existing PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Ensure there is at least one page to work with
+            Page page = doc.Pages[1];
 
-            // Create a text fragment for the subscript "2"
-            TextFragment subscriptFragment = new TextFragment("2");
-            // Set the subscript flag (internally applies a negative rise)
-            subscriptFragment.TextState.Subscript = true;
-            // Ensure the subscript uses the same font and size as the base text
-            subscriptFragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            subscriptFragment.TextState.FontSize = 48;
+            // Base coordinates for the formula (adjust as needed)
+            double startX = 100;      // X‑position of the first character
+            double baselineY = 700;   // Y‑position of the normal baseline
 
-            // Create another normal text fragment for the trailing text "O"
-            TextFragment trailingFragment = new TextFragment("O");
-            trailingFragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            trailingFragment.TextState.FontSize = 48;
+            // "H" fragment (normal text)
+            var hFragment = new TextFragment("H");
+            hFragment.TextState.FontSize = 12;               // normal size
+            hFragment.Position = new Position(startX, baselineY);
+            page.Paragraphs.Add(hFragment);
 
-            // Add the fragments to the page in sequence
-            page.Paragraphs.Add(baseFragment);
-            page.Paragraphs.Add(subscriptFragment);
-            page.Paragraphs.Add(trailingFragment);
+            // Subscript "2" fragment
+            var subFragment = new TextFragment("2");
+            subFragment.TextState.FontSize = 8;               // smaller size for subscript
+            // Lower the baseline to create a subscript effect
+            subFragment.Position = new Position(startX + 12, baselineY - 4);
+            page.Paragraphs.Add(subFragment);
 
-            // Save the document as PDF
+            // "O" fragment (normal text)
+            var oFragment = new TextFragment("O");
+            oFragment.TextState.FontSize = 12;
+            oFragment.Position = new Position(startX + 20, baselineY);
+            page.Paragraphs.Add(oFragment);
+
+            // Save the modified document (still inside the using block)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with subscript text saved to '{outputPath}'.");
+        Console.WriteLine($"Subscript PDF saved to '{outputPath}'.");
     }
 }

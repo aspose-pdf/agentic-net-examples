@@ -1,70 +1,43 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
-namespace PdfUtility
+class Program
 {
-    /// <summary>
-    /// Provides helper methods for PDF manipulation.
-    /// </summary>
-    public static class PdfHelper
+    static void Main()
     {
-        /// <summary>
-        /// Loads a PDF, optionally modifies it, and returns the document as a byte array.
-        /// </summary>
-        /// <param name="inputPath">Path to the source PDF file.</param>
-        /// <returns>Byte array containing the PDF data.</returns>
-        public static byte[] GetPdfBytes(string inputPath)
+        const string inputPath = "input.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            if (!File.Exists(inputPath))
-                throw new FileNotFoundException($"File not found: {inputPath}");
-
-            // Load the PDF document inside a using block for deterministic disposal.
-            using (Document doc = new Document(inputPath))
-            {
-                // Example modification: add a blank page at the end.
-                doc.Pages.Add();
-
-                // Save the document into a memory stream.
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    doc.Save(ms);               // Document.Save(Stream) writes PDF bytes to the stream.
-                    return ms.ToArray();        // Retrieve the byte array for further processing or transmission.
-                }
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
-    }
 
-    /// <summary>
-    /// Entry point required for a console application.
-    /// Demonstrates how to call <see cref="PdfHelper.GetPdfBytes"/>.
-    /// </summary>
-    internal class Program
-    {
-        static void Main(string[] args)
+        // Load the PDF and apply a simple modification
+        using (Document doc = new Document(inputPath))
         {
-            // Expect the first argument to be the path of the PDF to process.
-            if (args.Length == 0)
+            // Add a text annotation on the first page as an example change
+            Page page = doc.Pages[1];
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            TextAnnotation annotation = new TextAnnotation(page, rect)
             {
-                Console.WriteLine("Usage: PdfUtility <input-pdf-path>");
-                return;
-            }
+                Title    = "Note",
+                Contents = "This is an added annotation.",
+                Open     = true,
+                Icon     = TextIcon.Note
+            };
+            page.Annotations.Add(annotation);
 
-            string inputPath = args[0];
-            try
+            // Save the modified PDF into a byte array for further processing
+            using (MemoryStream ms = new MemoryStream())
             {
-                byte[] pdfBytes = PdfHelper.GetPdfBytes(inputPath);
-                Console.WriteLine($"PDF processed successfully. Byte array length: {pdfBytes.Length}");
+                doc.Save(ms);               // Saves as PDF by default
+                byte[] pdfBytes = ms.ToArray();
 
-                // Optional: write the modified PDF back to disk for verification.
-                string outputPath = Path.Combine(Path.GetDirectoryName(inputPath) ?? string.Empty,
-                                                 Path.GetFileNameWithoutExtension(inputPath) + "_modified.pdf");
-                File.WriteAllBytes(outputPath, pdfBytes);
-                Console.WriteLine($"Modified PDF saved to: {outputPath}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
+                // pdfBytes now contains the PDF data
+                Console.WriteLine($"PDF saved to byte array, length = {pdfBytes.Length} bytes.");
             }
         }
     }

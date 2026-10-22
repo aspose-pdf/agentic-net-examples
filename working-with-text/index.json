@@ -1,133 +1,141 @@
 {
   "category": "working-with-text",
-  "nuget_version": "26.8.0",
-  "last_updated": "2026-08-20T08:59:26Z",
+  "nuget_version": "26.9.0",
+  "last_updated": "2026-10-22T07:18:08Z",
   "examples": {
     "add-text-to-pdf-page-at-specific-coordinates": {
-      "title": "Add Text to PDF Page at Specific Coordinates",
+      "title": "Add Text at Specific Coordinates to a PDF Page",
       "filename": "add-text-to-pdf-page-at-specific-coordinates.cs",
-      "description": "Shows how to load a PDF, create a TextFragment, set its position using X/Y coordinates, and save the modified document.",
+      "description": "Demonstrates loading a PDF, creating a TextFragment, positioning it using X/Y coordinates, adding it to the first page, and saving the result.",
       "tags": [
         "text",
-        "pdf",
         "coordinates",
-        "aspose",
+        "pdf",
+        "aspose.pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Text.FontRepository.FindFont"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "insert-identical-text-on-all-pdf-pages": {
-      "title": "Insert Identical Text on All PDF Pages",
-      "filename": "insert-identical-text-on-all-pdf-pages.cs",
-      "description": "Shows how to add the same plain text to every page of a PDF by creating a TextFragment, setting its appearance, and adding it to each page's Paragraphs collection.",
-      "tags": [
-        "pdf",
-        "text",
-        "aspose-pdf",
-        "paragraphs",
-        "iteration"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.FontRepository.FindFont"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "load-custom-ttf-font-and-apply-to-text": {
-      "title": "Load Custom TrueType Font and Apply to PDF Text",
-      "filename": "load-custom-ttf-font-and-apply-to-text.cs",
-      "description": "Shows how to retrieve a TrueType font from the Aspose.Pdf font repository, embed it, and assign it to a TextFragment's TextState for rendering in a PDF document.",
-      "tags": [
-        "font",
-        "text",
-        "pdf",
-        "custom-font",
-        "embedding"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.FontRepository.FindFont",
-        "Aspose.Pdf.Font",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.ParagraphCollection.Add",
         "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20094"
     },
-    "apply-opentype-font-to-textfragment": {
-      "title": "Apply OpenType Font to TextFragment in PDF",
-      "filename": "apply-opentype-font-to-textfragment.cs",
-      "description": "Demonstrates loading an OpenType (OTF) font, embedding it, and applying it to a TextFragment to create a styled PDF document.",
+    "insert-identical-text-on-all-pdf-pages": {
+      "title": "Insert Identical Plain Text on All PDF Pages",
+      "filename": "insert-identical-text-on-all-pdf-pages.cs",
+      "description": "Loads a PDF, iterates through each page, adds the same plain text via a TextFragment to the page's Paragraphs collection, and saves the modified document.",
       "tags": [
-        "otf",
-        "font",
-        "textfragment",
         "pdf",
-        "aspose-pdf"
+        "text",
+        "aspose.pdf",
+        "csharp",
+        "pages"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Text.Font",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20095"
+    },
+    "load-custom-ttf-font-and-apply-to-text": {
+      "title": "Apply Custom TrueType Font to PDF Text",
+      "filename": "load-custom-ttf-font-and-apply-to-text.cs",
+      "description": "Demonstrates how to register a custom TrueType font with Aspose.Pdf, retrieve it, and assign it to a TextFragment's TextState for rendering in a PDF document.",
+      "tags": [
+        "custom-font",
+        "pdf",
+        "text",
+        "Aspose.Pdf",
+        "TrueType"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.FontRepository",
+        "Aspose.Pdf.SimpleFontSubstitution",
+        "Aspose.Pdf.Font",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Position"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20096"
+    },
+    "apply-opentype-font-to-textfragment": {
+      "title": "Apply Custom OpenType Font to a TextFragment",
+      "filename": "apply-opentype-font-to-textfragment.cs",
+      "description": "Demonstrates how to register an OTF font with Aspose.Pdf, create a TextFragment, apply the custom font and styling, and save the result as a PDF.",
+      "tags": [
+        "otf",
+        "custom-font",
+        "textfragment",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "FontRepository",
+        "SimpleFontSubstitution",
+        "Document",
+        "Page",
+        "TextFragment",
+        "TextState",
+        "Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20097"
     },
     "set-character-spacing-pdf": {
-      "title": "Set Character Spacing for PDF Text",
+      "title": "Add Text with Custom Character Spacing",
       "filename": "set-character-spacing-pdf.cs",
-      "description": "Demonstrates how to adjust the CharacterSpacing property of a TextState to control inter‑character gaps before adding a TextFragment to a PDF page using Aspose.Pdf.",
+      "description": "Loads an existing PDF, creates a TextFragment, sets the CharacterSpacing property on its TextState to increase inter‑character gaps, positions the fragment on the first page, and saves the modified document.",
       "tags": [
         "character-spacing",
-        "text-state",
+        "textfragment",
         "pdf",
         "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.FontRepository",
-        "Aspose.Pdf.Text.TextState"
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Position",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20098"
     },
     "left-align-text-pdf": {
-      "title": "Left Align Text in PDF using Aspose.Pdf",
+      "title": "Add Left-Aligned Text to PDF",
       "filename": "left-align-text-pdf.cs",
-      "description": "Shows how to create a PDF, add a TextFragment, and set its HorizontalAlignment to Left for left‑aligned text.",
+      "description": "Demonstrates adding a text fragment to a PDF page and aligning it to the left margin using Aspose.Pdf.",
       "tags": [
-        "text-alignment",
         "pdf",
+        "text",
+        "alignment",
         "aspose-pdf",
-        "textfragment",
-        "horizontal-alignment"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -135,47 +143,49 @@
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.TextState",
         "Aspose.Pdf.Text.HorizontalAlignment",
-        "Aspose.Pdf.Position",
-        "Aspose.Pdf.Page.Paragraphs.Add",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20099"
     },
     "center-text-horizontally-in-pdf": {
       "title": "Center Text Horizontally in PDF",
       "filename": "center-text-horizontally-in-pdf.cs",
-      "description": "Demonstrates how to place a text fragment at the horizontal center of a PDF page using Aspose.Pdf's TextFragment and HorizontalAlignment properties.",
+      "description": "Shows how to load a PDF, create a TextFragment, set its TextState.HorizontalAlignment to Center, and save the updated document.",
       "tags": [
         "text-alignment",
         "pdf",
         "aspose-pdf",
         "csharp",
-        "horizontal-center"
+        "center"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Text.TextState",
         "Aspose.Pdf.Text.HorizontalAlignment",
+        "Aspose.Pdf.Color",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20100"
     },
     "right-align-text-in-pdf": {
-      "title": "Right Align Text in PDF",
+      "title": "Right‑Align Text on a PDF Page",
       "filename": "right-align-text-in-pdf.cs",
-      "description": "Shows how to right‑align a text fragment on a PDF page by setting TextState.HorizontalAlignment to Right using Aspose.Pdf.",
+      "description": "Shows how to right‑align a text fragment on a PDF page using Aspose.Pdf by setting the TextState.HorizontalAlignment property.",
       "tags": [
-        "right-alignment",
-        "text-fragment",
-        "pdf",
+        "text-alignment",
+        "pdf-modification",
         "aspose-pdf",
-        "horizontal-alignment"
+        "csharp",
+        "right-align"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -186,360 +196,384 @@
         "Aspose.Pdf.Position"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20101"
     },
     "add-multi-line-text-paragraph": {
-      "title": "Add Multi‑Line Text Paragraph to PDF Page",
+      "title": "Add Multi‑Line Text to PDF",
       "filename": "add-multi-line-text-paragraph.cs",
-      "description": "Demonstrates creating a TextParagraph, setting its rectangle and word‑wrap options, appending multiple lines, and inserting it into a PDF page using TextBuilder.",
+      "description": "Demonstrates creating a PDF document, adding a page, inserting a multi‑line TextFragment with custom font, size, color, and line spacing, and saving the file.",
       "tags": [
+        "pdf",
         "text",
-        "paragraph",
         "multiline",
-        "aspdf",
-        "pdf"
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextParagraph",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Text.TextFormattingOptions.WordWrapMode",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20102"
     },
     "insert-hyperlink-into-pdf-text-segment": {
-      "title": "Insert Hyperlink into PDF Text Segment",
+      "title": "Insert Clickable Hyperlink into PDF",
       "filename": "insert-hyperlink-into-pdf-text-segment.cs",
-      "description": "Shows how to create a clickable hyperlink by assigning a WebHyperlink to a TextSegment and adding it to a TextFragment in a PDF document.",
+      "description": "Shows how to add a clickable hyperlink to a PDF by creating a TextSegment and attaching a LinkAnnotation with a GoToURIAction.",
       "tags": [
         "hyperlink",
-        "textsegment",
         "pdf",
-        "aspose",
-        "csharp"
+        "textsegment",
+        "annotation",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.TextSegment",
-        "Aspose.Pdf.Text.WebHyperlink",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Text.FontRepository"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "add-styled-html-fragment-to-pdf-page": {
-      "title": "Add Styled HTML Fragment to PDF Page",
-      "filename": "add-styled-html-fragment-to-pdf-page.cs",
-      "description": "Shows how to insert a styled HTML fragment into an existing PDF document using Aspose.Pdf's HtmlFragment and optional TextState for formatting.",
-      "tags": [
-        "html",
-        "pdf",
-        "textstate",
-        "fragment",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.HtmlFragment",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.FontRepository.FindFont",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "add-footnote-with-image-to-pdf": {
-      "title": "Add Footnote with Image to PDF",
-      "filename": "add-footnote-with-image-to-pdf.cs",
-      "description": "Shows how to create a footnote (Note) for a TextFragment, insert an image into the footnote's Paragraphs collection, and save the modified PDF using Aspose.Pdf.",
-      "tags": [
-        "footnote",
-        "image",
-        "pdf",
-        "aspose-pdf",
-        "textfragment"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Note",
-        "Aspose.Pdf.Image",
-        "Aspose.Pdf.Text.Position"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "add-table-to-pdf-footnote": {
-      "title": "Insert a Table into a PDF Footnote",
-      "filename": "add-table-to-pdf-footnote.cs",
-      "description": "Demonstrates how to create a footnote for a text fragment and populate it with a table, then add the footnote to a PDF page using Aspose.Pdf.",
-      "tags": [
-        "footnote",
-        "table",
-        "pdf",
-        "aspose-pdf",
-        "textfragment"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Note",
-        "Aspose.Pdf.Table",
-        "Aspose.Pdf.Row"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "add-endnote-bold-italic": {
-      "title": "Add Endnote with Bold and Italic Formatting to PDF",
-      "filename": "add-endnote-bold-italic.cs",
-      "description": "Demonstrates how to insert an endnote into a PDF and apply bold and italic formatting using TextState settings.",
-      "tags": [
-        "endnote",
-        "bold",
-        "italic",
-        "textstate",
-        "pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Note",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "inline-text-image-paragraph": {
-      "title": "Create Inline Text and Image in PDF Paragraph",
-      "filename": "inline-text-image-paragraph.cs",
-      "description": "Shows how to combine a TextFragment and an Image fragment inline within a single paragraph of a PDF document using Aspose.Pdf.",
-      "tags": [
-        "inline",
-        "text",
-        "image",
-        "pdf",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction",
         "Aspose.Pdf.FontRepository",
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20103"
     },
-    "add-invisible-tooltip-button-over-text": {
-      "title": "Add Invisible Tooltip Button Over Text in PDF",
-      "filename": "add-invisible-tooltip-button-over-text.cs",
-      "description": "Shows how to locate a specific text fragment in a PDF and overlay an invisible button field that displays a tooltip via JavaScript when the mouse enters the area.",
+    "add-styled-html-fragment-to-pdf-page": {
+      "title": "Add Styled HTML Fragment to PDF",
+      "filename": "add-styled-html-fragment-to-pdf-page.cs",
+      "description": "Shows how to insert a styled HTML fragment into a PDF page using HtmlFragment and customize its appearance with TextState.",
       "tags": [
-        "tooltip",
-        "buttonfield",
-        "textsearch",
-        "javascript",
+        "html",
+        "pdf",
+        "aspose-pdf",
+        "textstate",
+        "styling"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.HtmlFragment",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20104"
+    },
+    "add-footnote-with-image-to-pdf": {
+      "title": "Add Footnote with Image to PDF Page",
+      "filename": "add-footnote-with-image-to-pdf.cs",
+      "description": "Shows how to create a footnote on a PDF page and insert an image into the page's Paragraphs collection using Aspose.Pdf.",
+      "tags": [
+        "footnote",
+        "image",
+        "pdf",
+        "text",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20105"
+    },
+    "add-table-to-pdf-footnote": {
+      "title": "Add Table to Footnote in a Tagged PDF",
+      "filename": "add-table-to-pdf-footnote.cs",
+      "description": "Demonstrates how to create a footnote (NoteElement) in a tagged PDF and populate it with a table using Aspose.Pdf's logical structure API.",
+      "tags": [
+        "footnote",
+        "table",
+        "tagged-pdf",
+        "structured-content",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.NoteElement",
+        "Aspose.Pdf.Tagged.TableElement",
+        "Aspose.Pdf.Tagged.TableTHeadElement",
+        "Aspose.Pdf.Tagged.TableTRElement",
+        "Aspose.Pdf.Tagged.TableTHElement",
+        "Aspose.Pdf.Tagged.TableTDElement"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20106"
+    },
+    "add-endnote-bold-italic": {
+      "title": "Add Endnote with Bold and Italic Styling to PDF",
+      "filename": "add-endnote-bold-italic.cs",
+      "description": "Demonstrates loading a PDF, optionally extracting its text, adding a new page, creating a TextFragment for an endnote, applying bold and italic formatting via TextState, positioning it, and saving the document.",
+      "tags": [
+        "endnote",
+        "bold",
+        "italic",
+        "textformatting",
         "pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Forms.ButtonField",
-        "Aspose.Pdf.Annotations.JavascriptAction"
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Position"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20107"
     },
-    "find-phrase-occurrences-with-textabsorber": {
-      "title": "Find All Occurrences of a Phrase Using TextAbsorber",
-      "filename": "find-phrase-occurrences-with-textabsorber.cs",
-      "description": "Demonstrates how to extract the full text of a PDF with TextAbsorber and locate every case‑insensitive occurrence of a specified phrase, reporting its character positions.",
+    "inline-text-image-paragraph": {
+      "title": "Add Inline Image to Text Paragraph",
+      "filename": "inline-text-image-paragraph.cs",
+      "description": "Shows how to combine a TextFragment and an Image fragment inline within a single paragraph to create a mixed text‑image element in a PDF using Aspose.Pdf.",
       "tags": [
-        "textabsorption",
-        "phrase-search",
+        "inline-image",
+        "text-fragment",
         "pdf",
         "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.PageCollection",
-        "Aspose.Pdf.PageCollection.Accept"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20108"
     },
-    "replace-phrase-preserve-formatting": {
-      "title": "Replace Phrase While Preserving Formatting in PDF",
-      "filename": "replace-phrase-preserve-formatting.cs",
-      "description": "Demonstrates how to search for a specific text phrase in a PDF, replace it with new text, and retain the original font, size, color, and other formatting using Aspose.Pdf.",
+    "add-invisible-tooltip-button-over-text": {
+      "title": "Add Invisible Tooltip Button Over Specific Text",
+      "filename": "add-invisible-tooltip-button-over-text.cs",
+      "description": "Demonstrates locating a target string in a PDF with TextFragmentAbsorber, then overlaying an invisible ButtonField on that text and assigning a tooltip via the AlternateName property and a JavaScript OnEnter action.",
       "tags": [
+        "tooltip",
+        "buttonfield",
+        "textsearch",
         "pdf",
-        "text-replacement",
-        "formatting",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextSearchOptions",
+        "Aspose.Pdf.Forms.ButtonField",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Forms.Border"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20109"
+    },
+    "find-phrase-occurrences-with-textabsorber": {
+      "title": "Find Specific Phrase in PDF Using TextFragmentAbsorber",
+      "filename": "find-phrase-occurrences-with-textabsorber.cs",
+      "description": "Shows how to use Aspose.Pdf's TextFragmentAbsorber to locate each occurrence of a given phrase in a PDF, outputting the page number and the fragment's coordinates.",
+      "tags": [
+        "text-search",
+        "pdf",
         "aspose",
-        "csharp"
+        "textfragmentabsorber",
+        "coordinates"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page.Accept",
         "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextState"
+        "Aspose.Pdf.Text.TextExtractionOptions",
+        "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20113"
+    },
+    "replace-phrase-preserve-formatting": {
+      "title": "Replace Text in PDF While Preserving Formatting",
+      "filename": "replace-phrase-preserve-formatting.cs",
+      "description": "Shows how to locate specific phrases in a PDF and replace them with new text using Aspose.Pdf, while keeping the original font, size, color, and other formatting.",
+      "tags": [
+        "pdf",
+        "text-replacement",
+        "aspose-pdf",
+        "formatting",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.PageCollection.Accept",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20114"
     },
     "add-header-to-pdf-pages": {
-      "title": "Add Header to PDF Pages",
+      "title": "Add Header to All PDF Pages",
       "filename": "add-header-to-pdf-pages.cs",
-      "description": "Shows how to loop through a PDF's Pages collection and add a repeated header string to each page using a TextStamp.",
+      "description": "Shows how to iterate through a PDF document's pages and insert a text header on each page using Aspose.Pdf.",
       "tags": [
         "pdf",
         "header",
-        "textstamp",
+        "text",
         "pages",
-        "aspose-pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Paragraphs.Insert"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20115"
     },
     "add-footer-page-numbers-to-pdf": {
-      "title": "Add Footer Page Numbers to PDF",
+      "title": "Add Footer with Page Numbers to PDF",
       "filename": "add-footer-page-numbers-to-pdf.cs",
-      "description": "Shows how to insert a footer with automatic page numbers on every page of an existing PDF using Aspose.Pdf's PageNumberStamp.",
+      "description": "Shows how to insert a footer containing page numbers on each page of a PDF using Aspose.Pdf's TextFragment and positioning APIs.",
       "tags": [
         "footer",
         "page-number",
-        "stamp",
+        "pdf",
+        "textfragment",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Text.HorizontalAlignment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20116"
+    },
+    "add-semi-transparent-text-watermark": {
+      "title": "Add Semi-Transparent Text Watermark to PDF",
+      "filename": "add-semi-transparent-text-watermark.cs",
+      "description": "Demonstrates how to overlay a semi‑transparent text watermark on every page of a PDF using Aspose.Pdf's TextStamp and TextState.",
+      "tags": [
+        "watermark",
+        "text",
+        "opacity",
         "pdf",
         "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PageNumberStamp",
-        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Text.TextStamp",
         "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.FontRepository"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "add-semi-transparent-text-watermark": {
-      "title": "Add Semi-Transparent Text Watermark to PDF Pages",
-      "filename": "add-semi-transparent-text-watermark.cs",
-      "description": "Demonstrates how to overlay a semi-transparent watermark text on each page of a PDF using Aspose.Pdf's TextState and WatermarkAnnotation.",
-      "tags": [
-        "watermark",
-        "text",
-        "opacity",
-        "annotation",
-        "pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Annotations.WatermarkAnnotation",
-        "Aspose.Pdf.Annotations.WatermarkAnnotation.SetTextAndState",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
         "Aspose.Pdf.Color.FromRgb",
-        "Aspose.Pdf.FontRepository.FindFont"
+        "Aspose.Pdf.Page.AddStamp"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20117"
     },
     "rotate-added-text-in-pdf": {
-      "title": "Rotate Added Text in PDF",
+      "title": "Rotate Text in a PDF Document",
       "filename": "rotate-added-text-in-pdf.cs",
-      "description": "Demonstrates how to rotate a text fragment by setting the TextState.Rotation property before placing it on a PDF page.",
+      "description": "Demonstrates how to add a text fragment to a PDF page and rotate it by specifying an angle via the TextState.Rotation property.",
       "tags": [
         "text-rotation",
-        "textfragment",
         "pdf",
         "aspose-pdf",
+        "textfragment",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Position",
         "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Page"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20118"
     },
     "apply-background-color-to-text": {
       "title": "Apply Background Color to Text in PDF",
       "filename": "apply-background-color-to-text.cs",
-      "description": "Demonstrates how to set a background color for a text fragment in a PDF using Aspose.Pdf by configuring the TextState.BackgroundColor property before adding the fragment to a page.",
+      "description": "Creates a PDF document, adds a TextFragment, sets its TextState.BackgroundColor to Yellow, and saves the file.",
       "tags": [
-        "text",
-        "background",
+        "background-color",
+        "textfragment",
         "pdf",
         "aspose-pdf",
-        "textfragment"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Color",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20119"
     },
     "set-font-size-color-textfragment": {
-      "title": "Set Font Size and Color for a TextFragment",
+      "title": "Set Font Size and Color for TextFragment",
       "filename": "set-font-size-color-textfragment.cs",
-      "description": "Demonstrates how to define font size, color, and font family using a TextState and apply it to a TextFragment for styled PDF output.",
+      "description": "Demonstrates how to style a TextFragment by configuring its TextState properties (FontSize, ForegroundColor, Font) and adding it to a PDF page.",
       "tags": [
         "textfragment",
+        "styling",
         "font",
         "color",
-        "styling",
         "pdf"
       ],
       "apis_used": [
@@ -547,62 +581,67 @@
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Text.Color.FromRgb",
         "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20120"
     },
     "add-text-to-pdf-from-memory-stream": {
       "title": "Add Text to PDF from Memory Stream",
       "filename": "add-text-to-pdf-from-memory-stream.cs",
-      "description": "Shows how to load a PDF from a Stream, insert a text fragment on the first page, and write the updated PDF back to another Stream using Aspose.Pdf.",
+      "description": "Shows how to create a PDF in memory, load it from a MemoryStream, insert a TextFragment, and save the modified PDF back to a stream.",
       "tags": [
         "pdf",
-        "text",
         "memory-stream",
-        "aspose",
+        "text-fragment",
+        "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20121"
     },
     "convert-modified-pdf-to-byte-array": {
-      "title": "Convert Modified PDF to Byte Array",
+      "title": "Save Modified PDF to Byte Array",
       "filename": "convert-modified-pdf-to-byte-array.cs",
-      "description": "Loads a PDF, adds a blank page, and returns the modified document as a byte array using a MemoryStream for further processing or transmission.",
+      "description": "The example loads a PDF, adds a text annotation, and saves the modified document into a byte array using a MemoryStream for further processing or transmission.",
       "tags": [
         "pdf",
+        "annotation",
         "byte-array",
-        "memory-stream",
-        "aspose.pdf",
-        "document-modification"
+        "memorystream",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Document.Pages.Add"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.TextIcon",
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20122"
     },
     "add-text-and-encrypt-pdf": {
       "title": "Add Text and Encrypt PDF with Password",
       "filename": "add-text-and-encrypt-pdf.cs",
-      "description": "Loads an existing PDF, adds a red text fragment to the first page, then encrypts the document with user and owner passwords and specific permissions before saving.",
+      "description": "Loads a PDF, adds a text fragment to the first page, then encrypts the document with user and owner passwords using AES‑256 and saves it.",
       "tags": [
         "pdf",
         "encryption",
@@ -614,25 +653,50 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Position",
         "Aspose.Pdf.Permissions",
         "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.CryptoAlgorithm"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20123"
     },
     "add-underlined-text-to-pdf": {
       "title": "Add Underlined Text to PDF",
       "filename": "add-underlined-text-to-pdf.cs",
-      "description": "Creates a PDF document, adds a page, and inserts a text fragment with underlining by setting TextState.Underline to true.",
+      "description": "Loads an existing PDF, creates a TextFragment, enables underline via TextState, and inserts the fragment onto the first page before saving.",
       "tags": [
         "underlined-text",
+        "pdf",
+        "aspose-pdf",
+        "text-fragment",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Paragraphs.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20124"
+    },
+    "create-strikethrough-text-pdf": {
+      "title": "Create Strikethrough Text in a PDF",
+      "filename": "create-strikethrough-text-pdf.cs",
+      "description": "Shows how to apply a strikethrough (strikeout) style to text by setting TextState.StrikeOut and adding a TextFragment to a PDF page with Aspose.Pdf.",
+      "tags": [
+        "strikethrough",
+        "text",
+        "pdf",
         "Aspose.Pdf",
-        "TextFragment",
-        "PDF-generation",
         "C#"
       ],
       "apis_used": [
@@ -640,44 +704,44 @@
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.FontRepository.FindFont"
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20125"
     },
-    "create-strikethrough-text-pdf": {
-      "title": "Create Strikethrough Text in PDF",
-      "filename": "create-strikethrough-text-pdf.cs",
-      "description": "Shows how to apply strikeout formatting to a TextFragment by setting TextState.StrikeOut and adding the fragment to a PDF page using Aspose.Pdf.",
+    "render-superscript-text": {
+      "title": "Create Superscript Text in PDF",
+      "filename": "render-superscript-text.cs",
+      "description": "Shows how to add normal and superscript text to a PDF using TextFragment objects, adjusting font size and positioning the superscript above the baseline.",
       "tags": [
-        "strikethrough",
+        "superscript",
         "text",
         "pdf",
-        "aspose-pdf",
-        "csharp"
+        "aspose",
+        "textfragment"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
         "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Page.Paragraphs.Add",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20126"
     },
-    "render-superscript-text": {
-      "title": "Render Superscript Text in PDF",
-      "filename": "render-superscript-text.cs",
-      "description": "Loads an existing PDF, adds a normal text fragment and a superscript fragment by adjusting its position and font size, then saves the modified document.",
+    "render-subscript-text": {
+      "title": "Render Subscript Text in PDF",
+      "filename": "render-subscript-text.cs",
+      "description": "Shows how to add subscript characters to an existing PDF by creating TextFragment objects with a smaller font size and adjusted position (or rise) before saving the document.",
       "tags": [
-        "superscript",
+        "subscript",
         "textfragment",
         "pdf",
         "aspose-pdf",
@@ -687,94 +751,73 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextState",
         "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Text.TextState"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20127"
     },
-    "render-subscript-text": {
-      "title": "Render Subscript Text in PDF",
-      "filename": "render-subscript-text.cs",
-      "description": "Shows how to create subscript characters in a PDF by setting the Subscript flag (negative rise) on a TextFragment before adding it to a page.",
+    "set-custom-line-spacing-pdf": {
+      "title": "Set Line Spacing for Added Text in PDF",
+      "filename": "set-custom-line-spacing-pdf.cs",
+      "description": "Shows how to add a multi‑line text fragment to a PDF and control its line spacing by setting the TextState.LineSpacing (Leading) property.",
       "tags": [
-        "subscript",
-        "text",
+        "line-spacing",
+        "text-fragment",
+        "pdf-modification",
+        "csharp",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.FontRepository",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20128"
+    },
+    "adjust-word-spacing-in-pdf": {
+      "title": "Insert Text with Custom Word Spacing into PDF",
+      "filename": "adjust-word-spacing-in-pdf.cs",
+      "description": "Shows how to add a TextFragment to a PDF page and adjust the spacing between words using the TextState.WordSpacing property.",
+      "tags": [
+        "text insertion",
+        "word spacing",
         "pdf",
-        "aspose-pdf",
+        "aspose.pdf",
         "textfragment"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextState",
         "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.Text.TextState.Subscript",
+        "Aspose.Pdf.Text.Position",
         "Aspose.Pdf.Page.Paragraphs.Add",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "set-custom-line-spacing-pdf": {
-      "title": "Set Custom Line Spacing for Added Text in PDF",
-      "filename": "set-custom-line-spacing-pdf.cs",
-      "description": "Shows how to add text to a PDF with a specific leading (line spacing) by using Aspose.Pdf's TextParagraph, TextState, and TextBuilder.",
-      "tags": [
-        "line-spacing",
-        "text-paragraph",
-        "aspose-pdf",
-        "pdf-modification",
-        "textstate"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextParagraph",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Text.TextFormattingOptions",
-        "Aspose.Pdf.FontRepository"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "adjust-word-spacing-in-pdf": {
-      "title": "Adjust Word Spacing for Inserted Text in PDF",
-      "filename": "adjust-word-spacing-in-pdf.cs",
-      "description": "Demonstrates how to load an existing PDF, create a TextFragment, set its WordSpacing property, and place it on a page using Aspose.Pdf.",
-      "tags": [
-        "word-spacing",
-        "text-fragment",
-        "pdf-modification",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.FontRepository.FindFont",
-        "Aspose.Pdf.Position",
-        "Aspose.Pdf.Page"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20129"
     },
     "justify-text-in-pdf": {
-      "title": "Justify Text in PDF with TextFragment",
+      "title": "Justify Text in PDF using Aspose.Pdf",
       "filename": "justify-text-in-pdf.cs",
-      "description": "Demonstrates how to create a PDF, add a TextFragment, and set its TextState.HorizontalAlignment to Justify so the text spans the full page width.",
+      "description": "Demonstrates how to create a PDF, add a paragraph, and set its horizontal alignment to Justify using Aspose.Pdf's TextFragment and TextState.",
       "tags": [
-        "justify",
-        "textfragment",
-        "aspose-pdf",
-        "horizontal-alignment",
-        "pdf"
+        "justification",
+        "text",
+        "pdf",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -782,65 +825,70 @@
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.TextState",
         "Aspose.Pdf.Text.HorizontalAlignment",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20130"
     },
     "add-arabic-bidi-text-to-pdf": {
-      "title": "Add Arabic Bidirectional Text to PDF",
+      "title": "Add Bidirectional Text to PDF using Aspose.PDF",
       "filename": "add-arabic-bidi-text-to-pdf.cs",
-      "description": "Demonstrates how to open an existing PDF, create a TextFragment with Arabic Unicode characters, configure its TextState, and save the document, enabling proper bidirectional rendering.",
+      "description": "Shows how to insert mixed left‑to‑right and right‑to‑left Unicode text (e.g., English, Arabic, Hebrew) into a PDF by creating a TextFragment, setting a Unicode font, and saving the document.",
       "tags": [
-        "bidi",
-        "arabic",
+        "bidirectional",
+        "unicode",
         "textfragment",
         "pdf",
         "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.Color"
+        "Document",
+        "Page",
+        "TextFragment",
+        "FontRepository",
+        "TextState",
+        "Paragraphs",
+        "Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20132"
     },
     "set-custom-line-height-pdf-text": {
       "title": "Set Custom Line Height for PDF Text",
       "filename": "set-custom-line-height-pdf-text.cs",
-      "description": "Loads an existing PDF, adds a multi‑line TextFragment, sets a custom line height via the TextState.LineSpacing property, and saves the document.",
+      "description": "Loads an existing PDF, creates a multi‑line TextFragment, sets a custom line height (line spacing) via TextState, adds it to the first page, and saves the result.",
       "tags": [
         "line-height",
-        "text-fragment",
+        "line-spacing",
         "pdf",
         "aspose-pdf",
-        "text-formatting"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextState.LineSpacing",
-        "Aspose.Pdf.Page.Paragraphs.Add",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.FontRepository",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20133"
     },
     "emulate-kerning-in-pdf-text": {
-      "title": "Emulate Kerning in PDF Text Using Aspose.Pdf",
+      "title": "Add Text Fragment with Kerning Approximation to PDF",
       "filename": "emulate-kerning-in-pdf-text.cs",
-      "description": "Shows how to add a TextFragment to a PDF and emulate kerning by setting the CharacterSpacing property on its TextState.",
+      "description": "Demonstrates loading a PDF, creating a TextFragment, adjusting character spacing to simulate kerning, setting font properties, and saving the modified document.",
       "tags": [
+        "text",
         "kerning",
-        "textfragment",
         "character-spacing",
         "pdf",
         "aspose-pdf"
@@ -849,67 +897,69 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Position",
+        "Aspose.Pdf.FontRepository",
         "Aspose.Pdf.Page"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20134"
     },
     "render-text-with-ligatures": {
-      "title": "Render Text with Ligatures in PDF",
+      "title": "Generate PDF with Ligatures Using Aspose.Pdf",
       "filename": "render-text-with-ligatures.cs",
-      "description": "Creates a PDF document, adds a TextFragment containing Unicode ligature characters, and demonstrates that ligatures are rendered automatically.",
+      "description": "Demonstrates creating a PDF, adding a TextFragment containing characters that can form ligatures, setting font and size, and saving the document. Highlights that ligatures are handled automatically by Aspose.Pdf.",
       "tags": [
-        "ligatures",
-        "text",
         "pdf",
+        "text",
+        "ligatures",
         "aspose-pdf",
-        "textfragment"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Position"
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20135"
     },
     "enable-hyphenation-long-words-pdf": {
-      "title": "Enable Hyphenation for Long Words in PDF",
+      "title": "Enable Automatic Hyphenation for Long Words in PDF",
       "filename": "enable-hyphenation-long-words-pdf.cs",
-      "description": "Demonstrates how to enable automatic hyphenation for long words when inserting text into a PDF using Aspose.Pdf. The example creates a TextFragment, configures hyphenation options, and appends it to a page.",
+      "description": "Demonstrates opening a PDF, creating a TextFragment with a long word, configuring its TextState (including hyphenation when supported), adding it to a page, and saving the modified document.",
       "tags": [
         "hyphenation",
         "textfragment",
         "pdf",
         "aspose-pdf",
-        "textbuilder"
+        "textstate"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Text.TextFormattingOptions",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Paragraphs.Add"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20136"
     },
     "embed-css-in-htmlfragment": {
-      "title": "Embed CSS in HtmlFragment to Style PDF Text",
+      "title": "Embed CSS in HtmlFragment for Styled PDF",
       "filename": "embed-css-in-htmlfragment.cs",
-      "description": "Demonstrates embedding CSS rules within an HtmlFragment to control font, color, and spacing, and adding the fragment to a PDF page using Aspose.Pdf.",
+      "description": "Shows how to embed CSS rules inside an HtmlFragment to control font, color, and spacing when converting HTML to PDF with Aspose.Pdf.",
       "tags": [
+        "html",
         "css",
-        "htmlfragment",
         "pdf",
         "styling",
         "aspose-pdf"
@@ -922,19 +972,20 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20137"
     },
     "create-text-link-goto-action": {
-      "title": "Create Text Link with GoTo Action in PDF",
+      "title": "Create GoTo Link Between PDF Pages",
       "filename": "create-text-link-goto-action.cs",
-      "description": "Shows how to add a clickable text fragment that jumps to another page by using a LinkAnnotation with a GoToAction in Aspose.Pdf.",
+      "description": "Shows how to add a TextFragment and a LinkAnnotation with a GoToAction to navigate from one page to another in a PDF document using Aspose.Pdf.",
       "tags": [
-        "text-link",
-        "goto-action",
+        "goto",
+        "link",
         "annotation",
         "pdf",
-        "aspose"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -943,46 +994,45 @@
         "Aspose.Pdf.Annotations.LinkAnnotation",
         "Aspose.Pdf.Annotations.GoToAction",
         "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Border"
+        "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20139"
     },
     "add-clickable-hyperlink-text-to-pdf": {
-      "title": "Add Clickable Hyperlink Text to PDF",
+      "title": "Add Clickable Text Link to PDF",
       "filename": "add-clickable-hyperlink-text-to-pdf.cs",
-      "description": "Shows how to create a TextSegment with a WebHyperlink and append it to a PDF page using Aspose.Pdf.",
+      "description": "Shows how to insert a styled text fragment into a PDF and attach a URI link annotation so the text becomes clickable.",
       "tags": [
-        "hyperlink",
-        "textsegment",
         "pdf",
-        "aspose",
-        "clickable"
+        "clickable-text",
+        "link-annotation",
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextSegment",
-        "Aspose.Pdf.Text.WebHyperlink",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Position",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20140"
     },
     "create-pdf-launch-action-open-external-file": {
-      "title": "Create PDF with Launch Action to Open External File",
+      "title": "Add Launch Action to PDF Text to Open External File",
       "filename": "create-pdf-launch-action-open-external-file.cs",
-      "description": "Demonstrates how to add clickable text in a PDF that launches an external file using Aspose.Pdf's LaunchAction.",
+      "description": "Demonstrates how to add a clickable text element in a PDF that launches an external file using a LaunchAction annotation.",
       "tags": [
-        "pdf",
         "launch-action",
-        "link-annotation",
-        "clickable-text",
+        "annotation",
+        "external-file",
+        "pdf",
         "aspose-pdf"
       ],
       "apis_used": [
@@ -991,17 +1041,19 @@
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Annotations.LinkAnnotation",
         "Aspose.Pdf.Annotations.LaunchAction",
+        "Aspose.Pdf.Annotations.Border",
         "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Color"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20141"
     },
     "rotate-specific-text-fragment": {
       "title": "Rotate Specific Text Fragment in PDF",
       "filename": "rotate-specific-text-fragment.cs",
-      "description": "Shows how to load a PDF, locate a text fragment using TextFragmentAbsorber, rotate that fragment by 45 degrees, and save the modified document.",
+      "description": "Shows how to load a PDF, locate a given text string with TextFragmentAbsorber, and add a new TextFragment rotated by 45 degrees at the same position.",
       "tags": [
         "pdf",
         "text-rotation",
@@ -1011,72 +1063,80 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Page.Accept",
-        "Aspose.Pdf.Text.TextState.Rotation",
+        "Aspose.Pdf.Text.TextSearchOptions",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Position",
+        "Aspose.Pdf.Page.Paragraphs.Add",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20143"
     },
     "insert-rotated-text-second-page": {
       "title": "Insert Rotated Text on Second PDF Page",
       "filename": "insert-rotated-text-second-page.cs",
-      "description": "Shows how to use Aspose.Pdf's TextBuilder to add a rotated TextFragment to the second page of an existing PDF document.",
+      "description": "Demonstrates loading an existing PDF, checking for a second page, creating a TextFragment with rotation, and inserting it using TextBuilder.",
       "tags": [
         "text",
         "rotation",
         "pdf",
-        "textbuilder",
-        "aspose-pdf"
+        "aspose",
+        "pages"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Text.TextState",
         "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Text.FontRepository"
+        "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20144"
     },
     "create-rotated-text-paragraph": {
-      "title": "Create Rotated Text Paragraph in PDF",
+      "title": "Create Rotated Text Paragraph with Multiple Segments",
       "filename": "create-rotated-text-paragraph.cs",
-      "description": "Demonstrates how to build a TextParagraph with multiple TextFragments, set its bounding rectangle, apply a 30‑degree rotation, and add it to a PDF page using Aspose.Pdf.",
+      "description": "Shows how to build a TextFragment containing several TextSegments, set its position, apply a 30‑degree rotation, and add it to a PDF page using Aspose.Pdf.",
       "tags": [
         "text",
         "rotation",
         "paragraph",
-        "pdf",
-        "aspose-pdf"
+        "Aspose.Pdf",
+        "C#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextParagraph",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Text.TextSegment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Text.TextState.Rotation",
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20145"
     },
     "replace-confidential-with-public-in-pdf": {
-      "title": "Replace Confidential with Public in PDF",
+      "title": "Replace \"Confidential\" with \"Public\" in a PDF",
       "filename": "replace-confidential-with-public-in-pdf.cs",
-      "description": "Demonstrates how to locate all occurrences of a specific phrase in a PDF and replace it with another phrase using Aspose.Pdf's text absorption and replacement features.",
+      "description": "Demonstrates how to search for a specific phrase in a PDF and replace it with another using Aspose.Pdf's TextFragmentAbsorber and Document.Save.",
       "tags": [
         "text-replacement",
         "pdf",
         "aspose-pdf",
-        "search",
-        "replace"
+        "csharp",
+        "search"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -1087,195 +1147,253 @@
         "Aspose.Pdf.PageCollection.Accept"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20146"
     },
     "extract-email-addresses-from-pdf": {
-      "title": "Extract Email Addresses from PDF Pages using Regex",
+      "title": "Extract Email Addresses from Each PDF Page",
       "filename": "extract-email-addresses-from-pdf.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, search each page for email addresses using a regular expression, and print the matches together with their page numbers.",
+      "description": "Shows how to extract text from every page of a PDF using Aspose.Pdf, apply a regular expression to locate email addresses, and store the results per page.",
       "tags": [
         "pdf",
+        "text-extraction",
         "regex",
         "email",
-        "text-search",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page.Accept",
-        "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextSearchOptions",
-        "Aspose.Pdf.Text.TextFragment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "detect-manual-line-breaks-in-textfragment": {
-      "title": "Detect Manual Line Breaks in TextFragment Content",
-      "filename": "detect-manual-line-breaks-in-textfragment.cs",
-      "description": "Shows how to load a PDF, iterate through pages and TextFragment objects, split the fragment text into logical lines, and determine whether each line ends with a manual line‑break for custom layout handling.",
-      "tags": [
-        "pdf",
-        "textfragment",
-        "line-break",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.Paragraphs"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "extract-text-fragments-and-positions": {
-      "title": "Extract Text Fragments and Positions from PDF",
-      "filename": "extract-text-fragments-and-positions.cs",
-      "description": "Loads a PDF document, uses TextFragmentAbsorber to retrieve all text fragments on each page, and logs each fragment's text, coordinates, rectangle bounds, and segment details.",
-      "tags": [
-        "pdf",
-        "text-extraction",
-        "positions",
-        "text-fragment",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextSegment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "append-disclaimer-to-first-pdf-page": {
-      "title": "Append Disclaimer Text to First PDF Page",
-      "filename": "append-disclaimer-to-first-pdf-page.cs",
-      "description": "Shows how to load a PDF, create a formatted TextFragment, and add it to the end of the first page's paragraph collection as a disclaimer.",
-      "tags": [
-        "pdf",
-        "textfragment",
-        "disclaimer",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.FontRepository.FindFont",
-        "Aspose.Pdf.Color.Gray",
-        "Aspose.Pdf.Page.Paragraphs.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "rotate-header-text-pdf": {
-      "title": "Rotate Header Text in PDFs by 90 Degrees",
-      "filename": "rotate-header-text-pdf.cs",
-      "description": "Processes all PDF files in a folder, detects header-like text fragments based on font size, and rotates those fragments 90 degrees using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "text-rotation",
-        "header-detection",
-        "batch-processing",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "replace-text-rotate-page-save-memory-stream": {
-      "title": "Replace Text and Rotate PDF Page, Save to MemoryStream",
-      "filename": "replace-text-rotate-page-save-memory-stream.cs",
-      "description": "The example creates a PDF in memory, replaces a specific text string, rotates the first page, and saves the modified document to a MemoryStream.",
-      "tags": [
-        "text-replacement",
-        "page-rotation",
-        "memory-stream",
-        "pdf-modification",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Rotation",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "search-text-pdf-with-logging": {
-      "title": "Search Text in PDF with Logging",
-      "filename": "search-text-pdf-with-logging.cs",
-      "description": "Demonstrates how to enable logging while searching for a phrase in a PDF using Aspose.Pdf, and records the number of matches and any extraction errors to a log file.",
-      "tags": [
-        "pdf",
-        "text-search",
-        "logging",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextSearchOptions",
-        "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextFragmentAbsorber.Visit",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "extract-text-from-pdf-to-utf8-file": {
-      "title": "Extract Text from PDF and Save as UTF-8 File",
-      "filename": "extract-text-from-pdf-to-utf8-file.cs",
-      "description": "Demonstrates how to load a PDF with Aspose.Pdf, extract all page text using a TextAbsorber, and write the concatenated result to a UTF‑8 encoded text file.",
-      "tags": [
-        "pdf",
-        "text-extraction",
-        "utf-8",
-        "file-io",
         "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.PageCollection.Accept",
-        "Aspose.Pdf.Text.TextAbsorber.Text"
+        "Aspose.Pdf.Page.Accept",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20147"
+    },
+    "detect-manual-line-breaks-in-textfragment": {
+      "title": "Detect Line Breaks in TextFragment Segments",
+      "filename": "detect-manual-line-breaks-in-textfragment.cs",
+      "description": "Loads a PDF, adds a multi‑line TextFragment, iterates over its TextSegments to identify line‑break characters, and saves the modified document.",
+      "tags": [
+        "textfragment",
+        "linebreak",
+        "segments",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextSegment",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20148"
     },
-    "extract-line-break-positions-from-pdf": {
-      "title": "Extract Line-Break Positions from PDF Text Fragments",
-      "filename": "extract-line-break-positions-from-pdf.cs",
-      "description": "Demonstrates how to load a PDF, absorb its text fragments, and determine the Y‑coordinates where each line starts, outputting the positions as JSON.",
+    "extract-text-fragments-and-positions": {
+      "title": "Retrieve Line Break Information from PDF Text Fragments",
+      "filename": "extract-text-fragments-and-positions.cs",
+      "description": "Shows how to load a PDF, extract all text fragments and obtain line‑break details using the GetLineBreakInfo method (with a reflection fallback).",
+      "tags": [
+        "pdf",
+        "text-fragment",
+        "line-break",
+        "aspose-pdf",
+        "reflection"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.LineBreakInfo",
+        "Aspose.Pdf.PageCollection.Accept"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20149"
+    },
+    "append-disclaimer-to-first-pdf-page": {
+      "title": "Append Disclaimer Text to First PDF Page",
+      "filename": "append-disclaimer-to-first-pdf-page.cs",
+      "description": "Shows how to load a PDF, create a TextFragment with a disclaimer, append it to the first page's paragraph collection, and save the updated document using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "textfragment",
+        "append",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20150"
+    },
+    "rotate-header-text-pdf": {
+      "title": "Rotate PDF Header Text by 90 Degrees",
+      "filename": "rotate-header-text-pdf.cs",
+      "description": "The example loops through all PDF files in a folder, detects header‑like text fragments by font size, rotates those fragments 90° clockwise, and saves the updated PDFs.",
+      "tags": [
+        "pdf",
+        "text-rotation",
+        "header",
+        "batch",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextState.Rotation",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20151"
+    },
+    "replace-text-rotate-page-save-memory-stream": {
+      "title": "Replace Text and Rotate PDF Pages, Save to MemoryStream",
+      "filename": "replace-text-rotate-page-save-memory-stream.cs",
+      "description": "The example loads a PDF, replaces all occurrences of a specified string with new text, rotates each page 90 degrees clockwise, and saves the modified document into a MemoryStream.",
+      "tags": [
+        "text-replacement",
+        "page-rotation",
+        "memorystream",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rotation",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20152"
+    },
+    "search-text-pdf-with-logging": {
+      "title": "Enable Logging and Search Text in a PDF",
+      "filename": "search-text-pdf-with-logging.cs",
+      "description": "The example shows how to enable simple file logging, search for a term in a PDF using TextFragmentAbsorber, highlight the matches, save the modified document, and verify that the search action was recorded in the log.",
+      "tags": [
+        "logging",
+        "text-search",
+        "pdf",
+        "aspose-pdf",
+        "highlight"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20153"
+    },
+    "extract-text-from-pdf-to-utf8-file": {
+      "title": "Extract Text from PDF and Save as UTF-8 File",
+      "filename": "extract-text-from-pdf-to-utf8-file.cs",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf, extract all page text using TextAbsorber, and write the concatenated result to a UTF‑8 encoded text file.",
       "tags": [
         "pdf",
         "text-extraction",
-        "line-break",
+        "utf-8",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.Text.TextExtractionOptions",
+        "Aspose.Pdf.Text.TextExtractionOptions.TextFormattingMode",
+        "Aspose.Pdf.PageCollection.Accept"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20154"
+    },
+    "extract-line-break-positions-from-pdf": {
+      "title": "Extract Line Break Y Positions from a PDF TextFragment",
+      "filename": "extract-line-break-positions-from-pdf.cs",
+      "description": "The example creates a PDF with a multi‑line TextFragment, iterates over its TextSegments to obtain the lower‑left Y coordinate of each line, and saves these positions to a JSON file.",
+      "tags": [
+        "pdf",
+        "textfragment",
+        "line-positions",
+        "json",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextSegment",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Position"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20155"
+    },
+    "add-rotated-text-watermark-to-pdf-pages": {
+      "title": "Add Rotated Text Watermark to PDF Pages",
+      "filename": "add-rotated-text-watermark-to-pdf-pages.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's TextStamp and TextState to place a semi‑transparent, rotated watermark on every page of a PDF document.",
+      "tags": [
+        "watermark",
+        "textstamp",
+        "rotation",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Drawing.Color.FromRgb",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20156"
+    },
+    "replace-text-on-specific-pdf-pages": {
+      "title": "Replace Text on Specific PDF Pages",
+      "filename": "replace-text-on-specific-pdf-pages.cs",
+      "description": "Demonstrates how to replace a given string only within a defined page range of a PDF by iterating pages and using TextFragmentAbsorber.",
+      "tags": [
+        "text-replacement",
+        "pdf",
+        "page-range",
         "aspose-pdf",
         "csharp"
       ],
@@ -1283,112 +1401,67 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Text.TextFragmentAbsorber",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextSegment",
-        "Aspose.Pdf.Text.Position"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "add-rotated-text-watermark-to-pdf-pages": {
-      "title": "Add Rotated Text Watermark to PDF Pages",
-      "filename": "add-rotated-text-watermark-to-pdf-pages.cs",
-      "description": "Shows how to use Aspose.Pdf's TextBuilder and TextFragment to place a rotated \"CONFIDENTIAL\" watermark on every page of a PDF document.",
-      "tags": [
-        "watermark",
-        "text",
-        "pdf",
-        "rotation",
-        "Aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.FontRepository.FindFont",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Text.TextBuilder.AppendText",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "replace-text-on-specific-pdf-pages": {
-      "title": "Replace Text on Specific PDF Pages",
-      "filename": "replace-text-on-specific-pdf-pages.cs",
-      "description": "Demonstrates how to replace a given phrase only within a defined page range of a PDF by iterating pages and using Aspose.Pdf's TextFragmentAbsorber.",
-      "tags": [
-        "text-replacement",
-        "pdf",
-        "page-range",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Page.Accept",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20157"
     },
     "highlight-keyword-occurrences-pdf": {
-      "title": "Highlight Keyword Occurrences in PDF (Case‑Insensitive)",
+      "title": "Case‑Insensitive Keyword Highlight in PDF",
       "filename": "highlight-keyword-occurrences-pdf.cs",
-      "description": "Shows how to search a PDF for a case‑insensitive keyword using a regular expression and highlight each found instance with a colored background.",
+      "description": "Loads a PDF, searches for a keyword without regard to case, and highlights each occurrence with a yellow background using Aspose.Pdf.",
       "tags": [
         "pdf",
         "highlight",
         "search",
-        "regex",
+        "case-insensitive",
         "textfragment"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextSearchOptions",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextState",
         "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.PageCollection.Accept"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20158"
     },
     "insert-rotated-mixed-style-text-paragraph": {
-      "title": "Insert Rotated Mixed-Style Text Paragraph on Third PDF Page",
+      "title": "Add Mixed-Style Rotated Text to PDF Page",
       "filename": "insert-rotated-mixed-style-text-paragraph.cs",
-      "description": "Loads an existing PDF, creates a TextParagraph with bold and italic font styles, rotates it 45 degrees, and inserts it onto the third page of the document.",
+      "description": "Shows how to create a TextFragment with bold, italic and regular segments, apply a 45° rotation, and insert it onto the third page of a PDF using Aspose.Pdf.",
       "tags": [
         "text",
         "rotation",
-        "font-style",
+        "mixed-style",
         "pdf",
-        "aspdf"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextParagraph",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.FontRepository.FindFont",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextSegment",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20159"
     },
     "batch-replace-multiple-strings-in-pdf": {
-      "title": "Batch Replace Multiple Strings in PDF",
+      "title": "Batch Replace Multiple Strings in PDFs",
       "filename": "batch-replace-multiple-strings-in-pdf.cs",
-      "description": "Shows how to replace several text strings in a PDF by iterating a dictionary of old‑new pairs using Aspose.Pdf's TextFragmentAbsorber and TextReplaceOptions.",
+      "description": "Demonstrates how to process a folder of PDF files and replace several specified strings with new values using Aspose.Pdf's text extraction and replacement capabilities.",
       "tags": [
         "pdf",
         "text-replacement",
@@ -1399,46 +1472,120 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextReplaceOptions",
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.PageCollection.Accept",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20160"
     },
     "extract-page-word-count-to-csv": {
-      "title": "Extract Text from PDF Pages and Count Words to CSV",
+      "title": "Extract Text and Count Words per PDF Page",
       "filename": "extract-page-word-count-to-csv.cs",
-      "description": "The example opens a PDF, extracts the text of each page using Aspose.Pdf, counts the words, and writes the page number and word count to a CSV file.",
+      "description": "Demonstrates how to extract text from each page of a PDF, count the words on that page, and write the page number and word count to a CSV file using Aspose.Pdf.",
       "tags": [
         "pdf",
         "text-extraction",
         "word-count",
         "csv",
-        "aspose-pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Page.Accept",
-        "Aspose.Pdf.Document.Pages"
+        "Aspose.Pdf.Text.TextExtractionOptions",
+        "Aspose.Pdf.Text.TextExtractionOptions.TextFormattingMode"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20161"
     },
     "rotate-draft-text-fragments": {
       "title": "Rotate 'Draft' Text Fragments in PDF",
       "filename": "rotate-draft-text-fragments.cs",
-      "description": "Shows how to locate all text fragments containing the word \"Draft\" with TextFragmentAbsorber and apply a 15‑degree rotation to each fragment in a PDF document.",
+      "description": "Shows how to locate all text fragments containing the word \"Draft\" in a PDF and apply a 15‑degree rotation to each fragment using Aspose.Pdf.",
       "tags": [
         "text-rotation",
-        "text-search",
+        "text-fragment",
         "pdf-modification",
         "aspose-pdf",
+        "search-text"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection.Accept"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20162"
+    },
+    "find-dates-in-pdf-using-regex": {
+      "title": "Find MM/DD/YYYY Dates in PDF Using Regex",
+      "filename": "find-dates-in-pdf-using-regex.cs",
+      "description": "Demonstrates how to search a PDF for dates in the MM/DD/YYYY format using a regular‑expression pattern with Aspose.Pdf's text‑search APIs.",
+      "tags": [
+        "regex",
+        "date-search",
+        "pdf",
+        "text-extraction",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextSearchOptions",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextFragmentCollection"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20163"
+    },
+    "rotate-table-cell-text": {
+      "title": "Rotate Text Inside a Table Cell",
+      "filename": "rotate-table-cell-text.cs",
+      "description": "Demonstrates how to rotate a TextFragment by 60 degrees and place it inside a table cell, updating the PDF layout accordingly.",
+      "tags": [
+        "text-rotation",
+        "table",
+        "pdf",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Table",
+        "Aspose.Pdf.Row",
+        "Aspose.Pdf.Cell",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.MarginInfo",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20165"
+    },
+    "rotate-pdf-title-text-45-degrees": {
+      "title": "Rotate PDF Title Text by 45 Degrees",
+      "filename": "rotate-pdf-title-text-45-degrees.cs",
+      "description": "Shows how to read a PDF's title metadata, find matching text fragments, rotate them 45 degrees, and save the updated PDFs using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "text-rotation",
+        "metadata",
+        "aspose",
         "csharp"
       ],
       "apis_used": [
@@ -1446,100 +1593,23 @@
         "Aspose.Pdf.Text.TextFragmentAbsorber",
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "find-dates-in-pdf-using-regex": {
-      "title": "Find Dates in PDF Using Regex",
-      "filename": "find-dates-in-pdf-using-regex.cs",
-      "description": "Shows how to locate all dates in MM/DD/YYYY format within a PDF by applying a regular expression with TextFragmentAbsorber and output the matches.",
-      "tags": [
-        "date extraction",
-        "regex",
-        "text search",
-        "pdf",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextSearchOptions",
-        "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.PageCollection.Accept"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "append-a-multi-line-textfragment-to-a-page-and-retrieve-its-line-break-information-for-custom-rendering": {
-      "title": "Append A Multi Line Textfragment To A Page And Retrieve Its Line Break Information For Custom Rendering",
-      "filename": "append-a-multi-line-textfragment-to-a-page-and-retrieve-its-line-break-information-for-custom-rendering.cs",
-      "description": "",
-      "tags": [],
-      "apis_used": [],
-      "difficulty": "",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "rotate-table-cell-text": {
-      "title": "Rotate Table Cell Text by 60 Degrees",
-      "filename": "rotate-table-cell-text.cs",
-      "description": "Shows how to locate a table cell in a PDF and rotate its text fragments by 60 degrees using Aspose.Pdf.",
-      "tags": [
-        "table",
-        "text-rotation",
-        "pdf",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.TableAbsorber",
-        "Aspose.Pdf.TableAbsorber.Visit",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextState.Rotation",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "rotate-pdf-title-text-45-degrees": {
-      "title": "Rotate PDF Title Text by 45 Degrees",
-      "filename": "rotate-pdf-title-text-45-degrees.cs",
-      "description": "Shows how to load PDF files with Aspose.Pdf, extract all text fragments on each page, rotate them 45 degrees, and save the updated documents.",
-      "tags": [
-        "pdf",
-        "text-rotation",
-        "aspose.pdf",
-        "csharp",
-        "document-manipulation"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextState.Rotation",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20166"
     },
     "add-rotated-text-bottom-right-last-page": {
-      "title": "Add Rotated Text to Bottom‑Right of Last PDF Page",
+      "title": "Add Rotated Text to Bottom‑Right Corner of Last PDF Page",
       "filename": "add-rotated-text-bottom-right-last-page.cs",
       "description": "Demonstrates how to use Aspose.Pdf's TextBuilder to place a rotated text fragment at the bottom‑right corner of the last page of a PDF document.",
       "tags": [
         "text",
         "rotation",
+        "position",
         "pdf",
-        "textbuilder",
-        "aspose-pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -1547,126 +1617,228 @@
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.TextBuilder",
         "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.FontRepository",
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20167"
     },
     "replace-text-with-clickable-hyperlink": {
-      "title": "Replace Text with Clickable Hyperlink in PDF",
+      "title": "Add Clickable Hyperlink to Text in PDF",
       "filename": "replace-text-with-clickable-hyperlink.cs",
-      "description": "Shows how to locate a phrase in a PDF, replace it with new text, and attach a clickable hyperlink annotation using Aspose.Pdf.",
+      "description": "Searches for a specific phrase in a PDF and replaces it with a styled, clickable hyperlink using Aspose.Pdf.",
       "tags": [
         "pdf",
-        "text-replacement",
         "hyperlink",
+        "text-search",
         "annotation",
-        "search"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Annotations.LinkAnnotation",
-        "Aspose.Pdf.Annotations.GoToURIAction"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "extract-pdf-text-sentences-per-page": {
-      "title": "Extract PDF Text and Save Each Sentence on Separate Pages",
-      "filename": "extract-pdf-text-sentences-per-page.cs",
-      "description": "The example extracts all text from an input PDF, splits it into individual sentences, and writes each sentence to its own page in a new PDF using TextFragment objects.",
-      "tags": [
-        "pdf",
-        "text-extraction",
-        "sentence-splitting",
-        "textfragment",
         "aspnet"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextBuilder",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "rotate-text-box-form-field": {
-      "title": "Rotate Text Box Form Field",
-      "filename": "rotate-text-box-form-field.cs",
-      "description": "Shows how to rotate a text box form field by adjusting its rectangle and regenerating its appearance using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "form-field",
-        "rotation",
-        "appearance",
-        "textbox"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Forms.TextBoxField",
-        "Aspose.Pdf.Drawing.Rectangle.Rotate",
-        "Aspose.Pdf.Forms.Form.AddFieldAppearance",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "batch-replace-keywords-in-pdf": {
-      "title": "Batch Replace Keywords in PDF Using a Configuration File",
-      "filename": "batch-replace-keywords-in-pdf.cs",
-      "description": "Demonstrates how to read a mapping file and perform batch text replacements in a PDF document using Aspose.Pdf's text absorber and fragment classes.",
-      "tags": [
-        "pdf",
-        "text-replacement",
-        "batch-processing",
-        "configuration-file",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.PageCollection.Accept"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
-    },
-    "replace-text-in-pdf-using-fuzzy-regex": {
-      "title": "Replace Text in PDF Using Fuzzy Regex Search",
-      "filename": "replace-text-in-pdf-using-fuzzy-regex.cs",
-      "description": "Demonstrates how to locate approximate text matches in a PDF using a regular‑expression (fuzzy) search with Aspose.Pdf and replace the found fragments with new content.",
-      "tags": [
-        "pdf",
-        "text-replacement",
-        "regex",
-        "fuzzy-search",
-        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Text.TextFragmentAbsorber",
         "Aspose.Pdf.Text.TextSearchOptions",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Document.Pages.Accept",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20168"
+    },
+    "extract-pdf-text-sentences-per-page": {
+      "title": "Split PDF Text into Sentences and Write Each to a New Page",
+      "filename": "extract-pdf-text-sentences-per-page.cs",
+      "description": "The example loads a PDF, extracts its full text using TextAbsorber, splits the text into individual sentences, and creates a new PDF where each sentence is placed on its own page as a TextFragment.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "sentence-splitting",
+        "textfragment",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.FontRepository.FindFont",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-08-20T08:59:26Z",
-      "status": "verified"
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20169"
+    },
+    "batch-replace-keywords-in-pdf": {
+      "title": "Batch Replace Text in PDF Using JSON Configuration",
+      "filename": "batch-replace-keywords-in-pdf.cs",
+      "description": "Demonstrates loading a PDF, reading a JSON map of old‑to‑new strings, and replacing all occurrences of each keyword across all pages using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "text-replacement",
+        "json",
+        "aspose",
+        "batch"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Accept"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20171"
+    },
+    "replace-text-in-pdf-using-fuzzy-regex": {
+      "title": "Fuzzy Text Search in PDF with Aspose.Pdf",
+      "filename": "replace-text-in-pdf-using-fuzzy-regex.cs",
+      "description": "Demonstrates how to perform a fuzzy (approximate) text search in a PDF document using Aspose.Pdf's TextFragmentAbsorber and TextSearchOptions, and writes the locations of matches to a text file.",
+      "tags": [
+        "fuzzy-search",
+        "pdf",
+        "text-search",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextSearchOptions",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20172"
+    },
+    "show-popup-on-button-mouse-enter": {
+      "title": "Show Popup on Button Mouse Enter",
+      "filename": "show-popup-on-button-mouse-enter.cs",
+      "description": "Demonstrates creating a popup annotation and assigning a HideAction to a button's OnEnter event so the floating box appears when the mouse enters the button.",
+      "tags": [
+        "popup",
+        "button",
+        "hideaction",
+        "event",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.PopupAnnotation",
+        "Aspose.Pdf.Forms.ButtonField",
+        "Aspose.Pdf.Annotations.HideAction"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20111"
+    },
+    "add-arabic-rtl-text-to-pdf": {
+      "title": "Add Arabic RTL Text to PDF",
+      "filename": "add-arabic-rtl-text-to-pdf.cs",
+      "description": "Shows how to load an existing PDF, create a TextFragment with Arabic characters, set a Unicode font and right‑to‑left direction, and save the updated document.",
+      "tags": [
+        "rtl",
+        "arabic",
+        "textfragment",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20131"
+    },
+    "add-text-annotation-to-pdf-page": {
+      "title": "Add Text Annotation to PDF Page",
+      "filename": "add-text-annotation-to-pdf-page.cs",
+      "description": "Loads a PDF, creates a text annotation with title, contents and icon, adds it to the first page, and saves the modified document.",
+      "tags": [
+        "text-annotation",
+        "pdf",
+        "aspose-pdf",
+        "csharp",
+        "annotation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.TextIcon",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20138"
+    },
+    "add-semi-transparent-text-to-pdf": {
+      "title": "Add Semi-Transparent Text to a PDF",
+      "filename": "add-semi-transparent-text-to-pdf.cs",
+      "description": "Demonstrates how to set text opacity by configuring the TextState's color with an alpha component and adding the TextFragment to a PDF page using Aspose.Pdf.",
+      "tags": [
+        "text opacity",
+        "text fragment",
+        "pdf",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.FontRepository"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20142"
+    },
+    "append-multiline-textfragment-line-breaks": {
+      "title": "Append Multi‑Line TextFragment and Retrieve Line Breaks",
+      "filename": "append-multiline-textfragment-line-breaks.cs",
+      "description": "Loads a PDF, appends a multi‑line TextFragment to the first page, and shows how to extract line‑break information from the original text for custom rendering.",
+      "tags": [
+        "textfragment",
+        "multiline",
+        "linebreak",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Position",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-22T07:18:08Z",
+      "status": "verified",
+      "task_id": "20164"
     }
   }
 }

@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_endnote.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,30 +16,40 @@ class Program
             return;
         }
 
-        // Load the existing PDF, modify it, and save.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a text fragment that will contain the endnote.
-            TextFragment fragment = new TextFragment("Sample paragraph with an endnote.");
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
+            {
+                // Extract all text from the document (optional demonstration)
+                TextAbsorber absorber = new TextAbsorber();
+                doc.Pages.Accept(absorber);
+                Console.WriteLine($"Extracted text length: {absorber.Text.Length}");
 
-            // Create the endnote content.
-            Note endNote = new Note("This is the endnote text.");
+                // Add a new page at the end for the endnote
+                Page endPage = doc.Pages.Add();
 
-            // Define bold and italic style via TextState.
-            // Constructor (fontFamily, bold, italic) sets both styles.
-            TextState style = new TextState("Helvetica", true, true);
-            endNote.TextState = style;
+                // Create a TextFragment containing the endnote text
+                TextFragment endNote = new TextFragment("Endnote: This is a sample endnote with bold and italic styling.");
 
-            // Attach the endnote to the text fragment.
-            fragment.EndNote = endNote;
+                // Apply bold and italic formatting via TextState
+                endNote.TextState.FontStyle = FontStyles.Bold | FontStyles.Italic;
+                endNote.TextState.FontSize = 12; // optional size
+                // Position the fragment on the page (optional)
+                endNote.Position = new Position(50, 750);
 
-            // Add the fragment to the first page.
-            doc.Pages[1].Paragraphs.Add(fragment);
+                // Add the TextFragment to the page's paragraph collection
+                endPage.Paragraphs.Add(endNote);
 
-            // Save the modified document.
-            doc.Save(outputPath);
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Document saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF saved with endnote: {outputPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

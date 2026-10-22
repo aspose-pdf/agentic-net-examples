@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,26 +16,22 @@ class Program
             return;
         }
 
-        // Load the existing PDF document inside a using block for proper disposal
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Define styled HTML markup
-            string html = "<p style='font-family:Helvetica; font-size:14pt; color:#0000FF;'>This is <b>bold</b> and <i>italic</i> text.</p>";
+            // Ensure there is at least one page to work with
+            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
 
-            // Create an HtmlFragment from the markup
+            // HTML fragment with styled markup
+            string html = "<div style='font-family:Arial; font-size:14pt; color:#0066CC;'><b>Welcome</b> to <i>Aspose.Pdf</i>!</div>";
             HtmlFragment htmlFragment = new HtmlFragment(html);
 
-            // Optional: customize the fragment's text appearance via TextState
-            TextState textState = new TextState
-            {
-                Font = FontRepository.FindFont("Helvetica"),
-                FontSize = 14,
-                ForegroundColor = Aspose.Pdf.Color.Blue
-            };
-            htmlFragment.TextState = textState;
+            // Optional TextState customization
+            htmlFragment.TextState.Font = FontRepository.FindFont("Arial");
+            htmlFragment.TextState.FontSize = 14;
+            htmlFragment.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0, 102, 204); // matches #0066CC
 
-            // Add the fragment to the first page (1‑based indexing)
-            Page page = doc.Pages[1];
+            // Add the HTML fragment to the page's paragraph collection
             page.Paragraphs.Add(htmlFragment);
 
             // Save the modified PDF

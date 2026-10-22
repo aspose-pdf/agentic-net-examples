@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,45 +7,41 @@ class Program
 {
     static void Main()
     {
-        // Output PDF path
-        const string outputPath = "RotatedParagraph.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a page before accessing it (required for evaluation mode & safety)
+            // Add a single page to the document
             Page page = doc.Pages.Add();
 
-            // Create a TextParagraph
-            TextParagraph paragraph = new TextParagraph();
+            // Create a TextFragment which can hold multiple TextSegments (acts like a paragraph)
+            TextFragment paragraph = new TextFragment();
 
-            // Define the rectangle where the paragraph will be placed (fully qualified to avoid ambiguity)
-            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 500, 400, 700);
+            // Position of the paragraph on the page
+            paragraph.Position = new Position(100, 500);
 
             // Apply a 30-degree rotation to the entire paragraph
-            paragraph.Rotation = 30; // degrees
+            paragraph.TextState.Rotation = 30; // rotation in degrees (clockwise)
 
-            // First TextFragment
-            TextFragment fragment1 = new TextFragment("First line of text");
-            fragment1.TextState.FontSize = 12;
-            fragment1.TextState.Font = FontRepository.FindFont("Helvetica");
-            fragment1.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+            // First text segment
+            TextSegment segment1 = new TextSegment("Hello, ");
+            segment1.TextState.FontSize = 12;
+            segment1.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Second TextFragment
-            TextFragment fragment2 = new TextFragment("Second line of text");
-            fragment2.TextState.FontSize = 12;
-            fragment2.TextState.Font = FontRepository.FindFont("Helvetica");
-            fragment2.TextState.ForegroundColor = Aspose.Pdf.Color.Green;
+            // Second text segment
+            TextSegment segment2 = new TextSegment("world!");
+            segment2.TextState.FontSize = 12;
+            segment2.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
 
-            // Append the TextFragments as separate lines to the paragraph
-            paragraph.AppendLine(fragment1);
-            paragraph.AppendLine(fragment2);
+            // Add the segments to the fragment (paragraph)
+            paragraph.Segments.Add(segment1);
+            paragraph.Segments.Add(segment2);
 
-            // Use TextBuilder to add the paragraph to the page
-            TextBuilder textBuilder = new TextBuilder(page);
-            textBuilder.AppendParagraph(paragraph);
+            // Add the fragment to the page's paragraph collection
+            page.Paragraphs.Add(paragraph);
 
-            // Save the PDF document
+            // Save the document to a PDF file
             doc.Save(outputPath);
         }
 

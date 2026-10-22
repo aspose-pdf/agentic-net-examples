@@ -3,48 +3,50 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-public static class PdfMemoryProcessor
+class Program
 {
-    /// <summary>
-    /// Loads a PDF from <paramref name="inputPdfStream"/>, adds the specified <paramref name="text"/>
-    /// to the first page, and writes the resulting PDF to <paramref name="outputPdfStream"/>.
-    /// </summary>
-    public static void AddTextToPdf(Stream inputPdfStream, string text, Stream outputPdfStream)
+    static void Main()
     {
-        if (inputPdfStream == null) throw new ArgumentNullException(nameof(inputPdfStream));
-        if (outputPdfStream == null) throw new ArgumentNullException(nameof(outputPdfStream));
-        if (text == null) throw new ArgumentNullException(nameof(text));
-
-        // Load the PDF from the input stream. Document implements IDisposable, so wrap it in using.
-        using (Document doc = new Document(inputPdfStream))
+        // ------------------------------------------------------------
+        // 1. Create a minimal PDF in memory (acts as the source PDF).
+        // ------------------------------------------------------------
+        byte[] pdfBytes;
+        using (var seedDoc = new Document())
         {
-            // Aspose.Pdf uses 1‑based page indexing.
-            Page page = doc.Pages[1];
-
-            // Create a text fragment with the desired content.
-            TextFragment tf = new TextFragment(text);
-            // Position the text on the page (coordinates are in points).
-            tf.Position = new Position(100, 700);
-            // Optional styling.
-            tf.TextState.FontSize = 12;
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-            // Append the text fragment to the page.
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendText(tf);
-
-            // Save the modified document to the output stream.
-            doc.Save(outputPdfStream);
+            // Add a blank page so the document is valid.
+            seedDoc.Pages.Add();
+            using (var ms = new MemoryStream())
+            {
+                seedDoc.Save(ms);
+                pdfBytes = ms.ToArray();
+            }
         }
-    }
-}
 
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        // Entry point required for compilation. No operation performed here.
-        // Example usage can be added if needed.
+        // ------------------------------------------------------------
+        // 2. Load the PDF from a MemoryStream, modify it, and write back.
+        // ------------------------------------------------------------
+        using (var inputStream = new MemoryStream(pdfBytes))
+        using (var outputStream = new MemoryStream())
+        {
+            // Load PDF from the input stream.
+            using (var doc = new Document(inputStream))
+            {
+                // Create a text fragment to add.
+                var fragment = new TextFragment("Added text")
+                {
+                    // Optional: set the position on the page.
+                    Position = new Position(100, 700)
+                };
+
+                // Add the fragment to the first page (pages are 1‑based).
+                doc.Pages[1].Paragraphs.Add(fragment);
+
+                // Save the modified PDF into the output stream.
+                doc.Save(outputStream);
+            }
+
+            // Example: write the result to a file (optional).
+            File.WriteAllBytes("output.pdf", outputStream.ToArray());
+        }
     }
 }

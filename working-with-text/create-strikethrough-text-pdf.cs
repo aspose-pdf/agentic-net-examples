@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -8,29 +9,34 @@ class Program
     {
         const string outputPath = "strikethrough.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
+        // Ensure the output directory exists
+        string outDir = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))
+            Directory.CreateDirectory(outDir);
+
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a new page (Pages collection is 1‑based)
+            // Add a blank page (Pages collection is 1‑based)
             Page page = doc.Pages.Add();
 
-            // Create a TextFragment with the desired content
-            TextFragment tf = new TextFragment("This text is struck through.");
+            // Create a text fragment with the desired content
+            TextFragment fragment = new TextFragment("This text is struck through");
 
-            // Enable strikeout via the TextState property
-            tf.TextState.StrikeOut = true;
+            // Enable strikethrough (strikeout) via the TextState – note the correct property name is **StrikeOut**
+            fragment.TextState.StrikeOut = true;
 
-            // Optional: set font and size for better appearance
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf.TextState.FontSize = 14;
+            // Optionally set font size and color for better visibility
+            fragment.TextState.FontSize = 14F;
+            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Add the TextFragment to the page's paragraph collection
-            page.Paragraphs.Add(tf);
+            // Add the fragment to the page's paragraph collection
+            page.Paragraphs.Add(fragment);
 
-            // Save the document as PDF
+            // Save the PDF; Document.Save(string) writes PDF regardless of extension
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with strikethrough text saved to '{outputPath}'.");
     }
 }

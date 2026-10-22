@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,33 +7,39 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "character_spacing.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string text       = "Sample spaced text";
 
-        // Create a new PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a TextFragment with the desired text and position
-            TextFragment fragment = new TextFragment("Aspose.Pdf Character Spacing Example")
-            {
-                Position = new Position(50, 750) // X=50, Y=750
-            };
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Create a text fragment that will hold the string
+            TextFragment fragment = new TextFragment(text);
 
-            // Modify the existing TextState (the property is read‑only)
-            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
+            // Set character spacing (in points) on the TextState before adding the fragment
+            fragment.TextState.CharacterSpacing = 2.0f; // increase spacing by 2 points (float literal)
+
+            // Optional: set other visual properties
+            fragment.TextState.Font = FontRepository.FindFont("Arial");
             fragment.TextState.FontSize = 12;
             fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-            fragment.TextState.CharacterSpacing = 2f; // increase spacing between characters
 
-            // Add the fragment to the page
+            // Position the text on the first page
+            Page page = doc.Pages[1];
+            fragment.Position = new Position(100, 700); // X=100, Y=700 points from bottom-left
             page.Paragraphs.Add(fragment);
 
-            // Save the PDF document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Text with custom character spacing saved to '{outputPath}'.");
     }
 }

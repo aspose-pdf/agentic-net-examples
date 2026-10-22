@@ -7,11 +7,11 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string text = "Hello, Aspose!";
-        const double x = 100; // X coordinate
-        const double y = 600; // Y coordinate
+        const string text       = "Hello, Aspose.Pdf!";
+        const double x = 100; // X coordinate (points, from left)
+        const double y = 500; // Y coordinate (points, from bottom)
 
         if (!File.Exists(inputPath))
         {
@@ -19,26 +19,19 @@ class Program
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
+        // Load the PDF; using ensures proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based; get the first page
-            Page page = doc.Pages[1];
-
-            // Create a TextFragment with the desired string
+            // Create a TextFragment containing the desired string
             TextFragment tf = new TextFragment(text);
-            // Set the position where the text will appear
+
+            // Position the fragment at the specified coordinates
             tf.Position = new Position(x, y);
-            // Optional styling
-            tf.TextState.FontSize = 12;
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf.TextState.ForegroundColor = Color.Black;
 
-            // Append the fragment to the page using TextBuilder
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendText(tf);
+            // Add the fragment to the first page's paragraph collection
+            doc.Pages[1].Paragraphs.Add(tf);
 
-            // Save the modified PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 

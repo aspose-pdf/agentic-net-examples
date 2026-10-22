@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using Aspose.Pdf;
@@ -16,24 +17,48 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Dictionary to hold email addresses per page (page number -> list of emails)
+        var emailsByPage = new Dictionary<int, List<string>>();
+
+        // Regular expression for email addresses
+        Regex emailRegex = new Regex(@"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", RegexOptions.Compiled);
+
         using (Document doc = new Document(inputPath))
         {
-            // Regular expression for email addresses
-            Regex emailRegex = new Regex(@"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", RegexOptions.IgnoreCase);
-            TextSearchOptions searchOptions = new TextSearchOptions(true); // enable regex search
-
-            // Iterate through all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate pages using 1‑based indexing
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                // Create an absorber for the current page
-                TextFragmentAbsorber absorber = new TextFragmentAbsorber(emailRegex, searchOptions);
-                doc.Pages[i].Accept(absorber);
+                // Extract text from the current page
+                TextAbsorber absorber = new TextAbsorber();
+                doc.Pages[pageNum].Accept(absorber);
+                string pageText = absorber.Text ?? string.Empty;
 
-                // Output each found email with its page number
-                foreach (TextFragment fragment in absorber.TextFragments)
+                // Find all email matches on this page
+                var matches = emailRegex.Matches(pageText);
+                var emails = new List<string>();
+                foreach (Match match in matches)
                 {
-                    Console.WriteLine($"Page {i}: {fragment.Text}");
+                    emails.Add(match.Value);
+                }
+
+                // Store results (even if empty)
+                emailsByPage[pageNum] = emails;
+            }
+        }
+
+        // Output the collected email addresses
+        foreach (var kvp in emailsByPage)
+        {
+            Console.WriteLine($"Page {kvp.Key}:");
+            if (kvp.Value.Count == 0)
+            {
+                Console.WriteLine("  No email addresses found.");
+            }
+            else
+            {
+                foreach (string email in kvp.Value)
+                {
+                    Console.WriteLine($"  {email}");
                 }
             }
         }

@@ -2,12 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing; // retained for possible future use
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,43 +17,46 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load the source PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[i];
+                // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    Page page = doc.Pages[i];
 
-                // Create a TextBuilder for the current page
-                TextBuilder builder = new TextBuilder(page);
+                    // Create a TextStamp that will serve as the watermark
+                    TextStamp watermark = new TextStamp("CONFIDENTIAL");
 
-                // Create the watermark text fragment
-                TextFragment watermark = new TextFragment("CONFIDENTIAL");
+                    // Set visual appearance
+                    watermark.TextState.Font = FontRepository.FindFont("Arial");
+                    watermark.TextState.FontSize = 72;
+                    watermark.TextState.FontStyle = FontStyles.Bold;
+                    watermark.TextState.ForegroundColor = Color.FromRgb(0.8, 0.8, 0.8); // light gray
+                    watermark.Opacity = 0.3f; // semi‑transparent
 
-                // Position the text roughly at the center of the page
-                // (you may adjust X/Y as needed)
-                watermark.Position = new Position(page.PageInfo.Width / 2, page.PageInfo.Height / 2);
+                    // Position at the centre of the page
+                    watermark.HorizontalAlignment = HorizontalAlignment.Center;
+                    watermark.VerticalAlignment = VerticalAlignment.Center;
 
-                // Set visual appearance
-                watermark.TextState.Font = FontRepository.FindFont("Helvetica");
-                watermark.TextState.FontSize = 72;
-                watermark.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
+                    // Rotate the stamp (degrees)
+                    watermark.RotateAngle = 45f;
 
-                // Rotate the text (45 degrees)
-                watermark.TextState.Rotation = 45;
+                    // Add the stamp to the page content
+                    page.AddStamp(watermark);
+                }
 
-                // Optionally send the watermark behind page content
-                watermark.ZIndex = -1; // negative ZIndex places it behind other graphics
-
-                // Append the fragment to the page
-                builder.AppendText(watermark);
+                // Save the modified document as PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified document as PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

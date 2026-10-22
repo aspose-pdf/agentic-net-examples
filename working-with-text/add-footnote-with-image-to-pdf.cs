@@ -7,50 +7,50 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
         const string imagePath = "footnote_image.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
-
         if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Image for footnote not found: {imagePath}");
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPdf))
+        // Open the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Choose the page where the footnote will be placed (first page in this example)
-            Page page = doc.Pages[1];
+            // Use the first page (1‑based indexing)
+            Aspose.Pdf.Page page = doc.Pages[1];
 
-            // Create a text fragment that will contain the footnote reference
-            TextFragment tf = new TextFragment("Sample text with footnote reference[1]");
-            tf.Position = new Position(100, 700); // place the text on the page
+            // Create a footnote text fragment
+            TextFragment footnote = new TextFragment("1. This is a footnote reference.");
+            footnote.TextState.FontSize = 8;
+            footnote.TextState.Font = FontRepository.FindFont("Arial");
+            footnote.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
 
-            // Create a footnote (Note) and attach it to the TextFragment
-            Note footNote = new Note();
-            footNote.Text = "This is the footnote content.";
-            // Add an image to the footnote's Paragraphs collection
-            Image footImg = new Image();
-            footImg.File = imagePath;
-            footNote.Paragraphs.Add(footImg);
+            // Add the footnote to the page's paragraph collection
+            page.Paragraphs.Add(footnote);
 
-            // Assign the footnote to the TextFragment
-            tf.FootNote = footNote;
+            // Create an image object and load the image file
+            Image img = new Image();
+            img.ImageStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read);
+            // Optional: set image dimensions (points)
+            img.FixWidth = 50;
+            img.FixHeight = 50;
 
-            // Add the TextFragment (with its footnote) to the page
-            page.Paragraphs.Add(tf);
+            // Insert the image after the footnote
+            page.Paragraphs.Add(img);
 
             // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with footnote saved to '{outputPdf}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

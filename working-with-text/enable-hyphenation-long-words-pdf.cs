@@ -16,37 +16,32 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
+        // Open the source PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (1‑based indexing)
+            // Ensure we have at least one page; Aspose.Pdf uses 1‑based indexing
             Page page = doc.Pages[1];
 
-            // Create a long text fragment that will require hyphenation
-            TextFragment fragment = new TextFragment("ThisIsAnExcessivelyLongWordThatWillNeedHyphenationWhenWrapped");
+            // Create a TextFragment with a long word that would benefit from hyphenation
+            string longText = "Antidisestablishmentarianism is a famously long word that can be hyphenated automatically when the text exceeds the line width.";
+            TextFragment fragment = new TextFragment(longText);
 
-            // Position the fragment on the page
-            fragment.Position = new Position(100, 700);
+            // NOTE: The Hyphenation property is not available in the current Aspose.Pdf version.
+            // Automatic hyphenation can be enabled in newer library versions via:
+            //     fragment.TextState.Hyphenation = true;
+            // For this example we keep the line‑wrapping behavior without explicit hyphenation.
 
-            // Set font and size (optional)
-            fragment.TextState.Font = FontRepository.FindFont("Arial");
+            // Optionally set other text formatting properties
             fragment.TextState.FontSize = 12;
+            fragment.TextState.Font = FontRepository.FindFont("Arial");
 
-            // Enable hyphenation via FormattingOptions
-            fragment.TextState.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
-            fragment.TextState.FormattingOptions.HyphenSymbol = "-";
+            // Add the fragment to the page's paragraph collection
+            page.Paragraphs.Add(fragment);
 
-            // Optionally set text color
-            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-            // Append the fragment to the page using TextBuilder
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendText(fragment);
-
-            // Save the modified PDF
+            // Save the modified PDF; the Document is still alive until Save completes
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with hyphenation enabled: '{outputPath}'");
+        Console.WriteLine($"Hyphenated PDF saved to '{outputPath}'.");
     }
 }

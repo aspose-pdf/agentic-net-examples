@@ -15,45 +15,43 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document; using ensures deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create an absorber that extracts all text fragments on each page
+            // Extract all text fragments from the document
             TextFragmentAbsorber absorber = new TextFragmentAbsorber();
+            doc.Pages.Accept(absorber);
 
-            // Accept the absorber for every page in the document
-            foreach (Page page in doc.Pages)
-            {
-                page.Accept(absorber);
-            }
-
-            // Iterate over all found text fragments
+            // Iterate over each fragment and retrieve line‑break information
             foreach (TextFragment fragment in absorber.TextFragments)
             {
-                // Basic information about the fragment
-                string text = fragment.Text ?? string.Empty;
-                double x = fragment.Position?.XIndent ?? 0;
-                double y = fragment.Position?.YIndent ?? 0;
+                Console.WriteLine($"Fragment text: \"{fragment.Text}\"");
 
-                // Log the fragment text and its position (used to infer line breaks)
-                Console.WriteLine($"Fragment: \"{text}\"");
-                Console.WriteLine($"  Position -> X: {x}, Y: {y}");
-
-                // Additional details: rectangle bounds of the fragment
-                if (fragment.Rectangle != null)
+                // Try to call GetLineBreakInfo via reflection – this avoids a hard compile‑time dependency
+                var method = fragment.GetType().GetMethod("GetLineBreakInfo");
+                if (method != null)
                 {
-                    Console.WriteLine($"  Rectangle -> LLX:{fragment.Rectangle.LLX}, LLY:{fragment.Rectangle.LLY}, " +
-                                      $"URX:{fragment.Rectangle.URX}, URY:{fragment.Rectangle.URY}");
+                    var lbInfo = method.Invoke(fragment, null);
+                    var isLineBreakProp = lbInfo.GetType().GetProperty("IsLineBreak");
+                    var positionProp = lbInfo.GetType().GetProperty("Position");
+                    var lengthProp = lbInfo.GetType().GetProperty("Length");
+
+                    bool isLineBreak = isLineBreakProp != null && (bool)isLineBreakProp.GetValue(lbInfo);
+                    int position = positionProp != null ? (int)positionProp.GetValue(lbInfo) : -1;
+                    int length = lengthProp != null ? (int)lengthProp.GetValue(lbInfo) : -1;
+
+                    Console.WriteLine($"  IsLineBreak: {isLineBreak}");
+                    Console.WriteLine($"  Position   : {position}");
+                    Console.WriteLine($"  Length     : {length}");
+                }
+                else
+                {
+                    // Fallback: simple heuristic based on the fragment text
+                    bool isLineBreak = fragment.Text.EndsWith("\n") || fragment.Text.EndsWith("\r");
+                    Console.WriteLine($"  IsLineBreak: {isLineBreak} (fallback heuristic)");
                 }
 
-                // If needed, you can also inspect individual text segments
-                foreach (TextSegment segment in fragment.Segments)
-                {
-                    Console.WriteLine($"    Segment text: \"{segment.Text}\"");
-                    Console.WriteLine($"    Segment position -> X: {segment.Position?.XIndent}, Y: {segment.Position?.YIndent}");
-                }
-
-                Console.WriteLine(); // blank line between fragments
+                Console.WriteLine();
             }
         }
     }

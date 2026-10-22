@@ -8,43 +8,51 @@ class Program
     static void Main()
     {
         const string outputPath = "output.pdf";
-        const string imagePath  = "image.png";
+        const string imagePath = "image.png";
 
+        // Verify that the image file exists
         if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            Console.Error.WriteLine($"Image not found: {imagePath}");
             return;
         }
 
-        // Create a new PDF document and ensure proper disposal
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
+        try
         {
-            // Add a single page
-            Aspose.Pdf.Page page = doc.Pages.Add();
+            // Create a new PDF document
+            using (Document doc = new Document())
+            {
+                // Add a page to the document
+                Page page = doc.Pages.Add();
 
-            // Create a text fragment that will appear inline
-            Aspose.Pdf.Text.TextFragment textFragment = new Aspose.Pdf.Text.TextFragment("Hello ");
-            textFragment.IsInLineParagraph = true;
-            textFragment.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica");
-            textFragment.TextState.FontSize = 12;
-            textFragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                // First text fragment
+                TextFragment textBefore = new TextFragment("This is inline image: ");
+                page.Paragraphs.Add(textBefore);
 
-            // Create an image fragment that will appear inline with the text
-            Aspose.Pdf.Image imageFragment = new Aspose.Pdf.Image();
-            imageFragment.File = imagePath;
-            imageFragment.IsInLineParagraph = true;
-            // Optional: set explicit size for the image
-            imageFragment.FixWidth = 50;
-            imageFragment.FixHeight = 50;
+                // Image fragment (inline with the text)
+                Image img = new Image();
+                using (FileStream imgStream = File.OpenRead(imagePath))
+                {
+                    img.ImageStream = imgStream;
+                    // Optional: set fixed dimensions for the image
+                    img.FixWidth = 50;
+                    img.FixHeight = 50;
+                }
+                page.Paragraphs.Add(img);
 
-            // Add both fragments to the page's paragraph collection
-            page.Paragraphs.Add(textFragment);
-            page.Paragraphs.Add(imageFragment);
+                // Optional trailing text after the image
+                TextFragment textAfter = new TextFragment(" end of paragraph.");
+                page.Paragraphs.Add(textAfter);
 
-            // Save the resulting PDF
-            doc.Save(outputPath);
+                // Save the PDF document
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF successfully saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF with inline text and image saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
