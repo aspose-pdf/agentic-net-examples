@@ -6,48 +6,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "invoice.pdf";          // PDF containing ZUGFeRD data
-        const string outputXml = "ZUGFeRD.xml";         // Desired output file name
+        const string pdfPath = "input.pdf";
+        const string outputXmlPath = "ZUGFeRD.xml";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-            using (Document pdfDoc = new Document(inputPdf))
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
                 bool extracted = false;
 
-                // Iterate over all embedded files in the PDF
-                foreach (FileSpecification fileSpec in pdfDoc.EmbeddedFiles)
+                // Iterate over all embedded files in the PDF using FileSpecification
+                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
                 {
-                    // ZUGFeRD payload is an XML file; look for .xml extension (case‑insensitive)
+                    // ZUGFeRD XML files are typically named with .xml extension and contain "ZUGFeRD"
                     if (!string.IsNullOrEmpty(fileSpec.Name) &&
-                        fileSpec.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+                        fileSpec.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) &&
+                        fileSpec.Name.IndexOf("ZUGFeRD", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        // Ensure the content stream is positioned at the beginning
-                        if (fileSpec.Contents.CanSeek)
-                            fileSpec.Contents.Position = 0;
-
-                        // Write the embedded XML to the local file system
-                        using (FileStream outStream = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
+                        // Save the embedded XML to the specified path via its Contents stream
+                        using (FileStream outStream = File.Create(outputXmlPath))
+                        using (Stream content = fileSpec.Contents)
                         {
-                            fileSpec.Contents.CopyTo(outStream);
+                            content.CopyTo(outStream);
                         }
 
-                        Console.WriteLine($"Embedded ZUGFeRD XML saved to '{outputXml}'.");
+                        Console.WriteLine($"ZUGFeRD XML extracted to '{outputXmlPath}'.");
                         extracted = true;
-                        break; // stop after the first matching file
+                        break; // stop after the first match
                     }
                 }
 
                 if (!extracted)
                 {
-                    Console.WriteLine("No embedded ZUGFeRD XML file found in the PDF.");
+                    Console.WriteLine("No ZUGFeRD XML embedded file found in the PDF.");
                 }
             }
         }

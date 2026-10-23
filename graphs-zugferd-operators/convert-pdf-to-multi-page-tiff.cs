@@ -7,37 +7,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.tif";
+        const string inputPdf = "input.pdf";
+        const string outputTiff = "output.tiff";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDocument = new Document(inputPath))
+        try
         {
-            // Define resolution for the TIFF images (e.g., 300 DPI)
-            Resolution resolution = new Resolution(300);
-
-            // Configure TIFF conversion settings
-            TiffSettings tiffSettings = new TiffSettings
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                Compression = CompressionType.None,
-                Depth = ColorDepth.Default,
-                Shape = ShapeType.Landscape,
-                SkipBlankPages = false
-            };
+                // Configure TIFF settings – each PDF page will become a separate frame in the TIFF
+                TiffSettings tiffSettings = new TiffSettings
+                {
+                    // Example: use LZW compression (optional)
+                    Compression = CompressionType.LZW,
+                    // You can adjust other settings such as Depth, SkipBlankPages, etc., if needed
+                };
 
-            // Create a TIFF device with the specified resolution and settings
-            TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
+                // Create a TIFF device with desired resolution (e.g., 300 DPI)
+                Resolution resolution = new Resolution(300);
+                TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
 
-            // Convert the entire PDF to a multi‑page TIFF file
-            tiffDevice.Process(pdfDocument, outputPath);
+                // Process the document – this generates a multi‑page TIFF where each PDF page is a separate image layer
+                tiffDevice.Process(pdfDoc, outputTiff);
+            }
+
+            Console.WriteLine($"PDF successfully converted to multi‑page TIFF: {outputTiff}");
         }
-
-        Console.WriteLine($"PDF successfully converted to multi‑page TIFF: {outputPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+        }
     }
 }

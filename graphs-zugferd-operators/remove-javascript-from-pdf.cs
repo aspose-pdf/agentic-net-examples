@@ -1,15 +1,15 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-class RemoveJavaScript
+class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_no_js.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,59 +17,63 @@ class RemoveJavaScript
             return;
         }
 
-        // Load the PDF inside a using block to ensure proper disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // ------------------------------------------------------------
-            // 1. Remove document‑level JavaScript actions
-            // ------------------------------------------------------------
-            // Clear the OpenAction (executed when the document is opened)
-            doc.OpenAction = null;
-
-            // Remove any named JavaScript entries from the document's JavaScript collection
-            if (doc.JavaScript != null && doc.JavaScript.Keys.Count > 0)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                // Copy keys to a list to avoid modifying the collection while iterating
-                List<string> keys = new List<string>(doc.JavaScript.Keys);
-                foreach (string key in keys)
+                // ---- Remove document‑level JavaScript actions ----
+                ClearJavascriptActions(doc.Actions);
+
+                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
                 {
-                    doc.JavaScript.Remove(key);
-                }
-            }
+                    Page page = doc.Pages[pageIndex];
 
-            // ------------------------------------------------------------
-            // 2. Remove page‑level JavaScript actions
-            // ------------------------------------------------------------
-            foreach (Page page in doc.Pages)
-            {
-                // Page actions only expose OnOpen and OnClose
-                page.Actions.OnOpen = null;
-                page.Actions.OnClose = null;
-            }
+                    // Remove page‑level JavaScript actions
+                    ClearJavascriptActions(page.Actions);
 
-            // ------------------------------------------------------------
-            // 3. Remove JavaScript actions attached to annotations
-            // ------------------------------------------------------------
-            foreach (Page page in doc.Pages)
-            {
-                // Iterate backwards because we may delete annotations
-                for (int i = page.Annotations.Count; i >= 1; i--)
-                {
-                    Annotation ann = page.Annotations[i];
-                    // Only LinkAnnotation (and its derived types) expose an Action property
-                    if (ann is LinkAnnotation link && link.Action is JavascriptAction)
+                    // Iterate over annotations in reverse order to allow safe removal if needed
+                    for (int annIndex = page.Annotations.Count; annIndex >= 1; annIndex--)
                     {
-                        link.Action = null;
+                        Annotation annotation = page.Annotations[annIndex];
+
+                        // Remove any JavaScript actions attached to the annotation via its Actions collection
+                        ClearJavascriptActions(annotation.Actions);
                     }
                 }
+
+                // Save the cleaned PDF
+                doc.Save(outputPath);
             }
 
-            // ------------------------------------------------------------
-            // 4. Save the cleaned PDF
-            // ------------------------------------------------------------
-            doc.Save(outputPath);
+            Console.WriteLine($"JavaScript actions removed. Output saved to '{outputPath}'.");
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
 
-        Console.WriteLine($"JavaScript removed. Saved to '{outputPath}'.");
+    /// <summary>
+    /// Clears all properties of type <see cref="JavascriptAction"/> from the supplied actions collection.
+    /// The method uses reflection so it works across Aspose.Pdf versions where the exact set of
+    /// JavaScript‑related properties may differ.
+    /// </summary>
+    private static void ClearJavascriptActions(object actionsCollection)
+    {
+        if (actionsCollection == null)
+            return;
+
+        // Iterate over all public instance properties of the collection
+        foreach (PropertyInfo prop in actionsCollection.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            // If the property type is JavascriptAction (the correct class name in Aspose.Pdf) and it can be written to,
+            // set it to null – effectively removing the script.
+            if (prop.PropertyType == typeof(JavascriptAction) && prop.CanWrite)
+            {
+                prop.SetValue(actionsCollection, null);
+            }
+        }
     }
 }

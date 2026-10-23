@@ -1,82 +1,78 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "combined_graphs.pdf";
+        // Paths to the four graph images (PNG, JPEG, etc.)
+        string[] graphPaths = {
+            "graph1.png",
+            "graph2.png",
+            "graph3.png",
+            "graph4.png"
+        };
 
-        // Create a new PDF document and add a single blank page
-        using (Document doc = new Document())
+        // Verify that all image files exist
+        foreach (string path in graphPaths)
         {
-            Page page = doc.Pages.Add();
-
-            // Size of each graph in points
-            double graphWidth = 250;
-            double graphHeight = 250;
-
-            // Positions for a 2x2 grid (origin is bottom‑left)
-            // Top‑left
-            AddGraph(page, 0, page.PageInfo.Height - graphHeight, graphWidth, graphHeight, "Graph 1");
-            // Top‑right
-            AddGraph(page, graphWidth, page.PageInfo.Height - graphHeight, graphWidth, graphHeight, "Graph 2");
-            // Bottom‑left
-            AddGraph(page, 0, page.PageInfo.Height - 2 * graphHeight, graphWidth, graphHeight, "Graph 3");
-            // Bottom‑right
-            AddGraph(page, graphWidth, page.PageInfo.Height - 2 * graphHeight, graphWidth, graphHeight, "Graph 4");
-
-            // Save the resulting PDF
-            doc.Save(outputPath);
+            if (!File.Exists(path))
+            {
+                Console.Error.WriteLine($"Image not found: {path}");
+                return;
+            }
         }
 
-        Console.WriteLine($"PDF saved to {outputPath}");
-    }
-
-    static void AddGraph(Page page, double left, double top, double width, double height, string title)
-    {
-        // Create a Graph container with the desired size
-        Graph graph = new Graph(width, height)
+        // Create a new PDF document and add a single page
+        using (Document pdfDoc = new Document())
         {
-            Left = left,
-            Top = top,
-            // Title property expects a TextFragment, not a raw string
-            Title = new TextFragment(title)
-        };
+            Page page = pdfDoc.Pages.Add();
 
-        // Add a light‑gray rectangle as a background shape
-        var rect = new Aspose.Pdf.Drawing.Rectangle(
-            10f,
-            10f,
-            (float)(width - 20),
-            (float)(height - 20));
-        rect.GraphInfo = new GraphInfo
-        {
-            FillColor = Color.LightGray,
-            Color = Color.Black,
-            LineWidth = 1f
-        };
-        graph.Shapes.Add(rect);
+            // Use A4 size for simplicity (points: 595 x 842)
+            page.PageInfo.Width = 595;
+            page.PageInfo.Height = 842;
 
-        // Add a red diagonal line across the rectangle
-        float[] linePoints =
-        {
-            10f,
-            10f,
-            (float)(width - 10),
-            (float)(height - 10)
-        };
-        Line line = new Line(linePoints);
-        line.GraphInfo = new GraphInfo
-        {
-            Color = Color.Red,
-            LineWidth = 2f
-        };
-        graph.Shapes.Add(line);
+            // Calculate cell dimensions for a 2x2 grid
+            double cellWidth  = page.PageInfo.Width  / 2.0;
+            double cellHeight = page.PageInfo.Height / 2.0;
 
-        // Place the graph on the page
-        page.Paragraphs.Add(graph);
+            // Place each graph in its grid cell
+            for (int i = 0; i < graphPaths.Length; i++)
+            {
+                // Determine row (0 or 1) and column (0 or 1)
+                int row = i / 2;      // 0 = top, 1 = bottom
+                int col = i % 2;      // 0 = left, 1 = right
+
+                // Compute lower‑left corner of the cell (Aspose.Pdf uses lower‑left origin)
+                double llx = col * cellWidth;
+                double lly = page.PageInfo.Height - ((row + 1) * cellHeight);
+
+                // Create an ImageStamp for the graph
+                ImageStamp imgStamp = new ImageStamp(graphPaths[i])
+                {
+                    // Fit the image inside the cell while preserving aspect ratio
+                    Width  = cellWidth,
+                    Height = cellHeight,
+                    // Align to the lower‑left corner of the cell
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment   = VerticalAlignment.Bottom,
+                    // Offset from the page origin to the cell's lower‑left corner
+                    XIndent = (float)llx,
+                    YIndent = (float)lly,
+                    // Do not place the image behind page content
+                    Background = false
+                };
+
+                // Add the stamp to the page
+                page.AddStamp(imgStamp);
+            }
+
+            // Save the resulting PDF
+            const string outputPath = "combined_graphs.pdf";
+            pdfDoc.Save(outputPath);
+            Console.WriteLine($"PDF saved to '{outputPath}'.");
+        }
     }
 }

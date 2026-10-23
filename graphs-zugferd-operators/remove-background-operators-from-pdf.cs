@@ -1,61 +1,46 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Operators; // contains operator types like FillStroke, etc.
+using Aspose.Pdf.Operators; // contains operator classes like Do
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "cleaned.pdf";
 
-        // Ensure the input file exists – create a minimal placeholder if it does not.
         if (!File.Exists(inputPath))
         {
-            using (var placeholder = new Document())
-            {
-                placeholder.Pages.Add();
-                placeholder.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Wrap Document in a using block for deterministic disposal (rule: document-disposal-with-using)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (page indexing is 1‑based)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate pages using 1‑based indexing (rule: page-indexing-one-based)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                Page page = doc.Pages[i];
+                Page page = doc.Pages[pageNum];
+                // OperatorCollection is also 1‑based (rule: operator-collection-1based)
+                var ops = page.Contents;
 
-                // Get the collection of operators in the page's content stream
-                OperatorCollection ops = page.Contents;
-
-                // Collect operators that render unwanted background graphics.
-                // Example: remove all FillStroke (operator "B") occurrences.
-                List<Operator> toDelete = new List<Operator>();
-                foreach (Operator op in ops)
+                // Delete unwanted operators (e.g., Do – XObject painting) while iterating backwards
+                // (rule: delete-operators-iterate-backwards)
+                for (int i = ops.Count; i >= 1; i--)
                 {
-                    if (op is FillStroke) // "B" operator – fill and stroke path
-                        toDelete.Add(op);
-                    // Add other operator type checks here if needed, e.g.:
-                    // else if (op is Fill) { ... }
-                    // else if (op is Stroke) { ... }
-                }
-
-                // Delete the collected operators from the content stream.
-                if (toDelete.Count > 0)
-                {
-                    // Delete(Operator[]) overload
-                    ops.Delete(toDelete.ToArray());
+                    if (ops[i] is Do) // correct class name, not DoOperator
+                    {
+                        ops.Delete(i); // use Delete, not RemoveAt
+                    }
                 }
             }
 
-            // Save the modified PDF (lifecycle rule: save inside using block)
+            // Save the modified PDF (no special SaveOptions needed)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Background operators removed. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Background graphics removed. Saved to '{outputPath}'.");
     }
 }

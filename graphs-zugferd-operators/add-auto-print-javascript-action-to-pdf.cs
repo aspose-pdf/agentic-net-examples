@@ -10,23 +10,23 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output_with_print.pdf";
 
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Attach a JavaScript action that opens the print dialog when the PDF is opened
-            // The script "this.print(true);" triggers the print dialog automatically
             doc.OpenAction = new JavascriptAction("this.print(true);");
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with auto‑print action: '{outputPath}'");
+        Console.WriteLine($"PDF saved with auto‑print JavaScript to '{outputPath}'.");
     }
 }

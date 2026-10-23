@@ -7,40 +7,50 @@ class Program
 {
     static void Main()
     {
-        // Directory containing the PDF file
-        string dataDir = @"C:\Data\";
-        // PDF file name
-        string pdfFile = "sample.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPng = "page1.png";
+        const int pageNumber = 1; // 1‑based page index
 
-        string pdfPath = Path.Combine(dataDir, pdfFile);
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDocument = new Document(pdfPath))
+        try
         {
-            // Create a Resolution object for 300 DPI
-            Resolution resolution = new Resolution(300);
-            // Initialize the PNG device with the desired resolution
-            PngDevice pngDevice = new PngDevice(resolution);
-
-            // Iterate over all pages (1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+            // Load PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                // Output PNG file path for the current page
-                string outPath = Path.Combine(dataDir, $"page{pageNumber}.png");
-
-                // Convert the page to PNG and write to a file stream
-                using (FileStream pngStream = new FileStream(outPath, FileMode.Create))
+                // Verify requested page exists (pages are 1‑based)
+                if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
                 {
-                    pngDevice.Process(pdfDocument.Pages[pageNumber], pngStream);
+                    Console.Error.WriteLine($"Page {pageNumber} out of range (1‑{pdfDoc.Pages.Count}).");
+                    return;
                 }
 
-                Console.WriteLine($"Page {pageNumber} saved as PNG to: {outPath}");
+                // Set 300 DPI resolution
+                Resolution resolution = new Resolution(300);
+                // Create PNG device with the desired resolution
+                PngDevice pngDevice = new PngDevice(resolution);
+
+                // Convert the specified page to PNG
+                using (FileStream outStream = new FileStream(outputPng, FileMode.Create))
+                {
+                    pngDevice.Process(pdfDoc.Pages[pageNumber], outStream);
+                }
             }
+
+            Console.WriteLine($"Page {pageNumber} saved as PNG at '{outputPng}' (300 DPI).");
+        }
+        catch (TypeInitializationException)
+        {
+            // Image conversion relies on GDI+ and is Windows‑only
+            Console.WriteLine("Image conversion requires Windows (GDI+). Skipped on this platform.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

@@ -1,60 +1,97 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms;          // Form fields (TextBoxField, CheckboxField, etc.)
+using Aspose.Pdf.Annotations;    // JavascriptAction
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "checkbox_hide_field.pdf";
+        // Paths – adjust as needed
+        const string inputPath  = "input.pdf";          // Existing PDF with form fields (optional)
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document())
+        // If the source PDF does not exist, create a new one with the required fields
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            // Create a new PDF document
+            using (Document doc = new Document())
+            {
+                // Add a single page
+                Page page = doc.Pages.Add();
 
-            // -------------------------------------------------
-            // Create the checkbox that will control visibility
-            // -------------------------------------------------
-            // Rectangle: left, bottom, right, top
-            Aspose.Pdf.Rectangle chkRect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
-            CheckboxField chkHide = new CheckboxField(page, chkRect);
-            chkHide.Name = "chkHide";               // field name used in JavaScript
-            chkHide.AlternateName = "Show/Hide Field";
-            chkHide.Checked = false;                // initially unchecked
-            doc.Form.Add(chkHide);
+                // ----- Target field (the field to hide/show) -----
+                // Rectangle: lower‑left X/Y, upper‑right X/Y (1‑based page coordinates)
+                Aspose.Pdf.Rectangle targetRect = new Aspose.Pdf.Rectangle(100, 600, 300, 620);
+                TextBoxField targetField = new TextBoxField(page, targetRect)
+                {
+                    PartialName = "targetField",
+                    Value       = "Sample text"
+                };
+                doc.Form.Add(targetField);
 
-            // -------------------------------------------------
-            // Create the target field that will be hidden/shown
-            // -------------------------------------------------
-            Aspose.Pdf.Rectangle txtRect = new Aspose.Pdf.Rectangle(100, 650, 300, 680);
-            TextBoxField txtTarget = new TextBoxField(page, txtRect);
-            txtTarget.Name = "txtTarget";
-            txtTarget.AlternateName = "Target Text Field";
-            txtTarget.Contents = "This field is hidden when the box is unchecked.";
-            doc.Form.Add(txtTarget);
+                // ----- Checkbox field (controller) -----
+                Aspose.Pdf.Rectangle checkRect = new Aspose.Pdf.Rectangle(100, 650, 120, 670);
+                CheckboxField checkBox = new CheckboxField(page, checkRect)
+                {
+                    PartialName = "myCheckBox",
+                    // Initial state: unchecked (value = "Off")
+                    Checked = false
+                };
+                doc.Form.Add(checkBox);
 
-            // -------------------------------------------------
-            // Attach JavaScript to the checkbox to toggle visibility
-            // -------------------------------------------------
-            // The script checks the checkbox value; "Off" means unchecked.
-            // It sets the display property of the target field accordingly.
-            string js = @"
-if (event.target.value == 'Off') {
-    this.getField('txtTarget').display = display.hidden;
-} else {
-    this.getField('txtTarget').display = display.visible;
+                // JavaScript that hides the target field when the checkbox is unchecked
+                // and shows it when checked. The field name must match the PartialName above.
+                string js = @"if (event.target.value == 'Off')
+{
+    this.getField('targetField').display = display.hidden;
+}
+else
+{
+    this.getField('targetField').display = display.visible;
 }";
-            // Assign the script to a valid action property (OnCalculate) of the checkbox
-            chkHide.Actions.OnCalculate = new JavascriptAction(js);
+                // Assign the script to the mouse‑press event (valid action property)
+                checkBox.Actions.OnPressMouseBtn = new JavascriptAction(js);
 
-            // Save the PDF
+                // Save the newly created PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Created PDF with interactive fields: '{outputPath}'");
+            return;
+        }
+
+        // ----- Existing PDF path -----
+        // Load the existing PDF, locate the checkbox, and attach the JavaScript action.
+        using (Document doc = new Document(inputPath))
+        {
+            // Retrieve the checkbox by its partial name. Adjust the name if different.
+            CheckboxField checkBox = doc.Form["myCheckBox"] as CheckboxField;
+
+            if (checkBox == null)
+            {
+                Console.Error.WriteLine("Checkbox field 'myCheckBox' not found in the document.");
+                return;
+            }
+
+            // JavaScript identical to the one used during creation.
+            string js = @"if (event.target.value == 'Off')
+{
+    this.getField('targetField').display = display.hidden;
+}
+else
+{
+    this.getField('targetField').display = display.visible;
+}";
+
+            // Attach the script to the mouse‑press event.
+            checkBox.Actions.OnPressMouseBtn = new JavascriptAction(js);
+
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to: '{outputPath}'");
     }
 }

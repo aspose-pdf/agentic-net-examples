@@ -2,66 +2,52 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class ExportSelectedPages
+class Program
 {
     static void Main()
     {
-        // Input PDF file
         const string inputPath = "input.pdf";
-
-        // Folder where individual pages will be saved
         const string outputFolder = "ExportedPages";
 
-        // Page numbers to export (1‑based indexing)
-        int[] selectedPages = { 1, 3, 5 }; // example: export pages 1, 3 and 5
+        // Pages to export – use 1‑based indices as Aspose.Pdf expects.
+        int[] pagesToExport = { 2, 4, 5 }; // example selection
 
-        // Validate input file
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists.
         Directory.CreateDirectory(outputFolder);
 
-        try
+        // Load the source PDF. Document is wrapped in a using block (lifecycle rule).
+        using (Document srcDoc = new Document(inputPath))
         {
-            // Load the source PDF (using block ensures proper disposal)
-            using (Document sourceDoc = new Document(inputPath))
+            // Iterate over the requested page numbers.
+            foreach (int pageNum in pagesToExport)
             {
-                int totalPages = sourceDoc.Pages.Count;
-
-                foreach (int pageNumber in selectedPages)
+                // Validate the page number against the source document.
+                if (pageNum < 1 || pageNum > srcDoc.Pages.Count)
                 {
-                    // Validate page number (Aspose.Pdf uses 1‑based indexing)
-                    if (pageNumber < 1 || pageNumber > totalPages)
-                    {
-                        Console.Error.WriteLine($"Page {pageNumber} is out of range (1‑{totalPages}). Skipping.");
-                        continue;
-                    }
+                    Console.Error.WriteLine($"Page {pageNum} is out of range (1‑{srcDoc.Pages.Count}). Skipping.");
+                    continue;
+                }
 
-                    // Create a new PDF document for the single page
-                    using (Document singlePageDoc = new Document())
-                    {
-                        // Add the selected page; this copies the page preserving size and orientation
-                        singlePageDoc.Pages.Add(sourceDoc.Pages[pageNumber]);
+                // Create a new PDF that will contain only this page.
+                using (Document singlePageDoc = new Document())
+                {
+                    // Add the selected page. The page is cloned, preserving its size and orientation.
+                    singlePageDoc.Pages.Add(srcDoc.Pages[pageNum]);
 
-                        // Build output file name
-                        string outputPath = Path.Combine(
-                            outputFolder,
-                            $"{Path.GetFileNameWithoutExtension(inputPath)}_page_{pageNumber}.pdf");
+                    // Build the output file name.
+                    string outPath = Path.Combine(outputFolder, $"Page_{pageNum}.pdf");
 
-                        // Save the single‑page PDF
-                        singlePageDoc.Save(outputPath);
-                        Console.WriteLine($"Exported page {pageNumber} to '{outputPath}'.");
-                    }
+                    // Save the single‑page PDF.
+                    singlePageDoc.Save(outPath);
+                    Console.WriteLine($"Exported page {pageNum} to '{outPath}'.");
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }
