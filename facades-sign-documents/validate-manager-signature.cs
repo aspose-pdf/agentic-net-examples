@@ -1,27 +1,32 @@
 using System;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf"; // PDF containing the 'ManagerSignature' field
+        const string pdfPath = "input.pdf";
+        const string signatureField = "ManagerSignature";
 
-        if (!System.IO.File.Exists(inputPdf))
+        // Ensure the PDF file exists before attempting verification
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF and bind it to the PdfFileSignature facade
-        using (PdfFileSignature pdfSignature = new PdfFileSignature())
-        {
-            pdfSignature.BindPdf(inputPdf);
+        // PdfFileSignature does not implement IDisposable, so no using block is required
+        PdfFileSignature signer = new PdfFileSignature();
 
-            // Verify the integrity of the signature named 'ManagerSignature'
-            bool isSignatureValid = pdfSignature.VerifySignature("ManagerSignature");
+        // Bind the PDF document to the signature handler
+        signer.BindPdf(pdfPath);
 
-            Console.WriteLine($"Signature 'ManagerSignature' valid: {isSignatureValid}");
-        }
+        // Verify the integrity of the specified signature field
+        // VerifySignature returns true if the signature is valid, false otherwise
+        bool isSignatureValid = signer.VerifySignature(signatureField);
+
+        // Output the verification result
+        Console.WriteLine($"Signature field '{signatureField}' validation result: {isSignatureValid}");
     }
 }

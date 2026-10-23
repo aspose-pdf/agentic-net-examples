@@ -1,41 +1,56 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "signed_document.pdf";
+        const string pdfPath = "signed.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF with the PdfFileSignature facade
-        using (PdfFileSignature pdfSignature = new PdfFileSignature())
+        // Load the PDF document
+        Document pdfDoc = new Document(pdfPath);
+
+        // Verify that the document contains a form
+        if (pdfDoc.Form == null)
         {
-            pdfSignature.BindPdf(inputPdf);
+            Console.WriteLine("The PDF does not contain any form.");
+            return;
+        }
 
-            // Retrieve all non‑empty signature names
-            var signatureNames = pdfSignature.GetSignatureNames();
+        // Verify that the form contains fields
+        if (pdfDoc.Form.Fields == null || !pdfDoc.Form.Fields.Any())
+        {
+            Console.WriteLine("No form fields (including signature fields) found in the PDF.");
+            return;
+        }
 
-            foreach (var sigName in signatureNames)
+        // Iterate over each form field and process signature fields
+        foreach (var field in pdfDoc.Form.Fields)
+        {
+            if (field is SignatureField sigField)
             {
-                // Try to extract the X.509 certificate associated with the signature
-                if (pdfSignature.TryExtractCertificate(sigName, out X509Certificate2 certificate))
+                // Extract the certificate associated with the signature field
+                X509Certificate2 cert = sigField.ExtractCertificateObject();
+
+                Console.WriteLine($"Signature Field: {sigField.PartialName}");
+                if (cert != null)
                 {
-                    Console.WriteLine($"Signature: {sigName}");
-                    Console.WriteLine($"  Issuer: {certificate.Issuer}");
-                    Console.WriteLine($"  Expiration: {certificate.NotAfter}");
+                    Console.WriteLine($"  Issuer          : {cert.Issuer}");
+                    Console.WriteLine($"  Expiration Date: {cert.NotAfter}");
                 }
                 else
                 {
-                    Console.WriteLine($"Signature: {sigName} – no certificate found.");
+                    Console.WriteLine("  No certificate associated with this signature.");
                 }
             }
         }

@@ -1,43 +1,45 @@
 using System;
 using System.Collections.Generic;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "signed.pdf";
+        const string pdfPath = "signed_document.pdf";
 
-        if (!System.IO.File.Exists(inputPath))
+        if (!System.IO.File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Bind the PDF to the signature facade
+            PdfFileSignature signatureFacade = new PdfFileSignature();
+            signatureFacade.BindPdf(pdfPath);
+
+            // Retrieve all signature names (true = include inactive signatures)
+            IList<SignatureName> signatureNames = signatureFacade.GetSignatureNames(true);
+
+            if (signatureNames == null || signatureNames.Count == 0)
             {
-                // Initialize the signature facade on the loaded document
-                PdfFileSignature pdfSign = new PdfFileSignature(doc);
+                Console.WriteLine("No signatures were found in the document.");
+                return;
+            }
 
-                // Retrieve all non‑empty signature names
-                IList<SignatureName> names = pdfSign.GetSignatureNames();
-
-                // Iterate through each signature and verify it
-                foreach (SignatureName sigName in names)
-                {
-                    // VerifySigned expects the signature name as a string, not the SignatureName object
-                    bool isValid = pdfSign.VerifySigned(sigName.Name);
-                    Console.WriteLine($"Signature: {sigName.Name}  Valid: {isValid}");
-                }
+            // Verify each signature using VerifySigned and report its status
+            foreach (SignatureName sigName in signatureNames)
+            {
+                // VerifySigned expects the signature name as a string, not the SignatureName object
+                bool isValid = signatureFacade.VerifySigned(sigName.Name);
+                Console.WriteLine($"Signature '{sigName.Name}': {(isValid ? "Valid" : "Invalid")}");
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during verification: {ex.Message}");
         }
     }
 }

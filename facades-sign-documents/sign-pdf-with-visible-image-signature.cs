@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -7,62 +8,62 @@ class Program
     static void Main(string[] args)
     {
         // Expect two arguments: input PDF path and signature image path
-        if (args.Length < 2)
+        if (args.Length != 2)
         {
-            Console.Error.WriteLine("Usage: <app> <input-pdf> <signature-image>");
+            Console.Error.WriteLine("Usage: <app> <pdfPath> <signatureImagePath>");
             return;
         }
 
-        string inputPdf = args[0];
-        string signatureImage = args[1];
+        string pdfPath = args[0];
+        string imagePath = args[1];
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        if (!File.Exists(signatureImage))
+        if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Signature image not found: {signatureImage}");
+            Console.Error.WriteLine($"Signature image file not found: {imagePath}");
             return;
         }
 
-        // Prepare output file name (e.g., original name with "_signed.pdf")
-        string outputPdf = Path.Combine(
-            Path.GetDirectoryName(inputPdf) ?? string.Empty,
-            Path.GetFileNameWithoutExtension(inputPdf) + "_signed.pdf");
+        // Prepare output file name
+        string outputPath = Path.Combine(
+            Path.GetDirectoryName(pdfPath) ?? string.Empty,
+            Path.GetFileNameWithoutExtension(pdfPath) + "_signed.pdf");
 
         try
         {
-            // Use PdfFileSignature facade to add a visible signature appearance
-            using (PdfFileSignature pdfSign = new PdfFileSignature())
+            // Create an ImageStamp for the signature image
+            ImageStamp signatureStamp = new ImageStamp(imagePath)
             {
-                // Bind the source PDF
-                pdfSign.BindPdf(inputPdf);
+                // Position the stamp at the bottom‑right corner of the page
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                // Use individual margin properties instead of a non‑existent Margin object
+                BottomMargin = 20,
+                RightMargin  = 20,
+                // Set opacity if desired (1.0 = fully opaque)
+                Opacity = 1.0
+            };
 
-                // Set the image that will be shown as the signature appearance
-                pdfSign.SignatureAppearance = signatureImage;
+            // Load the PDF document
+            using (Document doc = new Document(pdfPath))
+            {
+                // Iterate through all pages (1‑based indexing) and stamp each page
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    Page page = doc.Pages[i];
+                    page.AddStamp(signatureStamp);
+                }
 
-                // Define the rectangle where the signature will be placed (in points)
-                // System.Drawing.Rectangle is required by the API
-                System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 200, 100);
-
-                // Add a visible signature on page 1.
-                // Reason, contact and location are optional strings.
-                pdfSign.Sign(
-                    page: 1,
-                    SigReason: "Signed by application",
-                    SigContact: "",
-                    SigLocation: "",
-                    visible: true,
-                    annotRect: rect);
-
-                // Save the signed PDF
-                pdfSign.Save(outputPdf);
+                // Save the modified document
+                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Signed PDF saved to: {outputPdf}");
+            Console.WriteLine($"Signature image applied. Output saved to: {outputPath}");
         }
         catch (Exception ex)
         {
