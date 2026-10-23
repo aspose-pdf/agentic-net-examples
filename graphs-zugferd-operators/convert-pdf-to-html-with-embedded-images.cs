@@ -6,38 +6,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputHtml = "output.html";
+        const string inputPdfPath = "input.pdf";
+        const string outputHtmlPath = "output.html";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdf))
+            // Configure HTML save options to embed all resources (including images) directly into the HTML file
+            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
             {
-                // Configure HTML conversion options
-                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
-                {
-                    // Embed all resources (CSS, fonts, images) directly into the HTML file
-                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                    // Embed raster images as Base64‑encoded PNG inside SVG wrappers
-                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
-                };
+                // Embed all parts (CSS, fonts, images) into the single HTML output as Base64 data URIs
+                PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                // Ensure the output is a single HTML file (no page splitting)
+                SplitIntoPages = false
+            };
 
-                // Save as HTML with the specified options
-                pdfDoc.Save(outputHtml, htmlOpts);
+            // HTML conversion relies on GDI+ and is Windows‑only; handle possible exceptions on other platforms
+            try
+            {
+                pdfDoc.Save(outputHtmlPath, htmlOpts);
+                Console.WriteLine($"PDF successfully converted to HTML with embedded images: {outputHtmlPath}");
             }
-
-            Console.WriteLine($"PDF successfully converted to HTML with embedded images: '{outputHtml}'");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            catch (TypeInitializationException)
+            {
+                Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped on this platform.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error during HTML conversion: {ex.Message}");
+            }
         }
     }
 }

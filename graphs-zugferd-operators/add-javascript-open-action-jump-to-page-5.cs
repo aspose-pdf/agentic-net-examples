@@ -16,19 +16,16 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // JavaScript that jumps to page 5 when the document opens
-            JavascriptAction openJs = new JavascriptAction("this.pageNum = 5;");
+            // JavaScript open action: jump to page 5 (zero‑based index 4)
+            doc.OpenAction = new JavascriptAction("this.pageNum = 4;");
 
-            // Set the JavaScript as the document's open action
-            doc.OpenAction = openJs;
-
-            // Save the updated PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved PDF with open action to '{outputPath}'.");
+        Console.WriteLine($"PDF with open action saved to '{outputPath}'.");
     }
 }

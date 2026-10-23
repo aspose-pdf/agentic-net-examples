@@ -5,88 +5,73 @@ using System.Drawing.Printing;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
-class PrintPdfRange
+class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
+        // UNC path to the network printer
+        const string printerName = @"\\PrintServer\\NetworkPrinter";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
-        using (Document doc = new Document(pdfPath))
+        try
         {
-            // Set the document‑level duplex option (used by the print dialog).
-            doc.Duplex = PrintDuplex.DuplexFlipLongEdge; // long‑edge binding for double‑sided printing
-
-            // Configure printer settings for a network printer.
-            var printerSettings = new PrinterSettings
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Specify the network printer (use either PrinterName or PrinterUri).
-                PrinterName = @"\\PrintServer\\NetworkPrinter",
-                // Set duplex mode for the printer (vertical = long‑edge binding).
-                Duplex = Duplex.Vertical,
-                // Define the page range to print (pages 2 through 5, inclusive).
-                PrintRange = PrintRange.SomePages,
-                FromPage = 2,
-                ToPage = 5
-            };
+                // Define the page range to print (inclusive)
+                const int startPage = 2;
+                const int endPage   = 5;
+                int currentPage = startPage;
 
-            // Set the desired paper size (A4 in hundredths of an inch).
-            printerSettings.DefaultPageSettings.PaperSize =
-                new PaperSize("A4", 827, 1169); // 8.27 in × 11.69 in
-
-            // Use System.Drawing.Printing.PrintDocument to send the pages to the printer.
-            using (PrintDocument printDoc = new PrintDocument())
-            {
-                printDoc.PrinterSettings = printerSettings;
-                // Ensure the PrintDocument uses the same paper size.
-                printDoc.DefaultPageSettings.PaperSize = printerSettings.DefaultPageSettings.PaperSize;
-
-                int currentPage = printerSettings.FromPage;
-                int lastPage = printerSettings.ToPage;
-
-                printDoc.PrintPage += (sender, e) =>
+                // Configure the .NET PrintDocument with duplex mode and A4 paper size
+                using (PrintDocument printDoc = new PrintDocument())
                 {
-                    if (currentPage > lastPage)
-                    {
-                        e.HasMorePages = false;
-                        return;
-                    }
+                    printDoc.PrinterSettings.PrinterName = printerName;
+                    // DuplexFlipLongEdge corresponds to vertical duplex in System.Drawing.Printing
+                    printDoc.PrinterSettings.Duplex = Duplex.Vertical;
+                    // A4 size in hundredths of an inch (8.27" x 11.69")
+                    printDoc.DefaultPageSettings.PaperSize = new PaperSize("A4", 827, 1169);
 
-                    // Render the current PDF page to a PNG image in memory.
-                    using (var ms = new MemoryStream())
+                    // Event handler that renders each PDF page to an image and draws it on the printer graphics
+                    printDoc.PrintPage += (sender, e) =>
                     {
-                        var pngDevice = new PngDevice();
-                        pngDevice.Process(doc.Pages[currentPage], ms);
-                        ms.Position = 0;
-                        // Fully qualify System.Drawing.Image to avoid ambiguity with Aspose.Pdf.Image.
-                        using (var img = System.Drawing.Image.FromStream(ms))
+                        // Render the current PDF page to a PNG image in memory
+                        using (MemoryStream ms = new MemoryStream())
                         {
-                            // Scale the image to fit the printable area while preserving aspect ratio.
-                            RectangleF printableArea = e.PageBounds;
-                            float scale = Math.Min(printableArea.Width / img.Width, printableArea.Height / img.Height);
-                            float imgWidth = img.Width * scale;
-                            float imgHeight = img.Height * scale;
-                            float posX = printableArea.X + (printableArea.Width - imgWidth) / 2f;
-                            float posY = printableArea.Y + (printableArea.Height - imgHeight) / 2f;
-                            e.Graphics.DrawImage(img, posX, posY, imgWidth, imgHeight);
+                            // 300 DPI gives good print quality; adjust as needed
+                            var pngDevice = new PngDevice(new Resolution(300));
+                            pngDevice.Process(doc.Pages[currentPage], ms);
+                            ms.Position = 0;
+
+                            using (System.Drawing.Image img = System.Drawing.Image.FromStream(ms))
+                            {
+                                // Fit the image into the printable area while preserving aspect ratio
+                                System.Drawing.Rectangle marginBounds = e.MarginBounds;
+                                e.Graphics.DrawImage(img, marginBounds);
+                            }
                         }
-                    }
 
-                    currentPage++;
-                    e.HasMorePages = currentPage <= lastPage;
-                };
+                        // Move to the next page and indicate whether more pages remain
+                        currentPage++;
+                        e.HasMorePages = currentPage <= endPage;
+                    };
 
-                // Submit the print job.
-                printDoc.Print();
+                    // Send the job to the printer
+                    printDoc.Print();
+                }
             }
-        }
 
-        Console.WriteLine("Print job submitted.");
+            Console.WriteLine("Print job submitted successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

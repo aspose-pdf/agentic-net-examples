@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // for JavascriptAction
 
 class Program
 {
@@ -15,60 +15,81 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // ---------- Document‑level JavaScript ----------
-            Console.WriteLine("Document‑level JavaScript actions:");
-            if (doc.JavaScript != null && doc.JavaScript.Keys != null)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                foreach (string key in doc.JavaScript.Keys)
+                // ----- Document‑level JavaScript actions -----
+                Console.WriteLine("Document‑level JavaScript actions:");
+                bool docHasJs = false;
+
+                // 1. OpenAction (executed when the document is opened)
+                if (doc.OpenAction is JavascriptAction docOpenJs)
                 {
-                    string script = doc.JavaScript[key];
-                    Console.WriteLine($"- [{key}] {script}");
+                    docHasJs = true;
+                    Console.WriteLine("- OpenAction:");
+                    Console.WriteLine(docOpenJs.Script);
+                    Console.WriteLine();
                 }
-            }
 
-            // Document actions (Open / Close) may also contain JavaScript
-            PrintIfJavascript("Open", doc.OpenAction);
-
-            // CloseAction may not exist in older versions – use reflection and treat it as IAppointment
-            var closeProp = doc.GetType().GetProperty("CloseAction");
-            if (closeProp != null)
-            {
-                var closeAction = closeProp.GetValue(doc) as IAppointment;
-                PrintIfJavascript("Close", closeAction);
-            }
-
-            // ---------- Page‑level JavaScript ----------
-            Console.WriteLine("\nPage‑level JavaScript actions:");
-            foreach (Page page in doc.Pages)
-            {
-                var pageActions = page.Actions; // PageActionCollection
-                if (pageActions != null)
+                // 2. Named JavaScript entries (doc.JavaScript collection)
+                if (doc.JavaScript != null && doc.JavaScript.Keys.Count > 0)
                 {
-                    PrintPageIfJavascript(page.Number, "OnOpen",  pageActions.OnOpen);
-                    PrintPageIfJavascript(page.Number, "OnClose", pageActions.OnClose);
+                    foreach (string key in doc.JavaScript.Keys)
+                    {
+                        string script = doc.JavaScript[key];
+                        docHasJs = true;
+                        Console.WriteLine($"- Named script '{key}':");
+                        Console.WriteLine(script);
+                        Console.WriteLine();
+                    }
+                }
+
+                if (!docHasJs)
+                {
+                    Console.WriteLine("  None.");
+                }
+
+                // ----- Page‑level JavaScript actions -----
+                foreach (Page page in doc.Pages)
+                {
+                    bool pageHasJs = false;
+
+                    // OnOpen action
+                    if (page.Actions.OnOpen is JavascriptAction onOpenJs)
+                    {
+                        if (!pageHasJs)
+                        {
+                            Console.WriteLine($"Page {page.Number} JavaScript actions:");
+                            pageHasJs = true;
+                        }
+                        Console.WriteLine("- OnOpen:");
+                        Console.WriteLine(onOpenJs.Script);
+                        Console.WriteLine();
+                    }
+
+                    // OnClose action
+                    if (page.Actions.OnClose is JavascriptAction onCloseJs)
+                    {
+                        if (!pageHasJs)
+                        {
+                            Console.WriteLine($"Page {page.Number} JavaScript actions:");
+                            pageHasJs = true;
+                        }
+                        Console.WriteLine("- OnClose:");
+                        Console.WriteLine(onCloseJs.Script);
+                        Console.WriteLine();
+                    }
+
+                    // Uncomment the following line if you want to list pages without scripts
+                    // if (!pageHasJs) Console.WriteLine($"Page {page.Number} has no JavaScript actions.");
                 }
             }
         }
-    }
-
-    // Helper to output a document‑level action if it is a JavaScript action
-    static void PrintIfJavascript(string actionName, IAppointment action)
-    {
-        if (action is JavascriptAction js && !string.IsNullOrEmpty(js.Script))
+        catch (Exception ex)
         {
-            Console.WriteLine($"{actionName} JavaScript: {js.Script}");
-        }
-    }
-
-    // Helper to output a page‑level action if it is a JavaScript action
-    static void PrintPageIfJavascript(int pageNumber, string actionName, PdfAction action)
-    {
-        if (action is JavascriptAction js && !string.IsNullOrEmpty(js.Script))
-        {
-            Console.WriteLine($"Page {pageNumber} {actionName} JavaScript: {js.Script}");
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string language   = "en-US";
+        const string language = "en-US";
 
         if (!File.Exists(inputPath))
         {
@@ -17,26 +17,22 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document within a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the existing PDF
-            using (Document doc = new Document(inputPath))
-            {
-                // Access tagged content and set the document language
-                ITaggedContent tagged = doc.TaggedContent;
-                tagged.SetLanguage(language);
-                // Optionally set a title for the PDF
-                tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+            // Obtain the tagged content interface
+            ITaggedContent tagged = doc.TaggedContent;
 
-                // Save the modified PDF
-                doc.Save(outputPath);
-            }
+            // Set the primary language of the document (helps screen readers)
+            tagged.SetLanguage(language);
 
-            Console.WriteLine($"Document language set to '{language}' and saved as '{outputPath}'.");
+            // Optional: set a title (write‑only)
+            // tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+
+            // Save the updated PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Language set to '{language}' and saved to '{outputPath}'.");
     }
 }

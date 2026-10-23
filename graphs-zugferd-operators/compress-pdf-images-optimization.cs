@@ -1,45 +1,42 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Optimization;
+using Aspose.Pdf.Optimization; // Core optimization namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_compressed.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "compressed_output.pdf";
 
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Error: File not found – {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDoc = new Document(inputPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Create optimization options
-            OptimizationOptions opt = new OptimizationOptions();
-
-            // Enable image compression and set quality
+            // Configure optimization options for image compression and cleanup.
+            // ImageQuality: 0‑100 (higher = better quality, larger size). 75 is a good trade‑off.
+            // MaxResolution: DPI limit for raster images after compression. 150 DPI keeps visual fidelity.
+            OptimizationOptions opt = OptimizationOptions.All();
             opt.ImageCompressionOptions.CompressImages = true;
-            opt.ImageCompressionOptions.ImageQuality = 75; // 0-100, higher = better quality
-            opt.ImageCompressionOptions.ResizeImages = true;
-            opt.ImageCompressionOptions.MaxResolution = 150; // DPI, images above this will be downscaled
+            opt.ImageCompressionOptions.ImageQuality   = 75;   // 0‑100
+            opt.ImageCompressionOptions.MaxResolution  = 150;  // DPI
+            opt.RemoveUnusedObjects = true;
+            opt.RemoveUnusedStreams = true;
 
-            // Additional optimizations (optional but helpful)
-            opt.CompressObjects = true;          // Compress PDF object streams
-            opt.RemoveUnusedObjects = true;      // Remove objects not referenced by any page
-            opt.SubsetFonts = true;              // Embed only used glyphs
+            // Apply the optimization to the document.
+            doc.OptimizeResources(opt);
 
-            // Apply the optimization strategy to the document
-            pdfDoc.OptimizeResources(opt);
-
-            // Save the optimized PDF
-            pdfDoc.Save(outputPath);
+            // Save the compressed PDF.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Optimized PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Compressed PDF saved to '{outputPath}'.");
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
@@ -10,30 +11,38 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (using lifecycle rule)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // JavaScript to hide toolbar and menu bar when the document opens
-            string js = "app.toolbar = false; app.menuBar = false;";
+            // Attempt to set viewer preferences (HideToolbar, HideMenubar).
+            // The ViewerPreferences property is available only in newer Aspose.Pdf versions.
+            // Use dynamic access with a try/catch to keep the code compatible with older versions.
+            dynamic dynDoc = doc;
+            try
+            {
+                dynDoc.ViewerPreferences.HideToolbar = true;
+                dynDoc.ViewerPreferences.HideMenubar = true;
+            }
+            catch (RuntimeBinderException)
+            {
+                // ViewerPreferences not supported – silently ignore or log if needed.
+                Console.WriteLine("ViewerPreferences property is not available in the current Aspose.Pdf version.");
+            }
 
-            // Assign the JavaScript as the document's open action
-            doc.OpenAction = new JavascriptAction(js);
+            // Embed JavaScript that runs when the document is opened.
+            // This works on viewers that support JavaScript (e.g., Adobe Acrobat).
+            doc.OpenAction = new JavascriptAction("app.toolbar = false; app.menu = false;");
 
-            // Also set the viewer preference flags directly (optional but reinforces the intent)
-            doc.HideToolBar = true;
-            doc.HideMenubar = true;
-
-            // Save the modified PDF (using lifecycle rule)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with hidden UI to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with hidden toolbar and menu bar: {outputPath}");
     }
 }

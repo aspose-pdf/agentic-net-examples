@@ -6,43 +6,50 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "graph_output.pdf";
+        const string outputPath = "graph.pdf";
 
-        // Create a new PDF document and ensure proper disposal
+        // Document lifecycle must be wrapped in a using block
         using (Document doc = new Document())
         {
-            // Add a blank page to the document
+            // Add a new page to host the vector graphic
             Page page = doc.Pages.Add();
 
-            // Graph constructor now expects double values (float overload is obsolete)
-            Graph graph = new Graph(400.0, 200.0);
+            // Create a Graph container that spans the whole page
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // ----- Example vector shapes -----
-
-            // Use Aspose.Pdf.Drawing.Rectangle for shapes inside a Graph
-            var rect = new Aspose.Pdf.Drawing.Rectangle(50f, 50f, 150f, 100f);
-            rect.GraphInfo = new GraphInfo
+            // Define the points of the simple line graph
+            var points = new (float x, float y)[]
             {
-                FillColor = Color.LightGray,
-                Color = Color.Black,
-                LineWidth = 2f
+                (50, 750),   // Point 1
+                (150, 650),  // Point 2
+                (250, 700),  // Point 3
+                (350, 600),  // Point 4
+                (450, 720)   // Point 5
             };
-            graph.Shapes.Add(rect);
 
-            // Line shape
-            float[] linePoints = { 200f, 150f, 350f, 150f };
-            var line = new Line(linePoints);
-            line.GraphInfo = new GraphInfo
+            // Add a line segment between each consecutive pair of points
+            for (int i = 0; i < points.Length - 1; i++)
             {
-                Color = Color.Red,
-                LineWidth = 1.5f
-            };
-            graph.Shapes.Add(line);
+                Line line = new Line(new float[]
+                {
+                    points[i].x, points[i].y,
+                    points[i + 1].x, points[i + 1].y
+                })
+                {
+                    GraphInfo = new GraphInfo
+                    {
+                        Color = Color.Black,
+                        LineWidth = 1
+                    }
+                };
 
-            // Add the Graph (vector graphic) to the page
+                graph.Shapes.Add(line);
+            }
+
+            // Embed the vector graphic into the page
             page.Paragraphs.Add(graph);
 
-            // Save the PDF – this embeds the vector graphic directly in the page content
+            // Save the PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 

@@ -1,20 +1,21 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class UpdateZugferdAttachment
 {
     static void Main()
     {
-        // Paths for the source PDF, the new ZUGFeRD XML, and the output PDF
-        const string sourcePdfPath   = "invoice_original.pdf";
-        const string newXmlPath      = "invoice_updated.xml";
-        const string outputPdfPath   = "invoice_updated.pdf";
+        // Paths – adjust as needed
+        const string inputPdfPath = "invoice_original.pdf";
+        const string newXmlPath = "invoice_updated.xml";
+        const string outputPdfPath = "invoice_updated.pdf";
 
-        // Verify that the required files exist
-        if (!File.Exists(sourcePdfPath))
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
         if (!File.Exists(newXmlPath))
@@ -23,25 +24,44 @@ class UpdateZugferdAttachment
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Load the existing PDF document (lifecycle rule: use using for deterministic disposal)
-            using (Document pdfDoc = new Document(sourcePdfPath))
+            // ------------------------------------------------------------
+            // Remove any existing ZUGFeRD XML attachment
+            // ------------------------------------------------------------
+            var namesToDelete = new List<string>();
+            foreach (FileSpecification fileSpec in pdfDocument.EmbeddedFiles)
             {
-                // Bind the new XML to the PDF.
-                // The BindXml(string) overload replaces any existing XML attachment
-                // (including a ZUGFeRD invoice) with the supplied file.
-                pdfDoc.BindXml(newXmlPath);
-
-                // Save the modified PDF.  Save(string) writes a PDF regardless of extension.
-                pdfDoc.Save(outputPdfPath);
+                if (!string.IsNullOrEmpty(fileSpec.Name) &&
+                    (fileSpec.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) ||
+                     fileSpec.Name.IndexOf("ZUGFeRD", StringComparison.OrdinalIgnoreCase) >= 0))
+                {
+                    namesToDelete.Add(fileSpec.Name);
+                }
+            }
+            foreach (string name in namesToDelete)
+            {
+                pdfDocument.EmbeddedFiles.Delete(name);
             }
 
-            Console.WriteLine($"ZUGFeRD attachment updated successfully. Output saved to '{outputPdfPath}'.");
+            // ------------------------------------------------------------
+            // Add the new ZUGFeRD XML attachment
+            // ------------------------------------------------------------
+            // FileSpecification constructor (string filePath, string description)
+            var newSpec = new FileSpecification(newXmlPath, "ZUGFeRD invoice data")
+            {
+                // MimeType property does not exist in Aspose.Pdf.FileSpecification; it is omitted.
+            };
+            // Optional: set modification date for completeness
+            newSpec.Params.ModDate = DateTime.UtcNow;
+
+            pdfDocument.EmbeddedFiles.Add(newSpec);
+
+            // Save the modified PDF
+            pdfDocument.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error updating ZUGFeRD attachment: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF with updated ZUGFeRD attachment saved to '{outputPdfPath}'.");
     }
 }

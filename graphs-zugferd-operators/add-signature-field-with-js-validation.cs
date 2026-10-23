@@ -1,54 +1,42 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Forms;          // SignatureField and related form classes
+using Aspose.Pdf.Annotations;    // JavascriptAction and other annotation actions
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "SignedDocument.pdf";
+        const string outputPath = "signed_with_js.pdf";
 
-        // Create a new PDF document
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page
+            // Add a blank page to host the signature field
             Page page = doc.Pages.Add();
 
-            // Define the rectangle for the signature field (left, bottom, right, top)
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the signature field rectangle (llx, lly, urx, ury) using fully qualified type
+            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
 
             // Create the signature field on the page
-            SignatureField sigField = new SignatureField(page, sigRect)
+            SignatureField signatureField = new SignatureField(page, sigRect)
             {
-                // Optional: set a name and tooltip (alternate name)
-                Name = "Signature1",
-                AlternateName = "Please sign here"
+                PartialName = "Signature1"   // internal name of the field
             };
 
-            // Add the signature field to the document's form (AcroForm) collection
-            // NOTE: Form fields must be added via the Document.Form collection, not directly to page.Annotations
-            doc.Form.Add(sigField);
+            // Attach JavaScript that runs when the signature is validated by the user
+            // The OnValidate action is triggered after the user signs the field
+            signatureField.Actions.OnValidate = new JavascriptAction(
+                "app.alert('Signature validated successfully');");
 
-            // Create a JavaScript action that validates the signature when the field is activated
-            // This script runs when the user clicks the signature field
-            JavascriptAction jsAction = new JavascriptAction(
-                "if (event.target.signatureValidate()) {" +
-                "    app.alert('Signature is valid.');" +
-                "} else {" +
-                "    app.alert('Signature validation failed.');" +
-                "}"
-            );
+            // Add the signature field to the document's interactive form
+            doc.Form.Add(signatureField);
 
-            // Attach the JavaScript action to the signature field
-            sigField.ExecuteFieldJavaScript(jsAction);
-
-            // Save the PDF document
+            // Save the PDF; Document.Save without SaveOptions writes a PDF regardless of extension
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with signature field saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with signature field and JavaScript saved to '{outputPath}'.");
     }
 }

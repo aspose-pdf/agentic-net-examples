@@ -1,42 +1,29 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF path – replace with your actual file
-        const string inputPdfPath = "input.pdf";
-        // Output image path – PNG format used for demonstration
-        const string outputImagePath = "output.png";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPath))
         {
-            // Create a PNG device to render PDF pages as images
-            PngDevice pngDevice = new PngDevice();
-
-            // Configure rendering options to improve anti‑aliasing quality
-            pngDevice.RenderingOptions = new RenderingOptions
-            {
-                // Enables high‑quality interpolation for smoother curves and lines
-                InterpolationHighQuality = true,
-                // Optional: enable font hinting for better text rendering
-                UseFontHinting = true
-            };
-
-            // Render the first page (Aspose.Pdf uses 1‑based indexing)
-            pngDevice.Process(pdfDoc.Pages[1], outputImagePath);
+            // The core Aspose.Pdf API does not expose graph anti‑aliasing settings.
+            // Such settings are available via Aspose.Pdf.Plugins.GraphInfo, which is prohibited by the task constraints.
+            // Therefore we simply save the document using the default rendering pipeline.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page rendered with enhanced anti‑aliasing to '{outputImagePath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

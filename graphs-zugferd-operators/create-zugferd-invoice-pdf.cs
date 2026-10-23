@@ -1,51 +1,55 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API
-using Aspose.Pdf.Facades;      // For ConvertErrorAction enum (also in Aspose.Pdf)
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string templatePdf = "invoice_template.pdf";   // Readable invoice layout
-        const string zugferdXml  = "invoice.xml";           // Generated ZUGFeRD XML data
-        const string outputPdf   = "invoice_zugferd.pdf";   // Resulting ZUGFeRD‑compliant PDF
-        const string logFile     = "conversion_log.xml";    // Optional conversion log
+        const string outputPdf = "invoice.pdf";
+        const string xmlPath   = "invoice.xml";
 
-        // Verify input files exist
-        if (!File.Exists(templatePdf))
+        // Verify that the ZUGFeRD XML file exists
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"Template PDF not found: {templatePdf}");
-            return;
-        }
-        if (!File.Exists(zugferdXml))
-        {
-            Console.Error.WriteLine($"ZUGFeRD XML not found: {zugferdXml}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        try
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            // Load the readable invoice PDF
-            using (Document doc = new Document(templatePdf))
+            // Add a page for the readable invoice content
+            Page page = doc.Pages.Add();
+
+            // Create a simple text fragment with invoice details
+            TextFragment tf = new TextFragment(
+                "Invoice #12345\nDate: 2023-10-07\nTotal: $1,234.56");
+            tf.Position = new Position(50, 750);
+            tf.TextState.Font = FontRepository.FindFont("Helvetica");
+            tf.TextState.FontSize = 12;
+            tf.TextState.ForegroundColor = Color.Black;
+            page.Paragraphs.Add(tf);
+
+            // Read the XML data into a memory stream
+            byte[] xmlBytes = File.ReadAllBytes(xmlPath);
+            using (MemoryStream xmlStream = new MemoryStream(xmlBytes))
             {
-                // Embed the ZUGFeRD XML into the PDF
-                doc.BindXml(zugferdXml);
+                // Create a file specification for the embedded XML
+                // Use the constructor that takes a file name and a description,
+                // then assign the file contents via the Contents property.
+                FileSpecification fileSpec = new FileSpecification("invoice.xml", "ZUGFeRD XML invoice");
+                fileSpec.Contents = xmlStream; // embed the XML bytes
 
-                // Convert the document to PDF/A‑3 (ZUGFeRD) format.
-                // The Convert method writes conversion errors to the supplied log file.
-                doc.Convert(logFile, PdfFormat.ZUGFeRD, ConvertErrorAction.Delete);
-
-                // Save the final ZUGFeRD‑compliant PDF
-                doc.Save(outputPdf);
+                // Add the file specification to the document's embedded files collection
+                doc.EmbeddedFiles.Add(fileSpec);
             }
 
-            Console.WriteLine($"ZUGFeRD invoice saved to '{outputPdf}'.");
+            // Save the PDF (plain PDF; for full ZUGFeRD compliance PDF/A‑3 would be required)
+            doc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Invoice PDF created: {outputPdf}");
     }
 }

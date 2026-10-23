@@ -1,15 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "invoice.pdf";          // PDF with line‑item fields
-        const string outputPath = "invoice_with_js.pdf"; // Resulting PDF
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,45 +18,53 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access the form object
-            Form form = doc.Form;
+            // JavaScript that sums the values of the price fields and writes the result to the total field
+            string js = @"
+var total = 0;
+var fields = ['price1','price2','price3'];
+for (var i = 0; i < fields.length; i++) {
+    var f = this.getField(fields[i]);
+    if (f != null && f.value != null) {
+        var v = parseFloat(f.value);
+        if (!isNaN(v)) total += v;
+    }
+}
+var totalField = this.getField('total');
+if (totalField != null) totalField.value = total.toFixed(2);
+";
 
-            // Retrieve the summary field where the total will be displayed
-            // Adjust the field name ("Total") to match the actual field name in the PDF
-            Field totalField = form["Total"] as Field; // explicit cast from WidgetAnnotation
-            if (totalField == null)
+            // Names of the line‑item fields that participate in the calculation
+            string[] priceFieldNames = new string[] { "price1", "price2", "price3" };
+
+            // Attach the JavaScript action to each price field (triggered on calculate)
+            foreach (string fieldName in priceFieldNames)
             {
-                Console.Error.WriteLine("Summary field 'Total' not found or is not a form field.");
-                return;
+                TextBoxField field = doc.Form[fieldName] as TextBoxField;
+                if (field != null)
+                {
+                    // Use the correct class name (lower‑case 's') and assign to a valid action property
+                    field.Actions.OnCalculate = new JavascriptAction(js);
+                }
             }
 
-            // JavaScript that sums the values of line‑item fields and writes the result
-            // Adjust the field names ("Item1", "Item2", "Item3") to match your PDF
-            string jsCode = @"
-                var sum = 0;
-                var fields = ['Item1', 'Item2', 'Item3']; // add all line‑item field names here
-                for (var i = 0; i < fields.length; i++) {
-                    var f = this.getField(fields[i]);
-                    if (f && !isNaN(parseFloat(f.value))) {
-                        sum += parseFloat(f.value);
-                    }
-                }
-                this.getField('Total').value = sum.toFixed(2);
-            ";
-
-            // Create a JavaScript action
-            JavascriptAction jsAction = new JavascriptAction(jsCode);
-
-            // Assign the JavaScript to the OnCalculate action of the summary field
-            totalField.Actions.OnCalculate = jsAction;
+            // Ensure the summary field exists; create it if it does not
+            if (doc.Form["total"] == null)
+            {
+                TextBoxField totalField = new TextBoxField(
+                    doc.Pages[1],
+                    new Rectangle(100, 500, 200, 520));
+                totalField.PartialName = "total";
+                totalField.Value = "0.00";
+                doc.Form.Add(totalField);
+            }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with JavaScript calculation: {outputPath}");
+        Console.WriteLine($"PDF with JavaScript saved to '{outputPath}'.");
     }
 }

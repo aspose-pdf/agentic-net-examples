@@ -7,8 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string attachmentName = "ZUGFeRD.xml"; // typical ZUGFeRD attachment name
+        const string outputPath = "output_without_zugferd.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,39 +15,30 @@ class Program
             return;
         }
 
-        try
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            // Work with embedded files – the Attachments collection does not exist.
+            if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
             {
-                // If the document contains embedded files, attempt to delete the ZUGFeRD attachment
-                if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+                // Iterate backwards so that removal does not affect the index of remaining items.
+                for (int i = doc.EmbeddedFiles.Count - 1; i >= 0; i--)
                 {
-                    try
-                    {
-                        doc.EmbeddedFiles.Delete(attachmentName);
-                        Console.WriteLine($"Deleted attachment: {attachmentName}");
-                    }
-                    catch (Exception)
-                    {
-                        // Attachment not present – ignore
-                        Console.WriteLine($"Attachment '{attachmentName}' not found.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("No embedded files found in the document.");
-                }
+                    FileSpecification fileSpec = doc.EmbeddedFiles[i];
+                    string name = fileSpec.Name ?? string.Empty;
 
-                // Save the modified PDF, preserving all other content
-                doc.Save(outputPath);
+                    // ZUGFeRD files are usually XML and often contain the word "ZUGFeRD" in the name.
+                    if (name.IndexOf("ZUGFeRD", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Delete expects the attachment name (string), not the index.
+                        doc.EmbeddedFiles.Delete(name);
+                    }
+                }
             }
 
-            Console.WriteLine($"PDF saved without ZUGFeRD attachment to '{outputPath}'.");
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"ZUGFeRD attachment removed. Output saved to '{outputPath}'.");
     }
 }

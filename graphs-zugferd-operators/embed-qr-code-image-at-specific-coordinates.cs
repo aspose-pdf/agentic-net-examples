@@ -1,25 +1,25 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // ImageStamp lives here
+using Aspose.Pdf.Operators;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
+        const string inputPdf = "input.pdf";
         const string qrImagePath = "qr.png";
+        const string outputPdf = "output.pdf";
 
-        // Define the rectangle where the QR code will be placed (lower‑left and upper‑right corners)
-        double llx = 100; // lower‑left X
-        double lly = 500; // lower‑left Y
-        double urx = 200; // upper‑right X
-        double ury = 600; // upper‑right Y
+        // Desired position (lower‑left corner) and size of the QR code on the page
+        const double posX = 100;   // X coordinate in points
+        const double posY = 200;   // Y coordinate in points
+        const double imgWidth = 150;  // Width in points
+        const double imgHeight = 150; // Height in points
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
@@ -29,37 +29,36 @@ class Program
             return;
         }
 
-        // Open the PDF document
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF inside a using block (document‑disposal‑with‑using rule)
+        using (Document doc = new Document(inputPdf))
         {
-            // Work with the first page (1‑based indexing)
+            // Access the first page (1‑based indexing rule)
             Page page = doc.Pages[1];
 
-            // Calculate width and height from the rectangle
-            double width = urx - llx;
-            double height = ury - lly;
-
-            // Create an ImageStamp for the QR code image
-            ImageStamp qrStamp = new ImageStamp(qrImagePath)
+            // Add the QR code image to the page resources and obtain its name
+            string imageName;
+            using (FileStream imgStream = File.OpenRead(qrImagePath))
             {
-                // Position the stamp using the lower‑left corner coordinates
-                XIndent = llx,
-                YIndent = lly,
-                // Set the desired size (width/height)
-                Width = width,
-                Height = height,
-                // Ensure the stamp is placed exactly at the coordinates (no alignment offsets)
-                HorizontalAlignment = HorizontalAlignment.None,
-                VerticalAlignment = VerticalAlignment.None
-            };
+                imageName = page.Resources.Images.Add(imgStream);
+            }
 
-            // Add the stamp to the page content
-            page.AddStamp(qrStamp);
+            // Retrieve the XImage object to read its original dimensions
+            XImage qrImage = page.Resources.Images[imageName];
 
-            // Save the modified PDF
-            doc.Save(outputPdfPath);
+            // Compute scaling factors to fit the desired width/height
+            double scaleX = imgWidth / qrImage.Width;
+            double scaleY = imgHeight / qrImage.Height;
+
+            // Insert low‑level PDF operators to draw the image at the specified location
+            page.Contents.Add(new GSave()); // q – Save graphics state
+            page.Contents.Add(new ConcatenateMatrix(scaleX, 0, 0, scaleY, posX, posY)); // cm – Position & scale
+            page.Contents.Add(new Do(imageName)); // Do – Draw the image
+            page.Contents.Add(new GRestore()); // Q – Restore graphics state
+
+            // Save the modified PDF (PDF format, so no special SaveOptions needed)
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"QR code embedded successfully: {outputPdfPath}");
+        Console.WriteLine($"QR code embedded and saved to '{outputPdf}'.");
     }
 }

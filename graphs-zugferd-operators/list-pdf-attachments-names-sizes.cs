@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -15,45 +14,44 @@ class Program
             return;
         }
 
-        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
             {
-                Page page = doc.Pages[pageIndex];
-
-                // Annotations collection also uses 1‑based indexing
-                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
-                {
-                    Annotation ann = page.Annotations[annIndex];
-
-                    // We're interested only in file attachment annotations
-                    if (ann is FileAttachmentAnnotation fileAnn && fileAnn.File != null)
-                    {
-                        // FileSpecification provides the attachment name
-                        string name = fileAnn.File.Name ?? "(unnamed)";
-
-                        // Determine size – Params.Size is an int (non‑nullable)
-                        long size = 0;
-                        if (fileAnn.File.Params != null)
-                        {
-                            size = fileAnn.File.Params.Size; // direct int value
-                        }
-                        else if (fileAnn.File.Contents != null)
-                        {
-                            // Contents is a Stream; copy to a MemoryStream to get its length.
-                            using (var ms = new MemoryStream())
-                            {
-                                fileAnn.File.Contents.CopyTo(ms);
-                                size = ms.Length;
-                            }
-                        }
-
-                        Console.WriteLine($"Attachment: {name}, Size: {size} bytes");
-                    }
-                }
+                Console.WriteLine("No attachments found.");
+                return;
             }
+
+            Console.WriteLine("Attachments:");
+            foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
+            {
+                string name = fileSpec.Name ?? "Unnamed";
+                long size = GetStreamLength(fileSpec.Contents);
+                Console.WriteLine($"{name} - {size} bytes");
+            }
+        }
+    }
+
+    private static long GetStreamLength(Stream stream)
+    {
+        if (stream == null)
+            return 0;
+
+        // If the stream supports seeking, use Length directly.
+        if (stream.CanSeek)
+        {
+            long originalPos = stream.Position;
+            long length = stream.Length;
+            // Reset position to original to avoid side‑effects.
+            stream.Position = originalPos;
+            return length;
+        }
+
+        // Otherwise copy to a MemoryStream to determine length.
+        using (var ms = new MemoryStream())
+        {
+            stream.CopyTo(ms);
+            return ms.Length;
         }
     }
 }

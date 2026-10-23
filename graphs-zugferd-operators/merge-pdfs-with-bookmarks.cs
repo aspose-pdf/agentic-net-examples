@@ -2,48 +2,82 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class PdfMerger
+class Program
 {
     static void Main()
     {
-        // Input PDF files to be merged – adjust paths as needed
-        string[] inputFiles = new string[]
-        {
-            "first.pdf",
-            "second.pdf",
-            "third.pdf"
-        };
+        // Input PDF files to merge (order matters)
+        string[] inputFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
+        string outputFile = "merged.pdf";
 
-        // Output merged PDF file
-        const string outputFile = "merged_output.pdf";
-
-        // Validate that all input files exist
-        foreach (string path in inputFiles)
+        if (inputFiles.Length == 0)
         {
-            if (!File.Exists(path))
-            {
-                Console.Error.WriteLine($"Input file not found: {path}");
-                return;
-            }
+            Console.Error.WriteLine("No input files specified.");
+            return;
         }
 
-        // Load the first document as the target; it will receive pages and bookmarks from the others
+        // Verify the first file exists – it will be the base document
+        if (!File.Exists(inputFiles[0]))
+        {
+            Console.Error.WriteLine($"File not found: {inputFiles[0]}");
+            return;
+        }
+
+        // Use the first PDF as the target document (as per the merge rule)
         using (Document target = new Document(inputFiles[0]))
         {
-            // Merge each subsequent document into the target.
-            // The Document.Merge method preserves outlines/bookmarks from the source document.
+            // Iterate over the remaining PDFs and merge them
             for (int i = 1; i < inputFiles.Length; i++)
             {
-                using (Document source = new Document(inputFiles[i]))
+                string srcPath = inputFiles[i];
+                if (!File.Exists(srcPath))
                 {
-                    target.Merge(source);
+                    Console.Error.WriteLine($"Skipping missing file: {srcPath}");
+                    continue;
+                }
+
+                // Load each source PDF in its own using block (lifecycle rule)
+                using (Document source = new Document(srcPath))
+                {
+                    // Merge pages
+                    target.Pages.Add(source.Pages);
+
+                    // Preserve bookmarks/outlines hierarchy by copying each outline item
+                    foreach (OutlineItemCollection srcOutline in source.Outlines)
+                    {
+                        OutlineItemCollection cloned = CloneOutline(srcOutline, target);
+                        target.Outlines.Add(cloned);
+                    }
                 }
             }
 
-            // Save the combined document; bookmarks and outline hierarchy are retained
+            // Save the merged PDF (still inside the using block)
             target.Save(outputFile);
         }
 
         Console.WriteLine($"Merged PDF saved to '{outputFile}'.");
+    }
+
+    // Recursively clones an outline item (bookmark) and its children for the target document
+    private static OutlineItemCollection CloneOutline(OutlineItemCollection sourceItem, Document targetDoc)
+    {
+        // Create a new outline item attached to the target document's outline collection
+        OutlineItemCollection copy = new OutlineItemCollection(targetDoc.Outlines)
+        {
+            Title = sourceItem.Title,
+            Open = sourceItem.Open,
+            Color = sourceItem.Color,
+            Italic = sourceItem.Italic,
+            Bold = sourceItem.Bold,
+            Action = sourceItem.Action // preserve navigation action if present
+        };
+
+        // Recursively copy child outline items
+        foreach (OutlineItemCollection child in sourceItem)
+        {
+            copy.Add(CloneOutline(child, targetDoc));
+        }
+
+        return copy;
     }
 }

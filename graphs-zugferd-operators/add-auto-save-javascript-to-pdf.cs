@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_autosave.pdf";
+        const string outputPath = "output_with_js.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,22 +16,20 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // JavaScript that sets a timer to save the document every 60 seconds (60000 ms)
-            // The script uses app.setInterval to repeatedly call this.saveAs.
-            // Adjust the interval and file name as needed.
-            string js = "app.setInterval('this.saveAs({cPath:\"auto_save.pdf\"});', 60000);";
-
-            // Assign the JavaScript action to be executed when the document is opened.
-            // Document‑level JavaScript is set via the OpenAction property.
+            // Add a document‑level JavaScript that saves the PDF every 60 seconds (60000 ms)
+            // The script uses app.setInterval to repeatedly invoke this.saveAs().
+            // bUI:false hides the save dialog, bSilent:true suppresses alerts,
+            // bEmbed:true ensures the document is saved in place.
+            string js = "app.setInterval('this.saveAs({bUI:false,bSilent:true,bEmbed:true});', 60000);";
             doc.OpenAction = new JavascriptAction(js);
 
-            // Save the modified PDF
+            // Save the modified PDF (Document.Save writes PDF regardless of extension)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document with auto‑save JavaScript saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with auto‑save JavaScript saved to '{outputPath}'.");
     }
 }

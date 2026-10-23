@@ -1,26 +1,33 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Output file path
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Create a new PDF document inside a using block (ensures proper disposal)
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Dynamically set the Author property to the current system user name
-            doc.Info.Author = Environment.UserName;
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // (Optional) set additional metadata
-            doc.Info.Title = "Generated PDF";
+        // Wrap Document in a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Get the current system user name
+            string currentUser = Environment.UserName;
 
-            // Save the document as PDF
+            // Set the PDF author property dynamically
+            doc.Info.Author = currentUser;
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}' with Author = '{Environment.UserName}'.");
+        Console.WriteLine($"Author set to current user and saved as '{outputPath}'.");
     }
 }

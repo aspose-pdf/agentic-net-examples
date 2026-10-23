@@ -2,48 +2,46 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class SplitPdfIntoPages
+class Program
 {
     static void Main()
     {
         // Input PDF file path
-        const string inputPdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
+        // Directory where individual pages will be saved
+        const string outputDir = "SplitPages";
 
-        // Output directory where individual page PDFs will be saved
-        const string outputDirectory = "SplitPages";
-
-        // Verify that the input file exists
-        if (!File.Exists(inputPdfPath))
+        // Verify the source file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputDirectory);
+        Directory.CreateDirectory(outputDir);
 
         try
         {
-            // Load the source PDF document inside a using block for deterministic disposal
-            using (Document sourceDoc = new Document(inputPdfPath))
+            // Load the source PDF inside a using block for deterministic disposal
+            using (Document src = new Document(inputPdf))
             {
                 // Aspose.Pdf uses 1‑based page indexing
-                for (int pageNumber = 1; pageNumber <= sourceDoc.Pages.Count; pageNumber++)
+                for (int i = 1; i <= src.Pages.Count; i++)
                 {
                     // Create a new empty PDF document for the single page
-                    using (Document singlePageDoc = new Document())
+                    using (Document single = new Document())
                     {
-                        // Add the current page from the source document to the new document
-                        // The Add method copies the page reference; the source document remains unchanged
-                        singlePageDoc.Pages.Add(sourceDoc.Pages[pageNumber]);
+                        // Add the i‑th page from the source document
+                        single.Pages.Add(src.Pages[i]);
 
-                        // Build the output file name (e.g., Page_1.pdf, Page_2.pdf, ...)
-                        string outputPath = Path.Combine(outputDirectory, $"Page_{pageNumber}.pdf");
+                        // Build the output file name (e.g., Page_1.pdf)
+                        string outPath = Path.Combine(outputDir, $"Page_{i}.pdf");
 
-                        // Save the single‑page PDF; no SaveOptions needed because the format is PDF
-                        singlePageDoc.Save(outputPath);
+                        // Save the single‑page PDF
+                        single.Save(outPath);
 
-                        Console.WriteLine($"Saved page {pageNumber} → {outputPath}");
+                        Console.WriteLine($"Saved page {i} → {outPath}");
                     }
                 }
             }
@@ -52,8 +50,8 @@ class SplitPdfIntoPages
         }
         catch (Exception ex)
         {
-            // Catch any unexpected errors and report them
-            Console.Error.WriteLine($"Error during splitting: {ex.Message}");
+            // Report any errors that occur during processing
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }
