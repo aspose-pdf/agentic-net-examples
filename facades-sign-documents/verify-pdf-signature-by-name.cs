@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -6,23 +7,30 @@ class Program
     static void Main()
     {
         const string pdfPath = "input.pdf";
-        const string signatureName = "ContractSigner";
 
-        if (!System.IO.File.Exists(pdfPath))
+        if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Bind the PDF to the PdfFileSignature facade
-        using (PdfFileSignature pdfSign = new PdfFileSignature())
+        try
         {
-            pdfSign.BindPdf(pdfPath);
+            // Use PdfFileSignature (the correct class for signature operations in Aspose.Pdf.Facades)
+            using (PdfFileSignature pdfSignature = new PdfFileSignature())
+            {
+                // Load the PDF into the signature handler
+                pdfSignature.BindPdf(pdfPath);
 
-            // Verify the signature named 'ContractSigner'
-            bool isValid = pdfSign.VerifySigned(signatureName);
+                // Verify whether a signature named 'ContractSigner' exists and is valid
+                bool isSigned = pdfSignature.VerifySigned("ContractSigner");
 
-            Console.WriteLine($"Signature '{signatureName}' verification result: {isValid}");
+                Console.WriteLine($"Signature 'ContractSigner' present and valid: {isSigned}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Verification error: {ex.Message}");
         }
     }
 }

@@ -2,61 +2,75 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using Aspose.Pdf.Facades;          // PdfFileSignature, SignatureName
+using Aspose.Pdf.Facades;
 
-// Model for a single verification result
-public class SignatureVerificationResult
+namespace PdfSignatureVerification
 {
-    // Mark as required (C# 11) so the compiler knows it will be set before use
-    public required string SignatureName { get; set; }
-    public bool IsValid { get; set; }
-}
-
-class Program
-{
-    static void Main()
+    // Simple DTO for JSON output
+    public class SignatureResult
     {
-        const string inputPdfPath = "signed_document.pdf";
-        const string outputJsonPath = "signature_verification_log.json";
+        public string SignatureName { get; set; }
+        public bool IsValid { get; set; }
 
-        if (!File.Exists(inputPdfPath))
+        // Parameter‑less constructor ensures non‑nullable property is initialized
+        public SignatureResult()
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
+            SignatureName = string.Empty;
         }
+    }
 
-        // Initialise the facade that works with digital signatures
-        PdfFileSignature pdfSignature = new PdfFileSignature();
-        pdfSignature.BindPdf(inputPdfPath);
-
-        // Get all signature fields (both signed and empty). The method now returns
-        // IList<SignatureName> – each item contains the field's Name property.
-        IList<SignatureName> signatureNames = pdfSignature.GetSignatureNames(true);
-
-        var results = new List<SignatureVerificationResult>();
-
-        foreach (SignatureName sigInfo in signatureNames)
+    class Program
+    {
+        static void Main()
         {
-            // If the field does not actually contain a signature, VerifySignature will
-            // simply return false – we can still log it.
-            bool isValid = pdfSignature.VerifySignature(sigInfo);
+            const string inputPdfPath = "signed_document.pdf";
+            const string jsonOutputPath = "signature_verification.json";
 
-            results.Add(new SignatureVerificationResult
+            if (!File.Exists(inputPdfPath))
             {
-                SignatureName = sigInfo.Name,
-                IsValid = isValid
-            });
+                Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+                return;
+            }
+
+            try
+            {
+                // Bind the PDF to the signature facade
+                PdfFileSignature pdfSignature = new PdfFileSignature();
+                pdfSignature.BindPdf(inputPdfPath);
+
+                // Retrieve all signature names present in the document (compatible with all Aspose.Pdf versions)
+                IList<SignatureName> signatureNames = pdfSignature.GetSignatureNames();
+
+                var results = new List<SignatureResult>();
+
+                foreach (SignatureName sigName in signatureNames)
+                {
+                    // Verify each signature; returns true if the signature is valid
+                    bool isValid = pdfSignature.VerifySignature(sigName);
+                    results.Add(new SignatureResult
+                    {
+                        SignatureName = sigName.Name,
+                        IsValid = isValid
+                    });
+                }
+
+                // Serialize results to formatted JSON
+                JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+                string json = JsonSerializer.Serialize(results, jsonOptions);
+
+                // Write JSON to file
+                using (FileStream fs = new FileStream(jsonOutputPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                using (StreamWriter writer = new StreamWriter(fs))
+                {
+                    writer.Write(json);
+                }
+
+                Console.WriteLine($"Signature verification completed. Results saved to '{jsonOutputPath}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error during verification: {ex.Message}");
+            }
         }
-
-        // Serialize the list to a nicely‑indented JSON document
-        var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-        string json = JsonSerializer.Serialize(results, jsonOptions);
-
-        File.WriteAllText(outputJsonPath, json);
-
-        // Clean‑up
-        pdfSignature.Close();
-
-        Console.WriteLine($"Signature verification log saved to '{outputJsonPath}'.");
     }
 }

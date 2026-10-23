@@ -1,42 +1,60 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using System.Security.Cryptography.X509Certificates;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // PDF containing the 'LegalSignature' field
-        const string outputCer = "LegalSignature.cer"; // Destination for the extracted certificate
+        const string inputPdfPath = "input.pdf";
+        const string outputCerPath = "LegalSignature.cer";
+        const string signatureFieldName = "LegalSignature";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Bind the PDF and extract the certificate from the specified signature field
-        using (PdfFileSignature pdfSignature = new PdfFileSignature())
+        try
         {
-            pdfSignature.BindPdf(inputPdf);
+            // Load the PDF document
+            Document pdfDoc = new Document(inputPdfPath);
 
-            // ExtractCertificate returns a Stream containing the DER‑encoded X.509 certificate
-            using (Stream certStream = pdfSignature.ExtractCertificate("LegalSignature"))
+            bool fieldFound = false;
+            foreach (Field field in pdfDoc.Form.Fields)
             {
-                if (certStream == null)
+                // Look for a signature field with the specified name
+                if (field is SignatureField sigField &&
+                    string.Equals(sigField.PartialName, signatureFieldName, StringComparison.OrdinalIgnoreCase))
                 {
-                    Console.Error.WriteLine("No certificate found in the 'LegalSignature' field.");
-                    return;
-                }
+                    fieldFound = true;
+                    // Extract the signing certificate from the signature field
+                    X509Certificate2 cert = sigField.ExtractCertificateObject();
+                    if (cert == null)
+                    {
+                        Console.Error.WriteLine($"Signature field '{signatureFieldName}' does not contain a certificate.");
+                        return;
+                    }
 
-                // Save the certificate stream to a .cer file
-                using (FileStream fileStream = new FileStream(outputCer, FileMode.Create, FileAccess.Write))
-                {
-                    certStream.CopyTo(fileStream);
+                    // Save the certificate in DER format as a .cer file
+                    byte[] certBytes = cert.Export(X509ContentType.Cert);
+                    File.WriteAllBytes(outputCerPath, certBytes);
+                    Console.WriteLine($"Certificate extracted and saved to '{outputCerPath}'.");
+                    break;
                 }
             }
-        }
 
-        Console.WriteLine($"Certificate extracted and saved to '{outputCer}'.");
+            if (!fieldFound)
+            {
+                Console.Error.WriteLine($"Signature field '{signatureFieldName}' not found in the PDF.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

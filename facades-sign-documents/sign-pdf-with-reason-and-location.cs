@@ -1,51 +1,53 @@
 using System;
-using System.Drawing;
-using Aspose.Pdf.Facades;
+using System.IO;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms; // needed for PKCS7 and signature appearance
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "signed_output.pdf";
-        const string certPath  = "certificate.pfx";
-        const string certPass  = "password";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed.pdf";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "password";
 
-        // Ensure the input file exists
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Define the rectangle where the visible signature will appear
-        // (x, y, width, height) – coordinates are in points (1/72 inch)
-        Rectangle signatureRect = new Rectangle(100, 100, 200, 100);
-
-        // Use PdfFileSignature facade to sign the PDF
-        using (PdfFileSignature pdfSign = new PdfFileSignature())
+        if (!File.Exists(certPath))
         {
-            // Bind the existing PDF document
-            pdfSign.BindPdf(inputPdf);
-
-            // Set the certificate used for signing
-            pdfSign.SetCertificate(certPath, certPass);
-
-            // Sign the document:
-            // page number (1‑based), reason, contact (empty), location,
-            // visibility (true for visible signature), and rectangle.
-            pdfSign.Sign(
-                page: 1,
-                SigReason: "Approved for release",
-                SigContact: "",
-                SigLocation: "New York",
-                visible: true,
-                annotRect: signatureRect);
-
-            // Save the signed PDF
-            pdfSign.Save(outputPdf);
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
+            return;
         }
 
-        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Create a visible signature field (position can be adjusted as needed)
+        // Rectangle(xLL, yLL, xUR, yUR) – lower‑left and upper‑right coordinates
+        SignatureField sigField = new SignatureField(doc, new Aspose.Pdf.Rectangle(100, 100, 300, 200))
+        {
+            Name = "Signature1"
+        };
+        doc.Form.Add(sigField);
+
+        // Configure PKCS7 signature with reason and location
+        PKCS7 pkcs7 = new PKCS7(certPath, certPassword)
+        {
+            Reason = "Approved for release",
+            Location = "New York"
+        };
+
+        // Sign the field
+        sigField.Sign(pkcs7);
+
+        // Save the signed PDF
+        doc.Save(outputPath);
+
+        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
     }
 }

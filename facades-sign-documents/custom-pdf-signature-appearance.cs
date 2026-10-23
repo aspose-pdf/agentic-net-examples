@@ -1,54 +1,67 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;          // PdfFileSignature
-using Aspose.Pdf.Forms;           // PKCS1, SignatureCustomAppearance
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source PDF, output PDF and the signing certificate
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputPdf = "signed.pdf";
-        const string certPath  = "certificate.pfx";
-        const string certPwd   = "password";
+        const string certificatePath = "mycert.pfx";
+        const string certificatePassword = "password";
 
+        // Verify required files exist
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(certificatePath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
             return;
         }
 
-        // Create a PKCS#1 signature object and assign a custom appearance
-        PKCS1 signature = new PKCS1(certPath, certPwd);
+        // Load the PDF document
+        Document doc = new Document(inputPdf);
 
-        // Build a custom appearance that hides the default caption and other fields
+        // Prepare custom appearance – hide the default "Digitally signed by" caption
         SignatureCustomAppearance customAppearance = new SignatureCustomAppearance
         {
-            DigitalSignedLabel = "",   // hide "Digitally signed by" text
-            ShowContactInfo    = false,
-            ShowLocation       = false,
-            ShowReason         = false
+            // Setting an empty label removes the default caption
+            DigitalSignedLabel = string.Empty
         };
-        signature.CustomAppearance = customAppearance;
 
-        // Define the rectangle where the signature will be placed.
-        // PdfFileSignature expects a System.Drawing.Rectangle.
-        System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 200, 100);
-
-        // Sign the document using the facade API.
-        using (PdfFileSignature pdfSigner = new PdfFileSignature())
+        // Create a signature field with the desired rectangle
+        Rectangle signatureRect = new Rectangle(100, 100, 250, 150);
+        SignatureField sigField = new SignatureField(doc, signatureRect)
         {
-            pdfSigner.BindPdf(inputPdf);          // load the PDF
-            // Optional: set an image for the signature appearance
-            // pdfSigner.SignatureAppearance = "signature.png";
+            PartialName = "Signature1"
+        };
 
-            // Sign page 1, make the signature visible, using the custom appearance.
-            pdfSigner.Sign(page: 1, visible: true, annotRect: rect, sig: signature);
+        // Assign the custom appearance to the signature field via its Signature property
+        sigField.Signature.CustomAppearance = customAppearance;
 
-            // Save the signed PDF.
-            pdfSigner.Save(outputPdf);
-        }
+        // Add the signature field to the document's form collection
+        doc.Form.Add(sigField);
+
+        // Create PKCS7 object using the certificate file and assign the same custom appearance
+        PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePassword)
+        {
+            // Optional: you can also set Reason, Location, ContactInfo here if you want them stored
+            // Reason = "Approval",
+            // Location = "New York",
+            // ContactInfo = "signer@example.com",
+            CustomAppearance = customAppearance
+        };
+
+        // Sign the field
+        sigField.Sign(pkcs7);
+
+        // Save the signed PDF
+        doc.Save(outputPdf);
 
         Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
     }

@@ -1,29 +1,24 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "unsigned.pdf";
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF into the signature facade
-        using (PdfFileSignature pdfSign = new PdfFileSignature())
-        {
-            pdfSign.BindPdf(inputPath);
+        // Verify whether the PDF contains any digital signatures.
+        PdfFileSignature signatureFacade = new PdfFileSignature();
+        bool hasSignature = signatureFacade.VerifySigned(pdfPath);
 
-            // Verify a signature that does not exist; should return false
-            bool isValid = pdfSign.VerifySigned("NonExistentSignature");
-
-            Console.WriteLine($"VerifySigned returned: {isValid} (expected false)");
-        }
+        // Expect false for a PDF with no signatures.
+        Console.WriteLine($"PDF has signatures: {hasSignature}");
     }
 }

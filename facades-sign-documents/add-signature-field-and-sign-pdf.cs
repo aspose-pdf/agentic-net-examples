@@ -1,99 +1,101 @@
 using System;
 using System.IO;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
+using System.Drawing; // for System.Drawing.Rectangle
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades; // Facade API for signature operations
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";          // source PDF (generated if missing)
-        const string tempPdf = "temp_with_field.pdf"; // intermediate PDF with signature field
-        const string signedPdf = "signed.pdf";        // final signed PDF
-        const string certPath = "certificate.pfx";   // signing certificate (generated if missing)
-        const string certPass = "password";          // certificate password
+        // Input PDF, output PDF, and certificate (PFX) paths
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "signed_output.pdf";
+        const string certificatePath = "certificate.pfx";
+        const string certificatePassword = "certPassword";
 
-        // ------------------------------------------------------------
-        // Ensure a source PDF exists – create a minimal one‑page PDF
-        // ------------------------------------------------------------
-        if (!File.Exists(inputPdf))
+        // Verify that required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            using var placeholder = new Document();
-            placeholder.Pages.Add();
-            placeholder.Save(inputPdf);
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(certificatePath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // Ensure a signing certificate exists – generate a self‑signed PFX
-        // ------------------------------------------------------------
-        if (!File.Exists(certPath))
+        // Define signature field properties
+        const string fieldName = "SignatureField1";
+        const int pageNumber = 1; // 1‑based page index
+        const double llx = 100;   // lower‑left X coordinate
+        const double lly = 100;   // lower‑left Y coordinate
+        const double urx = 300;   // upper‑right X coordinate
+        const double ury = 200;   // upper‑right Y coordinate
+
+        // ---------------------------------------------------------------------
+        // 1. Load the PDF and add an empty signature field using the Document API
+        // ---------------------------------------------------------------------
+        Document doc = new Document(inputPdfPath);
+
+        // Create the rectangle that defines the field bounds (Aspose.Pdf.Rectangle)
+        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+
+        // Create the signature field on the required page
+        SignatureField sigField = new SignatureField(doc.Pages[pageNumber], rect)
         {
-            GenerateSelfSignedCertificate(certPath, certPass);
-        }
-
-        // ------------------------------------------------------------
-        // 1. Add an empty signature field to the desired page.
-        // ------------------------------------------------------------
-        Document srcDoc = new Document(inputPdf);
-        FormEditor formEditor = new FormEditor(srcDoc);
-        // FieldType.Signature creates a signature form field.
-        // Parameters: field type, field name, page number (1‑based), llx, lly, urx, ury.
-        formEditor.AddField(FieldType.Signature, "Signature1", 1, 100f, 100f, 200f, 150f);
-        formEditor.Save(tempPdf);
-
-        // ------------------------------------------------------------
-        // 2. Sign the PDF using the previously created signature field.
-        // ------------------------------------------------------------
-        PdfFileSignature pdfSigner = new PdfFileSignature();
-        pdfSigner.BindPdf(tempPdf);                     // load the PDF that contains the empty field
-        pdfSigner.SetCertificate(certPath, certPass);  // associate the signing certificate
-
-        // Create a PKCS#1 signature object.
-        PKCS1 signature = new PKCS1(certPath, certPass)
-        {
-            Reason = "Document approval",
-            ContactInfo = "john.doe@example.com",
-            Location = "New York"
+            PartialName = fieldName
         };
 
-        // Sign the document using the field named "Signature1".
-        pdfSigner.Sign("Signature1", signature);
-        pdfSigner.Save(signedPdf);
-    }
+        // Add the field to the form (the second argument is the 1‑based page index)
+        doc.Form.Add(sigField, pageNumber);
 
-    // --------------------------------------------------------------------
-    // Helper: generate a temporary self‑signed certificate and export as PFX
-    // --------------------------------------------------------------------
-    private static void GenerateSelfSignedCertificate(string path, string password)
-    {
-        using RSA rsa = RSA.Create(2048);
-        var request = new CertificateRequest(
-            "CN=AsposeSample",
-            rsa,
-            HashAlgorithmName.SHA256,
-            RSASignaturePadding.Pkcs1);
+        // Save the intermediate PDF that now contains the empty signature field
+        const string tempPdfPath = "temp_with_field.pdf";
+        doc.Save(tempPdfPath);
 
-        // Basic Constraints – self‑signed CA
-        request.CertificateExtensions.Add(
-            new X509BasicConstraintsExtension(true, false, 0, true));
+        // ---------------------------------------------------------------------
+        // 2. Sign the PDF using PdfFileSignature, referencing the field we just added
+        // ---------------------------------------------------------------------
+        // Prepare the PKCS#7 certificate object
+        PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePassword);
+        pkcs7.Reason = "Document signed"; // optional metadata
+        pkcs7.ContactInfo = "contact@example.com"; // optional metadata
+        pkcs7.Location = "Location"; // optional metadata
 
-        // Subject Key Identifier
-        request.CertificateExtensions.Add(
-            new X509SubjectKeyIdentifierExtension(request.PublicKey, false));
+        // Convert the Aspose rectangle to System.Drawing.Rectangle (required by Sign overload)
+        int width = (int)(urx - llx);
+        int height = (int)(ury - lly);
+        System.Drawing.Rectangle signRect = new System.Drawing.Rectangle((int)llx, (int)lly, width, height);
 
-        // Enhanced Key Usage – digital signature
-        request.CertificateExtensions.Add(
-            new X509EnhancedKeyUsageExtension(
-                new OidCollection { new Oid("1.3.6.1.5.5.7.3.3") }, false));
+        using (PdfFileSignature pdfSignature = new PdfFileSignature())
+        {
+            // Bind the PDF that already contains the signature field
+            pdfSignature.BindPdf(tempPdfPath);
 
-        // Validity period
-        var cert = request.CreateSelfSigned(DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddYears(1));
+            // Sign the document. The overload used is:
+            // Sign(int pageNumber, string reason, string contactInfo, string location,
+            //      bool isVisible, System.Drawing.Rectangle rectangle, Signature signature)
+            pdfSignature.Sign(pageNumber,
+                               pkcs7.Reason,
+                               pkcs7.ContactInfo,
+                               pkcs7.Location,
+                               true,               // make the signature visible
+                               signRect,
+                               pkcs7);
 
-        // Export as PFX and write to disk
-        byte[] pfxBytes = cert.Export(X509ContentType.Pfx, password);
-        File.WriteAllBytes(path, pfxBytes);
+            // Save the signed PDF to the final output path
+            pdfSignature.Save(outputPdfPath);
+        }
+
+        // Clean up the temporary file (optional)
+        if (File.Exists(tempPdfPath))
+        {
+            try { File.Delete(tempPdfPath); } catch { /* ignore cleanup errors */ }
+        }
+
+        Console.WriteLine($"Signature field '{fieldName}' added and document signed. Output saved to '{outputPdfPath}'.");
     }
 }

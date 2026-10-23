@@ -1,59 +1,59 @@
 using System;
-using System.Drawing;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdf      = "input.pdf";          // source PDF (already has a signature)
-        const string outputPdf     = "output_signed.pdf"; // PDF after adding the second signature
-        const string certificate   = "certificate.pfx";   // PKCS#12 certificate file
-        const string certPassword  = "password";          // certificate password
+        // Paths to the source PDF, output PDF and the signing certificate (PFX)
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "signed_output.pdf";
+        const string certificatePath = "certificate.pfx";
+        const string certificatePassword = "certPassword";
 
         // Verify that required files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(certificate))
+        if (!File.Exists(certificatePath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {certificate}");
+            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
             return;
         }
 
-        // PdfFileSignature implements IDisposable, so wrap it in a using block
-        using (PdfFileSignature pdfSign = new PdfFileSignature())
+        // Load the PDF document
+        Document doc = new Document(inputPdfPath);
+
+        // First digital signature on page 3, rectangle (100,500,200,550)
+        // Aspose.Pdf.Rectangle uses (lowerLeftX, lowerLeftY, upperRightX, upperRightY)
+        SignatureField sigField1 = new SignatureField(doc, new Aspose.Pdf.Rectangle(100, 500, 200, 550))
         {
-            // Bind the existing PDF document
-            pdfSign.BindPdf(inputPdf);
+            Name = "Signature1",
+            // Optional: set reason, location, contact info via custom properties if needed
+        };
+        doc.Form.Add(sigField1);
 
-            // Set the certificate that will be used for signing
-            pdfSign.SetCertificate(certificate, certPassword);
+        // Second digital signature on page 3, rectangle (300,500,400,550)
+        SignatureField sigField2 = new SignatureField(doc, new Aspose.Pdf.Rectangle(300, 500, 400, 550))
+        {
+            Name = "Signature2",
+        };
+        doc.Form.Add(sigField2);
 
-            // Optional: set a visual appearance for the signature (e.g., an image)
-            // pdfSign.SignatureAppearance = "signature_appearance.png";
+        // Create PKCS7 object from the certificate (used for both signatures)
+        PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePassword);
 
-            // Define the rectangle where the second signature will be placed on page 3
-            // Rectangle(x, y, width, height) – coordinates are in points (1/72 inch)
-            Rectangle secondSigRect = new Rectangle(100, 100, 200, 100);
+        // Sign each field
+        sigField1.Sign(pkcs7);
+        sigField2.Sign(pkcs7);
 
-            // Add the second digital signature
-            pdfSign.Sign(
-                page: 3,                     // page number (1‑based)
-                SigReason: "Approved by second signer",
-                SigContact: "second.signer@example.com",
-                SigLocation: "New York",
-                visible: true,               // make the signature visible
-                annotRect: secondSigRect);   // rectangle defined above
+        // Save the signed PDF to the output file
+        doc.Save(outputPdfPath);
 
-            // Save the signed PDF to a new file
-            pdfSign.Save(outputPdf);
-        }
-
-        Console.WriteLine($"Second digital signature added. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF signed successfully. Output saved to '{outputPdfPath}'.");
     }
 }
