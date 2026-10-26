@@ -1,34 +1,31 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // All SaveOptions are in this namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputXml = "output.xml";
+        const string inputPdfPath  = "input.pdf";      // source PDF
+        const string outputXmlPath = "output.xml";     // XML representation
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal.
-            using (Document pdfDoc = new Document(inputPdf))
-            {
-                // Export the internal XML representation of the PDF.
-                pdfDoc.SaveXml(outputXml);
-            }
+            // XmlSaveOptions forces the output format to XML
+            XmlSaveOptions xmlOpts = new XmlSaveOptions();
 
-            Console.WriteLine($"XML representation saved to '{outputXml}'.");
+            // Save the PDF as XML. The overload with SaveOptions is required;
+            // otherwise the file would be saved as PDF regardless of extension.
+            pdfDoc.Save(outputXmlPath, xmlOpts);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"XML representation saved to '{outputXmlPath}'.");
     }
 }

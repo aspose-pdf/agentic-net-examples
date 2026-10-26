@@ -1,17 +1,16 @@
 using System;
 using System.IO;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
 class Program
 {
-    // Threshold for the length of text (in characters) after which a page break is inserted.
-    const int TextLengthThreshold = 1000;
-
     static void Main()
     {
-        const string xmlPath = "input.xml";   // Path to the source XML file.
-        const string pdfPath = "output.pdf";  // Path for the generated PDF.
+        const string xmlPath = "input.xml";   // source XML
+        const string pdfPath = "output.pdf";  // result PDF
+        const int lengthThresh = 1000;         // characters per page
 
         if (!File.Exists(xmlPath))
         {
@@ -19,44 +18,47 @@ class Program
             return;
         }
 
-        // Load the XML file and convert it to a PDF document.
-        // XmlLoadOptions is the correct load option for XML input.
-        XmlLoadOptions loadOptions = new XmlLoadOptions();
-        using (Document pdfDocument = new Document(xmlPath, loadOptions))
+        // Load XML document
+        XDocument xDoc = XDocument.Load(xmlPath);
+
+        // Disable Aspose.Pdf native helper executables (prevents missing‑exe runtime errors in restricted environments)
+        // This must be set before any Aspose.Pdf API is used.
+        Environment.SetEnvironmentVariable("Aspose.Pdf.DisableNative", "true");
+
+        // Create a new PDF document
+        using (Document pdfDoc = new Document())
         {
-            // Capture the original page count before we start inserting new pages.
-            int originalPageCount = pdfDocument.Pages.Count;
+            // Add the first page (Pages collection is 1‑based)
+            pdfDoc.Pages.Add();
 
-            // Iterate over the original pages (1‑based indexing).
-            for (int pageIndex = 1; pageIndex <= originalPageCount; pageIndex++)
+            int currentLength = 0; // accumulated text length on the current page
+
+            // Iterate over XML elements that contain text (example: <Paragraph> nodes)
+            foreach (XElement elem in xDoc.Descendants("Paragraph"))
             {
-                // Extract the text of the current page.
-                TextAbsorber absorber = new TextAbsorber();
-                pdfDocument.Pages[pageIndex].Accept(absorber);
-                string pageText = absorber.Text ?? string.Empty;
+                string text = (elem.Value ?? string.Empty).Trim();
+                if (string.IsNullOrEmpty(text))
+                    continue;
 
-                // If the text length exceeds the defined threshold, insert a blank page after the current page.
-                if (pageText.Length > TextLengthThreshold)
+                // If adding this text exceeds the threshold, start a new page
+                if (currentLength + text.Length > lengthThresh)
                 {
-                    // Insert a new blank page immediately after the current page.
-                    // The overload without a Page argument creates an empty page.
-                    pdfDocument.Pages.Insert(pageIndex + 1);
-
-                    // Preserve the size of the original page.
-                    Page newPage = pdfDocument.Pages[pageIndex + 1];
-                    newPage.MediaBox = pdfDocument.Pages[pageIndex].MediaBox;
-
-                    // Adjust the loop counters:
-                    // - Increment originalPageCount because we have added a page.
-                    // - Increment pageIndex to skip the newly inserted blank page.
-                    originalPageCount++;
-                    pageIndex++;
+                    pdfDoc.Pages.Add();
+                    currentLength = 0;
                 }
+
+                // Add the text fragment to the current (last) page
+                TextFragment tf = new TextFragment(text);
+                pdfDoc.Pages[pdfDoc.Pages.Count].Paragraphs.Add(tf);
+
+                // Update accumulated length
+                currentLength += text.Length;
             }
 
-            // Save the resulting PDF.
-            pdfDocument.Save(pdfPath);
-            Console.WriteLine($"PDF with conditional page breaks saved to '{pdfPath}'.");
+            // Save the PDF
+            pdfDoc.Save(pdfPath);
         }
+
+        Console.WriteLine($"PDF generated at '{pdfPath}'.");
     }
 }

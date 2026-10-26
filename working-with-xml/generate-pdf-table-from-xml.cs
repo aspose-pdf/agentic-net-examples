@@ -1,65 +1,115 @@
 using System;
-using System.Data;
+using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;               // Core PDF API
-using Aspose.Pdf.Text;          // For text-related types if needed
+using System.Linq;
+using System.Xml.Linq;
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath = "report.xml";   // Input XML containing tabular data
-        const string pdfPath = "report.pdf";   // Output PDF file
+        const string xmlPath = "data.xml";
+        const string pdfPath = "report.pdf";
 
-        // Verify that the XML source exists
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Load the XML into a DataSet; the first DataTable is assumed to hold the report data
-        DataSet dataSet = new DataSet();
-        dataSet.ReadXml(xmlPath);
-        if (dataSet.Tables.Count == 0)
+        // Load XML data
+        XDocument xDoc = XDocument.Load(xmlPath);
+        XElement? root = xDoc.Root;
+        if (root == null)
         {
-            Console.Error.WriteLine("No tables found in the XML file.");
+            Console.Error.WriteLine("Invalid XML: missing root element.");
             return;
         }
 
-        DataTable dataTable = dataSet.Tables[0];   // Use the first table
+        // Expected XML format:
+        // <Table>
+        //   <Header><Column>Header1</Column><Column>Header2</Column>...</Header>
+        //   <Row><Cell>Data11</Cell><Cell>Data12</Cell>...</Row>
+        //   <Row>...</Row>
+        // </Table>
 
-        // Create a new PDF document (lifecycle: create)
+        // Header may be missing, so make the list nullable
+        List<XElement>? headerColumns = root.Element("Header")?.Elements("Column").ToList();
+        List<XElement> dataRows = root.Elements("Row").ToList();
+
+        // Determine column count (header preferred, otherwise first data row)
+        int columnCount = headerColumns?.Count ??
+                          dataRows.FirstOrDefault()?.Elements("Cell").Count() ??
+                          0;
+
+        if (columnCount == 0)
+        {
+            Console.Error.WriteLine("No column information found in XML.");
+            return;
+        }
+
+        // Create PDF document
         using (Document pdfDoc = new Document())
         {
-            // Add a single page to host the table
+            // Add a page
             Page page = pdfDoc.Pages.Add();
 
-            // Instantiate a Table object (lifecycle: create)
-            Table table = new Table
+            // Create a table
+            Table pdfTable = new Table
             {
-                // Optional visual styling
-                Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black),
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Gray),
+                Border = new BorderInfo(BorderSide.All, 0.5f),
                 DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
-                // Column widths can be set via table.ColumnWidths if required
             };
 
-            // Import the DataTable into the Aspose.Pdf.Table
-            // Parameters:
-            //   dataTable                – source data
-            //   true                     – import column names as the first row
-            //   0                        – start at the first row of the PDF table (zero‑based)
-            //   0                        – start at the first column of the PDF table (zero‑based)
-            table.ImportDataTable(dataTable, true, 0, 0);
+            // Add header row if present
+            if (headerColumns != null && headerColumns.Any())
+            {
+                Row headerRow = pdfTable.Rows.Add();
+                foreach (XElement col in headerColumns)
+                {
+                    Cell cell = headerRow.Cells.Add();
+                    cell.BackgroundColor = Aspose.Pdf.Color.LightGray;
+                    cell.Paragraphs.Add(new TextFragment(col.Value ?? string.Empty)
+                    {
+                        TextState = { FontSize = 12, FontStyle = FontStyles.Bold }
+                    });
+                }
+            }
 
-            // Add the populated table to the page's paragraph collection
-            page.Paragraphs.Add(table);
+            // Add data rows
+            foreach (XElement row in dataRows)
+            {
+                Row pdfRow = pdfTable.Rows.Add();
+                foreach (XElement cellData in row.Elements("Cell"))
+                {
+                    Cell cell = pdfRow.Cells.Add();
+                    cell.Paragraphs.Add(new TextFragment(cellData.Value ?? string.Empty));
+                }
+            }
 
-            // Save the PDF document to disk (lifecycle: save)
+            // Ensure each row has the expected number of cells (add empty cells if needed)
+            foreach (Row r in pdfTable.Rows)
+            {
+                while (r.Cells.Count < columnCount)
+                {
+                    r.Cells.Add();
+                }
+            }
+
+            // Set equal column widths based on page width
+            double usableWidth = page.PageInfo.Width - page.PageInfo.Margin.Left - page.PageInfo.Margin.Right;
+            float colWidth = (float)(usableWidth / columnCount);
+            pdfTable.ColumnWidths = string.Join(" ", Enumerable.Repeat(colWidth.ToString(System.Globalization.CultureInfo.InvariantCulture), columnCount));
+
+            // Add the table to the page
+            page.Paragraphs.Add(pdfTable);
+
+            // Save the PDF
             pdfDoc.Save(pdfPath);
         }
 
-        Console.WriteLine($"PDF report generated successfully: {pdfPath}");
+        Console.WriteLine($"PDF report generated: {pdfPath}");
     }
 }

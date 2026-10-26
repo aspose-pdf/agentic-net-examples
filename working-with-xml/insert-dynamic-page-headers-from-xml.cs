@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
 using Aspose.Pdf;
@@ -9,71 +8,72 @@ class Program
 {
     static void Main()
     {
-        const string pdfInputPath = "template.pdf";   // existing PDF
-        const string xmlDataPath = "headers.xml";    // XML with per‑page header text
-        const string pdfOutputPath = "output_with_headers.pdf";
+        const string inputPdfPath   = "input.pdf";
+        const string outputPdfPath  = "output_with_headers.pdf";
+        const string xmlDataPath    = "headers.xml";
 
-        if (!File.Exists(pdfInputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfInputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
+
         if (!File.Exists(xmlDataPath))
         {
-            Console.Error.WriteLine($"XML not found: {xmlDataPath}");
+            Console.Error.WriteLine($"XML data file not found: {xmlDataPath}");
             return;
         }
 
-        // Load the source PDF
-        using (Document pdfDoc = new Document(pdfInputPath))
+        // Load XML that defines a header per page, e.g.:
+        // <Headers>
+        //   <Header page="1">Report Title – Page 1</Header>
+        //   <Header page="2">Report Title – Page 2</Header>
+        //   ...
+        // </Headers>
+        XDocument xmlDoc = XDocument.Load(xmlDataPath);
+
+        // Open the PDF inside a using block for deterministic disposal.
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Parse XML – expected format:
-            // <Headers>
-            //   <Header page="1">First page header</Header>
-            //   <Header page="2">Second page header</Header>
-            //   ...
-            // </Headers>
-            XDocument xDoc = XDocument.Load(xmlDataPath);
-            var headerMap = new Dictionary<int, string>();
-            foreach (var elem in xDoc.Root?.Elements("Header") ?? new List<XElement>())
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement).
+            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
             {
-                if (int.TryParse(elem.Attribute("page")?.Value, out int pageNum))
-                {
-                    headerMap[pageNum] = elem.Value;
-                }
-            }
+                // Find the header text for the current page.
+                XElement headerElement = xmlDoc.Root?
+                    .Element("Headers")?
+                    .Elements("Header")
+                    .FirstOrDefault(e => (string)e.Attribute("page") == pageIndex.ToString());
 
-            // Iterate over each page and add a TextStamp as the header
-            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
-            {
-                // Retrieve the header for the current page, fallback to empty string
-                headerMap.TryGetValue(i, out string headerText);
-                headerText ??= string.Empty;
+                if (headerElement == null)
+                    continue; // No header defined for this page.
 
-                // Create a TextStamp – this works without any Facades types
-                TextStamp stamp = new TextStamp(headerText)
+                string headerText = headerElement.Value.Trim();
+                if (string.IsNullOrEmpty(headerText))
+                    continue;
+
+                // Create a TextFragment for the header.
+                TextFragment headerFragment = new TextFragment(headerText)
                 {
-                    // Position the stamp at the top centre of the page
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Top,
-                    // Use TopMargin to push the stamp down from the top edge
-                    TopMargin = 20 // 20 points from the top edge
+                    // Set visual appearance.
+                    TextState =
+                    {
+                        FontSize = 12,
+                        FontStyle = FontStyles.Bold,
+                        ForegroundColor = Aspose.Pdf.Color.DarkBlue
+                    },
+                    // Position the header near the top of the page.
+                    // (x, y) coordinates are in points; (0,0) is bottom‑left.
+                    Position = new Position(50, pdfDoc.Pages[pageIndex].PageInfo.Height - 30)
                 };
 
-                // Configure appearance (font, size, color, etc.)
-                stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-                stamp.TextState.FontSize = 12;
-                stamp.TextState.FontStyle = FontStyles.Bold;
-                stamp.TextState.ForegroundColor = Color.Black;
-
-                // Add the stamp to the current page
-                pdfDoc.Pages[i].AddStamp(stamp);
+                // Add the header to the page's paragraph collection.
+                pdfDoc.Pages[pageIndex].Paragraphs.Add(headerFragment);
             }
 
-            // Save the modified PDF
-            pdfDoc.Save(pdfOutputPath);
+            // Save the modified PDF. No SaveOptions needed because the output is PDF.
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF with dynamic headers saved to '{pdfOutputPath}'.");
+        Console.WriteLine($"PDF with dynamic headers saved to '{outputPdfPath}'.");
     }
 }

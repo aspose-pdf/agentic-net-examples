@@ -7,50 +7,41 @@ class Program
 {
     static void Main()
     {
-        // Input and output file paths
-        const string inputPdfPath = "input.pdf";
-        const string intermediateXmlPath = "temp.xml";
-        const string outputPdfPath = "compressed.pdf";
+        const string inputPdf  = "input.pdf";
+        const string tempXml   = "temp.xml";
+        const string outputPdf = "compressed.pdf";
 
-        // Ensure the input PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // Step 1: Load the original PDF and save it as XML.
-        // -----------------------------------------------------------------
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the original PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // XmlSaveOptions are required for exporting to XML format.
-            XmlSaveOptions xmlSaveOptions = new XmlSaveOptions();
-            pdfDoc.Save(intermediateXmlPath, xmlSaveOptions);
-        }
+            // Convert PDF to XML (intermediate representation) using XmlSaveOptions
+            pdfDoc.Save(tempXml, new XmlSaveOptions());
 
-        // -----------------------------------------------------------------
-        // Step 2: Load the XML back into a PDF document.
-        // -----------------------------------------------------------------
-        XmlLoadOptions xmlLoadOptions = new XmlLoadOptions();
-        using (Document xmlDoc = new Document(intermediateXmlPath, xmlLoadOptions))
-        {
-            // -----------------------------------------------------------------
-            // Step 3: Apply Flate compression to text streams via optimization.
-            // -----------------------------------------------------------------
-            OptimizationOptions optOptions = new OptimizationOptions
+            // Load the PDF back from the XML representation
+            using (Document xmlDoc = new Document(tempXml))
             {
-                // Compress all PDF objects (including text streams) using Flate.
-                CompressObjects = true
-            };
-            xmlDoc.OptimizeResources(optOptions);
+                // Optimize resources – this applies Flate compression to text streams
+                // and removes unused objects/streams, effectively reducing file size.
+                OptimizationOptions opt = OptimizationOptions.All();
+                opt.RemoveUnusedObjects = true;
+                opt.RemoveUnusedStreams = true;
+                // Images are already compressed; we keep image settings unchanged.
+                xmlDoc.OptimizeResources(opt);
 
-            // -----------------------------------------------------------------
-            // Step 4: Save the compressed PDF.
-            // -----------------------------------------------------------------
-            xmlDoc.Save(outputPdfPath);
+                // Save the compressed PDF
+                xmlDoc.Save(outputPdf);
+            }
         }
 
-        Console.WriteLine($"Compressed PDF saved to '{outputPdfPath}'.");
+        // Clean up the temporary XML file
+        try { File.Delete(tempXml); } catch { }
+
+        Console.WriteLine($"Compressed PDF saved to '{outputPdf}'.");
     }
 }

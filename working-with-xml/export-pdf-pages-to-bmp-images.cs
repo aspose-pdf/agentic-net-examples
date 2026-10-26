@@ -7,11 +7,8 @@ class Program
 {
     static void Main()
     {
-        // Path to the source XML file that will be transformed into a PDF.
         const string xmlPath = "input.xml";
-
-        // Directory where each page image will be saved.
-        const string outputDir = "PageImages";
+        const string outputDir = "ExportedImages";
 
         if (!File.Exists(xmlPath))
         {
@@ -19,33 +16,36 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists.
         Directory.CreateDirectory(outputDir);
 
-        // Load the XML and create a PDF document from it.
-        using (Document pdfDoc = new Document())
+        try
         {
-            // Bind the XML content to the document.
-            pdfDoc.BindXml(xmlPath);
-
-            // Optional: save the generated PDF if you need it.
-            // pdfDoc.Save(Path.Combine(outputDir, "generated.pdf"));
-
-            // Prepare an image device – BMP format with 300 DPI resolution.
-            Resolution resolution = new Resolution(300);
-            BmpDevice bmpDevice = new BmpDevice(resolution);
-
-            // Export each page as a separate BMP image file.
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            // Load the XML and convert it to a PDF document in memory
+            using (Document pdfDoc = new Document(xmlPath, new XmlLoadOptions()))
             {
-                string imagePath = Path.Combine(outputDir, $"page_{pageNum}.bmp");
-                using (FileStream imgStream = new FileStream(imagePath, FileMode.Create))
+                // Define the resolution for the exported images (e.g., 300 DPI)
+                var resolution = new Resolution(300);
+                // PngDevice does NOT implement IDisposable, so instantiate it directly
+                var pngDevice = new PngDevice(resolution) { TransparentBackground = true };
+
+                // Iterate over pages using 1‑based indexing (Aspose.Pdf requirement)
+                for (int i = 1; i <= pdfDoc.Pages.Count; i++)
                 {
-                    // Convert the current page to an image and write it to the stream.
-                    bmpDevice.Process(pdfDoc.Pages[pageNum], imgStream);
+                    string outPath = Path.Combine(outputDir, $"page_{i}.png");
+
+                    // Render a single page to PNG. Only the stream needs a using block.
+                    using (var outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                    {
+                        pngDevice.Process(pdfDoc.Pages[i], outStream);
+                    }
+
+                    Console.WriteLine($"Saved page {i} as image: {outPath}");
                 }
-                Console.WriteLine($"Saved page {pageNum} as {imagePath}");
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

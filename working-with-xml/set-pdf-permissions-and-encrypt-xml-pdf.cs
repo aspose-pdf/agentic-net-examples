@@ -1,15 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath        = "input.xml";          // source XML file
-        const string outputPdfPath  = "output.pdf";         // encrypted PDF output
-        const string userPassword   = "user123";            // password for opening
-        const string ownerPassword  = "owner123";           // password for permissions change
+        const string xmlPath = "input.xml";
+        const string outputPdf = "output.pdf";
+        const string userPassword = "";          // empty user password allows opening without prompt
+        const string ownerPassword = "owner123"; // owner password required for permission changes
 
         if (!File.Exists(xmlPath))
         {
@@ -17,20 +18,20 @@ class Program
             return;
         }
 
-        // Load XML and convert to PDF
+        // Load the XML file and convert it to a PDF document
         using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
         {
-            // Define permissions: exclude PrintDocument and ExtractContent
-            // Here we allow only content modification; adjust as needed.
-            Permissions perms = Permissions.ModifyContent;
+            // Restrict printing and copying by granting no permissions (view‑only).
+            // Using (Permissions)0 creates a permission set with all flags cleared.
+            Permissions perms = (Permissions)0;
 
-            // Encrypt with AES-256 and the defined permissions
+            // Encrypt the document using AES‑256 algorithm with the specified passwords and permissions
             doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // Save the encrypted PDF
-            doc.Save(outputPdfPath);
+            // Save the secured PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Encrypted PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved with restricted permissions to '{outputPdf}'.");
     }
 }

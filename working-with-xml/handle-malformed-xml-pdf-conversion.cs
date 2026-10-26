@@ -1,56 +1,58 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-
-// Custom warning handler that implements IWarningCallback.
-// It aborts the loading process when a warning (e.g., malformed XML) occurs.
-class MyWarningHandler : IWarningCallback
-{
-    public ReturnAction Warning(WarningInfo info)
-    {
-        Console.Error.WriteLine($"Load warning: {info.WarningMessage}");
-        return ReturnAction.Abort; // Stop loading on warning.
-    }
-}
+using System.Xml;               // For XmlException
+using Aspose.Pdf;               // Core PDF API (Document, XmlSaveOptions, PdfException)
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath = "input.xml";
-        const string pdfPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputXml = "output.xml";
 
-        if (!File.Exists(xmlPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Configure load options with the custom warning handler.
-        XmlLoadOptions loadOptions = new XmlLoadOptions
-        {
-            WarningHandler = new MyWarningHandler()
-        };
-
         try
         {
-            // Load the XML and convert it to PDF.
-            using (Document pdfDoc = new Document(xmlPath, loadOptions))
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                // Save the resulting PDF.
-                pdfDoc.Save(pdfPath);
-                Console.WriteLine($"PDF successfully saved to '{pdfPath}'.");
+                // Configure XML save options (default options are sufficient for most cases)
+                XmlSaveOptions xmlOptions = new XmlSaveOptions();
+
+                try
+                {
+                    // Attempt to save the PDF as XML
+                    doc.Save(outputXml, xmlOptions);
+                    Console.WriteLine($"PDF successfully converted to XML: {outputXml}");
+                }
+                catch (XmlException xmlEx)
+                {
+                    // Handles malformed XML that may be produced during conversion
+                    Console.Error.WriteLine($"Malformed XML generated: {xmlEx.Message}");
+                    // Optional: fallback logic (e.g., save as plain text) could be placed here
+                }
+                catch (PdfException pdfEx)
+                {
+                    // Handles PDF-specific conversion errors
+                    Console.Error.WriteLine($"PDF conversion error: {pdfEx.Message}");
+                }
+                catch (Exception ex)
+                {
+                    // Catch‑all for any other unexpected issues
+                    Console.Error.WriteLine($"Unexpected error during conversion: {ex.Message}");
+                }
             }
-        }
-        catch (PdfException ex)
-        {
-            // Handles errors raised by Aspose.Pdf (e.g., malformed XML).
-            Console.Error.WriteLine($"PDF processing error: {ex.Message}");
         }
         catch (Exception ex)
         {
-            // Handles any other unexpected exceptions.
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            // Handles errors that occur while loading the PDF document
+            Console.Error.WriteLine($"Failed to load PDF: {ex.Message}");
         }
     }
 }

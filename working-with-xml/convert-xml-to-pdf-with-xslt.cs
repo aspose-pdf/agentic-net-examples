@@ -1,39 +1,56 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // XmlLoadOptions and Document are in this namespace
+using System.Xml;
+using System.Xml.Xsl;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source XML, the XSLT stylesheet, and the output PDF.
         const string xmlPath = "input.xml";
-        const string xslPath = "transform.xslt";
-        const string pdfPath = "output.pdf";
+        const string xsltPath = "transform.xslt";
+        const string outputPdf = "output.pdf";
 
-        // Verify that the required files exist.
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
-        if (!File.Exists(xslPath))
+        if (!File.Exists(xsltPath))
         {
-            Console.Error.WriteLine($"XSLT file not found: {xslPath}");
+            Console.Error.WriteLine($"XSLT file not found: {xsltPath}");
             return;
         }
 
-        // Load the XML and apply the XSLT during loading using XmlLoadOptions.
-        // The constructor XmlLoadOptions(string xslFile) attaches the stylesheet.
-        XmlLoadOptions loadOptions = new XmlLoadOptions(xslPath);
-
-        // Create the PDF document from the XML + XSLT.
-        using (Document pdfDocument = new Document(xmlPath, loadOptions))
+        // Transform the XML with the XSLT, producing XSL‑FO in a memory stream
+        using (MemoryStream foStream = new MemoryStream())
         {
-            // Save the resulting PDF.
-            pdfDocument.Save(pdfPath);
+            XslCompiledTransform xslt = new XslCompiledTransform();
+            xslt.Load(xsltPath);
+
+            using (XmlReader xmlReader = XmlReader.Create(xmlPath))
+            using (XmlWriter foWriter = XmlWriter.Create(foStream, xslt.OutputSettings))
+            {
+                xslt.Transform(xmlReader, foWriter);
+            }
+
+            // Reset the stream position before handing it to Aspose.Pdf
+            foStream.Position = 0;
+
+            // Load the XSL‑FO and convert it to PDF using core Aspose.Pdf API only
+            var loadOptions = new XslFoLoadOptions();
+            using (Document pdfDoc = new Document(foStream, loadOptions))
+            {
+                pdfDoc.Save(outputPdf);
+            }
         }
 
-        Console.WriteLine($"PDF generated successfully at '{pdfPath}'.");
+        // Ensure all native resources used by Aspose.Pdf are released before the process ends.
+        // This helps avoid the CS2012 file‑lock error when the project is rebuilt immediately.
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+
+        Console.WriteLine($"PDF created: {outputPdf}");
     }
 }

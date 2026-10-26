@@ -7,44 +7,36 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file
-        const string inputPath = "input.pdf";
-        // Directory where PNG thumbnails will be saved
-        const string outputDir = "Thumbnails";
+        const string inputPdfPath = "input.pdf";          // source PDF
+        const string outputFolder = "Thumbnails";         // folder for PNG images
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPath))
+        // Load PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Define a high resolution (e.g., 300 DPI) for the PNG images
-            Resolution resolution = new Resolution(300);
+            // High‑resolution (300 dpi) PNG device
+            var pngDevice = new PngDevice(new Resolution(300));
 
-            // Create a PNG device with the specified resolution
-            PngDevice pngDevice = new PngDevice(resolution);
-
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                // Build the output file name for the current page
-                string outPath = Path.Combine(outputDir, $"page_{pageNum}.png");
+                // Build output file name
+                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
 
-                // Convert the page to PNG and write it to a file stream
-                using (FileStream outStream = new FileStream(outPath, FileMode.Create))
-                {
-                    pngDevice.Process(pdfDoc.Pages[pageNum], outStream);
-                }
-
-                Console.WriteLine($"Saved thumbnail: {outPath}");
+                // Render the page to PNG
+                pngDevice.Process(pdfDoc.Pages[pageNumber], outputPath);
             }
         }
+
+        Console.WriteLine($"Thumbnails created in folder: {outputFolder}");
     }
 }
