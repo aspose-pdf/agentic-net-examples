@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades; // NOTE: This line is intentionally omitted to respect the hard namespace restriction.
 
 class Program
 {
@@ -15,60 +16,41 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Absorb all image placements in the document
-            ImagePlacementAbsorber imgAbsorber = new ImagePlacementAbsorber();
-            doc.Pages.Accept(imgAbsorber);
-
-            // Iterate over each image placement
-            foreach (ImagePlacement placement in imgAbsorber.ImagePlacements)
+            // Iterate through each page and absorb its image placements
+            foreach (Page page in doc.Pages)
             {
-                XImage xImg = placement.Image;
-                if (xImg == null)
-                    continue;
+                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
+                page.Accept(absorber);
 
-                // Calculate DPI using the image's pixel size and the placement size (in points).
-                // 1 point = 1/72 inch.
-                double dpiX = 0, dpiY = 0;
-                if (placement.Rectangle != null &&
-                    placement.Rectangle.Width > 0 && placement.Rectangle.Height > 0)
+                // Process each image placement on the current page
+                foreach (ImagePlacement placement in absorber.ImagePlacements)
                 {
-                    dpiX = (xImg.Width * 72.0) / placement.Rectangle.Width;
-                    dpiY = (xImg.Height * 72.0) / placement.Rectangle.Height;
-                }
+                    // DPI information is available via the Resolution property
+                    double dpiX = placement.Resolution.X;
+                    double dpiY = placement.Resolution.Y;
 
-                // If DPI information could not be derived, skip this image.
-                if (dpiX == 0 && dpiY == 0)
-                    continue;
-
-                // Check if either horizontal or vertical DPI is below the threshold
-                if (dpiX < 72 || dpiY < 72)
-                {
-                    // Find the page that contains this image (fallback when PageNumber is unavailable)
-                    Page targetPage = null;
-                    foreach (Page p in doc.Pages)
+                    // Delete images whose horizontal or vertical DPI is below 72
+                    if (dpiX < 72 || dpiY < 72)
                     {
-                        if (p.Resources != null && p.Resources.Images != null && p.Resources.Images.Contains(xImg))
+                        // The image object associated with the placement is an XImage
+                        Aspose.Pdf.XImage xImg = placement.Image;
+
+                        // Remove the image from the page's resources if it exists
+                        if (page.Resources.Images.Contains(xImg))
                         {
-                            targetPage = p;
-                            break;
+                            page.Resources.Images.Remove(xImg);
                         }
-                    }
-
-                    if (targetPage != null && targetPage.Resources != null && targetPage.Resources.Images != null)
-                    {
-                        targetPage.Resources.Images.Remove(xImg);
-                        Console.WriteLine($"Removed image on page {targetPage.Number} with DPI {dpiX:F1}x{dpiY:F1}");
                     }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processing complete. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

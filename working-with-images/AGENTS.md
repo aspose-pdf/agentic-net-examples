@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - working-with-images
 
-> **Working with images** in PDF using C# / .NET -- **66** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with images** in PDF using C# / .NET -- **69** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,22 +23,23 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (66/66 files) ← category-specific
-- `using Aspose.Pdf.Drawing;` (12/66 files)
-- `using Aspose.Pdf.Devices;` (8/66 files)
-- `using Aspose.Pdf.Text;` (8/66 files)
-- `using Aspose.Pdf.Annotations;` (5/66 files)
-- `using Aspose.Pdf.Optimization;` (2/66 files)
-- `using Aspose.Pdf.Operators;` (1/66 files)
-- `using System;` (66/66 files)
-- `using System.IO;` (66/66 files)
-- `using System.Collections.Generic;` (9/66 files)
-- `using System.Drawing.Imaging;` (4/66 files)
-- `using System.Reflection;` (3/66 files)
-- `using System.Text.Json;` (3/66 files)
-- `using System.Drawing;` (2/66 files)
-- `using System.Linq;` (1/66 files)
-- `using System.Security.Cryptography;` (1/66 files)
+- `using Aspose.Pdf;` (69/69 files) ← category-specific
+- `using Aspose.Pdf.Drawing;` (12/69 files)
+- `using Aspose.Pdf.Devices;` (9/69 files)
+- `using Aspose.Pdf.Text;` (9/69 files)
+- `using Aspose.Pdf.Annotations;` (6/69 files)
+- `using Aspose.Pdf.Optimization;` (2/69 files)
+- `using Aspose.Pdf.Facades;` (1/69 files)
+- `using Aspose.Pdf.Operators;` (1/69 files)
+- `using System;` (69/69 files)
+- `using System.IO;` (69/69 files)
+- `using System.Collections.Generic;` (10/69 files)
+- `using System.Drawing.Imaging;` (4/69 files)
+- `using System.Reflection;` (3/69 files)
+- `using System.Text.Json;` (3/69 files)
+- `using System.Drawing;` (2/69 files)
+- `using System.Linq;` (1/69 files)
+- `using System.Security.Cryptography;` (1/69 files)
 
 ## Common Code Pattern
 
@@ -62,7 +63,7 @@ using (Document doc = new Document("input.pdf"))
 | [add-background-pattern-image-to-pdf-pages](./add-background-pattern-image-to-pdf-pages.cs) | Add Background Pattern Image to PDF Pages | `Document`, `Page`, `ImageStamp` | Demonstrates how to overlay a semi‑transparent pattern image as a background on every page of a P... |
 | [add-centered-logo-to-first-pdf-page](./add-centered-logo-to-first-pdf-page.cs) | Add Company Logo to First Page of PDF | `Document`, `Page`, `ImageStamp` | Shows how to place a centered image stamp (logo) on the first page of a PDF using Aspose.Pdf. |
 | [add-decorative-footer-image-to-pdf-pages](./add-decorative-footer-image-to-pdf-pages.cs) | Add Footer Image to Each PDF Page | `Document`, `Page`, `ImageStamp` | Shows how to insert a decorative footer image on every page of a PDF with Aspose.Pdf, scaling the... |
-| [add-diagonal-image-watermark-to-pdf](./add-diagonal-image-watermark-to-pdf.cs) | Add Diagonal Image Watermark to PDF | `Document`, `ImageStamp`, `AddStamp` | Shows how to place an image watermark on every page of a PDF and rotate it 45 degrees for diagona... |
+| [add-diagonal-image-watermark-to-pdf__v2](./add-diagonal-image-watermark-to-pdf__v2.cs) | Add Diagonal Image Watermark to PDF | `Document`, `ImageStamp`, `AddStamp` | Shows how to place an image watermark on every page of a PDF and rotate it 45 degrees for diagona... |
 | [add-dicom-image-to-pdf-page](./add-dicom-image-to-pdf-page.cs) | Add DICOM Image to PDF Using FileStream | `Document`, `Page`, `Image` | Demonstrates loading a DICOM medical image from a FileStream and inserting it into a PDF page wit... |
 | [add-header-image-to-pdf-pages](./add-header-image-to-pdf-pages.cs) | Add Header Image to Each PDF Page | `Document`, `ImageStamp`, `PageCollection` | Shows how to place a decorative header image at the top of every page in a PDF using Aspose.Pdf, ... |
 | [add-image-with-alt-text-to-pdf](./add-image-with-alt-text-to-pdf.cs) | Add Image with Alt Text to PDF | `Document`, `Page`, `ImageStamp` | Shows how to insert an image into a PDF using Aspose.Pdf and assign alternative text for accessib... |
@@ -79,17 +80,17 @@ using (Document doc = new Document("input.pdf"))
 | [compress-large-images-in-pdf](./compress-large-images-in-pdf.cs) | Compress Large Images in PDF Using OptimizationOptions | `Document`, `OptimizationOptions`, `All` | Demonstrates how to reduce PDF size by compressing images (especially those larger than 2 MB) usi... |
 | [compress-pdf-images-using-optimization](./compress-pdf-images-using-optimization.cs) | Compress Large Images in PDF | `Document`, `Page`, `XImage` | Demonstrates detecting images larger than 1 MB in a PDF and applying Aspose.Pdf optimization to r... |
 | [convert-pdf-images-to-monochrome](./convert-pdf-images-to-monochrome.cs) | Convert PDF Images to Monochrome | `Document`, `Page`, `XImage` | Demonstrates how to iterate through a PDF, extract each embedded image, convert it to a grayscale... |
-| [convert-pdf-pages-to-png-with-default-font](./convert-pdf-pages-to-png-with-default-font.cs) | Render PDF Pages to PNG with Custom Font | `RenderingOptions`, `Resolution`, `PngDevice` | Shows how to set a default font for rendering and convert each page of a PDF into PNG images usin... |
+| [convert-pdf-pages-to-png-with-default-font](./convert-pdf-pages-to-png-with-default-font.cs) | Convert PDF Pages to PNG with Default Font Arial | `Document`, `PngDevice`, `Resolution` | Shows how to load a PDF, set RenderingOptions.DefaultFontName to "Arial", and render each page as... |
+| [convert-pdf-pages-to-png-with-default-font__v2](./convert-pdf-pages-to-png-with-default-font__v2.cs) | Render PDF Pages to PNG with Custom Font | `RenderingOptions`, `Resolution`, `PngDevice` | Shows how to set a default font for rendering and convert each page of a PDF into PNG images usin... |
 | [convert-pdf-to-multi-page-tiff-default-font](./convert-pdf-to-multi-page-tiff-default-font.cs) | Convert PDF to Multi-Page TIFF with Default Font Substitutio... | `Document`, `Add`, `SimpleFontSubstitution` | Shows how to convert an entire PDF document to a multi-page TIFF file using Aspose.Pdf while appl... |
 | [copy-vector-graphics-between-pdf-pages](./copy-vector-graphics-between-pdf-pages.cs) | Insert Extracted SVG Vector Graphic into PDF Page | `Document`, `SvgSaveOptions`, `Page` | Demonstrates extracting a vector graphic from a source PDF as SVG, loading it as an Image, and in... |
 | [correct-pdf-image-orientation](./correct-pdf-image-orientation.cs) | Correct EXIF Orientation of Images in PDF | `Document`, `Page`, `XImage` | The example loads a PDF, scans each embedded image for EXIF orientation metadata, rotates/flips t... |
 | [delete-raster-image-from-pdf-page](./delete-raster-image-from-pdf-page.cs) | Remove Specific Raster Image from PDF Page | `Document`, `Page`, `XImage` | Demonstrates how to delete a particular raster image from a PDF page by removing it from the page... |
 | [export-pdf-pages-to-bmp-300-dpi](./export-pdf-pages-to-bmp-300-dpi.cs) | Export PDF Pages to BMP Images at 300 DPI | `Document`, `BmpDevice`, `Resolution` | Shows how to convert each page of a PDF into a high‑resolution BMP image (300 DPI) using Aspose.P... |
-| [extract-images-from-multiple-pdfs](./extract-images-from-multiple-pdfs.cs) | Batch Extract Images from PDFs | `Document`, `Page`, `XImage` | Demonstrates how to process multiple PDF files in a folder and extract all embedded images to a d... |
-| ... | | | *and 36 more files* |
+| ... | | | *and 39 more files* |
 
 ## Category Statistics
-- Total examples: 66
+- Total examples: 69
 
 ## Category-Specific Tips
 
@@ -133,5 +134,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for working-with-images patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-10-25 | Run: `20261025_212854_576218`
+Updated: 2026-10-25 | Run: `20261025_232257_0da171`
 <!-- AUTOGENERATED:END -->
