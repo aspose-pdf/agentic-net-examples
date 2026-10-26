@@ -1,31 +1,8 @@
 {
   "category": "facades-acroforms",
   "nuget_version": "26.9.0",
-  "last_updated": "2026-10-22T06:26:44Z",
+  "last_updated": "2026-10-26T07:22:03Z",
   "examples": {
-    "list-pdf-form-field-names": {
-      "title": "List PDF Form Field Names with Aspose.Pdf",
-      "filename": "list-pdf-form-field-names.cs",
-      "description": "Shows how to load a PDF, access its AcroForm fields via the Form collection, and output each field's PartialName to the console.",
-      "tags": [
-        "acroform",
-        "form-fields",
-        "list",
-        "console",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Form",
-        "Aspose.Pdf.Forms.FieldCollection",
-        "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Forms.Field.PartialName"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
-      "status": "verified",
-      "task_id": "22237"
-    },
     "add-text-field-to-pdf": {
       "title": "Add Text Field to PDF Using Aspose.Pdf",
       "filename": "add-text-field-to-pdf.cs",
@@ -45,7 +22,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22238"
     },
@@ -67,7 +44,7 @@
         "Aspose.Pdf.Facades.Form.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22239"
     },
@@ -90,7 +67,7 @@
         "Aspose.Pdf.Facades.FormEditor.DecorateField"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22240"
     },
@@ -111,7 +88,7 @@
         "Aspose.Pdf.Facades.Form.GetButtonOptionValues"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22241"
     },
@@ -132,53 +109,9 @@
         "Aspose.Pdf.Facades.Form.GetButtonOptionCurrentValue"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22242"
-    },
-    "export-pdf-form-data-to-xml": {
-      "title": "Export PDF Form Data to JSON",
-      "filename": "export-pdf-form-data-to-xml.cs",
-      "description": "Loads a PDF document, enables automatic form field recalculation, and exports all form field values to a JSON file using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "forms",
-        "export",
-        "json",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Forms.Form.AutoRecalculate",
-        "Aspose.Pdf.Forms.Form.ExportToJson"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
-      "status": "verified",
-      "task_id": "22243"
-    },
-    "export-pdf-form-data-to-fdf": {
-      "title": "Export PDF Form Data to FDF File",
-      "filename": "export-pdf-form-data-to-fdf.cs",
-      "description": "Shows how to load a PDF, bind it to the Form facade, and export its AcroForm data to an FDF file using a file stream.",
-      "tags": [
-        "pdf",
-        "form",
-        "fdf",
-        "export",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.BindPdf",
-        "Aspose.Pdf.Facades.Form.ExportFdf"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
-      "status": "verified",
-      "task_id": "22244"
     },
     "export-pdf-form-fields-to-xfdf": {
       "title": "Export PDF Form Data to XFDF",
@@ -198,32 +131,9 @@
         "Aspose.Pdf.Facades.Form.ExportXfdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22245"
-    },
-    "export-pdf-form-fields-to-json": {
-      "title": "Export PDF Form Fields to JSON and Verify Structure",
-      "filename": "export-pdf-form-fields-to-json.cs",
-      "description": "Demonstrates how to export AcroForm field names and values from a PDF into a JSON file using Aspose.Pdf, then reads and validates the JSON structure.",
-      "tags": [
-        "pdf",
-        "acroform",
-        "export",
-        "json",
-        "validation"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Form",
-        "Aspose.Pdf.Form.ExportToJson",
-        "Aspose.Pdf.Document.Form",
-        "Aspose.Pdf.Document.Form.ExportToJson"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
-      "status": "verified",
-      "task_id": "22246"
     },
     "import-form-fields-from-xml": {
       "title": "Import XML Data into PDF Form Fields",
@@ -243,7 +153,7 @@
         "Aspose.Pdf.Facades.Form.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22247"
     },
@@ -265,73 +175,32 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22248"
     },
-    "import-xfdf-data-into-pdf-form": {
-      "title": "Import XFDF Form Data into a PDF",
-      "filename": "import-xfdf-data-into-pdf-form.cs",
-      "description": "Demonstrates how to bind an existing PDF, import form field values from an XFDF file using the Form facade, and save the updated document.",
-      "tags": [
-        "XFDF",
-        "AcroForm",
-        "Import",
-        "Aspose.Pdf",
-        "Facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.BindPdf",
-        "Aspose.Pdf.Facades.Form.ImportXfdf",
-        "Aspose.Pdf.Facades.Form.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
-      "status": "verified",
-      "task_id": "22249"
-    },
     "import-json-data-into-pdf-form": {
-      "title": "Import FDF Data into PDF Form with Missing Field Handling",
+      "title": "Import JSON Data into PDF Form Fields",
       "filename": "import-json-data-into-pdf-form.cs",
-      "description": "Demonstrates how to import FDF data into an AcroForm PDF using Aspose.Pdf.Facades.Form and handle missing form fields by catching the exception and logging the field name.",
+      "description": "Demonstrates loading a PDF, reading a JSON file, mapping its key‑value pairs to AcroForm fields, and saving the filled PDF while handling errors.",
       "tags": [
-        "acroforms",
-        "fdf",
+        "json",
+        "pdf-form",
         "import",
-        "error-handling",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.ImportFdf",
-        "Aspose.Pdf.Facades.Form.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
-      "status": "verified",
-      "task_id": "22275"
-    },
-    "batch-export-pdf-form-data-to-xml": {
-      "title": "Batch Export PDF Form Data to XML (XFDF)",
-      "filename": "batch-export-pdf-form-data-to-xml.cs",
-      "description": "Shows how to iterate over multiple PDF files, load each with Aspose.Pdf, and export its AcroForm data to an XFDF XML file using the Form facade.",
-      "tags": [
-        "acroform",
-        "xfdf",
-        "batch-export",
-        "pdf",
-        "aspdf"
+        "aspose-pdf",
+        "error-handling"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.ExportXfdf"
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.Field",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Forms.Form.Fields"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
-      "task_id": "22251"
+      "task_id": "22250"
     },
     "batch-import-json-data-into-pdfs": {
       "title": "Batch Import JSON Data into PDF Forms in Parallel",
@@ -352,7 +221,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22252"
     },
@@ -375,7 +244,7 @@
         "Aspose.Pdf.Text.TextAbsorber.Text"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22253"
     },
@@ -396,7 +265,7 @@
         "Aspose.Pdf.Form.ExportToJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22254"
     },
@@ -418,7 +287,7 @@
         "Aspose.Pdf.Forms.Field"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22255"
     },
@@ -441,7 +310,7 @@
         "Aspose.Pdf.Forms.Field.Name"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22256"
     },
@@ -463,31 +332,9 @@
         "Aspose.Pdf.Document.Form.Fields"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22257"
-    },
-    "import-form-data-from-json": {
-      "title": "Import JSON Data into PDF Form While Ignoring Missing Fields",
-      "filename": "import-form-data-from-json.cs",
-      "description": "Demonstrates how to load JSON data from a file and import it into an AcroForm PDF using Aspose.Pdf.Facades.Form, automatically skipping any fields that are not present in the PDF.",
-      "tags": [
-        "json",
-        "pdf-form",
-        "import",
-        "aspose-pdf",
-        "acroforms"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.BindPdf",
-        "Aspose.Pdf.Facades.Form.ImportJson",
-        "Aspose.Pdf.Facades.Form.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
-      "status": "verified",
-      "task_id": "22258"
     },
     "validate-xml-import-into-pdf-form": {
       "title": "Validate XML with XSD and Import into PDF Form",
@@ -507,7 +354,7 @@
         "Aspose.Pdf.Facades.Form.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22259"
     },
@@ -531,7 +378,7 @@
         "Aspose.Pdf.Facades.PdfFormEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22260"
     },
@@ -554,7 +401,7 @@
         "Aspose.Pdf.Forms.CheckBoxField"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22261"
     },
@@ -577,7 +424,7 @@
         "Aspose.Pdf.Forms.FieldCollection"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22262"
     },
@@ -602,7 +449,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22263"
     },
@@ -623,7 +470,7 @@
         "Aspose.Pdf.Facades.PdfFormEditor.GetRadioButtonOptions"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22264"
     },
@@ -646,32 +493,9 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22265"
-    },
-    "fill-pdf-form-fields-from-json": {
-      "title": "Fill PDF Form Fields from JSON",
-      "filename": "fill-pdf-form-fields-from-json.cs",
-      "description": "Loads a PDF template containing AcroForm fields, reads a JSON file of key/value pairs, maps each JSON property to a matching form field, sets the field value, and saves the populated PDF.",
-      "tags": [
-        "pdf",
-        "acroform",
-        "json",
-        "fill-form",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Forms.Field.Value"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
-      "status": "verified",
-      "task_id": "22266"
     },
     "update-pdf-acroform-fields-from-byte-array": {
       "title": "Update PDF Form Fields from Byte Array",
@@ -691,7 +515,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22267"
     },
@@ -712,7 +536,7 @@
         "Aspose.Pdf.Facades.PdfFormEditor.GetFields"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22268"
     },
@@ -734,33 +558,9 @@
         "Aspose.Pdf.Facades.FormFiller.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22269"
-    },
-    "export-pdf-form-data-to-json": {
-      "title": "Export PDF AcroForm Data to JSON and Deserialize to Typed Object",
-      "filename": "export-pdf-form-data-to-json.cs",
-      "description": "Demonstrates extracting AcroForm field values from a PDF, writing them to a JSON file, and deserializing the JSON into a strongly‑typed C# class using Json.NET.",
-      "tags": [
-        "AcroForm",
-        "JSON",
-        "Aspose.Pdf",
-        "deserialization",
-        "C#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Forms.FieldCollection",
-        "Aspose.Pdf.Forms.Field.PartialName",
-        "Aspose.Pdf.Forms.Field.Value"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
-      "status": "verified",
-      "task_id": "22270"
     },
     "import-json-data-into-pdf-acroform": {
       "title": "Import JSON Data into PDF Form using Aspose.Pdf Facade",
@@ -780,7 +580,7 @@
         "Aspose.Pdf.Facades.Form.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22271"
     },
@@ -803,7 +603,7 @@
         "Aspose.Pdf.Forms.Field.Value"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22272"
     },
@@ -824,7 +624,7 @@
         "Aspose.Pdf.Facades.PdfFormEditor.ExportFormDataToXml"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22273"
     },
@@ -847,7 +647,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22274"
     },
@@ -868,7 +668,7 @@
         "Aspose.Pdf.Facades.PdfFormEditor.ExportFormDataToXml"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22276"
     },
@@ -893,9 +693,232 @@
         "Aspose.Pdf.Forms.Field"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-22T06:26:44Z",
+      "generated_at": "2026-10-26T07:22:03Z",
       "status": "verified",
       "task_id": "22277"
+    },
+    "list-pdf-form-field-names__v2": {
+      "title": "List PDF Form Field Names with Aspose.Pdf",
+      "filename": "list-pdf-form-field-names__v2.cs",
+      "description": "Shows how to load a PDF, access its AcroForm fields via the Form collection, and output each field's PartialName to the console.",
+      "tags": [
+        "acroform",
+        "form-fields",
+        "list",
+        "console",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Form",
+        "Aspose.Pdf.Forms.FieldCollection",
+        "Aspose.Pdf.Forms.Field",
+        "Aspose.Pdf.Forms.Field.PartialName"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:22:03Z",
+      "status": "verified",
+      "task_id": "22237"
+    },
+    "export-pdf-form-data-to-xml__v5": {
+      "title": "Export PDF Form Data to JSON",
+      "filename": "export-pdf-form-data-to-xml__v5.cs",
+      "description": "Loads a PDF document, enables automatic form field recalculation, and exports all form field values to a JSON file using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "forms",
+        "export",
+        "json",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.Form.AutoRecalculate",
+        "Aspose.Pdf.Forms.Form.ExportToJson"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:22:03Z",
+      "status": "verified",
+      "task_id": "22243"
+    },
+    "export-pdf-form-data-to-fdf__v2": {
+      "title": "Export PDF Form Data to FDF File",
+      "filename": "export-pdf-form-data-to-fdf__v2.cs",
+      "description": "Shows how to load a PDF, bind it to the Form facade, and export its AcroForm data to an FDF file using a file stream.",
+      "tags": [
+        "pdf",
+        "form",
+        "fdf",
+        "export",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.BindPdf",
+        "Aspose.Pdf.Facades.Form.ExportFdf"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:22:03Z",
+      "status": "verified",
+      "task_id": "22244"
+    },
+    "export-pdf-form-fields-to-json__v6": {
+      "title": "Export PDF Form Fields to JSON and Verify Structure",
+      "filename": "export-pdf-form-fields-to-json__v6.cs",
+      "description": "Demonstrates how to export AcroForm field names and values from a PDF into a JSON file using Aspose.Pdf, then reads and validates the JSON structure.",
+      "tags": [
+        "pdf",
+        "acroform",
+        "export",
+        "json",
+        "validation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Form",
+        "Aspose.Pdf.Form.ExportToJson",
+        "Aspose.Pdf.Document.Form",
+        "Aspose.Pdf.Document.Form.ExportToJson"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:22:03Z",
+      "status": "verified",
+      "task_id": "22246"
+    },
+    "import-xfdf-data-into-pdf-form__v2": {
+      "title": "Import XFDF Form Data into a PDF",
+      "filename": "import-xfdf-data-into-pdf-form__v2.cs",
+      "description": "Demonstrates how to bind an existing PDF, import form field values from an XFDF file using the Form facade, and save the updated document.",
+      "tags": [
+        "XFDF",
+        "AcroForm",
+        "Import",
+        "Aspose.Pdf",
+        "Facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.BindPdf",
+        "Aspose.Pdf.Facades.Form.ImportXfdf",
+        "Aspose.Pdf.Facades.Form.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:22:03Z",
+      "status": "verified",
+      "task_id": "22249"
+    },
+    "batch-export-pdf-form-data-to-xml__v2": {
+      "title": "Batch Export PDF Form Data to XML (XFDF)",
+      "filename": "batch-export-pdf-form-data-to-xml__v2.cs",
+      "description": "Shows how to iterate over multiple PDF files, load each with Aspose.Pdf, and export its AcroForm data to an XFDF XML file using the Form facade.",
+      "tags": [
+        "acroform",
+        "xfdf",
+        "batch-export",
+        "pdf",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.ExportXfdf"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:22:03Z",
+      "status": "verified",
+      "task_id": "22251"
+    },
+    "import-form-data-from-json__v2": {
+      "title": "Import JSON Data into PDF Form While Ignoring Missing Fields",
+      "filename": "import-form-data-from-json__v2.cs",
+      "description": "Demonstrates how to load JSON data from a file and import it into an AcroForm PDF using Aspose.Pdf.Facades.Form, automatically skipping any fields that are not present in the PDF.",
+      "tags": [
+        "json",
+        "pdf-form",
+        "import",
+        "aspose-pdf",
+        "acroforms"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.BindPdf",
+        "Aspose.Pdf.Facades.Form.ImportJson",
+        "Aspose.Pdf.Facades.Form.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:22:03Z",
+      "status": "verified",
+      "task_id": "22258"
+    },
+    "fill-pdf-form-fields-from-json__v3": {
+      "title": "Fill PDF Form Fields from JSON",
+      "filename": "fill-pdf-form-fields-from-json__v3.cs",
+      "description": "Loads a PDF template containing AcroForm fields, reads a JSON file of key/value pairs, maps each JSON property to a matching form field, sets the field value, and saves the populated PDF.",
+      "tags": [
+        "pdf",
+        "acroform",
+        "json",
+        "fill-form",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.Field",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Forms.Field.Value"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:22:03Z",
+      "status": "verified",
+      "task_id": "22266"
+    },
+    "export-pdf-form-data-to-json__v7": {
+      "title": "Export PDF AcroForm Data to JSON and Deserialize to Typed Object",
+      "filename": "export-pdf-form-data-to-json__v7.cs",
+      "description": "Demonstrates extracting AcroForm field values from a PDF, writing them to a JSON file, and deserializing the JSON into a strongly‑typed C# class using Json.NET.",
+      "tags": [
+        "AcroForm",
+        "JSON",
+        "Aspose.Pdf",
+        "deserialization",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.Field",
+        "Aspose.Pdf.Forms.FieldCollection",
+        "Aspose.Pdf.Forms.Field.PartialName",
+        "Aspose.Pdf.Forms.Field.Value"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:22:03Z",
+      "status": "verified",
+      "task_id": "22270"
+    },
+    "import-json-data-into-pdf-form__v2": {
+      "title": "Import FDF Data into PDF Form with Missing Field Handling",
+      "filename": "import-json-data-into-pdf-form__v2.cs",
+      "description": "Demonstrates how to import FDF data into an AcroForm PDF using Aspose.Pdf.Facades.Form and handle missing form fields by catching the exception and logging the field name.",
+      "tags": [
+        "acroforms",
+        "fdf",
+        "import",
+        "error-handling",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.ImportFdf",
+        "Aspose.Pdf.Facades.Form.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:22:03Z",
+      "status": "verified",
+      "task_id": "22275"
     }
   }
 }
