@@ -1,30 +1,30 @@
 {
   "category": "facades-documents",
   "nuget_version": "26.9.0",
-  "last_updated": "2026-09-30T11:30:17Z",
+  "last_updated": "2026-10-26T07:28:50Z",
   "examples": {
     "insert-page-range-into-pdf": {
-      "title": "Insert Page Range from One PDF into Another Using Streams",
+      "title": "Insert a Range of Pages from One PDF into Another",
       "filename": "insert-page-range-into-pdf.cs",
-      "description": "Demonstrates loading source and destination PDFs from file streams, validating a page range, and inserting those pages into a specific position in the destination document using Aspose.Pdf.",
+      "description": "Demonstrates loading two PDF documents with Aspose.Pdf, validating a page range, and inserting the selected pages from the source PDF into a specific position of the destination PDF.",
       "tags": [
         "pdf",
         "page-insertion",
-        "streams",
         "aspose.pdf",
-        "c#"
+        "csharp",
+        "document-manipulation"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageCollection",
-        "Aspose.Pdf.PageCollection.Insert",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.PageCollection.Count"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Pages.Insert",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
-      "task_id": "21256"
+      "task_id": "21255"
     },
     "insert-selected-pages-into-pdf": {
       "title": "Insert Selected Pages from One PDF into Another",
@@ -45,7 +45,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21257"
     },
@@ -68,7 +68,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21258"
     },
@@ -91,7 +91,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21259"
     },
@@ -114,7 +114,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21260"
     },
@@ -136,7 +136,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21261"
     },
@@ -160,7 +160,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21262"
     },
@@ -183,7 +183,7 @@
         "Aspose.Pdf.Document.Pages.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21263"
     },
@@ -206,7 +206,7 @@
         "Aspose.Pdf.PageCollection.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21264"
     },
@@ -229,7 +229,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Extract"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21265"
     },
@@ -252,7 +252,7 @@
         "Aspose.Pdf.Document.Pages.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21266"
     },
@@ -275,7 +275,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21267"
     },
@@ -299,7 +299,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21268"
     },
@@ -322,7 +322,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21269"
     },
@@ -342,32 +342,29 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitFromFirst"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21270"
     },
     "split-pdf-into-bulk-page-sets": {
-      "title": "Split PDF into Bulk Page Sets Using Streams",
+      "title": "Split PDF into Multiple Page Ranges",
       "filename": "split-pdf-into-bulk-page-sets.cs",
-      "description": "Shows how to split an input PDF stream into multiple smaller PDFs, each containing up to a specified number of pages, and return the results as an array of MemoryStream objects.",
+      "description": "Demonstrates how to split a PDF into several files by specifying start‑end page ranges using Aspose.Pdf.Facades.PdfFileEditor.",
       "tags": [
         "pdf",
         "split",
-        "memorystream",
-        "bulk",
-        "aspnet"
+        "page-range",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages.Add",
-        "Aspose.Pdf.Document.Pages.Count"
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Extract"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
-      "task_id": "21272"
+      "task_id": "21271"
     },
     "split-pdf-from-page-to-end": {
       "title": "Extract PDF Pages from Start Page to End",
@@ -386,7 +383,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Extract(string, int, int, string)"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21273"
     },
@@ -406,31 +403,9 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToEnd"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21274"
-    },
-    "split-pdf-into-individual-pages": {
-      "title": "Split PDF into Individual Page PDFs",
-      "filename": "split-pdf-into-individual-pages.cs",
-      "description": "Shows how to split a multi‑page PDF into separate one‑page PDF files using Aspose.Pdf's Document class and page collection methods.",
-      "tags": [
-        "pdf",
-        "split",
-        "pages",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.PageCollection.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
-      "status": "verified",
-      "task_id": "21285"
     },
     "split-pdf-into-individual-page-pdfs": {
       "title": "Split PDF into Single-Page PDFs Using MemoryStream",
@@ -451,7 +426,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21276"
     },
@@ -473,7 +448,7 @@
         "Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21277"
     },
@@ -496,7 +471,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21278"
     },
@@ -516,7 +491,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitFromFirst"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21279"
     },
@@ -536,7 +511,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitFromFirst"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21280"
     },
@@ -556,7 +531,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToBulks"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21281"
     },
@@ -576,7 +551,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToBulks"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21282"
     },
@@ -596,7 +571,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToEnd"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21283"
     },
@@ -616,7 +591,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToEnd"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21284"
     },
@@ -638,7 +613,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21286"
     },
@@ -658,7 +633,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Delete"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21287"
     },
@@ -678,7 +653,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Delete"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21288"
     },
@@ -701,7 +676,7 @@
         "Aspose.Pdf.Document.Pages.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21289"
     },
@@ -724,7 +699,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21290"
     },
@@ -747,7 +722,7 @@
         "Aspose.Pdf.Document.Pages.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21291"
     },
@@ -767,7 +742,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21292"
     },
@@ -790,7 +765,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21293"
     },
@@ -810,7 +785,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21294"
     },
@@ -830,7 +805,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21295"
     },
@@ -850,7 +825,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21296"
     },
@@ -871,7 +846,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21297"
     },
@@ -894,7 +869,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21298"
     },
@@ -914,7 +889,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21299"
     },
@@ -935,7 +910,7 @@
         "Aspose.Pdf.PageSize"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21300"
     },
@@ -957,33 +932,33 @@
         "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21301"
     },
     "create-booklet-pdf-custom-page-size": {
-      "title": "Create Booklet PDF with Custom Page Size from Stream",
+      "title": "Create Booklet PDF with Custom Page Size Using Streams",
       "filename": "create-booklet-pdf-custom-page-size.cs",
-      "description": "Demonstrates how to generate a booklet from a PDF stream, set each page to a custom 5.5×8.5‑inch size, and save the result to disk using Aspose.Pdf.",
+      "description": "Shows how to load a PDF from a stream, reorder its pages into booklet order, apply custom page dimensions, and save the result using Aspose.Pdf.",
       "tags": [
         "booklet",
         "custom-size",
-        "pdf",
-        "stream",
+        "streams",
+        "page-reordering",
         "Aspose.Pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet",
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Document.Pages.Add",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
-      "task_id": "21323"
+      "task_id": "21302"
     },
     "create-pdf-booklet-in-separate-folders": {
       "title": "Create PDF Booklets and Save to Separate Directories",
@@ -1001,7 +976,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21303"
     },
@@ -1024,7 +999,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21304"
     },
@@ -1047,7 +1022,7 @@
         "PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21305"
     },
@@ -1067,7 +1042,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Delete"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21306"
     },
@@ -1091,7 +1066,7 @@
         "Aspose.Pdf.Pages.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21307"
     },
@@ -1114,7 +1089,7 @@
         "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21309"
     },
@@ -1137,7 +1112,7 @@
         "Aspose.Pdf.Document..ctor(Stream)"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21310"
     },
@@ -1160,7 +1135,7 @@
         "Aspose.Pdf.Page.SetPageSize"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21311"
     },
@@ -1183,7 +1158,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21312"
     },
@@ -1203,7 +1178,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21313"
     },
@@ -1223,7 +1198,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21314"
     },
@@ -1247,7 +1222,7 @@
         "Aspose.Pdf.Facades.BookletPdfProcessor.Process"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21316"
     },
@@ -1271,7 +1246,7 @@
         "Aspose.Pdf.Document.Pages.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21317"
     },
@@ -1294,7 +1269,7 @@
         "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21318"
     },
@@ -1314,7 +1289,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21319"
     },
@@ -1337,7 +1312,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Delete"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21320"
     },
@@ -1357,29 +1332,29 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21321"
     },
     "create-booklet-pdf-custom-page-order": {
-      "title": "Create Booklet PDF with Default Page Size",
+      "title": "Generate PDF Booklet Using Aspose.Pdf",
       "filename": "create-booklet-pdf-custom-page-order.cs",
-      "description": "Demonstrates how to generate a booklet PDF from an existing document using Aspose.Pdf.Facades.PdfFileEditor's MakeBooklet method with the default page size.",
+      "description": "Demonstrates how to create a booklet PDF from a source document with pages 1‑10 as left pages and 11‑20 as right pages using Aspose.Pdf.Facades.PdfFileEditor.",
       "tags": [
-        "booklet",
         "pdf",
-        "Aspose.Pdf",
-        "MakeBooklet",
-        "C#"
+        "booklet",
+        "aspose.pdf",
+        "csharp",
+        "pdf-manipulation"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
-      "task_id": "21337"
+      "task_id": "21322"
     },
     "validate-pdf-concatenation-page-order": {
       "title": "Validate PDF Concatenation Preserves Page Order",
@@ -1400,7 +1375,7 @@
         "Aspose.Pdf.Document.Pages.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21324"
     },
@@ -1423,7 +1398,7 @@
         "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21325"
     },
@@ -1443,7 +1418,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21326"
     },
@@ -1467,7 +1442,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21327"
     },
@@ -1490,7 +1465,7 @@
         "Aspose.Pdf.Document..ctor(Stream)"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21328"
     },
@@ -1514,29 +1489,29 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21329"
     },
     "concatenate-multiple-pdfs": {
-      "title": "Merge Multiple PDFs into a Single Document",
+      "title": "Concatenate Multiple PDFs into a Single Document",
       "filename": "concatenate-multiple-pdfs.cs",
-      "description": "Shows how to concatenate several PDF files into one PDF using Aspose.Pdf.Facades.PdfFileEditor.",
+      "description": "Demonstrates how to merge several PDF files into one using Aspose.Pdf.Facades.PdfFileEditor from a command‑line application.",
       "tags": [
         "pdf",
-        "merge",
-        "concatenate",
+        "concatenation",
         "aspose",
-        "facade"
+        "facade",
+        "command-line"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
-      "task_id": "21346"
+      "task_id": "21330"
     },
     "merge-pdfs-from-network-streams": {
       "title": "Merge PDFs from URLs without Temporary Files",
@@ -1554,7 +1529,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21331"
     },
@@ -1578,7 +1553,7 @@
         "Aspose.Pdf.PageSize"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21332"
     },
@@ -1601,7 +1576,7 @@
         "Aspose.Pdf.Document.Save(string)"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21333"
     },
@@ -1624,7 +1599,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21334"
     },
@@ -1647,7 +1622,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21335"
     },
@@ -1670,7 +1645,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21336"
     },
@@ -1693,7 +1668,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21338"
     },
@@ -1716,7 +1691,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21339"
     },
@@ -1740,7 +1715,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21340"
     },
@@ -1760,7 +1735,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21341"
     },
@@ -1783,7 +1758,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21342"
     },
@@ -1806,7 +1781,7 @@
         "Aspose.Pdf.Document.Pages.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21343"
     },
@@ -1829,7 +1804,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21344"
     },
@@ -1849,7 +1824,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21345"
     },
@@ -1860,7 +1835,7 @@
       "tags": [],
       "apis_used": [],
       "difficulty": "",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21347"
     },
@@ -1883,7 +1858,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21348"
     },
@@ -1906,7 +1881,7 @@
         "Aspose.Pdf.PageCollection.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21349"
     },
@@ -1929,7 +1904,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21350"
     },
@@ -1952,7 +1927,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21351"
     },
@@ -1975,7 +1950,7 @@
         "Aspose.Pdf.Pages.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21352"
     },
@@ -2000,7 +1975,7 @@
         "Aspose.Pdf.Text.HorizontalAlignment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21353"
     },
@@ -2023,7 +1998,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21354"
     },
@@ -2047,9 +2022,207 @@
         "Aspose.Pdf.Document.Pages.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-30T11:30:17Z",
+      "generated_at": "2026-10-26T07:28:50Z",
       "status": "verified",
       "task_id": "21355"
+    },
+    "insert-page-range-into-pdf__v2": {
+      "title": "Insert Page Range from One PDF into Another Using Streams",
+      "filename": "insert-page-range-into-pdf__v2.cs",
+      "description": "Demonstrates loading source and destination PDFs from file streams, validating a page range, and inserting those pages into a specific position in the destination document using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "page-insertion",
+        "streams",
+        "aspose.pdf",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection.Count"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:28:50Z",
+      "status": "verified",
+      "task_id": "21256"
+    },
+    "split-pdf-into-bulk-page-sets__v2": {
+      "title": "Split PDF into Bulk Page Sets Using Streams",
+      "filename": "split-pdf-into-bulk-page-sets__v2.cs",
+      "description": "Shows how to split an input PDF stream into multiple smaller PDFs, each containing up to a specified number of pages, and return the results as an array of MemoryStream objects.",
+      "tags": [
+        "pdf",
+        "split",
+        "memorystream",
+        "bulk",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Document.Pages.Count"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:28:50Z",
+      "status": "verified",
+      "task_id": "21272"
+    },
+    "split-pdf-into-individual-pages__v3": {
+      "title": "Split PDF into Individual Page Files",
+      "filename": "split-pdf-into-individual-pages__v3.cs",
+      "description": "Demonstrates how to split a PDF into separate one‑page PDF files using Aspose.Pdf.Facades and save each page to a specified output folder.",
+      "tags": [
+        "pdf",
+        "split",
+        "pages",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.SplitToPages"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:28:50Z",
+      "status": "verified",
+      "task_id": "21275"
+    },
+    "split-pdf-into-individual-pages__v4": {
+      "title": "Split PDF into Individual Page PDFs",
+      "filename": "split-pdf-into-individual-pages__v4.cs",
+      "description": "Shows how to split a multi‑page PDF into separate one‑page PDF files using Aspose.Pdf's Document class and page collection methods.",
+      "tags": [
+        "pdf",
+        "split",
+        "pages",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:28:50Z",
+      "status": "verified",
+      "task_id": "21285"
+    },
+    "create-booklet-custom-page-order": {
+      "title": "Create Booklet with Custom Page Order using Aspose.Pdf",
+      "filename": "create-booklet-custom-page-order.cs",
+      "description": "Demonstrates building a source PDF, defining custom left and right page arrays, manually assembling a booklet that respects those arrays, and extracting the resulting page order.",
+      "tags": [
+        "booklet",
+        "custom-page-order",
+        "aspose-pdf",
+        "pdf-manipulation",
+        "text-extraction"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:28:50Z",
+      "status": "verified",
+      "task_id": "21308"
+    },
+    "batch-create-nup-pdfs-3x2": {
+      "title": "Batch Create 3x2 N-up PDFs",
+      "filename": "batch-create-nup-pdfs-3x2.cs",
+      "description": "The example iterates over all PDF files in a folder and uses Aspose.Pdf's NUpPdfProcessor to generate N-up PDFs with three columns and two rows (6-up) for each document.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "batch",
+        "aspose",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.NUpPdfProcessor",
+        "Aspose.Pdf.Facades.NUpPdfProcessor.BindPdf",
+        "Aspose.Pdf.Facades.NUpPdfProcessor.Process",
+        "Aspose.Pdf.Facades.NUpPdfProcessor.Save",
+        "Aspose.Pdf.Facades.NUpOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:28:50Z",
+      "status": "verified",
+      "task_id": "21315"
+    },
+    "create-booklet-pdf-custom-page-size__v2": {
+      "title": "Create Booklet PDF with Custom Page Size from Stream",
+      "filename": "create-booklet-pdf-custom-page-size__v2.cs",
+      "description": "Demonstrates how to generate a booklet from a PDF stream, set each page to a custom 5.5×8.5‑inch size, and save the result to disk using Aspose.Pdf.",
+      "tags": [
+        "booklet",
+        "custom-size",
+        "pdf",
+        "stream",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:28:50Z",
+      "status": "verified",
+      "task_id": "21323"
+    },
+    "create-booklet-pdf-custom-page-order__v2": {
+      "title": "Create Booklet PDF with Default Page Size",
+      "filename": "create-booklet-pdf-custom-page-order__v2.cs",
+      "description": "Demonstrates how to generate a booklet PDF from an existing document using Aspose.Pdf.Facades.PdfFileEditor's MakeBooklet method with the default page size.",
+      "tags": [
+        "booklet",
+        "pdf",
+        "Aspose.Pdf",
+        "MakeBooklet",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:28:50Z",
+      "status": "verified",
+      "task_id": "21337"
+    },
+    "concatenate-multiple-pdfs__v2": {
+      "title": "Merge Multiple PDFs into a Single Document",
+      "filename": "concatenate-multiple-pdfs__v2.cs",
+      "description": "Shows how to concatenate several PDF files into one PDF using Aspose.Pdf.Facades.PdfFileEditor.",
+      "tags": [
+        "pdf",
+        "merge",
+        "concatenate",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:28:50Z",
+      "status": "verified",
+      "task_id": "21346"
     }
   }
 }

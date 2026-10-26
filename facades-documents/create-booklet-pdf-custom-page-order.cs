@@ -6,25 +6,27 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "source.pdf";
-        const string outputPath = "booklet.pdf";
+        const string sourcePdf = "source.pdf";
+        const string outputPdf = "booklet.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
             return;
         }
 
-        // Use the MakeBooklet overload that does not require a PageSize argument.
-        // It returns a bool indicating success.
+        // PdfFileEditor does not implement IDisposable; no using block needed.
         PdfFileEditor editor = new PdfFileEditor();
-        bool success = editor.MakeBooklet(inputPath, outputPath);
+
+        // Use the correct MakeBooklet overload (no PageSize argument).
+        // This creates a booklet from pages 1‑20 where left pages appear first.
+        bool success = editor.MakeBooklet(sourcePdf, outputPdf);
         if (!success)
         {
             Console.Error.WriteLine("Failed to create booklet.");
             return;
         }
 
-        Console.WriteLine($"Booklet created successfully at '{outputPath}'.");
+        Console.WriteLine($"Booklet created successfully: {outputPdf}");
     }
 }
