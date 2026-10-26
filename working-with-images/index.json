@@ -1,7 +1,7 @@
 {
   "category": "working-with-images",
   "nuget_version": "26.9.0",
-  "last_updated": "2026-10-26T04:33:50Z",
+  "last_updated": "2026-10-26T06:28:41Z",
   "examples": {
     "add-png-logo-to-first-page": {
       "title": "Add PNG Logo to First Page of PDF",
@@ -22,7 +22,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20173"
     },
@@ -46,7 +46,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20174"
     },
@@ -69,32 +69,9 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20175"
-    },
-    "add-diagonal-image-watermark-to-pdf": {
-      "title": "Add Diagonal Image Watermark to PDF",
-      "filename": "add-diagonal-image-watermark-to-pdf.cs",
-      "description": "Shows how to place an image watermark on every page of a PDF and rotate it 45 degrees for diagonal placement using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "watermark",
-        "image",
-        "rotation",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.ImageStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
-      "status": "verified",
-      "task_id": "20176"
     },
     "add-centered-logo-to-first-pdf-page": {
       "title": "Add Company Logo to First Page of PDF",
@@ -115,7 +92,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20177"
     },
@@ -138,7 +115,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20178"
     },
@@ -161,7 +138,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20179"
     },
@@ -184,7 +161,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20180"
     },
@@ -207,7 +184,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20181"
     },
@@ -230,7 +207,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20182"
     },
@@ -253,7 +230,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20183"
     },
@@ -276,7 +253,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20185"
     },
@@ -299,7 +276,7 @@
         "Aspose.Pdf.Color.FromArgb"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20186"
     },
@@ -322,7 +299,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20187"
     },
@@ -347,7 +324,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20188"
     },
@@ -370,7 +347,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20189"
     },
@@ -394,7 +371,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20190"
     },
@@ -418,7 +395,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20191"
     },
@@ -443,7 +420,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20192"
     },
@@ -467,7 +444,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20194"
     },
@@ -490,33 +467,35 @@
         "Aspose.Pdf.Document.OptimizeResources"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20195"
     },
     "replace-pdf-images-with-placeholder": {
-      "title": "Replace Appendix Images with Placeholder in PDF",
+      "title": "Replace PDF Images with Hyperlinked Placeholders",
       "filename": "replace-pdf-images-with-placeholder.cs",
-      "description": "The example loads a PDF, detects the start of the appendix section, and overlays each appendix page with a full‑page placeholder image while optionally setting alternative text for existing images.",
+      "description": "Shows how to remove images from each page of a PDF and insert a clickable text placeholder that links to the original image URL.",
       "tags": [
         "pdf",
-        "image-replacement",
-        "appendix",
+        "image",
         "placeholder",
-        "aspose-pdf"
+        "link",
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Text.TextExtractionOptions",
-        "Aspose.Pdf.ImageStamp",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.XImage"
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Position"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
-      "task_id": "20207"
+      "task_id": "20196"
     },
     "convert-pdf-images-to-monochrome": {
       "title": "Convert PDF Images to Monochrome",
@@ -539,7 +518,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20197"
     },
@@ -563,7 +542,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20198"
     },
@@ -586,7 +565,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20199"
     },
@@ -610,7 +589,7 @@
         "Aspose.Pdf.Annotations.TextIcon"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20200"
     },
@@ -633,7 +612,7 @@
         "Aspose.Pdf.Resources.Images.Replace"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20201"
     },
@@ -656,7 +635,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20202"
     },
@@ -679,7 +658,7 @@
         "Aspose.Pdf.Image.ImageStream"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20203"
     },
@@ -703,7 +682,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20205"
     },
@@ -727,7 +706,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20206"
     },
@@ -751,33 +730,35 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20208"
     },
     "remove-low-resolution-images-from-pdf": {
       "title": "Remove Low-Resolution Images from PDF",
       "filename": "remove-low-resolution-images-from-pdf.cs",
-      "description": "Demonstrates how to scan a PDF for image placements, calculate each image's DPI, and delete images whose DPI is below 72 using Aspose.Pdf's ImagePlacementAbsorber.",
+      "description": "Shows how to traverse PDF pages, use ImagePlacementAbsorber to locate images, evaluate their DPI, and delete any image whose horizontal or vertical resolution is below 72 DPI.",
       "tags": [
         "pdf",
         "image",
         "dpi",
-        "removal",
+        "filter",
         "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.ImagePlacementAbsorber",
         "Aspose.Pdf.ImagePlacement",
         "Aspose.Pdf.XImage",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Document.Save"
+        "Page.Accept",
+        "Document.Save",
+        "Page.Resources.Images.Remove"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
-      "task_id": "20210"
+      "task_id": "20209"
     },
     "remove-duplicate-images-from-pdf": {
       "title": "Remove Duplicate Images from PDF Pages",
@@ -799,7 +780,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20211"
     },
@@ -823,7 +804,7 @@
         "Aspose.Pdf.XImage.Height"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20212"
     },
@@ -847,7 +828,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20214"
     },
@@ -871,7 +852,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20215"
     },
@@ -895,7 +876,7 @@
         "Aspose.Pdf.Image.ImageScale"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20216"
     },
@@ -918,7 +899,7 @@
         "Aspose.Pdf.Page.Paragraphs"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20219"
     },
@@ -941,7 +922,7 @@
         "Aspose.Pdf.Paragraphs.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20242"
     },
@@ -964,7 +945,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20243"
     },
@@ -988,7 +969,7 @@
         "Aspose.Pdf.Drawing.Image.FixHeight"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20244"
     },
@@ -1011,7 +992,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20245"
     },
@@ -1035,7 +1016,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20246"
     },
@@ -1058,7 +1039,7 @@
         "Aspose.Pdf.XImage.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20247"
     },
@@ -1081,7 +1062,7 @@
         "Aspose.Pdf.XImage.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20248"
     },
@@ -1104,7 +1085,7 @@
         "Aspose.Pdf.XImage.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20249"
     },
@@ -1127,7 +1108,7 @@
         "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20250"
     },
@@ -1150,7 +1131,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20251"
     },
@@ -1174,7 +1155,7 @@
         "Aspose.Pdf.Devices.PngDevice.Process"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20252"
     },
@@ -1199,7 +1180,7 @@
         "Aspose.Pdf.Devices.Resolution"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20253"
     },
@@ -1222,32 +1203,32 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20254"
     },
     "convert-pdf-pages-to-png-with-default-font": {
-      "title": "Render PDF Pages to PNG with Custom Font",
+      "title": "Convert PDF Pages to PNG with Default Font Arial",
       "filename": "convert-pdf-pages-to-png-with-default-font.cs",
-      "description": "Shows how to set a default font for rendering and convert each page of a PDF into PNG images using Aspose.Pdf.",
+      "description": "Shows how to load a PDF, set RenderingOptions.DefaultFontName to \"Arial\", and render each page as a 300 DPI PNG image using Aspose.Pdf.",
       "tags": [
         "pdf",
-        "image-conversion",
+        "png",
+        "rendering-options",
         "default-font",
-        "rendering",
         "aspose-pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.RenderingOptions",
-        "Aspose.Pdf.Devices.Resolution",
-        "Aspose.Pdf.Devices.PngDevice",
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Rendering.RenderingOptions",
         "Aspose.Pdf.Devices.PngDevice.Process"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
-      "task_id": "20270"
+      "task_id": "20255"
     },
     "render-pdf-to-tiff-with-lzw-and-font-fallback": {
       "title": "Render PDF Pages to TIFF with LZW Compression and Font Fallback",
@@ -1269,7 +1250,7 @@
         "Aspose.Pdf.Devices.TiffDevice.Process"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20256"
     },
@@ -1292,7 +1273,7 @@
         "Aspose.Pdf.Devices.BmpDevice.Process"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20257"
     },
@@ -1316,33 +1297,9 @@
         "Aspose.Pdf.Devices.TiffDevice.Process"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20258"
-    },
-    "extract-vector-graphics-to-svg": {
-      "title": "Extract Vector Graphics from a PDF Page",
-      "filename": "extract-vector-graphics-to-svg.cs",
-      "description": "Shows how to load a PDF, retrieve the vector graphics (form XObjects) from a specific page, and copy them into a new PDF document using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "vector-graphics",
-        "extraction",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.XForm",
-        "Aspose.Pdf.Page.Resources",
-        "Aspose.Pdf.Page.Resources.Forms",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
-      "status": "verified",
-      "task_id": "20259"
     },
     "move-vector-graphic-position": {
       "title": "Move Vector Graphic by Adjusting Its Matrix",
@@ -1363,7 +1320,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20260"
     },
@@ -1387,7 +1344,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20262"
     },
@@ -1410,7 +1367,7 @@
         "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20263"
     },
@@ -1433,7 +1390,7 @@
         "Document.Pages.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20265"
     },
@@ -1456,7 +1413,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20266"
     },
@@ -1479,7 +1436,7 @@
         "Aspose.Pdf.Page.Resources.Images"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20267"
     },
@@ -1502,7 +1459,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20268"
     },
@@ -1525,7 +1482,7 @@
         "Aspose.Pdf.Devices.PngDevice.Process"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20269"
     },
@@ -1548,9 +1505,127 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:33:50Z",
+      "generated_at": "2026-10-26T06:28:41Z",
       "status": "verified",
       "task_id": "20271"
+    },
+    "add-diagonal-image-watermark-to-pdf__v2": {
+      "title": "Add Diagonal Image Watermark to PDF",
+      "filename": "add-diagonal-image-watermark-to-pdf__v2.cs",
+      "description": "Shows how to place an image watermark on every page of a PDF and rotate it 45 degrees for diagonal placement using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "watermark",
+        "image",
+        "rotation",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T06:28:41Z",
+      "status": "verified",
+      "task_id": "20176"
+    },
+    "replace-pdf-images-with-placeholder__v2": {
+      "title": "Replace Appendix Images with Placeholder in PDF",
+      "filename": "replace-pdf-images-with-placeholder__v2.cs",
+      "description": "The example loads a PDF, detects the start of the appendix section, and overlays each appendix page with a full‑page placeholder image while optionally setting alternative text for existing images.",
+      "tags": [
+        "pdf",
+        "image-replacement",
+        "appendix",
+        "placeholder",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.Text.TextExtractionOptions",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T06:28:41Z",
+      "status": "verified",
+      "task_id": "20207"
+    },
+    "remove-low-resolution-images-from-pdf__v2": {
+      "title": "Remove Low-Resolution Images from PDF",
+      "filename": "remove-low-resolution-images-from-pdf__v2.cs",
+      "description": "Demonstrates how to scan a PDF for image placements, calculate each image's DPI, and delete images whose DPI is below 72 using Aspose.Pdf's ImagePlacementAbsorber.",
+      "tags": [
+        "pdf",
+        "image",
+        "dpi",
+        "removal",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImagePlacementAbsorber",
+        "Aspose.Pdf.ImagePlacement",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T06:28:41Z",
+      "status": "verified",
+      "task_id": "20210"
+    },
+    "extract-vector-graphics-to-svg__v3": {
+      "title": "Extract Vector Graphics from a PDF Page",
+      "filename": "extract-vector-graphics-to-svg__v3.cs",
+      "description": "Shows how to load a PDF, retrieve the vector graphics (form XObjects) from a specific page, and copy them into a new PDF document using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "vector-graphics",
+        "extraction",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XForm",
+        "Aspose.Pdf.Page.Resources",
+        "Aspose.Pdf.Page.Resources.Forms",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T06:28:41Z",
+      "status": "verified",
+      "task_id": "20259"
+    },
+    "convert-pdf-pages-to-png-with-default-font__v2": {
+      "title": "Render PDF Pages to PNG with Custom Font",
+      "filename": "convert-pdf-pages-to-png-with-default-font__v2.cs",
+      "description": "Shows how to set a default font for rendering and convert each page of a PDF into PNG images using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "image-conversion",
+        "default-font",
+        "rendering",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.RenderingOptions",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.PngDevice.Process"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T06:28:41Z",
+      "status": "verified",
+      "task_id": "20270"
     }
   }
 }
