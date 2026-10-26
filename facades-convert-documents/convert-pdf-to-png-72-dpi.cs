@@ -8,34 +8,38 @@ class Program
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputDir = "PngPages";
+        const string outputDir = "output_images";
 
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPdf);
-        int pageCount = pdfDocument.Pages.Count;
-
-        // Configure the PNG device (resolution 72 DPI)
-        // Note: The UseCropBox property is not available in recent Aspose.Pdf versions.
-        // The device renders using the page's CropBox by default, so we omit the property.
-        var pngDevice = new PngDevice(new Resolution(72));
-
-        // Convert each page to a PNG image
-        for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
-            using (FileStream imageStream = new FileStream(outPath, FileMode.Create))
+            // Set the desired resolution (72 DPI) for the PNG output
+            var resolution = new Resolution(72);
+
+            // Iterate over all pages (1‑based indexing) and save each as a PNG file
+            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
             {
-                pngDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
+                string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+
+                // Use PngDevice (cross‑platform) to render the page to a PNG stream
+                using (FileStream imageStream = new FileStream(outPath, FileMode.Create))
+                {
+                    var pngDevice = new PngDevice(resolution);
+                    pngDevice.Process(doc.Pages[pageNumber], imageStream);
+                }
             }
-            Console.WriteLine($"Saved page {pageNumber} as PNG to '{outPath}'.");
         }
+
+        Console.WriteLine("PDF to PNG conversion completed.");
     }
 }
