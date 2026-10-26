@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - parse-pdf
 
-> **Parse PDF** in PDF using C# / .NET -- **57** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Parse PDF** in PDF using C# / .NET -- **63** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,30 +23,30 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (57/57 files) ← category-specific
-- `using Aspose.Pdf.Forms;` (19/57 files)
-- `using Aspose.Pdf.Text;` (12/57 files)
-- `using Aspose.Pdf.Annotations;` (3/57 files)
-- `using Aspose.Pdf.Devices;` (3/57 files)
-- `using Aspose.Pdf.Drawing;` (3/57 files)
-- `using Aspose.Pdf.Facades;` (1/57 files)
-- `using Aspose.Pdf.Vector;` (1/57 files)
-- `using System;` (57/57 files)
-- `using System.IO;` (57/57 files)
-- `using System.Collections.Generic;` (14/57 files)
-- `using System.Linq;` (10/57 files)
-- `using System.Text.Json;` (5/57 files)
-- `using System.Collections;` (2/57 files)
-- `using System.Collections.Concurrent;` (1/57 files)
-- `using System.Drawing;` (1/57 files)
-- `using System.Drawing.Imaging;` (1/57 files)
-- `using System.Drawing.Text;` (1/57 files)
-- `using System.Globalization;` (1/57 files)
-- `using System.Reflection;` (1/57 files)
-- `using System.Text;` (1/57 files)
-- `using System.Text.RegularExpressions;` (1/57 files)
-- `using System.Threading.Tasks;` (1/57 files)
-- `using System.Xml;` (1/57 files)
+- `using Aspose.Pdf;` (62/63 files) ← category-specific
+- `using Aspose.Pdf.Forms;` (21/63 files)
+- `using Aspose.Pdf.Text;` (13/63 files)
+- `using Aspose.Pdf.Annotations;` (3/63 files)
+- `using Aspose.Pdf.Devices;` (3/63 files)
+- `using Aspose.Pdf.Drawing;` (3/63 files)
+- `using Aspose.Pdf.Facades;` (1/63 files)
+- `using Aspose.Pdf.Vector;` (1/63 files)
+- `using System;` (63/63 files)
+- `using System.IO;` (63/63 files)
+- `using System.Collections.Generic;` (16/63 files)
+- `using System.Linq;` (10/63 files)
+- `using System.Text.Json;` (6/63 files)
+- `using System.Text;` (4/63 files)
+- `using System.Collections;` (2/63 files)
+- `using System.Collections.Concurrent;` (1/63 files)
+- `using System.Drawing;` (1/63 files)
+- `using System.Drawing.Imaging;` (1/63 files)
+- `using System.Drawing.Text;` (1/63 files)
+- `using System.Globalization;` (1/63 files)
+- `using System.Reflection;` (1/63 files)
+- `using System.Text.RegularExpressions;` (1/63 files)
+- `using System.Threading.Tasks;` (1/63 files)
+- `using System.Xml;` (1/63 files)
 
 ## Common Code Pattern
 
@@ -74,7 +74,11 @@ using (Document doc = new Document("input.pdf"))
 | [export-acroform-to-xfdf](./export-acroform-to-xfdf.cs) | Export AcroForm Fields to XFDF | `Document`, `Form`, `ExportAnnotationsToXfdf` | Loads a PDF, verifies the presence of AcroForm fields, and exports those fields to an XFDF file u... |
 | [export-pdf-annotations-to-xfdf](./export-pdf-annotations-to-xfdf.cs) | Export PDF Form Data to XFDF | `Document`, `Form`, `ExportXfdf` | Demonstrates loading a PDF, accessing its AcroForm, and exporting the form data to an XFDF file u... |
 | [export-pdf-form-data-to-fdf](./export-pdf-form-data-to-fdf.cs) | Export PDF Form Data to FDF Using FileStream | `Document`, `Form`, `Field` | Loads a PDF, verifies it contains form fields, and writes those fields to an FDF file using a Fil... |
-| [export-pdf-form-data-to-json](./export-pdf-form-data-to-json.cs) | Export PDF Form Data to JSON Stream | `Document`, `Form`, `ExportToJson` | Demonstrates how to load a PDF document with a form and export its field data directly to a JSON ... |
+| [export-pdf-form-data-to-json](./export-pdf-form-data-to-json.cs) | Export PDF Form Fields to JSON | `Document`, `Form`, `ExportToJson` | Shows how to load a PDF document with Aspose.Pdf, export all form fields to a JSON string using t... |
+| [export-pdf-form-data-to-json__v2](./export-pdf-form-data-to-json__v2.cs) | Save JSON Form Data to UTF-8 File |  | Demonstrates writing a JSON string containing form data to a UTF‑8 encoded file using File.WriteA... |
+| [export-pdf-form-data-to-json__v3](./export-pdf-form-data-to-json__v3.cs) | Extract PDF Form Data to JSON Files | `Document`, `Form`, `Form` | Loads each PDF in a folder, reads its form fields using Aspose.Pdf, and writes the extracted name... |
+| [export-pdf-form-data-to-json__v4](./export-pdf-form-data-to-json__v4.cs) | Export PDF Form Data to JSON | `Document`, `Form`, `ExportToJson` | Shows how to load a PDF with Aspose.Pdf, verify that it contains form fields, and export the form... |
+| [export-pdf-form-data-to-json__v5](./export-pdf-form-data-to-json__v5.cs) | Export PDF Form Data to JSON Stream | `Document`, `Form`, `ExportToJson` | Demonstrates how to load a PDF document with a form and export its field data directly to a JSON ... |
 | [export-pdf-form-data-to-xml](./export-pdf-form-data-to-xml.cs) | Export PDF Form Fields to JSON via MemoryStream | `Document`, `Form`, `ExportToJson` | Loads a PDF document, accesses its AcroForm, and writes the form fields as JSON directly into a M... |
 | [export-pdf-form-fields-to-xml](./export-pdf-form-fields-to-xml.cs) | Export PDF Form Fields to XML | `Document`, `Form`, `FieldCollection` | Loads a PDF document, iterates over its form fields, and writes each field's name, type, and valu... |
 | [export-pdf-form-fields-with-prefix-to-json](./export-pdf-form-fields-with-prefix-to-json.cs) | Export PDF Form Fields with Prefix Filter | `Document`, `Field`, `Form` | Loads a PDF, filters its form fields whose names start with a specified prefix, and writes the fi... |
@@ -89,14 +93,10 @@ using (Document doc = new Document("input.pdf"))
 | [extract-fonts-from-pdf-ttf](./extract-fonts-from-pdf-ttf.cs) | Extract Embedded Fonts from PDF as TTF/OTF Files | `Document`, `Page`, `Font` | Demonstrates how to read a PDF, locate embedded font resources, and save them as .ttf or .otf fil... |
 | [extract-graphic-element-as-svg](./extract-graphic-element-as-svg.cs) | Extract Graphic Element from PDF and Save as SVG | `Document`, `Page`, `XImage` | Demonstrates how to locate an image on a PDF page by its index, copy it into a new PDF, and expor... |
 | [extract-graphics-from-specific-pdf-pages](./extract-graphics-from-specific-pdf-pages.cs) | Extract Vector Graphics from Specific PDF Pages | `Document`, `Page`, `GraphicsAbsorber` | Shows how to use Aspose.Pdf's GraphicsAbsorber to visit selected pages and extract vector graphic... |
-| [extract-images-from-pdf](./extract-images-from-pdf.cs) | Extract Images from PDF and Save as PNG | `Document`, `Page`, `Resources` | Shows how to iterate through PDF pages using Aspose.Pdf, extract each embedded XImage, and write ... |
-| [extract-paragraphs-with-line-breaks](./extract-paragraphs-with-line-breaks.cs) | Extract Paragraph Text from PDF Preserving Line Breaks | `Document`, `TextAbsorber`, `TextExtractionOptions` | Demonstrates loading a PDF with Aspose.Pdf, extracting its text while keeping paragraph and line ... |
-| [extract-pdf-font-table-form-field-statistics](./extract-pdf-font-table-form-field-statistics.cs) | Extract PDF Font, Table, and Form Field Counts | `Document`, `Page`, `Resources` | Demonstrates how to open PDF files with Aspose.Pdf and count the number of fonts, tables, and for... |
-| [extract-pdf-form-field-values](./extract-pdf-form-field-values.cs) | Extract PDF Form Fields to Dictionary | `Document`, `Form`, `Fields` | Demonstrates loading a PDF with Aspose.Pdf, iterating over its form fields, and returning a case‑... |
-| ... | | | *and 27 more files* |
+| ... | | | *and 33 more files* |
 
 ## Category Statistics
-- Total examples: 57
+- Total examples: 63
 
 ## General Tips
 - See parent [AGENTS.md](../AGENTS.md) for:
@@ -107,5 +107,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for parse-pdf patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-10-08 | Run: `20261008_043531_e14173`
+Updated: 2026-10-26 | Run: `20261026_001223_9dc44d`
 <!-- AUTOGENERATED:END -->

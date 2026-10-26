@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,32 +8,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputJsonPath = "formdata.json";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
+            string json;
+
+            // Export all form fields to a JSON string using ExportToJson (writes to a stream)
+            using (var memory = new MemoryStream())
             {
-                // Export the form data directly to a JSON file stream
-                using (FileStream jsonStream = new FileStream(outputJsonPath, FileMode.Create, FileAccess.Write))
+                doc.Form.ExportToJson(memory);
+                memory.Position = 0; // rewind the stream
+                using (var reader = new StreamReader(memory, Encoding.UTF8))
                 {
-                    pdfDoc.Form.ExportToJson(jsonStream);
+                    json = reader.ReadToEnd();
                 }
             }
 
-            Console.WriteLine($"Form data successfully exported to '{outputJsonPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during export: {ex.Message}");
+            // Output the JSON string (could also be saved to a file if needed)
+            Console.WriteLine(json);
         }
     }
 }
