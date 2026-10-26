@@ -1,57 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // ------------------------------------------------------------
-        // 1. Create a minimal PDF in memory (acts as the "input" PDF).
-        // ------------------------------------------------------------
-        byte[] inputPdfBytes;
-        using (var doc = new Document())
-        {
-            // Add a single blank page – you can add any content you need here.
-            doc.Pages.Add();
+        const string inputPath = "input.pdf";
 
-            using (var ms = new MemoryStream())
-            {
-                doc.Save(ms);
-                inputPdfBytes = ms.ToArray();
-            }
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // 2. Edit the PDF entirely in memory using PdfPageEditor.
-        // ------------------------------------------------------------
-        using (var sourceStream = new MemoryStream(inputPdfBytes))
-        using (var destStream   = new MemoryStream())
+        // Load the PDF and modify it inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Ensure the source stream is positioned at the beginning.
-            sourceStream.Position = 0;
+            // Example modification: add a simple text annotation on the first page
+            Page page = doc.Pages[1];
+            var rect = new Rectangle(100, 500, 300, 550);
+            var annotation = new TextAnnotation(page, rect)
+            {
+                Title    = "Note",
+                Contents = "This PDF was processed in memory.",
+                Open     = true,
+                Icon     = TextIcon.Note
+            };
+            page.Annotations.Add(annotation);
 
-            // PdfPageEditor does not implement IDisposable, so we instantiate it directly.
-            var pageEditor = new PdfPageEditor();
+            // Save the modified PDF directly to a MemoryStream (no file I/O)
+            using (MemoryStream pdfStream = new MemoryStream())
+            {
+                doc.Save(pdfStream, SaveFormat.Pdf);
+                pdfStream.Position = 0; // reset for reading
 
-            // Bind the PDF document from the source memory stream.
-            pageEditor.BindPdf(sourceStream);
+                Console.WriteLine($"Modified PDF size in memory: {pdfStream.Length} bytes");
 
-            // Specify which page(s) to affect – 1‑based indexing.
-            pageEditor.ProcessPages = new int[] { 1 };
-
-            // Rotation angle in degrees (allowed values: 0, 90, 180, 270).
-            pageEditor.Rotation = 90;
-
-            // Save the edited PDF into the destination memory stream.
-            pageEditor.Save(destStream);
-
-            // Reset the position of the destination stream for further use.
-            destStream.Position = 0;
-
-            // Optional: write the edited PDF to a file for verification.
-            File.WriteAllBytes("output.pdf", destStream.ToArray());
+                // At this point pdfStream can be passed to other APIs (e.g., HTTP response, further processing)
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -15,21 +16,39 @@ class Program
             return;
         }
 
+        // Rotation values for each page (1‑based index). Adjust the array length as needed.
+        int[] rotations = new int[] { 0, 90, 180, 270 };
+
+        // Validate that every rotation value is allowed.
+        foreach (int angle in rotations)
+        {
+            if (!IsValidRotation(angle))
+            {
+                Console.Error.WriteLine($"Invalid rotation angle: {angle}. Allowed values are 0, 90, 180, 270.");
+                return;
+            }
+        }
+
+        // Use PdfPageEditor to apply per‑page rotations.
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the PDF into the editor
             editor.BindPdf(inputPath);
 
-            // Specify which page(s) to rotate (1‑based indexing)
-            editor.ProcessPages = new int[] { 1 };
+            // Build a dictionary where key = page number (1‑based) and value = rotation angle.
+            var pageRotations = new Dictionary<int, int>();
+            for (int i = 1; i <= rotations.Length; i++)
+            {
+                pageRotations[i] = rotations[i - 1];
+            }
+            editor.PageRotations = pageRotations;
 
-            // Set rotation angle in degrees. Allowed values are 0, 90, 180, or 270.
-            editor.Rotation = 90;
-
-            // Save the rotated PDF
+            // Save the modified PDF.
             editor.Save(outputPath);
         }
 
         Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
     }
+
+    // Helper to ensure only permitted rotation angles are used.
+    static bool IsValidRotation(int angle) => angle == 0 || angle == 90 || angle == 180 || angle == 270;
 }
