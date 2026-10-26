@@ -1,64 +1,89 @@
 using System;
-using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_with_bookmarks.pdf";
+        const string sourcePdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        // Ensure the source PDF exists – create a minimal one if it does not.
-        if (!File.Exists(inputPdf))
+        // -----------------------------------------------------------------
+        // 0. Ensure a source PDF exists – create a minimal one‑page document
+        //    if the file is missing. This makes the example self‑contained and
+        //    prevents a FileNotFoundException in the sandbox.
+        // -----------------------------------------------------------------
+        if (!File.Exists(sourcePdfPath))
         {
             using var placeholder = new Document();
             placeholder.Pages.Add();
-            placeholder.Save(inputPdf);
+            placeholder.Save(sourcePdfPath);
         }
 
-        // Simulated database query result: list of (title, pageNumber) tuples
-        List<(string Title, int PageNumber)> records = GetBookmarkRecordsFromDatabase();
+        // -----------------------------------------------------------------
+        // 1. Load the original PDF.
+        // -----------------------------------------------------------------
+        Document pdfDocument = new Document(sourcePdfPath);
 
-        // Initialize the bookmark editor and bind the existing PDF
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        // -----------------------------------------------------------------
+        // 2. Create an in‑memory DataTable that mimics the result of a DB query.
+        // -----------------------------------------------------------------
+        DataTable bookmarksTable = new DataTable();
+        bookmarksTable.Columns.Add("Title", typeof(string));
+        bookmarksTable.Columns.Add("PageNumber", typeof(int));
+
+        // Sample data – replace or extend as needed.
+        bookmarksTable.Rows.Add("Chapter 1", 1);
+        bookmarksTable.Rows.Add("Chapter 2", 5);
+        bookmarksTable.Rows.Add("Appendix", 12);
+
+        // -----------------------------------------------------------------
+        // 3. Iterate over the rows and add a bookmark for each record.
+        // -----------------------------------------------------------------
+        foreach (DataRow row in bookmarksTable.Rows)
         {
-            editor.BindPdf(inputPdf);
+            string title = (string)row["Title"];
+            int pageNumber = (int)row["PageNumber"];
 
-            // Insert a bookmark for each record
-            foreach (var rec in records)
+            // Ensure the page number is within the document range.
+            if (pageNumber < 1 || pageNumber > pdfDocument.Pages.Count)
+                continue; // skip invalid entries
+
+            // Create a GoToAction that points to the requested page.
+            var goToAction = new GoToAction(pdfDocument.Pages[pageNumber], ExplicitDestinationType.Fit);
+
+            // Create the bookmark (OutlineItemCollection) and attach the action.
+            var bookmark = new OutlineItemCollection(pdfDocument.Outlines)
             {
-                // Create a Bookmark instance and set its properties
-                Bookmark bm = new Bookmark
-                {
-                    Title = rec.Title,
-                    PageNumber = rec.PageNumber,
-                    Action = "GoTo"
-                };
+                Title = title,
+                Action = goToAction
+            };
 
-                // Add the bookmark to the document
-                editor.CreateBookmarks(bm);
-            }
-
-            // Save the PDF with the newly added bookmarks
-            editor.Save(outputPdf);
+            // Add the bookmark to the document's outline collection.
+            pdfDocument.Outlines.Add(bookmark);
         }
 
-        Console.WriteLine($"Bookmarks imported and saved to '{outputPdf}'.");
-    }
+        // -----------------------------------------------------------------
+        // 4. Save the modified PDF to the output path.
+        // -----------------------------------------------------------------
+        pdfDocument.Save(outputPdfPath);
 
-    // Placeholder for actual database access; returns sample data
-    static List<(string Title, int PageNumber)> GetBookmarkRecordsFromDatabase()
-    {
-        // Replace this with real DB query logic (e.g., ADO.NET, Dapper, EF Core)
-        return new List<(string, int)>
-        {
-            ("Introduction", 1),
-            ("Chapter 1", 3),
-            ("Chapter 2", 7),
-            ("Conclusion", 12)
-        };
+        Console.WriteLine($"Bookmarks imported successfully to '{outputPdfPath}'.");
     }
 }
+
+/*
+ * NOTE: The original build warnings were caused by a vulnerable version of
+ *       System.Security.Cryptography.Pkcs (9.0.0) that Aspose.Pdf brings in as a
+ *       transitive dependency. Adding an explicit PackageReference to a newer,
+ *       non‑vulnerable version (e.g., 8.0.0) resolves the warnings:
+ *
+ * <ItemGroup>
+ *   <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0" />
+ * </ItemGroup>
+ *
+ * The project file should be updated accordingly.
+ */

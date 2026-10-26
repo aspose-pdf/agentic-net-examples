@@ -2,14 +2,15 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using Aspose.Pdf.Facades;
+using System.Collections;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string pattern    = @"^Unwanted.*$"; // adjust regex as needed
+        const string pattern = @"^Draft.*$"; // adjust the regex as needed
 
         if (!File.Exists(inputPath))
         {
@@ -17,31 +18,32 @@ class Program
             return;
         }
 
-        // Initialize the bookmark editor and bind the PDF
-        PdfBookmarkEditor editor = new PdfBookmarkEditor();
+        // Bind the PDF to the bookmark editor
+        var editor = new PdfBookmarkEditor();
         editor.BindPdf(inputPath);
 
-        // Extract all bookmarks
-        Bookmarks allBookmarks = editor.ExtractBookmarks();
+        // Extract all bookmarks. In recent Aspose.Pdf versions this returns a Bookmarks collection.
+        var bookmarks = editor.ExtractBookmarks();
 
-        // Collect titles that match the regex
-        var regex = new Regex(pattern, RegexOptions.Compiled);
-        var titlesToDelete = new System.Collections.Generic.List<string>();
+        // Prepare the regex
+        var regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        foreach (Bookmark bm in allBookmarks)
+        // Iterate through the collection and delete matching titles.
+        // The concrete type of each item may vary between library versions, so we use reflection to obtain the Title.
+        foreach (var bm in (IEnumerable)bookmarks)
         {
-            if (bm.Title != null && regex.IsMatch(bm.Title))
-                titlesToDelete.Add(bm.Title);
-        }
-
-        // Delete each matching bookmark by title
-        foreach (string title in titlesToDelete)
-        {
-            editor.DeleteBookmarks(title);
+            var titleProp = bm.GetType().GetProperty("Title");
+            var title = titleProp?.GetValue(bm) as string;
+            if (!string.IsNullOrEmpty(title) && regex.IsMatch(title))
+            {
+                // DeleteBookmarks removes all entries that match the supplied title.
+                editor.DeleteBookmarks(title);
+            }
         }
 
         // Save the modified PDF
         editor.Save(outputPath);
-        Console.WriteLine($"Bookmarks matching pattern '{pattern}' have been removed. Saved to '{outputPath}'.");
+
+        Console.WriteLine($"Removed bookmarks matching '{pattern}'. Saved to '{outputPath}'.");
     }
 }

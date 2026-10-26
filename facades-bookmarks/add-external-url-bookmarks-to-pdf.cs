@@ -1,54 +1,51 @@
 using System;
 using System.IO;
-using System.Drawing; // System.Drawing.Color is required by PdfContentEditor
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations; // required for action types
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_bookmarks.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Ensure a source PDF exists – create a minimal one if it does not.
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            var placeholder = new Document();
-            placeholder.Pages.Add();
-            placeholder.Save(inputPdf);
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
         }
 
-        // Define bookmark titles and their target URLs
-        string[] titles = { "Google", "Microsoft", "GitHub" };
-        string[] urls   = { "https://www.google.com", "https://www.microsoft.com", "https://github.com" };
-        // Use System.Drawing.Color because PdfContentEditor.CreateBookmarksAction expects it
-        System.Drawing.Color[] colors = { System.Drawing.Color.Blue, System.Drawing.Color.Green, System.Drawing.Color.Purple };
+        // Load the PDF document
+        Document pdf = new Document(inputPath);
 
-        // Use PdfContentEditor (a Facades class) to add bookmarks with URI actions
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Add external URL bookmarks (level 1 in the outline hierarchy)
+        AddExternalBookmark(pdf, "Google", "https://www.google.com");
+        AddExternalBookmark(pdf, "Stack Overflow", "https://stackoverflow.com");
+        AddExternalBookmark(pdf, "Aspose PDF Docs", "https://docs.aspose.com/pdf/net/");
+
+        // Save the PDF with the new bookmarks
+        pdf.Save(outputPath);
+
+        Console.WriteLine($"Bookmarks added and saved to '{outputPath}'.");
+    }
+
+    /// <summary>
+    /// Adds a top‑level bookmark that points to an external URL.
+    /// </summary>
+    /// <param name="doc">The PDF document.</param>
+    /// <param name="title">The text displayed in the bookmark pane.</param>
+    /// <param name="url">The external web address.</param>
+    private static void AddExternalBookmark(Document doc, string title, string url)
+    {
+        // Create a new outline item (bookmark)
+        OutlineItemCollection bookmark = new OutlineItemCollection(doc.Outlines)
         {
-            // Load the PDF document
-            editor.BindPdf(inputPdf);
+            Title = title,
+            Action = new GoToURIAction(url) // Opens the URL in a browser when the bookmark is clicked
+        };
 
-            // Create a bookmark for each URL
-            for (int i = 0; i < titles.Length; i++)
-            {
-                // actionType "URI" creates a bookmark that opens an external web address
-                editor.CreateBookmarksAction(
-                    title:       titles[i],
-                    color:       colors[i],
-                    boldFlag:    true,
-                    italicFlag:  false,
-                    file:        null,          // not required for URI action
-                    actionType:  "URI",
-                    destination: urls[i]);      // external URL
-            }
-
-            // Save the modified PDF
-            editor.Save(outputPdf);
-        }
-
-        Console.WriteLine($"Bookmarks with external links saved to '{outputPdf}'.");
+        // Add the bookmark to the document's outline collection (top level)
+        doc.Outlines.Add(bookmark);
     }
 }

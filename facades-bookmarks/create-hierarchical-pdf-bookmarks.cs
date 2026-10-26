@@ -1,14 +1,16 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations; // for GoToAction and ExplicitDestinationType
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "bookmarked_output.pdf";
+        const string outputPath = "bookmarked.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,69 +18,52 @@ class Program
             return;
         }
 
-        // Create the bookmark editor facade
-        PdfBookmarkEditor editor = new PdfBookmarkEditor();
+        // Collect chapter titles and their page numbers.
+        // Simple heuristic: a line that starts with "Chapter" is considered a title.
+        List<(string Title, int Page)> chapters = new List<(string, int)>();
 
-        // Load (bind) the existing PDF document
-        editor.BindPdf(inputPath);
-
-        // -------------------------------------------------
-        // Build a hierarchical bookmark structure
-        // Example:
-        //   Chapter 1 (page 1)
-        //       Section 1.1 (page 2)
-        //       Section 1.2 (page 3)
-        //   Chapter 2 (page 4)
-        //       Section 2.1 (page 5)
-        // -------------------------------------------------
-
-        // Child bookmarks for Chapter 1
-        Bookmark sec11 = new Bookmark
+        // Load the PDF document.
+        using (Document doc = new Document(inputPath))
         {
-            Title = "Section 1.1",
-            PageNumber = 2
-        };
-        Bookmark sec12 = new Bookmark
-        {
-            Title = "Section 1.2",
-            PageNumber = 3
-        };
-        Bookmarks chapter1Children = new Bookmarks();
-        chapter1Children.Add(sec11);
-        chapter1Children.Add(sec12);
+            // Scan each page for chapter headings.
+            for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based page indexing
+            {
+                TextAbsorber absorber = new TextAbsorber
+                {
+                    ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
+                };
+                doc.Pages[i].Accept(absorber);
+                string pageText = absorber.Text;
 
-        Bookmark chapter1 = new Bookmark
-        {
-            Title = "Chapter 1",
-            PageNumber = 1,
-            ChildItem = chapter1Children
-        };
+                string[] lines = pageText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string line in lines)
+                {
+                    if (line.StartsWith("Chapter", StringComparison.OrdinalIgnoreCase))
+                    {
+                        chapters.Add((line.Trim(), i));
+                        break; // assume first matching line per page is the chapter title
+                    }
+                }
+            }
 
-        // Child bookmarks for Chapter 2
-        Bookmark sec21 = new Bookmark
-        {
-            Title = "Section 2.1",
-            PageNumber = 5
-        };
-        Bookmarks chapter2Children = new Bookmarks();
-        chapter2Children.Add(sec21);
+            // Add hierarchical bookmarks (level 1 = top‑level).
+            foreach (var (title, page) in chapters)
+            {
+                // Create a GoTo action that points to the target page.
+                Page targetPage = doc.Pages[page];
+                GoToAction goTo = new GoToAction(targetPage, ExplicitDestinationType.Fit);
 
-        Bookmark chapter2 = new Bookmark
-        {
-            Title = "Chapter 2",
-            PageNumber = 4,
-            ChildItem = chapter2Children
-        };
+                OutlineItemCollection bookmark = new OutlineItemCollection(doc.Outlines)
+                {
+                    Title = title,
+                    Action = goTo
+                };
+                doc.Outlines.Add(bookmark);
+            }
 
-        // Add top‑level bookmarks to the document
-        editor.CreateBookmarks(chapter1);
-        editor.CreateBookmarks(chapter2);
-
-        // Save the modified PDF with the new bookmark hierarchy
-        editor.Save(outputPath);
-
-        // Release resources held by the facade
-        editor.Close();
+            // Save the PDF with the new bookmarks.
+            doc.Save(outputPath);
+        }
 
         Console.WriteLine($"Bookmarks added and saved to '{outputPath}'.");
     }

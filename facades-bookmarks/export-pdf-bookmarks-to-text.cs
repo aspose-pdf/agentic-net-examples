@@ -1,55 +1,49 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // PdfBookmarkEditor, Bookmark, Bookmarks
+using System.Collections.Generic;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputTxtPath = "bookmarks.txt";
+        const string inputPdf = "input.pdf";
+        const string outputTxt = "bookmarks.txt";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Initialize the bookmark editor and bind the PDF
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
+
+        // The root outline collection of the document
+        OutlineCollection rootOutlines = pdfDocument.Outlines;
+
+        // Write the outline hierarchy to a plain‑text file
+        using (StreamWriter writer = new StreamWriter(outputTxt))
         {
-            editor.BindPdf(inputPdfPath);
-
-            // Extract all bookmarks (recursive hierarchy)
-            Aspose.Pdf.Facades.Bookmarks rootBookmarks = editor.ExtractBookmarks();
-
-            // Write the outline to a plain‑text file with indentation
-            using (StreamWriter writer = new StreamWriter(outputTxtPath))
-            {
-                WriteBookmarksRecursive(rootBookmarks, 0, writer);
-            }
-
-            // No need to call Save on the editor because we only read bookmarks
+            WriteBookmarks(rootOutlines, writer, 0);
         }
 
-        Console.WriteLine($"Bookmarks exported to '{outputTxtPath}'.");
+        Console.WriteLine($"Bookmarks exported to '{outputTxt}'.");
     }
 
-    // Recursively writes bookmarks preserving hierarchy indentation
-    private static void WriteBookmarksRecursive(Aspose.Pdf.Facades.Bookmarks bookmarks, int level, StreamWriter writer)
+    // Recursive helper that writes each bookmark with indentation reflecting its level
+    static void WriteBookmarks(IEnumerable<OutlineItemCollection> items, StreamWriter writer, int level)
     {
-        if (bookmarks == null) return;
-
-        foreach (Bookmark bm in bookmarks)
+        foreach (OutlineItemCollection item in items)
         {
-            // Indentation: 4 spaces per level
+            // Indent 4 spaces per hierarchy level
             string indent = new string(' ', level * 4);
-            writer.WriteLine($"{indent}{bm.Title}");
+            writer.WriteLine($"{indent}{item.Title}");
 
-            // Recursively process child bookmarks, if any
-            if (bm.ChildItem != null && bm.ChildItem.Count > 0)
+            // If the current item has child bookmarks, recurse into them
+            if (item.Count > 0)
             {
-                WriteBookmarksRecursive(bm.ChildItem, level + 1, writer);
+                WriteBookmarks(item, writer, level + 1);
             }
         }
     }

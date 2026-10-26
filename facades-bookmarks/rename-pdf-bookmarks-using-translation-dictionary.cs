@@ -1,49 +1,66 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
+    // Recursively rename bookmarks (outline items) using the provided translation dictionary
+    static void RenameBookmarks(IEnumerable<OutlineItemCollection> items, Dictionary<string, string> translations)
+    {
+        foreach (OutlineItemCollection item in items)
+        {
+            if (!string.IsNullOrEmpty(item.Title) && translations.TryGetValue(item.Title, out string newTitle))
+            {
+                item.Title = newTitle; // replace with translated title
+            }
+
+            // Process child outline items, if any
+            if (item.Count > 0)
+            {
+                // OutlineItemCollection implements IEnumerable<OutlineItemCollection>,
+                // so we can pass it directly to the same method.
+                RenameBookmarks(item, translations);
+            }
+        }
+    }
+
     static void Main()
     {
-        // Input and output PDF files
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_renamed.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_translated_bookmarks.pdf";
 
-        // Translation dictionary: original bookmark title -> new title
-        var translation = new Dictionary<string, string>
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Example translation dictionary: original bookmark title -> translated title
+        var translationDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "Chapter 1", "Capítulo 1" },
-            { "Chapter 2", "Capítulo 2" },
+            { "Introduction", "Introducción" },
             { "Conclusion", "Conclusión" }
             // Add more entries as needed
         };
 
-        // Verify the source file exists
-        if (!File.Exists(inputPdf))
+        try
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdf}");
-            return;
-        }
+            // Load the PDF document
+            Document pdfDocument = new Document(inputPath);
 
-        // Use PdfBookmarkEditor (create‑load‑save lifecycle)
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+            // Rename bookmarks according to the translation dictionary
+            RenameBookmarks(pdfDocument.Outlines, translationDict);
+
+            // Save the updated PDF
+            pdfDocument.Save(outputPath);
+
+            Console.WriteLine($"Bookmarks renamed and saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
         {
-            // Load the PDF document into the editor
-            editor.BindPdf(inputPdf);
-
-            // Rename each bookmark according to the dictionary
-            foreach (var kvp in translation)
-            {
-                // ModifyBookmarks changes all bookmarks with the source title to the destination title
-                editor.ModifyBookmarks(kvp.Key, kvp.Value);
-            }
-
-            // Save the modified PDF
-            editor.Save(outputPdf);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        Console.WriteLine($"Bookmarks renamed and saved to '{outputPdf}'.");
     }
 }

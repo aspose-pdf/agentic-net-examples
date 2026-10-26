@@ -1,97 +1,81 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";      // source PDF
-        const string csvPath   = "bookmarks.csv";  // CSV with Title,Level,Page
-        const string outPath   = "output.pdf";     // PDF with imported bookmarks
+        const string pdfPath = "input.pdf";
+        const string csvPath = "bookmarks.csv";
+        const string outputPath = "output.pdf";
 
+        // Verify input files exist
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
         if (!File.Exists(csvPath))
         {
-            Console.Error.WriteLine($"CSV not found: {csvPath}");
+            Console.Error.WriteLine($"CSV file not found: {csvPath}");
             return;
         }
 
-        // Initialize the bookmark editor and bind the source PDF
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        // PdfBookmarkEditor does not implement IDisposable, so no using block is required
+        var bookmarkEditor = new PdfBookmarkEditor();
+        bookmarkEditor.BindPdf(pdfPath);
+
+        // Process each line of the CSV file
+        foreach (var line in File.ReadLines(csvPath))
         {
-            editor.BindPdf(pdfPath);
+            // Skip empty or whitespace‑only lines
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
 
-            // Parse CSV and build a hierarchical bookmark structure
-            List<Bookmark> topLevelBookmarks = new List<Bookmark>();
-            Stack<Bookmark> hierarchyStack = new Stack<Bookmark>();
+            // Expected CSV format: title,level,destination
+            // Destination is interpreted as a 1‑based page number
+            var parts = line.Split(',');
 
-            using (StreamReader sr = new StreamReader(csvPath))
+            if (parts.Length < 3)
             {
-                while (!sr.EndOfStream)
-                {
-                    string line = sr.ReadLine();
-                    if (string.IsNullOrWhiteSpace(line))
-                        continue; // skip empty lines
-
-                    // Expected CSV format: Title,Level,PageNumber
-                    string[] parts = line.Split(',');
-                    if (parts.Length < 3)
-                        continue; // malformed line – ignore
-
-                    string title = parts[0].Trim();
-                    if (!int.TryParse(parts[1].Trim(), out int level) || level < 1)
-                        continue; // invalid level – ignore
-                    if (!int.TryParse(parts[2].Trim(), out int pageNumber) || pageNumber < 1)
-                        continue; // invalid page – ignore
-
-                    // Create a new bookmark for this entry
-                    Bookmark bm = new Bookmark
-                    {
-                        Title      = title,
-                        PageNumber = pageNumber
-                    };
-
-                    // Adjust the stack to match the current level
-                    while (hierarchyStack.Count >= level)
-                        hierarchyStack.Pop();
-
-                    if (hierarchyStack.Count == 0)
-                    {
-                        // This is a top‑level bookmark
-                        topLevelBookmarks.Add(bm);
-                    }
-                    else
-                    {
-                        // Attach as a child of the current parent
-                        Bookmark parent = hierarchyStack.Peek();
-                        if (parent.ChildItem == null)
-                            parent.ChildItem = new Bookmarks();
-
-                        parent.ChildItem.Add(bm);
-                    }
-
-                    // Push the current bookmark onto the stack
-                    hierarchyStack.Push(bm);
-                }
+                Console.Error.WriteLine($"Invalid line (expected 3 columns): {line}");
+                continue;
             }
 
-            // Add the constructed bookmarks to the PDF
-            foreach (Bookmark topBm in topLevelBookmarks)
+            var title = parts[0].Trim();
+
+            // Parse bookmark level (must be >= 1)
+            if (!int.TryParse(parts[1].Trim(), out int level) || level < 1)
             {
-                editor.CreateBookmarks(topBm);
+                Console.Error.WriteLine($"Invalid level in line: {line}");
+                continue;
             }
 
-            // Save the resulting PDF
-            editor.Save(outPath);
-            // Optional: close the editor (handled by using)
+            // Parse destination page number (must be >= 1)
+            if (!int.TryParse(parts[2].Trim(), out int destination) || destination < 1)
+            {
+                Console.Error.WriteLine($"Invalid destination (page number) in line: {line}");
+                continue;
+            }
+
+            // Build a Bookmark object and add it via CreateBookmarks(Bookmark)
+            var bookmark = new Bookmark
+            {
+                Title = title,
+                PageNumber = destination,
+                Level = level,
+                Action = "GoTo"
+            };
+
+            // Add the bookmark to the PDF
+            bookmarkEditor.CreateBookmarks(bookmark);
         }
 
-        Console.WriteLine($"Bookmarks imported and saved to '{outPath}'.");
+        // Save the modified PDF with the new bookmarks
+        bookmarkEditor.Save(outputPath);
+
+        Console.WriteLine($"Bookmarks imported and saved to '{outputPath}'.");
     }
 }

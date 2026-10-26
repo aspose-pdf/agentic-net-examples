@@ -4,7 +4,7 @@ using System.IO;
 using System.Text.Json;
 using Aspose.Pdf.Facades;
 
-namespace BookmarkExportExample
+namespace BookmarkExport
 {
     // Simple DTO for JSON serialization
     public class BookmarkInfo
@@ -23,46 +23,57 @@ namespace BookmarkExportExample
 
             if (!File.Exists(inputPdfPath))
             {
-                Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+                Console.Error.WriteLine($"File not found: {inputPdfPath}");
                 return;
             }
 
-            // Extract bookmarks using PdfBookmarkEditor (facade API)
-            using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+            try
             {
-                editor.BindPdf(inputPdfPath);
+                // Use the facade model for bookmark handling
+                using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
+                {
+                    bookmarkEditor.BindPdf(inputPdfPath);
 
-                // Get all bookmarks (recursive hierarchy)
-                var allBookmarks = editor.ExtractBookmarks();
+                    // Extract the top‑level bookmark collection using the correct API
+                    Bookmarks rootBookmarks = bookmarkEditor.ExtractBookmarks();
 
-                var flatList = new List<BookmarkInfo>();
-                TraverseBookmarks(allBookmarks, 1, flatList);
+                    // Flatten the hierarchy into a list with level information
+                    List<BookmarkInfo> flatList = new List<BookmarkInfo>();
+                    ExtractBookmarks(rootBookmarks, 1, flatList); // level starts at 1
 
-                // Serialize to JSON with indentation for readability
-                JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(flatList, jsonOptions);
+                    // Serialize to pretty‑printed JSON
+                    JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+                    string json = JsonSerializer.Serialize(flatList, jsonOptions);
+                    File.WriteAllText(outputJsonPath, json);
+                }
 
-                File.WriteAllText(outputJsonPath, json);
-                Console.WriteLine($"Bookmarks exported to '{outputJsonPath}'.");
+                Console.WriteLine($"Bookmark hierarchy exported to '{outputJsonPath}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
             }
         }
 
-        // Recursively walk the bookmark tree, recording title, level and page number
-        private static void TraverseBookmarks(Aspose.Pdf.Facades.Bookmarks bookmarks, int level, List<BookmarkInfo> result)
+        // Recursively walk the bookmark tree using the facade model types
+        private static void ExtractBookmarks(Bookmarks bookmarks, int level, List<BookmarkInfo> list)
         {
-            foreach (Aspose.Pdf.Facades.Bookmark bm in bookmarks)
+            foreach (Bookmark bm in bookmarks)
             {
-                result.Add(new BookmarkInfo
+                // PageNumber is always available in the facade model
+                int pageNumber = bm.PageNumber;
+
+                list.Add(new BookmarkInfo
                 {
                     Title = bm.Title,
                     Level = level,
-                    PageNumber = bm.PageNumber
+                    PageNumber = pageNumber
                 });
 
-                // If the bookmark has children, recurse with increased level
-                if (bm.ChildItem != null && bm.ChildItem.Count > 0)
+                // Process child bookmarks, if any
+                if (bm.ChildItems != null && bm.ChildItems.Count > 0)
                 {
-                    TraverseBookmarks(bm.ChildItem, level + 1, result);
+                    ExtractBookmarks(bm.ChildItems, level + 1, list);
                 }
             }
         }

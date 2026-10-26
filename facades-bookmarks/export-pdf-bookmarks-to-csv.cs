@@ -1,63 +1,58 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using System.Collections.Generic;
+using Aspose.Pdf.Facades;   // Facade API for bookmark handling
+using Aspose.Pdf;           // Core API (required for Destination type)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "bookmarks.csv";
+        const string inputPdf  = "input.pdf";
+        const string outputCsv = "bookmarks.csv";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Open the PDF and extract bookmarks using PdfBookmarkEditor
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        try
         {
-            editor.BindPdf(inputPdfPath);
+            // Bind the PDF to the bookmark editor (no IDisposable required)
+            PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
+            bookmarkEditor.BindPdf(inputPdf);
 
-            // Extract all bookmarks (recursive)
-            Bookmarks bookmarks = editor.ExtractBookmarks();
+            // Extract all bookmarks; each Bookmark contains Title, Destination and Level
+            IList<Bookmark> bookmarks = bookmarkEditor.ExtractBookmarks();
 
-            // Write bookmarks to CSV
-            using (StreamWriter writer = new StreamWriter(outputCsvPath, false))
+            // Write CSV header and rows
+            using (StreamWriter writer = new StreamWriter(outputCsv))
             {
-                // CSV header
-                writer.WriteLine("Title,Destination,Level");
+                writer.WriteLine("Title,Destination,Level"); // CSV header
 
-                // Recursive traversal to capture hierarchy level
-                WriteBookmarksRecursive(bookmarks, 0, writer);
+                foreach (Bookmark bm in bookmarks)
+                {
+                    // Destination: use the raw destination string (it may be a page number, named destination, etc.)
+                    string destination = bm.Destination ?? string.Empty;
+
+                    // Escape title for CSV (double quotes and commas)
+                    string title = bm.Title ?? string.Empty;
+                    title = title.Replace("\"", "\"\""); // double up quotes
+                    if (title.Contains(",") || title.Contains("\""))
+                    {
+                        title = $"\"{title}\"";
+                    }
+
+                    writer.WriteLine($"{title},{destination},{bm.Level}");
+                }
             }
 
-            // No need to call Save on the editor because we are only reading.
+            Console.WriteLine($"Bookmarks extracted to '{outputCsv}'.");
         }
-
-        Console.WriteLine($"Bookmarks exported to '{outputCsvPath}'.");
-    }
-
-    // Recursively writes each bookmark with its hierarchy level
-    private static void WriteBookmarksRecursive(Bookmarks bookmarks, int level, StreamWriter writer)
-    {
-        foreach (Bookmark bm in bookmarks)
+        catch (Exception ex)
         {
-            // Resolve destination: prefer explicit Destination, fallback to PageNumber
-            string destination = bm.Destination != null ? bm.Destination.ToString() :
-                                 bm.PageNumber > 0 ? $"Page {bm.PageNumber}" : string.Empty;
-
-            // Escape commas in title by surrounding with double quotes if needed
-            string title = bm.Title?.Contains(",") == true ? $"\"{bm.Title}\"" : bm.Title;
-
-            writer.WriteLine($"{title},{destination},{level}");
-
-            // If the bookmark has child items, recurse with increased level
-            if (bm.ChildItem != null && bm.ChildItem.Count > 0)
-            {
-                WriteBookmarksRecursive(bm.ChildItem, level + 1, writer);
-            }
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

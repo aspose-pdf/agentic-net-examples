@@ -1,61 +1,46 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_zoomed.pdf";
-        const int zoomLevel = 150; // 150% magnification
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_bookmarked.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the bookmark editor (lifecycle: create)
-        using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
+        // Bind the PDF to the bookmark editor (PdfBookmarkEditor does NOT implement IDisposable)
+        PdfBookmarkEditor editor = new PdfBookmarkEditor();
+        editor.BindPdf(inputPath);
+
+        // Extract existing bookmarks
+        Bookmarks bookmarks = editor.ExtractBookmarks();
+
+        // Update each bookmark to open at 150% zoom (XYZ destination with Zoom = 150)
+        foreach (Bookmark bm in bookmarks)
         {
-            // Load the PDF into the editor (lifecycle: load)
-            bookmarkEditor.BindPdf(inputPdf);
-
-            // Extract the top‑level bookmarks collection (ExtractBookmarks returns Bookmarks, not a single Bookmark)
-            Bookmarks topBookmarks = bookmarkEditor.ExtractBookmarks();
-
-            if (topBookmarks != null)
-            {
-                // Iterate over each top‑level bookmark and set the zoom recursively
-                foreach (Bookmark bm in topBookmarks)
-                {
-                    SetZoomForBookmarkTree(bm, zoomLevel);
-                }
-            }
-
-            // Save the modified PDF (lifecycle: save)
-            bookmarkEditor.Save(outputPdf);
+            bm.PageDisplay = "XYZ";          // specify XYZ destination type
+            bm.PageDisplay_Zoom = 150;        // zoom expressed as a percentage
         }
 
-        Console.WriteLine($"Bookmarks updated with {zoomLevel}% zoom. Saved to '{outputPdf}'.");
-    }
-
-    // Recursively traverses bookmark tree and sets PageDisplay_Zoom
-    private static void SetZoomForBookmarkTree(Bookmark bookmark, int zoom)
-    {
-        if (bookmark == null) return;
-
-        // Set zoom factor for this bookmark
-        bookmark.PageDisplay_Zoom = zoom;
-
-        // Process child bookmarks if any
-        if (bookmark.ChildItems != null)
+        // Remove the old bookmarks and add the modified ones back
+        editor.DeleteBookmarks();
+        foreach (Bookmark bm in bookmarks)
         {
-            foreach (Bookmark child in bookmark.ChildItems)
-            {
-                SetZoomForBookmarkTree(child, zoom);
-            }
+            editor.CreateBookmarks(bm);
         }
+
+        // Save the modified PDF
+        editor.Save(outputPath);
+        editor.Close();
+
+        Console.WriteLine($"Bookmarks updated to 150% zoom and saved to '{outputPath}'.");
     }
 }
