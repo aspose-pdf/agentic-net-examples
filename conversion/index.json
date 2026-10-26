@@ -1,7 +1,7 @@
 {
   "category": "conversion",
   "nuget_version": "26.9.0",
-  "last_updated": "2026-09-28T07:16:49Z",
+  "last_updated": "2026-10-26T07:14:35Z",
   "examples": {
     "convert-pdf-to-docx-layout": {
       "title": "Convert PDF to DOCX with Standard Layout Preservation",
@@ -22,7 +22,7 @@
         "Aspose.Pdf.DocSaveOptions.RecognitionMode"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18391"
     },
@@ -45,7 +45,7 @@
         "Aspose.Pdf.DocSaveOptions.DocFormat"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18392"
     },
@@ -66,7 +66,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18393"
     },
@@ -89,7 +89,7 @@
         "Aspose.Pdf.DocSaveOptions.RecognitionMode"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18394"
     },
@@ -112,7 +112,7 @@
         "Aspose.Pdf.DocSaveOptions.DocFormat"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18395"
     },
@@ -134,7 +134,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18396"
     },
@@ -157,7 +157,7 @@
         "Aspose.Pdf.DocSaveOptions.Format"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18397"
     },
@@ -180,7 +180,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18398"
     },
@@ -204,7 +204,7 @@
         "Aspose.Pdf.XImage.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18399"
     },
@@ -227,7 +227,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18400"
     },
@@ -249,7 +249,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18401"
     },
@@ -273,7 +273,7 @@
         "Aspose.Pdf.Document.Convert"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18402"
     },
@@ -296,7 +296,7 @@
         "Aspose.Pdf.DocSaveOptions.DocFormat"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18403"
     },
@@ -321,7 +321,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18404"
     },
@@ -345,30 +345,30 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18405"
     },
     "convert-pdf-to-pptx": {
       "title": "Convert PDF to PPTX with Aspose.Pdf",
       "filename": "convert-pdf-to-pptx.cs",
-      "description": "Shows how to convert a PDF file to a PPTX presentation using Aspose.Pdf's Document class and the Save method with SaveFormat.Pptx.",
+      "description": "Shows how to load a PDF document and save it as an editable PPTX presentation using Aspose.Pdf's default conversion options.",
       "tags": [
         "pdf",
         "pptx",
         "conversion",
-        "aspose.pdf",
-        "document"
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.SaveFormat"
+        "Aspose.Pdf.PptxSaveOptions",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
-      "task_id": "18422"
+      "task_id": "18406"
     },
     "convert-pdf-to-pptx-slides-as-images": {
       "title": "Convert PDF to PPTX with Slides as Images",
@@ -389,7 +389,7 @@
         "Aspose.Pdf.Document.Dispose"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18407"
     },
@@ -412,7 +412,7 @@
         "Aspose.Pdf.PptxSaveOptions.SlidesAsImages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18409"
     },
@@ -435,7 +435,7 @@
         "Aspose.Pdf.PptxSaveOptions.ImageResolution"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18411"
     },
@@ -457,7 +457,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18412"
     },
@@ -480,7 +480,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18414"
     },
@@ -503,7 +503,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18415"
     },
@@ -525,7 +525,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18416"
     },
@@ -546,7 +546,7 @@
         "Aspose.Pdf.SaveFormat"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18419"
     },
@@ -567,7 +567,7 @@
         "Aspose.Pdf.SaveFormat"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18420"
     },
@@ -591,7 +591,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18421"
     },
@@ -614,7 +614,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18423"
     },
@@ -636,7 +636,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18424"
     },
@@ -659,7 +659,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18425"
     },
@@ -682,32 +682,32 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18426"
     },
     "convert-pdf-to-html-png-background": {
-      "title": "Convert PDF to HTML with PNG Backgrounds",
+      "title": "Convert PDF to HTML with PNG Background Images",
       "filename": "convert-pdf-to-html-png-background.cs",
-      "description": "Loads a PDF file and converts it to an HTML document, configuring the conversion to render page backgrounds as PNG images embedded in SVG and embedding all resources directly into the HTML.",
+      "description": "Shows how to load a PDF document and save it as a single HTML file where all raster images, including background images, are rendered as PNGs embedded into SVG.",
       "tags": [
         "pdf",
         "html",
-        "png",
         "conversion",
-        "Aspose.Pdf"
+        "png",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.HtmlSaveOptions",
-        "Aspose.Pdf.HtmlSaveOptions.RasterImagesSavingModes",
         "Aspose.Pdf.HtmlSaveOptions.PartsEmbeddingModes",
+        "Aspose.Pdf.HtmlSaveOptions.RasterImagesSavingModes",
         "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
-      "task_id": "18432"
+      "task_id": "18427"
     },
     "convert-pdf-pages-to-separate-html-files": {
       "title": "Convert PDF Pages to Separate HTML Files",
@@ -727,7 +727,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18428"
     },
@@ -750,7 +750,7 @@
         "Aspose.Pdf.HtmlSaveOptions.RasterImagesSavingModes"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18429"
     },
@@ -773,7 +773,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18430"
     },
@@ -796,7 +796,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18431"
     },
@@ -819,7 +819,7 @@
         "Aspose.Pdf.HtmlSaveOptions.RasterImagesSavingModes"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18433"
     },
@@ -840,7 +840,7 @@
         "Aspose.Pdf.HtmlSaveOptions.RasterImagesSavingModes"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18434"
     },
@@ -863,7 +863,7 @@
         "Aspose.Pdf.HtmlSaveOptions.RasterImagesSavingModes"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18435"
     },
@@ -886,7 +886,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18436"
     },
@@ -909,7 +909,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18437"
     },
@@ -933,7 +933,7 @@
         "Aspose.Pdf.HtmlSaveOptions.SplitIntoPages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18438"
     },
@@ -956,7 +956,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18439"
     },
@@ -979,7 +979,7 @@
         "Document.Pages.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18440"
     },
@@ -1002,7 +1002,7 @@
         "Aspose.Pdf.Text.SimpleFontSubstitution"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18441"
     },
@@ -1026,7 +1026,7 @@
         "Aspose.Pdf.SaveFormat"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "18442"
     },
@@ -1049,7 +1049,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19649"
     },
@@ -1072,7 +1072,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19650"
     },
@@ -1095,32 +1095,33 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19651"
     },
     "convert-pdf-to-png-transparent-background": {
       "title": "Convert PDF Pages to PNG with Transparent Background",
       "filename": "convert-pdf-to-png-transparent-background.cs",
-      "description": "Shows how to convert each page of a PDF document to a PNG image while preserving transparency by enabling the TransparentBackground option on PngDevice.",
+      "description": "Shows how to load a PDF using Aspose.Pdf, iterate through its pages, and render each page to a PNG image with a transparent background using PngDevice.",
       "tags": [
         "pdf",
         "png",
-        "transparent-background",
         "conversion",
-        "aspose"
+        "transparent",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Devices.PngDevice",
-        "Aspose.Pdf.Devices.Resolution",
         "Aspose.Pdf.Devices.PngDevice.Process",
-        "Aspose.Pdf.PageCollection"
+        "Aspose.Pdf.Devices.PngDevice.TransparentBackground",
+        "Aspose.Pdf.Devices.Resolution"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
-      "task_id": "19694"
+      "task_id": "19652"
     },
     "convert-pdf-to-emf-images": {
       "title": "Convert PDF to EMF Images Preserving Vector Data",
@@ -1141,14 +1142,14 @@
         "Aspose.Pdf.Devices.EmfDevice.Process"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19653"
     },
     "convert-pdf-to-multi-page-tiff": {
-      "title": "Convert PDF to Multi‑Page TIFF",
+      "title": "Convert PDF to Multi-Page TIFF using TiffDevice",
       "filename": "convert-pdf-to-multi-page-tiff.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf and use TiffDevice to convert all pages into a single multi‑page TIFF using the default settings.",
+      "description": "Shows how to load a PDF with Aspose.Pdf, create a TiffDevice with a specific resolution, and convert all pages into a single multi-page TIFF file.",
       "tags": [
         "pdf",
         "tiff",
@@ -1159,37 +1160,34 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Devices.TiffDevice",
-        "Aspose.Pdf.Devices.TiffDevice.Process",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Document.Pages.Count"
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.TiffDevice.Process"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
-      "task_id": "19656"
+      "task_id": "19654"
     },
     "convert-pdf-to-svg": {
-      "title": "Convert PDF to SVG with Embedded CSS Styles",
+      "title": "Convert PDF to SVG Images",
       "filename": "convert-pdf-to-svg.cs",
-      "description": "Demonstrates converting a PDF file to SVG using Aspose.Pdf's Document and SvgSaveOptions, enabling CSS style embedding via the ScaleToPixels option.",
+      "description": "Demonstrates how to load a PDF file and save each page as SVG images using Aspose.Pdf's Document and SvgSaveOptions with default settings.",
       "tags": [
         "pdf",
         "svg",
         "conversion",
-        "css",
-        "aspose-pdf"
+        "aspose-pdf",
+        "document"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.SvgSaveOptions",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.SvgSaveOptions.ScaleToPixels",
-        "Aspose.Pdf.SaveFormat"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
-      "task_id": "19697"
+      "task_id": "19655"
     },
     "extract-pdf-page-region-to-png": {
       "title": "Convert PDF Page Region to PNG",
@@ -1210,7 +1208,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19657"
     },
@@ -1232,7 +1230,7 @@
         "Aspose.Pdf.Devices.JpegDevice.Process"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19658"
     },
@@ -1255,7 +1253,7 @@
         "Aspose.Pdf.Devices.PngDevice.Process"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19659"
     },
@@ -1278,7 +1276,7 @@
         "Aspose.Pdf.Devices.JpegDevice.Process"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19660"
     },
@@ -1301,7 +1299,7 @@
         "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19661"
     },
@@ -1325,7 +1323,7 @@
         "Aspose.Pdf.ConvertErrorAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19662"
     },
@@ -1350,7 +1348,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19663"
     },
@@ -1374,7 +1372,7 @@
         "Aspose.Pdf.ConvertErrorAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19664"
     },
@@ -1397,7 +1395,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19665"
     },
@@ -1420,7 +1418,7 @@
         "Aspose.Pdf.ConvertErrorAction"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19666"
     },
@@ -1443,7 +1441,7 @@
         "Aspose.Pdf.ConvertErrorAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19667"
     },
@@ -1466,7 +1464,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19668"
     },
@@ -1489,7 +1487,7 @@
         "Aspose.Pdf.Document.EmbeddedFiles"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19669"
     },
@@ -1513,7 +1511,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19670"
     },
@@ -1537,7 +1535,7 @@
         "Aspose.Pdf.PdfFormat"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19671"
     },
@@ -1559,7 +1557,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19672"
     },
@@ -1581,7 +1579,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19673"
     },
@@ -1602,7 +1600,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19674"
     },
@@ -1622,7 +1620,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19675"
     },
@@ -1643,7 +1641,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19676"
     },
@@ -1663,7 +1661,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19677"
     },
@@ -1684,7 +1682,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19678"
     },
@@ -1705,7 +1703,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19679"
     },
@@ -1726,7 +1724,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19680"
     },
@@ -1751,7 +1749,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19681"
     },
@@ -1774,7 +1772,7 @@
         "Aspose.Pdf.PdfException.GenerateCrashReport"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19682"
     },
@@ -1797,7 +1795,7 @@
         "Aspose.Pdf.Document.Pages.Accept"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19683"
     },
@@ -1819,7 +1817,7 @@
         "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19684"
     },
@@ -1842,7 +1840,7 @@
         "Aspose.Pdf.PageCollection.Accept"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19685"
     },
@@ -1865,7 +1863,7 @@
         "Aspose.Pdf.PageCollection.Accept"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19686"
     },
@@ -1888,7 +1886,7 @@
         "Aspose.Pdf.Document.Dispose"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19687"
     },
@@ -1911,7 +1909,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19688"
     },
@@ -1932,7 +1930,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19689"
     },
@@ -1955,7 +1953,7 @@
         "Aspose.Pdf.Text.TextAbsorber"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19690"
     },
@@ -1976,7 +1974,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19691"
     },
@@ -1998,7 +1996,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19692"
     },
@@ -2021,7 +2019,7 @@
         "Aspose.Pdf.Devices.PngDevice.Process"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19693"
     },
@@ -2044,7 +2042,7 @@
         "Aspose.Pdf.Devices.TiffDevice.Process"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19695"
     },
@@ -2065,9 +2063,228 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-28T07:16:49Z",
+      "generated_at": "2026-10-26T07:14:35Z",
       "status": "verified",
       "task_id": "19698"
+    },
+    "convert-pdf-to-pptx-with-progress-handler": {
+      "title": "Convert PDF to PPTX with Aspose.Pdf",
+      "filename": "convert-pdf-to-pptx-with-progress-handler.cs",
+      "description": "Shows how to load a PDF document and save it as a PPTX file using Aspose.Pdf in C#.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PptxSaveOptions",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:14:35Z",
+      "status": "verified",
+      "task_id": "18408"
+    },
+    "convert-pdf-to-pptx__v2": {
+      "title": "Convert PDF to PPTX using Aspose.Pdf",
+      "filename": "convert-pdf-to-pptx__v2.cs",
+      "description": "Shows how to convert a PDF document to a PPTX presentation by loading the PDF with Aspose.Pdf and saving it in PPTX format.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.SaveFormat"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:14:35Z",
+      "status": "verified",
+      "task_id": "18413"
+    },
+    "convert-pdf-to-pptx__v3": {
+      "title": "Convert PDF to PPTX with Aspose.Pdf",
+      "filename": "convert-pdf-to-pptx__v3.cs",
+      "description": "Demonstrates converting a PDF file to a PPTX presentation using Aspose.Pdf's Document class and the Save method with the PPTX format.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.SaveFormat",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:14:35Z",
+      "status": "verified",
+      "task_id": "18417"
+    },
+    "convert-pdf-to-pptx__v4": {
+      "title": "Convert PDF to PPTX using Aspose.Pdf",
+      "filename": "convert-pdf-to-pptx__v4.cs",
+      "description": "Shows how to load a PDF document with Aspose.Pdf and directly save it as a PPTX presentation.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.SaveFormat",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:14:35Z",
+      "status": "verified",
+      "task_id": "18418"
+    },
+    "convert-pdf-to-pptx__v5": {
+      "title": "Convert PDF to PPTX with Aspose.Pdf",
+      "filename": "convert-pdf-to-pptx__v5.cs",
+      "description": "Shows how to convert a PDF file to a PPTX presentation using Aspose.Pdf's Document class and the Save method with SaveFormat.Pptx.",
+      "tags": [
+        "pdf",
+        "pptx",
+        "conversion",
+        "aspose.pdf",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.SaveFormat"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:14:35Z",
+      "status": "verified",
+      "task_id": "18422"
+    },
+    "convert-pdf-to-html-png-background__v2": {
+      "title": "Convert PDF to HTML with PNG Backgrounds",
+      "filename": "convert-pdf-to-html-png-background__v2.cs",
+      "description": "Loads a PDF file and converts it to an HTML document, configuring the conversion to render page backgrounds as PNG images embedded in SVG and embedding all resources directly into the HTML.",
+      "tags": [
+        "pdf",
+        "html",
+        "png",
+        "conversion",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.HtmlSaveOptions",
+        "Aspose.Pdf.HtmlSaveOptions.RasterImagesSavingModes",
+        "Aspose.Pdf.HtmlSaveOptions.PartsEmbeddingModes",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:14:35Z",
+      "status": "verified",
+      "task_id": "18432"
+    },
+    "convert-pdf-to-multi-page-tiff__v2": {
+      "title": "Convert PDF to Multi‑Page TIFF",
+      "filename": "convert-pdf-to-multi-page-tiff__v2.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf and use TiffDevice to convert all pages into a single multi‑page TIFF using the default settings.",
+      "tags": [
+        "pdf",
+        "tiff",
+        "conversion",
+        "multipage",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.TiffDevice",
+        "Aspose.Pdf.Devices.TiffDevice.Process",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Pages.Count"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:14:35Z",
+      "status": "verified",
+      "task_id": "19656"
+    },
+    "convert-pdf-to-png-transparent-background__v2": {
+      "title": "Convert PDF Pages to PNG with Transparent Background",
+      "filename": "convert-pdf-to-png-transparent-background__v2.cs",
+      "description": "Shows how to convert each page of a PDF document to a PNG image while preserving transparency by enabling the TransparentBackground option on PngDevice.",
+      "tags": [
+        "pdf",
+        "png",
+        "transparent-background",
+        "conversion",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.PngDevice.Process",
+        "Aspose.Pdf.PageCollection"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:14:35Z",
+      "status": "verified",
+      "task_id": "19694"
+    },
+    "create-single-page-tiff-from-pdf": {
+      "title": "Create Single-Page TIFF from PDF using TiffDevice",
+      "filename": "create-single-page-tiff-from-pdf.cs",
+      "description": "Demonstrates how to convert the first page of a PDF into a single-page TIFF file with a custom resolution using Aspose.Pdf's TiffDevice.",
+      "tags": [
+        "tiff",
+        "pdf",
+        "conversion",
+        "resolution",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.TiffDevice",
+        "Aspose.Pdf.Devices.TiffDevice.Process"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:14:35Z",
+      "status": "verified",
+      "task_id": "19696"
+    },
+    "convert-pdf-to-svg__v2": {
+      "title": "Convert PDF to SVG with Embedded CSS Styles",
+      "filename": "convert-pdf-to-svg__v2.cs",
+      "description": "Demonstrates converting a PDF file to SVG using Aspose.Pdf's Document and SvgSaveOptions, enabling CSS style embedding via the ScaleToPixels option.",
+      "tags": [
+        "pdf",
+        "svg",
+        "conversion",
+        "css",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.SvgSaveOptions",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.SvgSaveOptions.ScaleToPixels",
+        "Aspose.Pdf.SaveFormat"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:14:35Z",
+      "status": "verified",
+      "task_id": "19697"
     }
   }
 }

@@ -7,30 +7,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.tiff";
+        const string inputPdfPath = "input.pdf";
+        const string outputTiffPath = "output.tiff";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document; using ensures deterministic disposal of the Document.
-        using (Document pdfDoc = new Document(inputPath))
-        {
-            // TiffDevice does not implement IDisposable, so instantiate it without a using block.
-            // The parameter‑less constructor uses the default resolution (300 DPI) and default compression.
-            TiffDevice tiffDevice = new TiffDevice();
+        // Load the PDF document.
+        Document pdfDoc = new Document(inputPdfPath);
 
-            // Create a FileStream for the output TIFF; the stream is disposable and therefore wrapped in a using block.
-            using (FileStream tiffStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-            {
-                // Convert all pages of the PDF (from page 1 to the last page) into a multi‑page TIFF.
-                tiffDevice.Process(pdfDoc, 1, pdfDoc.Pages.Count, tiffStream);
-            }
+        // Create a TiffDevice with the desired resolution.
+        // The overload without a compression argument uses the default compression (CCITT4).
+        Resolution resolution = new Resolution(300); // DPI
+        TiffDevice tiffDevice = new TiffDevice(resolution);
+
+        // Write all pages to a single multi‑page TIFF file.
+        using (FileStream tiffStream = new FileStream(outputTiffPath, FileMode.Create, FileAccess.Write))
+        {
+            tiffDevice.Process(pdfDoc, 1, pdfDoc.Pages.Count, tiffStream);
         }
 
-        Console.WriteLine($"PDF pages have been converted to a multi‑page TIFF: {outputPath}");
+        Console.WriteLine($"PDF successfully converted to multi‑page TIFF: {outputTiffPath}");
     }
 }
