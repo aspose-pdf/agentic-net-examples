@@ -1,12 +1,31 @@
-// URL-STABILITY STUB
-//
-// Read pdf page dimensions__v2
-//
-// This example has been consolidated or moved. Current location:
-//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/pages/AGENTS.md
-//
-// This stub keeps the original URL live for existing bookmarks,
-// search-engine indexes, and blog-post links. See the canonical
-// location above for the current, maintained implementation.
+using System;
+using System.IO;
+using Aspose.Pdf;
 
-class Program { static void Main() { } }
+class Program
+{
+    static void Main()
+    {
+        const string inputPath = "input.pdf";
+
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Wrap Document in a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Pages are 1‑based in Aspose.Pdf
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                Page page = doc.Pages[i];
+                double width  = page.PageInfo.Width;
+                double height = page.PageInfo.Height;
+
+                Console.WriteLine($"Page {i}: Width = {width} pt, Height = {height} pt");
+            }
+        }
+    }
+}
