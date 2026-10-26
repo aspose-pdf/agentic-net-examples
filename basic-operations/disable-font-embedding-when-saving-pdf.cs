@@ -1,12 +1,31 @@
-// URL-STABILITY STUB
-//
-// Disable font embedding when saving pdf
-//
-// This example has been consolidated or moved. Current location:
-//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/basic-operations/AGENTS.md
-//
-// This stub keeps the original URL live for existing bookmarks,
-// search-engine indexes, and blog-post links. See the canonical
-// location above for the current, maintained implementation.
+using System;
+using System.IO;
+using Aspose.Pdf;
+using Aspose.Pdf.Optimization;
 
-class Program { static void Main() { } }
+class Program
+{
+    static void Main()
+    {
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_no_embed.pdf";
+
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Disable font embedding using OptimizationOptions
+        var opt = new OptimizationOptions { UnembedFonts = true };
+        doc.OptimizeResources(opt);
+
+        // Save the document
+        doc.Save(outputPath);
+
+        Console.WriteLine($"PDF saved without embedded fonts to '{outputPath}'.");
+    }
+}

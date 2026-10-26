@@ -1,7 +1,7 @@
 {
   "category": "basic-operations",
   "nuget_version": "26.9.0",
-  "last_updated": "2026-09-25T05:21:43Z",
+  "last_updated": "2026-10-26T07:12:25Z",
   "examples": {
     "open-pdf-get-page-count": {
       "title": "Open PDF and Get Page Count",
@@ -22,7 +22,7 @@
         "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19699"
     },
@@ -42,7 +42,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19700"
     },
@@ -63,7 +63,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19701"
     },
@@ -83,7 +83,7 @@
         "Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19702"
     },
@@ -106,7 +106,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19703"
     },
@@ -129,7 +129,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19704"
     },
@@ -152,7 +152,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19705"
     },
@@ -174,7 +174,7 @@
         "Aspose.Pdf.InvalidPasswordException"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19706"
     },
@@ -197,7 +197,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19707"
     },
@@ -220,7 +220,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19708"
     },
@@ -243,7 +243,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19709"
     },
@@ -266,7 +266,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19710"
     },
@@ -289,7 +289,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19711"
     },
@@ -312,7 +312,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19712"
     },
@@ -337,7 +337,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19713"
     },
@@ -360,7 +360,7 @@
         "Aspose.Pdf.Document.Pages.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19714"
     },
@@ -383,7 +383,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19716"
     },
@@ -403,7 +403,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19717"
     },
@@ -426,7 +426,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19718"
     },
@@ -449,7 +449,7 @@
         "Aspose.Pdf.ConvertErrorAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19719"
     },
@@ -472,7 +472,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19720"
     },
@@ -495,7 +495,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19721"
     },
@@ -518,31 +518,30 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19722"
     },
     "update-pdf-author-metadata": {
-      "title": "Update PDF Author Metadata",
+      "title": "Update PDF Author Metadata with Aspose.Pdf",
       "filename": "update-pdf-author-metadata.cs",
-      "description": "Loads a PDF file, replaces its Author metadata with the current user name, and saves the updated document.",
+      "description": "Shows how to open an existing PDF using Aspose.Pdf, modify the Author metadata, and save the changes back to the original file.",
       "tags": [
         "pdf",
         "metadata",
         "author",
-        "aspose.pdf",
+        "aspose",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.DocumentInfo",
-        "Aspose.Pdf.Document.Info",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
-      "task_id": "19741"
+      "task_id": "19723"
     },
     "batch-encrypt-pdfs-in-directory": {
       "title": "Batch Encrypt PDFs with a User Password",
@@ -563,7 +562,7 @@
         "Aspose.Pdf.Permissions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19724"
     },
@@ -585,32 +584,32 @@
         "Aspose.Pdf.InvalidPasswordException"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19725"
     },
     "convert-pdf-to-pdfa-1b": {
-      "title": "Convert PDF to PDF/A-1B Compliance",
+      "title": "Convert PDF to PDF/A‑1b with Structure Preservation",
       "filename": "convert-pdf-to-pdfa-1b.cs",
-      "description": "Loads a PDF file, converts it to PDF/A‑1B compliance using Aspose.Pdf, and saves the compliant document.",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, converting it to PDF/A‑1b while preserving the original document structure and embedded fonts, and saving the resulting file.",
       "tags": [
+        "pdf",
         "pdfa",
         "conversion",
-        "aspose-pdf",
-        "csharp",
-        "document"
+        "aspose",
+        "c#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.PdfFormat",
-        "Aspose.Pdf.ConvertErrorAction",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.ConvertErrorAction"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
-      "task_id": "19750"
+      "task_id": "19726"
     },
     "download-pdf-from-url-and-save": {
       "title": "Download PDF from URL and Save Locally with Aspose.Pdf",
@@ -628,7 +627,7 @@
         "Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19728"
     },
@@ -653,7 +652,7 @@
         "Aspose.Pdf.Document.Permissions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19729"
     },
@@ -676,7 +675,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19730"
     },
@@ -700,7 +699,7 @@
         "Aspose.Pdf.InvalidPasswordException"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19731"
     },
@@ -723,7 +722,7 @@
         "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19732"
     },
@@ -746,7 +745,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19733"
     },
@@ -770,7 +769,7 @@
         "Aspose.Pdf.PdfFormat"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19735"
     },
@@ -793,7 +792,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19736"
     },
@@ -816,7 +815,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19737"
     },
@@ -839,7 +838,7 @@
         "Aspose.Pdf.CryptoAlgorithm"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19738"
     },
@@ -862,7 +861,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19739"
     },
@@ -885,7 +884,7 @@
         "Aspose.Pdf.Document.Pages.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19740"
     },
@@ -908,7 +907,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19742"
     },
@@ -931,7 +930,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19743"
     },
@@ -954,7 +953,7 @@
         "Aspose.Pdf.ConvertErrorAction"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19744"
     },
@@ -977,7 +976,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19745"
     },
@@ -1000,7 +999,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19746"
     },
@@ -1022,7 +1021,7 @@
         "Aspose.Pdf.Security.Permissions"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19747"
     },
@@ -1045,7 +1044,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19748"
     },
@@ -1069,7 +1068,7 @@
         "Aspose.Pdf.Document.Decrypt"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19749"
     },
@@ -1092,7 +1091,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19751"
     },
@@ -1115,7 +1114,7 @@
         "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19752"
     },
@@ -1138,7 +1137,7 @@
         "Aspose.Pdf.CryptoAlgorithm"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19753"
     },
@@ -1162,7 +1161,7 @@
         "Aspose.Pdf.DocumentInfo.Subject"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19754"
     },
@@ -1187,7 +1186,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19755"
     },
@@ -1210,9 +1209,99 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-09-25T05:21:43Z",
+      "generated_at": "2026-10-26T07:12:25Z",
       "status": "verified",
       "task_id": "19734"
+    },
+    "disable-font-embedding-when-saving-pdf": {
+      "title": "Disable Font Embedding and Save PDF",
+      "filename": "disable-font-embedding-when-saving-pdf.cs",
+      "description": "Loads a PDF document, disables font embedding using OptimizationOptions, and saves the modified file.",
+      "tags": [
+        "pdf",
+        "font-embedding",
+        "optimization",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Optimization.OptimizationOptions",
+        "Aspose.Pdf.Document.OptimizeResources",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:12:25Z",
+      "status": "verified",
+      "task_id": "19715"
+    },
+    "compress-pdf-high-optimization": {
+      "title": "Compress PDF with High Image Compression",
+      "filename": "compress-pdf-high-optimization.cs",
+      "description": "Loads a PDF, applies high‑level image compression and other optimizations using Aspose.Pdf's OptimizationOptions, then saves the result and reports the size reduction.",
+      "tags": [
+        "pdf",
+        "compression",
+        "optimization",
+        "csharp",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Optimization.OptimizationOptions",
+        "Aspose.Pdf.Optimization.ImageCompressionOptions",
+        "Aspose.Pdf.Document.OptimizeResources",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:12:25Z",
+      "status": "verified",
+      "task_id": "19727"
+    },
+    "update-pdf-author-metadata__v2": {
+      "title": "Update PDF Author Metadata",
+      "filename": "update-pdf-author-metadata__v2.cs",
+      "description": "Loads a PDF file, replaces its Author metadata with the current user name, and saves the updated document.",
+      "tags": [
+        "pdf",
+        "metadata",
+        "author",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocumentInfo",
+        "Aspose.Pdf.Document.Info",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:12:25Z",
+      "status": "verified",
+      "task_id": "19741"
+    },
+    "convert-pdf-to-pdfa-1b__v2": {
+      "title": "Convert PDF to PDF/A-1B Compliance",
+      "filename": "convert-pdf-to-pdfa-1b__v2.cs",
+      "description": "Loads a PDF file, converts it to PDF/A‑1B compliance using Aspose.Pdf, and saves the compliant document.",
+      "tags": [
+        "pdfa",
+        "conversion",
+        "aspose-pdf",
+        "csharp",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Convert",
+        "Aspose.Pdf.PdfFormat",
+        "Aspose.Pdf.ConvertErrorAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:12:25Z",
+      "status": "verified",
+      "task_id": "19750"
     }
   }
 }

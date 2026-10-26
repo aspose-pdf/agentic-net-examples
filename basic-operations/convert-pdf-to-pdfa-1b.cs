@@ -16,24 +16,17 @@ class Program
             return;
         }
 
-        try
+        // Load the source PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal.
-            using (Document doc = new Document(inputPath))
-            {
-                // Convert the document to PDF/A‑1B compliance.
-                // The conversion log is written to logPath.
-                doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+            // Convert the document to PDF/A‑1b.
+            // This overload preserves the original structure and embedded fonts.
+            doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
 
-                // Save the PDF/A‑1B compliant document.
-                doc.Save(outputPath);
-            }
+            // Save the converted document. No special SaveOptions are required for PDF/A.
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"PDF/A‑1B compliant file saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"PDF/A‑1b file saved to '{outputPath}'.");
     }
 }
