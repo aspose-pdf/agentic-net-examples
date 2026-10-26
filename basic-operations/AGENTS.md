@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - basic-operations
 
-> **Basic operations** in PDF using C# / .NET -- **53** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Basic operations** in PDF using C# / .NET -- **57** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,15 +23,16 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (53/53 files) ← category-specific
-- `using Aspose.Pdf.Security;` (6/53 files)
-- `using Aspose.Pdf.Text;` (1/53 files)
-- `using System;` (53/53 files)
-- `using System.IO;` (53/53 files)
-- `using System.Net.Http;` (2/53 files)
-- `using System.Text;` (2/53 files)
-- `using System.Threading.Tasks;` (2/53 files)
-- `using System.Security.Cryptography;` (1/53 files)
+- `using Aspose.Pdf;` (57/57 files) ← category-specific
+- `using Aspose.Pdf.Security;` (6/57 files)
+- `using Aspose.Pdf.Optimization;` (2/57 files)
+- `using Aspose.Pdf.Text;` (1/57 files)
+- `using System;` (57/57 files)
+- `using System.IO;` (57/57 files)
+- `using System.Net.Http;` (2/57 files)
+- `using System.Text;` (2/57 files)
+- `using System.Threading.Tasks;` (2/57 files)
+- `using System.Security.Cryptography;` (1/57 files)
 
 ## Common Code Pattern
 
@@ -60,7 +61,9 @@ using (Document doc = new Document("input.pdf"))
 | [batch-encrypt-pdfs](./batch-encrypt-pdfs.cs) | Batch Encrypt PDFs with User Passwords from Config | `Document`, `Permissions`, `CryptoAlgorithm` | Demonstrates reading a configuration file to apply individual user passwords to multiple PDFs, en... |
 | [batch-split-pdf-by-page-ranges](./batch-split-pdf-by-page-ranges.cs) | Batch Split PDF into Sections Using Page Ranges | `Document`, `Save`, `Pages` | Demonstrates how to read page‑range definitions from a text file and split a source PDF into mult... |
 | [compress-pdf-default-settings](./compress-pdf-default-settings.cs) | Compress PDF Using Default Settings | `Document`, `Save` | Loads a PDF file and saves it with Aspose.Pdf's default compression, then compares the original a... |
-| [convert-pdf-to-pdfa-1b](./convert-pdf-to-pdfa-1b.cs) | Convert PDF to PDF/A-1B Compliance | `Document`, `Convert`, `PdfFormat` | Loads a PDF file, converts it to PDF/A‑1B compliance using Aspose.Pdf, and saves the compliant do... |
+| [compress-pdf-high-optimization](./compress-pdf-high-optimization.cs) | Compress PDF with High Image Compression | `Document`, `OptimizationOptions`, `ImageCompressionOptions` | Loads a PDF, applies high‑level image compression and other optimizations using Aspose.Pdf's Opti... |
+| [convert-pdf-to-pdfa-1b](./convert-pdf-to-pdfa-1b.cs) | Convert PDF to PDF/A‑1b with Structure Preservation | `Document`, `Convert`, `Save` | Demonstrates loading a PDF with Aspose.Pdf, converting it to PDF/A‑1b while preserving the origin... |
+| [convert-pdf-to-pdfa-1b__v2](./convert-pdf-to-pdfa-1b__v2.cs) | Convert PDF to PDF/A-1B Compliance | `Document`, `Convert`, `PdfFormat` | Loads a PDF file, converts it to PDF/A‑1B compliance using Aspose.Pdf, and saves the compliant do... |
 | [convert-pdf-to-pdfa1b-with-font-embedding](./convert-pdf-to-pdfa1b-with-font-embedding.cs) | Convert PDF to PDF/A-1b with Font Embedding | `Document`, `Convert`, `PdfFormat` | Shows how to load a PDF, convert it to PDF/A‑1b compliance while embedding missing fonts, and sav... |
 | [convert-pdf-to-pdfa1b](./convert-pdf-to-pdfa1b.cs) | Convert PDF to PDF/A‑1b with Metadata Preservation | `Document`, `Convert`, `PdfFormat` | Shows how to load a PDF, convert it to PDF/A‑1b compliance while automatically preserving metadat... |
 | [convert-pdf-to-pdfx3-cmyk](./convert-pdf-to-pdfx3-cmyk.cs) | Convert PDF to PDF/X‑3 with CMYK Color Space | `Document`, `PdfFormatConversionOptions`, `Convert` | Demonstrates loading a PDF, converting it to PDF/X‑3 format and optionally forcing CMYK color spa... |
@@ -69,6 +72,7 @@ using (Document doc = new Document("input.pdf"))
 | [create-pdfa1b-with-text-paragraph](./create-pdfa1b-with-text-paragraph.cs) | Create PDF/A‑1b Document with Text Paragraph | `Document`, `Page`, `TextFragment` | Demonstrates how to create a PDF, add a text paragraph, convert it to PDF/A‑1b compliance, and sa... |
 | [create-pdfx3-document-three-pages](./create-pdfx3-document-three-pages.cs) | Create PDF/X‑3 Document with Multiple Pages | `Document`, `Pages`, `Add` | Shows how to create a new PDF, add three blank pages, convert it to PDF/X‑3 format, and save the ... |
 | [decrypt-encrypted-pdf](./decrypt-encrypted-pdf.cs) | Decrypt Encrypted PDF with User Password | `Document`, `Decrypt()`, `Save()` | Loads an encrypted PDF using the provided user password, removes its encryption, and saves an unp... |
+| [disable-font-embedding-when-saving-pdf](./disable-font-embedding-when-saving-pdf.cs) | Disable Font Embedding and Save PDF | `Document`, `OptimizationOptions`, `OptimizeResources` | Loads a PDF document, disables font embedding using OptimizationOptions, and saves the modified f... |
 | [download-pdf-from-url-and-save](./download-pdf-from-url-and-save.cs) | Download PDF from URL and Save Locally with Aspose.Pdf | `Document`, `Save` | Demonstrates how to download a PDF file from a network URL using HttpClient, load it into an Aspo... |
 | [encrypt-pdf-aes128-verify-print-permissions](./encrypt-pdf-aes128-verify-print-permissions.cs) | Encrypt PDF with AES‑128 and Verify Print Permission | `Document`, `Permissions`, `CryptoAlgorithm` | Demonstrates how to encrypt a PDF using AES‑128, set high‑quality printing permission, and then v... |
 | [encrypt-pdf-aes256-no-print](./encrypt-pdf-aes256-no-print.cs) | Encrypt PDF with AES‑256 and Verify No Printing Permission | `Document`, `Permissions`, `CryptoAlgorithm` | Demonstrates how to apply AES‑256 encryption to a PDF with all permissions disabled (no printing)... |
@@ -76,13 +80,10 @@ using (Document doc = new Document("input.pdf"))
 | [encrypt-pdf-form-fill-permission](./encrypt-pdf-form-fill-permission.cs) | Encrypt PDF with User Password and Restrict to Form Filling | `Document`, `Encrypt`, `Save` | Demonstrates how to encrypt a PDF using a user and owner password, allow only form‑filling permis... |
 | [encrypt-pdf-form-filling-permission](./encrypt-pdf-form-filling-permission.cs) | Encrypt PDF with Form Fill Permission Only | `Document`, `Permissions`, `Encrypt` | Demonstrates how to encrypt a PDF, allow only form filling, and disable content extraction using ... |
 | [encrypt-pdf-owner-password-only](./encrypt-pdf-owner-password-only.cs) | Encrypt PDF with Owner Password Only | `Document`, `Encrypt`, `CryptoAlgorithm` | Shows how to encrypt a PDF using Aspose.Pdf by setting an owner password, leaving the user passwo... |
-| [encrypt-pdf-rc4-128-verify-size](./encrypt-pdf-rc4-128-verify-size.cs) | Encrypt PDF with 128‑bit RC4 and Verify Size Increase | `Document`, `Permissions`, `CryptoAlgorithm` | Demonstrates loading a PDF, applying 128‑bit RC4 encryption with specific permissions, saving the... |
-| [encrypt-pdf-rc4-no-copy-permission](./encrypt-pdf-rc4-no-copy-permission.cs) | Encrypt PDF with RC4 and Disable Copying | `Document`, `Encrypt`, `CryptoAlgorithm` | Demonstrates encrypting a PDF using RC4 128‑bit, setting no permissions to block copying, and pro... |
-| [encrypt-pdf-stream](./encrypt-pdf-stream.cs) | Encrypt PDF from URL and Save to Stream | `Document`, `Permissions`, `CryptoAlgorithm` | Downloads a PDF from a given URL, applies AES‑256 encryption with specified user and owner passwo... |
-| ... | | | *and 23 more files* |
+| ... | | | *and 27 more files* |
 
 ## Category Statistics
-- Total examples: 53
+- Total examples: 57
 
 ## General Tips
 - See parent [AGENTS.md](../AGENTS.md) for:
@@ -93,5 +94,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for basic-operations patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-09-24 | Run: `20260924_222140_ec8685`
+Updated: 2026-10-26 | Run: `20261026_001223_9dc44d`
 <!-- AUTOGENERATED:END -->
