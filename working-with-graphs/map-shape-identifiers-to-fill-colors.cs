@@ -7,57 +7,69 @@ class Program
 {
     static void Main()
     {
-        // Map shape identifiers to fill colors (Aspose.Pdf.Color)
-        var shapeColors = new Dictionary<string, Color>
+        const string outputPath = "graph.pdf";
+
+        // Map shape identifiers to fill colors
+        var shapeFillColors = new Dictionary<string, Color>
         {
-            { "Rect1", Color.LightBlue },
-            { "Ellipse1", Color.LightGreen },
-            { "Rect2", Color.LightCoral }
+            { "rect1", Color.FromRgb(0.9f, 0.2f, 0.2f) }, // light red
+            { "ellipse1", Color.FromRgb(0.2f, 0.9f, 0.2f) }, // light green
+            { "rect2", Color.FromRgb(0.2f, 0.2f, 0.9f) } // light blue
         };
 
-        // Create a new PDF document
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a page
+            // Add a single page
             Page page = doc.Pages.Add();
 
-            // Graph container – use double parameters as the obsolete float ctor is deprecated
-            Graph graph = new Graph(500.0, 400.0);
+            // Create a Graph container that covers the whole page
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
             // ---------- Rectangle 1 ----------
-            // Identifier: "Rect1"
-            var rect1 = new Aspose.Pdf.Drawing.Rectangle(50f, 300f, 150f, 200f);
-            if (shapeColors.TryGetValue("Rect1", out Color rect1Color))
+            // Identifier: "rect1"
+            // Original coordinates: left=100, top=700, right=250, bottom=600
+            // Width = right - left = 150, Height = top - bottom = 100
+            var rect1 = new Aspose.Pdf.Drawing.Rectangle(100, 600, 150, 100);
+            rect1.GraphInfo = new GraphInfo
             {
-                rect1.GraphInfo = new GraphInfo { FillColor = rect1Color };
-            }
+                FillColor = shapeFillColors["rect1"],
+                Color = Color.Black, // border color
+                LineWidth = 1
+            };
             graph.Shapes.Add(rect1);
 
             // ---------- Ellipse ----------
-            // Identifier: "Ellipse1"
-            var ellipse = new Ellipse(200f, 250f, 100f, 150f);
-            if (shapeColors.TryGetValue("Ellipse1", out Color ellipseColor))
+            // Identifier: "ellipse1"
+            // Original coordinates: left=300, top=700, right=450, bottom=600
+            var ellipse = new Ellipse(300, 600, 150, 100);
+            ellipse.GraphInfo = new GraphInfo
             {
-                ellipse.GraphInfo = new GraphInfo { FillColor = ellipseColor };
-            }
+                FillColor = shapeFillColors["ellipse1"],
+                Color = Color.Black,
+                LineWidth = 1
+            };
             graph.Shapes.Add(ellipse);
 
             // ---------- Rectangle 2 ----------
-            // Identifier: "Rect2"
-            var rect2 = new Aspose.Pdf.Drawing.Rectangle(350f, 100f, 120f, 180f);
-            if (shapeColors.TryGetValue("Rect2", out Color rect2Color))
+            // Identifier: "rect2"
+            // Original coordinates: left=500, top=700, right=650, bottom=600
+            var rect2 = new Aspose.Pdf.Drawing.Rectangle(500, 600, 150, 100);
+            rect2.GraphInfo = new GraphInfo
             {
-                rect2.GraphInfo = new GraphInfo { FillColor = rect2Color };
-            }
+                FillColor = shapeFillColors["rect2"],
+                Color = Color.Black,
+                LineWidth = 1
+            };
             graph.Shapes.Add(rect2);
 
-            // Add the graph to the page
+            // Add the graph (which now contains all shapes) to the page
             page.Paragraphs.Add(graph);
 
             // Save the PDF
-            doc.Save("shapes_mapped_colors.pdf");
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF created: shapes_mapped_colors.pdf");
+        Console.WriteLine($"Graph PDF saved to '{outputPath}'.");
     }
 }

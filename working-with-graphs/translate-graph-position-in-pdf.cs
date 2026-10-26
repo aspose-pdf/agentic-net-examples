@@ -6,42 +6,49 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document and ensure proper disposal
+        const string outputPath = "translated_graph.pdf";
+
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a new page to the document
             Page page = doc.Pages.Add();
 
-            // Graph constructor expects double values (the older float overload is obsolete)
-            Graph graph = new Graph(400.0, 200.0);
+            // Create a Graph that covers the whole page (size can be arbitrary)
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Position the graph at (100, 500) on the page
-            graph.Left = 100;
-            graph.Top = 500;
+            // Original rectangle position and size
+            const float originalLeft = 100f;
+            const float originalBottom = 100f;
+            const float rectWidth = 100f;
+            const float rectHeight = 100f;
 
-            // Add a rectangle shape inside the graph
-            // Use Aspose.Pdf.Drawing.Rectangle (not Aspose.Pdf.Rectangle) for drawing shapes
-            Aspose.Pdf.Drawing.Rectangle shape = new Aspose.Pdf.Drawing.Rectangle(0, 0, 150, 80);
-            shape.GraphInfo = new GraphInfo
-            {
-                FillColor = Color.LightGray,
-                Color = Color.Black,
-                LineWidth = 2
-            };
-            graph.Shapes.Add(shape);
+            // Translation offsets
+            const float offsetX = 50f; // move right
+            const float offsetY = 30f; // move up
 
-            // Add the graph to the page's paragraphs collection
+            // Create a rectangle shape at the translated position
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(
+                originalLeft + offsetX,
+                originalBottom + offsetY,
+                rectWidth,
+                rectHeight);
+
+            // Styling via GraphInfo
+            rect.GraphInfo.FillColor = Aspose.Pdf.Color.LightGray; // fill color
+            rect.GraphInfo.Color = Aspose.Pdf.Color.Black;       // border color
+            rect.GraphInfo.LineWidth = 1;
+
+            // Add the rectangle to the graph
+            graph.Shapes.Add(rect);
+
+            // Add the graph to the page
             page.Paragraphs.Add(graph);
 
-            // Translate (move) the entire graph horizontally by 30 points
-            // and vertically by 20 points relative to its current location
-            double dx = 30;
-            double dy = 20;
-            graph.Left += dx; // horizontal translation
-            graph.Top += dy;  // vertical translation
-
-            // Save the resulting PDF
-            doc.Save("translated_graph.pdf");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF with translated graph saved to '{outputPath}'.");
     }
 }

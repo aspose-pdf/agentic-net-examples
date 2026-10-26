@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -7,37 +6,42 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document and ensure proper disposal
+        const string outputPath = "ellipse_rotated.pdf";
+
         using (Document doc = new Document())
         {
-            // Add a blank page to the document
             Page page = doc.Pages.Add();
 
-            // Create a Graph container (size can be adjusted as needed)
-            Graph graph = new Graph(400, 200);
+            const double graphWidth = 300.0;   // width of the graph container
+            const double graphHeight = 200.0;  // height of the graph container
+            const double graphLeft = 100.0;    // left (X) position on the page
+            const double graphBottom = 200.0; // desired bottom Y coordinate on the page
 
-            // Create an ellipse: left = 100, bottom = 100, width = 200, height = 150
-            Ellipse ellipse = new Ellipse(100, 100, 200, 150);
-
-            // Set visual properties and rotate the ellipse by 45 degrees
-            ellipse.GraphInfo = new GraphInfo
+            // Create the graph with double parameters (float overload is obsolete)
+            Graph graph = new Graph(graphWidth, graphHeight)
             {
-                FillColor = Color.Yellow,   // Fill color
-                Color = Color.Red,          // Border color
-                LineWidth = 2,              // Border thickness
-                RotationAngle = 45          // Rotation angle in degrees
+                Left = graphLeft,
+                // Graph.Top defines the Y coordinate of the top edge; add height to place the bottom at graphBottom
+                Top = graphBottom + graphHeight
             };
 
-            // Add the ellipse to the graph
-            graph.Shapes.Add(ellipse);
+            // Create an ellipse (centerX, centerY, radiusX, radiusY) using float literals
+            Ellipse ellipse = new Ellipse(150.0f, 150.0f, 80.0f, 40.0f);
+            // Styling is done through the shape's GraphInfo
+            ellipse.GraphInfo.FillColor = Color.LightBlue;
+            ellipse.GraphInfo.Color = Color.DarkBlue; // stroke colour
+            ellipse.GraphInfo.LineWidth = 2.0f;
+            // Rotate the ellipse 45 degrees (counter‑clockwise)
+            ellipse.GraphInfo.RotationAngle = 45.0;
 
-            // Add the graph to the page's content
+            // Add the ellipse to the graph and the graph to the page
+            graph.Shapes.Add(ellipse);
             page.Paragraphs.Add(graph);
 
-            // Save the PDF to a file
-            doc.Save("EllipseRotated45.pdf");
+            // Save the PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with rotated ellipse saved as 'EllipseRotated45.pdf'.");
+        Console.WriteLine($"Saved PDF with rotated ellipse to '{outputPath}'.");
     }
 }

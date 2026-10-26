@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -6,44 +7,44 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "arc_graph.pdf";
+        const string outputPath = "graph_arc.pdf";
 
-        // Create a new PDF document and ensure proper disposal
+        // Ensure the output directory exists (fully‑qualified System.IO.Path to avoid ambiguity)
+        string outputDir = System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(outputPath))!;
+        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
+
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page (pages are 1‑based)
-            doc.Pages.Add();
-            Page page = doc.Pages[1];
+            // Add a blank page
+            Page page = doc.Pages.Add();
 
-            // Create a graph container (width, height in points)
-            Graph graph = new Graph(400, 400)
+            // Create a Graph (canvas) – use float parameters
+            Graph graph = new Graph(200f, 200f)
             {
-                // Position the graph on the page (optional)
-                Left = 100,
-                Top  = 500
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center
             };
 
-            // Create an arc: center (200,200), radius 100, from 0° to 180°
-            Arc arc = new Arc(200, 200, 100, 0, 180)
+            // Arc constructor expects float values
+            Arc arc = new Arc(50f, 50f, 100f, 0f, 120f);
+
+            // Fill the arc with a custom color and remove the stroke.
+            arc.GraphInfo = new GraphInfo
             {
-                // Set visual properties via GraphInfo
-                GraphInfo = new GraphInfo
-                {
-                    // Fill the arc with opaque red
-                    FillColor = Color.FromArgb(255, 255, 0, 0)
-                }
+                FillColor = Color.FromRgb(0.2f, 0.7f, 0.3f), // custom greenish color
+                Color     = Color.Transparent               // no stroke
             };
 
-            // Add the arc shape to the graph
+            // Add the arc to the graph and the graph to the page
             graph.Shapes.Add(arc);
-
-            // Add the graph to the page's paragraph collection
             page.Paragraphs.Add(graph);
 
-            // Save the document as PDF
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with filled arc saved to '{outputPath}'.");
     }
 }

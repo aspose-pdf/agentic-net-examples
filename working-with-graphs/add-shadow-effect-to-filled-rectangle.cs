@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -6,36 +7,49 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "shadow_rectangle.pdf";
+        const string outputPath = "graph_with_shadow.pdf";
 
         using (Document doc = new Document())
         {
             Page page = doc.Pages.Add();
 
-            // Graph container (width, height)
-            Graph graph = new Graph(400.0, 200.0);
+            // Create a Graph container (200x200 points) and position it on the page
+            Graph graph = new Graph(200.0, 200.0)
+            {
+                Left = 100,
+                Top = 400
+            };
 
-            // ----- Shadow rectangle (offset +5, -5) -----
-            // In PDF coordinate system the origin is bottom‑left, so a negative Y offset moves the shape down.
+            // -----------------------------------------------------------------
+            // Shadow emulation: Aspose.Pdf.GraphInfo does not expose a Shadow
+            // property, so we draw a second rectangle slightly offset and with
+            // a semi‑transparent fill to mimic a blurred shadow.
+            // -----------------------------------------------------------------
             Aspose.Pdf.Drawing.Rectangle shadowRect = new Aspose.Pdf.Drawing.Rectangle(
-                55,   // left  = original left  + OffsetX (5)
-                95,   // bottom = original bottom - OffsetY (5)
-                250,  // width
-                50    // height
-            );
-            shadowRect.GraphInfo = new GraphInfo
+                20 + 5,   // X position + horizontal offset
+                20 - 5,   // Y position + vertical offset (negative moves up)
+                160 + 5, // Width + horizontal offset
+                100 - 5   // Height + vertical offset
+            )
             {
-                // Semi‑transparent gray to simulate a soft shadow
-                FillColor = Aspose.Pdf.Color.FromArgb(128, 200, 200, 200)
+                GraphInfo = new GraphInfo
+                {
+                    // 30% opaque black (alpha 80 out of 255) creates a soft shadow
+                    FillColor = Color.FromArgb(80, 0, 0, 0)
+                }
             };
-            graph.Shapes.Add(shadowRect);
 
-            // ----- Main filled rectangle -----
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(50, 100, 250, 50);
-            rect.GraphInfo = new GraphInfo
+            // Main filled rectangle inside the graph
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(20, 20, 160, 100)
             {
-                FillColor = Aspose.Pdf.Color.LightGray
+                GraphInfo = new GraphInfo
+                {
+                    FillColor = Color.FromRgb(0.2, 0.6, 0.8) // rectangle fill color
+                }
             };
+
+            // Add the shadow first so it is rendered beneath the main shape
+            graph.Shapes.Add(shadowRect);
             graph.Shapes.Add(rect);
 
             // Add the graph to the page
@@ -45,6 +59,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with shadowed rectangle saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to {outputPath}");
     }
 }

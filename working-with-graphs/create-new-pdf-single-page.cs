@@ -1,23 +1,22 @@
 using System;
-using Aspose.Pdf;   // Aspose.Pdf namespace provides Document, DocumentFactory, etc.
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "new.pdf";
+        const string outputPath = "single_page.pdf";
 
-        // Create an empty PDF document using the DocumentFactory (lifecycle rule)
-        DocumentFactory factory = new DocumentFactory();
-        using (Document doc = factory.CreateDocument())
+        // Wrap Document in a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            // Add a single default‑size page (Pages.Add() creates a page with the most common size)
+            // Add a single default‑size page (A4 by default)
             doc.Pages.Add();
 
-            // Save the document as PDF (no SaveOptions needed for PDF output)
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF created and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

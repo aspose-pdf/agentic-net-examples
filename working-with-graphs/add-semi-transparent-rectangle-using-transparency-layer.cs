@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -7,63 +6,33 @@ class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "transparent_shape.pdf";
 
-        if (!File.Exists(inputPath))
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            Page page = doc.Pages.Add();
 
-        // Open the existing PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Get the first page (pages are 1‑based)
-            Page page = doc.Pages[1];
+            // Create a Graph that spans the whole page (use double overload – more stable)
+            var graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // ------------------------------------------------------------
-            // Begin a transparency layer by creating a Graph (paragraph)
-            // that will contain the drawing commands.
-            // ------------------------------------------------------------
-            // Graph constructor expects width and height (points)
-            Aspose.Pdf.Drawing.Graph graph = new Aspose.Pdf.Drawing.Graph(400, 200);
+            // Define a rectangle shape (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+            var rect = new Aspose.Pdf.Drawing.Rectangle(100, 500, 300, 600);
+            // Fill with semi‑transparent blue (alpha 128 ≈ 50% opacity)
+            rect.GraphInfo.FillColor = Aspose.Pdf.Color.FromArgb(128, 0, 0, 255);
+            // Optional border settings
+            rect.GraphInfo.Color = Aspose.Pdf.Color.Black;
+            rect.GraphInfo.LineWidth = 1;
 
-            // Create a rectangle shape (left, bottom, width, height)
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(50, 50, 300, 100);
-
-            // Set visual properties via GraphInfo.
-            // Use a semi‑transparent fill by combining a color with the
-            // Artifact.Opacity property (the shape itself does not expose
-            // opacity, so we use an Artifact wrapper).
-            rect.GraphInfo = new Aspose.Pdf.GraphInfo
-            {
-                // Fill with a light red color
-                FillColor = Aspose.Pdf.Color.FromRgb(1.0, 0.6, 0.6),
-                // Outline color
-                Color = Aspose.Pdf.Color.Red,
-                LineWidth = 2
-            };
-
-            // Add the rectangle to the graph's shape collection
+            // Add the rectangle to the graph
             graph.Shapes.Add(rect);
 
-            // ------------------------------------------------------------
-            // End of transparency layer – the graph is now a complete
-            // paragraph that can be added to the page.
-            // ------------------------------------------------------------
-            // Add the graph to the page's paragraphs collection
+            // Add the graph to the page's paragraph collection
             page.Paragraphs.Add(graph);
 
-            // Optional: flatten transparency so that the semi‑transparent
-            // appearance is rasterized into the final PDF.
-            doc.FlattenTransparency();
-
-            // Save the modified PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with semi‑transparent shape saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

@@ -1,53 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "graph_with_text.pdf";
+        const string inputPath  = "input.pdf";      // PDF that already contains a graph
+        const string outputPath = "output.pdf";     // Resulting PDF with added text
 
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Graph dimensions and position (use double values as required by the API)
-            Graph graph = new Graph(300.0, 200.0);
-            graph.Left = 100.0;   // X coordinate of the graph's left side
-            graph.Top  = 500.0;   // Y coordinate of the graph's top side
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Choose the page that contains the graph (first page in this example)
+            Page page = doc.Pages[1];   // 1‑based indexing
 
-            // Styling for the graph – border and background are set via GraphInfo
-            graph.GraphInfo = new GraphInfo
-            {
-                Color = Color.Black,      // border color
-                FillColor = Color.White,  // background fill
-                LineWidth = 1             // border thickness
-            };
+            // Create a text fragment with the desired content
+            TextFragment tf = new TextFragment("Sample Text");
 
-            // Add the graph to the page
-            page.Paragraphs.Add(graph);
+            // Set font family, size and color
+            tf.TextState.Font = FontRepository.FindFont("Arial");   // Font family
+            tf.TextState.FontSize = 14;                             // Font size
+            tf.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0.0, 0.5, 0.8); // Color (RGB)
 
-            // Create a text fragment to be placed inside the graph
-            TextFragment tf = new TextFragment("Hello Aspose.Pdf!");
-            // Modify the existing TextState instead of assigning a new one (TextState is read‑only)
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf.TextState.FontSize = 14;
-            tf.TextState.ForegroundColor = Color.Blue;
+            // Position the text at specific coordinates (e.g., x=150, y=300)
+            tf.Position = new Position(150, 300); // Coordinates are in points
 
-            // Position the text (coordinates are relative to the page)
-            tf.Position = new Position(150.0, 560.0);
-
-            // Add the text fragment to the page – it will render over the graph
+            // Add the text fragment to the page's paragraphs collection
             page.Paragraphs.Add(tf);
 
-            // Save the document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Text added and saved to '{outputPath}'.");
     }
 }

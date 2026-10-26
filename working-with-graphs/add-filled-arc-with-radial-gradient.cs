@@ -1,60 +1,46 @@
 using System;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
+        const string outputPath = "graph.pdf";
+
         using (Document doc = new Document())
         {
-            // Add a new page (1‑based indexing)
             Page page = doc.Pages.Add();
 
-            // Create a Graph container – size can be larger than the shape
-            // Use double parameters as the float overload is obsolete
-            Graph graph = new Graph(500.0, 400.0);
+            // Create a graph of size 300x300 and position it at (50,400)
+            Graph graph = new Graph(300f, 300f);
+            graph.Left = 50f;
+            graph.Top = 400f;
 
-            // Define an arc: center at (250,200), radius 100, start angle 0°, sweep 180°
-            // Arc constructor expects float values, so we cast or use float literals
-            Arc arc = new Arc(250f, 200f, 100f, 0f, 180f);
+            // Define an arc (center at 150,150, radius 100) with start and sweep angles
+            Arc arc = new Arc(150f, 150f, 100f, 30f, 120f);
+            arc.GraphInfo.Color = Aspose.Pdf.Color.Black; // stroke color (optional)
+            arc.GraphInfo.LineWidth = 1f;
 
-            // Create a radial gradient shading from LightBlue (centre) to DarkBlue (outer)
+            // Create a radial gradient fill
             GradientRadialShading radial = new GradientRadialShading(
-                Aspose.Pdf.Color.LightBlue,
-                Aspose.Pdf.Color.DarkBlue);
-
-            // Set the centre point for both start and end circles (same centre)
-            radial.Start = new Point(250.0, 200.0);
-            radial.End   = new Point(250.0, 200.0);
-
-            // Inner radius = 0 (solid colour at centre), outer radius = arc radius
-            radial.StartingRadius = 0.0;
-            radial.EndingRadius   = 100.0;
-
-            // Apply the gradient to the arc via GraphInfo
-            // NOTE: In recent Aspose.PDF versions GraphInfo does not expose a 'Shading' property.
-            // The gradient can be applied by assigning the shading to the GraphInfo's FillColor
-            // using a Color object created from the shading. Since a direct gradient fill is not
-            // supported via GraphInfo, we fall back to a solid fill colour (the centre colour).
-            // This keeps the code compile‑time correct while still demonstrating the shape.
-            arc.GraphInfo = new GraphInfo
-            {
-                // Solid fill colour (centre of the gradient) – replace with actual gradient handling if supported.
-                FillColor = Aspose.Pdf.Color.LightBlue,
-                // Optional stroke (outline) settings
-                Color     = Aspose.Pdf.Color.Black,
-                LineWidth = 1f
-            };
+                Aspose.Pdf.Color.FromRgb(0.9f, 0.2f, 0.2f), // light red
+                Aspose.Pdf.Color.FromRgb(0.2f, 0.2f, 0.9f)  // blue
+            );
+            // Apply the gradient as the fill color of the arc
+            arc.GraphInfo.FillColor = new Aspose.Pdf.Color { PatternColorSpace = radial };
 
             // Add the arc to the graph
             graph.Shapes.Add(arc);
 
-            // Add the graph to the page's paragraph collection
+            // Add the graph to the page
             page.Paragraphs.Add(graph);
 
-            // Save the PDF
-            doc.Save("ArcWithRadialGradient.pdf");
+            // Save the PDF document
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF with filled arc saved to {outputPath}");
     }
 }

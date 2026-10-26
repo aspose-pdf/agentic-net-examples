@@ -6,43 +6,43 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document and ensure proper disposal
+        const string outputPath = "BezierGraph.pdf";
+
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page (1‑based indexing)
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a graph container with desired dimensions
-            Graph graph = new Graph(500, 400);
+            // Define the size of the graph (width, height)
+            double graphWidth = 500;
+            double graphHeight = 500;
 
-            // Define four control points for the Bezier curve
-            // (x0, y0), (x1, y1), (x2, y2), (x3, y3)
-            float[] controlPoints = new float[]
-            {
-                100f, 300f, // first point
-                150f, 350f, // second point
-                250f, 250f, // third point
-                300f, 300f  // fourth point
-            };
+            // Create a Graph object with the defined size
+            Graph graph = new Graph(graphWidth, graphHeight);
+            // Position the graph on the page (optional – defaults to (0,0))
+            graph.Left = 0;
+            graph.Top = 0;
 
-            // Create the curve shape using the control points
-            Curve bezier = new Curve(controlPoints);
+            // Define the four control points of the Bezier curve
+            // The Curve shape expects a flat float array: startX, startY, ctrl1X, ctrl1Y, ctrl2X, ctrl2Y, endX, endY
+            float[] bezierPoints = new float[] { 50f, 250f, 150f, 400f, 350f, 100f, 450f, 250f };
 
-            // Set stroke color and line width via GraphInfo
-            bezier.GraphInfo = new GraphInfo
-            {
-                Color = Color.Blue, // stroke color
-                LineWidth = 2
-            };
+            // Create the Bezier curve (as a Curve shape)
+            Curve bezierCurve = new Curve(bezierPoints);
+            // Set the stroke colour for the curve
+            bezierCurve.GraphInfo.Color = Color.Blue;
 
             // Add the curve to the graph
-            graph.Shapes.Add(bezier);
+            graph.Shapes.Add(bezierCurve);
 
-            // Add the graph to the page's content
+            // Add the graph (which now contains the Bezier curve) to the page
             page.Paragraphs.Add(graph);
 
-            // Save the PDF document
-            doc.Save("BezierCurve.pdf");
+            // Save the PDF document to the specified file
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"Bezier curve PDF saved to '{outputPath}'.");
     }
 }

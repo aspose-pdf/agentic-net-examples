@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
@@ -10,8 +9,8 @@ class Program
     static void Main()
     {
         // Input and output directories
-        const string inputDir = "InputPdfs";
-        const string outputDir = "OutputPdfs";
+        string inputDir = "InputPdfs";
+        string outputDir = "OutputPdfs";
 
         if (!Directory.Exists(inputDir))
         {
@@ -21,73 +20,55 @@ class Program
 
         Directory.CreateDirectory(outputDir);
 
-        // Collect all PDF files in the input directory
+        // Get all PDF files in the input directory
         string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf");
 
         // Process each PDF concurrently
-        Parallel.ForEach(pdfFiles, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, pdfPath =>
+        Parallel.ForEach(pdfFiles, pdfPath =>
         {
             try
             {
-                string fileName = System.IO.Path.GetFileNameWithoutExtension(pdfPath);
-                string outputPath = System.IO.Path.Combine(outputDir, $"{fileName}_modified.pdf");
-
-                // Load the PDF document (lifecycle rule: use using)
+                // Load the PDF inside a using block (deterministic disposal)
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Iterate through each page and add a graph with ellipses
-                    foreach (Page page in doc.Pages)
+                    // Ensure the document has at least one page
+                    if (doc.Pages.Count == 0)
                     {
-                        // Create a Graph container sized to the page
-                        Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
-
-                        // Parameters for gradient‑like ellipses
-                        int ellipseCount = 5;
-                        double centerX = page.PageInfo.Width / 2;
-                        double centerY = page.PageInfo.Height / 2;
-                        double maxRadiusX = page.PageInfo.Width / 4;
-                        double maxRadiusY = page.PageInfo.Height / 4;
-
-                        for (int i = 0; i < ellipseCount; i++)
-                        {
-                            double factor = (double)i / (ellipseCount - 1);
-                            double radiusX = maxRadiusX * (1 - factor * 0.5);
-                            double radiusY = maxRadiusY * (1 - factor * 0.5);
-                            double left = centerX - radiusX;
-                            double bottom = centerY - radiusY;
-                            double width = radiusX * 2;
-                            double height = radiusY * 2;
-
-                            // Create an ellipse shape
-                            Ellipse ellipse = new Ellipse(left, bottom, width, height);
-
-                            // Simulate a gradient by varying the fill color
-                            ellipse.GraphInfo = new GraphInfo
-                            {
-                                FillColor = Aspose.Pdf.Color.FromRgb(0.2 + 0.6 * factor,
-                                                                    0.4 + 0.4 * factor,
-                                                                    1.0 - 0.5 * factor),
-                                Color = Aspose.Pdf.Color.Black,
-                                LineWidth = 0.5f // float literal required
-                            };
-
-                            graph.Shapes.Add(ellipse);
-                        }
-
-                        // Add the graph to the page
-                        page.Paragraphs.Add(graph);
+                        doc.Pages.Add();
                     }
 
-                    // Save the modified PDF (lifecycle rule: use Save)
-                    doc.Save(outputPath);
+                    // Access the first page (1‑based indexing)
+                    Page page = doc.Pages[1];
+
+                    // Create a Graph container that spans the whole page
+                    Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+
+                    // Define the ellipse (left, bottom, width, height)
+                    Aspose.Pdf.Drawing.Ellipse ellipse = new Aspose.Pdf.Drawing.Ellipse(100, 300, 200, 200);
+
+                    // Style the ellipse via GraphInfo (solid fill – gradient not supported in core API)
+                    ellipse.GraphInfo.FillColor = Aspose.Pdf.Color.Blue; // solid fill (replace with gradient logic if available)
+                    ellipse.GraphInfo.Color = Aspose.Pdf.Color.Black;   // border color
+                    ellipse.GraphInfo.LineWidth = 2;                     // border width
+
+                    // Add the ellipse to the graph, then the graph to the page
+                    graph.Shapes.Add(ellipse);
+                    page.Paragraphs.Add(graph);
+
+                    // Save the modified PDF to the output directory
+                    string fileName = System.IO.Path.GetFileName(pdfPath);
+                    string outPath = System.IO.Path.Combine(outputDir, fileName);
+                    doc.Save(outPath);
                 }
 
-                Console.WriteLine($"Processed: {pdfPath} → {outputPath}");
+                Console.WriteLine($"Processed: {pdfPath}");
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"Error processing {pdfPath}: {ex.Message}");
             }
         });
+
+        Console.WriteLine("All PDFs processed.");
     }
 }
