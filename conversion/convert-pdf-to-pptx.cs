@@ -1,34 +1,31 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace (contains Document and all SaveOptions)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPptxPath = "converted.pptx";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pptx";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        // Verify the source PDF exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
-        // -------------------------------------------------
-        // Step: Convert PDF to PPTX using Aspose.Pdf only
-        // -------------------------------------------------
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF and convert to PPTX using default options
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Aspose.Pdf can directly save a PDF as PPTX – no need for Aspose.Slides.
-            pdfDoc.Save(outputPptxPath, SaveFormat.Pptx);
+            // PptxSaveOptions is the required options class for PPTX output.
+            // Using the default constructor applies the library's default conversion settings.
+            PptxSaveOptions pptxOptions = new PptxSaveOptions();
+
+            pdfDoc.Save(outputPath, pptxOptions);
         }
 
-        // NOTE: Adding speaker notes to the generated PPTX would require the
-        // Aspose.Slides library, which is not referenced in this project. The
-        // conversion itself is performed entirely with Aspose.Pdf.
-
-        Console.WriteLine($"PDF successfully converted to PPTX.\nOutput file: {outputPptxPath}");
+        Console.WriteLine($"PDF successfully converted to PPTX: {outputPath}");
     }
 }

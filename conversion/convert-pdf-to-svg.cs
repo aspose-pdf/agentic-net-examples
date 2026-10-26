@@ -1,33 +1,40 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
+// SaveOptions subclasses (including SvgSaveOptions) are also in Aspose.Pdf
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.svg";
+        const string inputPdfPath  = "input.pdf";
+        const string outputDirPath = "SvgOutput";
 
-        if (!File.Exists(inputPath))
+        // Verify the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block (lifecycle rule)
-        using (Document pdfDoc = new Document(inputPath))
-        {
-            // Configure SVG output options – enable CSS style embedding by scaling to pixels
-            var svgOptions = new SvgSaveOptions
-            {
-                ScaleToPixels = true // embeds CSS styles into the generated SVG
-            };
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDirPath);
 
-            // Save the PDF directly to SVG using the configured options
-            pdfDoc.Save(outputPath, svgOptions);
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
+        {
+            // Configure SVG save options (default options are sufficient)
+            SvgSaveOptions svgOptions = new SvgSaveOptions();
+
+            // The base file name for the SVG output.
+            // When the PDF has multiple pages Aspose.Pdf will generate
+            // output.svg, output_1.svg, output_2.svg, ... automatically.
+            string svgBasePath = Path.Combine(outputDirPath, "output.svg");
+
+            // Save the PDF as SVG using the explicit SvgSaveOptions.
+            pdfDoc.Save(svgBasePath, svgOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to SVG: {outputPath}");
+        Console.WriteLine($"PDF has been converted to SVG files in '{outputDirPath}'.");
     }
 }

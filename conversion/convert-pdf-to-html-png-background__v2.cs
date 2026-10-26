@@ -1,12 +1,50 @@
-// URL-STABILITY STUB
-//
-// Convert pdf to html png background__v2
-//
-// This example has been consolidated or moved. Current location:
-//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/conversion/AGENTS.md
-//
-// This stub keeps the original URL live for existing bookmarks,
-// search-engine indexes, and blog-post links. See the canonical
-// location above for the current, maintained implementation.
+using System;
+using System.IO;
+using Aspose.Pdf;
 
-class Program { static void Main() { } }
+class Program
+{
+    static void Main()
+    {
+        const string inputPdf = "input.pdf";
+        const string outputHtml = "output.html";
+
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
+        }
+
+        try
+        {
+            using (Document doc = new Document(inputPdf))
+            {
+                // Configure HTML conversion options.
+                // The PngBackground property was removed in newer Aspose.Pdf versions;
+                // rendering of page backgrounds as PNG is now controlled via RasterImagesSavingMode.
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+                {
+                    // Render raster images (including page backgrounds) as PNG embedded into SVG.
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
+                    // Embed all resources directly into the HTML file.
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml
+                };
+
+                // HTML conversion requires GDI+ (Windows only). Handle platforms that lack it gracefully.
+                try
+                {
+                    doc.Save(outputHtml, htmlOpts);
+                    Console.WriteLine($"HTML saved to '{outputHtml}'.");
+                }
+                catch (TypeInitializationException)
+                {
+                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
+}
