@@ -5,75 +5,60 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Simple console progress bar
-    static void ShowProgress(int currentPage, int totalPages)
-    {
-        int percent = (int)((double)currentPage / totalPages * 100);
-        const int barWidth = 50;
-        int filled = percent * barWidth / 100;
-        string bar = new string('#', filled) + new string('-', barWidth - filled);
-        Console.Write($"\r[{bar}] {percent}%");
-        if (currentPage == totalPages)
-            Console.WriteLine(); // move to next line when done
-    }
-
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTxt = "extracted.txt";
+        const string inputPdfPath = "large_input.pdf";
+        const string outputTxtPath = "extracted_text.txt";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output file is empty before appending page texts
-        File.WriteAllText(outputTxt, string.Empty);
-
-        // Get total page count via Document (PdfExtractor has no PageCount property)
+        // Determine total pages (1‑based indexing).
         int pageCount;
-        using (var doc = new Document(inputPdf))
+        using (var doc = new Document(inputPdfPath))
         {
             pageCount = doc.Pages.Count;
         }
 
-        // PdfExtractor implements IDisposable – wrap in using per lifecycle rule
-        using (PdfExtractor extractor = new PdfExtractor())
+        // PdfExtractor implements IDisposable.
+        using (var extractor = new PdfExtractor())
         {
-            // Bind the source PDF
-            extractor.BindPdf(inputPdf);
+            extractor.BindPdf(inputPdfPath);
 
-            // Process each page individually to report progress
-            for (int page = 1; page <= pageCount; page++)
+            using (var writer = new StreamWriter(outputTxtPath))
             {
-                // Set the range to a single page using properties
-                extractor.StartPage = page;
-                extractor.EndPage   = page;
-
-                // Extract text from the current page
-                extractor.ExtractText();
-
-                // Retrieve extracted text via stream overload
-                string pageText;
-                using (MemoryStream ms = new MemoryStream())
+                for (int page = 1; page <= pageCount; page++)
                 {
-                    extractor.GetText(ms);
-                    ms.Position = 0;
-                    using (StreamReader reader = new StreamReader(ms))
+                    // Process a single page.
+                    extractor.StartPage = page;
+                    extractor.EndPage   = page;
+                    extractor.ExtractText();
+
+                    // GetText requires a destination stream.
+                    string pageText;
+                    using (var ms = new MemoryStream())
                     {
-                        pageText = reader.ReadToEnd();
+                        extractor.GetText(ms);
+                        ms.Position = 0; // rewind
+                        using (var sr = new StreamReader(ms))
+                        {
+                            pageText = sr.ReadToEnd();
+                        }
                     }
+
+                    writer.WriteLine(pageText);
+
+                    // Progress report (overwrites the same console line).
+                    int percent = (page * 100) / pageCount;
+                    Console.Write($"\rProcessing page {page}/{pageCount} ({percent}%)");
                 }
-
-                // Append page text to the output file
-                File.AppendAllText(outputTxt, pageText);
-
-                // Update progress bar
-                ShowProgress(page, pageCount);
             }
         }
 
-        Console.WriteLine($"Text extraction completed. Output saved to '{outputTxt}'.");
+        // Move to the next line after the progress loop.
+        Console.WriteLine("\nExtraction completed successfully.");
     }
 }
