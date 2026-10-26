@@ -1,7 +1,7 @@
 {
   "category": "pages",
   "nuget_version": "26.9.0",
-  "last_updated": "2026-10-08T11:52:38Z",
+  "last_updated": "2026-10-26T07:47:22Z",
   "examples": {
     "append-empty-a4-page-to-pdf": {
       "title": "Append Empty A4 Page to PDF",
@@ -23,7 +23,7 @@
         "Aspose.Pdf.PageSize"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19944"
     },
@@ -45,7 +45,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19945"
     },
@@ -69,7 +69,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19946"
     },
@@ -92,19 +92,19 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19947"
     },
     "read-pdf-page-dimensions": {
-      "title": "Read PDF Page Width and Height",
+      "title": "Read PDF Page Dimensions",
       "filename": "read-pdf-page-dimensions.cs",
-      "description": "The example opens a PDF file, iterates through each page, and logs the page's width and height in points using Aspose.Pdf.",
+      "description": "Loads a PDF file using Aspose.Pdf, iterates over each page, and logs the page width and height (in points) to the console.",
       "tags": [
         "pdf",
-        "page-size",
+        "pages",
         "dimensions",
-        "aspose-pdf",
+        "aspose",
         "csharp"
       ],
       "apis_used": [
@@ -112,13 +112,13 @@
         "Aspose.Pdf.Page",
         "Aspose.Pdf.PageInfo",
         "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Page.PageInfo.Width",
-        "Aspose.Pdf.Page.PageInfo.Height"
+        "Aspose.Pdf.PageInfo.Width",
+        "Aspose.Pdf.PageInfo.Height"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
-      "task_id": "20034"
+      "task_id": "19948"
     },
     "resize-pdf-page-to-letter-size": {
       "title": "Resize PDF Page to Letter Size",
@@ -138,7 +138,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19949"
     },
@@ -161,7 +161,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19950"
     },
@@ -184,7 +184,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19951"
     },
@@ -207,7 +207,7 @@
         "Aspose.Pdf.Page.MediaBox"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19952"
     },
@@ -230,7 +230,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19953"
     },
@@ -253,7 +253,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19954"
     },
@@ -275,7 +275,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19955"
     },
@@ -297,7 +297,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19956"
     },
@@ -320,7 +320,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19957"
     },
@@ -342,7 +342,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19958"
     },
@@ -364,32 +364,9 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19959"
-    },
-    "rotate-all-pdf-pages-180-degrees": {
-      "title": "Rotate All PDF Pages 180 Degrees",
-      "filename": "rotate-all-pdf-pages-180-degrees.cs",
-      "description": "Shows how to rotate every page of a PDF document by 180° using Aspose.Pdf and save the result.",
-      "tags": [
-        "rotation",
-        "pages",
-        "pdf",
-        "Aspose.Pdf",
-        "document"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rotation",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
-      "status": "verified",
-      "task_id": "19960"
     },
     "convert-pdf-pages-portrait-to-landscape": {
       "title": "Convert PDF Pages from Portrait to Landscape",
@@ -410,7 +387,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19961"
     },
@@ -433,7 +410,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19962"
     },
@@ -456,7 +433,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19963"
     },
@@ -477,7 +454,7 @@
         "Aspose.Pdf.PageInfo"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19964"
     },
@@ -500,7 +477,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19965"
     },
@@ -523,7 +500,7 @@
         "Aspose.Pdf.Page.MediaBox"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19966"
     },
@@ -546,7 +523,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19967"
     },
@@ -570,7 +547,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19968"
     },
@@ -593,7 +570,7 @@
         "Aspose.Pdf.Page.MediaBox"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19969"
     },
@@ -615,7 +592,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19970"
     },
@@ -638,7 +615,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19971"
     },
@@ -661,7 +638,7 @@
         "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19972"
     },
@@ -684,7 +661,7 @@
         "Aspose.Pdf.PageCollection.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19973"
     },
@@ -707,7 +684,7 @@
         "Aspose.Pdf.Page.MediaBox"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19974"
     },
@@ -730,7 +707,7 @@
         "Aspose.Pdf.Rotation"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19975"
     },
@@ -752,7 +729,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19976"
     },
@@ -775,7 +752,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19977"
     },
@@ -798,7 +775,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19978"
     },
@@ -824,7 +801,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19979"
     },
@@ -847,18 +824,18 @@
         "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19980"
     },
     "resize-pdf-pages-to-template-size": {
-      "title": "Resize PDF Pages to Match Template Size",
+      "title": "Resize PDF Pages to Match Template Dimensions",
       "filename": "resize-pdf-pages-to-template-size.cs",
-      "description": "Demonstrates how to resize every page of a PDF to the dimensions of a reference template PDF using Aspose.Pdf.",
+      "description": "Shows how to load a template PDF, read its page size, and resize every page of another PDF to those dimensions using Aspose.Pdf.",
       "tags": [
         "pdf",
+        "page-size",
         "resize",
-        "pages",
         "aspose",
         "template"
       ],
@@ -870,9 +847,9 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
-      "task_id": "19993"
+      "task_id": "19981"
     },
     "rotate-pdf-pages-using-config": {
       "title": "Rotate PDF Pages by Configurable Angles",
@@ -893,7 +870,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19982"
     },
@@ -915,7 +892,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19983"
     },
@@ -938,7 +915,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19984"
     },
@@ -962,7 +939,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19985"
     },
@@ -985,7 +962,7 @@
         "Aspose.Pdf.Page.MediaBox"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19986"
     },
@@ -1008,7 +985,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19987"
     },
@@ -1030,7 +1007,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19988"
     },
@@ -1053,7 +1030,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19989"
     },
@@ -1076,7 +1053,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19990"
     },
@@ -1099,7 +1076,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19991"
     },
@@ -1122,7 +1099,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19992"
     },
@@ -1146,7 +1123,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19994"
     },
@@ -1169,7 +1146,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19995"
     },
@@ -1193,7 +1170,7 @@
         "Aspose.Pdf.Drawing.VerticalAlignment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19996"
     },
@@ -1217,7 +1194,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19997"
     },
@@ -1240,7 +1217,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19998"
     },
@@ -1263,7 +1240,7 @@
         "Aspose.Pdf.Text.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "19999"
     },
@@ -1287,7 +1264,7 @@
         "Aspose.Pdf.VerticalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20000"
     },
@@ -1310,7 +1287,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20001"
     },
@@ -1333,7 +1310,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20002"
     },
@@ -1356,7 +1333,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20003"
     },
@@ -1380,7 +1357,7 @@
         "Aspose.Pdf.Point"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20004"
     },
@@ -1406,7 +1383,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20005"
     },
@@ -1429,7 +1406,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20006"
     },
@@ -1452,7 +1429,7 @@
         "Aspose.Pdf.Color.Transparent"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20007"
     },
@@ -1475,7 +1452,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20009"
     },
@@ -1498,7 +1475,7 @@
         "Aspose.Pdf.TextStamp.TextState"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20013"
     },
@@ -1524,7 +1501,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20014"
     },
@@ -1550,7 +1527,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20015"
     },
@@ -1575,7 +1552,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20016"
     },
@@ -1600,7 +1577,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20017"
     },
@@ -1625,7 +1602,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20018"
     },
@@ -1649,7 +1626,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20019"
     },
@@ -1674,7 +1651,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20020"
     },
@@ -1699,7 +1676,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20021"
     },
@@ -1723,7 +1700,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20022"
     },
@@ -1746,32 +1723,35 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20023"
     },
     "add-bates-numbering-to-pdf-pages": {
-      "title": "Add Bates Numbering to PDF Pages",
+      "title": "Add Bates Numbering Stamp to PDF Pages",
       "filename": "add-bates-numbering-to-pdf-pages.cs",
-      "description": "Shows how to insert year‑based Bates numbers (e.g., 2026‑0001) on each page of a PDF using Aspose.Pdf's TextStamp.",
+      "description": "Demonstrates how to insert a Bates numbering stamp starting at 1000 with a dash separator on each page of a PDF using Aspose.Pdf.",
       "tags": [
         "bates-numbering",
+        "text-stamp",
         "pdf",
-        "textstamp",
-        "page-numbering",
-        "aspose-pdf"
+        "aspose",
+        "page-numbering"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.Text.TextStamp.TextState",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Text.HorizontalAlignment",
+        "Aspose.Pdf.Text.VerticalAlignment",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
-      "task_id": "20028"
+      "task_id": "20025"
     },
     "add-bates-numbering-with-custom-prefix-suffix": {
       "title": "Add Custom Bates Numbering to PDF Pages",
@@ -1792,7 +1772,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20026"
     },
@@ -1817,7 +1797,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20027"
     },
@@ -1842,7 +1822,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20029"
     },
@@ -1867,7 +1847,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20030"
     },
@@ -1891,7 +1871,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20031"
     },
@@ -1916,7 +1896,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20032"
     },
@@ -1937,7 +1917,7 @@
         "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20033"
     },
@@ -1960,7 +1940,7 @@
         "Page.BleedBox"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20035"
     },
@@ -1983,7 +1963,7 @@
         "Aspose.Pdf.Page.TrimBox"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20036"
     },
@@ -2006,7 +1986,7 @@
         "Aspose.Pdf.Page.PageInfo"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20037"
     },
@@ -2030,7 +2010,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20038"
     },
@@ -2053,7 +2033,7 @@
         "Aspose.Pdf.Page.Trim"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20039"
     },
@@ -2076,7 +2056,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20040"
     },
@@ -2099,7 +2079,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20041"
     },
@@ -2122,7 +2102,7 @@
         "Aspose.Pdf.VerticalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20042"
     },
@@ -2147,9 +2127,102 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:52:38Z",
+      "generated_at": "2026-10-26T07:47:22Z",
       "status": "verified",
       "task_id": "20043"
+    },
+    "rotate-all-pdf-pages-180-degrees__v2": {
+      "title": "Rotate All PDF Pages 180 Degrees",
+      "filename": "rotate-all-pdf-pages-180-degrees__v2.cs",
+      "description": "Shows how to rotate every page of a PDF document by 180° using Aspose.Pdf and save the result.",
+      "tags": [
+        "rotation",
+        "pages",
+        "pdf",
+        "Aspose.Pdf",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rotation",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:47:22Z",
+      "status": "verified",
+      "task_id": "19960"
+    },
+    "resize-pdf-pages-to-template-size__v2": {
+      "title": "Resize PDF Pages to Match Template Size",
+      "filename": "resize-pdf-pages-to-template-size__v2.cs",
+      "description": "Demonstrates how to resize every page of a PDF to the dimensions of a reference template PDF using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "resize",
+        "pages",
+        "aspose",
+        "template"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:47:22Z",
+      "status": "verified",
+      "task_id": "19993"
+    },
+    "add-bates-numbering-to-pdf-pages__v2": {
+      "title": "Add Bates Numbering to PDF Pages",
+      "filename": "add-bates-numbering-to-pdf-pages__v2.cs",
+      "description": "Shows how to insert year‑based Bates numbers (e.g., 2026‑0001) on each page of a PDF using Aspose.Pdf's TextStamp.",
+      "tags": [
+        "bates-numbering",
+        "pdf",
+        "textstamp",
+        "page-numbering",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.TextStamp.TextState",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:47:22Z",
+      "status": "verified",
+      "task_id": "20028"
+    },
+    "read-pdf-page-dimensions__v2": {
+      "title": "Read PDF Page Width and Height",
+      "filename": "read-pdf-page-dimensions__v2.cs",
+      "description": "The example opens a PDF file, iterates through each page, and logs the page's width and height in points using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "page-size",
+        "dimensions",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page.PageInfo.Width",
+        "Aspose.Pdf.Page.PageInfo.Height"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:47:22Z",
+      "status": "verified",
+      "task_id": "20034"
     }
   }
 }

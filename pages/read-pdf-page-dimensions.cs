@@ -14,15 +14,15 @@ class Program
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
+            // Aspose.Pdf uses 1‑based page indexing
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                double width  = page.PageInfo.Width;
-                double height = page.PageInfo.Height;
+                double width = page.PageInfo.Width;   // Width in points
+                double height = page.PageInfo.Height; // Height in points
 
                 Console.WriteLine($"Page {i}: Width = {width} pt, Height = {height} pt");
             }
