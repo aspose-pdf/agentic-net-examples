@@ -1,7 +1,7 @@
 {
   "category": "facades-extract-images-and-text",
   "nuget_version": "26.9.0",
-  "last_updated": "2026-10-08T11:41:06Z",
+  "last_updated": "2026-10-26T07:39:06Z",
   "examples": {
     "extract-text-from-pdf-to-utf8-txt": {
       "title": "Extract Text from PDF to UTF-8 Text File",
@@ -21,7 +21,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21743"
     },
@@ -45,7 +45,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21744"
     },
@@ -67,18 +67,18 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21745"
     },
     "batch-extract-text-from-pdfs": {
-      "title": "Batch Extract Text from PDFs with PdfExtractor",
+      "title": "Batch Extract Text from PDFs to Text Files",
       "filename": "batch-extract-text-from-pdfs.cs",
-      "description": "Shows how to loop through a directory, use Aspose.Pdf.Facades.PdfExtractor to extract text from each PDF, and write the results to UTF-8 text files.",
+      "description": "Shows how to loop through a folder of PDF documents, extract their text using Aspose.Pdf.Facades.PdfExtractor, and write each output to a matching .txt file.",
       "tags": [
         "pdf",
         "text-extraction",
-        "batch",
+        "batch-processing",
         "aspose-pdf",
         "csharp"
       ],
@@ -89,9 +89,9 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
-      "task_id": "21756"
+      "task_id": "21746"
     },
     "check-pdf-for-text-and-images": {
       "title": "Check PDF for Text and Images using PdfExtractor",
@@ -114,7 +114,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21747"
     },
@@ -140,7 +140,7 @@
         "Aspose.Pdf.Document"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21748"
     },
@@ -163,7 +163,7 @@
         "PdfExtractor.GetText"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21749"
     },
@@ -185,7 +185,7 @@
         "PdfExtractor.GetText"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21750"
     },
@@ -207,7 +207,7 @@
         "PdfExtractor.GetText"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21751"
     },
@@ -229,7 +229,7 @@
         "PdfExtractor.GetText"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21752"
     },
@@ -251,32 +251,32 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21753"
     },
     "extract-text-from-pdf": {
-      "title": "Extract Text from PDF via Command Line",
+      "title": "Extract Text from PDF using Aspose.Pdf",
       "filename": "extract-text-from-pdf.cs",
-      "description": "Shows a simple command‑line tool that loads a PDF file, uses Aspose.Pdf's TextAbsorber to extract pure text, and writes the result to standard output.",
+      "description": "Shows how to load a PDF file, extract all its text with PdfExtractor, and output the extracted text to the console.",
       "tags": [
         "pdf",
         "text-extraction",
-        "command-line",
-        "aspose-pdf",
+        "console",
+        "aspose",
         "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Text.TextExtractionOptions",
-        "Aspose.Pdf.Text.TextExtractionOptions.TextFormattingMode",
-        "Aspose.Pdf.PageCollection.Accept"
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText",
+        "Aspose.Pdf.Facades.PdfExtractor.Dispose"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
-      "task_id": "21771"
+      "task_id": "21754"
     },
     "extract-pdf-text-to-stringbuilder": {
       "title": "Extract PDF Text to StringBuilder and Save to File",
@@ -296,7 +296,7 @@
         "PdfExtractor.GetText"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21755"
     },
@@ -319,7 +319,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21757"
     },
@@ -341,7 +341,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21758"
     },
@@ -364,7 +364,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21760"
     },
@@ -386,7 +386,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21762"
     },
@@ -411,7 +411,7 @@
         "PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21763"
     },
@@ -436,7 +436,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21764"
     },
@@ -458,7 +458,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21766"
     },
@@ -482,7 +482,7 @@
         "Aspose.Pdf.Document.EmbeddedFiles"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21768"
     },
@@ -508,7 +508,7 @@
         "Aspose.Pdf.FontRepository.FindFont"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21769"
     },
@@ -531,7 +531,7 @@
         "PdfExtractor.Dispose"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21770"
     },
@@ -554,7 +554,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetText(MemoryStream)"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21772"
     },
@@ -579,7 +579,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21773"
     },
@@ -601,7 +601,7 @@
         "Aspose.Pdf.License"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21774"
     },
@@ -627,7 +627,7 @@
         "FileSpecification"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21775"
     },
@@ -652,7 +652,7 @@
         "PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21776"
     },
@@ -677,7 +677,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21777"
     },
@@ -700,7 +700,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21778"
     },
@@ -723,7 +723,7 @@
         "PdfExtractor.GetNextImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21779"
     },
@@ -746,7 +746,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21780"
     },
@@ -769,7 +769,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21781"
     },
@@ -792,7 +792,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21782"
     },
@@ -817,7 +817,7 @@
         "PdfExtractor.GetNextImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21783"
     },
@@ -841,7 +841,7 @@
         "PdfExtractor.GetNextImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21784"
     },
@@ -864,7 +864,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21785"
     },
@@ -887,7 +887,7 @@
         "PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21786"
     },
@@ -911,7 +911,7 @@
         "Aspose.Pdf.Facades.ImageExtractor.ExtractImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21787"
     },
@@ -934,7 +934,7 @@
         "Aspose.Pdf.XImage.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21788"
     },
@@ -957,7 +957,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21789"
     },
@@ -981,7 +981,7 @@
         "PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21790"
     },
@@ -1004,7 +1004,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.ExtractImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21791"
     },
@@ -1027,7 +1027,7 @@
         "Aspose.Pdf.XImage.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21792"
     },
@@ -1048,7 +1048,7 @@
         "Aspose.Pdf.PdfException"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21793"
     },
@@ -1071,7 +1071,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21795"
     },
@@ -1094,7 +1094,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21796"
     },
@@ -1118,7 +1118,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21797"
     },
@@ -1142,7 +1142,7 @@
         "PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21798"
     },
@@ -1166,32 +1166,34 @@
         "Aspose.Pdf.XImage.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21799"
     },
     "extract-pdf-text-with-progress": {
-      "title": "Extract PDF Text with Console Progress Bar",
+      "title": "Extract Text from PDF with Page‑by‑Page Progress",
       "filename": "extract-pdf-text-with-progress.cs",
-      "description": "Demonstrates how to extract text from a PDF file page‑by‑page using Aspose.Pdf.Facades.PdfExtractor while showing a console progress bar that reflects the extraction percentage.",
+      "description": "Demonstrates how to extract text from each page of a large PDF using Aspose.Pdf's PdfExtractor while reporting progress in the console.",
       "tags": [
         "pdf",
         "text-extraction",
-        "progress-bar",
-        "aspose-pdf",
-        "console"
+        "progress",
+        "console",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfExtractor",
         "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.StartPage",
+        "Aspose.Pdf.Facades.PdfExtractor.EndPage",
         "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
         "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
-      "task_id": "21826"
+      "task_id": "21801"
     },
     "extract-all-images-from-pdf": {
       "title": "Extract All Images from PDF Using ImageExtractor",
@@ -1213,7 +1215,7 @@
         "ImageExtractor.Images"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21802"
     },
@@ -1236,7 +1238,7 @@
         "Aspose.Pdf.Facades.ImageStream"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21803"
     },
@@ -1259,7 +1261,7 @@
         "Aspose.Pdf.Document.EmbeddedFiles.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21804"
     },
@@ -1282,7 +1284,7 @@
         "Aspose.Pdf.FileSpecification.Name"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21805"
     },
@@ -1305,7 +1307,7 @@
         "Aspose.Pdf.FileSpecification.Name"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21806"
     },
@@ -1328,7 +1330,7 @@
         "Aspose.Pdf.FileSpecification.Contents"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21807"
     },
@@ -1351,7 +1353,7 @@
         "Aspose.Pdf.FileSpecification.Contents"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21808"
     },
@@ -1377,7 +1379,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21809"
     },
@@ -1400,7 +1402,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21810"
     },
@@ -1423,7 +1425,7 @@
         "Aspose.Pdf.XImage.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21811"
     },
@@ -1448,7 +1450,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21812"
     },
@@ -1471,7 +1473,7 @@
         "Aspose.Pdf.Collection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21813"
     },
@@ -1494,7 +1496,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21815"
     },
@@ -1518,7 +1520,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21816"
     },
@@ -1541,7 +1543,7 @@
         "Aspose.Pdf.Page.Resources.Images"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21817"
     },
@@ -1564,7 +1566,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21818"
     },
@@ -1590,7 +1592,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21819"
     },
@@ -1613,7 +1615,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21821"
     },
@@ -1635,7 +1637,7 @@
         "PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21822"
     },
@@ -1658,7 +1660,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21823"
     },
@@ -1681,7 +1683,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21824"
     },
@@ -1707,7 +1709,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21825"
     },
@@ -1730,7 +1732,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21827"
     },
@@ -1752,7 +1754,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetText"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21828"
     },
@@ -1775,7 +1777,7 @@
         "Aspose.Pdf.Text.TextAbsorber.Text"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21767"
     },
@@ -1798,7 +1800,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21800"
     },
@@ -1821,7 +1823,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21814"
     },
@@ -1844,9 +1846,77 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:41:06Z",
+      "generated_at": "2026-10-26T07:39:06Z",
       "status": "verified",
       "task_id": "21820"
+    },
+    "batch-extract-text-from-pdfs__v2": {
+      "title": "Batch Extract Text from PDFs with PdfExtractor",
+      "filename": "batch-extract-text-from-pdfs__v2.cs",
+      "description": "Shows how to loop through a directory, use Aspose.Pdf.Facades.PdfExtractor to extract text from each PDF, and write the results to UTF-8 text files.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "batch",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:39:06Z",
+      "status": "verified",
+      "task_id": "21756"
+    },
+    "extract-text-from-pdf__v2": {
+      "title": "Extract Text from PDF via Command Line",
+      "filename": "extract-text-from-pdf__v2.cs",
+      "description": "Shows a simple command‑line tool that loads a PDF file, uses Aspose.Pdf's TextAbsorber to extract pure text, and writes the result to standard output.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "command-line",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.Text.TextExtractionOptions",
+        "Aspose.Pdf.Text.TextExtractionOptions.TextFormattingMode",
+        "Aspose.Pdf.PageCollection.Accept"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:39:06Z",
+      "status": "verified",
+      "task_id": "21771"
+    },
+    "extract-pdf-text-with-progress__v2": {
+      "title": "Extract PDF Text with Console Progress Bar",
+      "filename": "extract-pdf-text-with-progress__v2.cs",
+      "description": "Demonstrates how to extract text from a PDF file page‑by‑page using Aspose.Pdf.Facades.PdfExtractor while showing a console progress bar that reflects the extraction percentage.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "progress-bar",
+        "aspose-pdf",
+        "console"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractText",
+        "Aspose.Pdf.Facades.PdfExtractor.GetText"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:39:06Z",
+      "status": "verified",
+      "task_id": "21826"
     }
   }
 }

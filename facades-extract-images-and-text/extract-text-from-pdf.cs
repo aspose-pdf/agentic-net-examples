@@ -1,50 +1,48 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main(string[] args)
     {
         // Verify that a PDF path was provided
-        if (args.Length < 1)
+        if (args.Length == 0)
         {
-            Console.Error.WriteLine("Usage: ExtractText <pdf-path>");
+            Console.Error.WriteLine("Usage: <program> <pdf-path>");
             return;
         }
 
         string pdfPath = args[0];
 
-        // Ensure the file exists before attempting to open it
+        // Check that the file exists
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Error: File not found - {pdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        try
+        // Use PdfExtractor from Aspose.Pdf.Facades to extract text
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfPath))
+            // Bind the PDF document
+            extractor.BindPdf(pdfPath);
+
+            // Extract text from all pages
+            extractor.ExtractText();
+
+            // Retrieve the extracted text via the stream overload
+            using (MemoryStream textStream = new MemoryStream())
             {
-                // Create a TextAbsorber to extract text from the document
-                TextAbsorber absorber = new TextAbsorber();
-
-                // Optional: configure extraction options (pure text without formatting)
-                absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
-
-                // Apply the absorber to all pages
-                doc.Pages.Accept(absorber);
-
-                // Output the extracted text to standard output
-                Console.Write(absorber.Text);
+                extractor.GetText(textStream); // write text to the stream
+                textStream.Position = 0; // rewind for reading
+                using (StreamReader reader = new StreamReader(textStream))
+                {
+                    string extractedText = reader.ReadToEnd();
+                    // Output the text to the console
+                    Console.WriteLine(extractedText);
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            // Report any unexpected errors
-            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }
