@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "sanitized.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "clean_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,7 +18,7 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Remove all annotations from every page
+            // Iterate over all pages and clear their annotation collections
             foreach (Page page in doc.Pages)
             {
                 page.Annotations.Clear();
@@ -28,6 +28,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Sanitized PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Annotations removed. Clean PDF saved to '{outputPath}'.");
     }
 }
