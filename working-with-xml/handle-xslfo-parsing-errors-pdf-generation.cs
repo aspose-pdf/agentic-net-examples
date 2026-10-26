@@ -1,58 +1,73 @@
 using System;
 using System.IO;
+using System.Xml;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
-    // Custom warning handler implementing IWarningCallback
-    private class MyWarningHandler : IWarningCallback
-    {
-        public ReturnAction Warning(WarningInfo info)
-        {
-            // Provide a user‑friendly message
-            Console.WriteLine($"[XSL‑FO Warning] {info.WarningMessage}");
-            // Continue processing despite the warning
-            return ReturnAction.Continue;
-        }
-    }
-
     static void Main()
     {
-        const string xslFoPath = "input.xslfo";
-        const string pdfPath   = "output.pdf";
+        const string xmlPath = "data.xml";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(xslFoPath))
+        // Verify that the XML source file exists
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XSL‑FO file not found: {xslFoPath}");
+            Console.Error.WriteLine($"Error: XML file not found: {xmlPath}");
             return;
         }
 
-        // Configure load options with custom parsing‑error handling
-        var loadOptions = new XslFoLoadOptions
-        {
-            ParsingErrorsHandlingType = XslFoLoadOptions.ParsingErrorsHandlingTypes.InvokeCustomHandler,
-            WarningHandler = new MyWarningHandler()
-        };
-
+        // Load and parse the XML document with graceful error handling
+        XmlDocument xmlDoc = new XmlDocument();
         try
         {
-            // Load the XSL‑FO file and generate a PDF document
-            using (Document pdfDoc = new Document(xslFoPath, loadOptions))
+            xmlDoc.Load(xmlPath);
+        }
+        catch (XmlException ex)
+        {
+            // Provide a user‑friendly message that includes line/position information
+            Console.Error.WriteLine($"XML parsing error at line {ex.LineNumber}, position {ex.LinePosition}: {ex.Message}");
+            return;
+        }
+        catch (Exception ex)
+        {
+            // Catch any other unexpected errors while loading XML
+            Console.Error.WriteLine($"Unexpected error while loading XML: {ex.Message}");
+            return;
+        }
+
+        // Generate a PDF from the parsed XML content
+        try
+        {
+            // Document lifecycle is managed with a using block (deterministic disposal)
+            using (Document pdfDoc = new Document())
             {
-                // Save the resulting PDF
-                pdfDoc.Save(pdfPath);
-                Console.WriteLine($"PDF generated successfully: {pdfPath}");
+                // Add a new page (pages are 1‑based, but Add() returns the created page)
+                Page page = pdfDoc.Pages.Add();
+
+                // Extract simple text from the XML (for demonstration purposes)
+                string textContent = xmlDoc.DocumentElement?.InnerText ?? string.Empty;
+
+                // Create a text fragment and position it on the page
+                TextFragment tf = new TextFragment(textContent);
+                tf.Position = new Position(50, 750); // Position uses Aspose.Pdf.Text.Position
+                page.Paragraphs.Add(tf);
+
+                // Save the PDF (no SaveOptions needed because the target format is PDF)
+                pdfDoc.Save(outputPdf);
+                Console.WriteLine($"PDF generated successfully: {outputPdf}");
             }
         }
         catch (PdfException ex)
         {
-            // Friendly message for parsing errors that abort conversion
-            Console.Error.WriteLine($"Failed to generate PDF: {ex.Message}");
+            // Handle Aspose.Pdf specific errors
+            Console.Error.WriteLine($"PDF generation error: {ex.Message}");
         }
         catch (Exception ex)
         {
-            // Catch‑all for unexpected issues
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            // Handle any other unexpected errors during PDF creation
+            Console.Error.WriteLine($"Unexpected error during PDF generation: {ex.Message}");
         }
     }
 }

@@ -4,70 +4,89 @@ using System.Threading;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class PdfGeneratorWithRetry
+class Program
 {
-    // Path to the generated PDF file
-    private const string OutputPath = "generated.pdf";
-
-    // Maximum number of retry attempts for transient I/O errors
-    private const int MaxRetryAttempts = 3;
-
-    // Delay (in milliseconds) between retry attempts
-    private const int RetryDelayMs = 2000;
+    // Maximum number of retry attempts for saving a PDF
+    private const int MaxSaveAttempts = 3;
+    // Base delay in milliseconds between retries (exponential back‑off)
+    private const int BaseDelayMs = 500;
 
     static void Main()
+    {
+        const string inputPath = "input.pdf";
+        const string outputPath = "generated.pdf";
+
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+
+        try
+        {
+            // Load the source PDF inside a using block (lifecycle rule)
+            using (Document doc = new Document(inputPath))
+            {
+                // Perform any PDF generation/modification here
+                // For demonstration, add a simple text fragment to the first page
+                if (doc.Pages.Count > 0)
+                {
+                    Page page = doc.Pages[1]; // 1‑based indexing (global rule)
+                    TextFragment tf = new TextFragment("Generated content");
+                    page.Paragraphs.Add(tf);
+                }
+
+                // Save with retry logic
+                SaveWithRetry(doc, outputPath);
+            }
+
+            Console.WriteLine($"PDF successfully saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Fatal error: {ex.Message}");
+        }
+    }
+
+    // Saves the document with retry handling for transient I/O errors
+    private static void SaveWithRetry(Document doc, string path)
     {
         int attempt = 0;
         while (true)
         {
-            attempt++;
             try
             {
-                // === CREATE DOCUMENT (lifecycle rule: use using for disposal) ===
-                using (Document doc = new Document())
-                {
-                    // Add a single page
-                    Page page = doc.Pages.Add();
-
-                    // Add a simple text fragment to the page
-                    TextFragment tf = new TextFragment("Hello, Aspose.Pdf!");
-                    tf.Position = new Position(100, 700);
-                    page.Paragraphs.Add(tf);
-
-                    // === SAVE DOCUMENT (lifecycle rule) ===
-                    // Save as PDF; no SaveOptions needed for PDF format
-                    doc.Save(OutputPath);
-                }
-
-                // If we reach this point, generation succeeded; exit loop
-                Console.WriteLine($"PDF generated successfully at '{Path.GetFullPath(OutputPath)}'.");
+                // Save operation (lifecycle rule)
+                doc.Save(path);
+                // If save succeeds, exit the loop
                 break;
             }
-            catch (PdfException ex) // Catch transient PDF/I/O errors
+            catch (IOException ioEx)
             {
-                Console.Error.WriteLine($"Attempt {attempt} failed: {ex.Message}");
-
-                if (attempt >= MaxRetryAttempts)
+                attempt++;
+                if (attempt >= MaxSaveAttempts)
                 {
-                    // Re‑throw after exhausting retries
-                    Console.Error.WriteLine("Maximum retry attempts reached. Operation aborted.");
-                    throw;
+                    // Exhausted retries – rethrow the exception
+                    throw new IOException($"Failed to save PDF after {MaxSaveAttempts} attempts.", ioEx);
                 }
 
-                // Wait before next retry
-                Thread.Sleep(RetryDelayMs);
+                // Calculate exponential back‑off delay
+                int delay = BaseDelayMs * (int)Math.Pow(2, attempt - 1);
+                Console.Error.WriteLine($"I/O error on save attempt {attempt}: {ioEx.Message}. Retrying in {delay} ms...");
+                Thread.Sleep(delay);
             }
-            catch (IOException ex) // Additional catch for generic I/O issues
+            catch (UnauthorizedAccessException uaEx)
             {
-                Console.Error.WriteLine($"Attempt {attempt} encountered I/O error: {ex.Message}");
-
-                if (attempt >= MaxRetryAttempts)
+                // Treat as transient (e.g., file locked) and retry similarly
+                attempt++;
+                if (attempt >= MaxSaveAttempts)
                 {
-                    Console.Error.WriteLine("Maximum retry attempts reached. Operation aborted.");
-                    throw;
+                    throw new UnauthorizedAccessException($"Failed to save PDF after {MaxSaveAttempts} attempts.", uaEx);
                 }
 
-                Thread.Sleep(RetryDelayMs);
+                int delay = BaseDelayMs * (int)Math.Pow(2, attempt - 1);
+                Console.Error.WriteLine($"Access error on save attempt {attempt}: {uaEx.Message}. Retrying in {delay} ms...");
+                Thread.Sleep(delay);
             }
         }
     }

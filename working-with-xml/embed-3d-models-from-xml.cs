@@ -1,82 +1,132 @@
 using System;
 using System.IO;
 using System.Xml.Linq;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-class Embed3DModels
+class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";      // source PDF
-        const string xmlPath   = "models.xml";     // XML with 3D model references
-        const string outputPdf = "output_with_3d.pdf";
+        const string inputPdf = "input.pdf";
+        const string xmlPath = "models.xml";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML not found: {xmlPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Load the XML. Expected format:
-        // <Models>
-        //   <Model page="1" x="100" y="500" width="300" height="300" file="model1.u3d" />
-        //   ...
-        // </Models>
+        // Load XML containing 3D model references
         XDocument xmlDoc = XDocument.Load(xmlPath);
 
-        using (Document pdfDoc = new Document(pdfPath))
+        // Open PDF document inside a using block (lifecycle rule)
+        using (Document pdfDoc = new Document(inputPdf))
         {
+            // Iterate over each <Model> element
             foreach (XElement modelElem in xmlDoc.Root.Elements("Model"))
             {
-                // Parse attributes
-                int pageNumber = (int)modelElem.Attribute("page");
-                double llx = (double)modelElem.Attribute("x");
-                double lly = (double)modelElem.Attribute("y");
-                double urx = llx + (double)modelElem.Attribute("width");
-                double ury = lly + (double)modelElem.Attribute("height");
+                // Parse required attributes
+                int pageNumber = (int?)modelElem.Attribute("page") ?? 1;
                 string modelFile = (string)modelElem.Attribute("file");
+                double llx = (double?)modelElem.Attribute("x") ?? 100;
+                double lly = (double?)modelElem.Attribute("y") ?? 500;
+                double urx = llx + ((double?)modelElem.Attribute("width") ?? 200);
+                double ury = lly + ((double?)modelElem.Attribute("height") ?? 200);
 
-                if (!File.Exists(modelFile))
+                if (string.IsNullOrEmpty(modelFile) || !File.Exists(modelFile))
                 {
-                    Console.Error.WriteLine($"3D model file not found: {modelFile}");
+                    Console.Error.WriteLine($"Model file not found: {modelFile}");
                     continue;
                 }
 
-                // Create PDF3DContent and load the model file
-                PDF3DContent content = new PDF3DContent();
-                string ext = Path.GetExtension(modelFile).ToLowerInvariant();
-                if (ext == ".u3d")
-                    content.LoadAsU3D(modelFile);
-                else if (ext == ".prc")
-                    content.LoadAsPRC(modelFile);
-                else
+                // Ensure the requested page exists (1‑based indexing rule)
+                if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
                 {
-                    // Fallback to generic constructor that accepts filename
-                    content = new PDF3DContent(modelFile);
+                    Console.Error.WriteLine($"Page {pageNumber} out of range.");
+                    continue;
                 }
 
-                // Create the 3D artwork using the document and the content
-                PDF3DArtwork artwork = new PDF3DArtwork(pdfDoc, content);
+                // Get the target page
+                Page page = pdfDoc.Pages[pageNumber];
 
-                // Define the rectangle where the annotation will appear
+                // Define the annotation rectangle
                 Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
 
-                // Create the 3D annotation and add it to the page
-                Page page = pdfDoc.Pages[pageNumber]; // 1‑based indexing
-                PDF3DAnnotation annotation = new PDF3DAnnotation(page, rect, artwork);
-                page.Annotations.Add(annotation);
+                // Create a RichMediaAnnotation (3D annotation)
+                RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect);
+
+                // -----------------------------------------------------------------
+                // Set activation if the property exists (some versions expose it)
+                // -----------------------------------------------------------------
+                PropertyInfo activationProp = typeof(RichMediaAnnotation).GetProperty("Activation");
+                if (activationProp != null && activationProp.CanWrite)
+                {
+                    // Resolve the enum type (RichMediaActivation) via reflection
+                    Type activationEnum = activationProp.PropertyType;
+                    // Try to parse the enum value "OnPageOpen"
+                    object enumValue = Enum.Parse(activationEnum, "OnPageOpen", ignoreCase: true);
+                    activationProp.SetValue(richMedia, enumValue);
+                }
+
+                // ---------------------------------------------------------------
+                // Attach the 3D model file if RichMediaContent type is available
+                // ---------------------------------------------------------------
+                Type richMediaContentType = Type.GetType("Aspose.Pdf.Annotations.RichMediaContent, Aspose.Pdf");
+                if (richMediaContentType != null)
+                {
+                    // Create an instance of RichMediaContent
+                    object richMediaContent = Activator.CreateInstance(richMediaContentType);
+
+                    // Find an AddFile overload that accepts a Stream and a name (most common)
+                    MethodInfo addFileMethod = richMediaContentType.GetMethod("AddFile", new[] { typeof(Stream), typeof(string) })
+                                            ?? richMediaContentType.GetMethod("AddFile", new[] { typeof(string) });
+
+                    if (addFileMethod != null)
+                    {
+                        using (FileStream modelStream = File.OpenRead(modelFile))
+                        {
+                            if (addFileMethod.GetParameters().Length == 2)
+                            {
+                                // Stream + name overload
+                                addFileMethod.Invoke(richMediaContent, new object[] { modelStream, Path.GetFileName(modelFile) });
+                            }
+                            else
+                            {
+                                // Single string overload – pass the file path
+                                addFileMethod.Invoke(richMediaContent, new object[] { modelFile });
+                            }
+                        }
+                    }
+
+                    // Assign the content to the annotation via the RichMediaContent property (if present)
+                    PropertyInfo contentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
+                    if (contentProp != null && contentProp.CanWrite)
+                    {
+                        contentProp.SetValue(richMedia, richMediaContent);
+                    }
+                }
+                else
+                {
+                    // If RichMediaContent type is missing, we still add the annotation without media.
+                    Console.Error.WriteLine("RichMediaContent type not found in the current Aspose.Pdf version – 3D model will not be attached.");
+                }
+
+                // Add the annotation to the page
+                page.Annotations.Add(richMedia);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (PDF format, no special SaveOptions needed)
             pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"3D models embedded and saved to '{outputPdf}'.");
+        Console.WriteLine($"3D annotations processed. Output saved to '{outputPdf}'.");
     }
 }

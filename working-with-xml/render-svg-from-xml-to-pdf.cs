@@ -1,15 +1,14 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath = "input.xml";          // XML containing <svg> elements
-        const string outputPdf = "output.pdf";
+        const string xmlPath      = "input.xml";      // XML containing <svg> elements
+        const string outputPdfPath = "output.pdf";
 
         if (!File.Exists(xmlPath))
         {
@@ -18,53 +17,35 @@ class Program
         }
 
         // Load the XML document
-        XmlDocument xmlDoc = new XmlDocument();
-        xmlDoc.Load(xmlPath);
+        XDocument xmlDoc = XDocument.Load(xmlPath);
 
-        // Create a new PDF document
-        using (Document pdfDoc = new Document())
+        // Create the target PDF that will hold all rendered SVGs
+        using (Document targetPdf = new Document())
         {
-            // Find all <svg> nodes (ignoring namespaces for simplicity)
-            XmlNodeList svgNodes = xmlDoc.GetElementsByTagName("svg");
-            if (svgNodes.Count == 0)
+            // Iterate over each <svg> element in the XML (1‑based page indexing rule applies when we later add pages)
+            foreach (XElement svgElement in xmlDoc.Descendants("svg"))
             {
-                Console.WriteLine("No SVG elements found in the XML.");
-            }
-
-            int pageNumber = 1;
-            foreach (XmlNode svgNode in svgNodes)
-            {
-                // Create a new page for each SVG
-                Page page = pdfDoc.Pages.Add();
-
-                // Convert the SVG node back to its XML string
-                string svgContent = svgNode.OuterXml;
-                byte[] svgBytes = System.Text.Encoding.UTF8.GetBytes(svgContent);
-
-                // Use a memory stream so we don't need temporary files
-                using (MemoryStream svgStream = new MemoryStream(svgBytes))
+                // Serialize the SVG element to a memory stream
+                using (MemoryStream svgStream = new MemoryStream())
                 {
-                    // Define the rectangle where the SVG will be placed.
-                    // Adjust the size as needed; here we use the page size.
-                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
-                        page.PageInfo.Margin.Left,
-                        page.PageInfo.Margin.Bottom,
-                        page.PageInfo.Width - page.PageInfo.Margin.Right,
-                        page.PageInfo.Height - page.PageInfo.Margin.Top);
+                    // Write the SVG XML (including the root <svg> tag) to the stream
+                    svgElement.Save(svgStream);
+                    svgStream.Position = 0; // Reset for reading
 
-                    // Add the SVG as an image. Aspose.Pdf detects the SVG format
-                    // and renders it as vector graphics.
-                    page.AddImage(svgStream, rect);
+                    // Load the SVG as a temporary PDF document (vector graphics are preserved)
+                    SvgLoadOptions loadOpts = new SvgLoadOptions(); // No GDI+ dependency
+                    using (Document svgPdf = new Document(svgStream, loadOpts))
+                    {
+                        // Append all pages from the SVG‑derived PDF into the target PDF
+                        targetPdf.Pages.Add(svgPdf.Pages);
+                    }
                 }
-
-                Console.WriteLine($"Embedded SVG #{pageNumber} on page {pageNumber}.");
-                pageNumber++;
             }
 
-            // Save the resulting PDF
-            pdfDoc.Save(outputPdf);
+            // Save the combined PDF (no special SaveOptions needed for PDF output)
+            targetPdf.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF with embedded SVGs saved to '{outputPdf}'.");
+        Console.WriteLine($"SVG images rendered as vector graphics and saved to '{outputPdfPath}'.");
     }
 }

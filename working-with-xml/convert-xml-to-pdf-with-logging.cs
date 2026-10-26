@@ -1,105 +1,66 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Base directory of the application (works for both Windows and Linux)
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // Directory containing input XML files
+        const string inputDir = "XmlInputs";
+        // Directory where generated PDFs will be saved
+        const string outputDir = "PdfOutputs";
 
-        // Resolve input and output directories relative to the base directory
-        string inputDirectory = Path.Combine(baseDir, "XmlInputs");
-        string outputDirectory = Path.Combine(baseDir, "PdfOutputs");
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDirectory);
-
-        // If the input directory does not exist, create it and inform the user.
-        // This prevents an unhandled DirectoryNotFoundException and makes the sample runnable out‑of‑the‑box.
-        if (!Directory.Exists(inputDirectory))
+        if (!Directory.Exists(inputDir))
         {
-            Directory.CreateDirectory(inputDirectory);
-            Console.WriteLine($"[INFO] Input directory not found. Created empty folder at '{inputDirectory}'. Place XML files there and re‑run the program.");
+            Console.Error.WriteLine($"Input directory not found: {inputDir}");
             return;
         }
 
         // Get all XML files in the input directory
-        string[] xmlFiles = Directory.GetFiles(inputDirectory, "*.xml");
+        string[] xmlFiles = Directory.GetFiles(inputDir, "*.xml");
         if (xmlFiles.Length == 0)
         {
-            Console.WriteLine($"[INFO] No XML files found in '{inputDirectory}'. Nothing to process.");
+            Console.WriteLine("No XML files found to process.");
             return;
         }
-
-        // Optional: create a simple log file to capture detailed steps and errors
-        string logPath = Path.Combine(outputDirectory, "ProcessingLog.txt");
-        var logBuilder = new StringBuilder();
-        logBuilder.AppendLine($"Processing started at {DateTime.Now:O}");
-        logBuilder.AppendLine($"Input directory : {inputDirectory}");
-        logBuilder.AppendLine($"Output directory: {outputDirectory}");
-        logBuilder.AppendLine();
 
         // Process each XML file individually
         foreach (string xmlPath in xmlFiles)
         {
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(xmlPath);
-            string pdfPath = Path.Combine(outputDirectory, fileNameWithoutExt + ".pdf");
+            string baseName = Path.GetFileNameWithoutExtension(xmlPath);
+            string pdfPath = Path.Combine(outputDir, baseName + ".pdf");
 
-            Console.WriteLine($"Processing '{xmlPath}' → '{pdfPath}'");
-            logBuilder.AppendLine($"[START] {xmlPath} -> {pdfPath}");
-            var startTime = DateTime.Now;
+            Console.WriteLine($"--- Processing '{xmlPath}' ---");
 
             try
             {
-                // Initialize load options for XML conversion
+                // Load the XML file as a PDF document
                 XmlLoadOptions loadOptions = new XmlLoadOptions();
-
-                // Load the XML file and create a PDF document
-                using (Document pdfDocument = new Document(xmlPath, loadOptions))
+                using (Document doc = new Document(xmlPath, loadOptions))
                 {
+                    Console.WriteLine($"Loaded XML successfully. Page count: {doc.Pages.Count}");
+
+                    // (Optional) Insert additional PDF generation steps here
+                    // e.g., add headers, footers, watermarks, etc.
+
                     // Save the generated PDF
-                    pdfDocument.Save(pdfPath);
+                    doc.Save(pdfPath);
+                    Console.WriteLine($"PDF saved to '{pdfPath}'.");
                 }
-
-                var duration = DateTime.Now - startTime;
-                Console.WriteLine($"Successfully generated PDF: {pdfPath} (took {duration.TotalSeconds:F2}s)");
-                logBuilder.AppendLine($"[SUCCESS] {pdfPath} (Duration: {duration.TotalSeconds:F2}s)");
-            }
-            catch (PdfException pdfEx)
-            {
-                // Log Aspose.Pdf specific errors
-                Console.Error.WriteLine($"[PDF ERROR] File: {xmlPath}");
-                Console.Error.WriteLine($"Message: {pdfEx.Message}");
-                Console.Error.WriteLine($"StackTrace: {pdfEx.StackTrace}");
-
-                logBuilder.AppendLine($"[PDF ERROR] File: {xmlPath}");
-                logBuilder.AppendLine($"Message: {pdfEx.Message}");
-                logBuilder.AppendLine($"StackTrace: {pdfEx.StackTrace}");
             }
             catch (Exception ex)
             {
-                // Log any other unexpected errors
-                Console.Error.WriteLine($"[GENERAL ERROR] File: {xmlPath}");
-                Console.Error.WriteLine($"Message: {ex.Message}");
-                Console.Error.WriteLine($"StackTrace: {ex.StackTrace}");
+                // Log any errors that occur during processing
+                Console.Error.WriteLine($"Error processing '{xmlPath}': {ex.Message}");
+            }
 
-                logBuilder.AppendLine($"[GENERAL ERROR] File: {xmlPath}");
-                logBuilder.AppendLine($"Message: {ex.Message}");
-                logBuilder.AppendLine($"StackTrace: {ex.StackTrace}");
-            }
-            finally
-            {
-                logBuilder.AppendLine($"[END] {xmlPath}\n");
-            }
+            Console.WriteLine($"--- Finished '{xmlPath}' ---\n");
         }
 
-        logBuilder.AppendLine($"Processing completed at {DateTime.Now:O}");
-        // Write the log to a file (overwrites previous log)
-        File.WriteAllText(logPath, logBuilder.ToString());
-        Console.WriteLine($"Detailed log written to: {logPath}");
-        Console.WriteLine("Processing completed.");
+        Console.WriteLine("All files have been processed.");
     }
 }

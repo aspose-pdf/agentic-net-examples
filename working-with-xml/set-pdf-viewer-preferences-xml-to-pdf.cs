@@ -1,12 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core API – load option classes (e.g., XmlLoadOptions) are in this namespace
+using Aspose.Pdf;
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
         const string xmlPath = "input.xml";
         const string pdfPath = "output.pdf";
 
@@ -16,22 +16,24 @@ class Program
             return;
         }
 
-        // Load the XML file with default XmlLoadOptions (no extra using needed)
-        XmlLoadOptions loadOptions = new XmlLoadOptions();
-
-        // Document creation – wrapped in using for deterministic disposal
-        using (Document doc = new Document(xmlPath, loadOptions))
+        // Load the XML file and convert it to a PDF document
+        using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
         {
-            // Viewer preferences -------------------------------------------------
-            // Resize the PDF viewer window to fit the first displayed page
-            doc.FitWindow = true;
+            // Attempt to set viewer preferences if the current Aspose.Pdf version supports them.
+            // The ViewerPreferences property was introduced in later versions of Aspose.Pdf.
+            // Using dynamic bypasses compile‑time checks and allows the code to compile against older versions.
+            dynamic d = doc;
+            try
+            {
+                d.ViewerPreferences.FitWindow = true;
+                d.ViewerPreferences.PageLayout = PageLayout.SinglePage;
+            }
+            catch (RuntimeBinderException)
+            {
+                Console.WriteLine("ViewerPreferences property is not available in the referenced Aspose.Pdf version. Skipping viewer preference configuration.");
+            }
 
-            // Set the page mode (how the document is displayed when opened)
-            // UseNone means no side panels (outlines, thumbnails, etc.) are shown
-            doc.PageMode = PageMode.UseNone;
-            // ---------------------------------------------------------------------
-
-            // Save the resulting PDF
+            // Save the PDF with the (potentially) applied viewer preferences
             doc.Save(pdfPath);
         }
 

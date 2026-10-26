@@ -2,45 +2,74 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class PdfA2bValidation
 {
     static void Main()
     {
-        const string xmlInputPath   = "input.xml";          // source XML file
-        const string pdfOutputPath  = "output.pdf";         // PDF/A‑2b result
-        const string convertLogPath = "convert_log.txt";    // conversion log
-        const string validateLogPath = "validate_log.txt"; // validation log
+        // Input PDF, intermediate XML, and final PDF/A‑2b paths
+        const string inputPdfPath = "input.pdf";
+        const string xmlPath = "intermediate.xml";
+        const string pdfAPath = "output_pdfa2b.pdf";
+        const string validationLogPath = "validation_log.xml";
 
-        if (!File.Exists(xmlInputPath))
+        // Verify the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlInputPath}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
             return;
         }
 
+        // -----------------------------------------------------------------
+        // 1. Load the original PDF and export it to XML (non‑PDF format)
+        // -----------------------------------------------------------------
+        using (Document pdfDoc = new Document(inputPdfPath))
+        {
+            // XmlSaveOptions is required; otherwise the file would be saved as PDF
+            XmlSaveOptions xmlOpts = new XmlSaveOptions();
+            pdfDoc.Save(xmlPath, xmlOpts);
+        }
+
+        // -----------------------------------------------------------------
+        // 2. Load the XML representation back into a Document object
+        // -----------------------------------------------------------------
+        using (Document xmlDoc = new Document(xmlPath, new XmlLoadOptions()))
+        {
+            // -----------------------------------------------------------------
+            // 3. Convert the document to PDF/A‑2b using PdfFormatConversionOptions
+            // -----------------------------------------------------------------
+            PdfFormatConversionOptions convOpts = new PdfFormatConversionOptions(PdfFormat.PDF_A_2B);
+            xmlDoc.Convert(convOpts);
+
+            // Save the PDF/A‑2b file
+            xmlDoc.Save(pdfAPath);
+        }
+
+        // -----------------------------------------------------------------
+        // 4. Validate the resulting PDF/A‑2b file for compliance
+        // -----------------------------------------------------------------
         try
         {
-            // Load XML and create a PDF document
-            using (Document doc = new Document(xmlInputPath, new XmlLoadOptions()))
+            // Load the generated PDF/A‑2b document
+            using (Document pdfADoc = new Document(pdfAPath))
             {
-                // Convert the document to PDF/A‑2b format
-                // Errors are written to convertLogPath; objects that cannot be converted are deleted
-                doc.Convert(convertLogPath, PdfFormat.PDF_A_2B, ConvertErrorAction.Delete);
+                // The Validate method returns a boolean indicating compliance.
+                // It also creates a log file (XML) with detailed validation information.
+                bool isCompliant = pdfADoc.Validate(validationLogPath, PdfFormat.PDF_A_2B);
 
-                // Save the PDF/A‑2b compliant file
-                doc.Save(pdfOutputPath);
-
-                // Validate the saved PDF against PDF/A‑2b compliance
-                bool isCompliant = doc.Validate(validateLogPath, PdfFormat.PDF_A_2B);
-
-                Console.WriteLine($"PDF/A‑2b validation result: {isCompliant}");
-                Console.WriteLine($"Conversion log: {convertLogPath}");
-                Console.WriteLine($"Validation log: {validateLogPath}");
-                Console.WriteLine($"PDF saved to: {pdfOutputPath}");
+                if (isCompliant)
+                {
+                    Console.WriteLine($"The file '{pdfAPath}' is compliant with PDF/A‑2b.");
+                }
+                else
+                {
+                    Console.WriteLine($"The file '{pdfAPath}' is NOT compliant with PDF/A‑2b.");
+                    Console.WriteLine($"See validation details in '{validationLogPath}'.");
+                }
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Validation failed: {ex.Message}");
         }
     }
 }

@@ -1,5 +1,5 @@
 using System;
-using System.Data;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,59 +7,56 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "TableWithRepeatingHeader.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document())
+        // Load existing PDF if it exists; otherwise create a new document with a blank page.
+        Document doc;
+        if (File.Exists(inputPath))
         {
-            // Add a page to host the table
-            Page page = doc.Pages.Add();
+            doc = new Document(inputPath);
+        }
+        else
+        {
+            doc = new Document();
+            doc.Pages.Add(); // ensure at least one page
+        }
 
-            // Create a table and set its position on the page
+        // Ensure deterministic disposal of the Document.
+        using (doc)
+        {
+            // Create a table that will span multiple pages.
             Table table = new Table
             {
-                // Position the table (left, top) and set column widths as needed
-                ColumnWidths = "100 150 200",
-                // The first 2 rows will be repeated on each page when the table breaks
-                RepeatingRowsCount = 2
+                // Define three equal-width columns.
+                ColumnWidths = "100 100 100",
+                // Repeat the first row (header) on every new page.
+                RepeatingRowsCount = 1
             };
 
-            // ----- Header rows (will be repeated) -----
-            // Row 1 – column titles
-            Row headerRow1 = table.Rows.Add();
-            headerRow1.Cells.Add("Product");
-            headerRow1.Cells.Add("Category");
-            headerRow1.Cells.Add("Price");
+            // Header row – this row will be repeated on each page because of RepeatingRowsCount.
+            Row header = table.Rows.Add();
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
+            header.Cells.Add("Header 3");
 
-            // Row 2 – sub‑header (example)
-            Row headerRow2 = table.Rows.Add();
-            headerRow2.Cells.Add("Name");
-            headerRow2.Cells.Add("Type");
-            headerRow2.Cells.Add("Amount");
-
-            // Apply a simple style to header rows (optional)
-            foreach (Cell cell in headerRow1.Cells)
-                cell.DefaultCellTextState = new TextState { FontSize = 12, FontStyle = FontStyles.Bold, ForegroundColor = Color.Blue };
-            foreach (Cell cell in headerRow2.Cells)
-                cell.DefaultCellTextState = new TextState { FontSize = 11, FontStyle = FontStyles.Bold, ForegroundColor = Color.DarkGray };
-
-            // ----- Data rows (will flow across pages) -----
-            // For demonstration, generate many rows to force a page break
+            // Add many data rows to force the table to flow onto subsequent pages.
             for (int i = 1; i <= 100; i++)
             {
                 Row dataRow = table.Rows.Add();
-                dataRow.Cells.Add($"Item {i}");
-                dataRow.Cells.Add(i % 2 == 0 ? "Even" : "Odd");
-                dataRow.Cells.Add($"${i * 10}");
+                dataRow.Cells.Add($"Item {i}A");
+                dataRow.Cells.Add($"Item {i}B");
+                dataRow.Cells.Add($"Item {i}C");
             }
 
-            // Add the table to the page's paragraphs collection
-            page.Paragraphs.Add(table);
+            // Insert the table into the first page's paragraph collection.
+            Page firstPage = doc.Pages[1];
+            firstPage.Paragraphs.Add(table);
 
-            // Save the PDF
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'. Header rows will repeat on each page.");
+        Console.WriteLine($"PDF with repeating table header saved to '{outputPath}'.");
     }
 }

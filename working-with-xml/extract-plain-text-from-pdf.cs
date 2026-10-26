@@ -1,3 +1,10 @@
+// AsposePdfApi.GlobalUsings.g.cs
+global using System;
+global using System.IO;
+global using Aspose.Pdf;
+global using Aspose.Pdf.Text;
+
+// Program.cs
 using System;
 using System.IO;
 using Aspose.Pdf;
@@ -7,8 +14,11 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";          // PDF generated from XML
-        const string outputPath = "extracted.txt";   // Plain‑text output for indexing
+        // Path to the PDF generated from XML
+        const string pdfPath = "input.pdf";
+
+        // Optional: path to save the extracted plain text (for indexing)
+        const string txtOutputPath = "extracted.txt";
 
         if (!File.Exists(pdfPath))
         {
@@ -19,22 +29,33 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(pdfPath))
         {
-            // Set extraction options to plain text (no layout formatting)
-            TextExtractionOptions extractionOptions = new TextExtractionOptions(
-                TextExtractionOptions.TextFormattingMode.Pure);
+            // Create a TextAbsorber to extract text from the whole document
+            TextAbsorber absorber = new TextAbsorber
+            {
+                // Use pure text extraction (no formatting) – suitable for indexing
+                ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
+            };
 
-            // Create the absorber with the options
-            TextAbsorber absorber = new TextAbsorber(extractionOptions);
-
-            // Extract text from all pages
+            // Apply the absorber to all pages
             doc.Pages.Accept(absorber);
 
-            // Retrieve the extracted text
-            string extractedText = absorber.Text;
+            // The extracted plain text
+            string plainText = absorber.Text;
 
-            // Write the plain text to a file (or any other storage)
-            File.WriteAllText(outputPath, extractedText);
-            Console.WriteLine($"Plain text extracted to '{outputPath}'.");
+            // Output to console (optional)
+            Console.WriteLine("Extracted text:");
+            Console.WriteLine(plainText);
+
+            // Save the extracted text to a file for indexing pipelines
+            try
+            {
+                File.WriteAllText(txtOutputPath, plainText);
+                Console.WriteLine($"Plain text saved to '{txtOutputPath}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to write text file: {ex.Message}");
+            }
         }
     }
 }

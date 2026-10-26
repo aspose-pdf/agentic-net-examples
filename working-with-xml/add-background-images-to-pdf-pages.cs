@@ -2,15 +2,14 @@ using System;
 using System.IO;
 using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // for BackgroundArtifact (inherits from Artifact)
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";
-        const string xmlPath   = "backgrounds.xml";
-        const string outputPdf = "output_branded.pdf";
+        const string pdfPath   = "input.pdf";      // source PDF
+        const string xmlPath   = "backgrounds.xml"; // XML defining background images
+        const string outputPdf = "output.pdf";     // result PDF
 
         if (!File.Exists(pdfPath))
         {
@@ -24,60 +23,53 @@ class Program
             return;
         }
 
-        // Load XML that defines background images per page.
-        // Expected format:
-        // <Backgrounds>
-        //   <Page number="1" image="bg1.png" />
-        //   <Page number="2" image="bg2.png" />
-        //   ...
-        // </Backgrounds>
-        XDocument xmlDoc = XDocument.Load(xmlPath);
+        // Load XML: expected format <Backgrounds><Page number="1" image="brand1.png"/></Backgrounds>
+        XDocument xDoc = XDocument.Load(xmlPath);
+        // Build a simple lookup of page number -> image path
+        var bgMap = new System.Collections.Generic.Dictionary<int, string>();
+        foreach (var elem in xDoc.Root.Elements("Page"))
+        {
+            int pageNum;
+            if (int.TryParse(elem.Attribute("number")?.Value, out pageNum) &&
+                !string.IsNullOrWhiteSpace(elem.Attribute("image")?.Value))
+            {
+                string imgPath = elem.Attribute("image").Value;
+                if (File.Exists(imgPath))
+                    bgMap[pageNum] = imgPath;
+                else
+                    Console.Error.WriteLine($"Image not found for page {pageNum}: {imgPath}");
+            }
+        }
 
-        // Open the PDF document.
+        // Process PDF
         using (Document doc = new Document(pdfPath))
         {
-            // Iterate over all pages (1‑based indexing).
-            foreach (Page page in doc.Pages)
+            // Iterate using 1‑based page indexing
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Find a matching <Page> element in the XML.
-                XElement bgElement = null;
-                foreach (XElement el in xmlDoc.Root.Elements("Page"))
+                if (!bgMap.ContainsKey(i))
+                    continue; // no background defined for this page
+
+                string imgPath = bgMap[i];
+                // Create an ImageStamp that will be placed behind page content
+                ImageStamp stamp = new ImageStamp(imgPath)
                 {
-                    XAttribute numAttr = el.Attribute("number");
-                    if (numAttr != null && int.TryParse(numAttr.Value, out int num) && num == page.Number)
-                    {
-                        bgElement = el;
-                        break;
-                    }
-                }
+                    Background = true, // render behind existing content
+                    // Stretch to fill the whole page
+                    Width = doc.Pages[i].PageInfo.Width,
+                    Height = doc.Pages[i].PageInfo.Height,
+                    LeftMargin = 0,
+                    TopMargin = 0
+                };
 
-                // If no background defined for this page, continue.
-                if (bgElement == null) continue;
-
-                // Get the image file path.
-                XAttribute imgAttr = bgElement.Attribute("image");
-                if (imgAttr == null) continue;
-                string imagePath = imgAttr.Value;
-
-                if (!File.Exists(imagePath))
-                {
-                    Console.Error.WriteLine($"Background image not found: {imagePath} (page {page.Number})");
-                    continue;
-                }
-
-                // Create a background artifact, set the image, and mark it as background.
-                BackgroundArtifact bgArtifact = new BackgroundArtifact();
-                bgArtifact.IsBackground = true;          // place behind page content
-                bgArtifact.SetImage(imagePath);          // load image from file
-
-                // Add the artifact to the page.
-                page.Artifacts.Add(bgArtifact);
+                // Add the stamp to the current page
+                doc.Pages[i].AddStamp(stamp);
             }
 
-            // Save the modified PDF.
+            // Save the modified PDF (PDF format, no SaveOptions needed)
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Branded PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Background images applied. Output saved to '{outputPdf}'.");
     }
 }

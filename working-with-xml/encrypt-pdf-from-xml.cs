@@ -1,40 +1,64 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
+using Aspose.Pdf.Security; // Permissions and CryptoAlgorithm enums
 
 class Program
 {
     static void Main()
     {
-        // Paths for input XML and output PDF
-        const string xmlPath = "input.xml";
-        const string pdfPath = "output.pdf";
+        const string xmlPath = "source.xml";
+        const string encryptedPdfPath = "secure_output.pdf";
+        const string asposeDll = "Aspose.PDF.dll";
 
-        // Passwords for encryption
-        const string userPassword = "user123";
-        const string ownerPassword = "owner123";
+        // Verify that the Aspose.PDF assembly is available before any Aspose types are used.
+        if (!File.Exists(asposeDll))
+        {
+            Console.Error.WriteLine($"Required assembly not found: {asposeDll}. Ensure the Aspose.PDF NuGet package is installed or the DLL is copied to the output folder.");
+            return;
+        }
+        // Load the assembly explicitly to provide a clearer error if it cannot be loaded.
+        try
+        {
+            Assembly.LoadFrom(Path.GetFullPath(asposeDll));
+        }
+        catch (Exception loadEx)
+        {
+            Console.Error.WriteLine($"Failed to load {asposeDll}: {loadEx.Message}");
+            return;
+        }
 
-        // Verify that the XML source file exists
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Load the XML file and convert it to a PDF document
-        XmlLoadOptions loadOptions = new XmlLoadOptions();
-        using (Document doc = new Document(xmlPath, loadOptions))
+        try
         {
-            // Define permissions for the encrypted PDF (allow printing and content extraction)
-            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+            // Load the XML and convert it directly to a PDF document
+            using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
+            {
+                // Define the permissions that will be allowed for the end user
+                Permissions perms = Permissions.PrintDocument |
+                                     Permissions.ModifyContent |
+                                     Permissions.ExtractContent;
 
-            // Apply password protection using AES‑256 encryption
-            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+                // Apply DRM encryption using AES‑256
+                string userPassword = "user123";
+                string ownerPassword = "owner123";
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // Save the encrypted PDF to the specified path
-            doc.Save(pdfPath);
+                // Save the encrypted PDF for secure distribution
+                doc.Save(encryptedPdfPath);
+            }
+
+            Console.WriteLine($"Encrypted PDF saved to '{encryptedPdfPath}'.");
         }
-
-        Console.WriteLine($"Encrypted PDF saved to '{pdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

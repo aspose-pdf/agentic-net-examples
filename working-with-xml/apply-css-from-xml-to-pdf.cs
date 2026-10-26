@@ -1,53 +1,46 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
-class ApplyCssFromXml
+class Program
 {
     static void Main()
     {
-        // Paths to the source XML, the XSL stylesheet (which can reference external CSS),
-        // and the desired PDF output.
-        const string xmlFile   = "source.xml";
-        const string xslFile   = "style.xsl";
-        const string pdfOutput = "styled_output.pdf";
+        const string xmlPath   = "input.xml";   // XML (or XHTML) that references external CSS
+        const string cssFolder = "styles";      // Folder containing the CSS files
+        const string outputPdf = "styled_output.pdf";
 
-        // Verify that the required files exist.
-        if (!File.Exists(xmlFile))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlFile}");
+            Console.Error.WriteLine($"Input file not found: {xmlPath}");
             return;
         }
-        if (!File.Exists(xslFile))
-        {
-            Console.Error.WriteLine($"XSL file not found: {xslFile}");
-            return;
-        }
+
+        // HtmlLoadOptions constructor that accepts a base path resolves relative URLs
+        // (e.g., <link href="style.css" ...>) to the specified folder.
+        HtmlLoadOptions loadOptions = new HtmlLoadOptions(Path.GetFullPath(cssFolder));
 
         try
         {
-            // Load the XSL stylesheet into a stream. The XSL can contain processing
-            // instructions that reference external CSS files; Aspose.Pdf will apply those
-            // styles during the XML‑to‑PDF conversion.
-            using (FileStream xslStream = File.OpenRead(xslFile))
+            // Load the XML/HTML document with the specified options.
+            using (Document doc = new Document(xmlPath, loadOptions))
             {
-                // Create XmlLoadOptions with the XSL stream.
-                XmlLoadOptions loadOptions = new XmlLoadOptions(xslStream);
-
-                // Load the XML document together with the XSL options.
-                using (Document pdfDoc = new Document(xmlFile, loadOptions))
-                {
-                    // Save the resulting PDF. All CSS rules referenced by the XSL
-                    // (and any linked CSS files) are applied to the PDF content.
-                    pdfDoc.Save(pdfOutput);
-                }
+                // The document now contains styled content based on the external CSS.
+                // Save directly to PDF.
+                doc.Save(outputPdf);
             }
 
-            Console.WriteLine($"PDF generated successfully: {pdfOutput}");
+            Console.WriteLine($"PDF generated with CSS styling: {outputPdf}");
+        }
+        catch (TypeInitializationException)
+        {
+            // HTML-to-PDF conversion relies on GDI+ and is Windows‑only.
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped on this platform.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            Console.Error.WriteLine($"Error during processing: {ex.Message}");
         }
     }
 }

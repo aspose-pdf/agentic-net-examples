@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";      // source PDF
-        const string xmlPath   = "audio_refs.xml"; // XML with audio references
+        const string pdfPath   = "input.pdf";
+        const string xmlPath   = "audioReferences.xml";
         const string outputPdf = "output_with_audio.pdf";
 
         if (!File.Exists(pdfPath))
@@ -17,84 +17,74 @@ class Program
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML not found: {xmlPath}");
             return;
         }
 
-        // Load the PDF document inside a using block (lifecycle rule)
-        using (Document doc = new Document(pdfPath))
+        // Load the XML that contains audio annotation definitions.
+        // Expected format (example):
+        // <Audios>
+        //   <Audio page="1" llx="100" lly="500" urx="300" ury="550" file="sound1.wav" />
+        //   <Audio page="2" llx="50"  lly="400" urx="250" ury="450" file="sound2.mp3" />
+        // </Audios>
+        XDocument xmlDoc = XDocument.Load(xmlPath);
+
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Load and parse the XML file
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(xmlPath);
-
-            // Expected XML format:
-            // <Audios>
-            //   <Audio page="1" x="100" y="500" width="20" height="20">audio1.wav</Audio>
-            //   ...
-            // </Audios>
-            XmlNodeList? audioNodes = xmlDoc.SelectNodes("//Audio");
-            if (audioNodes != null)
+            foreach (XElement audioElem in xmlDoc.Root.Elements("Audio"))
             {
-                foreach (XmlNode node in audioNodes)
+                // Parse required attributes safely.
+                if (audioElem.Attribute("page") == null ||
+                    audioElem.Attribute("llx") == null ||
+                    audioElem.Attribute("lly") == null ||
+                    audioElem.Attribute("urx") == null ||
+                    audioElem.Attribute("ury") == null ||
+                    audioElem.Attribute("file") == null)
                 {
-                    // Guard against missing attributes
-                    if (node.Attributes == null)
-                    {
-                        Console.Error.WriteLine("Audio node missing attributes. Skipping.");
-                        continue;
-                    }
-
-                    // Extract attributes safely
-                    if (!int.TryParse(node.Attributes["page"]?.Value, out int pageNumber) ||
-                        !double.TryParse(node.Attributes["x"]?.Value, out double x) ||
-                        !double.TryParse(node.Attributes["y"]?.Value, out double y) ||
-                        !double.TryParse(node.Attributes["width"]?.Value, out double width) ||
-                        !double.TryParse(node.Attributes["height"]?.Value, out double height))
-                    {
-                        Console.Error.WriteLine("Invalid attribute values for an Audio element. Skipping.");
-                        continue;
-                    }
-
-                    string audioFile = node.InnerText.Trim();
-
-                    // Validate page index (Aspose.Pdf uses 1‑based indexing)
-                    if (pageNumber < 1 || pageNumber > doc.Pages.Count)
-                    {
-                        Console.Error.WriteLine($"Invalid page number {pageNumber} for audio '{audioFile}'. Skipping.");
-                        continue;
-                    }
-
-                    // Verify that the audio file exists
-                    if (!File.Exists(audioFile))
-                    {
-                        Console.Error.WriteLine($"Audio file not found: {audioFile}. Skipping.");
-                        continue;
-                    }
-
-                    // Create a rectangle for the annotation location
-                    // Fully qualify to avoid ambiguity with System.Drawing.Rectangle
-                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(x, y, x + width, y + height);
-
-                    // Create the sound annotation on the specified page
-                    // Constructor: SoundAnnotation(Page page, Rectangle rect, string soundFile)
-                    SoundAnnotation soundAnn = new SoundAnnotation(doc.Pages[pageNumber], rect, audioFile)
-                    {
-                        // The Icon enum is not available in the current library version, so we omit it.
-                        Title = Path.GetFileName(audioFile),
-                        Contents = $"Audio: {Path.GetFileName(audioFile)}"
-                    };
-
-                    // Add the annotation to the page's annotation collection
-                    doc.Pages[pageNumber].Annotations.Add(soundAnn);
+                    Console.Error.WriteLine("One or more required attributes are missing in an <Audio> element.");
+                    continue;
                 }
+
+                int pageNumber = (int)audioElem.Attribute("page");
+                double llx = (double)audioElem.Attribute("llx");
+                double lly = (double)audioElem.Attribute("lly");
+                double urx = (double)audioElem.Attribute("urx");
+                double ury = (double)audioElem.Attribute("ury");
+                string audioFile = (string)audioElem.Attribute("file");
+
+                if (!File.Exists(audioFile))
+                {
+                    Console.Error.WriteLine($"Audio file not found: {audioFile}");
+                    continue;
+                }
+
+                // Ensure the page exists (Aspose.Pdf uses 1‑based indexing).
+                if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
+                {
+                    Console.Error.WriteLine($"Invalid page number {pageNumber} for audio {audioFile}");
+                    continue;
+                }
+
+                Page page = pdfDoc.Pages[pageNumber];
+
+                // Create a rectangle that defines the annotation's location.
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+
+                // Create the sound annotation using the file path (string overload).
+                SoundAnnotation soundAnno = new SoundAnnotation(page, rect, audioFile)
+                {
+                    Title    = Path.GetFileNameWithoutExtension(audioFile),
+                    Contents = $"Audio: {Path.GetFileName(audioFile)}"
+                };
+
+                // Add the annotation to the page.
+                page.Annotations.Add(soundAnno);
             }
 
-            // Save the modified PDF (lifecycle rule)
-            doc.Save(outputPdf);
+            // Save the modified PDF.
+            pdfDoc.Save(outputPdf);
         }
 
         Console.WriteLine($"PDF with embedded audio saved to '{outputPdf}'.");

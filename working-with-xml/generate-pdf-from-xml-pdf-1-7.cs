@@ -6,30 +6,28 @@ class Program
 {
     static void Main()
     {
-        // Paths for input XML and output PDF
-        const string xmlPath = "input.xml";
-        const string pdfPath = "output.pdf";
-        const string conversionLogPath = "conversion_log.xml"; // optional log file
+        const string xmlPath = "input.xml";   // Path to the source XML data
+        const string outputPdf = "output.pdf"; // Desired PDF output path
+        const string conversionLog = "conversion_log.xml"; // Log file for conversion process
 
+        // Verify that the XML source file exists
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"Input file not found: {xmlPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Load XML with default options
+        // Load the XML data into a PDF Document using XmlLoadOptions
         XmlLoadOptions loadOptions = new XmlLoadOptions();
-
-        // Use a using block for deterministic disposal (lifecycle rule)
         using (Document doc = new Document(xmlPath, loadOptions))
         {
-            // Change PDF version to 1.7 using Document.Convert (Version property is read‑only)
-            doc.Convert(conversionLogPath, PdfFormat.v_1_7, ConvertErrorAction.Delete);
+            // Convert the document to PDF version 1.7 for maximum compatibility
+            doc.Convert(conversionLog, PdfFormat.v_1_7, ConvertErrorAction.Delete);
 
-            // Save the generated PDF (lifecycle rule)
-            doc.Save(pdfPath);
+            // Save the document as a PDF file (default PDF format)
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF generated at '{pdfPath}' with version 1.7.");
+        Console.WriteLine($"PDF generated with version 1.7: {outputPdf}");
     }
 }

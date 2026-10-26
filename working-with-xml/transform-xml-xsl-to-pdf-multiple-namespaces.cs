@@ -1,40 +1,52 @@
 using System;
 using System.IO;
+using System.Xml;
+using System.Xml.Xsl;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source XML, the XSLT stylesheet and the output PDF.
         const string xmlPath = "input.xml";
-        const string xslPath = "transform.xsl";
+        const string xsltPath = "transform.xslt";
         const string pdfPath = "output.pdf";
 
-        // Verify that the required files exist.
-        if (!File.Exists(xmlPath) || !File.Exists(xslPath))
+        if (!File.Exists(xmlPath) || !File.Exists(xsltPath))
         {
             Console.Error.WriteLine("XML or XSLT file not found.");
             return;
         }
 
-        // Load the XSLT stylesheet as a stream.
-        // Passing the XSLT stream to XmlLoadOptions ensures that the
-        // transformation uses the exact namespaces declared in the stylesheet,
-        // avoiding conflicts that can arise when the XSLT is loaded by name.
-        using (FileStream xslStream = File.OpenRead(xslPath))
-        {
-            // XmlLoadOptions can be constructed with an XSLT stream.
-            XmlLoadOptions loadOptions = new XmlLoadOptions(xslStream);
+        // Load the XSLT stylesheet
+        var xslt = new XslCompiledTransform();
+        var settings = new XsltSettings(true, true);
+        var resolver = new XmlUrlResolver();
+        xslt.Load(xsltPath, settings, resolver);
 
-            // Create the PDF document by applying the XSLT to the XML.
-            using (Document pdfDoc = new Document(xmlPath, loadOptions))
+        // Load the source XML document
+        var xmlDoc = new XmlDocument();
+        xmlDoc.Load(xmlPath);
+
+        // Transform XML to an intermediate HTML (or XSL‑FO) representation.
+        // No explicit namespace manager is required – the XSLT itself declares the
+        // namespaces it works with. Use the overload that accepts an XsltArgumentList
+        // (null in this case) to avoid the overload‑resolution conflict.
+        using (var htmlStream = new MemoryStream())
+        using (var writer = XmlWriter.Create(htmlStream, xslt.OutputSettings))
+        {
+            xslt.Transform(xmlDoc, null, writer);
+            writer.Flush();
+            htmlStream.Position = 0; // Reset stream for reading
+
+            // Load the transformed HTML into an Aspose.Pdf Document
+            using (var pdfDoc = new Document(htmlStream, new HtmlLoadOptions()))
             {
-                // Save the resulting PDF.
+                // Save the final PDF
                 pdfDoc.Save(pdfPath);
             }
         }
 
-        Console.WriteLine($"PDF generated successfully: {pdfPath}");
+        Console.WriteLine($"PDF generated at '{pdfPath}'.");
     }
 }

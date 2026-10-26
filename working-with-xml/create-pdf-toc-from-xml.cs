@@ -1,104 +1,100 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Xml.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath = "headings.xml";   // XML with heading hierarchy
-        const string pdfPath = "input.pdf";      // source PDF (may be empty)
-        const string outputPdf = "output_with_toc.pdf";
+        const string inputPdfPath = "source.pdf";   // existing PDF to augment
+        const string xmlPath = "headings.xml"; // XML with heading hierarchy
+        const string outputPdfPath = "output_with_toc.pdf";
 
+        if (!File.Exists(inputPdfPath))
+        {
+            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            return;
+        }
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
             return;
         }
 
-        if (!File.Exists(pdfPath))
+        // Load the source PDF
+        using (Document doc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
-            return;
-        }
+            // Parse the XML file. Expected format:
+            // <Headings>
+            //   <Heading Level="1" Title="Chapter 1" Page="2" />
+            //   <Heading Level="2" Title="Section 1.1" Page="3" />
+            //   ...
+            // </Headings>
+            XDocument xmlDoc = XDocument.Load(xmlPath);
+            var headingElements = xmlDoc.Root?.Elements("Heading") ?? Array.Empty<XElement>();
 
-        // Load the XML that defines the headings
-        XDocument xDoc = XDocument.Load(xmlPath);
-        if (xDoc.Root == null)
-        {
-            Console.Error.WriteLine("XML does not contain a root element.");
-            return;
-        }
+            // Insert a new page at the beginning for the Table of Contents
+            Page tocPage = doc.Pages.Add();
+            doc.Pages.Insert(1, tocPage);
 
-        // Load the PDF document
-        using (Document doc = new Document(pdfPath))
-        {
-            // Ensure the document has a tagged structure
-            ITaggedContent tagged = doc.TaggedContent;
+            // Add a visible title for the TOC
+            TextFragment titleFragment = new TextFragment("Table of Contents");
+            titleFragment.TextState.FontSize = 18;
+            titleFragment.Position = new Position(50, tocPage.PageInfo.Height - 50);
+            tocPage.Paragraphs.Add(titleFragment);
 
-            // Insert a blank page that will hold the TOC (as the first page)
-            doc.Pages.Insert(1); // creates a new empty page at position 1
-            Page tocPage = doc.Pages[1];
+            // Starting vertical position for the first entry (some space after the title)
+            double currentY = tocPage.PageInfo.Height - 80;
+            const double lineHeight = 20; // space between entries
 
-            // Configure TOC page info (title, page numbers, etc.)
-            tocPage.TocInfo = new TocInfo
+            foreach (var h in headingElements)
             {
-                Title = new TextFragment("Table of Contents"), // <-- fixed: TextFragment required
-                IsShowPageNumbers = true,
-                CopyToOutlines = false
-            };
+                // Safely read attributes; if missing, skip the entry
+                if (h.Attribute("Level") == null || h.Attribute("Title") == null || h.Attribute("Page") == null)
+                    continue;
 
-            // Create the top‑level TOC element and attach it to the root
-            TOCElement tocRoot = tagged.CreateTOCElement();
-            tocRoot.Title = "Table of Contents"; // visible title for the TOC element
-            StructureElement root = tagged.RootElement;
-            root.AppendChild(tocRoot);
+                int level = (int)h.Attribute("Level");
+                string title = (string)h.Attribute("Title");
+                int pageNum = (int)h.Attribute("Page");
 
-            // Recursive helper to process heading elements
-            void ProcessHeadingElements(XElement xmlElement, TOCElement parentToc)
-            {
-                if (xmlElement == null) return;
+                // Adjust page number because we inserted the TOC page at position 1
+                int targetPageNumber = pageNum + 1;
 
-                foreach (XElement heading in xmlElement.Elements("heading"))
+                // Create the visible TOC entry
+                TextFragment entryFragment = new TextFragment(title);
+                entryFragment.TextState.FontSize = 12;
+                double indent = 50 + (level - 1) * 20; // simple left indent per level
+                entryFragment.Position = new Position(indent, currentY);
+                tocPage.Paragraphs.Add(entryFragment);
+
+                // Create a clickable link annotation that jumps to the target page
+                double fontSize = entryFragment.TextState.FontSize;
+                Rectangle linkRect = new Rectangle(
+                    indent,
+                    currentY - fontSize,
+                    tocPage.PageInfo.Width - 50,
+                    currentY);
+
+                // Use the correct GoToAction constructor (expects a Page instance)
+                Page targetPage = doc.Pages[targetPageNumber];
+                GoToAction goTo = new GoToAction(targetPage);
+                LinkAnnotation link = new LinkAnnotation(tocPage, linkRect)
                 {
-                    // Create a TOC item (TOCI) for this heading
-                    TOCIElement tocItem = tagged.CreateTOCIElement();
+                    Action = goTo
+                };
+                tocPage.Annotations.Add(link);
 
-                    // Use ActualText to store the visible label of the TOC entry
-                    tocItem.ActualText = heading.Value?.Trim() ?? string.Empty;
-
-                    // Optionally store the heading level (if needed later)
-                    XAttribute levelAttr = heading.Attribute("level");
-                    if (levelAttr != null)
-                        tocItem.Language = levelAttr.Value; // simple example storage
-
-                    // Append the TOCI element to its parent TOC element
-                    parentToc.AppendChild(tocItem);
-
-                    // If the heading contains nested headings, create a nested TOC element
-                    if (heading.Elements("heading").Any())
-                    {
-                        TOCElement nestedToc = tagged.CreateTOCElement();
-                        // Optionally give the nested TOC a title (could be the same as the item)
-                        nestedToc.Title = tocItem.ActualText;
-                        tocItem.AppendChild(nestedToc);
-                        ProcessHeadingElements(heading, nestedToc);
-                    }
-                }
+                // Move to the next line
+                currentY -= lineHeight;
             }
 
-            // Start processing from the root of the XML document
-            ProcessHeadingElements(xDoc.Root, tocRoot);
-
-            // Save the updated PDF
-            doc.Save(outputPdf);
+            // Save the resulting PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF with TOC saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with Table of Contents saved to '{outputPdfPath}'.");
     }
 }
