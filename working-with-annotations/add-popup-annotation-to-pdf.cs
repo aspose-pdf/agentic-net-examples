@@ -16,49 +16,32 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure there is at least one page
+            // Get the first page (pages are 1‑based)
             Page page = doc.Pages[1];
 
-            // Create a markup annotation (TextAnnotation) that will own the popup
-            // Use fully qualified Rectangle to avoid ambiguity with System.Drawing
-            Aspose.Pdf.Rectangle markupRect = new Aspose.Pdf.Rectangle(100, 600, 200, 650);
+            // Create a markup annotation (TextAnnotation) that the user can select
+            // Fully qualify Rectangle to avoid ambiguity with System.Drawing
+            Aspose.Pdf.Rectangle markupRect = new Aspose.Pdf.Rectangle(100, 700, 200, 750);
             TextAnnotation markup = new TextAnnotation(page, markupRect)
             {
                 Title    = "Note",
-                Contents = "Click the icon to see more details.",
-                Open     = false,
-                Icon     = TextIcon.Note,
-                // Use Aspose.Pdf.Color for cross‑platform compatibility
-                Color    = Aspose.Pdf.Color.Yellow
+                Contents = "Click to see more details.",
+                Open     = false,                     // initially closed
+                Icon     = TextIcon.Note
             };
             page.Annotations.Add(markup);
 
-            // Define custom dimensions for the popup (width 250, height 150)
-            // Position it relative to the markup: offset 20 points right and 20 points down
-            double popupWidth  = 250;
-            double popupHeight = 150;
-            double offsetX = 20;
-            double offsetY = -20; // negative Y moves down in PDF coordinate system
-
-            // Calculate popup rectangle based on markup rectangle
-            double llx = markupRect.LLX + offsetX;
-            double lly = markupRect.LLY + offsetY - popupHeight; // lower‑left Y
-            double urx = llx + popupWidth;
-            double ury = lly + popupHeight;
-
-            Aspose.Pdf.Rectangle popupRect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
-
-            // Create the PopupAnnotation and associate it with the markup annotation
+            // Create a PopupAnnotation that is linked to the markup annotation
+            // Position the popup somewhere else on the page
+            Aspose.Pdf.Rectangle popupRect = new Aspose.Pdf.Rectangle(250, 600, 450, 750);
             PopupAnnotation popup = new PopupAnnotation(page, popupRect)
             {
-                // The Parent property links the popup to its markup annotation
-                Parent = markup,
-                // Optional: set a background color for the popup window
-                Color = Aspose.Pdf.Color.LightGray
-                // Title property is not available on PopupAnnotation in older versions; omitted intentionally
+                Parent   = markup,                    // link to the markup annotation
+                Contents = "This is the additional note that appears when the parent annotation is selected.",
+                Open     = false                      // popup is hidden until the markup is activated
             };
             page.Annotations.Add(popup);
 

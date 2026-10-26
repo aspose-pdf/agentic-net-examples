@@ -1,7 +1,7 @@
 {
   "category": "working-with-annotations",
   "nuget_version": "26.9.0",
-  "last_updated": "2026-10-26T04:28:57Z",
+  "last_updated": "2026-10-26T06:22:59Z",
   "examples": {
     "add-text-annotation-to-pdf-page-3": {
       "title": "Add Text Annotation to PDF Page Three",
@@ -24,7 +24,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20903"
     },
@@ -48,7 +48,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20904"
     },
@@ -73,7 +73,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20905"
     },
@@ -100,7 +100,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20906"
     },
@@ -123,7 +123,7 @@
         "Aspose.Pdf.Annotations.AnnotationFlags"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20907"
     },
@@ -148,7 +148,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20908"
     },
@@ -171,7 +171,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20909"
     },
@@ -195,7 +195,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20910"
     },
@@ -219,7 +219,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20911"
     },
@@ -242,7 +242,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20912"
     },
@@ -265,7 +265,7 @@
         "Aspose.Pdf.Page.Annotations"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20913"
     },
@@ -289,79 +289,53 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20914"
     },
     "import-xfdf-annotations-into-pdf": {
-      "title": "Import XFDF Annotations into a PDF",
+      "title": "Import Annotations from XFDF into PDF",
       "filename": "import-xfdf-annotations-into-pdf.cs",
-      "description": "Demonstrates loading an XFDF file, converting its annotation data to Aspose.Pdf annotation objects, and adding them to the corresponding pages of an existing PDF while preserving the original layout.",
+      "description": "Shows how to load a PDF document, import annotations from an XFDF string, and save the updated PDF using Aspose.Pdf.",
       "tags": [
         "xfdf",
         "annotations",
+        "import",
         "pdf",
-        "aspose-pdf",
-        "import"
+        "aspose.pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Annotations.HighlightAnnotation",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Document.ImportAnnotationsFromXfdf",
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
-      "task_id": "20998"
-    },
-    "export-pdf-annotations-to-xfdf": {
-      "title": "Export Page Annotations to XFDF",
-      "filename": "export-pdf-annotations-to-xfdf.cs",
-      "description": "Demonstrates how to export annotations from a specific PDF page to an XFDF file and save it next to the original PDF.",
-      "tags": [
-        "annotations",
-        "xfdf",
-        "export",
-        "pdf",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Xfdf.XfdfSaveOptions",
-        "Aspose.Pdf.Xfdf.XfdfSaveOptions.PageIndex"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
-      "status": "verified",
-      "task_id": "20916"
+      "task_id": "20915"
     },
     "import-annotations-from-fdf": {
-      "title": "Import Annotations and Form Fields from FDF into PDF",
+      "title": "Import Annotations from FDF File into PDF",
       "filename": "import-annotations-from-fdf.cs",
-      "description": "Demonstrates how to read a simple FDF file, import form‑field values and page‑level annotations, and assign them to the correct pages of a PDF using Aspose.Pdf.",
+      "description": "Loads a PDF document, reads an FDF file containing form field values, assigns those values to matching fields in the PDF, enumerates page annotations, and saves the updated PDF.",
       "tags": [
         "fdf",
         "annotations",
         "form-fields",
-        "pdf",
+        "import",
         "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Annotations.HighlightAnnotation",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.Forms.Field",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
-      "task_id": "20955"
+      "task_id": "20917"
     },
     "batch-add-text-annotations-to-pdf-pages": {
       "title": "Batch Add Text Annotations to All PDF Pages",
@@ -383,7 +357,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20918"
     },
@@ -406,7 +380,7 @@
         "Aspose.Pdf.Annotations.HighlightAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20919"
     },
@@ -430,7 +404,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20920"
     },
@@ -451,7 +425,7 @@
         "Aspose.Pdf.Xfdf.XfdfWriter.Write"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20921"
     },
@@ -474,7 +448,7 @@
         "Aspose.Pdf.Document.Dispose"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20922"
     },
@@ -497,7 +471,7 @@
         "Aspose.Pdf.Page.Annotations.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20924"
     },
@@ -520,7 +494,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20925"
     },
@@ -543,7 +517,7 @@
         "Aspose.Pdf.Annotations.Annotation.Name"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20926"
     },
@@ -566,7 +540,7 @@
         "Aspose.Pdf.Annotations.MarkupAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20927"
     },
@@ -591,7 +565,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20928"
     },
@@ -614,33 +588,34 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20929"
     },
     "add-polyline-figure-annotation": {
-      "title": "Add Polyline Annotation to PDF",
+      "title": "Add Figure Annotation with Custom Polyline to PDF",
       "filename": "add-polyline-figure-annotation.cs",
-      "description": "Demonstrates creating a polyline annotation from a list of points, calculating its bounding rectangle, styling it, and adding it to a PDF page using Aspose.Pdf.",
+      "description": "Demonstrates how to add a figure annotation using a custom polyline shape to a PDF page with Aspose.Pdf.",
       "tags": [
-        "polyline",
         "annotation",
+        "polyline",
+        "figure",
         "pdf",
-        "Aspose.Pdf",
-        "border"
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Point",
         "Aspose.Pdf.Annotations.PolylineAnnotation",
         "Aspose.Pdf.Border",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Color.FromRgb"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
-      "task_id": "20961"
+      "task_id": "20930"
     },
     "set-arrow-line-endings-on-pdf-annotation": {
       "title": "Add Arrow Line Annotation to PDF",
@@ -663,7 +638,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20931"
     },
@@ -686,7 +661,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20933"
     },
@@ -710,7 +685,7 @@
         "Aspose.Pdf.Annotation.Rect"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20934"
     },
@@ -734,20 +709,20 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20936"
     },
     "add-popup-annotation-to-pdf": {
-      "title": "Add Popup Annotation with Custom Size and Position",
+      "title": "Add Popup Annotation Linked to Text Annotation",
       "filename": "add-popup-annotation-to-pdf.cs",
-      "description": "Shows how to create a TextAnnotation markup and attach a PopupAnnotation with custom width, height, and an offset relative to the markup annotation.",
+      "description": "Demonstrates how to create a TextAnnotation and a linked PopupAnnotation in a PDF using Aspose.Pdf, then save the modified document.",
       "tags": [
         "popup",
         "annotation",
-        "custom-size",
-        "position",
-        "Aspose.Pdf"
+        "pdf",
+        "text-annotation",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -755,12 +730,12 @@
         "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Annotations.TextAnnotation",
         "Aspose.Pdf.Annotations.PopupAnnotation",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
-      "task_id": "20967"
+      "task_id": "20937"
     },
     "import-xfdf-annotations-reassign-pages": {
       "title": "Import XFDF Annotations and Map to PDF Pages",
@@ -783,7 +758,7 @@
         "Aspose.Pdf.Color.FromRgb"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20938"
     },
@@ -807,7 +782,7 @@
         "Aspose.Pdf.Annotations.AnnotationCollection.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20939"
     },
@@ -830,7 +805,7 @@
         "Aspose.Pdf.Annotations.LinkAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20940"
     },
@@ -855,7 +830,7 @@
         "Aspose.Pdf.Resources.Images.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20941"
     },
@@ -877,7 +852,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20942"
     },
@@ -902,7 +877,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20943"
     },
@@ -925,7 +900,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20944"
     },
@@ -949,7 +924,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20945"
     },
@@ -972,7 +947,7 @@
         "Aspose.Pdf.Annotations.Border"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20947"
     },
@@ -996,7 +971,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20948"
     },
@@ -1022,7 +997,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20949"
     },
@@ -1042,7 +1017,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20950"
     },
@@ -1068,7 +1043,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20951"
     },
@@ -1091,7 +1066,7 @@
         "Aspose.Pdf.AnnotationCollection"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20952"
     },
@@ -1116,7 +1091,7 @@
         "Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20953"
     },
@@ -1139,7 +1114,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20954"
     },
@@ -1164,7 +1139,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20956"
     },
@@ -1188,7 +1163,7 @@
         "Aspose.Pdf.LineEnding"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20957"
     },
@@ -1212,7 +1187,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20958"
     },
@@ -1237,7 +1212,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20959"
     },
@@ -1263,7 +1238,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20960"
     },
@@ -1288,7 +1263,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20962"
     },
@@ -1314,7 +1289,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20964"
     },
@@ -1337,7 +1312,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20965"
     },
@@ -1362,7 +1337,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20966"
     },
@@ -1386,7 +1361,7 @@
         "Aspose.Pdf.Border"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20968"
     },
@@ -1409,7 +1384,7 @@
         "Aspose.Pdf.Annotations.AnnotationCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20969"
     },
@@ -1434,7 +1409,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20970"
     },
@@ -1457,7 +1432,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20971"
     },
@@ -1480,7 +1455,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20972"
     },
@@ -1504,7 +1479,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20973"
     },
@@ -1529,7 +1504,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20974"
     },
@@ -1555,7 +1530,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20975"
     },
@@ -1580,7 +1555,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20976"
     },
@@ -1605,7 +1580,7 @@
         "Aspose.Pdf.Annotations.RichMediaAnnotation.Rect"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20977"
     },
@@ -1629,7 +1604,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20978"
     },
@@ -1654,7 +1629,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20979"
     },
@@ -1677,7 +1652,7 @@
         "Aspose.Pdf.Annotations.GoToAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20980"
     },
@@ -1702,7 +1677,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20981"
     },
@@ -1727,7 +1702,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20982"
     },
@@ -1751,7 +1726,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20983"
     },
@@ -1774,32 +1749,9 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20984"
-    },
-    "add-bates-numbering-with-prefix": {
-      "title": "Add Bates Numbering Artifact to PDF Pages",
-      "filename": "add-bates-numbering-with-prefix.cs",
-      "description": "Demonstrates how to apply automatic Bates numbering with a custom prefix and six‑digit format to each page of a PDF using Aspose.Pdf.",
-      "tags": [
-        "bates",
-        "artifact",
-        "pdf",
-        "numbering",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.BatesNArtifact",
-        "Aspose.Pdf.Page.Artifacts",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
-      "status": "verified",
-      "task_id": "20985"
     },
     "count-watermark-artifacts-on-pdf-page": {
       "title": "Count Watermark Artifacts on PDF Pages",
@@ -1820,7 +1772,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20986"
     },
@@ -1843,7 +1795,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20987"
     },
@@ -1865,7 +1817,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20988"
     },
@@ -1888,32 +1840,33 @@
         "Aspose.Pdf.Forms.FieldCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20989"
     },
     "batch-add-video-screen-annotations": {
       "title": "Batch Add Video Screen Annotations to PDF Pages",
       "filename": "batch-add-video-screen-annotations.cs",
-      "description": "Shows how to embed a video file as a ScreenAnnotation on every page of a PDF, automatically sizing and centering the annotation rectangle while preserving the video’s aspect ratio.",
+      "description": "Shows how to add a screen annotation that plays a video file to each page of a multi‑page PDF using Aspose.Pdf.",
       "tags": [
         "screen-annotation",
         "video",
         "pdf",
         "batch",
-        "aspect-ratio"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.PageInfo",
         "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Annotations.ScreenAnnotation"
+        "Aspose.Pdf.Annotations.ScreenAnnotation",
+        "Aspose.Pdf.Annotations.AnnotationCollection.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
-      "task_id": "21068"
+      "task_id": "20990"
     },
     "remove-background-artifacts-from-pdf": {
       "title": "Remove Background Artifacts from PDF Pages",
@@ -1934,7 +1887,7 @@
         "Aspose.Pdf.ArtifactCollection.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20991"
     },
@@ -1959,7 +1912,7 @@
         "Aspose.Pdf.Annotations.Border"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20992"
     },
@@ -1983,7 +1936,7 @@
         "Aspose.Pdf.Annotations.Border"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20993"
     },
@@ -2009,7 +1962,7 @@
         "Aspose.Pdf.Annotations.RichMediaContent"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20994"
     },
@@ -2034,7 +1987,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20995"
     },
@@ -2058,7 +2011,7 @@
         "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20996"
     },
@@ -2082,7 +2035,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20997"
     },
@@ -2107,7 +2060,7 @@
         "Aspose.Pdf.Annotations.PDF3DStream"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21001"
     },
@@ -2131,7 +2084,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21002"
     },
@@ -2154,7 +2107,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21003"
     },
@@ -2179,7 +2132,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21004"
     },
@@ -2204,7 +2157,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21006"
     },
@@ -2228,7 +2181,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21007"
     },
@@ -2251,7 +2204,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21008"
     },
@@ -2274,7 +2227,7 @@
         "Aspose.Pdf.Forms.Form"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21009"
     },
@@ -2299,7 +2252,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21010"
     },
@@ -2322,7 +2275,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21011"
     },
@@ -2347,7 +2300,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21012"
     },
@@ -2373,7 +2326,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21013"
     },
@@ -2396,7 +2349,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21014"
     },
@@ -2419,7 +2372,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21015"
     },
@@ -2442,7 +2395,7 @@
         "Aspose.Pdf.Xfdf.XfdfAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21018"
     },
@@ -2466,7 +2419,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21019"
     },
@@ -2491,7 +2444,7 @@
         "Aspose.Pdf.Permissions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21020"
     },
@@ -2515,7 +2468,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21021"
     },
@@ -2539,7 +2492,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21022"
     },
@@ -2563,7 +2516,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21023"
     },
@@ -2589,7 +2542,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21024"
     },
@@ -2614,7 +2567,7 @@
         "Aspose.Pdf.Page.Annotations.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21025"
     },
@@ -2638,7 +2591,7 @@
         "Aspose.Pdf.Drawing.Vector3D"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21027"
     },
@@ -2661,34 +2614,33 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21028"
     },
     "add-rich-media-video-annotation": {
-      "title": "Add Rich Media Video Annotation with Double‑Click Activation",
+      "title": "Embed MP4 Video with Poster Image using RichMediaAnnotation",
       "filename": "add-rich-media-video-annotation.cs",
-      "description": "Demonstrates how to embed a video file in a PDF using a RichMediaAnnotation and configure it to start playback only on a double‑click, with reflection for version‑agnostic compatibility.",
+      "description": "Demonstrates how to embed an MP4 video into a PDF as a RichMediaAnnotation and set a poster image that appears before playback, using reflection for version‑agnostic access to RichMediaContent and related properties.",
       "tags": [
         "richmedia",
         "video",
         "annotation",
-        "doubleclick",
-        "aspose-pdf"
+        "pdf",
+        "aspnet"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Annotations.RichMediaAnnotation",
-        "Aspose.Pdf.Annotations.RichMediaContent",
-        "Aspose.Pdf.Annotations.RichMediaSettings",
-        "Aspose.Pdf.Annotations.RichMediaActivation"
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Annotations.RichMediaContent"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
-      "task_id": "21045"
+      "task_id": "21029"
     },
     "add-sound-annotation-voiceover-page-five": {
       "title": "Add Sound Annotation to PDF Page",
@@ -2710,7 +2662,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21030"
     },
@@ -2734,7 +2686,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21031"
     },
@@ -2759,7 +2711,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21032"
     },
@@ -2783,7 +2735,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21033"
     },
@@ -2806,7 +2758,7 @@
         "Aspose.Pdf.Annotations.EmbeddedFile"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21034"
     },
@@ -2831,7 +2783,7 @@
         "Aspose.Pdf.Annotations.RichMediaData"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21036"
     },
@@ -2854,7 +2806,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21037"
     },
@@ -2877,7 +2829,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21038"
     },
@@ -2901,7 +2853,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21040"
     },
@@ -2926,7 +2878,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21041"
     },
@@ -2951,7 +2903,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21042"
     },
@@ -2972,7 +2924,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21043"
     },
@@ -2997,7 +2949,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21046"
     },
@@ -3020,7 +2972,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21047"
     },
@@ -3045,7 +2997,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21048"
     },
@@ -3069,7 +3021,7 @@
         "Aspose.Pdf.Color.FromRgb"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21049"
     },
@@ -3094,7 +3046,7 @@
         "Aspose.Pdf.Annotations.PDF3DAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21050"
     },
@@ -3118,7 +3070,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21051"
     },
@@ -3142,7 +3094,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21052"
     },
@@ -3165,7 +3117,7 @@
         "Aspose.Pdf.Annotations.JavascriptAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21053"
     },
@@ -3189,7 +3141,7 @@
         "Aspose.Pdf.Annotations.Asset"
       ],
       "difficulty": "advanced",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21055"
     },
@@ -3214,7 +3166,7 @@
         "Aspose.Pdf.Annotations.Border"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21056"
     },
@@ -3239,7 +3191,7 @@
         "Aspose.Pdf.Annotations.RichMediaPlayMode"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21057"
     },
@@ -3262,7 +3214,7 @@
         "Aspose.Pdf.PageInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21058"
     },
@@ -3287,7 +3239,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21059"
     },
@@ -3312,7 +3264,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21060"
     },
@@ -3338,7 +3290,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21061"
     },
@@ -3362,7 +3314,7 @@
         "Aspose.Pdf.Annotations.Border"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21062"
     },
@@ -3387,7 +3339,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21063"
     },
@@ -3412,7 +3364,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21064"
     },
@@ -3437,7 +3389,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21065"
     },
@@ -3463,7 +3415,7 @@
         "Aspose.Pdf.Annotations.RichMediaInstance"
       ],
       "difficulty": "advanced",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21066"
     },
@@ -3486,7 +3438,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21067"
     },
@@ -3511,7 +3463,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20935"
     },
@@ -3536,7 +3488,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20946"
     },
@@ -3559,7 +3511,7 @@
         "Aspose.Pdf.Annotations.JavascriptAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "20999"
     },
@@ -3583,7 +3535,7 @@
         "Aspose.Pdf.Annotations.RichMediaPermissions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21000"
     },
@@ -3609,7 +3561,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21016"
     },
@@ -3632,7 +3584,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21026"
     },
@@ -3655,7 +3607,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21035"
     },
@@ -3679,9 +3631,221 @@
         "Aspose.Pdf.Annotations.JavascriptAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:28:57Z",
+      "generated_at": "2026-10-26T06:22:59Z",
       "status": "verified",
       "task_id": "21044"
+    },
+    "export-pdf-annotations-to-xfdf__v3": {
+      "title": "Export Page Annotations to XFDF",
+      "filename": "export-pdf-annotations-to-xfdf__v3.cs",
+      "description": "Demonstrates how to export annotations from a specific PDF page to an XFDF file and save it next to the original PDF.",
+      "tags": [
+        "annotations",
+        "xfdf",
+        "export",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Xfdf.XfdfSaveOptions",
+        "Aspose.Pdf.Xfdf.XfdfSaveOptions.PageIndex"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T06:22:59Z",
+      "status": "verified",
+      "task_id": "20916"
+    },
+    "import-annotations-from-fdf__v2": {
+      "title": "Import FDF Annotations into PDF Pages",
+      "filename": "import-annotations-from-fdf__v2.cs",
+      "description": "Demonstrates how to read a simple FDF file, parse annotation data, and add text annotations to the corresponding PDF pages using Aspose.Pdf.",
+      "tags": [
+        "fdf",
+        "annotations",
+        "pdf",
+        "import",
+        "textannotation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.TextIcon"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T06:22:59Z",
+      "status": "verified",
+      "task_id": "20932"
+    },
+    "import-annotations-from-fdf__v3": {
+      "title": "Import Annotations and Form Fields from FDF into PDF",
+      "filename": "import-annotations-from-fdf__v3.cs",
+      "description": "Demonstrates how to read a simple FDF file, import form‑field values and page‑level annotations, and assign them to the correct pages of a PDF using Aspose.Pdf.",
+      "tags": [
+        "fdf",
+        "annotations",
+        "form-fields",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T06:22:59Z",
+      "status": "verified",
+      "task_id": "20955"
+    },
+    "add-polyline-figure-annotation__v2": {
+      "title": "Add Polyline Annotation to PDF",
+      "filename": "add-polyline-figure-annotation__v2.cs",
+      "description": "Demonstrates creating a polyline annotation from a list of points, calculating its bounding rectangle, styling it, and adding it to a PDF page using Aspose.Pdf.",
+      "tags": [
+        "polyline",
+        "annotation",
+        "pdf",
+        "Aspose.Pdf",
+        "border"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.PolylineAnnotation",
+        "Aspose.Pdf.Border",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T06:22:59Z",
+      "status": "verified",
+      "task_id": "20961"
+    },
+    "add-popup-annotation-to-pdf__v2": {
+      "title": "Add Popup Annotation with Custom Size and Position",
+      "filename": "add-popup-annotation-to-pdf__v2.cs",
+      "description": "Shows how to create a TextAnnotation markup and attach a PopupAnnotation with custom width, height, and an offset relative to the markup annotation.",
+      "tags": [
+        "popup",
+        "annotation",
+        "custom-size",
+        "position",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.PopupAnnotation",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T06:22:59Z",
+      "status": "verified",
+      "task_id": "20967"
+    },
+    "add-bates-numbering-with-prefix__v2": {
+      "title": "Add Bates Numbering Artifact to PDF Pages",
+      "filename": "add-bates-numbering-with-prefix__v2.cs",
+      "description": "Demonstrates how to apply automatic Bates numbering with a custom prefix and six‑digit format to each page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "bates",
+        "artifact",
+        "pdf",
+        "numbering",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BatesNArtifact",
+        "Aspose.Pdf.Page.Artifacts",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T06:22:59Z",
+      "status": "verified",
+      "task_id": "20985"
+    },
+    "import-xfdf-annotations-into-pdf__v2": {
+      "title": "Import XFDF Annotations into a PDF",
+      "filename": "import-xfdf-annotations-into-pdf__v2.cs",
+      "description": "Demonstrates loading an XFDF file, converting its annotation data to Aspose.Pdf annotation objects, and adding them to the corresponding pages of an existing PDF while preserving the original layout.",
+      "tags": [
+        "xfdf",
+        "annotations",
+        "pdf",
+        "aspose-pdf",
+        "import"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T06:22:59Z",
+      "status": "verified",
+      "task_id": "20998"
+    },
+    "add-rich-media-video-annotation__v2": {
+      "title": "Add Rich Media Video Annotation with Double‑Click Activation",
+      "filename": "add-rich-media-video-annotation__v2.cs",
+      "description": "Demonstrates how to embed a video file in a PDF using a RichMediaAnnotation and configure it to start playback only on a double‑click, with reflection for version‑agnostic compatibility.",
+      "tags": [
+        "richmedia",
+        "video",
+        "annotation",
+        "doubleclick",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation",
+        "Aspose.Pdf.Annotations.RichMediaContent",
+        "Aspose.Pdf.Annotations.RichMediaSettings",
+        "Aspose.Pdf.Annotations.RichMediaActivation"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T06:22:59Z",
+      "status": "verified",
+      "task_id": "21045"
+    },
+    "batch-add-video-screen-annotations__v2": {
+      "title": "Batch Add Video Screen Annotations to PDF Pages",
+      "filename": "batch-add-video-screen-annotations__v2.cs",
+      "description": "Shows how to embed a video file as a ScreenAnnotation on every page of a PDF, automatically sizing and centering the annotation rectangle while preserving the video’s aspect ratio.",
+      "tags": [
+        "screen-annotation",
+        "video",
+        "pdf",
+        "batch",
+        "aspect-ratio"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.ScreenAnnotation"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T06:22:59Z",
+      "status": "verified",
+      "task_id": "21068"
     }
   }
 }
