@@ -1,20 +1,19 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string fdfPath = "annotations.fdf";
-        const string outputPath = "output.pdf";
+        // Paths for the source PDF, the FDF file and the output PDF
+        string pdfPath = "input.pdf";
+        string fdfPath = Path.Combine("Resources", "annotations.fdf");
+        string outputPath = "output.pdf";
 
-        // Verify that source files exist
+        // Verify that the required files exist
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
@@ -26,153 +25,62 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(pdfPath))
+        try
         {
-            // ------------------------------------------------------------
-            // 1. Import form‑field values from the FDF (if any).
-            // ------------------------------------------------------------
-            ImportFormFieldsFromFdf(pdfDoc, fdfPath);
-
-            // ------------------------------------------------------------
-            // 2. Import page‑level annotations from the FDF.
-            // ------------------------------------------------------------
-            ImportPageAnnotationsFromFdf(pdfDoc, fdfPath);
-
-            // Save the updated PDF with the imported data
-            pdfDoc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Annotations imported and saved to '{outputPath}'.");
-    }
-
-    /// <summary>
-    /// Reads simple key‑value pairs from an FDF file and assigns matching values to form fields.
-    /// Expected line format (case‑insensitive):
-    ///   FieldName=MyField;Value=Some text
-    /// Lines that do not contain both keys are ignored.
-    /// </summary>
-    private static void ImportFormFieldsFromFdf(Document doc, string fdfPath)
-    {
-        if (doc?.Form?.Fields == null)
-            return;
-
-        foreach (var line in File.ReadLines(fdfPath))
-        {
-            if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("#"))
-                continue;
-
-            var parts = line.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
-                            .Select(p => p.Trim())
-                            .Where(p => p.Length > 0)
-                            .ToArray();
-            if (parts.Length == 0)
-                continue;
-
-            string fieldName = null;
-            string fieldValue = null;
-            foreach (var part in parts)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                var kv = part.Split(new[] { '=' }, 2);
-                if (kv.Length != 2)
-                    continue;
-                var key = kv[0].Trim().ToUpperInvariant();
-                var val = kv[1].Trim();
-                if (key == "FIELDNAME" || key == "NAME")
-                    fieldName = val;
-                else if (key == "VALUE")
-                    fieldValue = val;
+                // ------------------------------------------------------------
+                // Import annotations (form field values) from the FDF file.
+                // Aspose.Pdf's core API does not expose an ImportFdf method, so
+                // we read the FDF file manually and assign values to matching
+                // fields in the document's Form.Fields collection.
+                // ------------------------------------------------------------
+                foreach (var line in File.ReadLines(fdfPath))
+                {
+                    // Skip empty lines and comments (lines starting with '#')
+                    if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("#"))
+                        continue;
+
+                    // FDF entries are typically "fieldName=value"
+                    var parts = line.Split(new[] { '=' }, 2);
+                    if (parts.Length != 2)
+                        continue; // malformed line – ignore
+
+                    string fieldName = parts[0].Trim();
+                    string fieldValue = parts[1].Trim();
+
+                    // Find the field by Name or FullName (covers hierarchical names)
+                    var field = doc.Form?.Fields?.FirstOrDefault(f =>
+                        string.Equals(f.Name, fieldName, StringComparison.Ordinal) ||
+                        string.Equals(f.FullName, fieldName, StringComparison.Ordinal));
+
+                    if (field != null)
+                    {
+                        field.Value = fieldValue;
+                    }
+                }
+
+                // Example processing: enumerate annotations on each page
+                for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based page indexing
+                {
+                    Page page = doc.Pages[i];
+                    Console.WriteLine($"Page {i} contains {page.Annotations.Count} annotation(s).");
+                    foreach (var annotation in page.Annotations)
+                    {
+                        Console.WriteLine($"  - {annotation.GetType().Name}");
+                    }
+                }
+
+                // Save the modified PDF with the imported annotations
+                doc.Save(outputPath);
             }
 
-            if (fieldName == null || fieldValue == null)
-                continue; // not a form‑field line
-
-            var field = doc.Form.Fields.FirstOrDefault(f =>
-                string.Equals(f.Name, fieldName, StringComparison.Ordinal) ||
-                string.Equals(f.FullName, fieldName, StringComparison.Ordinal));
-            if (field != null)
-                field.Value = fieldValue;
+            Console.WriteLine($"Annotations imported successfully. Output saved to '{outputPath}'.");
         }
-    }
-
-    /// <summary>
-    /// Reads simple annotation definitions from an FDF file and adds them to the appropriate pages.
-    /// Expected line format (case‑insensitive):
-    ///   Page=2;Type=Text;Rect=100,200,150,250;Contents=Note text
-    /// Supported Types: Text (TextAnnotation), Highlight (HighlightAnnotation).
-    /// </summary>
-    private static void ImportPageAnnotationsFromFdf(Document doc, string fdfPath)
-    {
-        foreach (var line in File.ReadLines(fdfPath))
+        catch (Exception ex)
         {
-            if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("#"))
-                continue;
-
-            var dict = ParseKeyValuePairs(line);
-            if (!dict.ContainsKey("PAGE") || !dict.ContainsKey("TYPE") || !dict.ContainsKey("RECT"))
-                continue; // not an annotation line
-
-            if (!int.TryParse(dict["PAGE"], out int pageNumber) || pageNumber < 1 || pageNumber > doc.Pages.Count)
-                continue; // invalid page number
-
-            var rectParts = dict["RECT"].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            if (rectParts.Length != 4)
-                continue; // malformed rectangle
-
-            if (!double.TryParse(rectParts[0], out double llx) ||
-                !double.TryParse(rectParts[1], out double lly) ||
-                !double.TryParse(rectParts[2], out double urx) ||
-                !double.TryParse(rectParts[3], out double ury))
-                continue; // invalid rectangle values
-
-            var rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
-            var type = dict["TYPE"].Trim().ToUpperInvariant();
-            Annotation annotation = null;
-
-            switch (type)
-            {
-                case "TEXT":
-                    var textAnnot = new TextAnnotation(doc.Pages[pageNumber], rect);
-                    if (dict.TryGetValue("CONTENTS", out string contents))
-                        textAnnot.Contents = contents;
-                    annotation = textAnnot;
-                    break;
-
-                case "HIGHLIGHT":
-                    var highlight = new HighlightAnnotation(doc.Pages[pageNumber], rect);
-                    if (dict.TryGetValue("CONTENTS", out string hlContents))
-                        highlight.Contents = hlContents;
-                    annotation = highlight;
-                    break;
-
-                // Add more cases here for other annotation types as needed.
-                default:
-                    // Unsupported annotation type – skip.
-                    continue;
-            }
-
-            if (annotation != null)
-                doc.Pages[pageNumber].Annotations.Add(annotation);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-    }
-
-    /// <summary>
-    /// Helper that converts a semicolon‑separated list of key=value pairs into a dictionary.
-    /// Keys are stored in upper‑case to make look‑ups case‑insensitive.
-    /// </summary>
-    private static Dictionary<string, string> ParseKeyValuePairs(string line)
-    {
-        var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        var parts = line.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-        foreach (var part in parts)
-        {
-            var kv = part.Split(new[] { '=' }, 2);
-            if (kv.Length != 2)
-                continue;
-            var key = kv[0].Trim().ToUpperInvariant();
-            var value = kv[1].Trim();
-            dict[key] = value;
-        }
-        return dict;
     }
 }

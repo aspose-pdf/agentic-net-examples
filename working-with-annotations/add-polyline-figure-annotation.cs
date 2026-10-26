@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -17,49 +16,43 @@ class Program
             return;
         }
 
-        // Define the points that the polyline will pass through
-        List<Aspose.Pdf.Point> points = new List<Aspose.Pdf.Point>
-        {
-            new Aspose.Pdf.Point(100, 700),
-            new Aspose.Pdf.Point(150, 750),
-            new Aspose.Pdf.Point(200, 720),
-            new Aspose.Pdf.Point(250, 770)
-        };
-
-        // Compute a bounding rectangle that encloses all points (with a small margin)
-        double llx = double.MaxValue, lly = double.MaxValue, urx = double.MinValue, ury = double.MinValue;
-        foreach (var p in points)
-        {
-            if (p.X < llx) llx = p.X;
-            if (p.Y < lly) lly = p.Y;
-            if (p.X > urx) urx = p.X;
-            if (p.Y > ury) ury = p.Y;
-        }
-        const double margin = 5;
-        llx -= margin; lly -= margin; urx += margin; ury += margin;
-
-        // Open the PDF, add the polyline annotation, and save
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // For demonstration, add the annotation to the first page
+            // Work with the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Create the annotation with the calculated rectangle and vertices
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
-            PolylineAnnotation polyline = new PolylineAnnotation(page, rect, points.ToArray());
+            // Define the annotation rectangle (llx, lly, urx, ury)
+            // Note: lower‑left Y must be less than upper‑right Y
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 200, 400, 500);
 
-            // Optional visual styling
+            // Prepare vertices for the polyline annotation
+            Aspose.Pdf.Point[] vertices = new Aspose.Pdf.Point[]
+            {
+                new Aspose.Pdf.Point(120, 480),
+                new Aspose.Pdf.Point(200, 420),
+                new Aspose.Pdf.Point(280, 460),
+                new Aspose.Pdf.Point(360, 380)
+            };
+
+            // Create the PolylineAnnotation with the required vertices array
+            PolylineAnnotation polyline = new PolylineAnnotation(page, rect, vertices);
+
+            // Visual styling
+            polyline.Color = Aspose.Pdf.Color.FromRgb(0, 128, 0); // dark green line
             polyline.Border = new Border(polyline) { Width = 2 };
-            polyline.Color = Aspose.Pdf.Color.Blue;                     // stroke color
-            polyline.InteriorColor = Aspose.Pdf.Color.LightGray;        // fill color (if needed)
 
-            // Add the annotation to the page
+            // Alternative text for accessibility (figure description)
+            polyline.Title = "Custom Diagram Figure";
+            polyline.Contents = "A polyline illustrating the process flow.";
+
+            // Attach the annotation to the page
             page.Annotations.Add(polyline);
 
-            // Persist the changes
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PolyLine annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Figure annotation with custom polyline saved to '{outputPath}'.");
     }
 }
