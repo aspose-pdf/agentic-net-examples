@@ -1,90 +1,89 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputPdf = "output_vectorized.pdf";
+        const string vectorFolder = "vectors"; // folder containing .svg files with the same base names as raster images
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Create a temporary folder to store per‑page SVG files
-        string tempDir = Path.Combine(Path.GetTempPath(), "AsposePdf_Vectorize_" + Guid.NewGuid());
-        Directory.CreateDirectory(tempDir);
+        if (!Directory.Exists(vectorFolder))
+        {
+            Console.Error.WriteLine($"Vector folder not found: {vectorFolder}");
+            return;
+        }
 
         try
         {
-            // Load the source PDF
-            using (Document srcDoc = new Document(inputPdf))
+            using (Document doc = new Document(inputPdf))
             {
-                // Iterate through all pages (1‑based indexing)
-                for (int i = 1; i <= srcDoc.Pages.Count; i++)
+                // Pages are 1‑based in Aspose.Pdf
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    Page page = srcDoc.Pages[i];
+                    Page page = doc.Pages[i];
+                    var imagesToReplace = new List<XImage>();
 
-                    // If the page contains vector graphics, export them as SVG.
-                    // TrySaveVectorGraphics returns false when no vector data is present.
-                    string svgPath = Path.Combine(tempDir, $"page_{i}.svg");
-                    bool hasVector = page.TrySaveVectorGraphics(svgPath);
-
-                    // If no vector graphics were found, fall back to the original raster page.
-                    // In that case we simply copy the original page later.
-                    if (!hasVector)
+                    // Collect raster images that have a matching SVG counterpart
+                    foreach (XImage img in page.Resources.Images)
                     {
-                        // Mark the page as having no SVG output by deleting the empty file.
-                        if (File.Exists(svgPath))
-                            File.Delete(svgPath);
+                        // Image name may be null; skip if we cannot map it
+                        if (string.IsNullOrEmpty(img.Name))
+                            continue;
+
+                        string ext = Path.GetExtension(img.Name).ToLowerInvariant();
+                        bool isRaster = ext == ".png" || ext == ".jpg" || ext == ".jpeg" ||
+                                         ext == ".bmp" || ext == ".tif" || ext == ".tiff";
+
+                        if (!isRaster)
+                            continue;
+
+                        string baseName = Path.GetFileNameWithoutExtension(img.Name);
+                        string vectorPath = Path.Combine(vectorFolder, baseName + ".svg");
+
+                        if (File.Exists(vectorPath))
+                            imagesToReplace.Add(img);
+                    }
+
+                    // Replace each raster image with its SVG version
+                    foreach (XImage rasterImg in imagesToReplace)
+                    {
+                        string rasterName = rasterImg.Name;
+                        string baseName = Path.GetFileNameWithoutExtension(rasterName);
+                        string vectorPath = Path.Combine(vectorFolder, baseName + ".svg");
+
+                        // Remove the raster image from the page resources
+                        page.Resources.Images.Delete(rasterName);
+
+                        // Add the SVG image; preserve the original name so existing references stay valid
+                        using (FileStream vecStream = File.OpenRead(vectorPath))
+                        {
+                            // Add returns the name (string) of the newly added image
+                            string addedImageName = page.Resources.Images.Add(vecStream);
+                            // Retrieve the XImage object using the returned name
+                            XImage vectorImg = page.Resources.Images[addedImageName];
+                            // Keep the original name to satisfy existing references
+                            vectorImg.Name = rasterName;
+                        }
                     }
                 }
 
-                // Create a new PDF that will hold the vectorized pages
-                using (Document resultDoc = new Document())
-                {
-                    // Process each page again, this time adding either the SVG version
-                    // (if it exists) or the original raster page.
-                    for (int i = 1; i <= srcDoc.Pages.Count; i++)
-                    {
-                        string svgPath = Path.Combine(tempDir, $"page_{i}.svg");
-
-                        if (File.Exists(svgPath))
-                        {
-                            // Load the SVG page as a PDF document
-                            using (Document svgDoc = new Document(svgPath, new SvgLoadOptions()))
-                            {
-                                // The SVG document contains a single page; add it to the result.
-                                resultDoc.Pages.Add(svgDoc.Pages);
-                            }
-                        }
-                        else
-                        {
-                            // No vector representation – copy the original raster page.
-                            resultDoc.Pages.Add(srcDoc.Pages[i]);
-                        }
-                    }
-
-                    // Save the final PDF. No SaveOptions are needed because the output format is PDF.
-                    resultDoc.Save(outputPdf);
-                }
+                doc.Save(outputPdf);
+                Console.WriteLine($"Vectorized PDF saved to '{outputPdf}'.");
             }
-
-            Console.WriteLine($"Vectorized PDF saved to '{outputPdf}'.");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-        finally
-        {
-            // Clean up temporary SVG files
-            try { Directory.Delete(tempDir, true); } catch { /* ignore cleanup errors */ }
         }
     }
 }

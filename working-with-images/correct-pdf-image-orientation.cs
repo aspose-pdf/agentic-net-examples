@@ -1,20 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using System.Drawing.Imaging; // needed for ImageFormat, PropertyItem, RotateFlipType
-
-// Alias System.Drawing types to avoid ambiguity with Aspose.Pdf.Image
-using SysImage = System.Drawing.Image;
-using SysImageFormat = System.Drawing.Imaging.ImageFormat;
-using SysRotateFlipType = System.Drawing.RotateFlipType;
-using SysPropertyItem = System.Drawing.Imaging.PropertyItem;
+using System.Drawing;               // Used only for EXIF handling (Windows‑only)
+using System.Drawing.Imaging;      // For reading EXIF orientation
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_corrected.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -22,64 +17,52 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF inside a using block (lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Iterate over all pages (1‑based indexing rule)
+            for (int p = 1; p <= doc.Pages.Count; p++)
             {
-                var images = page.Resources.Images; // XImageCollection
-                int imageCount = images.Count;      // 1‑based count
+                Page page = doc.Pages[p];
 
-                // Process each image on the page
-                for (int i = 1; i <= imageCount; i++)
+                // XImageCollection is enumerable; iterate directly
+                foreach (XImage img in page.Resources.Images)
                 {
-                    XImage xImg = images[i];
-
-                    // Extract the original image bytes into a memory stream
+                    // Export the image to a memory stream
                     using (MemoryStream originalStream = new MemoryStream())
                     {
-                        xImg.Save(originalStream); // Save raw image data
+                        img.Save(originalStream);
                         originalStream.Position = 0;
 
-                        // Load the image with System.Drawing to read EXIF orientation
-                        using (SysImage sysImg = SysImage.FromStream(originalStream))
+                        // Load the image with System.Drawing to inspect EXIF orientation
+                        using (System.Drawing.Image sysImg = System.Drawing.Image.FromStream(originalStream))
                         {
-                            const int orientationTag = 274; // EXIF orientation tag ID
-                            int orientationIndex = Array.IndexOf(sysImg.PropertyIdList, orientationTag);
-
-                            // If the image has an orientation tag, handle it
-                            if (orientationIndex >= 0)
+                            const int OrientationId = 0x0112; // EXIF tag for orientation
+                            if (Array.Exists(sysImg.PropertyIdList, id => id == OrientationId))
                             {
-                                SysPropertyItem prop = sysImg.GetPropertyItem(orientationTag);
-                                ushort orientation = BitConverter.ToUInt16(prop.Value, 0);
+                                PropertyItem prop = sysImg.GetPropertyItem(OrientationId);
+                                int orientation = BitConverter.ToUInt16(prop.Value, 0);
 
-                                // Determine required rotation/flip based on EXIF value
-                                SysRotateFlipType rotateFlip = SysRotateFlipType.RotateNoneFlipNone;
-                                switch (orientation)
+                                // If orientation is not the default (1), rotate/flip accordingly
+                                if (orientation != 1)
                                 {
-                                    case 1: continue; // Normal – no action needed
-                                    case 2: rotateFlip = SysRotateFlipType.RotateNoneFlipX; break;
-                                    case 3: rotateFlip = SysRotateFlipType.Rotate180FlipNone; break;
-                                    case 4: rotateFlip = SysRotateFlipType.Rotate180FlipX; break;
-                                    case 5: rotateFlip = SysRotateFlipType.Rotate90FlipX; break;
-                                    case 6: rotateFlip = SysRotateFlipType.Rotate90FlipNone; break;
-                                    case 7: rotateFlip = SysRotateFlipType.Rotate270FlipX; break;
-                                    case 8: rotateFlip = SysRotateFlipType.Rotate270FlipNone; break;
-                                    default: continue; // Unknown value – skip
-                                }
+                                    RotateFlipType rotateFlip = GetRotateFlipType(orientation);
+                                    sysImg.RotateFlip(rotateFlip);
 
-                                // Apply rotation/flip
-                                sysImg.RotateFlip(rotateFlip);
+                                    // Save the corrected image back to a new memory stream (PNG to preserve lossless rotation)
+                                    using (MemoryStream correctedStream = new MemoryStream())
+                                    {
+                                        sysImg.Save(correctedStream, ImageFormat.Png);
+                                        correctedStream.Position = 0;
 
-                                // Save the corrected image back to a JPEG stream
-                                using (MemoryStream correctedStream = new MemoryStream())
-                                {
-                                    sysImg.Save(correctedStream, SysImageFormat.Jpeg);
-                                    correctedStream.Position = 0;
-
-                                    // Replace the image in the PDF (XImageCollection.Replace)
-                                    images.Replace(i, correctedStream);
+                                        // Replace the original XImage with the corrected one
+                                        // Remove the old image by instance (Remove expects XImage, not name)
+                                        page.Resources.Images.Remove(img);
+                                        string addedName = page.Resources.Images.Add(correctedStream);
+                                        XImage newImg = page.Resources.Images[addedName];
+                                        // Preserve the original image name so page content stays valid
+                                        newImg.Name = img.Name;
+                                    }
                                 }
                             }
                         }
@@ -87,10 +70,26 @@ class Program
                 }
             }
 
-            // Save the modified PDF (lifecycle rule: use Save)
+            // Save the updated PDF (save-to-non-pdf rule not needed – still PDF)
             doc.Save(outputPath);
         }
 
         Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+    }
+
+    // Maps EXIF orientation values to .NET RotateFlipType
+    private static RotateFlipType GetRotateFlipType(int orientation)
+    {
+        return orientation switch
+        {
+            2 => RotateFlipType.RotateNoneFlipX,
+            3 => RotateFlipType.Rotate180FlipNone,
+            4 => RotateFlipType.Rotate180FlipX,
+            5 => RotateFlipType.Rotate90FlipX,
+            6 => RotateFlipType.Rotate90FlipNone,
+            7 => RotateFlipType.Rotate270FlipX,
+            8 => RotateFlipType.Rotate270FlipNone,
+            _ => RotateFlipType.RotateNoneFlipNone,
+        };
     }
 }

@@ -1,56 +1,76 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
 
-class ReplaceImagesWithIcc
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string replacementImagePath = "replacement.jpg"; // JPEG with embedded ICC profile
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_icc.pdf";
+        const string iccPath = "profile.icc";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(replacementImagePath))
+        if (!File.Exists(iccPath))
         {
-            Console.Error.WriteLine($"Replacement image not found: {replacementImagePath}");
+            Console.Error.WriteLine($"ICC profile not found: {iccPath}");
             return;
         }
 
-        // Load the PDF document (using rule: document-disposal-with-using)
-        using (Document doc = new Document(inputPdfPath))
+        // Load ICC profile bytes once
+        byte[] iccData = File.ReadAllBytes(iccPath);
+
+        // Open PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Iterate over all pages (1‑based indexing per rule: page-indexing-one-based)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Iterate through all pages (1‑based indexing)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[pageNum];
-                XImageCollection images = page.Resources.Images;
-
-                // If the page contains images, replace each with the ICC‑profile‑embedded JPEG
-                if (images.Count > 0)
+                // Iterate over all images on the page
+                foreach (XImage img in page.Resources.Images)
                 {
-                    // Replace each image in the collection
-                    for (int imgIndex = 1; imgIndex <= images.Count; imgIndex++)
+                    // Use reflection to access ImageInfo and its IccProfile property.
+                    // This works across Aspose.Pdf versions where ImageInfo may be missing.
+                    Type imgType = img.GetType();
+                    PropertyInfo imageInfoProp = imgType.GetProperty("ImageInfo", BindingFlags.Public | BindingFlags.Instance);
+                    if (imageInfoProp != null)
                     {
-                        // Open the replacement image stream
-                        using (FileStream imgStream = File.OpenRead(replacementImagePath))
+                        // Get or create ImageInfo instance
+                        object imageInfo = imageInfoProp.GetValue(img);
+                        if (imageInfo == null)
                         {
-                            // Replace the image at the current index (XImageCollection.Replace expects 1‑based index)
-                            images.Replace(imgIndex, imgStream);
+                            // ImageInfo type is usually Aspose.Pdf.ImageInfo
+                            Type imageInfoType = imgType.Assembly.GetType("Aspose.Pdf.ImageInfo");
+                            if (imageInfoType != null)
+                            {
+                                imageInfo = Activator.CreateInstance(imageInfoType);
+                                imageInfoProp.SetValue(img, imageInfo);
+                            }
+                        }
+
+                        if (imageInfo != null)
+                        {
+                            // Set the ICC profile if the property exists
+                            PropertyInfo iccProp = imageInfo.GetType().GetProperty("IccProfile", BindingFlags.Public | BindingFlags.Instance);
+                            if (iccProp != null && iccProp.CanWrite)
+                            {
+                                iccProp.SetValue(imageInfo, iccData);
+                            }
                         }
                     }
                 }
             }
 
-            // Save the modified PDF (Document.Save(string) writes PDF regardless of extension)
-            doc.Save(outputPdfPath);
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with ICC‑profile images: {outputPdfPath}");
+        Console.WriteLine($"PDF saved with embedded ICC profiles: {outputPdf}");
     }
 }

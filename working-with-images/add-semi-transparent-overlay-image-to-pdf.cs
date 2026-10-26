@@ -6,49 +6,51 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string overlayImg = "overlay.png";       // semi‑transparent overlay image
-        const string outputPdf = "output.pdf";         // result PDF
+        const string inputPdf   = "input.pdf";      // source PDF
+        const string overlayImg = "overlay.png";    // semi‑transparent image to overlay
+        const string outputPdf  = "output.pdf";     // result PDF
 
+        // Verify required files exist
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
         if (!File.Exists(overlayImg))
         {
             Console.Error.WriteLine($"Overlay image not found: {overlayImg}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF inside a using block (document‑disposal‑with‑using rule)
         using (Document doc = new Document(inputPdf))
         {
-            // Create an ImageStamp that will be applied to each page
+            // Create an ImageStamp that will be placed on every page
             ImageStamp stamp = new ImageStamp(overlayImg)
             {
-                // Semi‑transparent (0.0 = fully transparent, 1.0 = opaque)
-                Opacity = 0.3f,
-                // Place the stamp on top of existing content
+                // Place on top of existing content
                 Background = false,
-                // Stretch the image to cover the whole page
+                // Semi‑transparent (0 = fully transparent, 1 = opaque)
+                Opacity = 0.2,
+                // Center the image; we will stretch it to page size below
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment   = VerticalAlignment.Center
             };
 
-            // Apply the stamp to every page
-            foreach (Page page in doc.Pages)
+            // Iterate pages using 1‑based indexing (page-indexing-one-based rule)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Adjust stamp size to match the current page dimensions
+                Page page = doc.Pages[i];
+
+                // Stretch the stamp to cover the whole page
                 stamp.Width  = page.PageInfo.Width;
                 stamp.Height = page.PageInfo.Height;
 
-                // Add the stamp to the page
+                // Apply the stamp to the current page
                 page.AddStamp(stamp);
             }
 
-            // Save the modified PDF (lifecycle rule: use Save with path)
+            // Save the modified PDF (PDF format, no special SaveOptions needed)
             doc.Save(outputPdf);
         }
 

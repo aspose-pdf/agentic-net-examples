@@ -1,68 +1,60 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // ---------------------------------------------------------------------
-        // 1. Create a sample input PDF that contains an image (so we have something
-        //    for ImagePlacementAbsorber to find).
-        // ---------------------------------------------------------------------
         const string inputPdf = "input.pdf";
+        const string logoPath = "logo.png";
         const string outputPdf = "output.pdf";
 
-        // Minimal 1x1 red PNG (will be the original image in the source PDF)
-        byte[] originalImageBytes = Convert.FromBase64String(
-            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADUlEQVR42mP8z8BQDwAF/AL+XK5ZVQAAAABJRU5ErkJggg==");
-
-        // Create the source PDF only if it does not already exist (makes the demo idempotent)
         if (!File.Exists(inputPdf))
         {
-            using (Document seed = new Document())
-            {
-                Page page = seed.Pages.Add();
-                // Add the original image to the page
-                // Keep the stream alive for the lifetime of the document – do NOT dispose it here.
-                MemoryStream imgStream = new MemoryStream(originalImageBytes);
-                Image img = new Image { ImageStream = imgStream };
-                // Position the image (coordinates are in points; 0,0 is bottom‑left)
-                img.FixHeight = 100; // 100 points high
-                img.FixWidth = 100;  // 100 points wide
-                page.Paragraphs.Add(img);
-                seed.Save(inputPdf);
-                // The stream can be disposed after the document is saved because the PDF now contains the image data.
-                imgStream.Dispose();
-            }
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(logoPath))
+        {
+            Console.Error.WriteLine($"Logo image not found: {logoPath}");
+            return;
         }
 
-        // ---------------------------------------------------------------------
-        // 2. Prepare the new logo that will replace every image found on the page.
-        //    This is also created in‑memory – no external file is required.
-        // ---------------------------------------------------------------------
-        // Minimal 1x1 blue PNG (the replacement logo)
-        byte[] logoBytes = Convert.FromBase64String(
-            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADUlEQVR42mP8z/CfAQADhgJ/6V6ZVQAAAABJRU5ErkJggg==");
-
-        // ---------------------------------------------------------------------
-        // 3. Load the PDF, locate all image placements and replace them.
-        // ---------------------------------------------------------------------
+        // Load the PDF document
         using (Document doc = new Document(inputPdf))
         {
-            ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-            absorber.Visit(doc);
-
-            foreach (ImagePlacement placement in absorber.ImagePlacements)
+            // Iterate through all pages (Aspose.Pdf pages are 1‑based)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // Each Replace call consumes the stream, so we provide a fresh one.
-                using (MemoryStream logoStream = new MemoryStream(logoBytes))
+                Page page = doc.Pages[pageIndex];
+
+                // Replace every image on the page with the new logo.
+                // The page's Paragraphs collection contains Image objects that represent
+                // raster images placed on the page.
+                for (int i = 0; i < page.Paragraphs.Count; i++)
                 {
-                    placement.Replace(logoStream);
+                    if (page.Paragraphs[i] is Image img)
+                    {
+                        // Preserve the original dimensions (FixWidth / FixHeight) if they are set.
+                        // If they are not set, the image will be rendered using its intrinsic size.
+                        double? originalWidth = img.FixWidth;
+                        double? originalHeight = img.FixHeight;
+
+                        // Load the logo image stream.
+                        using (FileStream logoStream = new FileStream(logoPath, FileMode.Open, FileAccess.Read))
+                        {
+                            img.ImageStream = logoStream;
+                        }
+
+                        // Re‑apply the original dimensions (if any) so the logo occupies the same space.
+                        if (originalWidth.HasValue) img.FixWidth = originalWidth.Value;
+                        if (originalHeight.HasValue) img.FixHeight = originalHeight.Value;
+                    }
                 }
             }
 
+            // Save the modified PDF.
             doc.Save(outputPdf);
         }
 

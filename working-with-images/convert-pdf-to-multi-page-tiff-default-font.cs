@@ -2,45 +2,41 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTiff = "output.tif";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.tiff";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Define the resolution for the TIFF output (e.g., 300 DPI)
+            // Apply a default font substitution for rendering (e.g., map any missing font to Arial)
+            // This ensures that text is rendered even if the original font is unavailable.
+            FontRepository.Substitutions.Add(new SimpleFontSubstitution("*", "Arial"));
+
+            // Define the resolution for the TIFF output (300 DPI)
             Resolution resolution = new Resolution(300);
 
-            // Configure TIFF settings: no compression, default color depth, landscape orientation
-            TiffSettings tiffSettings = new TiffSettings
+            // Create a TiffDevice. The overload without explicit compression uses CCITT Group4 by default.
+            TiffDevice tiffDevice = new TiffDevice(resolution);
+
+            // Convert the entire PDF to a multi‑page TIFF
+            using (FileStream outStream = new FileStream(outputPath, FileMode.Create))
             {
-                Compression = CompressionType.None,
-                Depth = ColorDepth.Default,
-                Shape = ShapeType.Landscape,
-                SkipBlankPages = false
-            };
-
-            // Create the TIFF device with the specified resolution and settings
-            TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
-
-            // Apply a default font for rendering when the original PDF references missing fonts
-            tiffDevice.RenderingOptions.DefaultFontName = "Arial";
-
-            // Convert the entire PDF to a multi‑page TIFF file
-            tiffDevice.Process(pdfDoc, outputTiff);
+                tiffDevice.Process(doc, outStream);
+            }
         }
 
-        Console.WriteLine($"PDF successfully converted to TIFF: {outputTiff}");
+        Console.WriteLine($"PDF successfully converted to TIFF: {outputPath}");
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Vector;
+using Aspose.Pdf.Operators; // for Path operator
 
 class Program
 {
@@ -16,37 +16,31 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Use a using block for deterministic disposal of the Document
         using (Document doc = new Document(inputPath))
         {
-            // Assume we want to modify the first page (1‑based indexing)
+            // Pages collection is 1‑based (global rule)
             Page page = doc.Pages[1];
 
-            // Create an absorber to find all vector graphics on the page
-            GraphicsAbsorber absorber = new GraphicsAbsorber();
-            absorber.Visit(page);
-
-            // If no vector graphics are present, nothing to delete
-            if (absorber.Elements.Count == 0)
+            // The Contents collection is also 1‑based (see fix note).
+            // Iterate over the operators and remove the first Path operator we encounter.
+            for (int i = 1; i <= page.Contents.Count; i++)
             {
-                Console.WriteLine("No vector graphics found on the page.");
-            }
-            else
-            {
-                // Example: delete the first vector graphic found.
-                // Replace this logic with your own criteria (e.g., bounding box, operator count, etc.).
-                var target = absorber.Elements[0];
-
-                // Remove the graphic from the page
-                target.Remove();
-
-                Console.WriteLine("Specified vector graphic has been removed.");
+                // Operators on a page are represented by classes derived from Aspose.Pdf.Operators.Operator.
+                // The vector graphic we want to delete is a Path operator.
+                if (page.Contents[i] is Path)
+                {
+                    // Remove the identified vector graphic from the contents collection.
+                    page.Contents.Delete(i);
+                    Console.WriteLine($"Removed vector graphic (Path operator) at index {i} from page 1.");
+                    break; // exit after removal if only one graphic is targeted
+                }
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

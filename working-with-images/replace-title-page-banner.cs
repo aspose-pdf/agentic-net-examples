@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing; // Image class lives here
 
-class ReplaceTitlePageBanner
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";          // source PDF
-        const string outputPdfPath  = "output.pdf";         // result PDF
-        const string bannerImagePath = "banner_high_res.jpg"; // high‑resolution banner
+        const string inputPdfPath = "input.pdf";
+        const string bannerImagePath = "banner_high_res.jpg";
+        const string outputPdfPath = "output.pdf";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -22,29 +23,34 @@ class ReplaceTitlePageBanner
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdfPath))
         {
-            // Assume the title page is the first page (1‑based indexing)
+            // Title page is the first page (1‑based indexing)
             Page titlePage = doc.Pages[1];
 
-            // Access the image collection of the page
-            var images = titlePage.Resources.Images;
+            // Remove all existing images from the page resources
+            titlePage.Resources.Images.Clear();
 
-            // If there are images on the title page, replace each with the banner
-            for (int i = 1; i <= images.Count; i++)
+            // Load the banner image via ImageStream (Aspose.Pdf.Image has no path ctor)
+            using (FileStream bannerStream = new FileStream(bannerImagePath, FileMode.Open, FileAccess.Read))
             {
-                // Open a fresh stream for each replacement (Replace consumes the stream)
-                using (FileStream bannerStream = File.OpenRead(bannerImagePath))
+                Image banner = new Image
                 {
-                    images.Replace(i, bannerStream);
-                }
-            }
+                    ImageStream = bannerStream,
+                    // Scale the banner to fill the entire page while preserving layout
+                    FixWidth = titlePage.PageInfo.Width,
+                    FixHeight = titlePage.PageInfo.Height
+                };
 
-            // Save the modified PDF
-            doc.Save(outputPdfPath);
+                // Insert the banner at the beginning of the page content
+                titlePage.Paragraphs.Insert(0, banner);
+
+                // Save the modified PDF while the stream is still open
+                doc.Save(outputPdfPath);
+            }
         }
 
-        Console.WriteLine($"Banner replacement completed. Saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Banner replaced on title page. Output saved to '{outputPdfPath}'.");
     }
 }

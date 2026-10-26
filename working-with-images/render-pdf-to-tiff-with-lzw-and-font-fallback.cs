@@ -1,69 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 using Aspose.Pdf.Devices;
-using Aspose.Pdf.Text;   // for font handling if needed
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as necessary
-        string dataDir   = "Data";
-        string pdfPath   = Path.Combine(dataDir, "input.pdf");
-        string tiffPath  = Path.Combine(dataDir, "output.tif");
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "TiffPages";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
+
         // Load the PDF document
-        using (Document pdfDocument = new Document(pdfPath))
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // ------------------------------------------------------------
-            // Default font fallback for missing characters.
-            // PdfSaveOptions.DefaultFontName is used when a font is not
-            // embedded in the source PDF. Saving to a memory stream with
-            // these options forces the fallback to be applied, after which
-            // the document can be rendered to TIFF.
-            // ------------------------------------------------------------
-            PdfSaveOptions fontFallbackOptions = new PdfSaveOptions
+            // Set a default font fallback for missing characters using RenderingOptions
+            RenderingOptions renderOptions = new RenderingOptions();
+            renderOptions.DefaultFontName = "Arial"; // fallback font name
+
+            // Iterate through all pages (1‑based indexing)
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                DefaultFontName = "Arial"   // any installed font can be used
-            };
+                // Configure TIFF settings with LZW compression
+                TiffSettings tiffSettings = new TiffSettings();
+                tiffSettings.Compression = CompressionType.LZW; // LZW compression
 
-            using (MemoryStream fallbackStream = new MemoryStream())
-            {
-                // Save to memory with the fallback options (no file is created)
-                pdfDocument.Save(fallbackStream, fontFallbackOptions);
-                fallbackStream.Position = 0;
+                // Create a TIFF device with desired resolution and settings
+                TiffDevice tiffDevice = new TiffDevice(new Resolution(300), tiffSettings);
+                tiffDevice.RenderingOptions = renderOptions; // apply fallback font
 
-                // Reload the document so the fallback font is taken into account
-                using (Document fallbackDoc = new Document(fallbackStream))
-                {
-                    // Create a resolution of 300 DPI for the TIFF output
-                    Resolution resolution = new Resolution(300);
+                // Build output file name for the current page
+                string outputTiffPath = Path.Combine(outputFolder, $"Page_{pageNumber}.tiff");
 
-                    // Configure TIFF settings – LZW compression, default depth, portrait shape
-                    TiffSettings tiffSettings = new TiffSettings
-                    {
-                        Compression = CompressionType.LZW,
-                        Depth = ColorDepth.Default,
-                        Shape = ShapeType.Portrait,
-                        SkipBlankPages = false
-                    };
-
-                    // Initialise the TIFF device with the resolution and settings
-                    TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
-
-                    // Render all pages of the PDF into a single multi‑page TIFF file
-                    tiffDevice.Process(fallbackDoc, tiffPath);
-                }
+                // Render the page to TIFF
+                tiffDevice.Process(pdfDoc.Pages[pageNumber], outputTiffPath);
             }
         }
 
-        Console.WriteLine($"TIFF image saved to: {tiffPath}");
+        Console.WriteLine("PDF pages have been rendered to TIFF with LZW compression.");
     }
 }

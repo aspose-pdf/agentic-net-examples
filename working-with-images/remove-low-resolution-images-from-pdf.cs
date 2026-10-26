@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,40 +15,60 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Absorb all image placements in the document
+            ImagePlacementAbsorber imgAbsorber = new ImagePlacementAbsorber();
+            doc.Pages.Accept(imgAbsorber);
+
+            // Iterate over each image placement
+            foreach (ImagePlacement placement in imgAbsorber.ImagePlacements)
             {
-                // Create an absorber to find image placements on the current page
-                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
+                XImage xImg = placement.Image;
+                if (xImg == null)
+                    continue;
 
-                // Perform the search on the page
-                doc.Pages[pageIndex].Accept(absorber);
-
-                // Examine each found image placement
-                foreach (ImagePlacement placement in absorber.ImagePlacements)
+                // Calculate DPI using the image's pixel size and the placement size (in points).
+                // 1 point = 1/72 inch.
+                double dpiX = 0, dpiY = 0;
+                if (placement.Rectangle != null &&
+                    placement.Rectangle.Width > 0 && placement.Rectangle.Height > 0)
                 {
-                    // Image resolution is expressed in DPI (horizontal and vertical)
-                    double dpiX = placement.Resolution.X;
-                    double dpiY = placement.Resolution.Y;
+                    dpiX = (xImg.Width * 72.0) / placement.Rectangle.Width;
+                    dpiY = (xImg.Height * 72.0) / placement.Rectangle.Height;
+                }
 
-                    // Delete images whose DPI is lower than 72 on either axis
-                    if (dpiX < 72 || dpiY < 72)
+                // If DPI information could not be derived, skip this image.
+                if (dpiX == 0 && dpiY == 0)
+                    continue;
+
+                // Check if either horizontal or vertical DPI is below the threshold
+                if (dpiX < 72 || dpiY < 72)
+                {
+                    // Find the page that contains this image (fallback when PageNumber is unavailable)
+                    Page targetPage = null;
+                    foreach (Page p in doc.Pages)
                     {
-                        placement.Hide(); // removes the image from the page
+                        if (p.Resources != null && p.Resources.Images != null && p.Resources.Images.Contains(xImg))
+                        {
+                            targetPage = p;
+                            break;
+                        }
+                    }
+
+                    if (targetPage != null && targetPage.Resources != null && targetPage.Resources.Images != null)
+                    {
+                        targetPage.Resources.Images.Remove(xImg);
+                        Console.WriteLine($"Removed image on page {targetPage.Number} with DPI {dpiX:F1}x{dpiY:F1}");
                     }
                 }
             }
 
-            // Optional: remove now‑unused resources to shrink the file
-            doc.OptimizeResources();
-
-            // Save the modified PDF (lifecycle rule: use Document.Save)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Processing complete. Output saved to '{outputPath}'.");
     }
 }

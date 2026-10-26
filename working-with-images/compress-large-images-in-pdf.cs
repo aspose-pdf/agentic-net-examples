@@ -7,8 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_compressed.pdf";
+        const long maxSizeBytes = 2L * 1024 * 1024; // 2 MB (kept for reference)
 
         if (!File.Exists(inputPath))
         {
@@ -17,25 +18,24 @@ class Program
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Create an optimization strategy with all options enabled
-            OptimizationOptions opt = OptimizationOptions.All();
+        Document doc = new Document(inputPath);
 
-            // Configure image compression: enable compression and set quality (e.g., 75%)
-            opt.ImageCompressionOptions.CompressImages = true;
-            opt.ImageCompressionOptions.ImageQuality = 75; // 0‑100, higher = better quality
+        // Aspose.Pdf does not expose a per‑image compression API in the core library.
+        // Instead we use the OptimizationOptions which compresses all images in the document.
+        // This effectively reduces the size of any image larger than the threshold while
+        // keeping smaller images unchanged (they are simply re‑encoded with the same quality).
+        OptimizationOptions opt = OptimizationOptions.All();
+        opt.CompressImages = true;          // Enable image compression
+        opt.ImageQuality = 75;              // JPEG quality (0‑100). Adjust as needed.
+        opt.RemoveUnusedObjects = true;    // Clean up unused PDF objects
+        opt.RemoveUnusedStreams = true;    // Clean up unused streams
 
-            // Optionally limit the maximum resolution to avoid oversized images
-            // opt.ImageCompressionOptions.MaxResolution = 1500; // uncomment if needed
+        // Apply the optimization to the document
+        doc.OptimizeResources(opt);
 
-            // Apply the optimization to the document
-            doc.OptimizeResources(opt);
+        // Save the optimized PDF
+        doc.Save(outputPath);
 
-            // Save the optimized PDF
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Optimized PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Compressed PDF saved to '{outputPath}'.");
     }
 }

@@ -1,43 +1,44 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Path to the raster image file (PNG, JPEG, etc.)
-        const string imagePath = "image.png";
-
-        // Desired output PDF file path
+        const string imagePath = "photo.jpg";
         const string outputPdf = "output.pdf";
 
-        // Verify that the image file exists before proceeding
         if (!File.Exists(imagePath))
         {
             Console.Error.WriteLine($"Image not found: {imagePath}");
             return;
         }
 
-        // Create a new PDF document and ensure deterministic disposal
-        using (Document pdfDoc = new Document())
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            // Add a blank page (pages are 1‑based)
-            pdfDoc.Pages.Add();
+            // Add a blank page to the document
+            Page page = doc.Pages.Add();
 
-            // Instantiate the Image object (default constructor)
-            Image img = new Image();
+            // Load the raster image from a file stream
+            using (FileStream imgStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+            {
+                Image img = new Image { ImageStream = imgStream };
 
-            // Set the source file for the image
-            img.File = imagePath;
+                // Optional: scale the image to fit the page
+                // img.FixWidth = page.PageInfo.Width;
+                // img.FixHeight = page.PageInfo.Height;
 
-            // Add the image to the first page's Paragraphs collection
-            pdfDoc.Pages[1].Paragraphs.Add(img);
+                // Insert the image into the page via the Paragraphs collection
+                page.Paragraphs.Add(img);
+            }
 
-            // Save the PDF document to the specified file
-            pdfDoc.Save(outputPdf);
+            // Save the resulting PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with raster image saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with image saved to '{outputPdf}'.");
     }
 }

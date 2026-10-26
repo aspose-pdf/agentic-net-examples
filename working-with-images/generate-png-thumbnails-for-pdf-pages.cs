@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // ThumbnailDevice resides in this namespace
+using Aspose.Pdf.Devices;   // PngDevice for rasterizing pages
 
 class Program
 {
@@ -10,35 +10,35 @@ class Program
         const string inputPdfPath = "input.pdf";
         const string outputFolder = "Thumbnails";
 
-        // Verify input file exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Create a ThumbnailDevice with the required thumbnail dimensions (150x200 pixels)
-            ThumbnailDevice thumbnailDevice = new ThumbnailDevice(150, 200);
-
-            // Iterate over all pages (Aspose.Pdf uses 1‑based page indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+            // Pages are 1‑based (see page-indexing-one-based rule)
+            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
             {
-                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
+                // Build the output file name for the current page
+                string outputPath = Path.Combine(outputFolder, $"page_{pageIndex}.png");
 
-                // Process each page and write the PNG thumbnail to a file stream
-                using (FileStream outputStream = new FileStream(outputPath, FileMode.Create))
+                // PngDevice creates PNG images; the constructor (width, height) sets the thumbnail size
+                PngDevice pngDevice = new PngDevice(150, 200);
+
+                // Render the page to a PNG file
+                using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
-                    thumbnailDevice.Process(pdfDocument.Pages[pageNumber], outputStream);
+                    pngDevice.Process(pdfDoc.Pages[pageIndex], outStream);
                 }
             }
         }
 
-        Console.WriteLine("Thumbnail generation completed.");
+        Console.WriteLine("Thumbnail images generated successfully.");
     }
 }

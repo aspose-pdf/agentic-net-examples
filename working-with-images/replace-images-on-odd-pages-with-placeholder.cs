@@ -1,19 +1,19 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // ImagePlacementAbsorber and related types are here
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string placeholderImg = "placeholder.jpg";
+        const string inputPath      = "input.pdf";
+        const string outputPath     = "output.pdf";
+        const string placeholderImg = "placeholder.png"; // path to the placeholder graphic
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
@@ -23,34 +23,50 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Iterate over pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
             for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
                 // Process only odd‑numbered pages
                 if (pageNum % 2 == 0) continue;
 
-                // Absorb image placements on the current page
-                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-                doc.Pages[pageNum].Accept(absorber);
+                Page page = doc.Pages[pageNum];
 
-                // Replace each found image with the placeholder while keeping its rectangle, rotation, etc.
-                foreach (ImagePlacement placement in absorber.ImagePlacements)
+                // Iterate over all images on the page
+                foreach (XImage img in page.Resources.Images)
                 {
-                    // Open the placeholder image stream for each replacement
-                    using (FileStream placeholderStream = File.OpenRead(placeholderImg))
+                    // Preserve the original image dimensions
+                    double originalWidth  = img.Width;
+                    double originalHeight = img.Height;
+
+                    // Create an ImageStamp that uses the placeholder graphic
+                    ImageStamp placeholderStamp = new ImageStamp(placeholderImg)
                     {
-                        placement.Replace(placeholderStream);
-                    }
+                        // Set the stamp size to match the original image dimensions
+                        Width   = originalWidth,
+                        Height  = originalHeight,
+
+                        // Position the stamp at the lower‑left corner of the page.
+                        // Exact original coordinates are not directly accessible via the core API,
+                        // so we place the stamp at (0,0). Adjust XIndent/YIndent if needed.
+                        XIndent = 0,
+                        YIndent = 0,
+
+                        // Ensure the stamp is drawn over existing content
+                        Background = false
+                    };
+
+                    // Add the stamp to the current page (it will appear on top of the original image)
+                    page.AddStamp(placeholderStamp);
                 }
             }
 
-            // Save the modified PDF (PDF format, no SaveOptions needed)
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Images on odd pages replaced. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

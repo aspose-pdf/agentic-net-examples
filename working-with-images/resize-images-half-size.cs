@@ -1,13 +1,12 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // required for Image class hierarchy
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "resized_output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,30 +15,28 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over all pages
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
-
-                // Iterate over all paragraph elements on the page
-                for (int j = 1; j <= page.Paragraphs.Count; j++)
+                // The page may contain Image objects (Aspose.Pdf.Image) in its Paragraphs collection.
+                // These objects expose the ImageScale property which can be used to resize the image.
+                foreach (var paragraph in page.Paragraphs)
                 {
-                    // Check if the paragraph is an Image
-                    if (page.Paragraphs[j] is Image img)
+                    if (paragraph is Image imgObj)
                     {
-                        // Scale the image to 50 % of its original size
-                        img.ImageScale = 0.5;
+                        // Scale the image to 50% of its original size.
+                        imgObj.ImageScale = 0.5f;
                     }
                 }
             }
 
-            // Save the modified document as PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All images have been resized and saved to '{outputPath}'.");
+        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
     }
 }

@@ -1,51 +1,53 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // JpegDevice resides here
+using Aspose.Pdf.Devices;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputDir = "output_images";
-        const string defaultFont = "Arial"; // Font used when glyphs are missing
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "PagesAsJpeg";
+        const string defaultFontName = "Arial Unicode MS"; // font used for missing glyphs
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document pdfDocument = new Document(inputPath))
+        // Register a global font substitution so that any missing glyphs are rendered
+        // with the specified default font. The wildcard "*" applies the substitution to
+        // all source fonts that are not found.
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("*", defaultFontName));
+
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Define the resolution for the JPEG images (e.g., 300 DPI)
-            Resolution resolution = new Resolution(300);
+            // JpegDevice settings (resolution 150 DPI, quality 90)
+            var jpegDevice = new JpegDevice(new Resolution(150), 90);
 
-            // Initialize the JPEG device with the chosen resolution
-            JpegDevice jpegDevice = new JpegDevice(resolution);
-
-            // Set the default font name for glyph substitution during rendering
-            jpegDevice.RenderingOptions.DefaultFontName = defaultFont;
-
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpeg");
+                // Build output file name for the current page
+                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.jpg");
 
-                // Create a file stream for the output JPEG image
-                using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
+                // Render the page to JPEG
+                using (FileStream imageStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
-                    // Render the current page to JPEG and write it to the stream
-                    jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
+                    jpegDevice.Process(pdfDoc.Pages[pageNumber], imageStream);
                 }
 
-                Console.WriteLine($"Saved page {pageNumber} as JPEG to '{outputPath}'.");
+                Console.WriteLine($"Rendered page {pageNumber} to {outputPath}");
             }
         }
+
+        Console.WriteLine("All pages have been rendered to JPEG images.");
     }
 }
