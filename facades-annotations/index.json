@@ -1,32 +1,8 @@
 {
   "category": "facades-annotations",
   "nuget_version": "26.9.0",
-  "last_updated": "2026-10-21T08:02:57Z",
+  "last_updated": "2026-10-26T07:23:38Z",
   "examples": {
-    "remove-all-annotations-from-pdf": {
-      "title": "Remove All Annotations from PDF",
-      "filename": "remove-all-annotations-from-pdf.cs",
-      "description": "Shows how to load a PDF, iterate through each page, delete all annotations, and save the cleaned document using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "remove",
-        "aspose.pdf",
-        "console"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.PageCollection",
-        "Aspose.Pdf.Page.Annotations",
-        "Aspose.Pdf.Page.Annotations.Delete",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
-      "status": "verified",
-      "task_id": "21642"
-    },
     "remove-all-annotations-from-pdfs": {
       "title": "Delete All Annotations from PDFs in a Folder",
       "filename": "remove-all-annotations-from-pdfs.cs",
@@ -47,7 +23,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21602"
     },
@@ -69,7 +45,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21603"
     },
@@ -92,52 +68,32 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21604"
     },
     "delete-pdf-annotation-by-name": {
-      "title": "Delete PDF Annotation by Name using Aspose.Pdf",
+      "title": "Delete a Specific Annotation from a PDF",
       "filename": "delete-pdf-annotation-by-name.cs",
-      "description": "Demonstrates how to remove a specific annotation from a PDF by passing its name to the DeleteAnnotation method of PdfAnnotationEditor.",
+      "description": "Shows how to locate an annotation named \"Comment1\" in a PDF, remove it using Aspose.Pdf, and save the updated document.",
       "tags": [
         "annotation",
         "delete",
         "pdf",
-        "Aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotation",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
-      "status": "verified",
-      "task_id": "21606"
-    },
-    "export-pdf-annotations-to-xfdf": {
-      "title": "Export PDF Annotations to XFDF Using MemoryStream",
-      "filename": "export-pdf-annotations-to-xfdf.cs",
-      "description": "Shows how to load a PDF from a byte array, export its annotations to XFDF via the Aspose.Pdf.Xfdf assembly, and return the XFDF data as a byte array.",
-      "tags": [
-        "pdf",
-        "annotations",
-        "xfdf",
-        "memorystream",
-        "reflection"
+        "Aspose.Pdf",
+        "document"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Xfdf.XfdfWriter",
-        "Aspose.Pdf.Xfdf.XfdfWriter.WriteAnnotations"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.AnnotationCollection.Delete",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
-      "task_id": "21621"
+      "task_id": "21605"
     },
     "export-annotations-to-xfdf-stream": {
       "title": "Export Annotations from Specific PDF Pages to XFDF Memory Stream",
@@ -157,31 +113,9 @@
         "Aspose.Pdf.Facades"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21608"
-    },
-    "import-xfdf-annotations-into-pdf": {
-      "title": "Import XFDF Annotations into PDF",
-      "filename": "import-xfdf-annotations-into-pdf.cs",
-      "description": "Shows how to bind an existing PDF with PdfAnnotationEditor, import annotations from an XFDF file, and save the updated document.",
-      "tags": [
-        "xfdf",
-        "annotations",
-        "pdf",
-        "import",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotations",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
-      "status": "verified",
-      "task_id": "21610"
     },
     "import-xfdf-annotations-to-specific-pages": {
       "title": "Import XFDF Annotations to Specific PDF Pages",
@@ -203,7 +137,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21611"
     },
@@ -226,32 +160,32 @@
         "Aspose.Pdf.Annotations.AnnotationType"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21612"
     },
     "flatten-pdf-annotations": {
-      "title": "Flatten PDF Annotations While Preserving Appearance",
+      "title": "Flatten PDF Annotations to Non‑Editable Elements",
       "filename": "flatten-pdf-annotations.cs",
-      "description": "Demonstrates how to convert interactive PDF annotations into static graphics, keeping their visual appearance, by using Aspose.Pdf's annotation editor to flatten them.",
+      "description": "Shows how to load a PDF, flatten all annotations into static visual content, and save the resulting document using Aspose.Pdf.Facades.",
       "tags": [
         "flatten",
         "annotations",
         "pdf",
-        "appearance",
-        "Aspose"
+        "Aspose.Pdf",
+        "facade"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfAnnotationEditor",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
         "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Close"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
-      "task_id": "21684"
+      "task_id": "21613"
     },
     "flatten-annotations-first-five-pages": {
       "title": "Flatten Annotations on the First Five PDF Pages",
@@ -272,7 +206,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21614"
     },
@@ -294,7 +228,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21615"
     },
@@ -319,7 +253,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21616"
     },
@@ -343,7 +277,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21617"
     },
@@ -366,7 +300,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21618"
     },
@@ -390,7 +324,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21619"
     },
@@ -415,7 +349,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21620"
     },
@@ -438,7 +372,7 @@
         "PdfAnnotationEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21623"
     },
@@ -457,7 +391,7 @@
         "Aspose.Pdf.Facades.Xfdf2Pdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21624"
     },
@@ -481,7 +415,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21625"
     },
@@ -504,32 +438,9 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21626"
-    },
-    "export-pdf-annotations-to-json": {
-      "title": "Extract PDF Annotations to JSON Log",
-      "filename": "export-pdf-annotations-to-json.cs",
-      "description": "Loads a PDF, iterates through all pages and their annotations, extracts key properties (type, rectangle, contents, title, subject) and writes the data as a pretty‑printed JSON file for auditing.",
-      "tags": [
-        "annotations",
-        "json",
-        "pdf",
-        "logging",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotation",
-        "Aspose.Pdf.TextAnnotation",
-        "Aspose.Pdf.Rectangle"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
-      "status": "verified",
-      "task_id": "21627"
     },
     "delete-pdf-annotation-with-error-handling": {
       "title": "Delete Annotation with Error Handling",
@@ -550,7 +461,7 @@
         "Aspose.Pdf.PdfException"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21628"
     },
@@ -574,7 +485,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21629"
     },
@@ -598,31 +509,9 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21630"
-    },
-    "export-import-pdf-annotations-xfdf": {
-      "title": "Export and Import PDF Annotations via XFDF",
-      "filename": "export-import-pdf-annotations-xfdf.cs",
-      "description": "Shows how to export annotations from a source PDF to an XFDF file and then import that XFDF into another PDF to duplicate the annotation layout.",
-      "tags": [
-        "annotations",
-        "xfdf",
-        "pdf",
-        "export",
-        "import"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.ExportAnnotationsToXfdf",
-        "Aspose.Pdf.Document.ImportAnnotationsFromXfdf",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
-      "status": "verified",
-      "task_id": "21631"
     },
     "batch-flatten-pdf-annotations": {
       "title": "Batch Flatten PDF Annotations",
@@ -642,7 +531,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21632"
     },
@@ -665,31 +554,9 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21633"
-    },
-    "import-xfdf-annotations-into-multiple-pdfs": {
-      "title": "Import XFDF Annotations into Multiple PDFs",
-      "filename": "import-xfdf-annotations-into-multiple-pdfs.cs",
-      "description": "Shows how to load a single XFDF file containing reviewer comments and apply those annotations to several PDF documents, saving the annotated versions to an output folder.",
-      "tags": [
-        "xfdf",
-        "annotations",
-        "pdf",
-        "batch",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfAnnotationEditor",
-        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotations",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
-      "status": "verified",
-      "task_id": "21634"
     },
     "delete-pdf-annotations-in-parallel": {
       "title": "Delete All Annotations from PDFs in Parallel",
@@ -707,7 +574,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21635"
     },
@@ -729,7 +596,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21636"
     },
@@ -753,7 +620,7 @@
         "Aspose.Pdf.Annotations.Annotation.Name"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21637"
     },
@@ -777,7 +644,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21638"
     },
@@ -800,7 +667,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21639"
     },
@@ -823,7 +690,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21640"
     },
@@ -846,7 +713,7 @@
         "Aspose.Pdf.Page.Annotations.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21641"
     },
@@ -869,7 +736,7 @@
         "PdfAnnotationEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21643"
     },
@@ -891,7 +758,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21644"
     },
@@ -913,7 +780,7 @@
         "Aspose.Pdf.Annotations.MarkupAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21645"
     },
@@ -937,7 +804,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21646"
     },
@@ -960,7 +827,7 @@
         "Aspose.Pdf.Document"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21647"
     },
@@ -984,7 +851,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21648"
     },
@@ -1007,7 +874,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21649"
     },
@@ -1029,7 +896,7 @@
         "PdfAnnotationEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21650"
     },
@@ -1053,7 +920,7 @@
         "PdfAnnotationEditor.ModifyAnnotations"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21651"
     },
@@ -1076,7 +943,7 @@
         "PdfAnnotationEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21652"
     },
@@ -1099,7 +966,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21653"
     },
@@ -1121,7 +988,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21655"
     },
@@ -1143,7 +1010,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21656"
     },
@@ -1167,7 +1034,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21657"
     },
@@ -1189,7 +1056,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21658"
     },
@@ -1213,7 +1080,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21659"
     },
@@ -1236,7 +1103,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21660"
     },
@@ -1259,7 +1126,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Dispose"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21661"
     },
@@ -1283,7 +1150,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21662"
     },
@@ -1306,7 +1173,7 @@
         "Aspose.Pdf.Facades.XfdfWriter.WriteAnnotations"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21663"
     },
@@ -1330,7 +1197,7 @@
         "Aspose.Pdf.Devices.Resolution"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21665"
     },
@@ -1353,7 +1220,7 @@
         "Aspose.Pdf.Facades.Pdf2Xfdf.ExportXfdf"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21667"
     },
@@ -1377,7 +1244,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21668"
     },
@@ -1400,7 +1267,7 @@
         "Aspose.Pdf.Annotations.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21669"
     },
@@ -1424,32 +1291,9 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21670"
-    },
-    "batch-import-xfdf-annotations-into-pdfs": {
-      "title": "Batch Import XFDF Data into Matching PDFs",
-      "filename": "batch-import-xfdf-annotations-into-pdfs.cs",
-      "description": "Demonstrates iterating over a folder, matching each PDF with an XFDF file of the same name, importing the XFDF data using the Form facade, and saving the updated PDFs.",
-      "tags": [
-        "xfdf",
-        "batch-processing",
-        "pdf-forms",
-        "aspose-pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.Form",
-        "Aspose.Pdf.Facades.Form.BindPdf",
-        "Aspose.Pdf.Facades.Form.ImportXfdf",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
-      "status": "verified",
-      "task_id": "21671"
     },
     "concurrent-insert-delete-pdf": {
       "title": "Concurrent Import and Delete Operations on a PDF",
@@ -1468,7 +1312,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21672"
     },
@@ -1490,7 +1334,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21673"
     },
@@ -1514,7 +1358,7 @@
         "Aspose.Pdf.Page.Annotations"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21674"
     },
@@ -1537,7 +1381,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21675"
     },
@@ -1560,7 +1404,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21676"
     },
@@ -1583,7 +1427,7 @@
         "Aspose.Pdf.Xfdf.XfdfWriter.WriteAnnotations"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21677"
     },
@@ -1606,7 +1450,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21678"
     },
@@ -1629,7 +1473,7 @@
         "Aspose.Pdf.Page.Annotations"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21679"
     },
@@ -1654,7 +1498,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21681"
     },
@@ -1677,7 +1521,7 @@
         "Aspose.Pdf.Page.Annotations"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21682"
     },
@@ -1701,7 +1545,7 @@
         "Aspose.Pdf.Text.FontStyles"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21683"
     },
@@ -1724,7 +1568,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21685"
     },
@@ -1745,7 +1589,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21686"
     },
@@ -1768,7 +1612,7 @@
         "Aspose.Pdf.Xfdf.XfdfWriter.WriteAnnotations"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21687"
     },
@@ -1789,7 +1633,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21688"
     },
@@ -1811,7 +1655,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21689"
     },
@@ -1835,7 +1679,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21690"
     },
@@ -1858,7 +1702,7 @@
         "Aspose.Pdf.Annotations.AnnotationType"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21691"
     },
@@ -1881,7 +1725,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21692"
     },
@@ -1904,7 +1748,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21693"
     },
@@ -1924,7 +1768,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21694"
     },
@@ -1947,7 +1791,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21695"
     },
@@ -1971,7 +1815,7 @@
         "PdfPage.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21696"
     },
@@ -1995,7 +1839,7 @@
         "Aspose.Pdf.Page.Annotations"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21697"
     },
@@ -2020,7 +1864,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21698"
     },
@@ -2043,7 +1887,7 @@
         "Aspose.Pdf.Annotations.AnnotationCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21699"
     },
@@ -2067,7 +1911,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21700"
     },
@@ -2087,7 +1931,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.ExportAnnotations"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21701"
     },
@@ -2111,7 +1955,7 @@
         "Aspose.Pdf.Page.Annotations"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21702"
     },
@@ -2131,7 +1975,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21703"
     },
@@ -2154,7 +1998,7 @@
         "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21704"
     },
@@ -2175,7 +2019,7 @@
         "Aspose.Pdf.PdfFormat"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21705"
     },
@@ -2196,7 +2040,7 @@
         "Aspose.Pdf.Xfdf.XfdfWriter.WriteAnnotations"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21706"
     },
@@ -2219,7 +2063,7 @@
         "PdfXfdfForm.Dispose"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21707"
     },
@@ -2244,9 +2088,254 @@
         "Aspose.Pdf.Annotations.AnnotationCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:02:57Z",
+      "generated_at": "2026-10-26T07:23:38Z",
       "status": "verified",
       "task_id": "21664"
+    },
+    "remove-all-annotations-from-pdf__v3": {
+      "title": "Remove All Annotations from a PDF",
+      "filename": "remove-all-annotations-from-pdf__v3.cs",
+      "description": "Shows how to bind a PDF to PdfAnnotationEditor, delete every annotation, and save the cleaned document to a new file.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "delete",
+        "Aspose.Pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:23:38Z",
+      "status": "verified",
+      "task_id": "21601"
+    },
+    "delete-pdf-annotation-by-name__v2": {
+      "title": "Delete PDF Annotation by Name using Aspose.Pdf",
+      "filename": "delete-pdf-annotation-by-name__v2.cs",
+      "description": "Demonstrates how to remove a specific annotation from a PDF by passing its name to the DeleteAnnotation method of PdfAnnotationEditor.",
+      "tags": [
+        "annotation",
+        "delete",
+        "pdf",
+        "Aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.DeleteAnnotation",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:23:38Z",
+      "status": "verified",
+      "task_id": "21606"
+    },
+    "export-pdf-annotations-to-xfdf__v4": {
+      "title": "Export PDF Annotations to XFDF",
+      "filename": "export-pdf-annotations-to-xfdf__v4.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf and exporting all its annotations to an XFDF file using the XfdfWriter class.",
+      "tags": [
+        "annotations",
+        "xfdf",
+        "export",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Xfdf.XfdfWriter",
+        "Aspose.Pdf.Xfdf.XfdfWriter.WriteAnnotations"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:23:38Z",
+      "status": "verified",
+      "task_id": "21607"
+    },
+    "import-xfdf-annotations-into-pdf__v3": {
+      "title": "Import XFDF Annotations into PDF",
+      "filename": "import-xfdf-annotations-into-pdf__v3.cs",
+      "description": "Shows how to bind an existing PDF with PdfAnnotationEditor, import annotations from an XFDF file, and save the updated document.",
+      "tags": [
+        "xfdf",
+        "annotations",
+        "pdf",
+        "import",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotations",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:23:38Z",
+      "status": "verified",
+      "task_id": "21610"
+    },
+    "export-pdf-annotations-to-xfdf__v5": {
+      "title": "Export PDF Annotations to XFDF Using MemoryStream",
+      "filename": "export-pdf-annotations-to-xfdf__v5.cs",
+      "description": "Shows how to load a PDF from a byte array, export its annotations to XFDF via the Aspose.Pdf.Xfdf assembly, and return the XFDF data as a byte array.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "xfdf",
+        "memorystream",
+        "reflection"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Xfdf.XfdfWriter",
+        "Aspose.Pdf.Xfdf.XfdfWriter.WriteAnnotations"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:23:38Z",
+      "status": "verified",
+      "task_id": "21621"
+    },
+    "export-pdf-annotations-to-json__v2": {
+      "title": "Extract PDF Annotations to JSON Log",
+      "filename": "export-pdf-annotations-to-json__v2.cs",
+      "description": "Loads a PDF, iterates through all pages and their annotations, extracts key properties (type, rectangle, contents, title, subject) and writes the data as a pretty‑printed JSON file for auditing.",
+      "tags": [
+        "annotations",
+        "json",
+        "pdf",
+        "logging",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotation",
+        "Aspose.Pdf.TextAnnotation",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:23:38Z",
+      "status": "verified",
+      "task_id": "21627"
+    },
+    "export-import-pdf-annotations-xfdf__v2": {
+      "title": "Export and Import PDF Annotations via XFDF",
+      "filename": "export-import-pdf-annotations-xfdf__v2.cs",
+      "description": "Shows how to export annotations from a source PDF to an XFDF file and then import that XFDF into another PDF to duplicate the annotation layout.",
+      "tags": [
+        "annotations",
+        "xfdf",
+        "pdf",
+        "export",
+        "import"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ExportAnnotationsToXfdf",
+        "Aspose.Pdf.Document.ImportAnnotationsFromXfdf",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:23:38Z",
+      "status": "verified",
+      "task_id": "21631"
+    },
+    "import-xfdf-annotations-into-multiple-pdfs__v2": {
+      "title": "Import XFDF Annotations into Multiple PDFs",
+      "filename": "import-xfdf-annotations-into-multiple-pdfs__v2.cs",
+      "description": "Shows how to load a single XFDF file containing reviewer comments and apply those annotations to several PDF documents, saving the annotated versions to an output folder.",
+      "tags": [
+        "xfdf",
+        "annotations",
+        "pdf",
+        "batch",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.ImportAnnotations",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:23:38Z",
+      "status": "verified",
+      "task_id": "21634"
+    },
+    "remove-all-annotations-from-pdf__v4": {
+      "title": "Remove All Annotations from PDF",
+      "filename": "remove-all-annotations-from-pdf__v4.cs",
+      "description": "Shows how to load a PDF, iterate through each page, delete all annotations, and save the cleaned document using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "remove",
+        "aspose.pdf",
+        "console"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.Page.Annotations",
+        "Aspose.Pdf.Page.Annotations.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:23:38Z",
+      "status": "verified",
+      "task_id": "21642"
+    },
+    "batch-import-xfdf-annotations-into-pdfs__v2": {
+      "title": "Batch Import XFDF Data into Matching PDFs",
+      "filename": "batch-import-xfdf-annotations-into-pdfs__v2.cs",
+      "description": "Demonstrates iterating over a folder, matching each PDF with an XFDF file of the same name, importing the XFDF data using the Form facade, and saving the updated PDFs.",
+      "tags": [
+        "xfdf",
+        "batch-processing",
+        "pdf-forms",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.Form",
+        "Aspose.Pdf.Facades.Form.BindPdf",
+        "Aspose.Pdf.Facades.Form.ImportXfdf",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:23:38Z",
+      "status": "verified",
+      "task_id": "21671"
+    },
+    "flatten-pdf-annotations__v2": {
+      "title": "Flatten PDF Annotations While Preserving Appearance",
+      "filename": "flatten-pdf-annotations__v2.cs",
+      "description": "Demonstrates how to convert interactive PDF annotations into static graphics, keeping their visual appearance, by using Aspose.Pdf's annotation editor to flatten them.",
+      "tags": [
+        "flatten",
+        "annotations",
+        "pdf",
+        "appearance",
+        "Aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfAnnotationEditor.FlatteningAnnotations",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:23:38Z",
+      "status": "verified",
+      "task_id": "21684"
     }
   }
 }
