@@ -16,28 +16,30 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPdf);
-        int pageCount = pdfDocument.Pages.Count;
-
-        // Process each page sequentially and save as JPEG
-        for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
+        // Load PDF document (Document implements IDisposable, so we can use a using block)
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
+            // 72 DPI keeps the original page size (1 point = 1 pixel at 72 DPI)
+            var resolution = new Resolution(72);
 
-            // Create a JPEG device with the desired resolution (150 DPI)
-            var jpegDevice = new JpegDevice(new Resolution(150));
+            // JpegDevice does NOT implement IDisposable – instantiate it directly
+            var jpegDevice = new JpegDevice(resolution, 100); // 100 = max quality
 
-            // Convert the current page to JPEG and write directly to a file stream
-            using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
+            // Iterate through all pages
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
+                string outputPath = Path.Combine(outputDir, $"Page_{pageNumber}.jpg");
+
+                // Only the stream needs to be disposed
+                using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                {
+                    jpegDevice.Process(pdfDoc.Pages[pageNumber], outStream);
+                }
+
+                Console.WriteLine($"Saved page {pageNumber} as JPEG to '{outputPath}'.");
             }
         }
-
-        Console.WriteLine("PDF pages have been converted to JPEG images.");
     }
 }
