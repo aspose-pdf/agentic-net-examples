@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string targetId = "YOUR_ANNOTATION_ID"; // replace with the actual Id (Annotation.Name)
+        const string annotationName = "unique-id-to-delete"; // the identifier stored in the Name property
 
         if (!File.Exists(inputPath))
         {
@@ -17,44 +17,43 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least two pages
+            // Verify that page two exists (Aspose.Pdf uses 1‑based indexing)
             if (doc.Pages.Count < 2)
             {
-                Console.Error.WriteLine("The document does not contain a page 2.");
+                Console.Error.WriteLine("Document has less than two pages.");
                 return;
             }
 
-            // Pages are 1‑based; page two is accessed with index 2
-            Page page = doc.Pages[2];
+            // Retrieve page two
+            Page pageTwo = doc.Pages[2];
 
-            Annotation annotationToDelete = null;
-
-            // Iterate through annotations on the page to find the one with the matching Name (Id)
-            foreach (Annotation ann in page.Annotations)
+            // Locate the annotation with the specified Name (unique identifier)
+            Annotation? target = null;
+            foreach (Annotation annot in pageTwo.Annotations)
             {
-                // In Aspose.Pdf for .NET the unique identifier is the Name property
-                if (ann.Name == targetId)
+                if (!string.IsNullOrEmpty(annot.Name) &&
+                    annot.Name.Equals(annotationName, StringComparison.Ordinal))
                 {
-                    annotationToDelete = ann;
+                    target = annot;
                     break;
                 }
             }
 
-            // If the annotation was found, delete it from the collection
-            if (annotationToDelete != null)
+            if (target != null)
             {
-                page.Annotations.Delete(annotationToDelete);
-                Console.WriteLine($"Annotation with Id '{targetId}' deleted from page 2.");
+                // Remove the annotation from the page's annotation collection
+                pageTwo.Annotations.Remove(target);
+                Console.WriteLine($"Annotation with Name '{annotationName}' removed from page 2.");
             }
             else
             {
-                Console.WriteLine($"Annotation with Id '{targetId}' not found on page 2.");
+                Console.WriteLine($"Annotation with Name '{annotationName}' not found on page 2.");
             }
 
-            // Save the modified PDF (lifecycle rule: save inside using block)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

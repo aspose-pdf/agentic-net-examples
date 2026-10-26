@@ -7,43 +7,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string url = "https://www.example.com";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_link.pdf";
+        const string url        = "https://example.com";
 
-        // If the source PDF does not exist, create a minimal one.
         if (!File.Exists(inputPath))
         {
-            using (Document doc = new Document())
-            {
-                doc.Pages.Add(); // add a blank page
-                doc.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Open the PDF, add a link annotation, and save.
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing).
+            // Choose the page where the annotation will be placed (first page in this example)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (llx, lly, urx, ury).
+            // Define the clickable rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create the link annotation and set its action to open an external URL.
-            LinkAnnotation link = new LinkAnnotation(page, rect)
-            {
-                Color = Aspose.Pdf.Color.Blue,
-                Action = new GoToURIAction(url) // external URL action
-            };
+            // Create the link annotation and associate it with the rectangle
+            LinkAnnotation link = new LinkAnnotation(page, rect);
 
-            // Add the annotation to the page.
+            // Set the action to open an external URL
+            link.Action = new GoToURIAction(url);
+
+            // Optional visual styling
+            link.Color = Aspose.Pdf.Color.Blue;               // Blue border
+            link.Border = new Border(link) { Width = 1 };      // 1‑point border
+
+            // Add the annotation to the page's annotation collection
             page.Annotations.Add(link);
 
-            // Save the updated document.
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Link annotation added. Saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with link annotation saved to '{outputPath}'.");
     }
 }

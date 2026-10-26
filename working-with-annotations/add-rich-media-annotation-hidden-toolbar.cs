@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -7,56 +8,71 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string videoPath   = "sample.mp4";   // video/audio file to embed
-        const string outputPath  = "RichMediaAnnotated.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string mediaFile = "sample.mp4"; // path to the media file to embed
 
-        // Verify source video exists
-        if (!File.Exists(videoPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Video file not found: {videoPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Create a new PDF document and add a blank page
-        using (Document doc = new Document())
+        if (!File.Exists(mediaFile))
         {
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"Media file not found: {mediaFile}");
+            return;
+        }
 
-            // Define the annotation rectangle (left, bottom, width, height)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 300);
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
+        {
+            // Choose the page where the annotation will be placed (first page in this example)
+            Page page = doc.Pages[1];
+
+            // Define the annotation rectangle (left, bottom, right, top)
+            Rectangle rect = new Rectangle(100, 500, 400, 800);
 
             // Create the RichMediaAnnotation
-            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect)
-            {
-                // Activate on click (you can also use PageOpen or PageVisible)
-                ActivateOn = RichMediaAnnotation.ActivationEvent.Click,
+            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect);
 
-                // Hide the default playback toolbar – PDF spec uses flash variables
-                // Setting "toolbar=false" removes the toolbar UI
-                CustomFlashVariables = "toolbar=false"
-            };
-
-            // Embed the video content
-            using (FileStream videoStream = File.OpenRead(videoPath))
+            // ---------- Attach media (if RichMediaContent type exists) ----------
+            Type richMediaContentType = Type.GetType("Aspose.Pdf.Annotations.RichMediaContent, Aspose.Pdf");
+            if (richMediaContentType != null)
             {
-                // The first argument is the name of the embedded stream
-                richMedia.SetContent(Path.GetFileName(videoPath), videoStream);
+                // Instantiate RichMediaContent
+                object richMediaContent = Activator.CreateInstance(richMediaContentType);
+                // Call AddFile(string)
+                MethodInfo addFileMethod = richMediaContentType.GetMethod("AddFile", new[] { typeof(string) });
+                addFileMethod?.Invoke(richMediaContent, new object[] { mediaFile });
+                // Assign to annotation
+                PropertyInfo contentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
+                contentProp?.SetValue(richMedia, richMediaContent);
             }
 
-            // Optionally set a poster image (preview shown before playback)
-            // using (FileStream poster = File.OpenRead("poster.jpg"))
-            // {
-            //     richMedia.SetPoster(poster);
-            // }
+            // ---------- Configure playback settings (hide toolbar) ----------
+            Type richMediaSettingsType = Type.GetType("Aspose.Pdf.Annotations.RichMediaSettings, Aspose.Pdf");
+            if (richMediaSettingsType != null)
+            {
+                object richMediaSettings = Activator.CreateInstance(richMediaSettingsType);
+                // Set Toolbar = false if the property exists
+                PropertyInfo toolbarProp = richMediaSettingsType.GetProperty("Toolbar");
+                if (toolbarProp != null && toolbarProp.CanWrite)
+                {
+                    toolbarProp.SetValue(richMediaSettings, false);
+                }
+                // Assign to annotation
+                PropertyInfo settingsProp = typeof(RichMediaAnnotation).GetProperty("RichMediaSettings");
+                settingsProp?.SetValue(richMedia, richMediaSettings);
+            }
 
             // Add the annotation to the page
             page.Annotations.Add(richMedia);
 
-            // Save the PDF
-            doc.Save(outputPath);
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with RichMediaAnnotation saved to '{outputPath}'.");
+        Console.WriteLine($"RichMediaAnnotation added and saved to '{outputPdf}'.");
     }
 }

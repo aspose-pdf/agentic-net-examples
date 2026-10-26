@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "highlighted.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,28 +16,31 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle area for the highlight annotation (example coordinates)
+            // Aspose.Pdf uses 1‑based page indexing
+            Page page = doc.Pages[1];
+
+            // Define the rectangle area to be highlighted (example coordinates)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
 
-            // Create a HighlightAnnotation on the first page
-            HighlightAnnotation highlight = new HighlightAnnotation(doc.Pages[1], rect);
+            // Create a highlight annotation on the specified page and rectangle
+            HighlightAnnotation highlight = new HighlightAnnotation(page, rect);
 
-            // Set the annotation color to yellow
+            // Set the annotation color to yellow using Aspose.Pdf.Color (cross‑platform)
             highlight.Color = Aspose.Pdf.Color.Yellow;
 
-            // Set the annotation opacity to 80%
-            highlight.Opacity = 0.8;
+            // Set opacity to 80% (value range 0.0‑1.0)
+            highlight.Opacity = 0.8f;
 
             // Add the annotation to the page's annotation collection
-            doc.Pages[1].Annotations.Add(highlight);
+            page.Annotations.Add(highlight);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Highlighted PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Highlight annotation saved to '{outputPath}'.");
     }
 }

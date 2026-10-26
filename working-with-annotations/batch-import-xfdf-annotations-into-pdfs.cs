@@ -2,58 +2,58 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class BatchXfdfImporter
 {
     static void Main()
     {
-        // Use the executable's folder as the base so the sample works out‑of‑the‑box
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // Folder containing PDFs and their corresponding XFDF files
+        const string inputFolder = @"C:\Docs\Input";
+        // Folder where the PDFs with merged annotations will be saved
+        const string outputFolder = @"C:\Docs\Output";
 
-        // Input / output folders – they will be created if they do not exist
-        string pdfFolder   = Path.Combine(baseDir, "pdfs");
-        string xfdfFolder  = Path.Combine(baseDir, "xfdfs");
-        string outputFolder = Path.Combine(baseDir, "output");
-
-        Directory.CreateDirectory(pdfFolder);
-        Directory.CreateDirectory(xfdfFolder);
-        Directory.CreateDirectory(outputFolder);
-
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(pdfFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
+        if (!Directory.Exists(inputFolder))
         {
-            Console.WriteLine($"No PDF files found in '{pdfFolder}'. Place PDFs there and rerun.");
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
             return;
         }
 
-        foreach (string pdfPath in pdfFiles)
+        Directory.CreateDirectory(outputFolder);
+
+        // Enumerate all PDF files in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
             string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-            string xfdfPath = Path.Combine(xfdfFolder, baseName + ".xfdf");
+            string xfdfPath = Path.Combine(inputFolder, baseName + ".xfdf");
 
+            // If there is no matching XFDF file, just copy the original PDF
             if (!File.Exists(xfdfPath))
             {
-                Console.WriteLine($"No matching XFDF for '{pdfPath}'. Skipping.");
+                string destCopy = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
+                File.Copy(pdfPath, destCopy, overwrite: true);
+                Console.WriteLine($"No XFDF for '{baseName}'. Copied original PDF.");
                 continue;
             }
 
-            string outputPath = Path.Combine(outputFolder, baseName + "_annotated.pdf");
-
             try
             {
-                // Load the PDF, import annotations from the XFDF file and save the result
-                using (Document doc = new Document(pdfPath))
+                // Load the PDF document
+                using (Document pdfDoc = new Document(pdfPath))
                 {
-                    doc.ImportAnnotationsFromXfdf(xfdfPath);
-                    doc.Save(outputPath);
-                }
+                    // Import XFDF annotations and merge them into the PDF
+                    pdfDoc.ImportAnnotationsFromXfdf(xfdfPath);
 
-                Console.WriteLine($"Annotated PDF saved: {outputPath}");
+                    // Save the annotated PDF to the output folder
+                    string outputPdfPath = Path.Combine(outputFolder, baseName + "_annotated.pdf");
+                    pdfDoc.Save(outputPdfPath);
+                    Console.WriteLine($"Merged annotations for '{baseName}' -> '{outputPdfPath}'.");
+                }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{baseName}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch XFDF import completed.");
     }
 }

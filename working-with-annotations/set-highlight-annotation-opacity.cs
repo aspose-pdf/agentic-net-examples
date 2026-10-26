@@ -16,32 +16,40 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Pages are 1‑based indexed
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[i];
-
-                // Annotations collection is also 1‑based
-                for (int j = 1; j <= page.Annotations.Count; j++)
+                // Pages are 1‑based in Aspose.Pdf
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    Annotation ann = page.Annotations[j];
+                    Page page = doc.Pages[i];
 
-                    // Process only highlight annotations
-                    if (ann is HighlightAnnotation highlight)
+                    // Annotations collection may be null if the page has none
+                    if (page.Annotations != null)
                     {
-                        // Set opacity to 60% (0.6)
-                        highlight.Opacity = 0.6;
+                        foreach (Annotation annotation in page.Annotations)
+                        {
+                            // Process only highlight annotations
+                            if (annotation is HighlightAnnotation highlight)
+                            {
+                                // Set opacity to 60% (0.6)
+                                highlight.Opacity = 0.6f;
+                            }
+                        }
                     }
                 }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"All highlight annotations set to 60% opacity. Saved as '{outputPath}'.");
         }
-
-        Console.WriteLine($"All highlight annotations updated and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

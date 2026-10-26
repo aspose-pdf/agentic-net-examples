@@ -1,57 +1,69 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                                 // Core PDF API
-using Aspose.Pdf.Annotations;                    // 3D annotation types
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string modelPath   = "model.u3d";          // 3‑D model file
-        const string outputPath  = "3d_annotation.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output_3d.pdf";
+        const string model3dPath = "model.u3d"; // U3D or PRC file
 
-        // Verify the 3‑D model exists
-        if (!File.Exists(modelPath))
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"3‑D model not found: {modelPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(model3dPath))
+        {
+            Console.Error.WriteLine($"3D model file not found: {model3dPath}");
             return;
         }
 
-        // Create a new PDF document and add a blank page
-        using (Document doc = new Document())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            Page page = doc.Pages.Add();
+            // Define the rectangle that will host the 3D annotation
+            Rectangle rect = new Rectangle(100, 500, 400, 800);
 
-            // Define the rectangle where the 3‑D annotation will appear
-            // (left, bottom, right, top) – coordinates are in points
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
+            // Load the 3D content (U3D or PRC)
+            PDF3DContent content = new PDF3DContent(model3dPath);
+            // For U3D files use LoadAsU3D, for PRC use LoadAsPRC
+            content.LoadAsU3D(model3dPath);
 
-            // Load the 3‑D content from the U3D file
-            PDF3DContent content = new PDF3DContent(modelPath);
+            // Choose a preset lighting scheme (e.g., Headlamp)
+            PDF3DLightingScheme lighting = new PDF3DLightingScheme(LightingSchemeType.Headlamp);
 
-            // Choose a lighting scheme – e.g., CAD lighting
-            PDF3DLightingScheme lightingScheme = PDF3DLightingScheme.CAD;
+            // Optional render mode – default is Solid; you can change if needed
+            PDF3DRenderMode renderMode = new PDF3DRenderMode(RenderModeType.Solid);
 
-            // Choose a render mode – e.g., ShadedIllustration
-            PDF3DRenderMode renderMode = PDF3DRenderMode.ShadedIllustration;
+            // Create the 3D artwork object linking document, content, lighting and render mode
+            PDF3DArtwork artwork = new PDF3DArtwork(pdfDoc, content, lighting, renderMode);
 
-            // Create the 3‑D artwork with the content, lighting, and render mode
-            PDF3DArtwork artwork = new PDF3DArtwork(doc, content, lightingScheme, renderMode);
+            // Create the 3D annotation. Activation determines when the model becomes visible.
+            PDF3DAnnotation threeD = new PDF3DAnnotation(
+                pdfDoc.Pages[1],
+                rect,
+                artwork,
+                PDF3DActivation.activeWhenOpen);
 
-            // Create the 3‑D annotation and attach it to the page
-            PDF3DAnnotation annotation = new PDF3DAnnotation(page, rect, artwork);
+            // Style the annotation border (color via Color property, width via Border)
+            threeD.Color = Color.LightGray; // border colour
+            threeD.Border = new Border(threeD) { Width = 1 };
 
-            // Optionally set a name or other properties
-            annotation.Name = "My3DModel";
+            // Add the annotation to the first page
+            pdfDoc.Pages[1].Annotations.Add(threeD);
 
-            // Add the annotation to the page's annotation collection
-            page.Annotations.Add(annotation);
+            // Embed the 3D stream – required for the model to be saved in the PDF
+            PDF3DStream stream = new PDF3DStream(pdfDoc, artwork);
 
-            // Save the resulting PDF
-            doc.Save(outputPath);
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF with 3‑D annotation saved to '{outputPath}'.");
+        Console.WriteLine($"3D annotation with custom lighting saved to '{outputPdfPath}'.");
     }
 }

@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_no_screen.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,31 +17,40 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate through all pages
-            foreach (Page page in doc.Pages)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Collect ScreenAnnotation instances to remove
-                var toRemove = new List<Annotation>();
-                foreach (Annotation ann in page.Annotations)
+                // Iterate pages (1‑based indexing)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    if (ann is ScreenAnnotation)
-                        toRemove.Add(ann);
+                    Page page = doc.Pages[i];
+                    var toRemove = new List<Annotation>();
+
+                    // Collect all ScreenAnnotation instances on the page
+                    foreach (Annotation ann in page.Annotations)
+                    {
+                        if (ann is ScreenAnnotation)
+                            toRemove.Add(ann);
+                    }
+
+                    // Remove the collected annotations
+                    foreach (Annotation ann in toRemove)
+                    {
+                        page.Annotations.Delete(ann);
+                    }
                 }
 
-                // Delete the collected ScreenAnnotations
-                foreach (Annotation ann in toRemove)
-                {
-                    page.Annotations.Delete(ann);
-                }
+                // Save the cleaned PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"All ScreenAnnotation objects removed. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Screen annotations removed. Saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

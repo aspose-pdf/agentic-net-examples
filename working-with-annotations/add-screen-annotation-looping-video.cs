@@ -7,45 +7,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_screen_annotation.pdf";
-        const string videoFile = "sample.mp4";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string videoPath = "sample.mp4"; // video file to embed
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(videoFile))
-        {
-            Console.Error.WriteLine($"Video file not found: {videoFile}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(videoPath))
         {
-            // Define the rectangle (llx, lly, urx, ury) where the video will appear
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
+            Console.Error.WriteLine($"Video file not found: {videoPath}");
+            return;
+        }
 
-            // Create a ScreenAnnotation on the first page that points to the video file
-            ScreenAnnotation screen = new ScreenAnnotation(doc.Pages[1], rect, videoFile);
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
 
-            // Disable user interaction by making the annotation read‑only
-            screen.Flags = AnnotationFlags.ReadOnly;
+            // Define the annotation rectangle (coordinates in points)
+            Rectangle rect = new Rectangle(100, 500, 400, 800);
 
-            // Loop playback – Aspose.Pdf does not expose a direct property.
-            // If the viewer supports it, a custom entry (e.g., /Loop) can be added to the annotation dictionary.
-            // This placeholder shows where such a setting would be applied.
-            // screen.AdditionalActions["Loop"] = true; // Uncomment and adjust if supported by the API
+            // Create the ScreenAnnotation – the media file is supplied in the constructor
+            ScreenAnnotation screenAnno = new ScreenAnnotation(page, rect, videoPath);
+
+            // NOTE: In the current Aspose.Pdf version the ScreenAnnotation does not expose
+            // properties for playback mode (loop, autoplay) or UI controls. The annotation
+            // will autoplay when opened in a PDF viewer that supports media playback.
+            // If fine‑grained control is required, low‑level PDF dictionary manipulation
+            // would be needed, which is beyond the scope of the core API.
 
             // Add the annotation to the page's annotation collection
-            doc.Pages[1].Annotations.Add(screen);
+            page.Annotations.Add(screenAnno);
 
             // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with screen annotation: {outputPdf}");
+        Console.WriteLine($"Screen annotation with video saved to '{outputPath}'.");
     }
 }

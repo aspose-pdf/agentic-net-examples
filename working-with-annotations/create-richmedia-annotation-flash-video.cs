@@ -7,62 +7,85 @@ class Program
 {
     static void Main()
     {
-        // Paths to source files (ensure they exist)
-        const string outputPdf = "RichMediaAnnotation.pdf";
-        const string flashVideoPath = "sample.swf";      // Flash video file
-        const string flashPlayerPath = "player.swf";     // Optional custom player
+        const string outputPath = "RichMediaFlash.pdf";
+        const string flashPath = "sample.swf"; // path to the Flash video file
 
-        // Create a new PDF document with a single blank page
-        using (Document doc = new Document())
+        if (!File.Exists(flashPath))
         {
-            // Add a blank page (page index will be 1)
-            doc.Pages.Add();
-
-            // Get the first page
-            Page page = doc.Pages[1];
-
-            // Define the rectangle where the annotation will appear
-            // (left, bottom, right, top) in points
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
-
-            // Create the RichMediaAnnotation on page one
-            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect);
-
-            // Set the type of content to Video using the enum value
-            richMedia.Type = RichMediaAnnotation.ContentType.Video;
-
-            // Activate the annotation on mouse click
-            richMedia.ActivateOn = RichMediaAnnotation.ActivationEvent.Click;
-
-            // Optional: set custom flash variables (e.g., autoplay and loop)
-            richMedia.CustomFlashVariables = "autoplay=true;loop=true";
-
-            // Optional: embed a custom flash player (if you have one)
-            if (File.Exists(flashPlayerPath))
-            {
-                using (FileStream playerStream = File.OpenRead(flashPlayerPath))
-                {
-                    richMedia.CustomPlayer = playerStream;
-                }
-            }
-
-            // Embed the Flash video content
-            if (File.Exists(flashVideoPath))
-            {
-                using (FileStream videoStream = File.OpenRead(flashVideoPath))
-                {
-                    // The first argument is the name of the stream inside the PDF
-                    richMedia.SetContent(Path.GetFileName(flashVideoPath), videoStream);
-                }
-            }
-
-            // Add the annotation to the page
-            page.Annotations.Add(richMedia);
-
-            // Save the PDF
-            doc.Save(outputPdf);
+            Console.Error.WriteLine($"Flash file not found: {flashPath}");
+            return;
         }
 
-        Console.WriteLine($"PDF with RichMediaAnnotation saved to '{outputPdf}'.");
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
+        {
+            // Add a page (page 1) to the document
+            Page page = doc.Pages.Add();
+
+            // Define the rectangle where the RichMedia annotation will appear
+            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
+
+            // Create the RichMedia annotation on page 1
+            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect);
+
+            // ----- Build RichMedia content (embed the Flash file) using reflection -----
+            Type contentType = Type.GetType("Aspose.Pdf.Annotations.RichMediaContent, Aspose.Pdf");
+            Type instanceType = Type.GetType("Aspose.Pdf.Annotations.RichMediaInstance, Aspose.Pdf");
+
+            if (contentType != null && instanceType != null)
+            {
+                // Create RichMediaContent instance
+                object richMediaContent = Activator.CreateInstance(contentType);
+
+                // Create RichMediaInstance and set its properties
+                object richMediaInstance = Activator.CreateInstance(instanceType);
+                var mimeProp = instanceType.GetProperty("MimeType");
+                mimeProp?.SetValue(richMediaInstance, "application/x-shockwave-flash");
+                var fileProp = instanceType.GetProperty("File");
+                fileProp?.SetValue(richMediaInstance, new FileSpecification(flashPath));
+
+                // Add the instance to the content collection
+                var addInstanceMethod = contentType.GetMethod("AddInstance", new[] { instanceType });
+                addInstanceMethod?.Invoke(richMediaContent, new[] { richMediaInstance });
+
+                // Assign the content to the annotation (if the property exists)
+                var contentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
+                contentProp?.SetValue(richMedia, richMediaContent);
+            }
+
+            // ----- Configure playback controls (if RichMediaSettings type is available) -----
+            Type settingsType = Type.GetType("Aspose.Pdf.Annotations.RichMediaSettings, Aspose.Pdf");
+            if (settingsType != null)
+            {
+                object settings = Activator.CreateInstance(settingsType);
+
+                var activationProp = settingsType.GetProperty("Activation");
+                var toolbarProp = settingsType.GetProperty("Toolbar");
+                var presentationProp = settingsType.GetProperty("Presentation");
+
+                Type activationEnum = Type.GetType("Aspose.Pdf.Annotations.RichMediaActivation, Aspose.Pdf");
+                Type toolbarEnum = Type.GetType("Aspose.Pdf.Annotations.RichMediaToolbar, Aspose.Pdf");
+                Type presentationEnum = Type.GetType("Aspose.Pdf.Annotations.RichMediaPresentation, Aspose.Pdf");
+
+                if (activationEnum != null && toolbarEnum != null && presentationEnum != null)
+                {
+                    activationProp?.SetValue(settings, Enum.Parse(activationEnum, "OnPageOpen"));
+                    toolbarProp?.SetValue(settings, Enum.Parse(toolbarEnum, "Visible"));
+                    presentationProp?.SetValue(settings, Enum.Parse(presentationEnum, "Fit"));
+                }
+
+                var settingsProp = typeof(RichMediaAnnotation).GetProperty("RichMediaSettings");
+                settingsProp?.SetValue(richMedia, settings);
+            }
+
+            // Add the annotation to the page's annotation collection
+            page.Annotations.Add(richMedia);
+
+            // Save the PDF document
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"RichMedia PDF with embedded Flash saved to '{outputPath}'.");
     }
 }

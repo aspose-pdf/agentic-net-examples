@@ -2,13 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,34 +20,33 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
             {
-                Page page = doc.Pages[i];
+                Page page = doc.Pages[pageNumber];
 
-                // Define a rectangle that spans the full width of the page
-                // and sits at the bottom (30 points high)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
-                    page.Rect.LLX,               // left
-                    page.Rect.LLY,               // bottom
-                    page.Rect.URX,               // right
-                    page.Rect.LLY + 30);         // top (30 pts above bottom)
+                // Define a rectangle that spans the width of the page and sits at the bottom (footer area)
+                // llx = 0, lly = 0, urx = page width, ury = 30 (30 points high footer)
+                var footerRect = new Rectangle(0, 0, page.PageInfo.Width, 30);
 
                 // Create a WatermarkAnnotation for this page
-                WatermarkAnnotation wm = new WatermarkAnnotation(page, rect)
+                var watermark = new WatermarkAnnotation(page, footerRect)
                 {
-                    // Unique identifier – the page number
-                    Contents = $"Page {i}",
-                    // Optional visual styling
-                    Color = Aspose.Pdf.Color.Gray,
-                    Opacity = 0.5
+                    // Unique identifier: page number + GUID
+                    Contents = $"Page {pageNumber} – ID: {Guid.NewGuid()}",
+                    // Optional styling
+                    Opacity = 0.5,
+                    Color = Color.Gray,
+                    // Align text to the center of the rectangle
+                    TextHorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
                 };
 
                 // Add the annotation to the page's annotation collection
-                page.Annotations.Add(wm);
+                page.Annotations.Add(watermark);
             }
 
-            // Save the modified document (PDF format)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

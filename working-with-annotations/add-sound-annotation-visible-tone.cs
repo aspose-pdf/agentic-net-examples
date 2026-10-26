@@ -9,9 +9,8 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_with_sound.pdf";
-        const string soundPath = "notification.wav";
+        const string soundPath = "tone.wav";
 
-        // Verify required files exist
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPath}");
@@ -23,32 +22,30 @@ class Program
             return;
         }
 
-        // Load the PDF (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            // Use the first page for the annotation
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (fully qualified to avoid ambiguity)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 120, 520);
+            // Define the annotation rectangle (lower‑left X,Y and upper‑right X,Y in points)
+            Rectangle rect = new Rectangle(100, 500, 200, 600);
 
-            // Create a SoundAnnotation that references the sound file
-            SoundAnnotation soundAnn = new SoundAnnotation(page, rect, soundPath)
-            {
-                // Choose an icon that will be displayed on the page
-                Icon = SoundIcon.Speaker,
-                // Optional tooltip and description
-                Title = "Notification",
-                Contents = "Plays when the annotation becomes visible on screen"
-            };
+            // Create a SoundAnnotation and associate the audio file directly via the constructor
+            // This constructor is available in the core Aspose.Pdf API and does not require the deprecated "Sound" property.
+            SoundAnnotation soundAnnot = new SoundAnnotation(page, rect, soundPath);
 
-            // Add the annotation to the page's annotation collection
-            page.Annotations.Add(soundAnn);
+            // Optional: set an icon if the enum is present in the used library version.
+            // Uncomment the line below when SoundAnnotationIcon is available.
+            // soundAnnot.Icon = SoundAnnotationIcon.Speaker;
 
-            // Save the modified PDF (lifecycle rule: save inside using block)
+            // The annotation is visible by default (no Hidden/NoView flags are set).
+            page.Annotations.Add(soundAnnot);
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with sound annotation saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with sound annotation: {outputPath}");
     }
 }

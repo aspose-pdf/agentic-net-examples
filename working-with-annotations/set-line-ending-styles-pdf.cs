@@ -2,13 +2,12 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,38 +16,37 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (1‑based indexing)
+            // Get the first page where the annotation will be placed
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (position on the page)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the bounding rectangle for the annotation (coordinates in points)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 400);
 
-            // Define start and end points of the line (relative to the page)
-            Point start = new Point(120, 520);
-            Point end   = new Point(280, 530);
+            // Create a line (figure) annotation with explicit start and end points
+            LineAnnotation line = new LineAnnotation(
+                page,
+                rect,
+                new Aspose.Pdf.Point(100, 500),   // start point (matches lower‑left of rect)
+                new Aspose.Pdf.Point(300, 400)    // end point (matches upper‑right of rect)
+            )
+            {
+                // Optional visual styling
+                Color = Aspose.Pdf.Color.Blue
+            };
 
-            // Create the line annotation
-            LineAnnotation line = new LineAnnotation(page, rect, start, end);
-
-            // Set line ending styles: circle at the start, open arrow at the end
-            line.StartingStyle = LineEnding.Circle;      // circle for start point
-            line.EndingStyle   = LineEnding.OpenArrow;   // arrow for end point
-
-            // Optional visual styling
-            line.Color = Aspose.Pdf.Color.Blue;
-            line.InteriorColor = Aspose.Pdf.Color.LightGray;
-            line.Border = new Border(line) { Width = 1 };
+            // Set line ending styles: circle at start, open arrow at end
+            line.StartingStyle = LineEnding.Circle;
+            line.EndingStyle   = LineEnding.OpenArrow;
 
             // Add the annotation to the page
             page.Annotations.Add(line);
 
-            // Save the modified PDF (lifecycle rule: save inside using)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Line annotation saved to '{outputPath}'.");
+        Console.WriteLine($"Annotated PDF saved to '{outputPath}'.");
     }
 }

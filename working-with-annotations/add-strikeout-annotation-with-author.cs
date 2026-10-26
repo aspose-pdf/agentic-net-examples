@@ -16,31 +16,31 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Ensure the Document is disposed properly
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (1‑based indexing)
+            // Aspose.Pdf uses 1‑based page indexing
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (left, bottom, right, top)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
+            // Define the annotation rectangle (llx, lly, urx, ury) in points
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create a strikeout annotation on the page
-            StrikeOutAnnotation strike = new StrikeOutAnnotation(page, rect)
-            {
-                // Set the author of the annotation (appears in the title bar of the popup)
-                Title = "Jane Smith",
-                // Optional: set the annotation color
-                Color = Aspose.Pdf.Color.Red
-            };
+            // Create a strike‑out (strikethrough) annotation on the page
+            StrikeOutAnnotation strike = new StrikeOutAnnotation(page, rect);
 
-            // Add the annotation to the page's annotation collection
+            // Set the author of the annotation
+            strike.Title = "Jane Smith";
+
+            // Optional: add a comment to the annotation
+            strike.Contents = "Reviewed";
+
+            // Attach the annotation to the page
             page.Annotations.Add(strike);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Strikethrough annotation added. Saved to '{outputPath}'.");
     }
 }

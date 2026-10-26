@@ -3,6 +3,7 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -11,72 +12,64 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // -------------------------------------------------
-        // 0. Ensure a source PDF exists (self‑contained example)
-        // -------------------------------------------------
         if (!File.Exists(inputPath))
         {
-            using (Document placeholder = new Document())
-            {
-                // Add a single blank page – the demo works on this page
-                placeholder.Pages.Add();
-                placeholder.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // -------------------------------------------------
-        // 1. Load the existing PDF (the one we just created)
-        // -------------------------------------------------
         using (Document doc = new Document(inputPath))
         {
-            // Use the first page for the demo
             Page page = doc.Pages[1];
 
-            // -------------------------------------------------
-            // 2. Create a RichMediaAnnotation (initially visible)
-            // -------------------------------------------------
-            Aspose.Pdf.Rectangle richRect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
-            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, richRect)
+            // ------------------------------------------------------------
+            // 1. Create a RichMediaAnnotation (placeholder content)
+            // ------------------------------------------------------------
+            Rectangle richMediaRect = new Rectangle(100, 500, 400, 800);
+            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, richMediaRect)
             {
-                Name = "richMedia",               // Identifier used in JavaScript
-                Contents = "Sample Media"        // Optional tooltip text
-                // Additional properties (e.g., RichMediaContent) can be set here
+                Name = "MyRichMedia",
+                // Use the annotation's Color property to make it visible initially
+                Color = Color.LightGray
             };
+            // Optional: give the annotation a thin border
+            richMedia.Border = new Border(richMedia) { Width = 1 };
             page.Annotations.Add(richMedia);
 
-            // -------------------------------------------------
-            // 3. Create a push button that will toggle the RichMediaAnnotation
-            // -------------------------------------------------
-            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(350, 500, 450, 550);
-            // NOTE: ButtonField constructor requires the *page* instance, not the document.
-            ButtonField toggleButton = new ButtonField(page, btnRect)
+            // ------------------------------------------------------------
+            // 2. Create a button annotation that toggles the rich media visibility
+            // ------------------------------------------------------------
+            Rectangle buttonRect = new Rectangle(50, 450, 150, 480);
+            ButtonField toggleButton = new ButtonField(page, buttonRect)
             {
-                PartialName = "toggleButton",
-                Contents = "Toggle Media",
-                Highlighting = HighlightingMode.Push,
-                Color = Aspose.Pdf.Color.LightGray
+                Name = "ToggleRichMediaButton",
+                AlternateCaption = "Toggle Media",
+                // Border color (background colour for a button field is not exposed directly)
+                Color = Color.Aqua
             };
-
-            // Optional: give the button a visible border
+            // Set a thin border for the button
             toggleButton.Border = new Border(toggleButton) { Width = 1 };
 
-            // -------------------------------------------------
-            // 4. Attach JavaScript that flips the Hidden flag (value 2) of the RichMediaAnnotation
-            // -------------------------------------------------
-            // The script retrieves the annotation by name and XORs its flags with 2,
-            // effectively toggling the Hidden flag on each click.
-            string js = "var annot = this.getAnnot(this.page, 'richMedia'); " +
-                        "annot.setFlags(annot.flags ^ 2);";
-            JavascriptAction jsAction = new JavascriptAction(js);
-            toggleButton.Actions.OnPressMouseBtn = jsAction;
+            // JavaScript to toggle the 'hidden' property of the rich media annotation
+            string js = @"\
+                var annot = this.getAnnot(this.pageNum, 'MyRichMedia');\
+                if (annot != null) {\
+                    annot.hidden = !annot.hidden;\
+                }\
+            ";
 
-            // Add the button to the document's form (AcroForm) – not directly to page.Annotations
+            // Assign the JavaScript action to the button's mouse‑press event (valid action property)
+            toggleButton.Actions.OnPressMouseBtn = new JavascriptAction(js);
+
+            // Add the button to the document's form collection
             doc.Form.Add(toggleButton);
 
-            // -------------------------------------------------
-            // 5. Save the modified PDF
-            // -------------------------------------------------
+            // ------------------------------------------------------------
+            // Save the modified PDF
+            // ------------------------------------------------------------
             doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF saved with toggle button: '{outputPath}'");
     }
 }

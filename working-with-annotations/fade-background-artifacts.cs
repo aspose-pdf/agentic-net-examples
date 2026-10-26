@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_faded_background.pdf";
+        const string outputPath = "output_faded.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,27 +15,25 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over all pages
+            foreach (Page page in doc.Pages)
             {
-                Aspose.Pdf.Page page = doc.Pages[i];
-
-                // Iterate over each artifact on the page
+                // Iterate over all artifacts on the page
                 foreach (Artifact artifact in page.Artifacts)
                 {
-                    // Check if the artifact is a BackgroundArtifact
+                    // Apply only to background artifacts
                     if (artifact is BackgroundArtifact bgArtifact)
                     {
                         // Set opacity to 40% (0.4)
-                        bgArtifact.Opacity = 0.4;
+                        bgArtifact.Opacity = 0.4f;
                     }
                 }
             }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

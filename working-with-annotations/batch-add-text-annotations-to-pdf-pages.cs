@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "annotated.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,35 +16,34 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Define the annotation rectangle (left, bottom, right, top)
+                // Define the annotation rectangle (fully qualified to avoid ambiguity)
                 Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
                 // Create a text annotation for the current page
                 TextAnnotation annotation = new TextAnnotation(page, rect)
                 {
-                    Title = $"Note {i}",
-                    Contents = $"This is page {i}",
-                    Color = Aspose.Pdf.Color.Yellow,
-                    Open = true,
-                    Icon = TextIcon.Note
+                    Title    = $"Page {i} Note",
+                    Contents = $"This is a batch annotation on page {i}.",
+                    Open     = true,
+                    Icon     = TextIcon.Note
                 };
 
                 // Add the annotation to the page's annotation collection
                 page.Annotations.Add(annotation);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (still within the using block)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotations added and saved to '{outputPath}'.");
+        Console.WriteLine($"Text annotations added to all pages. Saved as '{outputPath}'.");
     }
 }

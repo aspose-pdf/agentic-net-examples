@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_js.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,25 +16,30 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page where the annotation will be placed (first page in this example)
+            // Use the first page (change index if needed)
             Page page = doc.Pages[1];
 
-            // Define the rectangle area for the link annotation (coordinates are in points)
-            // Fully qualify Rectangle to avoid ambiguity with System.Drawing.Rectangle
+            // Define the clickable rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create the link annotation on the specified page and rectangle
+            // Create a link annotation on the specified rectangle
             LinkAnnotation link = new LinkAnnotation(page, rect);
-            // Optional visual styling
-            link.Color = Aspose.Pdf.Color.Blue;
-            link.Border = new Border(link) { Width = 1 };
 
-            // Assign a JavaScript action that shows a modal dialog box
-            // The script uses the Acrobat JavaScript API: app.alert()
-            link.Action = new JavascriptAction("app.alert('This is a custom modal dialog box.');");
+            // Create a JavaScript action that shows a modal dialog
+            // JavascriptAction does not have a parameter‑less constructor; pass the script string directly.
+            JavascriptAction jsAction = new JavascriptAction(
+                "app.alert({cMsg: 'Custom modal dialog', nIcon: 3, cTitle: 'Info'});"
+            );
+
+            // Assign the JavaScript action to the link annotation
+            link.Action = jsAction;
+
+            // Optional: make the annotation invisible (no border, no background)
+            link.Border = new Border(link) { Width = 0 };
+            link.Color = Aspose.Pdf.Color.Transparent;
 
             // Add the annotation to the page's annotation collection
             page.Annotations.Add(link);
@@ -43,6 +48,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with JavaScript link annotation to '{outputPath}'.");
+        Console.WriteLine($"PDF with JavaScript link annotation saved to '{outputPath}'.");
     }
 }

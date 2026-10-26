@@ -7,54 +7,58 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string csvPath = "annotations_report.csv";
+        const string inputPdf = "input.pdf";
+        const string outputCsv = "annotations_report.csv";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(pdfPath))
+        try
         {
-            // Prepare CSV writer
-            using (StreamWriter writer = new StreamWriter(csvPath, false, System.Text.Encoding.UTF8))
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                // Write CSV header
-                writer.WriteLine("AnnotationId,Author");
-
-                // Iterate through all pages (1‑based indexing)
-                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                // Prepare CSV header
+                using (StreamWriter writer = new StreamWriter(outputCsv, false))
                 {
-                    Page page = doc.Pages[pageIndex];
-                    AnnotationCollection annotations = page.Annotations;
+                    writer.WriteLine("PageNumber,AnnotationId,Author");
 
-                    // Iterate through annotations (1‑based indexing)
-                    for (int annIndex = 1; annIndex <= annotations.Count; annIndex++)
+                    // Aspose.Pdf uses 1‑based page indexing
+                    for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
                     {
-                        Annotation ann = annotations[annIndex];
-                        // Use the Name property as the identifier (Annotation.Id does not exist)
-                        string id = ann.Name ?? string.Empty;
+                        Page page = doc.Pages[pageNum];
 
-                        // Most markup annotations expose the author via the Title property
-                        string author = string.Empty;
-                        if (ann is MarkupAnnotation markup)
+                        // Each page has an Annotations collection
+                        foreach (Annotation annot in page.Annotations)
                         {
-                            author = markup.Title ?? string.Empty;
+                            // "Id" does not exist – use the optional Name property as an identifier
+                            string id = annot.Name ?? string.Empty;
+
+                            // Author information is stored in the Subject property of MarkupAnnotation
+                            string author = string.Empty;
+                            if (annot is MarkupAnnotation markup)
+                            {
+                                author = markup.Subject ?? string.Empty;
+                            }
+
+                            // Escape commas in fields if necessary
+                            id = id.Contains(",") ? $"\"{id}\"" : id;
+                            author = author.Contains(",") ? $"\"{author}\"" : author;
+
+                            writer.WriteLine($"{pageNum},{id},{author}");
                         }
-
-                        // Escape commas in fields if necessary
-                        id = id.Replace(",", "\\,");
-                        author = author.Replace(",", "\\,");
-
-                        writer.WriteLine($"{id},{author}");
                     }
                 }
             }
-        }
 
-        Console.WriteLine($"Annotation audit CSV generated at '{csvPath}'.");
+            Console.WriteLine($"Annotation report generated: {outputCsv}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

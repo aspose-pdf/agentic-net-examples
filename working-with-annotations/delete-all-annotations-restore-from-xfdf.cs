@@ -6,41 +6,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string xfdfBackup = "backup.xfdf";
-        const string outputPdf = "output.pdf";
+        const string pdfPath = "original.pdf";   // input PDF
+        const string xfdfPath = "backup.xfdf";    // XFDF backup containing annotations
+        const string outputPath = "restored.pdf"; // PDF after re‑importing annotations
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        if (!File.Exists(xfdfBackup))
+        if (!File.Exists(xfdfPath))
         {
-            Console.Error.WriteLine($"XFDF backup not found: {xfdfBackup}");
+            Console.Error.WriteLine($"XFDF not found: {xfdfPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdf))
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                // Remove all annotations from every page
-                foreach (Page page in doc.Pages)
+                // Delete all annotations from every page (1‑based indexing)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    page.Annotations.Delete(); // deletes all annotations on the page
+                    Page page = doc.Pages[i];
+                    page.Annotations.Clear(); // removes all annotations on the page
                 }
 
-                // Re‑import annotations from the XFDF file
-                doc.ImportAnnotationsFromXfdf(xfdfBackup);
+                // Re‑import annotations from the XFDF backup
+                doc.ImportAnnotationsFromXfdf(xfdfPath); // correct API call
 
                 // Save the updated PDF
-                doc.Save(outputPdf);
+                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Annotations restored and saved to '{outputPdf}'.");
+            Console.WriteLine($"Annotations restored and saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

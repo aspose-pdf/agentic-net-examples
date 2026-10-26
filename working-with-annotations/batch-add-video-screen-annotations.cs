@@ -7,61 +7,73 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPdfPath   = "input.pdf";
+        const string outputPdfPath  = "output_with_video.pdf";
+        const string videoFilePath  = "sample.mp4";
 
-        // Video files – one per page (ensure the array length matches the PDF page count)
-        string[] videoFiles = { "video1.mp4", "video2.mp4", "video3.mp4" };
+        // Define the video aspect ratio (width : height). Example: 16:9
+        const double videoWidthRatio  = 16.0;
+        const double videoHeightRatio = 9.0;
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Optional: verify video files exist
-        foreach (string vf in videoFiles)
+        if (!File.Exists(videoFilePath))
         {
-            if (!File.Exists(vf))
-            {
-                Console.Error.WriteLine($"Video file not found: {vf}");
-                return;
-            }
+            Console.Error.WriteLine($"Video file not found: {videoFilePath}");
+            return;
         }
 
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF and ensure deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            int pageCount = doc.Pages.Count;
-
-            if (videoFiles.Length < pageCount)
-            {
-                Console.Error.WriteLine("Insufficient video files for the number of pages.");
-                return;
-            }
-
-            // Iterate pages (1‑based indexing)
-            for (int i = 1; i <= pageCount; i++)
+            // Iterate using 1‑based page indexing (Aspose.Pdf rule)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Define annotation rectangle (example coordinates)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
+                // Page dimensions (points)
+                double pageWidth  = page.PageInfo.Width;
+                double pageHeight = page.PageInfo.Height;
 
-                // Create ScreenAnnotation with the corresponding video file
-                ScreenAnnotation screen = new ScreenAnnotation(page, rect, videoFiles[i - 1]);
+                // Desired rectangle size: 80% of page width, maintain aspect ratio
+                double rectWidth  = pageWidth * 0.8;
+                double rectHeight = rectWidth * (videoHeightRatio / videoWidthRatio);
 
-                // Optional metadata
-                screen.Title = $"Video {i}";
-                screen.Contents = $"Play {Path.GetFileName(videoFiles[i - 1])}";
+                // If height exceeds 80% of page height, scale down based on height instead
+                if (rectHeight > pageHeight * 0.8)
+                {
+                    rectHeight = pageHeight * 0.8;
+                    rectWidth  = rectHeight * (videoWidthRatio / videoHeightRatio);
+                }
 
-                // Add annotation to the page
-                page.Annotations.Add(screen);
+                // Center the rectangle on the page
+                double llx = (pageWidth  - rectWidth)  / 2.0; // lower‑left X
+                double lly = (pageHeight - rectHeight) / 2.0; // lower‑left Y
+                double urx = llx + rectWidth;                // upper‑right X
+                double ury = lly + rectHeight;               // upper‑right Y
+
+                // Fully qualified Rectangle to avoid ambiguity
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+
+                // Create the ScreenAnnotation and attach the video file via the constructor that accepts the media file path
+                ScreenAnnotation screenAnn = new ScreenAnnotation(page, rect, videoFilePath)
+                {
+                    // Optional: set a tooltip or description
+                    Contents = "Embedded video"
+                };
+
+                // Add the annotation to the page
+                page.Annotations.Add(screenAnn);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // Save the modified PDF (Document.Save writes PDF regardless of extension)
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Screen annotations added. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Video annotations added. Output saved to '{outputPdfPath}'.");
     }
 }

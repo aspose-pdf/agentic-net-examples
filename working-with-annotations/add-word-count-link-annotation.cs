@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_wordcount_link.pdf";
+        const string outputPath = "wordcount_link.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,46 +16,42 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule‑based lifecycle)
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page where the link will be placed (first page in this example)
+            // Choose the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the clickable rectangle (coordinates are in points)
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 700, 300, 750);
+            // Define the rectangle where the link annotation will appear
+            // (llx, lly, urx, ury) – coordinates are in points
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 250, 730);
 
-            // Create the link annotation on the specified page and rectangle
-            LinkAnnotation link = new LinkAnnotation(page, linkRect);
-            // Optional visual styling
-            link.Color = Aspose.Pdf.Color.Blue;
-            // Border must be created after the annotation instance exists
-            link.Border = new Border(link)
+            // JavaScript that calculates total word count across all pages
+            string js = @"
+                var total = 0;
+                for (var i = 0; i < this.numPages; i++) {
+                    total += this.getPageNumWords(i + 1);
+                }
+                app.alert('Document word count: ' + total);
+            ";
+
+            // Create the link annotation
+            LinkAnnotation link = new LinkAnnotation(page, rect)
             {
-                Style = BorderStyle.Solid,
-                Width = 1
+                Action = new JavascriptAction(js),
+                Color = Aspose.Pdf.Color.Blue // annotation color (border color is set via the annotation itself)
             };
 
-            // JavaScript that calculates total word count and shows an alert
-            string js = @"
-var total = 0;
-for (var i = 0; i < this.numPages; i++) {
-    total += this.getPageNumWords(i + 1);
-}
-app.alert('Word count: ' + total);
-";
-
-            // Attach the JavaScript action to the link annotation
-            link.Action = new JavascriptAction(js);
+            // Border must be created with the parent annotation instance
+            link.Border = new Border(link) { Width = 0 };
 
             // Add the annotation to the page
             page.Annotations.Add(link);
 
-            // Save the modified PDF (using rule‑based disposal)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with word‑count link: '{outputPath}'");
+        Console.WriteLine($"PDF with word‑count link saved to '{outputPath}'.");
     }
 }

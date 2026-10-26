@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -15,71 +16,74 @@ class Program
             return;
         }
 
-        // Load the PDF document (using block ensures proper disposal)
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageIndex];
-                AnnotationCollection annotations = page.Annotations;
+                Page page = doc.Pages[i];
 
-                // Iterate over each annotation on the page
-                foreach (Annotation annotation in annotations)
+                // Annotations collection may be empty
+                if (page.Annotations == null) continue;
+
+                foreach (Annotation annot in page.Annotations)
                 {
-                    // Annotation type (enum or class name)
-                    string typeName = annotation.AnnotationType.ToString();
+                    // Get the concrete annotation type name
+                    string typeName = annot.GetType().Name;
 
-                    // Rectangle coordinates
-                    Rectangle rect = annotation.Rect;
-                    string rectInfo = $"LLX={rect.LLX}, LLY={rect.LLY}, URX={rect.URX}, URY={rect.URY}";
+                    // Use fully qualified Rectangle to avoid ambiguity
+                    Aspose.Pdf.Rectangle rect = annot.Rect;
 
-                    // Media file name (if applicable)
-                    string mediaFile = "N/A";
+                    // Retrieve associated media file name when applicable
+                    string mediaFile = GetMediaFileName(annot);
 
-                    // Some annotation types embed external media (e.g., ScreenAnnotation, MovieAnnotation, RichMediaAnnotation)
-                    // Attempt to retrieve a known property; if not present, keep "N/A"
-                    switch (annotation)
-                    {
-                        case ScreenAnnotation screen:
-                            // ScreenAnnotation stores the media file path in the 'File' property (if available)
-                            // Use reflection as a safety net in case the property name differs
-                            var fileProp = typeof(ScreenAnnotation).GetProperty("File");
-                            if (fileProp != null)
-                            {
-                                var value = fileProp.GetValue(screen) as string;
-                                if (!string.IsNullOrEmpty(value))
-                                    mediaFile = value;
-                            }
-                            break;
-
-                        case MovieAnnotation movie:
-                            var movieFileProp = typeof(MovieAnnotation).GetProperty("File");
-                            if (movieFileProp != null)
-                            {
-                                var value = movieFileProp.GetValue(movie) as string;
-                                if (!string.IsNullOrEmpty(value))
-                                    mediaFile = value;
-                            }
-                            break;
-
-                        case RichMediaAnnotation rich:
-                            var richFileProp = typeof(RichMediaAnnotation).GetProperty("File");
-                            if (richFileProp != null)
-                            {
-                                var value = richFileProp.GetValue(rich) as string;
-                                if (!string.IsNullOrEmpty(value))
-                                    mediaFile = value;
-                            }
-                            break;
-
-                        // Add other media‑bearing annotation types here if needed
-                    }
-
-                    // Log the information
-                    Console.WriteLine($"Page {pageIndex}: Type={typeName}, Rect=[{rectInfo}], MediaFile={mediaFile}");
+                    Console.WriteLine(
+                        $"Page {i}: Type={typeName}, Rect=[{rect.LLX},{rect.LLY},{rect.URX},{rect.URY}], Media={mediaFile}");
                 }
             }
+        }
+    }
+
+    // Helper method to extract a media file name from known annotation types
+    private static string GetMediaFileName(Annotation annot)
+    {
+        switch (annot)
+        {
+            case FileAttachmentAnnotation fileAnnot:
+                // The File property returns a FileSpecification; use its Name property
+                return fileAnnot.File?.Name ?? "(none)";
+
+            case RichMediaAnnotation richAnnot:
+                // RichMediaContent may not exist in older Aspose.Pdf versions – use reflection
+                var richContentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
+                if (richContentProp != null)
+                {
+                    var richContent = richContentProp.GetValue(richAnnot);
+                    if (richContent != null)
+                    {
+                        var assetsProp = richContent.GetType().GetProperty("Assets");
+                        var assets = assetsProp?.GetValue(richContent) as IEnumerable;
+                        if (assets != null)
+                        {
+                            var enumerator = assets.GetEnumerator();
+                            if (enumerator.MoveNext())
+                            {
+                                var asset = enumerator.Current;
+                                // Asset may expose FileName or Name – try both
+                                var nameProp = asset.GetType().GetProperty("FileName") ??
+                                                asset.GetType().GetProperty("Name");
+                                var name = nameProp?.GetValue(asset) as string;
+                                return name ?? "(none)";
+                            }
+                        }
+                    }
+                }
+                return "(none)";
+
+            default:
+                // Other annotation types do not reference external media
+                return "(n/a)";
         }
     }
 }

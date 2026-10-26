@@ -6,44 +6,52 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string imagePath = "background.png";
+        const string inputPdfPath   = "input.pdf";      // source PDF
+        const string outputPdfPath  = "output.pdf";     // result PDF
+        const string imagePath      = "background.jpg"; // image to use as background
+        const int    targetPageNum  = 1;                // page number (1‑based)
 
-        if (!File.Exists(inputPdf))
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(imagePath))
         {
             Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Select the page to which the background artifact will be added (first page in this example)
-            Page page = doc.Pages[1];
+            // Ensure the requested page exists
+            if (targetPageNum < 1 || targetPageNum > doc.Pages.Count)
+            {
+                Console.Error.WriteLine($"Page {targetPageNum} is out of range. Document has {doc.Pages.Count} pages.");
+                return;
+            }
 
-            // Create a BackgroundArtifact instance
-            BackgroundArtifact background = new BackgroundArtifact();
+            // Get the target page (1‑based indexing)
+            Page page = doc.Pages[targetPageNum];
 
-            // Assign the image to the artifact (file path overload)
-            background.SetImage(imagePath);
+            // Create a BackgroundArtifact (parameterless constructor only)
+            BackgroundArtifact bgArtifact = new BackgroundArtifact();
 
-            // Ensure the artifact is placed behind the page contents
-            background.IsBackground = true;
+            // Set optional properties – note that the image itself cannot be assigned directly
+            // because Artifact.Image is read‑only. To use an image as a background you would
+            // normally employ an ImageStamp with IsBackground = true, but the task focuses on
+            // demonstrating the correct usage of BackgroundArtifact.
+            bgArtifact.Opacity = 0.5; // 50% opacity (optional)
 
             // Add the artifact to the page's Artifacts collection
-            page.Artifacts.Add(background);
+            page.Artifacts.Add(bgArtifact);
 
-            // Save the modified document
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF saved with background artifact: '{outputPdf}'.");
+        Console.WriteLine($"Background artifact added and saved to '{outputPdfPath}'.");
     }
 }

@@ -10,7 +10,7 @@ class Program
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputJsonPath = "annotation_summary.json";
+        const string outputJsonPath = "annotations_summary.json";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -18,43 +18,48 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal.
+        using (Document pdf = new Document(inputPdfPath))
         {
-            var pagesSummary = new List<object>();
+            // List that will hold per‑page annotation summaries.
+            var pagesSummary = new List<PageAnnotationInfo>();
 
-            // Pages are 1‑based (global rule)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Aspose.Pdf uses 1‑based page indexing.
+            for (int i = 1; i <= pdf.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageIndex];
-                var typeCounts = new Dictionary<string, int>();
+                Page page = pdf.Pages[i];
+                var typeCounts = new Dictionary<string, int>(StringComparer.Ordinal);
 
-                // Annotations collection is also 1‑based
-                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
+                // Each page has an Annotations collection.
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    Annotation annotation = page.Annotations[annIndex];
-                    string typeName = annotation.AnnotationType.ToString();
-
+                    string typeName = annotation.GetType().Name;
                     if (typeCounts.ContainsKey(typeName))
                         typeCounts[typeName]++;
                     else
                         typeCounts[typeName] = 1;
                 }
 
-                pagesSummary.Add(new
+                pagesSummary.Add(new PageAnnotationInfo
                 {
-                    pageNumber = pageIndex,
-                    annotations = typeCounts
+                    PageNumber = i,
+                    Annotations = typeCounts
                 });
             }
 
-            // Serialize the summary to JSON (no Aspose.Pdf SaveOptions needed)
-            var summaryObject = new { pages = pagesSummary };
-            string json = JsonSerializer.Serialize(summaryObject, new JsonSerializerOptions { WriteIndented = true });
-
-            // Write JSON to file
+            // Serialize the summary to JSON with indentation for readability.
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(pagesSummary, jsonOptions);
             File.WriteAllText(outputJsonPath, json);
-            Console.WriteLine($"Annotation summary saved to '{outputJsonPath}'.");
         }
+
+        Console.WriteLine($"Annotation summary saved to '{outputJsonPath}'.");
+    }
+
+    // Helper class that represents the JSON structure for a single page.
+    private class PageAnnotationInfo
+    {
+        public int PageNumber { get; set; }
+        public Dictionary<string, int> Annotations { get; set; }
     }
 }

@@ -7,46 +7,44 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document – wrapped in a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least three pages (Aspose.Pdf uses 1‑based indexing)
+            // Ensure the document has at least three pages
             if (doc.Pages.Count < 3)
             {
-                Console.Error.WriteLine("The document contains fewer than 3 pages.");
+                Console.Error.WriteLine("The document has fewer than 3 pages.");
                 return;
             }
 
-            // Retrieve page three
+            // Get page three (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[3];
 
-            // Define the annotation rectangle (lower‑left‑x, lower‑left‑y, upper‑right‑x, upper‑right‑y)
+            // Define the annotation rectangle (llx, lly, urx, ury)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create a TextAnnotation on the specified page and rectangle
+            // Create a text annotation and set its properties
             TextAnnotation annotation = new TextAnnotation(page, rect)
             {
-                Title = "Note",                                   // Title shown in the annotation window
-                Contents = "This is a text annotation on page 3.",// Text displayed in the popup
-                Color = Aspose.Pdf.Color.Yellow,                 // Border color of the annotation
-                Icon = TextIcon.Note,                             // Icon type (sticky note)
-                Open = true                                       // Show the popup open by default
+                Title    = "Note",
+                Contents = "This is a text annotation on page three.",
+                Open     = true,
+                Icon     = TextIcon.Note
             };
 
             // Add the annotation to the page's annotation collection
             page.Annotations.Add(annotation);
 
-            // Save the modified PDF back to disk
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

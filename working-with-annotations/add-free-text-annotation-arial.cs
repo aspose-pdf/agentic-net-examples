@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -7,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "annotated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,31 +17,32 @@ class Program
             return;
         }
 
-        // Load the existing PDF
+        // Load PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Use the first page (1‑based indexing)
+            // Use the first page (change index if needed)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the annotation rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
 
-            // Create DefaultAppearance with Arial, 12‑point size, black color
-            DefaultAppearance appearance = new DefaultAppearance("Arial", 12, System.Drawing.Color.Black);
+            // Create a DefaultAppearance that defines font, size and color (System.Drawing.Color required)
+            var appearance = new DefaultAppearance("Arial", 12, System.Drawing.Color.Black);
 
-            // Create the free‑text annotation on the page
-            FreeTextAnnotation ft = new FreeTextAnnotation(page, rect, appearance)
+            // Create a free‑text annotation on the page using the correct constructor order
+            FreeTextAnnotation freeText = new FreeTextAnnotation(page, rect, appearance)
             {
-                Contents = "Free‑text annotation example"
+                // Text displayed inside the annotation
+                Contents = "This is a free‑text annotation."
             };
 
-            // Add the annotation to the page's annotation collection
-            page.Annotations.Add(ft);
+            // Attach the annotation to the page
+            page.Annotations.Add(freeText);
 
-            // Save the modified document
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Free‑text annotation added and saved to '{outputPath}'.");
     }
 }

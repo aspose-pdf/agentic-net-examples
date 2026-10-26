@@ -2,59 +2,57 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string outputPdfPath = "3d_annotation.pdf";
-        const string model3dPath   = "model.u3d";   // 3‑D model file (U3D/PRC)
+        const string outputPath = "metal_3d.pdf";
+        const string modelPath = "metal_model.u3d";
 
-        // Verify the 3‑D model file exists
-        if (!File.Exists(model3dPath))
+        if (!File.Exists(modelPath))
         {
-            Console.Error.WriteLine($"3‑D model not found: {model3dPath}");
+            Console.Error.WriteLine($"3D model file not found: {modelPath}");
             return;
         }
 
         // Create a new PDF document
-        var doc = new Document();
+        using (Document doc = new Document())
+        {
+            // Add a blank page to host the annotation
+            Page page = doc.Pages.Add();
 
-        // Add a blank page
-        var page = doc.Pages.Add();
+            // Define the annotation rectangle (lower‑left x,y, upper‑right x,y)
+            // Use Aspose.Pdf.Rectangle for annotation bounds (fully qualified to avoid ambiguity)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 400, 500, 800);
 
-        // Load the 3‑D content directly from the file path (PDF3DContent expects a string path)
-        var content = new PDF3DContent(model3dPath);
+            // Load the U3D model into a PDF3DContent object
+            PDF3DContent content = new PDF3DContent();
+            content.LoadAsU3D(modelPath);
 
-        // Choose a lighting scheme that gives a realistic metallic look
-        PDF3DLightingScheme lightingScheme = PDF3DLightingScheme.Hard;
+            // Choose a lighting scheme – Headlamp gives a realistic directional light
+            PDF3DLightingScheme lighting = new PDF3DLightingScheme(LightingSchemeType.Headlamp);
 
-        // Choose a render mode that shades the surface – ShadedIllustration works well for metal.
-        PDF3DRenderMode renderMode = PDF3DRenderMode.ShadedIllustration;
+            // Define a render mode that mimics a metallic surface
+            PDF3DRenderMode render = new PDF3DRenderMode(RenderModeType.Solid);
+            render.SetFaceColor(Color.Silver);          // base metal colour
+            render.SetAuxiliaryColour(Color.Gray);      // secondary colour for subtle shading
+            render.SetOpacity(1.0);                     // fully opaque
 
-        // Create the 3‑D artwork with the content, lighting, and render mode
-        var artwork = new PDF3DArtwork(doc, content, lightingScheme, renderMode);
+            // Combine content, lighting and render mode into an artwork object
+            PDF3DArtwork artwork = new PDF3DArtwork(doc, content, lighting, render);
 
-        // Optionally adjust material properties via the render mode (e.g., face color, opacity)
-        // Here we set a subtle gray face colour to simulate metal.
-        artwork.RenderMode.SetFaceColor(Color.FromRgb(0.7, 0.7, 0.7));
-        artwork.RenderMode.SetOpacity(0.9); // Slight transparency for realism
+            // Create the 3D annotation – activate it when the page opens
+            PDF3DAnnotation annotation = new PDF3DAnnotation(page, rect, artwork, PDF3DActivation.activeWhenOpen);
 
-        // Define the rectangle on the page where the 3‑D annotation will appear
-        var rect = new Rectangle(100, 400, 500, 800); // llx, lly, urx, ury
+            // Add the annotation to the page
+            page.Annotations.Add(annotation);
 
-        // Create the 3‑D annotation and attach the artwork
-        var annotation = new PDF3DAnnotation(page, rect, artwork);
+            // Save the PDF (PDF format is the default)
+            doc.Save(outputPath);
+        }
 
-        // Set a border colour for visual distinction (optional)
-        annotation.Color = Color.LightGray;
-
-        // Add the annotation to the page
-        page.Annotations.Add(annotation);
-
-        // Save the PDF
-        doc.Save(outputPdfPath);
-        Console.WriteLine($"PDF with 3‑D annotation saved to '{outputPdfPath}'.");
+        Console.WriteLine($"3D PDF saved to '{outputPath}'.");
     }
 }
