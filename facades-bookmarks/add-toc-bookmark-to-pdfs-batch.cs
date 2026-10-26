@@ -1,52 +1,66 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         // Folder containing source PDFs
-        const string inputFolder = "input_pdfs";
-        // Folder where processed PDFs will be written
-        const string outputFolder = "output_pdfs";
+        string inputFolder = @"C:\InputPdfs";
+        // Folder where processed PDFs will be saved
+        string outputFolder = @"C:\OutputPdfs";
 
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
             return;
         }
 
-        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string sourcePath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Get all PDF files in the input folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        foreach (string pdfPath in pdfFiles)
         {
-            string fileName = Path.GetFileName(sourcePath);
-            string destinationPath = Path.Combine(outputFolder, fileName);
+            string fileName   = Path.GetFileName(pdfPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
 
             try
             {
-                // Create the facade, bind the source PDF, add the bookmark, and save
-                using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+                // Load the PDF. If it is encrypted, Document constructor throws PdfException.
+                Document doc;
+                try
                 {
-                    // Load the PDF into the facade
-                    editor.BindPdf(sourcePath);
-
-                    // Add a top‑level bookmark named "Table of Contents" that points to page 1
-                    editor.CreateBookmarkOfPage("Table of Contents", 1);
-
-                    // Save the modified PDF to the output location
-                    editor.Save(destinationPath);
+                    doc = new Document(pdfPath);
                 }
+                catch (PdfException)
+                {
+                    Console.Error.WriteLine($"Skipping encrypted PDF: {fileName}");
+                    continue;
+                }
+
+                // Add a top‑level bookmark named "Table of Contents" that points to page 1.
+                var tocBookmark = new OutlineItemCollection(doc.Outlines)
+                {
+                    Title = "Table of Contents",
+                    Action = new GoToAction(doc.Pages[1], ExplicitDestinationType.Fit)
+                };
+                doc.Outlines.Add(tocBookmark);
+
+                // Save the modified PDF to the output folder
+                doc.Save(outputPath);
 
                 Console.WriteLine($"Processed: {fileName}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
+                Console.Error.WriteLine($"Failed to process {fileName}: {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch processing completed.");
     }
 }

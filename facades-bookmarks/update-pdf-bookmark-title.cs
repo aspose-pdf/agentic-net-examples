@@ -1,51 +1,72 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 public static class PdfBookmarkHelper
 {
     /// <summary>
-    /// Binds a PDF from a memory stream, modifies a bookmark title, and returns the updated PDF as a byte array.
+    /// Loads a PDF from a byte array, adds a bookmark that points to an external URL,
+    /// and returns the modified PDF as a new byte array.
     /// </summary>
-    /// <param name="pdfBytes">Input PDF data.</param>
-    /// <param name="sourceTitle">Existing bookmark title to be changed.</param>
-    /// <param name="destTitle">New bookmark title.</param>
+    /// <param name="pdfBytes">The original PDF content.</param>
     /// <returns>Byte array containing the updated PDF.</returns>
-    public static byte[] UpdateBookmarkTitle(byte[] pdfBytes, string sourceTitle, string destTitle)
+    public static byte[] UpdatePdfBookmarks(byte[] pdfBytes)
     {
-        // Input stream wrapping the original PDF bytes
+        if (pdfBytes == null || pdfBytes.Length == 0)
+            throw new ArgumentException("PDF byte array is null or empty.", nameof(pdfBytes));
+
+        // Load the PDF from the input memory stream.
         using (MemoryStream inputStream = new MemoryStream(pdfBytes))
-        // PdfBookmarkEditor is a SaveableFacade; use it to edit bookmarks
-        using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
+        using (Document doc = new Document(inputStream))
         {
-            // Bind the PDF stream to the editor
-            bookmarkEditor.BindPdf(inputStream);
+            // Create a new bookmark (outline item) that navigates to an external URL.
+            Aspose.Pdf.OutlineItemCollection bookmark = new Aspose.Pdf.OutlineItemCollection(doc.Outlines)
+            {
+                Title = "Example Site",
+                Action = new GoToURIAction("https://example.org")
+            };
 
-            // Modify the bookmark title
-            bookmarkEditor.ModifyBookmarks(sourceTitle, destTitle);
+            // Add the bookmark to the document's outline collection.
+            doc.Outlines.Add(bookmark);
 
-            // Output stream to capture the modified PDF
+            // Save the modified PDF into an output memory stream.
             using (MemoryStream outputStream = new MemoryStream())
             {
-                // Save the edited PDF into the output stream
-                bookmarkEditor.Save(outputStream);
-
-                // Return the resulting byte array
+                doc.Save(outputStream);
                 return outputStream.ToArray();
             }
         }
     }
 }
 
-// Dummy entry point – required when the project is built as an executable.
 public class Program
 {
+    /// <summary>
+    /// Simple entry point required for a console‑type project.
+    /// Demonstrates how to call <see cref="PdfBookmarkHelper.UpdatePdfBookmarks"/>.
+    /// </summary>
     public static void Main(string[] args)
     {
-        // The library method can be called from here or from other projects.
-        // Example (commented out):
-        // byte[] pdf = File.ReadAllBytes("input.pdf");
-        // byte[] updated = PdfBookmarkHelper.UpdateBookmarkTitle(pdf, "OldTitle", "NewTitle");
-        // File.WriteAllBytes("output.pdf", updated);
+        if (args.Length == 0)
+        {
+            Console.WriteLine("Usage: <exe> <input-pdf-path>");
+            return;
+        }
+
+        string inputPath = args[0];
+        if (!File.Exists(inputPath))
+        {
+            Console.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        byte[] originalPdf = File.ReadAllBytes(inputPath);
+        byte[] updatedPdf = PdfBookmarkHelper.UpdatePdfBookmarks(originalPdf);
+
+        string outputPath = Path.Combine(Path.GetDirectoryName(inputPath) ?? string.Empty,
+                                         Path.GetFileNameWithoutExtension(inputPath) + "_updated.pdf");
+        File.WriteAllBytes(outputPath, updatedPdf);
+        Console.WriteLine($"Updated PDF saved to: {outputPath}");
     }
 }

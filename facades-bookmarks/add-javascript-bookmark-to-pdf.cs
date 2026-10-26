@@ -1,42 +1,49 @@
 using System;
 using System.IO;
-using System.Drawing; // needed for System.Drawing.Color
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations; // for JavascriptAction
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_with_js_bookmarks.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "bookmarked_output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF using PdfContentEditor (facade API)
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPdf);
+        // Load the existing PDF document
+        Document pdfDocument = new Document(inputPath);
 
-        // Create a bookmark that runs JavaScript when clicked.
-        // Action type "URI" with a javascript: scheme triggers the script.
-        // Use System.Drawing.Color for the color argument as required by the API.
-        editor.CreateBookmarksAction(
-            title: "Show Alert",                     // Bookmark title
-            color: System.Drawing.Color.Red,          // Title colour (System.Drawing.Color)
-            boldFlag: true,                           // Bold style
-            italicFlag: false,                        // Italic style
-            file: null,                               // Not used for URI action
-            actionType: "URI",                       // Use URI action
-            destination: "javascript:app.alert('Hello from bookmark!');" // JavaScript code
-        );
+        // ------------------------------------------------------------
+        // Create a top‑level bookmark (outline item) that runs JavaScript
+        // when the user clicks it.
+        // ------------------------------------------------------------
+        OutlineItemCollection rootBookmark = new OutlineItemCollection(pdfDocument.Outlines)
+        {
+            Title = "Show Message",
+            Action = new JavascriptAction("app.alert('Root bookmark clicked');")
+        };
+        pdfDocument.Outlines.Add(rootBookmark);
 
-        // Save the modified PDF
-        editor.Save(outputPdf);
+        // ------------------------------------------------------------
+        // Create a child bookmark under the root bookmark.
+        // ------------------------------------------------------------
+        OutlineItemCollection childBookmark = new OutlineItemCollection(pdfDocument.Outlines)
+        {
+            Title = "Child Action",
+            Action = new JavascriptAction("app.alert('Child bookmark clicked');")
+        };
+        // Add the child to the parent bookmark (use Add, not Outlines)
+        rootBookmark.Add(childBookmark);
 
-        Console.WriteLine($"PDF saved with JavaScript bookmark: {outputPdf}");
+        // Save the modified PDF with the new JavaScript bookmarks
+        pdfDocument.Save(outputPath);
+
+        Console.WriteLine($"PDF with JavaScript bookmarks saved to '{outputPath}'.");
     }
 }

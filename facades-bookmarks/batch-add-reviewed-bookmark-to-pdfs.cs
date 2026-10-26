@@ -1,15 +1,16 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations; // Added namespace for action types
 
 class Program
 {
     static void Main()
     {
-        // Folder containing the PDFs to process
-        const string inputFolder = "InputPdfs";
-        // Folder where the updated PDFs will be written
-        const string outputFolder = "OutputPdfs";
+        // Folder containing PDFs to process
+        const string inputFolder = @"C:\PdfBatch";
+        // Output folder for processed PDFs
+        const string outputFolder = @"C:\PdfBatch\Reviewed";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -17,34 +18,45 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
         // Process each PDF file in the input folder
         foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(outputFolder, $"{fileName}_reviewed.pdf");
+            try
+            {
+                // Load the document (using for deterministic disposal)
+                using (Document doc = new Document(inputPath))
+                {
+                    int pageCount = doc.Pages.Count;
 
-            // === Create ===
-            PdfBookmarkEditor editor = new PdfBookmarkEditor();
+                    // Get the last page instance
+                    Page lastPage = doc.Pages[pageCount];
 
-            // === Load ===
-            editor.BindPdf(inputPath);
+                    // Add a top‑level bookmark titled "Reviewed" that points to the last page
+                    OutlineItemCollection bookmark = new OutlineItemCollection(doc.Outlines)
+                    {
+                        Title = "Reviewed",
+                        Action = new GoToAction(lastPage) // jump to the last page
+                    };
+                    doc.Outlines.Add(bookmark);
 
-            // Determine the last page (Aspose.Pdf uses 1‑based indexing)
-            int lastPageNumber = editor.Document.Pages.Count;
+                    // Prepare output file path
+                    string fileName = Path.GetFileNameWithoutExtension(inputPath);
+                    string outputPath = Path.Combine(outputFolder, $"{fileName}_reviewed.pdf");
 
-            // Add a bookmark titled "Reviewed" that points to the last page
-            editor.CreateBookmarkOfPage("Reviewed", lastPageNumber);
+                    // Save the modified PDF
+                    doc.Save(outputPath);
 
-            // === Save ===
-            editor.Save(outputPath);
-
-            // Release resources held by the facade
-            editor.Close();
-
-            Console.WriteLine($"Processed: {inputPath} → {outputPath}");
+                    Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {Path.GetFileName(outputPath)}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+            }
         }
+
+        Console.WriteLine("Batch bookmark addition completed.");
     }
 }

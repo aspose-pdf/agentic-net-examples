@@ -4,49 +4,97 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+class BookmarkTocComparer
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string pdfPath = "input.pdf";          // PDF to analyze
+        const string tocPath = "toc.txt";            // Generated TOC (Title<TAB>PageNumber per line)
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Expected Table of Contents: title -> expected page number
-        var expectedToc = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+        if (!File.Exists(tocPath))
         {
-            { "Introduction", 1 },
-            { "Chapter 1", 3 },
-            { "Chapter 2", 7 }
-        };
+            Console.Error.WriteLine($"TOC file not found: {tocPath}");
+            return;
+        }
 
-        // Extract bookmarks using PdfBookmarkEditor
-        using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
+        // Load PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            bookmarkEditor.BindPdf(pdfPath);
-            Bookmarks bookmarks = bookmarkEditor.ExtractBookmarks();
-
-            // Iterate through all bookmarks (including nested ones)
-            foreach (Bookmark bm in bookmarks)
+            // -----------------------------------------------------------------
+            // Extract bookmarks using the Facades API
+            // -----------------------------------------------------------------
+            using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
             {
-                if (expectedToc.TryGetValue(bm.Title, out int expectedPage))
+                bookmarkEditor.BindPdf(pdfDoc);
+
+                // ExtractBookmarks returns a Bookmarks collection (facade model)
+                Bookmarks bookmarks = bookmarkEditor.ExtractBookmarks();
+
+                // Build a dictionary of bookmark title -> page number (1‑based)
+                var bookmarkMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                foreach (Bookmark bm in bookmarks)
                 {
-                    if (bm.PageNumber != expectedPage)
+                    // In the facade model the page number is exposed via the PageNumber property
+                    int pageNum = bm.PageNumber; // 1‑based page index
+                    bookmarkMap[bm.Title] = pageNum;
+                }
+
+                // -----------------------------------------------------------------
+                // Load the generated Table of Contents (simple TAB‑separated file)
+                // -----------------------------------------------------------------
+                var tocMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                foreach (string line in File.ReadAllLines(tocPath))
+                {
+                    // Expected format: Title<TAB>PageNumber
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+                    string[] parts = line.Split('\t');
+                    if (parts.Length != 2) continue;
+
+                    string title = parts[0].Trim();
+                    if (!int.TryParse(parts[1].Trim(), out int tocPage)) continue;
+
+                    tocMap[title] = tocPage;
+                }
+
+                // -----------------------------------------------------------------
+                // Compare bookmark page numbers with TOC entries
+                // -----------------------------------------------------------------
+                Console.WriteLine("=== Consistency Check Results ===");
+                foreach (var kvp in tocMap)
+                {
+                    string title = kvp.Key;
+                    int tocPage = kvp.Value;
+
+                    if (bookmarkMap.TryGetValue(title, out int bmPage))
                     {
-                        Console.WriteLine($"Mismatch: '{bm.Title}' points to page {bm.PageNumber}, expected {expectedPage}.");
+                        if (bmPage == tocPage)
+                        {
+                            Console.WriteLine($"OK   : \"{title}\" – page {tocPage}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"MISMATCH: \"{title}\" – TOC page {tocPage}, Bookmark page {bmPage}");
+                        }
                     }
                     else
                     {
-                        Console.WriteLine($"OK: '{bm.Title}' correctly points to page {bm.PageNumber}.");
+                        Console.WriteLine($"MISSING BOOKMARK: \"{title}\" – TOC page {tocPage}");
                     }
                 }
-                else
+
+                // Detect bookmarks that have no corresponding TOC entry
+                foreach (var bmTitle in bookmarkMap.Keys)
                 {
-                    Console.WriteLine($"Info: Bookmark '{bm.Title}' not present in expected TOC.");
+                    if (!tocMap.ContainsKey(bmTitle))
+                    {
+                        Console.WriteLine($"EXTRA BOOKMARK: \"{bmTitle}\" – Bookmark page {bookmarkMap[bmTitle]}");
+                    }
                 }
             }
         }

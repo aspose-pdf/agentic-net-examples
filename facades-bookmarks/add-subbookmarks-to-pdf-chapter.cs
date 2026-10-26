@@ -1,64 +1,63 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // PdfBookmarkEditor, Bookmark, Bookmarks
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using System.Drawing; // optional, only needed if you set TitleColor etc.
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_subbookmarks.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_bookmarked.pdf";
+        const string parentTitle = "Chapter 1";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the bookmark editor and bind the source PDF
-        PdfBookmarkEditor editor = new PdfBookmarkEditor();
-        editor.BindPdf(inputPdf);
-
-        // ----- Create parent bookmark (e.g., a chapter) -----
-        Bookmark parentBookmark = new Bookmark
+        // Use the facade editor for simple bookmark operations
+        using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
         {
-            Title      = "Chapter 1: Introduction",
-            PageNumber = 1,               // Destination page for the parent
-            Open       = true             // Expanded by default
-        };
+            bookmarkEditor.BindPdf(inputPath);
 
-        // ----- Create child bookmarks (subsections) -----
-        Bookmark child1 = new Bookmark
-        {
-            Title      = "Section 1.1: Background",
-            PageNumber = 2,
-            Open       = false
-        };
+            // Extract existing bookmarks to locate the parent and obtain its level
+            Bookmarks existingBookmarks = bookmarkEditor.ExtractBookmarks();
+            int parentLevel = 0;
+            foreach (Bookmark bm in existingBookmarks)
+            {
+                if (bm.Title == parentTitle)
+                {
+                    parentLevel = bm.Level;
+                    break;
+                }
+            }
 
-        Bookmark child2 = new Bookmark
-        {
-            Title      = "Section 1.2: Objectives",
-            PageNumber = 3,
-            Open       = false
-        };
+            // Child bookmark definitions (title + target page)
+            string[] childTitles = { "Section 1.1", "Section 1.2", "Section 1.3" };
+            int[] childPages = { 2, 3, 4 };
 
-        // Assemble child bookmarks into a collection
-        Bookmarks childCollection = new Bookmarks();
-        childCollection.Add(child1);
-        childCollection.Add(child2);
+            // Create each child bookmark one level deeper than the parent
+            for (int i = 0; i < childTitles.Length; i++)
+            {
+                Bookmark child = new Bookmark
+                {
+                    Title = childTitles[i],
+                    PageNumber = childPages[i],
+                    Level = parentLevel + 1,
+                    Action = "GoTo" // required for a navigation bookmark
+                };
 
-        // Attach the child collection to the parent
-        parentBookmark.ChildItems = childCollection;
+                // The facade API adds a single Bookmark via CreateBookmarks
+                bookmarkEditor.CreateBookmarks(child);
+            }
 
-        // Add the hierarchical bookmark structure to the PDF
-        editor.CreateBookmarks(parentBookmark);
+            // Persist the changes
+            bookmarkEditor.Save(outputPath);
+        }
 
-        // Save the modified PDF
-        editor.Save(outputPdf);
-
-        // Release resources held by the editor
-        editor.Close();
-
-        Console.WriteLine($"PDF saved with hierarchical bookmarks: {outputPdf}");
+        Console.WriteLine($"Child bookmarks added under '{parentTitle}'. Output saved to '{outputPath}'.");
     }
 }

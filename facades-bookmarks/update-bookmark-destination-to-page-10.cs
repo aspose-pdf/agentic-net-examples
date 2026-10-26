@@ -1,69 +1,58 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF containing the bookmarks
-        const string inputPdf  = "input.pdf";
-        // Output PDF with the updated bookmark destination
-        const string outputPdf = "output_updated.pdf";
-        // Identifier of the bookmark to modify – here we use the bookmark title as the ID
-        const string bookmarkId = "MyBookmark";
+        const string inputPath   = "input.pdf";
+        const string outputPath  = "output.pdf";
+        const string bookmarkId  = "bookmark123"; // Title (or Name) of the bookmark to modify
+        const int    targetPage  = 10;            // Aspose.Pdf uses 1‑based page indexing
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Work with the PDF bookmarks using PdfBookmarkEditor (facade API)
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Locate the bookmark (outline item) by its title/ID
+        OutlineItemCollection bookmark = FindBookmarkByTitle(doc.Outlines, bookmarkId);
+        if (bookmark == null)
         {
-            // Load the PDF document
-            editor.BindPdf(inputPdf);
-
-            // Extract all existing bookmarks
-            Aspose.Pdf.Facades.Bookmarks allBookmarks = editor.ExtractBookmarks();
-
-            // Locate the bookmark that matches the supplied identifier
-            Aspose.Pdf.Facades.Bookmark targetBookmark = null;
-            foreach (Aspose.Pdf.Facades.Bookmark bm in allBookmarks)
-            {
-                if (bm.Title == bookmarkId)
-                {
-                    targetBookmark = bm;
-                    break;
-                }
-            }
-
-            if (targetBookmark == null)
-            {
-                Console.Error.WriteLine($"Bookmark with title '{bookmarkId}' not found.");
-                // Save the original PDF unchanged
-                editor.Save(outputPdf);
-                return;
-            }
-
-            // Update the destination page to page 10 (Aspose.Pdf uses 1‑based indexing)
-            targetBookmark.PageNumber = 10;
-
-            // Remove all existing bookmarks from the document
-            editor.DeleteBookmarks();
-
-            // Re‑create bookmarks with the (now) updated collection
-            foreach (Aspose.Pdf.Facades.Bookmark bm in allBookmarks)
-            {
-                // Preserve title and (possibly) updated page number
-                editor.CreateBookmarkOfPage(bm.Title, bm.PageNumber);
-            }
-
-            // Persist the changes to a new file
-            editor.Save(outputPdf);
+            Console.Error.WriteLine($"Bookmark with ID '{bookmarkId}' not found.");
+            return;
         }
 
-        Console.WriteLine($"Bookmark '{bookmarkId}' updated to page 10 and saved to '{outputPdf}'.");
+        // Update the bookmark's destination to point to the desired page
+        // GoToAction(Page) creates a destination that points to the given page
+        bookmark.Action = new GoToAction(doc.Pages[targetPage]);
+
+        // Save the updated PDF
+        doc.Save(outputPath);
+
+        Console.WriteLine($"Bookmark '{bookmarkId}' now points to page {targetPage} and was saved to '{outputPath}'.");
+    }
+
+    // Recursively searches the outline tree for a bookmark with the specified title
+    private static OutlineItemCollection FindBookmarkByTitle(IEnumerable<OutlineItemCollection> collection, string title)
+    {
+        foreach (OutlineItemCollection item in collection)
+        {
+            if (item.Title == title)
+                return item;
+
+            // Search child outlines recursively (each OutlineItemCollection is also IEnumerable<OutlineItemCollection>)
+            OutlineItemCollection found = FindBookmarkByTitle(item, title);
+            if (found != null)
+                return found;
+        }
+        return null;
     }
 }

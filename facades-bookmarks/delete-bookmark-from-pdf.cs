@@ -7,43 +7,35 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string bookmarkTitleToDelete = "Chapter 2";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string bookmarkIdToDelete = "bookmark_3"; // identifier of the bookmark to remove
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Bind the PDF file to the bookmark editor facade
+        // Delete the specified bookmark using the Facades API
         PdfBookmarkEditor editor = new PdfBookmarkEditor();
-        editor.BindPdf(inputPdf);
+        editor.BindPdf(inputPath);
+        // DeleteBookmarks expects a single string identifier, not an array
+        editor.DeleteBookmarks(bookmarkIdToDelete);
+        editor.Save(outputPath);
 
-        // List all bookmarks before deletion
-        Console.WriteLine("Bookmarks before deletion:");
-        Bookmarks before = editor.ExtractBookmarks();
-        foreach (Bookmark bm in before)
+        // Verify removal by extracting remaining bookmarks
+        using (Document doc = new Document(outputPath))
         {
-            Console.WriteLine($"- {bm.Title}");
+            Console.WriteLine("Remaining bookmarks after deletion:");
+            // Iterate over the root outline collection
+            foreach (OutlineItemCollection outline in doc.Outlines)
+            {
+                // Only Title is available; Aspose.Pdf does not expose an Id property for outlines
+                Console.WriteLine($"- Title: {outline.Title}");
+            }
         }
 
-        // Delete the bookmark with the specified title
-        editor.DeleteBookmarks(bookmarkTitleToDelete);
-
-        // List remaining bookmarks to verify removal
-        Console.WriteLine("\nBookmarks after deletion:");
-        Bookmarks after = editor.ExtractBookmarks();
-        foreach (Bookmark bm in after)
-        {
-            Console.WriteLine($"- {bm.Title}");
-        }
-
-        // Save the modified PDF
-        editor.Save(outputPdf);
-
-        // Clean up resources
-        editor.Close();
+        Console.WriteLine($"Bookmark '{bookmarkIdToDelete}' deleted and saved to '{outputPath}'.");
     }
 }
