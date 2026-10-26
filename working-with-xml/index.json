@@ -1,7 +1,7 @@
 {
   "category": "working-with-xml",
   "nuget_version": "26.9.0",
-  "last_updated": "2026-10-26T04:36:03Z",
+  "last_updated": "2026-10-26T06:31:14Z",
   "examples": {
     "convert-xml-to-pdf": {
       "title": "Convert XML to PDF with Default XSLT Transformation",
@@ -20,7 +20,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20708"
     },
@@ -41,7 +41,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20709"
     },
@@ -62,7 +62,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20710"
     },
@@ -85,7 +85,7 @@
         "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20711"
     },
@@ -108,7 +108,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20712"
     },
@@ -131,7 +131,7 @@
         "Aspose.Pdf.Text.Position"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20713"
     },
@@ -154,7 +154,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20714"
     },
@@ -177,7 +177,7 @@
         "Aspose.Pdf.Text.XmlLoadOptions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20715"
     },
@@ -202,7 +202,7 @@
         "Aspose.Pdf.BorderInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20716"
     },
@@ -226,7 +226,7 @@
         "Aspose.Pdf.Drawing.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20717"
     },
@@ -250,7 +250,7 @@
         "Aspose.Pdf.Font"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20718"
     },
@@ -275,7 +275,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20719"
     },
@@ -296,7 +296,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20720"
     },
@@ -320,7 +320,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20721"
     },
@@ -343,7 +343,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20722"
     },
@@ -368,7 +368,7 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20723"
     },
@@ -391,7 +391,7 @@
         "Aspose.Pdf.PageInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20725"
     },
@@ -415,7 +415,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20726"
     },
@@ -438,7 +438,7 @@
         "Aspose.Pdf.Position"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20727"
     },
@@ -462,7 +462,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20728"
     },
@@ -486,7 +486,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20729"
     },
@@ -509,7 +509,7 @@
         "Aspose.Pdf.Document.Outlines"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20730"
     },
@@ -534,7 +534,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20731"
     },
@@ -558,7 +558,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20732"
     },
@@ -581,7 +581,7 @@
         "Aspose.Pdf.Document.PageMode"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20733"
     },
@@ -607,7 +607,7 @@
         "Aspose.Pdf.Facades.PdfPageEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20734"
     },
@@ -629,7 +629,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20735"
     },
@@ -654,7 +654,7 @@
         "Aspose.Pdf.PageLayout"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20736"
     },
@@ -677,7 +677,7 @@
         "Aspose.Pdf.PdfFormat"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20737"
     },
@@ -700,19 +700,19 @@
         "Aspose.Pdf.Security.CryptoAlgorithm"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20738"
     },
     "encrypt-pdf-from-xml": {
-      "title": "Apply DRM Encryption to PDF Generated from XML",
+      "title": "Encrypt PDF from XML with Password Protection",
       "filename": "encrypt-pdf-from-xml.cs",
-      "description": "The example loads an XML file, converts it to a PDF with Aspose.Pdf, and applies DRM protection by setting permissions and encrypting the document using AES‑256.",
+      "description": "Demonstrates loading an XML file into a PDF using Aspose.Pdf, applying password protection with specific permissions, and saving the encrypted document.",
       "tags": [
-        "pdf",
-        "encryption",
-        "xml",
-        "drm",
+        "pdf-encryption",
+        "xml-to-pdf",
+        "password-protection",
+        "permissions",
         "aspose-pdf"
       ],
       "apis_used": [
@@ -724,9 +724,9 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
-      "task_id": "20741"
+      "task_id": "20739"
     },
     "compress-pdf-streams-using-aspose-pdf": {
       "title": "Compress PDF Streams Using Aspose.Pdf Optimization",
@@ -747,7 +747,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20742"
     },
@@ -770,7 +770,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20743"
     },
@@ -793,7 +793,7 @@
         "Aspose.Pdf.Document.OptimizeResources"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20744"
     },
@@ -816,7 +816,7 @@
         "Aspose.Pdf.Document.OptimizeResources"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20745"
     },
@@ -839,7 +839,7 @@
         "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20746"
     },
@@ -863,7 +863,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20747"
     },
@@ -886,7 +886,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20748"
     },
@@ -909,7 +909,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20749"
     },
@@ -933,7 +933,7 @@
         "Aspose.Pdf.Annotations.RichMediaContent"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20752"
     },
@@ -957,7 +957,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20753"
     },
@@ -982,7 +982,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20754"
     },
@@ -1008,7 +1008,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20755"
     },
@@ -1034,7 +1034,7 @@
         "Aspose.Pdf.Forms.ComboBoxField"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20756"
     },
@@ -1060,7 +1060,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20757"
     },
@@ -1083,7 +1083,7 @@
         "Aspose.Pdf.Text.TextAbsorber.Text"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20758"
     },
@@ -1107,7 +1107,7 @@
         "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20759"
     },
@@ -1130,7 +1130,7 @@
         "Aspose.Pdf.Devices.PngDevice.Process"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20760"
     },
@@ -1153,7 +1153,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20761"
     },
@@ -1174,7 +1174,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20762"
     },
@@ -1197,7 +1197,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20763"
     },
@@ -1220,7 +1220,7 @@
         "Aspose.Pdf.PageCollection.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20765"
     },
@@ -1243,7 +1243,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20766"
     },
@@ -1269,7 +1269,7 @@
         "Aspose.Pdf.Document.Validate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20767"
     },
@@ -1290,7 +1290,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20768"
     },
@@ -1313,7 +1313,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20769"
     },
@@ -1336,7 +1336,7 @@
         "Aspose.Pdf.Document.Pages.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20770"
     },
@@ -1359,7 +1359,7 @@
         "Aspose.Pdf.SaveOptions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20771"
     },
@@ -1382,7 +1382,7 @@
         "Aspose.Pdf.PdfException"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20772"
     },
@@ -1405,7 +1405,7 @@
         "Aspose.Pdf.SaveOptions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20773"
     },
@@ -1431,7 +1431,7 @@
         "Aspose.Pdf.CryptoAlgorithm.AESx256"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20774"
     },
@@ -1454,7 +1454,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20776"
     },
@@ -1477,7 +1477,7 @@
         "Aspose.Pdf.Page.Paragraphs"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20777"
     },
@@ -1498,7 +1498,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20778"
     },
@@ -1519,7 +1519,7 @@
         "Aspose.Pdf.HtmlLoadOptions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20779"
     },
@@ -1542,7 +1542,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20780"
     },
@@ -1563,7 +1563,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20781"
     },
@@ -1586,7 +1586,7 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20782"
     },
@@ -1610,7 +1610,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20783"
     },
@@ -1634,7 +1634,7 @@
         "Aspose.Pdf.Forms.SignatureField.Sign"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20740"
     },
@@ -1658,7 +1658,7 @@
         "Aspose.Pdf.Document.Pages.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20764"
     },
@@ -1679,9 +1679,33 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T04:36:03Z",
+      "generated_at": "2026-10-26T06:31:14Z",
       "status": "verified",
       "task_id": "20775"
+    },
+    "encrypt-pdf-from-xml__v2": {
+      "title": "Apply DRM Encryption to PDF Generated from XML",
+      "filename": "encrypt-pdf-from-xml__v2.cs",
+      "description": "The example loads an XML file, converts it to a PDF with Aspose.Pdf, and applies DRM protection by setting permissions and encrypting the document using AES‑256.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "xml",
+        "drm",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XmlLoadOptions",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T06:31:14Z",
+      "status": "verified",
+      "task_id": "20741"
     }
   }
 }
