@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - facades-edit-document
 
-> **Facades edit document** in PDF using C# / .NET -- **201** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades edit document** in PDF using C# / .NET -- **206** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,39 +23,39 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (186/201 files) ← category-specific
-- `using Aspose.Pdf.Annotations;` (65/201 files)
-- `using Aspose.Pdf.Facades;` (55/201 files)
-- `using Aspose.Pdf.Text;` (22/201 files)
-- `using Aspose.Pdf.Devices;` (8/201 files)
-- `using Aspose.Pdf.Drawing;` (6/201 files)
-- `using Aspose.Pdf.Forms;` (5/201 files)
-- `using Aspose.Pdf.Printing;` (2/201 files)
-- `using Aspose.Pdf.Security;` (2/201 files)
-- `using Aspose.Pdf.LogicalStructure;` (1/201 files)
-- `using Aspose.Pdf.Tagged;` (1/201 files)
-- `using System;` (201/201 files)
-- `using System.IO;` (201/201 files)
-- `using Microsoft.CSharp.RuntimeBinder;` (21/201 files)
-- `using System.Collections.Generic;` (15/201 files)
-- `using System.Reflection;` (8/201 files)
-- `using System.Text.Json;` (6/201 files)
-- `using System.Linq;` (5/201 files)
-- `using System.Security.Cryptography;` (4/201 files)
-- `using System.Net.Http;` (3/201 files)
-- `using System.Text;` (3/201 files)
-- `using System.Threading.Tasks;` (3/201 files)
-- `using System.Drawing;` (2/201 files)
-- `using System.Xml.Linq;` (2/201 files)
-- `using NUnit.Framework;` (1/201 files)
-- `using System.Diagnostics;` (1/201 files)
-- `using System.Drawing.Imaging;` (1/201 files)
-- `using System.Drawing.Printing;` (1/201 files)
-- `using System.Runtime.Loader;` (1/201 files)
-- `using System.Security.Cryptography.X509Certificates;` (1/201 files)
-- `using System.Threading;` (1/201 files)
-- `using System.Xml;` (1/201 files)
-- `using System.Xml.Serialization;` (1/201 files)
+- `using Aspose.Pdf;` (190/206 files) ← category-specific
+- `using Aspose.Pdf.Annotations;` (67/206 files)
+- `using Aspose.Pdf.Facades;` (57/206 files)
+- `using Aspose.Pdf.Text;` (22/206 files)
+- `using Aspose.Pdf.Devices;` (8/206 files)
+- `using Aspose.Pdf.Drawing;` (6/206 files)
+- `using Aspose.Pdf.Forms;` (6/206 files)
+- `using Aspose.Pdf.Printing;` (2/206 files)
+- `using Aspose.Pdf.Security;` (2/206 files)
+- `using Aspose.Pdf.LogicalStructure;` (1/206 files)
+- `using Aspose.Pdf.Tagged;` (1/206 files)
+- `using System;` (206/206 files)
+- `using System.IO;` (206/206 files)
+- `using Microsoft.CSharp.RuntimeBinder;` (21/206 files)
+- `using System.Collections.Generic;` (16/206 files)
+- `using System.Reflection;` (8/206 files)
+- `using System.Text.Json;` (7/206 files)
+- `using System.Linq;` (5/206 files)
+- `using System.Security.Cryptography;` (4/206 files)
+- `using System.Net.Http;` (3/206 files)
+- `using System.Text;` (3/206 files)
+- `using System.Threading.Tasks;` (3/206 files)
+- `using System.Drawing;` (2/206 files)
+- `using System.Xml.Linq;` (2/206 files)
+- `using NUnit.Framework;` (1/206 files)
+- `using System.Diagnostics;` (1/206 files)
+- `using System.Drawing.Imaging;` (1/206 files)
+- `using System.Drawing.Printing;` (1/206 files)
+- `using System.Runtime.Loader;` (1/206 files)
+- `using System.Security.Cryptography.X509Certificates;` (1/206 files)
+- `using System.Threading;` (1/206 files)
+- `using System.Xml;` (1/206 files)
+- `using System.Xml.Serialization;` (1/206 files)
 
 ## Common Code Pattern
 
@@ -98,15 +98,15 @@ using (Document doc = new Document("input.pdf"))
 | [add-file-attachment-annotation](./add-file-attachment-annotation.cs) | Add File Attachment Link Annotation to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to attach a file to a PDF and create a clickable file‑attachment annotation that... |
 | [add-file-attachment-data-relationship](./add-file-attachment-data-relationship.cs) | Add Attachment with Data Relationship to PDF | `Document`, `FileSpecification`, `AFRelationship` | Demonstrates how to embed a file into a PDF using Aspose.Pdf and set its AFRelationship to Data f... |
 | [add-file-attachment-to-encrypted-pdf](./add-file-attachment-to-encrypted-pdf.cs) | Add File Attachment to Encrypted PDF | `Document`, `FileSpecification`, `EmbeddedFiles` | Demonstrates opening a password‑protected PDF, embedding a file as an attachment, and saving the ... |
-| [add-file-attachment-to-pdf](./add-file-attachment-to-pdf.cs) | Add File Attachment to PDF | `Document`, `FileSpecification`, `EmbeddedFiles` | Shows how to embed a local file as an attachment in an existing PDF document using Aspose.Pdf. |
+| [add-file-attachment-to-pdf__v3](./add-file-attachment-to-pdf__v3.cs) | Add File Attachment to PDF with Description | `Document`, `FileSpecification`, `EmbeddedFiles` | Shows how to embed an external file (Terms.pdf) into an existing PDF and assign a human‑readable ... |
+| [add-file-attachment-to-pdf__v4](./add-file-attachment-to-pdf__v4.cs) | Add File Attachment to PDF | `Document`, `FileSpecification`, `EmbeddedFiles` | Shows how to embed a local file as an attachment in an existing PDF document using Aspose.Pdf. |
 | [add-file-attachment-with-creation-date](./add-file-attachment-with-creation-date.cs) | Add Attachment with Timestamp to PDF | `Document`, `FileSpecification`, `EmbeddedFiles` | Shows how to embed a file as an attachment in a PDF and include the current creation date in the ... |
 | [add-file-attachment-with-custom-mime](./add-file-attachment-with-custom-mime.cs) | Add Custom MIME Type Attachment to PDF | `Document`, `FileSpecification`, `EmbeddedFiles` | Demonstrates how to attach a file to a PDF and specify a custom MIME type using Aspose.Pdf. |
 | [add-free-text-annotation-helvetica](./add-free-text-annotation-helvetica.cs) | Add Free‑Text Annotation with Custom Appearance to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to add a free‑text annotation to a PDF page using a Helvetica font, size 12, and... |
-| [add-green-circle-annotation-to-pdf-page](./add-green-circle-annotation-to-pdf-page.cs) | Add Green Circle Annotation to PDF Page | `Document`, `Page`, `Rectangle` | Demonstrates loading a PDF, verifying page 6 exists, creating a circle annotation with a green ou... |
-| ... | | | *and 171 more files* |
+| ... | | | *and 176 more files* |
 
 ## Category Statistics
-- Total examples: 201
+- Total examples: 206
 
 ## Category-Specific Tips
 
@@ -143,5 +143,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for facades-edit-document patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-10-21 | Run: `20261021_010254_451208`
+Updated: 2026-10-26 | Run: `20261026_001223_9dc44d`
 <!-- AUTOGENERATED:END -->
