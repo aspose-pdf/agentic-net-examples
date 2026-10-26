@@ -1,69 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
-class CrashReportGenerator
+class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string reportPath = "crash_report.txt";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
+        const string inputPath = "input.pdf";
+        const string crashReportPath = "crash_report.txt";
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
+            // Load a PDF document – this may throw a PdfException
+            using (Document doc = new Document(inputPath))
             {
-                // Example operation: add a simple text fragment to the first page
-                // (Replace with any complex PDF processing as needed)
-                if (doc.Pages.Count > 0)
-                {
-                    var page = doc.Pages[1];
-                    TextFragment text = new TextFragment("Processing successful.");
-                    page.Paragraphs.Add(text);
-                }
-
-                // Save the modified document
-                doc.Save(outputPdf);
-                Console.WriteLine($"Document processed and saved to '{outputPdf}'.");
+                // Example operation that could fail
+                Console.WriteLine($"Number of pages: {doc.Pages.Count}");
             }
+        }
+        catch (PdfException ex)
+        {
+            // Create and configure crash report options using the constructor that accepts the exception
+            var options = new CrashReportOptions(ex)
+            {
+                // Directory where the report will be written (fallback to current directory if null)
+                CrashReportDirectory = Path.GetDirectoryName(crashReportPath) ?? Directory.GetCurrentDirectory(),
+                // File name of the crash report (extension can be .html, .txt, etc.)
+                CrashReportFilename = Path.GetFileName(crashReportPath),
+                // Optional custom message to include in the report
+                CustomMessage = "Unexpected error while processing the PDF document."
+            };
+
+            // Generate the crash report using the static helper on PdfException
+            PdfException.GenerateCrashReport(options);
+
+            Console.WriteLine($"Crash report generated at: {Path.Combine(options.CrashReportDirectory, options.CrashReportFilename)}");
         }
         catch (Exception ex)
         {
-            // Build a custom stack trace message
-            StringWriter customTrace = new StringWriter();
-            customTrace.WriteLine("=== Crash Report ===");
-            customTrace.WriteLine($"Timestamp: {DateTime.UtcNow:O}");
-            customTrace.WriteLine($"Input File: {inputPdf}");
-            customTrace.WriteLine($"Output File: {outputPdf}");
-            customTrace.WriteLine($"Exception Type: {ex.GetType().FullName}");
-            customTrace.WriteLine($"Message: {ex.Message}");
-            customTrace.WriteLine("=== Original Stack Trace ===");
-            customTrace.WriteLine(ex.StackTrace);
-            customTrace.WriteLine("=== End of Report ===");
-
-            // Write the report to a file
-            try
-            {
-                File.WriteAllText(reportPath, customTrace.ToString());
-                Console.Error.WriteLine($"An error occurred. Crash report written to '{reportPath}'.");
-            }
-            catch (Exception writeEx)
-            {
-                // If writing the report fails, output both errors to console
-                Console.Error.WriteLine("Failed to write crash report:");
-                Console.Error.WriteLine(writeEx);
-                Console.Error.WriteLine("Original exception:");
-                Console.Error.WriteLine(ex);
-            }
+            // Handle any other unexpected exceptions
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
         }
     }
 }

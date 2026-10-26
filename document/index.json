@@ -1,7 +1,7 @@
 {
   "category": "document",
   "nuget_version": "26.9.0",
-  "last_updated": "2026-10-08T11:35:35Z",
+  "last_updated": "2026-10-26T07:18:04Z",
   "examples": {
     "create-pdf-custom-title-page": {
       "title": "Create PDF with Custom Title Page",
@@ -23,7 +23,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19821"
     },
@@ -46,7 +46,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19822"
     },
@@ -71,7 +71,7 @@
         "Aspose.Pdf.FontRepository"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19823"
     },
@@ -95,7 +95,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19824"
     },
@@ -120,7 +120,7 @@
         "Aspose.Pdf.Position"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19825"
     },
@@ -142,7 +142,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19827"
     },
@@ -164,7 +164,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19828"
     },
@@ -188,7 +188,7 @@
         "Aspose.Pdf.PageCollection.Accept"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19829"
     },
@@ -211,7 +211,7 @@
         "Aspose.Pdf.XImage.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19830"
     },
@@ -234,7 +234,7 @@
         "Aspose.Pdf.Forms.SignatureCustomAppearance"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19831"
     },
@@ -255,7 +255,7 @@
         "Aspose.Pdf.PdfFormat"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19832"
     },
@@ -276,7 +276,7 @@
         "Aspose.Pdf.PdfFormat"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19833"
     },
@@ -300,7 +300,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19834"
     },
@@ -322,7 +322,7 @@
         "Aspose.Pdf.Document.OpenAction"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19835"
     },
@@ -344,7 +344,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19836"
     },
@@ -366,7 +366,7 @@
         "Aspose.Pdf.DocumentInfo.ModDate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19837"
     },
@@ -390,7 +390,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19839"
     },
@@ -416,7 +416,7 @@
         "Aspose.Pdf.LogicalStructure.TableTDElement"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19840"
     },
@@ -439,7 +439,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19841"
     },
@@ -462,7 +462,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19842"
     },
@@ -485,7 +485,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19843"
     },
@@ -508,7 +508,7 @@
         "Aspose.Pdf.Devices.PngDevice.Process"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19844"
     },
@@ -531,7 +531,7 @@
         "Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19845"
     },
@@ -554,7 +554,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19846"
     },
@@ -578,7 +578,7 @@
         "Aspose.Pdf.FileSpecification.Contents"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19847"
     },
@@ -601,7 +601,7 @@
         "Aspose.Pdf.Document.Dispose"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19848"
     },
@@ -626,7 +626,7 @@
         "Aspose.Pdf.Page.PageInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19849"
     },
@@ -651,7 +651,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19850"
     },
@@ -674,7 +674,7 @@
         "Aspose.Pdf.Annotations.GoToURIAction"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19851"
     },
@@ -697,7 +697,7 @@
         "Aspose.Pdf.Page.Paragraphs"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19852"
     },
@@ -722,7 +722,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19853"
     },
@@ -745,7 +745,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19854"
     },
@@ -768,7 +768,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19855"
     },
@@ -791,7 +791,7 @@
         "Aspose.Pdf.TextAbsorber.Text"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19856"
     },
@@ -814,7 +814,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19857"
     },
@@ -839,7 +839,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19858"
     },
@@ -864,7 +864,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19859"
     },
@@ -888,7 +888,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19860"
     },
@@ -912,32 +912,32 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19861"
     },
     "remove-all-annotations-from-pdf": {
-      "title": "Remove All Annotations from PDF",
+      "title": "Remove All Annotations from a PDF",
       "filename": "remove-all-annotations-from-pdf.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, clear every annotation on each page, and save the sanitized document.",
+      "description": "Shows how to load a PDF with Aspose.Pdf, iterate through each page, clear its annotation collection, and save the resulting annotation‑free document.",
       "tags": [
         "pdf",
         "annotations",
-        "sanitization",
+        "cleanup",
         "aspose",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Page.Annotations",
-        "Aspose.Pdf.AnnotationsCollection.Clear"
+        "Aspose.Pdf.Page.Annotations.Clear",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
-      "task_id": "19910"
+      "task_id": "19862"
     },
     "add-signature-field-to-pdf": {
       "title": "Add User Signature Field to PDF",
@@ -958,7 +958,7 @@
         "Aspose.Pdf.Text.DefaultAppearance"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19863"
     },
@@ -981,7 +981,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19864"
     },
@@ -1004,7 +1004,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19865"
     },
@@ -1028,7 +1028,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19866"
     },
@@ -1051,7 +1051,7 @@
         "Aspose.Pdf.Drawing.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19867"
     },
@@ -1075,7 +1075,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19868"
     },
@@ -1098,7 +1098,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19869"
     },
@@ -1124,7 +1124,7 @@
         "Aspose.Pdf.MarginInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19870"
     },
@@ -1147,7 +1147,7 @@
         "Aspose.Pdf.Document.EmbeddedFiles"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19871"
     },
@@ -1171,7 +1171,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19872"
     },
@@ -1195,7 +1195,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19873"
     },
@@ -1218,7 +1218,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19874"
     },
@@ -1241,7 +1241,7 @@
         "Aspose.Pdf.FileSpecification.Name"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19875"
     },
@@ -1265,7 +1265,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19877"
     },
@@ -1289,7 +1289,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19878"
     },
@@ -1314,7 +1314,7 @@
         "Aspose.Pdf.FontStyles"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19879"
     },
@@ -1337,7 +1337,7 @@
         "Aspose.Pdf.Position"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19880"
     },
@@ -1362,7 +1362,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19881"
     },
@@ -1386,7 +1386,7 @@
         "Aspose.Pdf.JavascriptAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19882"
     },
@@ -1412,7 +1412,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19883"
     },
@@ -1435,7 +1435,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19884"
     },
@@ -1460,7 +1460,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19885"
     },
@@ -1483,7 +1483,7 @@
         "Aspose.Pdf.Document.Pages.Insert"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19886"
     },
@@ -1508,7 +1508,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19887"
     },
@@ -1533,7 +1533,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19888"
     },
@@ -1557,7 +1557,7 @@
         "Aspose.Pdf.Annotations.JavascriptAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19889"
     },
@@ -1583,7 +1583,7 @@
         "Aspose.Pdf.BorderInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19890"
     },
@@ -1608,7 +1608,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19891"
     },
@@ -1631,7 +1631,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19892"
     },
@@ -1655,7 +1655,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19893"
     },
@@ -1678,7 +1678,7 @@
         "Aspose.Pdf.OutlineItemCollection.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19894"
     },
@@ -1704,7 +1704,7 @@
         "Aspose.Pdf.FontStyles"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19895"
     },
@@ -1727,7 +1727,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19896"
     },
@@ -1750,7 +1750,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19897"
     },
@@ -1775,7 +1775,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19898"
     },
@@ -1798,7 +1798,7 @@
         "Aspose.Pdf.Text.TextAbsorber.Text"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19900"
     },
@@ -1821,7 +1821,7 @@
         "Aspose.Pdf.Form"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19902"
     },
@@ -1843,7 +1843,7 @@
         "Aspose.Pdf.Metadata.ToString"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19903"
     },
@@ -1868,7 +1868,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19904"
     },
@@ -1891,7 +1891,7 @@
         "Aspose.Pdf.Drawing.GraphInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19905"
     },
@@ -1914,7 +1914,7 @@
         "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19906"
     },
@@ -1939,7 +1939,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19907"
     },
@@ -1962,7 +1962,7 @@
         "Aspose.Pdf.Annotations.GoToURIAction"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19908"
     },
@@ -1985,7 +1985,7 @@
         "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19909"
     },
@@ -2008,7 +2008,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19911"
     },
@@ -2031,7 +2031,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19912"
     },
@@ -2054,7 +2054,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19913"
     },
@@ -2077,7 +2077,7 @@
         "Aspose.Pdf.Devices.JpegDevice.Process"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19914"
     },
@@ -2100,32 +2100,32 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19915"
     },
     "convert-pdf-pages-to-png-images": {
-      "title": "Convert PDF Pages to JPEG Images",
+      "title": "Convert PDF Pages to PNG Images",
       "filename": "convert-pdf-pages-to-png-images.cs",
-      "description": "Creates a PDF with a known number of pages, uses Aspose.Pdf's JpegDevice to render each page to a JPEG file, and verifies that an image is generated for every page.",
+      "description": "Shows how to load a PDF with Aspose.Pdf and render each page as a separate PNG image file.",
       "tags": [
         "pdf",
-        "image-conversion",
-        "aspose.pdf",
-        "unit-test",
-        "jpeg"
+        "image",
+        "conversion",
+        "aspose",
+        "png"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Devices.JpegDevice",
         "Aspose.Pdf.Devices.Resolution",
-        "Aspose.Pdf.Devices.JpegDevice.Process"
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Devices.PngDevice.Process"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
-      "task_id": "19937"
+      "task_id": "19916"
     },
     "selective-page-rasterization-hidden-data-sanitizer": {
       "title": "Sanitize PDF by Removing All Annotations",
@@ -2146,7 +2146,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19917"
     },
@@ -2169,7 +2169,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19918"
     },
@@ -2193,32 +2193,31 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19919"
     },
     "generate-pdf-crash-report": {
-      "title": "PDF Processing with Custom Crash Report",
+      "title": "Generate Crash Report on PdfException",
       "filename": "generate-pdf-crash-report.cs",
-      "description": "Demonstrates loading a PDF, adding a text fragment, saving the document, and generating a detailed custom crash report when an exception occurs.",
+      "description": "Demonstrates catching a PdfException, configuring CrashReportOptions, and generating a crash report file with Aspose.Pdf.",
       "tags": [
         "pdf",
+        "exception-handling",
         "crash-report",
-        "error-handling",
-        "aspose",
-        "text-fragment"
+        "aspose-pdf",
+        "error-reporting"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.Paragraphs",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.PdfException",
+        "Aspose.Pdf.CrashReportOptions",
+        "Aspose.Pdf.PdfException.GenerateCrashReport"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
-      "task_id": "19940"
+      "task_id": "19920"
     },
     "customize-crash-report-filename-message": {
       "title": "Customize Crash Report File Name with CrashReportOptions",
@@ -2238,7 +2237,7 @@
         "Aspose.Pdf.CrashReportOptions.CustomMessage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19921"
     },
@@ -2260,7 +2259,7 @@
         "Aspose.Pdf.PdfException.GenerateCrashReport"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19922"
     },
@@ -2282,7 +2281,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19923"
     },
@@ -2305,7 +2304,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19924"
     },
@@ -2330,7 +2329,7 @@
         "Aspose.Pdf.FontRepository"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19925"
     },
@@ -2355,7 +2354,7 @@
         "Aspose.Pdf.OutlineItemCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19926"
     },
@@ -2378,7 +2377,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19927"
     },
@@ -2404,7 +2403,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19928"
     },
@@ -2429,7 +2428,7 @@
         "Aspose.Pdf.Tagged.StructureElement.FindElements"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19929"
     },
@@ -2453,7 +2452,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19930"
     },
@@ -2476,7 +2475,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19931"
     },
@@ -2499,7 +2498,7 @@
         "Aspose.Pdf.Document.EmbeddedFiles"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19932"
     },
@@ -2523,7 +2522,7 @@
         "Aspose.Pdf.Annotations.AnnotationFlags"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19933"
     },
@@ -2546,7 +2545,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19934"
     },
@@ -2569,7 +2568,7 @@
         "Aspose.Pdf.Devices.TiffDevice.Process"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19936"
     },
@@ -2593,7 +2592,7 @@
         "Aspose.Pdf.Tagged.HeaderElement"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19938"
     },
@@ -2617,7 +2616,7 @@
         "Aspose.Pdf.Tagged.HeaderElement"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19939"
     },
@@ -2640,7 +2639,7 @@
         "Aspose.Pdf.CrashReportOptions.CrashReportDirectory"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19941"
     },
@@ -2663,7 +2662,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19942"
     },
@@ -2686,7 +2685,7 @@
         "Aspose.Pdf.Document.Pages.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19838"
     },
@@ -2710,7 +2709,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19876"
     },
@@ -2734,9 +2733,78 @@
         "Aspose.Pdf.Actions.JavascriptAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:35:35Z",
+      "generated_at": "2026-10-26T07:18:04Z",
       "status": "verified",
       "task_id": "19943"
+    },
+    "remove-all-annotations-from-pdf__v2": {
+      "title": "Remove All Annotations from PDF",
+      "filename": "remove-all-annotations-from-pdf__v2.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, clear every annotation on each page, and save the sanitized document.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "sanitization",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Annotations",
+        "Aspose.Pdf.AnnotationsCollection.Clear"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:18:04Z",
+      "status": "verified",
+      "task_id": "19910"
+    },
+    "convert-pdf-pages-to-png-images__v2": {
+      "title": "Convert PDF Pages to JPEG Images",
+      "filename": "convert-pdf-pages-to-png-images__v2.cs",
+      "description": "Creates a PDF with a known number of pages, uses Aspose.Pdf's JpegDevice to render each page to a JPEG file, and verifies that an image is generated for every page.",
+      "tags": [
+        "pdf",
+        "image-conversion",
+        "aspose.pdf",
+        "unit-test",
+        "jpeg"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Devices.JpegDevice",
+        "Aspose.Pdf.Devices.Resolution",
+        "Aspose.Pdf.Devices.JpegDevice.Process"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:18:04Z",
+      "status": "verified",
+      "task_id": "19937"
+    },
+    "generate-pdf-crash-report__v2": {
+      "title": "PDF Processing with Custom Crash Report",
+      "filename": "generate-pdf-crash-report__v2.cs",
+      "description": "Demonstrates loading a PDF, adding a text fragment, saving the document, and generating a detailed custom crash report when an exception occurs.",
+      "tags": [
+        "pdf",
+        "crash-report",
+        "error-handling",
+        "aspose",
+        "text-fragment"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Paragraphs",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:18:04Z",
+      "status": "verified",
+      "task_id": "19940"
     }
   }
 }

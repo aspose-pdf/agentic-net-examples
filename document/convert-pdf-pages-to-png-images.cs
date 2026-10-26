@@ -3,84 +3,59 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
-// Minimal NUnit stubs to allow compilation without the NUnit package
-namespace NUnit.Framework
+class Program
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    public sealed class TestFixtureAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TestAttribute : Attribute { }
-
-    public static class Assert
+    static void Main()
     {
-        public static void AreEqual<T>(T expected, T actual, string message = null)
+        const string inputPdf = "input.pdf";
+        const string outputDir = "Images";
+
+        if (!File.Exists(inputPdf))
         {
-            if (!object.Equals(expected, actual))
-                throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
         }
-    }
-}
 
-namespace AsposePdfTests
-{
-    [NUnit.Framework.TestFixture]
-    public class PdfConversionTests
-    {
-        [NUnit.Framework.Test]
-        public void ConvertPagesToImages_ShouldGenerateImageForEachPage()
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        try
         {
-            // Arrange: create temporary directories for input PDF and output images
-            string tempRoot = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            Directory.CreateDirectory(tempRoot);
-            string pdfPath = Path.Combine(tempRoot, "sample.pdf");
-            string imageOutputDir = Path.Combine(tempRoot, "Images");
-            Directory.CreateDirectory(imageOutputDir);
-
-            // Create a PDF with a known number of pages (e.g., 3 pages)
-            const int pageCount = 3;
-            using (Document doc = new Document())
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                for (int i = 1; i <= pageCount; i++) // 1‑based indexing per rule
-                {
-                    doc.Pages.Add();
-                }
-                doc.Save(pdfPath);
+                // Convert every page to an image using core Aspose.Pdf APIs
+                ConvertAllPagesToImages(doc, outputDir);
             }
 
-            // Act: convert each PDF page to an image using the core Device API
-            using (Document doc = new Document(pdfPath))
-            {
-                // Use JpegDevice (core API) to render pages as JPEG images
-                var resolution = new Resolution(300);
-                var jpegDevice = new JpegDevice(resolution);
-
-                int pageNumber = 1;
-                foreach (Page page in doc.Pages)
-                {
-                    string imagePath = Path.Combine(imageOutputDir, $"page_{pageNumber}.jpg");
-                    using (FileStream imageStream = new FileStream(imagePath, FileMode.Create))
-                    {
-                        jpegDevice.Process(page, imageStream);
-                    }
-                    pageNumber++;
-                }
-            }
-
-            // Assert: verify that an image file exists for each PDF page
-            string[] generatedImages = Directory.GetFiles(imageOutputDir, "page_*.jpg");
-            NUnit.Framework.Assert.AreEqual(pageCount, generatedImages.Length,
-                $"Expected {pageCount} image files, but found {generatedImages.Length}.");
-
-            // Cleanup temporary files
-            Directory.Delete(tempRoot, true);
+            Console.WriteLine($"All pages have been saved as images in '{outputDir}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 
-    // Dummy entry point to satisfy the compiler when the project is built as an executable.
-    // In a real test project this class would not be needed, but adding it removes the CS5001 error.
-    public static class Program
+    /// <summary>
+    /// Renders each page of the supplied PDF document to a separate PNG image file.
+    /// </summary>
+    /// <param name="doc">The loaded PDF document.</param>
+    /// <param name="outputDir">Directory where image files will be written.</param>
+    private static void ConvertAllPagesToImages(Document doc, string outputDir)
     {
-        public static void Main() { /* No‑op */ }
+        // Define the resolution for the output images (e.g., 300 DPI)
+        var resolution = new Resolution(300);
+        // Choose the image format – here we use PNG. You can switch to JpegDevice, etc.
+        var device = new PngDevice(resolution);
+
+        for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
+        {
+            var page = doc.Pages[pageNumber];
+            string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+            using (var stream = new FileStream(outPath, FileMode.Create))
+            {
+                device.Process(page, stream);
+            }
+        }
     }
 }
