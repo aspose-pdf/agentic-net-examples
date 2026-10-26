@@ -1,50 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// Export import pdf annotations xfdf
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/facades-annotations/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string sourcePdf = "source.pdf";
-        const string targetPdf = "target.pdf";
-        const string xfdfPath  = "annotations.xfdf";
-        const string outputPdf = "output.pdf";
-
-        // Verify input files exist
-        if (!File.Exists(sourcePdf))
-        {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdf}");
-            return;
-        }
-        if (!File.Exists(targetPdf))
-        {
-            Console.Error.WriteLine($"Target PDF not found: {targetPdf}");
-            return;
-        }
-
-        // ------------------------------------------------------------
-        // Export annotations from the source PDF to an XFDF file
-        // ------------------------------------------------------------
-        using (var srcDoc = new Document(sourcePdf))
-        using (var xfdfStream = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
-        {
-            // Aspose.Pdf provides ExportAnnotationsToXfdf on Document
-            srcDoc.ExportAnnotationsToXfdf(xfdfStream);
-        }
-        Console.WriteLine($"Annotations exported to '{xfdfPath}'.");
-
-        // ------------------------------------------------------------
-        // Import the XFDF annotations into the target PDF and save
-        // ------------------------------------------------------------
-        using (var tgtDoc = new Document(targetPdf))
-        {
-            // Import the previously exported annotations
-            tgtDoc.ImportAnnotationsFromXfdf(xfdfPath);
-
-            // Save the resulting PDF with duplicated annotation layout
-            tgtDoc.Save(outputPdf);
-        }
-        Console.WriteLine($"Annotations imported and saved to '{outputPdf}'.");
-    }
-}
+class Program { static void Main() { } }

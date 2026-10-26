@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -10,26 +9,27 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "flattened.pdf";
 
-        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-
         // PdfAnnotationEditor does not implement IDisposable, so we instantiate it directly.
-        // Bind the document, then flatten annotations which copies their appearance streams
-        // to the page content and removes the interactive annotation objects.
         PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        editor.BindPdf(doc);
-        editor.FlatteningAnnotations(); // correct method name
 
-        // Save the flattened PDF
-        doc.Save(outputPath);
+        // Load the PDF document.
+        editor.BindPdf(inputPath);
 
-        Console.WriteLine($"Annotations flattened and saved to '{outputPath}'.");
+        // Flatten all annotations into non‑editable visual elements.
+        editor.FlatteningAnnotations();
+
+        // Save the resulting PDF.
+        editor.Save(outputPath);
+
+        // Release internal resources.
+        editor.Close();
+
+        Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
     }
 }
