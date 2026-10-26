@@ -1,76 +1,53 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-public static class PdfSplitter
+class Program
 {
-    /// <summary>
-    /// Splits the input PDF stream into multiple bulk page sets.
-    /// Each set contains up to <paramref name="bulkSize"/> pages.
-    /// Returns an array of MemoryStream objects, each representing a subset PDF.
-    /// </summary>
-    /// <param name="pdfStream">Input PDF as a seekable stream.</param>
-    /// <param name="bulkSize">Maximum number of pages per output set.</param>
-    /// <returns>Array of MemoryStream, each containing a PDF fragment.</returns>
-    public static MemoryStream[] SplitPdfIntoBulkSets(Stream pdfStream, int bulkSize)
+    static void Main()
     {
-        if (pdfStream == null) throw new ArgumentNullException(nameof(pdfStream));
-        if (!pdfStream.CanSeek) throw new ArgumentException("Stream must support seeking.", nameof(pdfStream));
-        if (bulkSize <= 0) throw new ArgumentOutOfRangeException(nameof(bulkSize), "Bulk size must be greater than zero.");
+        // Input PDF file
+        const string inputPdf = "source.pdf";
 
-        // Read the entire PDF into a byte array so it can be reused for each extraction.
-        byte[] pdfBytes;
-        using (MemoryStream temp = new MemoryStream())
+        if (!File.Exists(inputPdf))
         {
-            pdfStream.CopyTo(temp);
-            pdfBytes = temp.ToArray();
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
         }
 
-        // Determine total page count using Document (wrapped in using for proper disposal).
-        int pageCount;
-        using (Document doc = new Document(new MemoryStream(pdfBytes)))
+        // Define bulk page sets as start‑end pairs with their output file names
+        // Example: split pages 1‑5 into Part1.pdf, 6‑10 into Part2.pdf, etc.
+        var pageRanges = new (int Start, int End, string Output)[]
         {
-            pageCount = doc.Pages.Count;
-        }
+            (1, 5, "Part1.pdf"),
+            (6, 10, "Part2.pdf"),
+            (11, 15, "Part3.pdf")
+            // Add more ranges as needed
+        };
 
-        // Calculate how many bulk sets are needed.
-        int setCount = (pageCount + bulkSize - 1) / bulkSize;
-        var result = new MemoryStream[setCount];
+        // PdfFileEditor does NOT implement IDisposable, so do NOT wrap it in a using block
+        PdfFileEditor editor = new PdfFileEditor();
 
-        for (int i = 0; i < setCount; i++)
+        foreach (var (start, end, output) in pageRanges)
         {
-            // Aspose.Pdf uses 1‑based page indexing.
-            int startPage = i * bulkSize + 1;
-            int endPage   = Math.Min(startPage + bulkSize - 1, pageCount);
-
-            // Create a fresh source stream for each extraction.
-            using (MemoryStream srcStream = new MemoryStream(pdfBytes))
-            using (Document srcDoc = new Document(srcStream))
+            // Validate page numbers (Aspose.Pdf uses 1‑based indexing)
+            if (start < 1 || end < start)
             {
-                // Create a new document that will hold the selected page range.
-                Document subsetDoc = new Document();
+                Console.Error.WriteLine($"Invalid range: {start}-{end}");
+                continue;
+            }
 
-                for (int p = startPage; p <= endPage; p++)
-                {
-                    // Add a copy of each required page to the subset document.
-                    subsetDoc.Pages.Add(srcDoc.Pages[p]);
-                }
-
-                MemoryStream destStream = new MemoryStream();
-                subsetDoc.Save(destStream);
-                destStream.Position = 0; // Reset for consumer reading.
-                result[i] = destStream; // Store the resulting MemoryStream.
+            try
+            {
+                // Extract the specified page range into a new PDF file
+                // Correct argument order: source, startPage, endPage, outputFile
+                editor.Extract(inputPdf, start, end, output);
+                Console.WriteLine($"Created '{output}' from pages {start}‑{end}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to extract pages {start}-{end}: {ex.Message}");
             }
         }
-
-        return result;
-    }
-
-    // Minimal entry point to satisfy the compiler when the project is built as an executable.
-    public static void Main(string[] args)
-    {
-        // The method is intentionally left empty – the library functionality is exercised
-        // via the SplitPdfIntoBulkSets method from user code or unit tests.
     }
 }

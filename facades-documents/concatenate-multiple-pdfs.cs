@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf.Facades;
 
@@ -7,42 +6,56 @@ class Program
 {
     static void Main(string[] args)
     {
-        // The console version expects file paths as arguments.
-        // Example: dotnet run file1.pdf file2.pdf [file3.pdf ...]
+        // Expect at least two arguments: one or more input PDFs and one output PDF path
         if (args.Length < 2)
         {
-            Console.WriteLine("Usage: <exe> <pdf1> <pdf2> [<pdf3> ...]");
+            Console.Error.WriteLine("Usage: <input1.pdf> [<input2.pdf> ...] <output.pdf>");
             return;
         }
 
-        var inputPaths = new List<string>();
-        foreach (var arg in args)
+        // The last argument is the output file; all preceding arguments are input files
+        string outputPath = args[args.Length - 1];
+        string[] inputFiles = new string[args.Length - 1];
+        Array.Copy(args, inputFiles, args.Length - 1);
+
+        // Verify that each input file exists
+        foreach (string file in inputFiles)
         {
-            if (File.Exists(arg))
-                inputPaths.Add(arg);
-            else
-                Console.WriteLine($"Warning: file not found '{arg}' – ignored.");
+            if (!File.Exists(file))
+            {
+                Console.Error.WriteLine($"Input file not found: {file}");
+                return;
+            }
         }
 
-        if (inputPaths.Count < 2)
+        // Ensure the output directory exists
+        string outputDir = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
         {
-            Console.WriteLine("At least two existing PDF files are required.");
-            return;
+            try
+            {
+                Directory.CreateDirectory(outputDir);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to create output directory: {ex.Message}");
+                return;
+            }
         }
-
-        // Create a temporary file for the merged PDF.
-        string outputPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
 
         try
         {
-            // PdfFileEditor does not implement IDisposable, so no using block is needed.
-            var editor = new PdfFileEditor();
-            editor.Concatenate(inputPaths.ToArray(), outputPath);
-            Console.WriteLine($"Merged PDF created at: {outputPath}");
+            // PdfFileEditor does NOT implement IDisposable; do NOT wrap in using
+            PdfFileEditor editor = new PdfFileEditor();
+
+            // Concatenate the input PDFs into the specified output PDF
+            editor.Concatenate(inputFiles, outputPath);
+
+            Console.WriteLine($"Successfully concatenated {inputFiles.Length} PDFs into '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error during concatenation: {ex.Message}");
+            Console.Error.WriteLine($"Error during concatenation: {ex.Message}");
         }
     }
 }
