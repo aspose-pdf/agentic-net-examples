@@ -2,101 +2,82 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
-using Aspose.Pdf.Facades;
-
-// Minimal stub for Aspose.Pdf.Facades.PdfFormEditor when the real library is not referenced.
-// This allows the sample to compile and run (the stub does not actually modify PDFs).
-namespace Aspose.Pdf.Facades
-{
-    public class PdfFormEditor : IDisposable
-    {
-        private string _boundPdfPath;
-        public void BindPdf(string pdfPath)
-        {
-            // In a real implementation this would load the PDF.
-            // Here we just store the path for demonstration purposes.
-            _boundPdfPath = pdfPath;
-        }
-
-        public void SetField(string fieldName, string value)
-        {
-            // Stub: no real PDF manipulation.
-            // In production this would set the form field value.
-        }
-
-        public void Save(string outputPath)
-        {
-            // Stub: simply copy the source PDF to the destination if it exists.
-            if (!string.IsNullOrEmpty(_boundPdfPath) && File.Exists(_boundPdfPath))
-            {
-                File.Copy(_boundPdfPath, outputPath, overwrite: true);
-            }
-        }
-
-        public void Dispose()
-        {
-            // No unmanaged resources in the stub.
-        }
-    }
-}
+using Aspose.Pdf;
+using Aspose.Pdf.Forms; // <-- required for Form fields
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, the configuration file and the output PDF
-        const string pdfPath = "input_form.pdf";
-        const string configPath = "defaults.json";
+        const string inputPdfPath  = "form.pdf";
         const string outputPdfPath = "filled_form.pdf";
+        const string jsonPath      = "data.json";
 
-        // Verify that the required files exist
-        if (!File.Exists(pdfPath))
+        // Verify required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(configPath))
+        if (!File.Exists(jsonPath))
         {
-            Console.Error.WriteLine($"Configuration file not found: {configPath}");
+            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
             return;
         }
 
-        // Load default field values from a simple JSON file:
-        // { "FieldName1": "DefaultValue1", "FieldName2": "DefaultValue2", ... }
-        Dictionary<string, string> fieldDefaults = new();
+        // Load JSON mapping of field names to values
+        Dictionary<string, string> fieldValues;
         try
         {
-            string json = File.ReadAllText(configPath);
-            fieldDefaults = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new Dictionary<string, string>();
+            string jsonContent = File.ReadAllText(jsonPath);
+            fieldValues = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent) ?? new Dictionary<string, string>();
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
+            Console.Error.WriteLine($"Failed to read or parse JSON: {ex.Message}");
             return;
         }
 
-        // Use PdfFormEditor (Facades API) to bind the PDF and set field values.
-        // PdfFormEditor does NOT implement IDisposable in older versions, but our stub does, so we can use a using block.
-        using PdfFormEditor formEditor = new();
+        // Load the PDF document
+        Document pdfDocument;
         try
         {
-            // Bind the source PDF
-            formEditor.BindPdf(pdfPath);
+            pdfDocument = new Document(inputPdfPath);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to load PDF: {ex.Message}");
+            return;
+        }
 
-            // Set each field to its default value
-            foreach (KeyValuePair<string, string> kvp in fieldDefaults)
+        // Fill form fields using the values from the JSON dictionary
+        foreach (var kvp in fieldValues)
+        {
+            // Retrieve the form field by its partial name (the key from JSON)
+            // Document.Form indexer returns a WidgetAnnotation; cast to Aspose.Pdf.Forms.Field to access the Value property.
+            Field formField = pdfDocument.Form[kvp.Key] as Field;
+            if (formField != null)
             {
-                // SetField will create the field if it does not exist; otherwise it overwrites the value.
-                formEditor.SetField(kvp.Key, kvp.Value);
+                // Most field types expose a Value property that accepts a string.
+                // For specific types (e.g., CheckBoxField) you may want to set the appropriate property,
+                // but assigning to Value works for the majority of cases.
+                formField.Value = kvp.Value;
             }
+            else
+            {
+                Console.Error.WriteLine($"Warning: Form field '{kvp.Key}' not found in the PDF.");
+            }
+        }
 
-            // Save the modified PDF with defaults applied
-            formEditor.Save(outputPdfPath);
-            Console.WriteLine($"Form fields populated and saved to '{outputPdfPath}'.");
+        // Save the modified PDF
+        try
+        {
+            pdfDocument.Save(outputPdfPath);
+            Console.WriteLine($"Form fields have been filled and saved to '{outputPdfPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+            Console.Error.WriteLine($"Error saving PDF: {ex.Message}");
         }
     }
 }

@@ -1,7 +1,7 @@
 {
   "category": "facades-edit-document",
   "nuget_version": "26.9.0",
-  "last_updated": "2026-10-21T08:06:39Z",
+  "last_updated": "2026-10-26T07:32:24Z",
   "examples": {
     "add-red-rectangle-annotation": {
       "title": "Add Red Rectangle Annotation with 2 mm Border to PDF Page",
@@ -22,32 +22,34 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21385"
     },
     "add-highlight-annotation-to-pdf-page": {
-      "title": "Highlight Text on a Specific PDF Page",
+      "title": "Add Highlight Annotation to PDF Page",
       "filename": "add-highlight-annotation-to-pdf-page.cs",
-      "description": "Shows how to locate a specific text fragment on page 3 of a PDF and apply a yellow highlight annotation using Aspose.Pdf.",
+      "description": "Shows how to insert a highlight annotation over a specific text range on page three of a PDF using Aspose.Pdf.",
       "tags": [
         "highlight",
         "annotation",
-        "text-search",
         "pdf",
-        "Aspose.Pdf"
+        "Aspose",
+        "C#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextFragmentAbsorber",
-        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Annotations.HighlightAnnotation",
-        "Aspose.Pdf.Color"
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
-      "task_id": "21530"
+      "task_id": "21386"
     },
     "add-sticky-note-annotation-to-pdf": {
       "title": "Add Sticky Note Annotation to First PDF Page",
@@ -71,7 +73,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21387"
     },
@@ -96,7 +98,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21388"
     },
@@ -120,7 +122,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21389"
     },
@@ -144,7 +146,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21390"
     },
@@ -167,7 +169,7 @@
         "Aspose.Pdf.Document.Form.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21391"
     },
@@ -192,32 +194,9 @@
         "PdfExtractor.GetNextImage"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21392"
-    },
-    "extract-images-from-pdf": {
-      "title": "Extract Images from PDF using Aspose.Pdf Facades",
-      "filename": "extract-images-from-pdf.cs",
-      "description": "Demonstrates how to extract all embedded images from a PDF file and save them to a specified folder using the Aspose.Pdf.Facades PdfExtractor class.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "aspose-pdf",
-        "facades",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfExtractor",
-        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
-        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
-        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
-        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
-      "status": "verified",
-      "task_id": "21393"
     },
     "add-image-stamp-to-bottom-right-page-3": {
       "title": "Add Logo Image Stamp to Bottom‑Right of Page 3",
@@ -239,7 +218,7 @@
         "Aspose.Pdf.VerticalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21394"
     },
@@ -262,7 +241,7 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21395"
     },
@@ -288,32 +267,31 @@
         "Aspose.Pdf.Pages.Insert"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21396"
     },
     "replace-text-in-pdf": {
-      "title": "Replace Text in PDF Using PdfContentEditor",
+      "title": "Replace 'Draft' with 'Final' in a PDF",
       "filename": "replace-text-in-pdf.cs",
-      "description": "Demonstrates how to replace all occurrences of a specific word in a PDF document using Aspose.Pdf.Facades.PdfContentEditor and save the result.",
+      "description": "Demonstrates how to load a PDF, replace every occurrence of the word \"Draft\" with \"Final\", and save the updated document using Aspose.Pdf.Facades.",
       "tags": [
         "text-replacement",
-        "pdf",
-        "aspose",
-        "facades",
-        "csharp"
+        "pdf-editing",
+        "Aspose.Pdf",
+        "PdfContentEditor",
+        "C#"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfContentEditor",
-        "PdfContentEditor.BindPdf",
-        "PdfContentEditor.ReplaceText",
-        "PdfContentEditor.Save",
-        "PdfContentEditor.Close"
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ReplaceText",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
-      "task_id": "21561"
+      "task_id": "21397"
     },
     "replace-invoicenumber-with-uuid-page-6": {
       "title": "Replace Text with UUID on Specific PDF Page",
@@ -333,7 +311,7 @@
         "Aspose.Pdf.Facades.PdfContentEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21398"
     },
@@ -356,7 +334,7 @@
         "Aspose.Pdf.PageLayout.OneColumn"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21399"
     },
@@ -379,32 +357,9 @@
         "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21400"
-    },
-    "add-file-attachment-to-pdf": {
-      "title": "Add File Attachment to PDF",
-      "filename": "add-file-attachment-to-pdf.cs",
-      "description": "Shows how to embed a local file as an attachment in an existing PDF document using Aspose.Pdf.",
-      "tags": [
-        "attachment",
-        "pdf",
-        "embed",
-        "Aspose.Pdf",
-        "file-specification"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Document.EmbeddedFiles",
-        "Aspose.Pdf.EmbeddedFiles.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
-      "status": "verified",
-      "task_id": "21485"
     },
     "remove-embedded-file-from-pdf": {
       "title": "Remove Embedded Attachment from PDF",
@@ -425,7 +380,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21402"
     },
@@ -448,7 +403,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21403"
     },
@@ -471,7 +426,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21404"
     },
@@ -494,7 +449,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21405"
     },
@@ -517,7 +472,7 @@
         "Aspose.Pdf.Document.Dispose"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21406"
     },
@@ -539,7 +494,7 @@
         "Aspose.Pdf.Document.Form"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21407"
     },
@@ -561,7 +516,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21408"
     },
@@ -584,7 +539,7 @@
         "Aspose.Pdf.Forms.RadioButtonField"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21409"
     },
@@ -607,7 +562,7 @@
         "Aspose.Pdf.Devices.PngDevice.Process"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21410"
     },
@@ -631,7 +586,7 @@
         "Aspose.Pdf.Devices.CompressionType"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21411"
     },
@@ -655,7 +610,7 @@
         "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21412"
     },
@@ -677,7 +632,7 @@
         "Aspose.Pdf.Facades.PdfPrintHelper.PrintDocument"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21413"
     },
@@ -700,7 +655,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21414"
     },
@@ -722,32 +677,9 @@
         "PdfContentEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21415"
-    },
-    "batch-extract-images-from-pdfs": {
-      "title": "Batch Extract Images from PDFs to Subfolders",
-      "filename": "batch-extract-images-from-pdfs.cs",
-      "description": "Shows how to loop through PDF files in a directory, use Aspose.Pdf.Facades.PdfExtractor to extract all embedded images, and save each image into a dedicated subfolder named after the source PDF.",
-      "tags": [
-        "pdf",
-        "image-extraction",
-        "batch-processing",
-        "aspose-pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfExtractor",
-        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
-        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
-        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
-        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
-      "status": "verified",
-      "task_id": "21416"
     },
     "batch-apply-js-alert-to-rectangle-annotations": {
       "title": "Batch Add JavaScript Alert to Rectangle Annotations",
@@ -768,7 +700,7 @@
         "Aspose.Pdf.Annotations.JavaScriptAction"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21417"
     },
@@ -790,7 +722,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21418"
     },
@@ -813,7 +745,7 @@
         "Aspose.Pdf.CryptoAlgorithm"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21419"
     },
@@ -836,7 +768,7 @@
         "Aspose.Pdf.Devices.PngDevice.Process"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21420"
     },
@@ -860,7 +792,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21421"
     },
@@ -883,7 +815,7 @@
         "Aspose.Pdf.Annotations.GoToURIAction"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21422"
     },
@@ -906,7 +838,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21423"
     },
@@ -929,7 +861,7 @@
         "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21424"
     },
@@ -953,7 +885,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21425"
     },
@@ -977,7 +909,7 @@
         "Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21426"
     },
@@ -998,7 +930,7 @@
         "Aspose.Pdf.Document.ViewerPreferences"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21427"
     },
@@ -1021,7 +953,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21429"
     },
@@ -1044,7 +976,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21430"
     },
@@ -1067,7 +999,7 @@
         "Aspose.Pdf.MetadataDictionary"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21431"
     },
@@ -1090,7 +1022,7 @@
         "Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21432"
     },
@@ -1114,31 +1046,32 @@
         "Aspose.Pdf.Text.TextState"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21433"
     },
     "fill-pdf-form-fields-from-json": {
-      "title": "Populate PDF Form Fields from JSON Configuration",
+      "title": "Fill PDF Form Fields from JSON",
       "filename": "fill-pdf-form-fields-from-json.cs",
-      "description": "Demonstrates how to read default field values from a JSON file and apply them to a PDF form using Aspose.Pdf.Facades.PdfFormEditor before user interaction.",
+      "description": "Shows how to load a PDF, read a JSON file that maps form field names to values, and populate the PDF form fields using Aspose.Pdf.",
       "tags": [
         "pdf",
         "form",
         "json",
-        "facades",
-        "default-values"
+        "fill",
+        "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFormEditor",
-        "PdfFormEditor.BindPdf",
-        "PdfFormEditor.SetField",
-        "PdfFormEditor.Save"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.Field",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Forms.Field.Value"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
-      "task_id": "21449"
+      "task_id": "21434"
     },
     "convert-pdf-pages-to-png-transparent": {
       "title": "Convert PDF Pages to Transparent PNG Images",
@@ -1159,7 +1092,7 @@
         "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21435"
     },
@@ -1180,7 +1113,7 @@
         "Aspose.Pdf.Facades.PdfViewer.PrintDocumentWithSettings"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21436"
     },
@@ -1204,7 +1137,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21437"
     },
@@ -1228,7 +1161,7 @@
         "Page.Actions.OnOpen"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21438"
     },
@@ -1254,7 +1187,7 @@
         "Aspose.Pdf.Drawing.ImageStamp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21439"
     },
@@ -1280,7 +1213,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21440"
     },
@@ -1302,7 +1235,7 @@
         "Aspose.Pdf.Facades.PdfContentEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21441"
     },
@@ -1326,7 +1259,7 @@
         "Aspose.Pdf.Zoom"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21442"
     },
@@ -1349,7 +1282,7 @@
         "Aspose.Pdf.Facades.PdfXmpMetadataEditor.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21443"
     },
@@ -1372,7 +1305,7 @@
         "Aspose.Pdf.FileSpecification.Contents"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21444"
     },
@@ -1394,7 +1327,7 @@
         "PdfBookmarkEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21445"
     },
@@ -1418,7 +1351,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21446"
     },
@@ -1442,32 +1375,9 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21447"
-    },
-    "add-rotated-image-stamp-to-pdf": {
-      "title": "Add Rotated Image Stamp to PDF",
-      "filename": "add-rotated-image-stamp-to-pdf.cs",
-      "description": "Demonstrates how to place an image stamp at specific coordinates, rotate it 45 degrees, and set its opacity to 80% using Aspose.Pdf.",
-      "tags": [
-        "image-stamp",
-        "rotation",
-        "opacity",
-        "pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.ImageStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.ImageStamp.RotateAngle",
-        "Aspose.Pdf.ImageStamp.Opacity"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
-      "status": "verified",
-      "task_id": "21448"
     },
     "convert-pdf-pages-to-bmp": {
       "title": "Convert PDF Pages to 24-bit BMP Images",
@@ -1488,7 +1398,7 @@
         "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21450"
     },
@@ -1512,7 +1422,7 @@
         "PrintDocumentWithSettings"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21451"
     },
@@ -1535,7 +1445,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21452"
     },
@@ -1559,7 +1469,7 @@
         "Aspose.Pdf.Annotations.JavascriptAction"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21453"
     },
@@ -1582,7 +1492,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21454"
     },
@@ -1606,7 +1516,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21455"
     },
@@ -1626,7 +1536,7 @@
         "Aspose.Pdf.ViewerPreferences"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21456"
     },
@@ -1649,7 +1559,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21457"
     },
@@ -1672,7 +1582,7 @@
         "Aspose.Pdf.OutlineCollection.Delete"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21458"
     },
@@ -1695,7 +1605,7 @@
         "Aspose.Pdf.X509CertificateLoader"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21459"
     },
@@ -1719,7 +1629,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21460"
     },
@@ -1742,7 +1652,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21461"
     },
@@ -1765,7 +1675,7 @@
         "Aspose.Pdf.Devices.JpegDevice.Process"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21462"
     },
@@ -1788,7 +1698,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21463"
     },
@@ -1813,7 +1723,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21465"
     },
@@ -1836,7 +1746,7 @@
         "Aspose.Pdf.Image.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21466"
     },
@@ -1858,7 +1768,7 @@
         "PdfContentEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21467"
     },
@@ -1881,7 +1791,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21468"
     },
@@ -1902,7 +1812,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21469"
     },
@@ -1925,32 +1835,9 @@
         "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21470"
-    },
-    "add-image-stamp-to-pdf-page": {
-      "title": "Add Image Stamp from URL to PDF Page",
-      "filename": "add-image-stamp-to-pdf-page.cs",
-      "description": "Shows how to download an image from an external URL and place it as an ImageStamp on the second page of a PDF using Aspose.Pdf.",
-      "tags": [
-        "image-stamp",
-        "pdf",
-        "aspose-pdf",
-        "download",
-        "page-2"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.ImageStamp",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Pages",
-        "Aspose.Pdf.Page.AddStamp"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
-      "status": "verified",
-      "task_id": "21471"
     },
     "convert-pdf-to-png-thumbnails-300-dpi": {
       "title": "Convert PDF Pages to PNG Thumbnails with 300 DPI and Transparent Background",
@@ -1971,7 +1858,7 @@
         "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21472"
     },
@@ -1995,7 +1882,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21473"
     },
@@ -2020,7 +1907,7 @@
         "Aspose.Pdf.Drawing.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21474"
     },
@@ -2042,7 +1929,7 @@
         "PdfFormEditor.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21475"
     },
@@ -2065,7 +1952,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21476"
     },
@@ -2088,7 +1975,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21477"
     },
@@ -2112,7 +1999,7 @@
         "Aspose.Pdf.FileSpecification.Contents"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21478"
     },
@@ -2135,7 +2022,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21479"
     },
@@ -2159,7 +2046,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21480"
     },
@@ -2182,7 +2069,7 @@
         "Aspose.Pdf.Drawing.VerticalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21481"
     },
@@ -2205,34 +2092,32 @@
         "Form.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21482"
     },
     "add-green-circle-annotation-to-pdf-page": {
-      "title": "Add Green Circle Annotation to PDF Page",
+      "title": "Add Green Circle Annotation to PDF Page 2",
       "filename": "add-green-circle-annotation-to-pdf-page.cs",
-      "description": "Demonstrates loading a PDF, verifying page 6 exists, creating a circle annotation with a green outline and custom thickness, adding it to the page, and saving the updated document.",
+      "description": "Demonstrates how to add a circle annotation with a green fill and a 3 pt border to the second page of a PDF using Aspose.Pdf.",
       "tags": [
-        "circle",
-        "annotation",
+        "circle-annotation",
+        "pdf-edit",
         "border",
-        "pdf",
-        "aspose-pdf"
+        "fill-color",
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Annotations.CircleAnnotation",
-        "Aspose.Pdf.Annotations.Border",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Annotations.Border"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
-      "task_id": "21533"
+      "task_id": "21483"
     },
     "embed-memory-stream-as-pdf-attachment": {
       "title": "Embed Memory Stream as PDF Attachment",
@@ -2253,32 +2138,9 @@
         "Aspose.Pdf.Document.EmbeddedFiles.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21486"
-    },
-    "attach-multiple-files-to-pdf": {
-      "title": "Attach Multiple Files to a PDF",
-      "filename": "attach-multiple-files-to-pdf.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, iterate over a list of files, create FileSpecification objects for each, add them to the document's EmbeddedFiles collection, and save the updated PDF.",
-      "tags": [
-        "pdf",
-        "attachment",
-        "aspose",
-        "embedded-files",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.FileSpecification",
-        "Aspose.Pdf.Document.EmbeddedFiles",
-        "Aspose.Pdf.EmbeddedFilesCollection.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
-      "status": "verified",
-      "task_id": "21487"
     },
     "add-document-attachment-with-description": {
       "title": "Add File Attachment with Description to PDF",
@@ -2298,7 +2160,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21488"
     },
@@ -2321,7 +2183,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21489"
     },
@@ -2344,7 +2206,7 @@
         "Aspose.Pdf.EmbeddedFiles.Delete"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21490"
     },
@@ -2367,7 +2229,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21491"
     },
@@ -2391,7 +2253,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21492"
     },
@@ -2414,7 +2276,7 @@
         "Aspose.Pdf.AFRelationship"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21493"
     },
@@ -2437,7 +2299,7 @@
         "Aspose.Pdf.EmbeddedFilesCollection.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21494"
     },
@@ -2460,7 +2322,7 @@
         "Aspose.Pdf.EmbeddedFilesCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21495"
     },
@@ -2483,7 +2345,7 @@
         "Aspose.Pdf.EmbeddedFileCollection.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21496"
     },
@@ -2506,7 +2368,7 @@
         "Aspose.Pdf.EmbeddedFilesCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21497"
     },
@@ -2530,7 +2392,7 @@
         "Aspose.Pdf.FileSpecification.Contents"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21498"
     },
@@ -2552,7 +2414,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21499"
     },
@@ -2575,7 +2437,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21500"
     },
@@ -2599,7 +2461,7 @@
         "Aspose.Pdf.CryptoAlgorithm"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21501"
     },
@@ -2622,7 +2484,7 @@
         "Aspose.Pdf.FileSpecification.Contents"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21502"
     },
@@ -2645,7 +2507,7 @@
         "Aspose.Pdf.ViewerPreferences.CenterWindow"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21503"
     },
@@ -2666,7 +2528,7 @@
         "Aspose.Pdf.ViewerPreferences"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21504"
     },
@@ -2689,7 +2551,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21505"
     },
@@ -2712,7 +2574,7 @@
         "Aspose.Pdf.PageMode"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21506"
     },
@@ -2733,7 +2595,7 @@
         "Aspose.Pdf.ViewerPreferences"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21507"
     },
@@ -2753,7 +2615,7 @@
         "Aspose.Pdf.ViewerPreferences"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21508"
     },
@@ -2776,7 +2638,7 @@
         "Aspose.Pdf.ViewerPreferences.HideMenubar"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21509"
     },
@@ -2797,7 +2659,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21510"
     },
@@ -2820,7 +2682,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21511"
     },
@@ -2842,7 +2704,7 @@
         "Aspose.Pdf.ViewerPreferences.HideToolbar"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21512"
     },
@@ -2864,7 +2726,7 @@
         "Aspose.Pdf.PdfViewerPreferencesOptions.HideScrollbars"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21513"
     },
@@ -2886,7 +2748,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21514"
     },
@@ -2907,7 +2769,7 @@
         "Aspose.Pdf.ViewerPreferences"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21515"
     },
@@ -2930,7 +2792,7 @@
         "Aspose.Pdf.ViewerPreferences.CenterWindow"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21516"
     },
@@ -2953,7 +2815,7 @@
         "Aspose.Pdf.ViewerPreferences.HideMenubar"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21517"
     },
@@ -2977,7 +2839,7 @@
         "Aspose.Pdf.Document.ViewerPreferences"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21518"
     },
@@ -2999,7 +2861,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21519"
     },
@@ -3022,7 +2884,7 @@
         "Aspose.Pdf.ViewerPreferences.PageLayout"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21520"
     },
@@ -3045,7 +2907,7 @@
         "Aspose.Pdf.ViewerPreferences.FitWindow"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21521"
     },
@@ -3067,7 +2929,7 @@
         "Aspose.Pdf.ViewerPreferences.FullScreen"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21522"
     },
@@ -3090,7 +2952,7 @@
         "Aspose.Pdf.Facades"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21523"
     },
@@ -3116,7 +2978,7 @@
         "ViewerPreferencesInfo.Duplex"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21524"
     },
@@ -3137,32 +2999,9 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21525"
-    },
-    "add-text-annotation-to-pdf-page": {
-      "title": "Add Text Annotation to PDF Page",
-      "filename": "add-text-annotation-to-pdf-page.cs",
-      "description": "Demonstrates how to place a text annotation with custom content at specific coordinates on the first page of a PDF using Aspose.Pdf.",
-      "tags": [
-        "annotation",
-        "pdf",
-        "text",
-        "csharp",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Page.Annotations.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
-      "status": "verified",
-      "task_id": "21526"
     },
     "add-web-link-annotation-to-pdf": {
       "title": "Add External Link Annotation to PDF",
@@ -3185,7 +3024,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21527"
     },
@@ -3209,7 +3048,7 @@
         "Aspose.Pdf.VerticalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21528"
     },
@@ -3234,7 +3073,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21529"
     },
@@ -3258,7 +3097,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21531"
     },
@@ -3281,32 +3120,9 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21532"
-    },
-    "add-popup-annotation-to-pdf": {
-      "title": "Add Popup Annotation to PDF",
-      "filename": "add-popup-annotation-to-pdf.cs",
-      "description": "Shows how to create a popup annotation that appears as a hover note on a PDF page using Aspose.Pdf.",
-      "tags": [
-        "popup",
-        "annotation",
-        "hover",
-        "pdf",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Annotations.PopupAnnotation",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
-      "status": "verified",
-      "task_id": "21535"
     },
     "add-batch-text-annotations-to-pdf": {
       "title": "Add Multiple Text Annotations to a PDF",
@@ -3329,7 +3145,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21536"
     },
@@ -3352,7 +3168,7 @@
         "Aspose.Pdf.Annotations.TextIcon"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21537"
     },
@@ -3375,7 +3191,7 @@
         "Aspose.Pdf.Annotations.TextIcon"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21538"
     },
@@ -3399,7 +3215,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21539"
     },
@@ -3423,7 +3239,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21541"
     },
@@ -3447,7 +3263,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21542"
     },
@@ -3473,7 +3289,7 @@
         "Aspose.Pdf.Annotations.BorderStyle"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21543"
     },
@@ -3497,7 +3313,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21544"
     },
@@ -3520,7 +3336,7 @@
         "Aspose.Pdf.Annotations.FileAttachmentAnnotation"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21545"
     },
@@ -3543,7 +3359,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21546"
     },
@@ -3566,7 +3382,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21547"
     },
@@ -3590,7 +3406,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21549"
     },
@@ -3614,7 +3430,7 @@
         "Aspose.Pdf.VerticalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21550"
     },
@@ -3637,34 +3453,9 @@
         "Aspose.Pdf.Annotations.TextIcon"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21551"
-    },
-    "add-hyperlink-annotation-to-pdf": {
-      "title": "Add Internal Hyperlink Annotation to PDF",
-      "filename": "add-hyperlink-annotation-to-pdf.cs",
-      "description": "Demonstrates how to insert a link annotation that navigates to a specific page within the same PDF document using Aspose.Pdf.",
-      "tags": [
-        "link-annotation",
-        "internal-hyperlink",
-        "pdf-editing",
-        "aspose-pdf",
-        "go-to-action"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Annotations.LinkAnnotation",
-        "Aspose.Pdf.Annotations.GoToAction",
-        "Aspose.Pdf.Page.Annotations.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
-      "status": "verified",
-      "task_id": "21552"
     },
     "add-red-highlight-annotation-to-pdf": {
       "title": "Add Red Border Square Annotation to PDF",
@@ -3685,7 +3476,7 @@
         "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21553"
     },
@@ -3710,7 +3501,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21556"
     },
@@ -3733,7 +3524,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21557"
     },
@@ -3756,7 +3547,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21558"
     },
@@ -3781,7 +3572,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21559"
     },
@@ -3804,7 +3595,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21560"
     },
@@ -3827,7 +3618,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21562"
     },
@@ -3850,7 +3641,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21564"
     },
@@ -3873,7 +3664,7 @@
         "Aspose.Pdf.Text.FontStyles"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21565"
     },
@@ -3897,7 +3688,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21566"
     },
@@ -3920,7 +3711,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21567"
     },
@@ -3944,7 +3735,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21568"
     },
@@ -3967,7 +3758,7 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21569"
     },
@@ -3989,7 +3780,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21570"
     },
@@ -4014,7 +3805,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21571"
     },
@@ -4038,7 +3829,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21572"
     },
@@ -4062,7 +3853,7 @@
         "Aspose.Pdf.ImageStamp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21574"
     },
@@ -4086,7 +3877,7 @@
         "Aspose.Pdf.Permissions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21575"
     },
@@ -4111,7 +3902,7 @@
         "Aspose.Pdf.CryptoAlgorithm"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21576"
     },
@@ -4134,7 +3925,7 @@
         "Aspose.Pdf.InvalidPasswordException"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21577"
     },
@@ -4156,7 +3947,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21578"
     },
@@ -4178,7 +3969,7 @@
         "Aspose.Pdf.ViewerPreferences"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21579"
     },
@@ -4202,7 +3993,7 @@
         "Aspose.Pdf.Text.FontStyles"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21580"
     },
@@ -4227,7 +4018,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21581"
     },
@@ -4252,7 +4043,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21582"
     },
@@ -4275,7 +4066,7 @@
         "Aspose.Pdf.ViewerPreferences"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21583"
     },
@@ -4298,7 +4089,7 @@
         "Aspose.Pdf.FileSpecification.Contents"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21585"
     },
@@ -4321,7 +4112,7 @@
         "Aspose.Pdf.EmbeddedFilesCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21586"
     },
@@ -4344,7 +4135,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21587"
     },
@@ -4367,7 +4158,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21588"
     },
@@ -4391,7 +4182,7 @@
         "Aspose.Pdf.Page.Paragraphs.Add"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21589"
     },
@@ -4414,7 +4205,7 @@
         "Aspose.Pdf.Annotations.MarkupAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21590"
     },
@@ -4437,7 +4228,7 @@
         "Aspose.Pdf.Annotations.TextIcon"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21591"
     },
@@ -4460,7 +4251,7 @@
         "Aspose.Pdf.Document.Load"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21593"
     },
@@ -4483,7 +4274,7 @@
         "Aspose.Pdf.Page.Annotations.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21594"
     },
@@ -4506,7 +4297,7 @@
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21595"
     },
@@ -4529,7 +4320,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21596"
     },
@@ -4554,7 +4345,7 @@
         "Aspose.Pdf.Text.FontRepository.FindFont"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21597"
     },
@@ -4577,33 +4368,9 @@
         "Aspose.Pdf.Facades.PdfContentEditor.Dispose"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21598"
-    },
-    "add-image-to-pdf-using-pdffilemend": {
-      "title": "PDF Edit Operations Using Aspose.Pdf Facades",
-      "filename": "add-image-to-pdf-using-pdffilemend.cs",
-      "description": "Demonstrates common PDF editing tasks with Aspose.Pdf.Facades, including merging multiple PDFs, splitting a document into single‑page files, adding an image stamp to every page, and inserting a text annotation on the first page.",
-      "tags": [
-        "pdf",
-        "aspose",
-        "facade",
-        "merge",
-        "annotation"
-      ],
-      "apis_used": [
-        "PdfFileEditor.Concatenate",
-        "PdfFileEditor.SplitToPages",
-        "Document",
-        "ImageStamp",
-        "TextAnnotation",
-        "Aspose.Pdf.Rectangle"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
-      "status": "verified",
-      "task_id": "21599"
     },
     "simple-pdf-editing-wrapper": {
       "title": "Simplified PDF Editing Wrapper with Aspose.Pdf",
@@ -4625,7 +4392,7 @@
         "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21600"
     },
@@ -4647,7 +4414,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21428"
     },
@@ -4670,9 +4437,358 @@
         "Aspose.Pdf.Annotations.JavascriptAction"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T08:06:39Z",
+      "generated_at": "2026-10-26T07:32:24Z",
       "status": "verified",
       "task_id": "21484"
+    },
+    "extract-images-from-pdf__v3": {
+      "title": "Extract Images from PDF using Aspose.Pdf Facades",
+      "filename": "extract-images-from-pdf__v3.cs",
+      "description": "Demonstrates how to extract all embedded images from a PDF file and save them to a specified folder using the Aspose.Pdf.Facades PdfExtractor class.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "aspose-pdf",
+        "facades",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:32:24Z",
+      "status": "verified",
+      "task_id": "21393"
+    },
+    "add-file-attachment-to-pdf__v3": {
+      "title": "Add File Attachment to PDF with Description",
+      "filename": "add-file-attachment-to-pdf__v3.cs",
+      "description": "Shows how to embed an external file (Terms.pdf) into an existing PDF and assign a human‑readable description using Aspose.Pdf.",
+      "tags": [
+        "attachment",
+        "pdf",
+        "aspose",
+        "embedded-files",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.FileSpecification.Description",
+        "Aspose.Pdf.FileSpecification.AFRelationship"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:32:24Z",
+      "status": "verified",
+      "task_id": "21401"
+    },
+    "batch-extract-images-from-pdfs__v2": {
+      "title": "Batch Extract Images from PDFs to Subfolders",
+      "filename": "batch-extract-images-from-pdfs__v2.cs",
+      "description": "Shows how to loop through PDF files in a directory, use Aspose.Pdf.Facades.PdfExtractor to extract all embedded images, and save each image into a dedicated subfolder named after the source PDF.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "batch-processing",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfExtractor",
+        "Aspose.Pdf.Facades.PdfExtractor.BindPdf",
+        "Aspose.Pdf.Facades.PdfExtractor.ExtractImage",
+        "Aspose.Pdf.Facades.PdfExtractor.HasNextImage",
+        "Aspose.Pdf.Facades.PdfExtractor.GetNextImage"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:32:24Z",
+      "status": "verified",
+      "task_id": "21416"
+    },
+    "add-rotated-image-stamp-to-pdf__v2": {
+      "title": "Add Rotated Image Stamp to PDF",
+      "filename": "add-rotated-image-stamp-to-pdf__v2.cs",
+      "description": "Demonstrates how to place an image stamp at specific coordinates, rotate it 45 degrees, and set its opacity to 80% using Aspose.Pdf.",
+      "tags": [
+        "image-stamp",
+        "rotation",
+        "opacity",
+        "pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.ImageStamp.RotateAngle",
+        "Aspose.Pdf.ImageStamp.Opacity"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:32:24Z",
+      "status": "verified",
+      "task_id": "21448"
+    },
+    "fill-pdf-form-fields-from-json__v2": {
+      "title": "Populate PDF Form Fields from JSON Configuration",
+      "filename": "fill-pdf-form-fields-from-json__v2.cs",
+      "description": "Demonstrates how to read default field values from a JSON file and apply them to a PDF form using Aspose.Pdf.Facades.PdfFormEditor before user interaction.",
+      "tags": [
+        "pdf",
+        "form",
+        "json",
+        "facades",
+        "default-values"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFormEditor",
+        "PdfFormEditor.BindPdf",
+        "PdfFormEditor.SetField",
+        "PdfFormEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:32:24Z",
+      "status": "verified",
+      "task_id": "21449"
+    },
+    "add-image-stamp-to-pdf-page__v2": {
+      "title": "Add Image Stamp from URL to PDF Page",
+      "filename": "add-image-stamp-to-pdf-page__v2.cs",
+      "description": "Shows how to download an image from an external URL and place it as an ImageStamp on the second page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "image-stamp",
+        "pdf",
+        "aspose-pdf",
+        "download",
+        "page-2"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Pages",
+        "Aspose.Pdf.Page.AddStamp"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:32:24Z",
+      "status": "verified",
+      "task_id": "21471"
+    },
+    "add-file-attachment-to-pdf__v4": {
+      "title": "Add File Attachment to PDF",
+      "filename": "add-file-attachment-to-pdf__v4.cs",
+      "description": "Shows how to embed a local file as an attachment in an existing PDF document using Aspose.Pdf.",
+      "tags": [
+        "attachment",
+        "pdf",
+        "embed",
+        "Aspose.Pdf",
+        "file-specification"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.EmbeddedFiles.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:32:24Z",
+      "status": "verified",
+      "task_id": "21485"
+    },
+    "attach-multiple-files-to-pdf__v2": {
+      "title": "Attach Multiple Files to a PDF",
+      "filename": "attach-multiple-files-to-pdf__v2.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, iterate over a list of files, create FileSpecification objects for each, add them to the document's EmbeddedFiles collection, and save the updated PDF.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "aspose",
+        "embedded-files",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.EmbeddedFilesCollection.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:32:24Z",
+      "status": "verified",
+      "task_id": "21487"
+    },
+    "add-text-annotation-to-pdf-page__v2": {
+      "title": "Add Text Annotation to PDF Page",
+      "filename": "add-text-annotation-to-pdf-page__v2.cs",
+      "description": "Demonstrates how to place a text annotation with custom content at specific coordinates on the first page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "annotation",
+        "pdf",
+        "text",
+        "csharp",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:32:24Z",
+      "status": "verified",
+      "task_id": "21526"
+    },
+    "add-highlight-annotation-to-pdf-page__v2": {
+      "title": "Highlight Text on a Specific PDF Page",
+      "filename": "add-highlight-annotation-to-pdf-page__v2.cs",
+      "description": "Shows how to locate a specific text fragment on page 3 of a PDF and apply a yellow highlight annotation using Aspose.Pdf.",
+      "tags": [
+        "highlight",
+        "annotation",
+        "text-search",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:32:24Z",
+      "status": "verified",
+      "task_id": "21530"
+    },
+    "add-green-circle-annotation-to-pdf-page__v2": {
+      "title": "Add Green Circle Annotation to PDF Page",
+      "filename": "add-green-circle-annotation-to-pdf-page__v2.cs",
+      "description": "Demonstrates loading a PDF, verifying page 6 exists, creating a circle annotation with a green outline and custom thickness, adding it to the page, and saving the updated document.",
+      "tags": [
+        "circle",
+        "annotation",
+        "border",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.CircleAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:32:24Z",
+      "status": "verified",
+      "task_id": "21533"
+    },
+    "add-popup-annotation-to-pdf__v3": {
+      "title": "Add Popup Annotation to PDF",
+      "filename": "add-popup-annotation-to-pdf__v3.cs",
+      "description": "Shows how to create a popup annotation that appears as a hover note on a PDF page using Aspose.Pdf.",
+      "tags": [
+        "popup",
+        "annotation",
+        "hover",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.PopupAnnotation",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:32:24Z",
+      "status": "verified",
+      "task_id": "21535"
+    },
+    "add-hyperlink-annotation-to-pdf__v2": {
+      "title": "Add Internal Hyperlink Annotation to PDF",
+      "filename": "add-hyperlink-annotation-to-pdf__v2.cs",
+      "description": "Demonstrates how to insert a link annotation that navigates to a specific page within the same PDF document using Aspose.Pdf.",
+      "tags": [
+        "link-annotation",
+        "internal-hyperlink",
+        "pdf-editing",
+        "aspose-pdf",
+        "go-to-action"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:32:24Z",
+      "status": "verified",
+      "task_id": "21552"
+    },
+    "replace-text-in-pdf__v2": {
+      "title": "Replace Text in PDF Using PdfContentEditor",
+      "filename": "replace-text-in-pdf__v2.cs",
+      "description": "Demonstrates how to replace all occurrences of a specific word in a PDF document using Aspose.Pdf.Facades.PdfContentEditor and save the result.",
+      "tags": [
+        "text-replacement",
+        "pdf",
+        "aspose",
+        "facades",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.ReplaceText",
+        "PdfContentEditor.Save",
+        "PdfContentEditor.Close"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:32:24Z",
+      "status": "verified",
+      "task_id": "21561"
+    },
+    "add-image-to-pdf-using-pdffilemend__v2": {
+      "title": "PDF Edit Operations Using Aspose.Pdf Facades",
+      "filename": "add-image-to-pdf-using-pdffilemend__v2.cs",
+      "description": "Demonstrates common PDF editing tasks with Aspose.Pdf.Facades, including merging multiple PDFs, splitting a document into single‑page files, adding an image stamp to every page, and inserting a text annotation on the first page.",
+      "tags": [
+        "pdf",
+        "aspose",
+        "facade",
+        "merge",
+        "annotation"
+      ],
+      "apis_used": [
+        "PdfFileEditor.Concatenate",
+        "PdfFileEditor.SplitToPages",
+        "Document",
+        "ImageStamp",
+        "TextAnnotation",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:32:24Z",
+      "status": "verified",
+      "task_id": "21599"
     }
   }
 }

@@ -1,12 +1,49 @@
-// URL-STABILITY STUB
-//
-// add image stamp to pdf page__v2
-//
-// This example has been consolidated or moved. Current location:
-//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/facades-edit-document/add-image-stamp-to-specific-page.cs
-//
-// This stub keeps the original URL live for existing bookmarks,
-// search-engine indexes, and blog-post links. See the canonical
-// location above for the current, maintained implementation.
+using System;
+using System.IO;
+using System.Net.Http;
+using Aspose.Pdf;
 
-class Program { static void Main() { } }
+class Program
+{
+    static void Main()
+    {
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string imageUrl = "https://example.com/logo.png";
+
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+
+        // Download the image from the external URL into a memory stream
+        using (HttpClient httpClient = new HttpClient())
+        using (Stream imageStream = httpClient.GetStreamAsync(imageUrl).Result)
+        {
+            // Load the PDF document
+            Document pdfDocument = new Document(inputPdf);
+
+            // Create an ImageStamp from the downloaded stream
+            ImageStamp stamp = new ImageStamp(imageStream)
+            {
+                // Position the stamp (distance from left and bottom edges)
+                XIndent = 100,
+                YIndent = 500,
+                // Set desired size of the stamp
+                Width = 150,
+                Height = 50,
+                // Place the stamp over existing content
+                Background = false
+            };
+
+            // Apply the stamp to page 2 (pages are 1‑based)
+            pdfDocument.Pages[2].AddStamp(stamp);
+
+            // Save the modified PDF
+            pdfDocument.Save(outputPdf);
+        }
+
+        Console.WriteLine($"Image stamp added to page 2 and saved as '{outputPdf}'.");
+    }
+}

@@ -9,36 +9,30 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            // PdfContentEditor is a Facades class for page-level operations.
-            // It does NOT implement IDisposable, so we do NOT wrap it in a using block.
+            // Load the PDF using the Facades API
             PdfContentEditor editor = new PdfContentEditor();
-
-            // Bind the source PDF file.
             editor.BindPdf(inputPath);
 
-            // Replace every occurrence of the word "Draft" with "Final".
-            // This method works on the entire document content.
+            // Replace every occurrence of the word "Draft" with "Final"
             editor.ReplaceText("Draft", "Final");
 
-            // Save the modified PDF to the desired output path.
+            // Save the modified document
             editor.Save(outputPath);
 
-            // Release any internal resources held by the editor.
-            editor.Close();
-
-            Console.WriteLine($"Text replacement completed. Output saved to '{outputPath}'.");
+            Console.WriteLine($"All occurrences replaced. Saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during processing: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }
