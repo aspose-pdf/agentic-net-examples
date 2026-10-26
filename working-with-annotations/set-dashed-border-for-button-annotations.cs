@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,38 +17,34 @@ class Program
             return;
         }
 
-        // Load the PDF document (using the required lifecycle rule)
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Iterate over all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Iterate through all annotations on the page (also 1‑based)
-                for (int idx = 1; idx <= page.Annotations.Count; idx++)
+                Page page = doc.Pages[i];
+
+                // Examine each annotation on the page
+                foreach (Annotation annot in page.Annotations)
                 {
-                    Annotation ann = page.Annotations[idx];
-
-                    // Process only button fields
-                    if (ann is ButtonField button)
+                    // Process only button annotations (form button fields)
+                    if (annot is ButtonField button)
                     {
-                        // Ensure a Border object exists; create one if necessary
-                        if (button.Border == null)
-                            button.Border = new Border(button);
-
-                        // Set the border style to dashed and thickness to 2 points
-                        button.Border.Style = BorderStyle.Dashed;
-                        button.Border.Width = 2;
-
-                        // Optional: define a dash pattern (on 3 points, off 3 points)
-                        button.Border.Dash = new Dash(3, 3);
+                        // Border must be created with the parent annotation instance
+                        button.Border = new Border(button)
+                        {
+                            Style = BorderStyle.Dashed,
+                            Width = 2
+                        };
                     }
                 }
             }
 
-            // Save the modified PDF (using the required lifecycle rule)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Button annotations updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Button annotation borders updated and saved to '{outputPath}'.");
     }
 }

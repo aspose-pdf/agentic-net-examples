@@ -1,9 +1,11 @@
 using System;
 using System.IO;
+using System.Reflection;
+using System.Collections;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-class ExtractRichMedia
+class Program
 {
     static void Main()
     {
@@ -12,87 +14,121 @@ class ExtractRichMedia
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Ensure the root output folder exists
         Directory.CreateDirectory(outputRoot);
 
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageIdx = 1; pageIdx <= doc.Pages.Count; pageIdx++)
+            // Wrap Document in a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                Page page = doc.Pages[pageIdx];
-                // Create a sub‑folder for the current page
-                string pageFolder = Path.Combine(outputRoot, $"Page_{pageIdx}");
-                Directory.CreateDirectory(pageFolder);
-
-                // Annotations collection is also 1‑based
-                for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
+                // Pages are 1‑based in Aspose.Pdf
+                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
                 {
-                    Annotation ann = page.Annotations[annIdx];
+                    Page page = doc.Pages[pageIndex];
+                    string pageFolder = Path.Combine(outputRoot, $"Page_{pageIndex}");
+                    Directory.CreateDirectory(pageFolder);
 
-                    // Process only RichMediaAnnotation instances
-                    if (ann is RichMediaAnnotation richMedia)
+                    int annotationIndex = 0;
+                    foreach (Annotation annotation in page.Annotations)
                     {
-                        // Use the annotation name if set; otherwise generate a unique name
-                        string baseName = !string.IsNullOrEmpty(richMedia.Name)
-                                          ? richMedia.Name
-                                          : $"RichMedia_{annIdx}";
+                        annotationIndex++;
 
-                        // Determine a file extension based on the media type
-                        string extension = richMedia.Type == RichMediaAnnotation.ContentType.Video ? ".mp4"
-                                         : richMedia.Type == RichMediaAnnotation.ContentType.Audio ? ".mp3"
-                                         : ".bin";
-
-                        string outputPath = Path.Combine(pageFolder, baseName + extension);
-
-                        // The Content property returns the embedded media as a stream.
-                        // It is exposed as a byte[] via the GetContent() method in the API.
-                        // Since the exact accessor is not documented here, we use the
-                        // Content property assuming it provides a Stream.
-                        // If it returns a string, you may need to adjust the extraction logic.
-                        try
+                        // Process only RichMediaAnnotations
+                        if (annotation is RichMediaAnnotation richMedia)
                         {
-                            // Attempt to read the content as a stream
-                            using (Stream contentStream = richMedia.Content as Stream)
-                            {
-                                if (contentStream != null)
-                                {
-                                    using (FileStream fileOut = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-                                    {
-                                        contentStream.CopyTo(fileOut);
-                                    }
-                                    Console.WriteLine($"Extracted: {outputPath}");
-                                }
-                                else
-                                {
-                                    // Fallback: if Content is a string, write it as text
-                                    string textContent = richMedia.Content?.ToString();
-                                    if (!string.IsNullOrEmpty(textContent))
-                                    {
-                                        File.WriteAllText(outputPath, textContent);
-                                        Console.WriteLine($"Extracted (text): {outputPath}");
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine($"No extractable content for annotation '{baseName}' on page {pageIdx}.");
-                                    }
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.Error.WriteLine($"Failed to extract media from annotation '{baseName}' on page {pageIdx}: {ex.Message}");
+                            string annotFolder = Path.Combine(pageFolder, $"Annotation_{annotationIndex}");
+                            Directory.CreateDirectory(annotFolder);
+
+                            ExtractRichMediaAssets(richMedia, annotFolder);
                         }
                     }
                 }
             }
-        }
 
-        Console.WriteLine("Extraction completed.");
+            Console.WriteLine("Media extraction completed.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    // Uses reflection to stay compatible with Aspose.Pdf versions that may not expose RichMediaContent/Asset types.
+    private static void ExtractRichMediaAssets(RichMediaAnnotation richMedia, string targetFolder)
+    {
+        // Get the RichMediaContent property via reflection.
+        PropertyInfo contentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent", BindingFlags.Public | BindingFlags.Instance);
+        if (contentProp == null)
+            return; // Property not available – nothing to extract.
+
+        object richMediaContent = contentProp.GetValue(richMedia);
+        if (richMediaContent == null)
+            return;
+
+        // Get the Assets collection from the content object.
+        PropertyInfo assetsProp = richMediaContent.GetType().GetProperty("Assets", BindingFlags.Public | BindingFlags.Instance);
+        if (assetsProp == null)
+            return;
+
+        object assetsObj = assetsProp.GetValue(richMediaContent);
+        if (assetsObj is not IEnumerable assets)
+            return;
+
+        int assetIndex = 0;
+        foreach (object asset in assets)
+        {
+            // Asset properties are accessed via reflection to avoid compile‑time dependencies.
+            string assetName = GetAssetPropertyValue(asset, "Name") as string;
+            if (string.IsNullOrEmpty(assetName))
+                assetName = $"Asset_{assetIndex}";
+
+            string mime = GetAssetPropertyValue(asset, "MimeType") as string;
+            string extension = GetExtensionFromMime(mime);
+            string filePath = Path.Combine(targetFolder, $"{assetName}{extension}");
+
+            // Retrieve the embedded stream.
+            MethodInfo getFileMethod = asset.GetType().GetMethod("GetFile", Type.EmptyTypes);
+            if (getFileMethod == null)
+                continue;
+
+            using (Stream assetStream = getFileMethod.Invoke(asset, null) as Stream)
+            using (FileStream fileStream = File.Create(filePath))
+            {
+                assetStream?.CopyTo(fileStream);
+            }
+
+            assetIndex++;
+        }
+    }
+
+    // Helper to read a property value via reflection safely.
+    private static object GetAssetPropertyValue(object asset, string propertyName)
+    {
+        PropertyInfo prop = asset.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+        return prop?.GetValue(asset);
+    }
+
+    // Simple MIME‑type to file‑extension mapper
+    static string GetExtensionFromMime(string mime)
+    {
+        if (string.IsNullOrEmpty(mime))
+            return string.Empty;
+
+        switch (mime.ToLowerInvariant())
+        {
+            case "audio/mpeg": return ".mp3";
+            case "audio/mp4": return ".m4a";
+            case "video/mp4": return ".mp4";
+            case "application/pdf": return ".pdf";
+            case "image/jpeg": return ".jpg";
+            case "image/png": return ".png";
+            case "application/x-shockwave-flash": return ".swf";
+            default: return string.Empty;
+        }
     }
 }

@@ -16,26 +16,24 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Aspose.Pdf uses 1‑based page indexing
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Iterate over all annotations on the page (1‑based indexing)
-                for (int j = 1; j <= page.Annotations.Count; j++)
+                // Iterate over all annotations on the page
+                foreach (Annotation annot in page.Annotations)
                 {
-                    Annotation ann = page.Annotations[j];
-
-                    // Process only LinkAnnotation objects
-                    if (ann is LinkAnnotation link)
+                    // Process only link annotations
+                    if (annot is LinkAnnotation link)
                     {
-                        // Set the border color to red
-                        link.Color = Aspose.Pdf.Color.Red;
+                        // Set border colour (Color property controls the border colour)
+                        link.Color = Color.Red;
 
-                        // Create a Border object for this annotation and set line width to 3 points
+                        // Set border line width via the Border object (requires the parent annotation)
                         link.Border = new Border(link) { Width = 3 };
                     }
                 }
@@ -45,6 +43,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All link annotations updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Link annotation borders updated and saved to '{outputPath}'.");
     }
 }

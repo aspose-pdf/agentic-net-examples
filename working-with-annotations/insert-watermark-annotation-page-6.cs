@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,44 +16,52 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Verify that page 6 exists (Aspose.Pdf uses 1‑based indexing)
+            // Ensure the document has at least six pages
             if (doc.Pages.Count < 6)
             {
-                Console.Error.WriteLine("The document contains fewer than 6 pages.");
+                Console.Error.WriteLine("Document does not contain page 6.");
                 return;
             }
 
+            // Get page six (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[6];
 
-            // Define the size of the watermark annotation (e.g., 200 × 100 points)
-            double wmWidth = 200;
-            double wmHeight = 100;
-
-            // Calculate rectangle coordinates to centre the watermark on the page
+            // Retrieve page dimensions
             double pageWidth = page.PageInfo.Width;
             double pageHeight = page.PageInfo.Height;
-            double llx = (pageWidth - wmWidth) / 2;   // lower‑left X
+
+            // Define watermark size (50% of page size) and compute centered rectangle
+            double wmWidth = pageWidth * 0.5;
+            double wmHeight = pageHeight * 0.5;
+            double llx = (pageWidth - wmWidth) / 2; // lower‑left X
             double lly = (pageHeight - wmHeight) / 2; // lower‑left Y
             double urx = llx + wmWidth;               // upper‑right X
             double ury = lly + wmHeight;              // upper‑right Y
 
-            // Fully qualified rectangle to avoid ambiguity with System.Drawing.Rectangle
+            // Fully qualified Rectangle to avoid ambiguity with System.Drawing
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
 
-            // Create the WatermarkAnnotation, set 30 % opacity, and add it to the page
+            // Create the watermark annotation
             WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect)
             {
-                Opacity = 0.3 // 30 percent opacity
+                // The text of the watermark
+                Contents = "CONFIDENTIAL",
+                // Set opacity to 30% (0.3)
+                Opacity = 0.3,
+                // Set the text colour (red in this example)
+                Color = Aspose.Pdf.Color.FromRgb(1.0, 0.0, 0.0)
             };
+
+            // Add the annotation to the page
             page.Annotations.Add(watermark);
 
-            // Save the modified document
+            // Save the modified document (inside the using block)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Watermark annotation added to page 6 and saved as '{outputPath}'.");
+        Console.WriteLine($"Watermark added and saved to '{outputPath}'.");
     }
 }

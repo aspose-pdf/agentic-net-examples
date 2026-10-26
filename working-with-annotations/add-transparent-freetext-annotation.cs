@@ -1,15 +1,15 @@
 using System;
 using System.IO;
-using System.Drawing;                     // Required for DefaultAppearance color
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;                    // For DefaultAppearance
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -18,29 +18,33 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page to place the annotation (first page, 1‑based indexing)
+            // Select the page to annotate (first page in this example)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (left, bottom, width, height)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 150);
+            // Define the annotation rectangle (lower‑left X,Y and upper‑right X,Y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Default appearance for the text (font, size, color)
+            // Build the default appearance required by FreeTextAnnotation
             DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
 
-            // Create the free‑text annotation
+            // Create a free‑text annotation with transparent background
             FreeTextAnnotation freeText = new FreeTextAnnotation(page, rect, appearance)
             {
-                Contents = "Overlay note – transparent background",
-                // Transparent background color
+                // Text displayed inside the annotation
+                Contents = "Note: Review this section.",
+
+                // Make the background fully transparent
                 Color = Aspose.Pdf.Color.Transparent,
-                // Semi‑transparent overall annotation (0 = fully transparent, 1 = opaque)
-                Opacity = 0.3
+                Opacity = 0.0
             };
 
-            // Add the annotation to the page
+            // Hide the border (optional) – Border requires the owning annotation instance
+            freeText.Border = new Border(freeText) { Width = 0 };
+
+            // Add the annotation to the page's annotation collection
             page.Annotations.Add(freeText);
 
             // Save the modified PDF

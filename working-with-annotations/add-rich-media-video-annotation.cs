@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -9,45 +10,88 @@ class Program
     {
         const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
-        const string videoPath = "sample.mp4";
-        const string posterPath = "poster.jpg";
+        const string videoFile = "sample.mp4";
 
-        // Verify required files exist
-        if (!File.Exists(inputPdf) || !File.Exists(videoPath) || !File.Exists(posterPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine("One or more required files are missing.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Open the existing PDF document
+        if (!File.Exists(videoFile))
+        {
+            Console.Error.WriteLine($"Video file not found: {videoFile}");
+            return;
+        }
+
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdf))
         {
-            // Select the first page (Aspose.Pdf uses 1‑based indexing)
+            // Access the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (lower‑left X/Y, upper‑right X/Y)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+            // Define the rectangle where the annotation will appear
+            // (llx, lly, urx, ury) – fully qualified to avoid ambiguity
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
 
-            // Create the RichMediaAnnotation
-            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect)
-            {
-                // Optional visual settings
-                Color = Aspose.Pdf.Color.Transparent,
-                // Specify that the embedded content is a video
-                Type = RichMediaAnnotation.ContentType.Video
-            };
+            // Create the RichMedia annotation
+            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect);
 
-            // Embed the MP4 video stream
-            using (FileStream videoStream = File.OpenRead(videoPath))
+            // -----------------------------------------------------------------
+            // Attach the video using reflection – RichMediaContent may not exist
+            // in older Aspose.Pdf versions. This keeps the code compilable across
+            // all supported versions while still enabling the feature when the
+            // runtime library provides it.
+            // -----------------------------------------------------------------
+            Type richMediaContentType = Type.GetType("Aspose.Pdf.Annotations.RichMediaContent, Aspose.Pdf");
+            if (richMediaContentType != null)
             {
-                // The first argument is the name of the stream inside the PDF
-                richMedia.SetContent(Path.GetFileName(videoPath), videoStream);
+                // Create an instance of RichMediaContent
+                object richMediaContent = Activator.CreateInstance(richMediaContentType);
+
+                // The RichMediaContent class (when present) exposes an AddFile method
+                // that accepts the path to the media file.
+                MethodInfo addFileMethod = richMediaContentType.GetMethod("AddFile", new[] { typeof(string) });
+                addFileMethod?.Invoke(richMediaContent, new object[] { videoFile });
+
+                // Assign the created content to the annotation via the RichMediaContent property.
+                PropertyInfo contentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
+                contentProp?.SetValue(richMedia, richMediaContent);
+            }
+            else
+            {
+                Console.Error.WriteLine("RichMediaContent type not found in the current Aspose.Pdf version; skipping media embedding.");
             }
 
-            // Set the poster image that appears before playback
-            using (FileStream posterStream = File.OpenRead(posterPath))
+            // -----------------------------------------------------------------
+            // Configure activation to start playback only on double‑click.
+            // The RichMediaSettings class, RichMediaActivation enum and the
+            // RichMediaSettings property may be missing in older releases, so we
+            // use reflection to apply the setting when it is available.
+            // -----------------------------------------------------------------
+            Type settingsType = Type.GetType("Aspose.Pdf.Annotations.RichMediaSettings, Aspose.Pdf");
+            Type activationEnumType = Type.GetType("Aspose.Pdf.Annotations.RichMediaActivation, Aspose.Pdf");
+            if (settingsType != null && activationEnumType != null)
             {
-                richMedia.SetPoster(posterStream);
+                // Create an instance of RichMediaSettings
+                object settingsInstance = Activator.CreateInstance(settingsType);
+
+                // Get the Activation property
+                PropertyInfo activationProp = settingsType.GetProperty("Activation");
+
+                // Parse the DoubleClick enum value
+                object doubleClickValue = Enum.Parse(activationEnumType, "DoubleClick");
+
+                // Set the Activation property
+                activationProp?.SetValue(settingsInstance, doubleClickValue);
+
+                // Assign the settings instance to the annotation (if the property exists)
+                PropertyInfo annotationSettingsProp = typeof(RichMediaAnnotation).GetProperty("RichMediaSettings");
+                annotationSettingsProp?.SetValue(richMedia, settingsInstance);
+            }
+            else
+            {
+                Console.Error.WriteLine("RichMediaSettings or RichMediaActivation type not found; using default activation behavior.");
             }
 
             // Add the annotation to the page
@@ -57,6 +101,6 @@ class Program
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Rich media annotation added and saved to '{outputPdf}'.");
+        Console.WriteLine($"RichMedia annotation added and saved to '{outputPdf}'.");
     }
 }

@@ -1,55 +1,86 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
-class Program
+public class WatermarkArtifact
 {
-    static void Main()
+    /// <summary>
+    /// Applies a tiled semi‑transparent rectangle as a background watermark to every page of the input PDF.
+    /// </summary>
+    /// <param name="inputPdfPath">Path to the source PDF.</param>
+    /// <param name="outputPdfPath">Path where the watermarked PDF will be saved.</param>
+    public void Apply(string inputPdfPath, string outputPdfPath)
     {
-        const string inputPdfPath   = "input.pdf";      // PDF to receive the tiled watermark
-        const string patternPdfPath = "pattern.pdf";    // PDF containing the pattern page
-        const string outputPdfPath  = "output.pdf";
-
-        // Verify that both source files exist
-        if (!File.Exists(inputPdfPath) || !File.Exists(patternPdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("Input PDF or pattern PDF not found.");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF that provides the pattern (assumed to have at least one page)
-        using (Document patternDoc = new Document(patternPdfPath))
+        // Load the source PDF inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Use the first page of the pattern document as the tile content
-            Page patternPage = patternDoc.Pages[1];
-
-            // Load the target document where the tiled watermark will be applied
-            using (Document targetDoc = new Document(inputPdfPath))
+            // Iterate over each page and add a tiled pattern made of semi‑transparent rectangles.
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Apply the watermark artifact to every page in the target document
-                foreach (Page page in targetDoc.Pages)
+                Page page = doc.Pages[i];
+                // Create a Graph that covers the whole page.
+                Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+
+                // Tile size (in points).
+                const float tileWidth = 100f;
+                const float tileHeight = 100f;
+                const float rectMargin = 10f; // margin inside each tile
+
+                // Loop over the page surface and place a rectangle in each tile.
+                for (float y = 0; y < page.PageInfo.Height; y += tileHeight)
                 {
-                    // Create a new WatermarkArtifact for the current page
-                    WatermarkArtifact watermark = new WatermarkArtifact();
+                    for (float x = 0; x < page.PageInfo.Width; x += tileWidth)
+                    {
+                        // Rectangle positioned inside the current tile.
+                        // Constructor: left, bottom, width, height
+                        Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(
+                            x + rectMargin,
+                            y + rectMargin,
+                            tileWidth - 2 * rectMargin,
+                            tileHeight - 2 * rectMargin);
 
-                    // Set the PDF page that will be used as the tiled pattern
-                    watermark.SetPdfPage(patternPage);
+                        // Styling via GraphInfo – use semi‑transparent light gray.
+                        rect.GraphInfo = new GraphInfo
+                        {
+                            FillColor = Color.FromArgb(128, 230, 230, 230), // 50% opacity
+                            Color = Color.Transparent, // No border
+                            LineWidth = 0
+                        };
 
-                    // Place the artifact behind the page content
-                    watermark.IsBackground = true;
-
-                    // Optional: adjust opacity (0.0 = fully transparent, 1.0 = opaque)
-                    watermark.Opacity = 0.5;
-
-                    // Add the artifact to the page's artifact collection
-                    page.Artifacts.Add(watermark);
+                        graph.Shapes.Add(rect);
+                    }
                 }
 
-                // Save the modified document (using the standard Document.Save method)
-                targetDoc.Save(outputPdfPath);
+                // Add the graph (containing the tiled rectangles) to the page.
+                page.Paragraphs.Add(graph);
             }
+
+            // Save the modified document.
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Tiled watermark PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPdfPath}'.");
+    }
+
+    // ---------------------------------------------------------------------
+    // Entry point – required for a console‑application build.
+    // ---------------------------------------------------------------------
+    public static void Main(string[] args)
+    {
+        if (args.Length != 2)
+        {
+            Console.WriteLine("Usage: WatermarkArtifact <input.pdf> <output.pdf>");
+            return;
+        }
+
+        var artifact = new WatermarkArtifact();
+        artifact.Apply(args[0], args[1]);
     }
 }

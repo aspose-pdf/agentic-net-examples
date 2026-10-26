@@ -2,76 +2,76 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";          // source PDF
-        const string outputPdfPath = "output.pdf";        // result PDF
-        const string u3dModelPath = "model.u3d";          // U3D file
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_3d.pdf";
+        const string u3dPath = "model.u3d";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(u3dModelPath))
+        if (!File.Exists(u3dPath))
         {
-            Console.Error.WriteLine($"U3D model not found: {u3dModelPath}");
+            Console.Error.WriteLine($"U3D model not found: {u3dPath}");
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPdf))
         {
-            // Ensure the document has at least two pages
+            // Ensure the document has at least two pages (Aspose.Pdf uses 1‑based indexing)
             if (doc.Pages.Count < 2)
             {
-                Console.Error.WriteLine("The document must contain at least two pages.");
+                Console.Error.WriteLine("Document contains fewer than two pages.");
                 return;
             }
 
-            // Load the U3D content
-            PDF3DContent content = new PDF3DContent();
-            content.LoadAsU3D(u3dModelPath);
-
-            // Create the 3D artwork using the loaded content
-            PDF3DArtwork artwork = new PDF3DArtwork(doc, content);
-
-            // Define the rectangle where the annotation will appear (coordinates in points)
-            // Here we place it at (100,400) with width 300 and height 300
+            // Define the rectangle where the 3D annotation will appear (llx, lly, urx, ury)
+            // Use Aspose.Pdf.Rectangle for annotation bounds (fully qualified to avoid ambiguity)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 400, 400, 700);
 
-            // Get page two (1‑based indexing)
-            Page pageTwo = doc.Pages[2];
+            // ------------------------------------------------------------
+            // Build the 3D annotation chain (Content -> Artwork -> View -> Annotation)
+            // ------------------------------------------------------------
 
-            // Create the 3D annotation on page two
-            PDF3DAnnotation annotation = new PDF3DAnnotation(pageTwo, rect, artwork);
+            // 1. Load the U3D model into PDF3DContent
+            PDF3DContent content = new PDF3DContent();
+            content.LoadAsU3D(u3dPath);
 
-            // Create an initial view for the 3D annotation
-            // Identity matrix for camera position, orbit = 0, view name = "Default"
-            // Matrix3D requires 12 parameters (including translation components tx, ty, tz)
-            Matrix3D cameraPos = new Matrix3D(
-                1, 0, 0,
-                0, 1, 0,
-                0, 0, 1,
-                0, 0, 0); // tx, ty, tz set to zero
-            PDF3DView view = new PDF3DView(doc, cameraPos, 0.0, "Default");
+            // 2. Choose a lighting scheme and render mode
+            PDF3DLightingScheme lighting = new PDF3DLightingScheme(LightingSchemeType.CAD);
+            PDF3DRenderMode renderMode = new PDF3DRenderMode(RenderModeType.Solid);
 
-            // Add the view to the annotation's view array
-            annotation.ViewArray.Add(view);
+            // 3. Create the artwork that ties content, lighting and render mode together
+            PDF3DArtwork artwork = new PDF3DArtwork(doc, content, lighting, renderMode);
 
-            // Set the default view index to the first (and only) view added
-            annotation.SetDefaultViewIndex(0);
+            // 4. Define an initial view for the 3D annotation
+            //    The view constructor requires a camera matrix, an orbit distance and a name.
+            Matrix3D cameraMatrix = new Matrix3D(); // identity matrix – you can customise if needed
+            PDF3DView view = new PDF3DView(doc, cameraMatrix, 100.0, "InitialView");
+            // Optional: customise view properties (background colour, etc.)
+            view.BackGroundColor = Aspose.Pdf.Color.White;
+            // Add the view to the artwork's view collection
+            artwork.ViewArray.Add(view);
 
-            // Attach the annotation to the page
-            pageTwo.Annotations.Add(annotation);
+            // 5. Create the annotation on page 2, linking the artwork and specifying activation behaviour
+            PDF3DAnnotation pdf3d = new PDF3DAnnotation(doc.Pages[2], rect, artwork, PDF3DActivation.activeWhenOpen);
+            // Set the view we just created as the default view
+            pdf3d.SetDefaultViewIndex(0);
+
+            // Add the annotation to the page
+            doc.Pages[2].Annotations.Add(pdf3d);
 
             // Save the modified PDF
-            doc.Save(outputPdfPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"3D annotation added and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"3D annotation added and saved to '{outputPdf}'.");
     }
 }

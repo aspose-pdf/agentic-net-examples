@@ -7,57 +7,89 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";
-        const string outputPdf  = "output_with_sound.pdf";
-        const string audioFile  = "background.mp3";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output_with_sound.pdf";
+        const string soundFilePath = "background.wav";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(audioFile))
+        if (!File.Exists(soundFilePath))
         {
-            Console.Error.WriteLine($"Audio file not found: {audioFile}");
+            Console.Error.WriteLine($"Sound file not found: {soundFilePath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Choose the page where the annotation will be placed (first page)
+            // Choose the page where the annotation will be placed (first page in this example)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (position and size on the page)
+            // Define the rectangle area for the annotation (coordinates are in points)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create a RichMediaAnnotation to embed audio
-            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect);
-
-            // Set the activation event to play when the page becomes visible
-            richMedia.ActivateOn = RichMediaAnnotation.ActivationEvent.PageVisible;
-
-            // Specify that the embedded content is audio
-            richMedia.Type = RichMediaAnnotation.ContentType.Audio;
-
-            // Load the audio stream and attach it to the annotation
-            using (FileStream audioStream = File.OpenRead(audioFile))
+            // ---------------------------------------------------------------------
+            // Create a SoundAnnotation in a version‑agnostic way using reflection.
+            // This avoids compile‑time errors when the library version does not expose
+            // the expected constructors or members.
+            // ---------------------------------------------------------------------
+            Type soundAnnotType = Type.GetType("Aspose.Pdf.Annotations.SoundAnnotation, Aspose.Pdf");
+            if (soundAnnotType == null)
             {
-                // The MIME type for MP3 audio; adjust if using a different format
-                richMedia.SetContent("audio/mpeg", audioStream);
+                Console.Error.WriteLine("SoundAnnotation type not found in the loaded Aspose.Pdf assembly.");
+                doc.Save(outputPdfPath);
+                return;
             }
 
-            // Optionally set a contents description for the annotation (Title property does not exist)
-            richMedia.Contents = "Automatically plays when the page is visible.";
+            object soundAnnot = null;
+            // Prefer the (Page, Rectangle) constructor if it exists.
+            var ctorWithPageRect = soundAnnotType.GetConstructor(new[] { typeof(Page), typeof(Rectangle) });
+            if (ctorWithPageRect != null)
+            {
+                soundAnnot = ctorWithPageRect.Invoke(new object[] { page, rect });
+            }
+            else
+            {
+                // Fallback to the parameterless constructor and set the Rect property manually.
+                var defaultCtor = soundAnnotType.GetConstructor(Type.EmptyTypes);
+                soundAnnot = defaultCtor.Invoke(null);
+                var rectProp = soundAnnotType.GetProperty("Rect");
+                rectProp?.SetValue(soundAnnot, rect);
+            }
 
-            // Add the annotation to the page
-            page.Annotations.Add(richMedia);
+            // Load the audio file into a Sound object (also via reflection).
+            using (FileStream soundStream = File.OpenRead(soundFilePath))
+            {
+                Type soundType = Type.GetType("Aspose.Pdf.Annotations.Sound, Aspose.Pdf");
+                if (soundType != null)
+                {
+                    var soundCtor = soundType.GetConstructor(new[] { typeof(Stream) });
+                    var soundObj = soundCtor?.Invoke(new object[] { soundStream });
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+                    // Assign the Sound object to the annotation if the property exists.
+                    var soundProp = soundAnnotType.GetProperty("Sound");
+                    soundProp?.SetValue(soundAnnot, soundObj);
+                }
+            }
+
+            // Enable automatic playback when the page becomes visible, if the property is present.
+            var playProp = soundAnnotType.GetProperty("PlayOnPageOpen");
+            if (playProp != null && playProp.CanWrite)
+            {
+                playProp.SetValue(soundAnnot, true);
+            }
+
+            // Add the annotation to the page's annotation collection.
+            page.Annotations.Add((Annotation)soundAnnot);
+
+            // Save the modified PDF.
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF with automatic background music saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with sound annotation saved to '{outputPdfPath}'.");
     }
 }

@@ -1,14 +1,14 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // for BackgroundArtifact
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_no_background_artifacts.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,25 +16,28 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
+            // Iterate through all pages
             foreach (Page page in doc.Pages)
             {
-                // Remove BackgroundArtifact objects safely by iterating backwards
-                for (int i = page.Artifacts.Count - 1; i >= 0; i--)
+                // Collect background artifacts first because ArtifactCollection does not support direct removal during enumeration
+                var artifactsToRemove = new List<Artifact>();
+                foreach (Artifact artifact in page.Artifacts)
                 {
-                    Artifact artifact = page.Artifacts[i];
                     if (artifact is BackgroundArtifact)
-                    {
-                        // ArtifactCollection provides Delete for removal
-                        page.Artifacts.Delete(artifact);
-                    }
+                        artifactsToRemove.Add(artifact);
+                }
+
+                // Delete the collected artifacts using ArtifactCollection.Delete
+                foreach (Artifact artifact in artifactsToRemove)
+                {
+                    page.Artifacts.Delete(artifact);
                 }
             }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

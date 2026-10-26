@@ -1,57 +1,69 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF and external image file paths
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string imageFilePath = "image.png";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_figure.pdf";
+        const string imagePath = "figure.png"; // external image file
 
-        // Ensure the files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(imageFilePath))
-        {
-            Console.Error.WriteLine($"Image file not found: {imageFilePath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF, add a FileAttachment annotation that shows the image as its appearance, and save
-        using (Document doc = new Document(inputPdfPath))
+        if (!File.Exists(imagePath))
         {
-            // Choose the page where the annotation will be placed (first page in this example)
-            Page page = doc.Pages[1];
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            return;
+        }
 
-            // Define the rectangle for the annotation (coordinates are in points; lower‑left origin)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 600);
-
-            // Create a FileSpecification that points to the external image file
-            FileSpecification fileSpec = new FileSpecification(imageFilePath);
-
-            // Create the FileAttachment annotation using the page, rectangle, and file specification
-            FileAttachmentAnnotation fileAttachment = new FileAttachmentAnnotation(page, rect, fileSpec)
+        try
+        {
+            // Load the PDF document
+            using (Document doc = new Document(inputPdf))
             {
-                // Optional: choose an icon to represent the attachment
-                Icon = FileIcon.Graph,
-                // Optional: set a tooltip text that appears when the user hovers over the annotation
-                Contents = "Attached image"
-            };
+                // Ensure the document is tagged (create structure if missing)
+                ITaggedContent tagged = doc.TaggedContent;
+                tagged.SetLanguage("en-US");
+                tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPdf));
 
-            // Add the annotation to the page's annotation collection
-            page.Annotations.Add(fileAttachment);
+                // Root of the tagged structure tree
+                StructureElement root = tagged.RootElement;
 
-            // Save the modified PDF
-            doc.Save(outputPdfPath);
+                // Create a Figure element and set its alternative text
+                FigureElement figure = tagged.CreateFigureElement();
+                figure.AlternativeText = "Illustration showing the concept.";
+                root.AppendChild(figure); // attach to the root
+
+                // Add the external image to the first page (or any page you prefer)
+                Page page = doc.Pages[1];
+
+                // Load the image into the page resources
+                using (FileStream imgStream = File.OpenRead(imagePath))
+                {
+                    // Images.Add returns the resource name (string). Retrieve the XImage via the name.
+                    string imgResourceName = page.Resources.Images.Add(imgStream);
+                    XImage img = page.Resources.Images[imgResourceName];
+                    // Associate alternative text with the image resource
+                    img.TrySetAlternativeText("Figure illustration", page);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPdf);
+            }
+
+            Console.WriteLine($"Figure annotation with external image saved to '{outputPdf}'.");
         }
-
-        Console.WriteLine($"PDF with image attachment saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

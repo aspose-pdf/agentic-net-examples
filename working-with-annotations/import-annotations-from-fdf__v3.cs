@@ -1,42 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+// URL-STABILITY STUB
+//
+// Import annotations from fdf__v3
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/working-with-annotations/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string pdfPath = "input.pdf";
-        const string fdfPath = "annotations.fdf";
-        const string outputPath = "output.pdf";
-
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
-            return;
-        }
-
-        if (!File.Exists(fdfPath))
-        {
-            Console.Error.WriteLine($"FDF not found: {fdfPath}");
-            return;
-        }
-
-        // Load the PDF document; using ensures proper disposal
-        using (Document doc = new Document(pdfPath))
-        {
-            // Open the FDF file as a stream
-            using (FileStream fdfStream = File.OpenRead(fdfPath))
-            {
-                // Import annotations; page numbers embedded in the FDF are applied automatically
-                FdfReader.ReadAnnotations(fdfStream, doc);
-            }
-
-            // Save the updated PDF with imported annotations
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Annotations imported and saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

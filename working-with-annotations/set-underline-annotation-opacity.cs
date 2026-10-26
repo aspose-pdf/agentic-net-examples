@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const int targetPageNumber = 1; // 1‑based page index
+        const int    targetPage = 2; // 1‑based page index to modify
 
         if (!File.Exists(inputPath))
         {
@@ -17,33 +17,31 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Validate page number
-            if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
+            if (targetPage < 1 || targetPage > doc.Pages.Count)
             {
-                Console.Error.WriteLine("Invalid page number.");
+                Console.Error.WriteLine($"Invalid page number: {targetPage}");
                 return;
             }
 
-            // Get the target page
-            Page page = doc.Pages[targetPageNumber];
+            // Get the target page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[targetPage];
 
-            // Iterate over annotations on the page
-            for (int i = 1; i <= page.Annotations.Count; i++) // annotation collections are 1‑based
+            // Iterate over all annotations on the page
+            foreach (Annotation annot in page.Annotations)
             {
-                Annotation ann = page.Annotations[i];
-
                 // Check if the annotation is an underline annotation
-                if (ann is UnderlineAnnotation underline)
+                if (annot is UnderlineAnnotation underline)
                 {
-                    // Set opacity to 50% (value range 0.0 – 1.0)
-                    underline.Opacity = 0.5;
+                    // Set opacity to 50% (value range 0.0‑1.0)
+                    underline.Opacity = 0.5f;
                 }
             }
 
-            // Save the modified PDF (lifecycle rule: save inside using)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -7,67 +8,87 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputDir = "ExtractedMedia";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document (wrapped in using for proper disposal)
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            int mediaCount = 0;
-
-            // Iterate through all pages
-            foreach (Page page in doc.Pages)
+            using (Document doc = new Document(inputPath))
             {
-                // Iterate through all annotations on the page
-                foreach (Annotation ann in page.Annotations)
+                int mediaCount = 0;
+
+                // Iterate through all pages (1‑based indexing)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    // Process only ScreenAnnotation instances
-                    if (ann is ScreenAnnotation screenAnn)
+                    Page page = doc.Pages[i];
+
+                    // Examine each annotation on the page
+                    foreach (Annotation annot in page.Annotations)
                     {
-                        // The Action of a ScreenAnnotation that references an external file is a GoToRemoteAction
-                        if (screenAnn.Action is GoToRemoteAction goToRemote && goToRemote.File != null)
+                        // Process only ScreenAnnotation objects
+                        if (annot is ScreenAnnotation screenAnnot)
                         {
-                            // Retrieve the embedded file specification
-                            FileSpecification fileSpec = goToRemote.File;
+                            // Use reflection to access RichMediaContent (may not exist in older versions)
+                            PropertyInfo richMediaProp = screenAnnot.GetType().GetProperty("RichMediaContent");
+                            if (richMediaProp == null)
+                                continue; // RichMediaContent not supported – skip
 
-                            // The actual media data is stored in the Contents stream of the FileSpecification
-                            using (Stream mediaStream = fileSpec.Contents)
+                            object richMedia = richMediaProp.GetValue(screenAnnot);
+                            if (richMedia == null)
+                                continue;
+
+                            // Get the EmbeddedFile property from RichMediaContent
+                            PropertyInfo embeddedFileProp = richMedia.GetType().GetProperty("EmbeddedFile");
+                            if (embeddedFileProp == null)
+                                continue;
+
+                            object embeddedFile = embeddedFileProp.GetValue(richMedia);
+                            if (embeddedFile == null)
+                                continue;
+
+                            // Determine a file name/extension
+                            string fileName = string.Empty;
+                            PropertyInfo fileNameProp = embeddedFile.GetType().GetProperty("FileName");
+                            if (fileNameProp != null)
                             {
-                                // Determine a file extension – fall back to .bin if the name is unavailable
-                                string extension = Path.GetExtension(fileSpec.Name ?? string.Empty);
-                                if (string.IsNullOrEmpty(extension))
-                                    extension = ".bin";
+                                object fn = fileNameProp.GetValue(embeddedFile);
+                                if (fn != null)
+                                    fileName = fn.ToString();
+                            }
 
-                                // Build a unique file name for the extracted media
-                                string mediaFileName = $"media_{++mediaCount}{extension}";
-                                string outputPath = Path.Combine(outputDir, mediaFileName);
+                            string ext = Path.GetExtension(fileName);
+                            if (string.IsNullOrEmpty(ext))
+                                ext = ".bin";
 
-                                // Write the media stream to disk
-                                using (FileStream outFs = File.Create(outputPath))
-                                {
-                                    mediaStream.CopyTo(outFs);
-                                }
+                            mediaCount++;
+                            string outPath = Path.Combine(outputDir, $"media_{mediaCount}{ext}");
 
-                                Console.WriteLine($"Extracted media saved to: {outputPath}");
+                            // Call EmbeddedFile.Save(string)
+                            MethodInfo saveMethod = embeddedFile.GetType().GetMethod("Save", new[] { typeof(string) });
+                            if (saveMethod != null)
+                            {
+                                saveMethod.Invoke(embeddedFile, new object[] { outPath });
+                                Console.WriteLine($"Saved media from page {i} to '{outPath}'.");
                             }
                         }
                     }
                 }
-            }
 
-            if (mediaCount == 0)
-            {
-                Console.WriteLine("No ScreenAnnotation media found in the document.");
+                if (mediaCount == 0)
+                    Console.WriteLine("No ScreenAnnotation with embedded media found.");
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

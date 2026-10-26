@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -16,23 +17,22 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: wrap in using)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least 5 pages (page indexing is 1‑based)
+            // Page indexing in Aspose.Pdf is 1‑based
             if (doc.Pages.Count < 5)
             {
-                Console.Error.WriteLine("The document does not contain a page 5.");
+                Console.Error.WriteLine("The document has fewer than 5 pages.");
                 return;
             }
 
-            // Get page 5
-            Page pageFive = doc.Pages[5];
+            Page page = doc.Pages[5];
 
-            // LINQ query to find the first RichMediaAnnotation on page 5
-            RichMediaAnnotation richMedia = pageFive.Annotations
-                                                   .OfType<RichMediaAnnotation>()
-                                                   .FirstOrDefault();
+            // LINQ query to get the first RichMediaAnnotation on page 5
+            RichMediaAnnotation richMedia = (from ann in page.Annotations
+                                             where ann is RichMediaAnnotation
+                                             select (RichMediaAnnotation)ann).FirstOrDefault();
 
             if (richMedia == null)
             {
@@ -40,15 +40,22 @@ class Program
                 return;
             }
 
-            // Display selected properties
+            // Display selected properties of the RichMediaAnnotation
             Console.WriteLine("RichMediaAnnotation found:");
-            Console.WriteLine($"  Name          : {richMedia.Name}");
-            Console.WriteLine($"  Contents      : {richMedia.Contents}");
-            Console.WriteLine($"  Type          : {richMedia.Type}");
-            Console.WriteLine($"  ActivateOn    : {richMedia.ActivateOn}");
-            Console.WriteLine($"  Modified      : {richMedia.Modified}");
-            Aspose.Pdf.Rectangle rect = richMedia.Rect;
-            Console.WriteLine($"  Rectangle     : LLX={rect.LLX}, LLY={rect.LLY}, URX={rect.URX}, URY={rect.URY}");
+            Console.WriteLine($"  Name               : {richMedia.Name}");
+            Console.WriteLine($"  AnnotationType     : {richMedia.AnnotationType}");
+            Console.WriteLine($"  Rect               : {richMedia.Rect}");
+
+            // RichMediaContent and RichMediaSettings may not exist in older library versions.
+            // Use reflection to safely access them if they are present.
+            PropertyInfo contentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
+            PropertyInfo settingsProp = typeof(RichMediaAnnotation).GetProperty("RichMediaSettings");
+
+            bool hasContent = contentProp != null && contentProp.GetValue(richMedia) != null;
+            bool hasSettings = settingsProp != null && settingsProp.GetValue(richMedia) != null;
+
+            Console.WriteLine($"  RichMediaContent   : {(hasContent ? "Present" : "None")}");
+            Console.WriteLine($"  RichMediaSettings  : {(hasSettings ? "Present" : "None")}");
         }
     }
 }

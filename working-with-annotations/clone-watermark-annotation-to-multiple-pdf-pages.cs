@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -8,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "watermarked_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,55 +17,42 @@ class Program
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Locate the first WatermarkAnnotation (assumed to exist on page 1)
-            WatermarkAnnotation original = null;
-            foreach (Annotation ann in doc.Pages[1].Annotations)
-            {
-                if (ann is WatermarkAnnotation wm)
-                {
-                    original = wm;
-                    break;
-                }
-            }
+            // Retrieve the first WatermarkAnnotation from the first page
+            WatermarkAnnotation original = doc.Pages[1]
+                .Annotations
+                .OfType<WatermarkAnnotation>()
+                .FirstOrDefault();
 
             if (original == null)
             {
-                Console.WriteLine("No WatermarkAnnotation found on the first page.");
-                doc.Save(outputPath);
+                Console.Error.WriteLine("No WatermarkAnnotation found on the first page.");
                 return;
             }
 
-            // Clone the annotation to every subsequent page with adjusted positions
+            // Base rectangle of the original annotation (use the Rect property)
+            Aspose.Pdf.Rectangle baseRect = original.Rect;
+
+            // Apply cloned watermark to each subsequent page with a vertical offset
             for (int i = 2; i <= doc.Pages.Count; i++)
             {
-                // Original rectangle of the watermark
-                Aspose.Pdf.Rectangle origRect = original.Rect;
+                // Clone the original annotation
+                WatermarkAnnotation clone = (WatermarkAnnotation)original.Clone();
 
-                // Example offset: shift 50 points right and 50 points up per page index
-                double offsetX = 50 * (i - 1);
-                double offsetY = 50 * (i - 1);
-
-                // Create a new rectangle based on the offset
+                // Calculate a new rectangle shifted down by 50 points per page
+                double offset = 50.0 * (i - 1);
                 Aspose.Pdf.Rectangle newRect = new Aspose.Pdf.Rectangle(
-                    origRect.LLX + offsetX,
-                    origRect.LLY + offsetY,
-                    origRect.URX + offsetX,
-                    origRect.URY + offsetY);
+                    baseRect.LLX,
+                    baseRect.LLY - offset,
+                    baseRect.URX,
+                    baseRect.URY - offset);
 
-                // Create a new WatermarkAnnotation on the target page
-                WatermarkAnnotation clone = new WatermarkAnnotation(doc.Pages[i], newRect)
-                {
-                    // Copy visual properties from the original annotation
-                    Color = original.Color,
-                    Opacity = original.Opacity,
-                    Contents = original.Contents,
-                    // Additional properties can be copied as needed
-                };
+                // Assign the adjusted rectangle to the clone (use Rect property)
+                clone.Rect = newRect;
 
-                // Add the cloned annotation to the page's annotation collection
+                // Add the cloned annotation to the current page
                 doc.Pages[i].Annotations.Add(clone);
             }
 
@@ -72,6 +60,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Watermark cloned to all pages. Saved as '{outputPath}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

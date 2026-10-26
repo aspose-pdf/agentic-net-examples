@@ -8,78 +8,59 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string csvPath       = "annotations_to_delete.csv";
+        const string pdfPath = "input.pdf";
+        const string csvPath = "ids.csv";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-
         if (!File.Exists(csvPath))
         {
             Console.Error.WriteLine($"CSV not found: {csvPath}");
             return;
         }
 
-        // Read CSV lines. Expected format per line:
-        //   pageNumber,annotationName
-        // If pageNumber is omitted, the annotation will be searched on all pages.
-        var deleteRequests = new List<(int? page, string name)>();
-        foreach (var line in File.ReadAllLines(csvPath))
+        // Load identifiers from CSV (first column, ignore empty lines)
+        var idsToDelete = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var line in File.ReadLines(csvPath))
         {
             if (string.IsNullOrWhiteSpace(line)) continue;
-
-            var parts = line.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length == 2 && int.TryParse(parts[0].Trim(), out int pageNum))
-            {
-                deleteRequests.Add((pageNum, parts[1].Trim()));
-            }
-            else if (parts.Length == 1)
-            {
-                deleteRequests.Add((null, parts[0].Trim()));
-            }
-            // Lines with unexpected format are ignored.
+            var parts = line.Split(',');
+            var id = parts[0].Trim();
+            if (!string.IsNullOrEmpty(id))
+                idsToDelete.Add(id);
         }
 
-        // Process PDF
-        using (Document doc = new Document(inputPdfPath))
+        // Open PDF with deterministic disposal
+        using (var doc = new Document(pdfPath))
         {
-            foreach (var (pageNumber, annotationName) in deleteRequests)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Determine pages to search
-                IEnumerable<Page> pagesToSearch;
-                if (pageNumber.HasValue)
+                Page page = doc.Pages[i];
+                // Collect annotations to remove (cannot modify collection while iterating)
+                var toRemove = new List<Annotation>();
+                foreach (Annotation annot in page.Annotations)
                 {
-                    // Ensure page number is within range (1‑based indexing)
-                    if (pageNumber.Value < 1 || pageNumber.Value > doc.Pages.Count)
-                        continue; // skip invalid page numbers
-
-                    pagesToSearch = new[] { doc.Pages[pageNumber.Value] };
+                    // Use the Name property as the identifier; if Name is null, skip
+                    string key = annot.Name;
+                    if (key != null && idsToDelete.Contains(key))
+                        toRemove.Add(annot);
                 }
-                else
+                // Remove the selected annotations
+                foreach (Annotation annot in toRemove)
                 {
-                    pagesToSearch = doc.Pages; // all pages
-                }
-
-                foreach (Page page in pagesToSearch)
-                {
-                    // Find annotation by its name (if it has one)
-                    Annotation ann = page.Annotations.FindByName(annotationName);
-                    if (ann != null)
-                    {
-                        // Delete the found annotation
-                        page.Annotations.Delete(ann);
-                    }
+                    page.Annotations.Delete(annot);
                 }
             }
 
             // Save the modified PDF
-            doc.Save(outputPdfPath);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotations removed. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Annotations removed. Result saved to '{outputPath}'.");
     }
 }

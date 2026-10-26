@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -17,35 +17,42 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Pages are 1‑based; iterate through each page
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[i];
-
-                // Gather all SoundAnnotation instances on the current page
-                List<Annotation> soundAnnotations = new List<Annotation>();
-                foreach (Annotation ann in page.Annotations)
+                // Aspose.Pdf uses 1‑based page indexing
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    if (ann is SoundAnnotation)
+                    Page page = doc.Pages[i];
+
+                    // Collect SoundAnnotations to delete (cannot modify collection while iterating)
+                    var toDelete = new List<Annotation>();
+                    foreach (Annotation annot in page.Annotations)
                     {
-                        soundAnnotations.Add(ann);
+                        if (annot is SoundAnnotation)
+                        {
+                            toDelete.Add(annot);
+                        }
+                    }
+
+                    // Delete the collected annotations
+                    foreach (Annotation annot in toDelete)
+                    {
+                        page.Annotations.Delete(annot);
                     }
                 }
 
-                // Delete each collected SoundAnnotation
-                foreach (Annotation ann in soundAnnotations)
-                {
-                    page.Annotations.Delete(ann);
-                }
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the updated PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"All SoundAnnotations removed. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"All SoundAnnotations removed. Saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

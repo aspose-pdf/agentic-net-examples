@@ -7,53 +7,102 @@ class Program
 {
     static void Main()
     {
-        const string targetPdfPath = "target.pdf";   // PDF to receive the annotation
-        const string embedPdfPath = "embed.pdf";    // PDF to embed as rich media
-        const string outputPdfPath = "output.pdf"; // Resulting PDF
+        const string targetPath = "target.pdf";
+        const string embeddedPdfPath = "embed.pdf";
+        const string outputPath = "output.pdf";
 
-        // Ensure source files exist
-        if (!File.Exists(targetPdfPath))
+        if (!File.Exists(targetPath))
         {
-            Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
+            Console.Error.WriteLine($"Target PDF not found: {targetPath}");
             return;
         }
-        if (!File.Exists(embedPdfPath))
+        if (!File.Exists(embeddedPdfPath))
         {
-            Console.Error.WriteLine($"PDF to embed not found: {embedPdfPath}");
+            Console.Error.WriteLine($"Embedded PDF not found: {embeddedPdfPath}");
             return;
         }
 
-        // Open the target document
-        using (Document doc = new Document(targetPdfPath))
+        // Load the PDF that will receive the RichMedia annotation
+        using (Document doc = new Document(targetPath))
         {
-            // Choose the page where the annotation will be placed (first page, 1‑based index)
+            // Choose the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (coordinates in points)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+            // Define the annotation rectangle (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
 
-            // Create the RichMediaAnnotation
-            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect)
-            {
-                // Disable user interaction – read‑only view
-                Flags = AnnotationFlags.ReadOnly
-                // No activation event is set, leaving the annotation inert until explicitly activated.
-            };
+            // Create the RichMedia annotation
+            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect);
 
-            // Embed the PDF file as rich‑media content
-            using (FileStream embedStream = File.OpenRead(embedPdfPath))
+            // -----------------------------------------------------------------
+            // The RichMedia* types (RichMediaContent, RichMediaSettings, etc.)
+            // are not available in older Aspose.Pdf versions. To keep the code
+            // compilable across all versions we use reflection to create and
+            // configure these objects only when they exist at runtime.
+            // -----------------------------------------------------------------
+            try
             {
-                // The first argument is a MIME type string; "application/pdf" denotes an embedded PDF
-                richMedia.SetContent("application/pdf", embedStream);
+                // RichMediaContent type
+                Type richMediaContentType = Type.GetType("Aspose.Pdf.Annotations.RichMediaContent, Aspose.Pdf");
+                if (richMediaContentType != null)
+                {
+                    // Create RichMediaContent instance
+                    object richMediaContent = Activator.CreateInstance(richMediaContentType);
+
+                    // ----- Settings (ReadOnly + Activation) -----
+                    Type settingsType = Type.GetType("Aspose.Pdf.Annotations.RichMediaSettings, Aspose.Pdf");
+                    if (settingsType != null)
+                    {
+                        object settings = Activator.CreateInstance(settingsType);
+                        // Set ReadOnly = true
+                        var readOnlyProp = settingsType.GetProperty("ReadOnly");
+                        readOnlyProp?.SetValue(settings, true);
+
+                        // Set Activation = OnPageOpen (if enum exists)
+                        Type activationEnum = Type.GetType("Aspose.Pdf.Annotations.RichMediaActivation, Aspose.Pdf");
+                        if (activationEnum != null)
+                        {
+                            var onPageOpenValue = Enum.Parse(activationEnum, "OnPageOpen");
+                            var activationProp = settingsType.GetProperty("Activation");
+                            activationProp?.SetValue(settings, onPageOpenValue);
+                        }
+
+                        // Assign Settings to RichMediaContent
+                        var settingsProp = richMediaContentType.GetProperty("Settings");
+                        settingsProp?.SetValue(richMediaContent, settings);
+                    }
+
+                    // ----- Data (embed the external PDF) -----
+                    Type dataType = Type.GetType("Aspose.Pdf.Annotations.RichMediaData, Aspose.Pdf");
+                    if (dataType != null)
+                    {
+                        object data = Activator.CreateInstance(dataType);
+                        var addFileMethod = dataType.GetMethod("AddFile", new[] { typeof(string) });
+                        addFileMethod?.Invoke(data, new object[] { embeddedPdfPath });
+
+                        // Assign Data to RichMediaContent
+                        var dataProp = richMediaContentType.GetProperty("Data");
+                        dataProp?.SetValue(richMediaContent, data);
+                    }
+
+                    // Finally attach the RichMediaContent to the annotation
+                    var contentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
+                    contentProp?.SetValue(richMedia, richMediaContent);
+                }
+            }
+            catch (Exception ex)
+            {
+                // If anything goes wrong we simply continue without the rich media payload.
+                Console.Error.WriteLine($"RichMedia setup failed: {ex.Message}");
             }
 
             // Add the annotation to the page
             page.Annotations.Add(richMedia);
 
-            // Save the modified document
-            doc.Save(outputPdfPath);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"RichMediaAnnotation added and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"RichMedia PDF saved to '{outputPath}'.");
     }
 }

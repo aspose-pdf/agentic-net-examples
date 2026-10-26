@@ -1,34 +1,40 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Provides Document, PageCollectionExtensions, BatesNArtifact
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_bates.pdf";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Add Bates numbering to each page using the extension method.
-            // Configure the artifact with the required prefix and digit format.
-            doc.Pages.AddBatesNumbering(bates =>
+            // Create a BatesNArtifact for automatic numbering
+            BatesNArtifact bates = new BatesNArtifact
             {
-                bates.Prefix = "ABC";          // Prefix to prepend to each number
-                bates.NumberOfDigits = 6;      // Six‑digit format (default is 6, set explicitly)
-                // Optional: bates.StartNumber = 1; // Starting number (default is 1)
-            });
+                Prefix = "ABC",          // Prefix for the Bates number
+                StartNumber = 1,          // Starting number
+                NumberOfDigits = 6,       // Six‑digit format (e.g., 000001)
+                StartPage = 1,            // First page to apply numbering
+                EndPage = doc.Pages.Count // Last page to apply numbering
+            };
 
-            // Save the modified document (lifecycle rule: Save inside using block)
+            // Add the artifact to each page's artifact collection (required because Document has no Artifacts collection)
+            foreach (Page page in doc.Pages)
+            {
+                page.Artifacts.Add(bates);
+            }
+
+            // Save the modified document
             doc.Save(outputPath);
         }
 

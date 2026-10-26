@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;          // Form field types (ButtonField, etc.)
+using Aspose.Pdf.Annotations;   // Annotation base class
 
 class Program
 {
@@ -17,19 +17,22 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages
-            foreach (Page page in doc.Pages)
+            // Iterate over all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Iterate over all annotations on the page
-                foreach (Annotation ann in page.Annotations)
+                Page page = doc.Pages[i];
+
+                // Iterate over each annotation on the page
+                foreach (Annotation annot in page.Annotations)
                 {
-                    // Change color of button annotations to blue
-                    if (ann is ButtonField button)
+                    // Check if the annotation is a button field (push button)
+                    if (annot is ButtonField button)
                     {
-                        button.Color = Aspose.Pdf.Color.Blue;
+                        // Set the button's border colour to blue (use the Color property)
+                        button.Color = Color.Blue;
                     }
                 }
             }
@@ -38,6 +41,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Annotations updated and saved to '{outputPath}'.");
     }
 }

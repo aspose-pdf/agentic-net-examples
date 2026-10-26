@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Text;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -7,66 +9,72 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "annotations.csv";
+        const string inputPdf  = "input.pdf";
+        const string outputCsv = "annotations_audit.csv";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Open the PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPdfPath))
-        // Open a StreamWriter for the CSV output
-        using (StreamWriter csvWriter = new StreamWriter(outputCsvPath))
+        try
         {
-            // Write CSV header
-            csvWriter.WriteLine("Page,Index,Type,Name,Title,Contents,Rect");
-
-            // Pages are 1‑based in Aspose.Pdf
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                Page page = doc.Pages[pageIndex];
-
-                // Annotations collection is also 1‑based
-                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
+                // Prepare CSV writer
+                using (StreamWriter writer = new StreamWriter(outputCsv, false, Encoding.UTF8))
                 {
-                    Annotation ann = page.Annotations[annIndex];
+                    // Write CSV header
+                    writer.WriteLine("PageNumber,AnnotationType,LLX,LLY,URX,URY,Title,Contents");
 
-                    // Basic details
-                    string typeName = ann.GetType().Name;
-                    string name = ann.Name ?? string.Empty;
-                    string contents = ann.Contents ?? string.Empty;
-
-                    // Title is available on markup annotations
-                    string title = string.Empty;
-                    if (ann is MarkupAnnotation markup)
+                    // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+                    for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
                     {
-                        title = markup.Title ?? string.Empty;
+                        Page page = doc.Pages[pageNum];
+                        // Each page has an Annotations collection
+                        foreach (Annotation annot in page.Annotations)
+                        {
+                            // Basic properties
+                            string typeName = annot.GetType().Name;
+                            Aspose.Pdf.Rectangle rect = annot.Rect;
+
+                            // Optional Title and Contents – use reflection to avoid missing members
+                            string title = GetPropertyValue<string>(annot, "Title");
+                            string contents = GetPropertyValue<string>(annot, "Contents");
+
+                            // Escape fields for CSV (wrap in quotes and double any internal quotes)
+                            string Escape(string s) => $"\"{s?.Replace("\"", "\"\"")}\"";
+
+                            // Write CSV line
+                            writer.WriteLine(
+                                $"{pageNum}," +
+                                $"{Escape(typeName)}," +
+                                $"{rect.LLX},{rect.LLY},{rect.URX},{rect.URY}," +
+                                $"{Escape(title)}," +
+                                $"{Escape(contents)}");
+                        }
                     }
-
-                    // Rectangle coordinates (fully qualified to avoid ambiguity)
-                    Aspose.Pdf.Rectangle rect = ann.Rect;
-                    string rectString = $"{rect.LLX},{rect.LLY},{rect.URX},{rect.URY}";
-
-                    // Write a CSV line, escaping fields that may contain commas or quotes
-                    csvWriter.WriteLine($"{pageIndex},{annIndex},{typeName},{EscapeCsv(name)},{EscapeCsv(title)},{EscapeCsv(contents)},{rectString}");
                 }
+
+                Console.WriteLine($"Annotation audit CSV saved to '{outputCsv}'.");
             }
         }
-
-        Console.WriteLine($"Annotation audit CSV saved to '{outputCsvPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 
-    // Helper to escape CSV fields according to RFC 4180
-    static string EscapeCsv(string value)
+    // Helper to safely read a property via reflection; returns default(T) if not present
+    private static T GetPropertyValue<T>(object obj, string propertyName)
     {
-        if (value.Contains(",") || value.Contains("\"") || value.Contains("\n"))
+        PropertyInfo prop = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+        if (prop != null && prop.PropertyType == typeof(T))
         {
-            value = value.Replace("\"", "\"\"");
-            return $"\"{value}\"";
+            return (T)prop.GetValue(obj);
         }
-        return value;
+        return default;
     }
 }

@@ -1,114 +1,61 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Azure.Storage.Blobs;
 
 class Program
 {
+    // Placeholder for cloud storage upload logic.
+    // Replace with actual SDK calls (e.g., AWS S3, Azure Blob, Google Cloud Storage) as needed.
+    static void UploadToBucket(string localFilePath, string bucketPath)
+    {
+        // Example: copy to a local "bucket" folder for demonstration.
+        string destination = Path.Combine(bucketPath, Path.GetFileName(localFilePath));
+        Directory.CreateDirectory(bucketPath);
+        File.Copy(localFilePath, destination, overwrite: true);
+        Console.WriteLine($"Uploaded '{localFilePath}' to bucket path '{destination}'.");
+    }
+
     static void Main()
     {
-        // Path to the source PDF file
-        const string pdfPath = "input.pdf";
+        // Folder containing source PDF files.
+        const string pdfFolder = "InputPdfs";
+        // Folder representing the cloud storage bucket.
+        const string bucketFolder = "CloudBucket";
 
-        // Ensure a PDF exists – create a minimal one with an annotation if missing
-        if (!File.Exists(pdfPath))
+        if (!Directory.Exists(pdfFolder))
         {
-            using var seed = new Document();
-            var page = seed.Pages.Add();
-            var rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-            var annotation = new TextAnnotation(page, rect)
-            {
-                Title = "Sample",
-                Contents = "Demo annotation for export"
-            };
-            page.Annotations.Add(annotation);
-            seed.Save(pdfPath);
+            Console.Error.WriteLine($"Source folder not found: {pdfFolder}");
+            return;
         }
 
-        // Azure Blob Storage connection string and container name (placeholder values)
-        const string storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=YOUR_ACCOUNT;AccountKey=YOUR_KEY;EndpointSuffix=core.windows.net";
-        const string containerName = "xfdf-annotations";
-
-        ExportAnnotationsToCloud(pdfPath, storageConnectionString, containerName);
-    }
-
-    static void ExportAnnotationsToCloud(string pdfFilePath, string storageConnectionString, string containerName)
-    {
-        // Load the PDF document (lifecycle: create/load)
-        using (Document pdfDoc = new Document(pdfFilePath))
+        // Process each PDF file in the source folder.
+        foreach (string pdfPath in Directory.GetFiles(pdfFolder, "*.pdf"))
         {
-            // Export all annotations to a memory stream in XFDF format (lifecycle: save via ExportAnnotationsToXfdf)
-            using (MemoryStream xfdfStream = new MemoryStream())
+            try
             {
-                pdfDoc.ExportAnnotationsToXfdf(xfdfStream);
-                xfdfStream.Position = 0; // Reset stream position before upload
+                // Load the PDF document.
+                using (Document pdfDoc = new Document(pdfPath))
+                {
+                    // Determine output XFDF file name (same base name, .xfdf extension).
+                    string xfdfFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".xfdf";
+                    string xfdfTempPath = Path.Combine(Path.GetTempPath(), xfdfFileName);
 
-                // Initialize Azure Blob container client (stub implementation works locally)
-                BlobContainerClient container = new BlobContainerClient(storageConnectionString, containerName);
-                container.CreateIfNotExists();
+                    // Export all annotations to XFDF.
+                    // Use the overload that infers format from the file extension.
+                    pdfDoc.Save(xfdfTempPath);
 
-                // Determine blob name (same as PDF but with .xfdf extension)
-                string blobName = Path.GetFileNameWithoutExtension(pdfFilePath) + ".xfdf";
+                    // Upload the generated XFDF file to the cloud bucket.
+                    UploadToBucket(xfdfTempPath, bucketFolder);
 
-                // Upload the XFDF stream to the cloud storage bucket
-                BlobClient blob = container.GetBlobClient(blobName);
-                blob.Upload(xfdfStream, overwrite: true);
+                    // Optionally delete the temporary XFDF file.
+                    File.Delete(xfdfTempPath);
+                }
+
+                Console.WriteLine($"Successfully exported annotations from '{pdfPath}'.");
             }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Minimal stub implementation for Azure.Storage.Blobs used only for compilation.
-// In a real project you would reference the official Azure.Storage.Blobs NuGet package.
-// ---------------------------------------------------------------------------
-namespace Azure.Storage.Blobs
-{
-    public class BlobContainerClient
-    {
-        private readonly string _containerPath;
-        public BlobContainerClient(string connectionString, string containerName)
-        {
-            // The connection string is ignored in the stub; we map the container to a local folder.
-            // This folder will be created under the current working directory.
-            _containerPath = Path.Combine(Directory.GetCurrentDirectory()!, "blobstorage", containerName);
-        }
-
-        public void CreateIfNotExists()
-        {
-            Directory.CreateDirectory(_containerPath!);
-        }
-
-        public BlobClient GetBlobClient(string blobName)
-        {
-            return new BlobClient(_containerPath, blobName);
-        }
-    }
-
-    public class BlobClient
-    {
-        private readonly string _blobPath;
-        public BlobClient(string containerPath, string blobName)
-        {
-            _blobPath = Path.Combine(containerPath, blobName);
-        }
-
-        public void Upload(Stream content, bool overwrite = false)
-        {
-            // Ensure the directory exists.
-            string dir = Path.GetDirectoryName(_blobPath);
-            if (!Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
-
-            // If overwrite is false and the file exists, throw to mimic Azure behaviour.
-            if (!overwrite && File.Exists(_blobPath))
-                throw new InvalidOperationException($"Blob '{_blobPath}' already exists and overwrite is set to false.");
-
-            // Write the stream to the file.
-            using (FileStream fileStream = new FileStream(_blobPath, FileMode.Create, FileAccess.Write))
+            catch (Exception ex)
             {
-                content.CopyTo(fileStream);
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
     }

@@ -1,47 +1,62 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-class Program
+class ExportPopupAnnotations
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputXfdf = "popups.xfdf";       // XFDF containing only popup annotations
+        const string inputPdfPath = "input.pdf";
+        const string outputXfdfPath = "popup_annotations.xfdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate through all pages
-            for (int pageIdx = 1; pageIdx <= doc.Pages.Count; pageIdx++)
+            // Prepare an empty XFDF structure
+            XDocument xfdfDoc = new XDocument(
+                new XElement("xfdf",
+                    new XElement("annots")
+                )
+            );
+
+            XElement annotsElement = xfdfDoc.Root.Element("annots");
+
+            // Iterate through all pages and collect only Popup annotations
+            foreach (Page page in pdfDoc.Pages)
             {
-                Page page = doc.Pages[pageIdx];
-
-                // Remove non‑popup annotations.
-                // Iterate backwards because Delete shifts the collection.
-                for (int annIdx = page.Annotations.Count; annIdx >= 1; annIdx--)
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    Annotation ann = page.Annotations[annIdx];
-
-                    // Keep only PopupAnnotation instances
-                    if (!(ann is PopupAnnotation))
+                    if (annotation is PopupAnnotation popup)
                     {
-                        page.Annotations.Delete(annIdx);
+                        // Build a minimal XFDF representation for the popup annotation
+                        // The XFDF spec allows attributes such as page, rect, contents, etc.
+                        var rect = popup.Rect; // Rectangle: LLX, LLY, URX, URY
+                        string rectValue = $"{rect.LLX},{rect.LLY},{rect.URX},{rect.URY}";
+
+                        XElement popupElement = new XElement("popup",
+                            new XAttribute("page", page.Number),
+                            new XAttribute("rect", rectValue),
+                            new XAttribute("contents", popup.Contents ?? string.Empty)
+                        );
+
+                        annotsElement.Add(popupElement);
                     }
                 }
             }
 
-            // Export the remaining (popup) annotations to XFDF
-            doc.ExportAnnotationsToXfdf(outputXfdf);
+            // Save the filtered XFDF containing only popup annotations
+            xfdfDoc.Save(outputXfdfPath);
         }
 
-        Console.WriteLine($"Popup annotations exported to '{outputXfdf}'.");
+        Console.WriteLine($"Popup annotations exported to: {outputXfdfPath}");
     }
 }

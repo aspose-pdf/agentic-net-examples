@@ -15,24 +15,31 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least four pages
+            // Aspose.Pdf uses 1‑based page indexing; page 4 is at index 4
             if (doc.Pages.Count < 4)
             {
-                Console.Error.WriteLine("The document has fewer than 4 pages.");
+                Console.WriteLine("The document has fewer than 4 pages.");
                 return;
             }
 
-            // Retrieve page 4 (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[4];
+            Page pageFour = doc.Pages[4];
 
-            // Iterate over all annotations on the page and output their types
-            foreach (Annotation annotation in page.Annotations)
+            // If there are no annotations, inform the user
+            if (pageFour.Annotations == null || pageFour.Annotations.Count == 0)
             {
-                // AnnotationType enum provides a readable type name
-                Console.WriteLine($"Annotation Type: {annotation.AnnotationType}");
+                Console.WriteLine("Page 4 contains no annotations.");
+                return;
+            }
+
+            // Iterate over all annotations on page 4 and output their type names
+            foreach (Annotation annotation in pageFour.Annotations)
+            {
+                // Get the concrete annotation type (e.g., TextAnnotation, LinkAnnotation, etc.)
+                string typeName = annotation.GetType().Name;
+                Console.WriteLine($"Annotation type: {typeName}");
             }
         }
     }

@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_popups.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "annotated_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,42 +16,38 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate over all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageIndex];
+                Page page = doc.Pages[i];
 
-                // Iterate through all annotations on the current page
-                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
+                // Define the rectangle for the annotation (llx, lly, urx, ury)
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+                // Create a text annotation
+                TextAnnotation txtAnn = new TextAnnotation(page, rect)
                 {
-                    Annotation ann = page.Annotations[annIndex];
+                    Title    = $"Note {i}",
+                    Contents = $"This is a popup linked to page {i}.",
+                    Open     = false,
+                    Icon     = TextIcon.Note
+                };
 
-                    // Process only TextAnnotation (sticky‑note) objects
-                    if (ann is TextAnnotation textAnn)
-                    {
-                        // Create a PopupAnnotation on the same page using the same rectangle
-                        Aspose.Pdf.Rectangle rect = textAnn.Rect;
-                        PopupAnnotation popup = new PopupAnnotation(page, rect);
+                // Create a popup annotation and link it to the text annotation
+                PopupAnnotation popup = new PopupAnnotation(page, rect);
+                txtAnn.Popup = popup;               // associate popup with the text annotation
 
-                        // Optionally copy the contents from the text annotation
-                        popup.Contents = textAnn.Contents;
-
-                        // Link the popup to the text annotation
-                        textAnn.Popup = popup;
-
-                        // Add the popup to the page's annotation collection
-                        page.Annotations.Add(popup);
-                    }
-                }
+                // Add the text annotation (the popup is added automatically)
+                page.Annotations.Add(txtAnn);
             }
 
-            // Save the modified document
+            // Save the modified PDF while the Document is still alive
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with linked pop‑up annotations saved to '{outputPath}'.");
+        Console.WriteLine($"Popup‑linked text annotations saved to '{outputPath}'.");
     }
 }

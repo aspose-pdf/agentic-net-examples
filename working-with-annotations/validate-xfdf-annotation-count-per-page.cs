@@ -2,62 +2,60 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the XFDF file containing annotations.
-        const string pdfPath  = "source.pdf";
-        const string xfdfPath = "annotations.xfdf";
+        // Paths to the PDF file (assumed to already contain the imported XFDF annotations)
+        const string pdfPath = "input.pdf";
 
-        // Define the expected number of annotations for each page (1‑based indexing).
-        // If a page is not present in the dictionary, the expected count is assumed to be 0.
-        var expectedCounts = new Dictionary<int, int>
-        {
-            { 1, 2 }, // Page 1 should have 2 annotations
-            { 2, 1 }, // Page 2 should have 1 annotation
-            { 3, 0 }  // Page 3 should have no annotations
-            // Add more entries as needed.
-        };
-
-        // Verify that the input files exist before proceeding.
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        if (!File.Exists(xfdfPath))
+        // Expected annotation count per page (page numbers are 1‑based)
+        var expectedCounts = new Dictionary<int, int>
         {
-            Console.Error.WriteLine($"XFDF file not found: {xfdfPath}");
-            return;
-        }
+            { 1, 3 }, // page 1 should have 3 annotations
+            { 2, 2 }, // page 2 should have 2 annotations
+            // add more entries as needed
+        };
 
-        // Load the PDF document and import annotations from the XFDF file.
-        using (Document doc = new Document(pdfPath))
+        try
         {
-            // Import all annotations defined in the XFDF file into the document.
-            doc.ImportAnnotationsFromXfdf(xfdfPath);
-
-            // Iterate through each page and compare the actual annotation count
-            // with the expected count defined in the dictionary.
-            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
+            using (Document doc = new Document(pdfPath))
             {
-                Page page = doc.Pages[pageNumber];
-                int actualCount   = page.Annotations.Count;
-                int expectedCount = expectedCounts.TryGetValue(pageNumber, out int val) ? val : 0;
+                foreach (var kvp in expectedCounts)
+                {
+                    int pageNumber = kvp.Key;
+                    int expected = kvp.Value;
 
-                if (actualCount != expectedCount)
-                {
-                    Console.WriteLine($"Page {pageNumber}: MISMATCH – expected {expectedCount}, found {actualCount}.");
-                }
-                else
-                {
-                    Console.WriteLine($"Page {pageNumber}: OK – annotation count matches ({actualCount}).");
+                    if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+                    {
+                        Console.WriteLine($"Page {pageNumber} does not exist in the document.");
+                        continue;
+                    }
+
+                    Page page = doc.Pages[pageNumber];
+                    int actual = page.Annotations.Count;
+
+                    if (actual == expected)
+                    {
+                        Console.WriteLine($"Page {pageNumber}: annotation count matches expected ({actual}).");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Page {pageNumber}: annotation count mismatch. Expected {expected}, found {actual}.");
+                    }
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

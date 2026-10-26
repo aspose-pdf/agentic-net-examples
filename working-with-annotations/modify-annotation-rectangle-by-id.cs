@@ -9,7 +9,13 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string annotationId = "myAnnotation"; // Identifier of the annotation to modify
+        const string targetAnnotationName = "Annot123"; // Name of the annotation to modify
+
+        // New rectangle coordinates (lower‑left X/Y and upper‑right X/Y)
+        const double llx = 100;
+        const double lly = 500;
+        const double urx = 300;
+        const double ury = 550;
 
         if (!File.Exists(inputPath))
         {
@@ -22,37 +28,45 @@ class Program
         {
             bool found = false;
 
-            // Iterate through all pages (1‑based indexing)
+            // Search all pages for the annotation with the specified Name
             foreach (Page page in doc.Pages)
             {
-                // Retrieve the annotation by its Name (Id) using FindByName
-                Annotation ann = page.Annotations.FindByName(annotationId);
-                if (ann != null)
+                // Preferred way: FindByName returns the annotation directly (or null)
+                Annotation annotation = page.Annotations.FindByName(targetAnnotationName);
+
+                // Fallback: enumerate annotations and compare the Name property
+                if (annotation == null)
                 {
-                    // Get the current rectangle
-                    Aspose.Pdf.Rectangle oldRect = ann.Rect;
+                    foreach (Annotation ann in page.Annotations)
+                    {
+                        if (!string.IsNullOrEmpty(ann.Name) &&
+                            ann.Name.Equals(targetAnnotationName, StringComparison.Ordinal))
+                        {
+                            annotation = ann;
+                            break;
+                        }
+                    }
+                }
 
-                    // Example modification: shift 10 units right/down and expand width/height by 20 units
-                    double newLlx = oldRect.LLX + 10;
-                    double newLly = oldRect.LLY + 10;
-                    double newUrx = oldRect.URX + 10 + 20;
-                    double newUry = oldRect.URY + 10 + 20;
-
-                    // Assign the new rectangle
-                    ann.Rect = new Aspose.Pdf.Rectangle(newLlx, newLly, newUrx, newUry);
-
+                if (annotation != null)
+                {
+                    // Update the annotation rectangle
+                    annotation.Rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
                     found = true;
-                    break; // Stop after the first matching annotation is updated
+                    break; // Assuming Names are unique across the document
                 }
             }
 
             if (!found)
-                Console.WriteLine($"Annotation with Id '{annotationId}' not found.");
+            {
+                Console.Error.WriteLine($"Annotation with Name '{targetAnnotationName}' not found.");
+                return;
+            }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Annotation rectangle updated and saved to '{outputPath}'.");
     }
 }

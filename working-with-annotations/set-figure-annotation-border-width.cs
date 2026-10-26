@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,31 +16,31 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for proper disposal
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Work with the first page (1‑based indexing)
+            // Get the first page (pages are 1‑based)
             Page page = doc.Pages[1];
 
-            // Define the rectangle that bounds the figure annotation
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the annotation rectangle (lower‑left X/Y, upper‑right X/Y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
 
-            // Create a square (figure) annotation on the page
-            SquareAnnotation square = new SquareAnnotation(page, rect);
+            // Create a SquareAnnotation (a generic figure) on the first page
+            SquareAnnotation squareAnno = new SquareAnnotation(page, rect);
 
-            // Set the border width to 2 points (must use Border ctor with the annotation)
-            square.Border = new Border(square) { Width = 2 };
+            // Set the annotation's color (this controls the border color for figure annotations)
+            squareAnno.Color = Aspose.Pdf.Color.Blue;
 
-            // Optional: set a visible color for the border
-            square.Color = Aspose.Pdf.Color.Blue;
+            // Set the border (line) thickness – Border requires the parent annotation in its constructor
+            squareAnno.Border = new Border(squareAnno) { Width = 2 };
 
             // Add the annotation to the page's annotation collection
-            page.Annotations.Add(square);
+            page.Annotations.Add(squareAnno);
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with figure annotation to '{outputPath}'.");
     }
 }

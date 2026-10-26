@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_button.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,36 +17,48 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Define the button rectangle (lower‑left‑x, lower‑left‑y, upper‑right‑x, upper‑right‑y)
-            Aspose.Pdf.Rectangle buttonRect = new Aspose.Pdf.Rectangle(100, 500, 200, 540);
+            // Define the rectangle for the button (lower‑left X,Y, upper‑right X,Y)
+            Rectangle rect = new Rectangle(100, 700, 200, 750);
 
-            // Create a push button field on the document
-            ButtonField button = new ButtonField(doc, buttonRect);
-            button.Name = "ExportAnnotationsBtn";
-            button.NormalCaption = "Export JSON";
+            // Create a button form field (acts as a button annotation)
+            ButtonField button = new ButtonField(doc.Pages[1], rect)
+            {
+                PartialName = "ExportAnnotationsBtn",
+                Value = "Export Annotations"
+            };
 
-            // JavaScript that gathers all annotations and shows them as a JSON string
-            // (In a real scenario you might write the JSON to a file or a hidden field)
-            string jsCode = @"
-var annots = this.getAnnots();
-var json = JSON.stringify(annots);
-app.alert(json);
-";
-            JavascriptAction jsAction = new JavascriptAction(jsCode);
+            // Simple border
+            button.Border = new Border(button) { Width = 1 };
 
-            // Assign the JavaScript to the button's mouse‑press action
-            button.Actions.OnPressMouseBtn = jsAction;
+            // JavaScript that gathers all annotations on the page and shows them as JSON
+            string js = @"
+                var annots = this.getAnnots();
+                var data = [];
+                for (var i = 0; i < annots.length; i++) {
+                    var a = annots[i];
+                    data.push({
+                        type: a.type,
+                        rect: a.rect,
+                        contents: a.contents
+                    });
+                }
+                var json = JSON.stringify(data);
+                app.alert(json);
+            ";
 
-            // Add the button to the PDF form
+            // Assign the JavaScript to the button's mouse‑press action (valid property)
+            button.Actions.OnPressMouseBtn = new JavascriptAction(js);
+
+            // Add the button to the AcroForm and to the page annotations
             doc.Form.Add(button);
+            doc.Pages[1].Annotations.Add(button);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with export button saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with button annotation: '{outputPath}'");
     }
 }

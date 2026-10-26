@@ -7,46 +7,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // source PDF
-        const string outputPath = "output_with_sound.pdf"; // result PDF
-        const string soundFile  = "audio.mp3";          // MP3 to play
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_sound.pdf";
+        const string mp3Path    = "sound.mp3";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-
-        if (!File.Exists(soundFile))
+        if (!File.Exists(mp3Path))
         {
-            Console.Error.WriteLine($"Sound file not found: {soundFile}");
+            Console.Error.WriteLine($"MP3 file not found: {mp3Path}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal.
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page where the annotation will be placed (first page in this example)
+            // Aspose.Pdf uses 1‑based page indexing.
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (coordinates are in points; lower‑left origin)
-            // Fully qualify the Rectangle type to avoid ambiguity with System.Drawing.Rectangle
+            // Define the annotation rectangle (lower‑left X/Y, upper‑right X/Y).
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
 
-            // Create the SoundAnnotation using the constructor that takes the page, rectangle and sound file path
-            SoundAnnotation soundAnn = new SoundAnnotation(page, rect, soundFile)
-            {
-                // Optional: set an icon (Speaker or Mic) to indicate a sound annotation
-                Icon = SoundIcon.Speaker,
-                // Optional: set a title and contents that appear in the popup window
-                Title    = "Audio Note",
-                Contents = "Click to play the attached MP3."
-            };
+            // Create a SoundAnnotation that references the MP3 file.
+            // The constructor (Page, Rectangle, string) attaches the annotation to the page.
+            SoundAnnotation soundAnno = new SoundAnnotation(page, rect, mp3Path);
 
-            // Add the annotation to the page's annotation collection
-            page.Annotations.Add(soundAnn);
+            // Optional: set a visible icon and a title for the annotation.
+            soundAnno.Icon  = SoundIcon.Speaker;   // uses a built‑in speaker icon
+            soundAnno.Title = "Play Audio";
 
-            // Save the modified document as PDF
+            // Add the annotation to the page's annotation collection.
+            page.Annotations.Add(soundAnno);
+
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 

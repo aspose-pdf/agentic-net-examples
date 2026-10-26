@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Aspose.Pdf;
 
@@ -8,57 +7,65 @@ class Program
 {
     static void Main()
     {
-        // Path to the XFDF file containing annotation data
-        string xfdfPath = "annotations.xfdf";
+        // Base directory of the running application
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-        // List of PDF files to which the annotations will be applied
-        List<string> pdfPaths = new List<string>
+        // Resolve input / output folders relative to the base directory
+        string pdfFolder = Path.Combine(baseDir, "pdfs");
+        string xfdfFolder = Path.Combine(baseDir, "xfdf");
+        string outputFolder = Path.Combine(baseDir, "output");
+
+        // If the expected folders are missing, fall back to the current working directory
+        if (!Directory.Exists(pdfFolder))
         {
-            "doc1.pdf",
-            "doc2.pdf",
-            "doc3.pdf"
-        };
+            Console.WriteLine($"PDF folder not found: {pdfFolder}. Using current directory instead.");
+            pdfFolder = Directory.GetCurrentDirectory();
+        }
+        if (!Directory.Exists(xfdfFolder))
+        {
+            Console.WriteLine($"XFDF folder not found: {xfdfFolder}. Using current directory instead.");
+            xfdfFolder = Directory.GetCurrentDirectory();
+        }
 
-        // Directory where the processed PDFs will be saved
-        string outputDir = "Output";
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output folder exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF in parallel for efficiency
-        Parallel.ForEach(pdfPaths, pdfPath =>
+        // Gather all PDF files from the resolved folder
+        string[] pdfFiles = Directory.GetFiles(pdfFolder, "*.pdf");
+        if (pdfFiles.Length == 0)
+        {
+            Console.WriteLine("No PDF files found to process.");
+            return;
+        }
+
+        // Process each PDF in parallel for maximum efficiency
+        Parallel.ForEach(pdfFiles, pdfPath =>
         {
             try
             {
-                // Verify that both the PDF and XFDF files exist
-                if (!File.Exists(pdfPath))
-                {
-                    Console.Error.WriteLine($"PDF not found: {pdfPath}");
-                    return;
-                }
+                string baseName = Path.GetFileNameWithoutExtension(pdfPath);
+                string xfdfPath = Path.Combine(xfdfFolder, baseName + ".xfdf");
+                string outputPath = Path.Combine(outputFolder, baseName + "_annotated.pdf");
+
+                // Skip if the corresponding XFDF file does not exist
                 if (!File.Exists(xfdfPath))
                 {
-                    Console.Error.WriteLine($"XFDF not found: {xfdfPath}");
+                    Console.Error.WriteLine($"XFDF not found for '{baseName}'. Skipping.");
                     return;
                 }
 
-                // Load the PDF document inside a using block for deterministic disposal
+                // Load the PDF, import annotations from XFDF, and save the result
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Import annotations from the XFDF file into the current document
                     doc.ImportAnnotationsFromXfdf(xfdfPath);
-
-                    // Construct the output file path (same name, different folder)
-                    string outputPath = Path.Combine(outputDir, Path.GetFileName(pdfPath));
-
-                    // Save the updated PDF; Save(string) always writes PDF regardless of extension
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed: {pdfPath}");
+                Console.WriteLine($"Successfully processed '{baseName}'.");
             }
             catch (Exception ex)
             {
-                // Log any errors that occur during processing of an individual file
-                Console.Error.WriteLine($"Error processing {pdfPath}: {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         });
     }
