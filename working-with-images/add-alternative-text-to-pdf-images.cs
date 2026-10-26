@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "accessible_images.pdf";
         const string altText    = "Description of the image for screen readers";
 
         if (!File.Exists(inputPath))
@@ -16,28 +16,30 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate over each page in the document (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Iterate over each XImage resource on the page
-                foreach (XImage img in page.Resources.Images)
+                // Iterate all pages and all images on each page
+                foreach (Page page in doc.Pages)
                 {
-                    // Try to set alternative text for the image on this page
-                    bool success = img.TrySetAlternativeText(altText, page);
-                    if (!success)
+                    foreach (XImage img in page.Resources.Images)
                     {
-                        Console.WriteLine("Could not set alt text for an image on page " + page.Number);
+                        // Set alternative text for the image; this links the description to the image resource
+                        img.TrySetAlternativeText(altText, page);
                     }
                 }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Image alternative text set and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF saved with alternative text to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

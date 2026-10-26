@@ -1,49 +1,53 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Vector;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputSvgPath = "extracted_page1.svg";
-        const int pageNumber = 1;
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "extracted_graphics.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        using (Document doc = new Document(inputPath))
+        // Load the source PDF document
+        using (Document sourceDoc = new Document(inputPdf))
         {
-            if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+            // Select the page to extract graphics from (1‑based index)
+            int pageNumber = 1;
+            if (pageNumber < 1 || pageNumber > sourceDoc.Pages.Count)
             {
                 Console.Error.WriteLine("Invalid page number.");
                 return;
             }
 
-            Page page = doc.Pages[pageNumber];
+            Page sourcePage = sourceDoc.Pages[pageNumber];
 
-            if (!page.HasVectorGraphics())
+            // Create a new PDF document to hold the extracted graphics
+            using (Document targetDoc = new Document())
             {
-                Console.WriteLine("The specified page contains no vector graphics.");
-                return;
+                // Add an empty page to the new document – copy the size of the source page
+                Page targetPage = targetDoc.Pages.Add();
+                targetPage.PageInfo = sourcePage.PageInfo; // preserve dimensions
+
+                // Transfer each extracted vector graphic (XForm) to the new page
+                // Vector graphics are stored as form XObjects in the page resources.
+                foreach (XForm form in sourcePage.Resources.Forms)
+                {
+                    // Add the form to the target page's resources collection.
+                    // The same XForm instance can be reused because it is immutable.
+                    targetPage.Resources.Forms.Add(form);
+                }
+
+                // Save the resulting PDF
+                targetDoc.Save(outputPdf);
+                Console.WriteLine($"Extracted graphics saved to '{outputPdf}'.");
             }
-
-            // Collect vector graphics from the page
-            GraphicsAbsorber absorber = new GraphicsAbsorber();
-            absorber.Visit(page);
-
-            // Convert collected graphics to SVG
-            SvgExtractor extractor = new SvgExtractor();
-            string svgContent = extractor.Extract(absorber, g => true, page);
-
-            // Save SVG for further manipulation
-            File.WriteAllText(outputSvgPath, svgContent);
-            Console.WriteLine($"Vector graphics extracted to: {outputSvgPath}");
         }
     }
 }

@@ -1,61 +1,77 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string rasterImg = "raster.png";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string rasterImgPath = "image.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(rasterImgPath))
+        {
+            Console.Error.WriteLine($"Raster image not found: {rasterImgPath}");
             return;
         }
 
-        if (!File.Exists(rasterImg))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"Raster image not found: {rasterImg}");
-            return;
-        }
+            // Aspose.Pdf uses 1‑based page indexing
+            Page page = doc.Pages[1];
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPdf))
-        {
-            // Iterate through all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Locate the first vector graphic (Path) on the page
+            Operator vectorOperator = null;
+            foreach (var element in page.Contents)
             {
-                Page page = doc.Pages[i];
-
-                // Process only pages that contain vector graphics
-                if (page.HasVectorGraphics())
+                if (element is Aspose.Pdf.Drawing.Path)
                 {
-                    // Define the rectangle that encloses the vector graphic to be replaced.
-                    // Replace the example coordinates with the actual values for your PDF.
-                    double llx = 100; // lower‑left X
-                    double lly = 200; // lower‑left Y
-                    double urx = 300; // upper‑right X
-                    double ury = 400; // upper‑right Y
-                    Aspose.Pdf.Rectangle targetRect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
-
-                    // Add the raster image over the vector graphic area.
-                    using (FileStream imgStream = File.OpenRead(rasterImg))
-                    {
-                        page.AddImage(imgStream, targetRect);
-                    }
+                    vectorOperator = element;
+                    break;
                 }
             }
 
-            // Optional: flatten transparency to ensure any remaining vector content is rasterized.
-            doc.FlattenTransparency();
+            if (vectorOperator == null)
+            {
+                Console.WriteLine("No vector graphic (Path) found on page 1.");
+                doc.Save(outputPdfPath);
+                return;
+            }
+
+            // Approximate the bounds of the vector graphic.
+            // In a real scenario you would compute the exact bounds from the path data.
+            // Here we use a placeholder rectangle (0,0,200,200).
+            Aspose.Pdf.Rectangle bounds = new Aspose.Pdf.Rectangle(0, 0, 200, 200);
+
+            // Remove the vector graphic from the page contents
+            page.Contents.Remove(vectorOperator);
+
+            // Create an ImageStamp (raster image) and position it to match the original bounds
+            ImageStamp imgStamp = new ImageStamp(rasterImgPath)
+            {
+                Width = bounds.URX - bounds.LLX,
+                Height = bounds.URY - bounds.LLY,
+                XIndent = bounds.LLX,
+                YIndent = bounds.LLY,
+                // Ensure the stamp does not add a background rectangle
+                Background = false
+            };
+
+            // Add the stamp to the page
+            page.AddStamp(imgStamp);
 
             // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Vector graphic replaced with raster image. Saved to '{outputPdf}'.");
+        Console.WriteLine($"Raster image replaced vector graphic and saved to '{outputPdfPath}'.");
     }
 }

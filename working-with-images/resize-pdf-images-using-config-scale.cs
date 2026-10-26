@@ -1,75 +1,72 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
-    // Simple POCO to map the configuration file
-    private class AppConfig
-    {
-        public double ImageScaleFactor { get; set; }
-    }
-
     static void Main()
     {
-        // Load scaling factor from appsettings.json using System.Text.Json
+        // Paths
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "resized.pdf";
         const string configPath = "appsettings.json";
+
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
+        {
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
         if (!File.Exists(configPath))
         {
             Console.Error.WriteLine($"Configuration file not found: {configPath}");
             return;
         }
 
-        double scaleFactor;
+        // Load scaling factor from appsettings.json using System.Text.Json (no Microsoft.Extensions.Configuration dependency)
+        double scalingFactor;
         try
         {
             string json = File.ReadAllText(configPath);
-            var config = JsonSerializer.Deserialize<AppConfig>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-            if (config == null)
+            using JsonDocument doc = JsonDocument.Parse(json);
+            if (!doc.RootElement.TryGetProperty("ImageScalingFactor", out JsonElement factorElem) ||
+                !factorElem.TryGetDouble(out scalingFactor) ||
+                scalingFactor <= 0)
             {
-                Console.Error.WriteLine("Failed to deserialize configuration.");
+                Console.Error.WriteLine("Invalid or missing ImageScalingFactor in configuration.");
                 return;
             }
-            scaleFactor = config.ImageScaleFactor;
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error reading configuration: {ex.Message}");
+            Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
             return;
         }
 
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_resized.pdf";
-
-        if (!File.Exists(inputPath))
+        // Open PDF, resize each image, and save
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF document (lifecycle rule: use Document constructor)
-        using (Document doc = new Document(inputPath))
-        {
-            // Iterate all pages (Aspose.Pdf uses 1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
             {
-                // Iterate all paragraphs on the page
-                for (int i = 1; i <= page.Paragraphs.Count; i++)
+                Page page = pdfDoc.Pages[pageIndex];
+
+                // Images that appear on a page are represented by Aspose.Pdf.Image objects
+                // inside the page's Paragraphs collection. Adjust their ImageScale.
+                foreach (var paragraph in page.Paragraphs)
                 {
-                    // Identify Image paragraphs
-                    if (page.Paragraphs[i] is Aspose.Pdf.Image img)
+                    if (paragraph is Aspose.Pdf.Image imgParagraph)
                     {
-                        // Apply the scaling factor (ImageScale property)
-                        img.ImageScale = scaleFactor;
+                        // Apply scaling factor – ImageScale is a multiplier applied when the image is rendered.
+                        imgParagraph.ImageScale = scalingFactor;
                     }
                 }
             }
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
-            doc.Save(outputPath);
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Images resized with factor {scalingFactor} and saved to '{outputPdfPath}'.");
     }
 }

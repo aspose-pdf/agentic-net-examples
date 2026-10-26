@@ -6,53 +6,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdfPath   = "input.pdf";
+        const string outputPdfPath  = "output.pdf";
         const string headerImagePath = "header.png";
 
-        if (!File.Exists(inputPath))
+        // Verify required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(headerImagePath))
         {
             Console.Error.WriteLine($"Header image not found: {headerImagePath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Fixed height for the header image (in points)
-            const double headerHeight = 50.0;
-
-            // Iterate over all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Iterate through all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                // Get page dimensions
-                double pageWidth = page.PageInfo.Width;
-                double pageHeight = page.PageInfo.Height;
+                // Create a new ImageStamp for each page
+                using (FileStream imgStream = File.OpenRead(headerImagePath))
+                {
+                    ImageStamp stamp = new ImageStamp(imgStream)
+                    {
+                        // Place the stamp over existing content
+                        Background = false,
 
-                // Define rectangle for the header image:
-                // lower‑left (0, pageHeight - headerHeight), upper‑right (pageWidth, pageHeight)
-                // This places the image at the top of the page without overlapping existing content.
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
-                    0,                     // llx
-                    pageHeight - headerHeight, // lly
-                    pageWidth,            // urx
-                    pageHeight            // ury
-                );
+                        // Center horizontally, align to the top vertically
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment   = VerticalAlignment.Top,
 
-                // Add the image to the page. The method keeps the image aspect ratio.
-                page.AddImage(headerImagePath, rect);
+                        // Add a small indent from the top edge to avoid overlap
+                        YIndent = 10   // points from the top margin
+                    };
+
+                    // Add the stamp to the current page
+                    doc.Pages[pageNum].AddStamp(stamp);
+                }
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            // Save the modified PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Header image added to each page. Saved as '{outputPath}'.");
+        Console.WriteLine($"Header image added to each page. Saved as '{outputPdfPath}'.");
     }
 }

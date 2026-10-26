@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath      = "input.pdf";
         const string outputPath     = "output.pdf";
-        const string placeholderPath = "placeholder.png"; // a small PNG to use as a placeholder
+        const string placeholderImg = "placeholder.png"; // confidential placeholder image
 
         if (!File.Exists(inputPath))
         {
@@ -17,65 +17,69 @@ class Program
             return;
         }
 
-        if (!File.Exists(placeholderPath))
+        if (!File.Exists(placeholderImg))
         {
-            Console.Error.WriteLine($"Placeholder image not found: {placeholderPath}");
+            Console.Error.WriteLine($"Placeholder image not found: {placeholderImg}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            int firstAppendixPage = -1;
+
+            // Determine the first page that contains the word "Appendix"
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageNum];
-
-                // Find all image placements on the current page
-                ImagePlacementAbsorber imgAbsorber = new ImagePlacementAbsorber();
-                page.Accept(imgAbsorber);
-
-                // Iterate over each image placement
-                foreach (ImagePlacement imgPlacement in imgAbsorber.ImagePlacements)
+                TextAbsorber absorber = new TextAbsorber
                 {
-                    // Determine the index of the XImage resource in the page's image collection (1‑based)
-                    int imgIndex = 0;
-                    int counter = 1;
-                    foreach (XImage imgRes in page.Resources.Images)
-                    {
-                        if (imgRes == imgPlacement.Image)
-                        {
-                            imgIndex = counter;
-                            break;
-                        }
-                        counter++;
-                    }
-
-                    if (imgIndex == 0)
-                        continue; // image not found in the collection; skip
-
-                    // Replace the original image with the placeholder image
-                    using (FileStream placeholderStream = File.OpenRead(placeholderPath))
-                    {
-                        page.Resources.Images.Replace(imgIndex, placeholderStream);
-                    }
-
-                    // Build a hyperlink that points to the original image location.
-                    // For demonstration we construct a URL using the page number and image index.
-                    string originalImageUrl = $"https://example.com/original-image/page{pageNum}/image{imgIndex}.png";
-
-                    // Create a link annotation over the same rectangle as the original image
-                    LinkAnnotation link = new LinkAnnotation(page, imgPlacement.Rectangle);
-                    link.Action = new GoToURIAction(originalImageUrl);
-                    link.Color = Aspose.Pdf.Color.Blue; // optional visual cue
-                    page.Annotations.Add(link);
+                    ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
+                };
+                doc.Pages[i].Accept(absorber);
+                if (absorber.Text != null && absorber.Text.IndexOf("Appendix", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    firstAppendixPage = i;
+                    break;
                 }
             }
 
-            // Save the modified PDF (lifecycle rule: use the provided save method)
-            doc.Save(outputPath);
-        }
+            if (firstAppendixPage == -1)
+            {
+                Console.WriteLine("No appendix section detected. No changes applied.");
+                doc.Save(outputPath);
+                return;
+            }
 
-        Console.WriteLine($"PDF saved with placeholders: {outputPath}");
+            // Prepare a full‑page placeholder stamp
+            ImageStamp placeholderStamp = new ImageStamp(placeholderImg)
+            {
+                // Place the stamp on top of existing content to hide images
+                Background = false,
+                // Stretch to cover the whole page
+                Width      = doc.Pages[1].PageInfo.Width,
+                Height     = doc.Pages[1].PageInfo.Height,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center
+            };
+
+            // Apply the placeholder to every page from the appendix start to the end
+            for (int i = firstAppendixPage; i <= doc.Pages.Count; i++)
+            {
+                Page page = doc.Pages[i];
+
+                // Optionally set alternative text for existing images (helps accessibility)
+                foreach (XImage img in page.Resources.Images)
+                {
+                    img.TrySetAlternativeText("Image removed for confidentiality", page);
+                }
+
+                // Add the placeholder stamp (covers the page)
+                page.AddStamp(placeholderStamp);
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
+            Console.WriteLine($"Appendix images replaced with placeholder. Saved to '{outputPath}'.");
+        }
     }
 }

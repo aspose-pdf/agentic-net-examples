@@ -1,13 +1,7 @@
 using System;
 using System.IO;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Collections.Generic;
 using Aspose.Pdf;
-
-// Alias ambiguous types to avoid CS0104 errors
-using PdfImage = Aspose.Pdf.XImage; // XImage is the correct type for raster images
-using SysImage = System.Drawing.Image;
+using System.Drawing.Imaging;
 
 class Program
 {
@@ -18,43 +12,42 @@ class Program
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document using the core Document API (no Facades)
+        // Open the PDF document inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPdfPath))
         {
             int imageCounter = 1;
 
-            // Iterate through each page and its image resources
-            foreach (Page page in pdfDoc.Pages)
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
             {
-                // page.Resources.Images is an ImageCollection, iterate directly
-                foreach (PdfImage pdfImg in page.Resources.Images)
-                {
-                    // Save the Aspose.Pdf.XImage to a memory stream first
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        pdfImg.Save(ms);
-                        ms.Position = 0;
+                Page page = pdfDoc.Pages[pageIndex];
 
-                        // Load the stream into a System.Drawing.Image so we can export as PNG
-                        using (SysImage sysImg = SysImage.FromStream(ms))
-                        {
-                            string outputPath = Path.Combine(outputFolder, $"image_{imageCounter}.png");
-                            sysImg.Save(outputPath, ImageFormat.Png);
-                        }
+                // Iterate over all raster images on the page
+                foreach (XImage img in page.Resources.Images)
+                {
+                    // Build a unique file name for each image
+                    string imageFileName = $"image_{imageCounter:D4}.png";
+                    string imagePath = Path.Combine(outputFolder, imageFileName);
+
+                    // Save the image as PNG using a FileStream (XImage.Save expects a Stream)
+                    using (FileStream fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
+                    {
+                        img.Save(fs, ImageFormat.Png);
                     }
 
+                    Console.WriteLine($"Saved image {imageCounter} to '{imagePath}'");
                     imageCounter++;
                 }
             }
         }
 
-        Console.WriteLine("All raster images have been extracted and saved as PNG files.");
+        Console.WriteLine("Image extraction completed.");
     }
 }

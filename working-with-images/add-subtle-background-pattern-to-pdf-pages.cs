@@ -6,48 +6,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string patternPath = "pattern.png";
+        const string inputPdfPath   = "input.pdf";
+        const string outputPdfPath  = "output.pdf";
+        const string patternImgPath = "pattern.png";
 
-        if (!File.Exists(inputPath))
+        // Verify required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(patternImgPath))
+        {
+            Console.Error.WriteLine($"Pattern image not found: {patternImgPath}");
             return;
         }
 
-        if (!File.Exists(patternPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"Pattern image not found: {patternPath}");
-            return;
-        }
-
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Apply the background artifact to each page
-            foreach (Page page in doc.Pages)
+            // Iterate over all pages (foreach respects 1‑based indexing internally)
+            foreach (Page page in pdfDoc.Pages)
             {
-                // Create a background artifact
-                BackgroundArtifact bg = new BackgroundArtifact();
+                // Create an ImageStamp for the background pattern
+                ImageStamp bgStamp = new ImageStamp(patternImgPath)
+                {
+                    // Place the stamp behind existing page content
+                    Background = true,
+                    // Set opacity to 5 percent for a subtle effect
+                    Opacity = 0.05f,
+                    // Scale the image to cover the entire page
+                    Width = page.PageInfo.Width,
+                    Height = page.PageInfo.Height,
+                    // Ensure the image starts at the page origin
+                    LeftMargin = 0,
+                    BottomMargin = 0,
+                    TopMargin = 0,
+                    RightMargin = 0
+                };
 
-                // Set the pattern image (file path)
-                bg.SetImage(patternPath);
-
-                // Set opacity to 5% (0.05)
-                bg.Opacity = 0.05;
-
-                // Ensure the artifact is placed behind page content
-                bg.IsBackground = true;
-
-                // Add the artifact to the page
-                page.Artifacts.Add(bg);
+                // Apply the stamp to the current page
+                page.AddStamp(bgStamp);
             }
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Background pattern applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Background pattern applied and saved to '{outputPdfPath}'.");
     }
 }

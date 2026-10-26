@@ -3,14 +3,13 @@ using System.IO;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
-class RemoveDuplicateImages
+class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_no_duplicates.pdf";
+        const string outputPath = "output_no_duplicate_images.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,54 +17,57 @@ class RemoveDuplicateImages
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using)
+        // Wrap Document in a using block for deterministic disposal (global rule)
         using (Document doc = new Document(inputPath))
         {
-            // Dictionary to keep track of image hashes already seen
+            // Keep track of image hashes we have already seen
             var seenHashes = new Dictionary<string, XImage>();
 
-            // Iterate over all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Aspose.Pdf uses 1‑based page indexing (global rule)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                Page page = doc.Pages[pageNum];
-                // XImageCollection is not a dictionary; iterate directly
+                Page page = doc.Pages[pageIndex];
+
+                // Collect images that are duplicates so we can remove them after iteration
+                var duplicates = new List<XImage>();
+
+                // Iterate over images using the correct foreach pattern (rule)
                 foreach (XImage img in page.Resources.Images)
                 {
-                    // Export the image to a memory stream to obtain raw bytes
+                    // Extract raw image bytes
                     using (MemoryStream ms = new MemoryStream())
                     {
-                        // XImage.Save writes the image to a stream in its original format
-                        img.Save(ms);
+                        img.Save(ms);               // Save image data to a memory stream
                         byte[] imageBytes = ms.ToArray();
 
-                        // Compute a SHA256 hash of the raw bytes for fast comparison
+                        // Compute a SHA‑256 hash of the bytes for comparison
                         string hash;
                         using (SHA256 sha = SHA256.Create())
                         {
                             hash = BitConverter.ToString(sha.ComputeHash(imageBytes));
                         }
 
-                        // If we have already encountered an identical image, remove this one
+                        // If we have seen this hash before, mark the image for removal
                         if (seenHashes.ContainsKey(hash))
                         {
-                            // Remove the image from the page's resources.
-                            // Use the image name (unique within the page) and force deletion.
-                            // The ImageDeleteAction.ForceDelete ensures the object is removed from the document.
-                            page.Resources.Images.Delete(img.Name, ImageDeleteAction.ForceDelete);
+                            duplicates.Add(img);
                         }
                         else
                         {
-                            // First occurrence – keep it and store the hash
+                            // First occurrence – store it
                             seenHashes[hash] = img;
                         }
                     }
                 }
+
+                // Remove duplicate images from the page's image collection
+                foreach (XImage dup in duplicates)
+                {
+                    page.Resources.Images.Remove(dup);
+                }
             }
 
-            // Optional: further compress resources (merges any remaining identical resources)
-            doc.OptimizeResources();
-
-            // Save the modified PDF (lifecycle rule: use save)
+            // Save the modified PDF (no special SaveOptions needed for PDF)
             doc.Save(outputPath);
         }
 

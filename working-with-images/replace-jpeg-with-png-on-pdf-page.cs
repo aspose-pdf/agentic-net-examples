@@ -6,24 +6,24 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // original PDF containing the JPEG on page 3
-        const string pngImage  = "high_res.png"; // higher‑resolution PNG to replace the JPEG
-        const string outputPdf = "output.pdf";   // result PDF
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string newPngPath    = "highres.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(pngImage))
+        if (!File.Exists(newPngPath))
         {
-            Console.Error.WriteLine($"PNG image not found: {pngImage}");
+            Console.Error.WriteLine($"Replacement PNG not found: {newPngPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: wrap in using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdfPath))
         {
             // Ensure the document has at least three pages
             if (doc.Pages.Count < 3)
@@ -32,30 +32,26 @@ class Program
                 return;
             }
 
-            // Access page three
+            // Get page three
             Page page = doc.Pages[3];
 
-            // Get the image collection for the page
-            XImageCollection images = page.Resources.Images;
-
-            // Verify that the page contains at least one image to replace
-            if (images.Count == 0)
+            // Remove the first image on the page (assumed to be the JPEG to replace)
+            // XImageCollection uses 1‑based indexing, like other Aspose collections
+            if (page.Resources.Images.Count > 0)
             {
-                Console.Error.WriteLine("No images found on page 3 to replace.");
-                return;
+                page.Resources.Images.Delete(1);
             }
 
-            // Replace the first image in the collection with the higher‑resolution PNG.
-            // XImageCollection uses 1‑based indexing.
-            using (FileStream pngStream = File.OpenRead(pngImage))
+            // Add the higher‑resolution PNG to the page's image resources
+            using (FileStream pngStream = File.OpenRead(newPngPath))
             {
-                images.Replace(1, pngStream);
+                page.Resources.Images.Add(pngStream);
             }
 
-            // Save the modified PDF (lifecycle rule: save inside the using block)
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Image replaced and saved to '{outputPdf}'.");
+        Console.WriteLine($"Image replaced and saved to '{outputPdfPath}'.");
     }
 }

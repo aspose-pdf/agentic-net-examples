@@ -2,50 +2,56 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class ReplaceJpegWithPng
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string pngReplacementPath = "replacement.png";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string pngPlaceholderPath = "placeholder.png"; // PNG file to use as replacement
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
-        if (!File.Exists(pngReplacementPath))
+
+        if (!File.Exists(pngPlaceholderPath))
         {
-            Console.Error.WriteLine($"Replacement PNG not found: {pngReplacementPath}");
+            Console.Error.WriteLine($"Placeholder PNG not found: {pngPlaceholderPath}");
             return;
         }
+
+        // Load the placeholder image once into memory
+        byte[] placeholderBytes = File.ReadAllBytes(pngPlaceholderPath);
 
         // Load the PDF document
-        using (Document doc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Iterate through all pages
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[pageNum];
-                var images = page.Resources.Images;
-
-                // XImageCollection is 1‑based as well
-                for (int imgIndex = 1; imgIndex <= images.Count; imgIndex++)
+                // Iterate through all page elements (Paragraphs collection)
+                // Image objects are stored in the Paragraphs collection
+                for (int i = 0; i < page.Paragraphs.Count; i++)
                 {
-                    // Replace the image with the PNG file.
-                    // The Replace method expects a stream; the format is inferred from the data.
-                    using (FileStream pngStream = File.OpenRead(pngReplacementPath))
+                    // Check if the current element is an Image
+                    if (page.Paragraphs[i] is Image oldImage)
                     {
-                        images.Replace(imgIndex, pngStream);
+                        // Replace the image data with the PNG placeholder while keeping all layout properties
+                        oldImage.ImageStream = new MemoryStream(placeholderBytes);
+
+                        // No need to recreate the Image object – all positioning, sizing, and margin
+                        // information (HorizontalAlignment, VerticalAlignment, FixWidth, FixHeight, Margin, etc.)
+                        // is already stored in the existing instance and is therefore preserved.
                     }
                 }
             }
 
             // Save the modified PDF
-            doc.Save(outputPdfPath);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All images replaced and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved with PNG replacements: '{outputPath}'.");
     }
 }

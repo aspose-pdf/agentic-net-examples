@@ -1,56 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // BmpDevice resides here
+using Aspose.Pdf.Devices;
+using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputFolder = "ExportedBmpImages";
+        const string outputFolder = "BmpPages";
 
-        // Verify input file exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document (using statement ensures proper disposal)
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Create a Resolution object for 300 DPI
-            Resolution resolution = new Resolution(300);
+            // Create a BMP device with 300 DPI resolution (no using – BmpDevice is not IDisposable)
+            var bmpDevice = new BmpDevice(new Resolution(300));
 
-            // Initialize BmpDevice with the custom resolution
-            BmpDevice bmpDevice = new BmpDevice(resolution);
-
-            // OPTIONAL: customize rendering options for higher quality
-            // bmpDevice.RenderingOptions = new RenderingOptions
-            // {
-            //     // Example settings (adjust as needed)
-            //     // AntiAliasing = true,
-            //     // TextRenderingMode = TextRenderingMode.AntiAliased
-            // };
-
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.bmp");
+                // Build the output file name for the current page
+                string outputPath = Path.Combine(outputFolder, $"Page_{pageNumber}.bmp");
 
-                // Create a file stream for the BMP output
-                using (FileStream bmpStream = new FileStream(outputPath, FileMode.Create))
+                // Render the specific page to the BMP file via a FileStream
+                using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
-                    // Convert the current page to BMP and write to the stream
-                    bmpDevice.Process(pdfDocument.Pages[pageNumber], bmpStream);
+                    bmpDevice.Process(pdfDoc.Pages[pageNumber], outStream);
                 }
             }
         }
 
-        Console.WriteLine("PDF pages have been exported as BMP images at 300 DPI.");
+        Console.WriteLine($"All pages exported to BMP at 300 DPI in folder: {outputFolder}");
     }
 }

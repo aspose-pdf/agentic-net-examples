@@ -1,65 +1,66 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
-class ReplaceImagesWithQrPlaceholder
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string qrPlaceholderPath = "qr_placeholder.png"; // QR code image file
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_placeholder.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(qrPlaceholderPath))
+        try
         {
-            Console.Error.WriteLine($"QR placeholder image not found: {qrPlaceholderPath}");
-            return;
-        }
-
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                Page page = pdfDoc.Pages[pageNum];
-                var images = page.Resources.Images;
-
-                // If the page contains no images, skip it
-                if (images.Count == 0)
-                    continue;
-
-                // Iterate over the images collection using 1‑based index
-                for (int imgIndex = 1; imgIndex <= images.Count; imgIndex++)
+                // Iterate through all pages
+                foreach (Page page in doc.Pages)
                 {
-                    // Capture the original image reference and its name (used as source identifier)
-                    XImage originalImage = images[imgIndex];
-                    string originalImageName = images.GetImageName(originalImage);
-
-                    // Replace the image with the QR code placeholder
-                    using (FileStream placeholderStream = File.OpenRead(qrPlaceholderPath))
+                    // Iterate through all images on the page
+                    foreach (XImage img in page.Resources.Images)
                     {
-                        // Replace expects a 1‑based index and a stream containing the new image data
-                        images.Replace(imgIndex, placeholderStream);
-                    }
+                        // Placeholder URL (original image source is not stored in the PDF)
+                        string placeholderUrl = "https://example.com/original-image";
 
-                    // After replacement, obtain the new image object to set alternative text
-                    XImage replacedImage = images[imgIndex];
-                    // Store the original image identifier as alternative text (acts as a link to the source)
-                    replacedImage.TrySetAlternativeText($"Original image source: {originalImageName}", page);
+                        // Define a rectangle for the annotation (positioned near the top‑right corner)
+                        var rect = new Aspose.Pdf.Rectangle(
+                            page.PageInfo.Width - 150, // llx (left)
+                            page.PageInfo.Height - 150, // lly (bottom)
+                            page.PageInfo.Width - 20,   // urx (right)
+                            page.PageInfo.Height - 20   // ury (top)
+                        );
+
+                        // Create a TextAnnotation that will act as the QR‑code placeholder
+                        var qrPlaceholder = new TextAnnotation(page, rect)
+                        {
+                            Title = "Image Placeholder",
+                            Contents = $"QR Code linking to: {placeholderUrl}",
+                            Open = true,
+                            Icon = TextIcon.Note
+                        };
+
+                        // Add the annotation to the page
+                        page.Annotations.Add(qrPlaceholder);
+                    }
                 }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            Console.WriteLine($"PDF with image placeholders saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF saved with QR placeholders: {outputPdfPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,83 +1,74 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Text;
 
-class ReplaceImagesWithQrPlaceholder
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string qrPlaceholderPath = "qr_placeholder.png"; // QR code image file
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string placeholderPath = "qr_placeholder.png"; // QR code image to use as placeholder
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(qrPlaceholderPath))
+        if (!File.Exists(placeholderPath))
         {
-            Console.Error.WriteLine($"QR placeholder image not found: {qrPlaceholderPath}");
+            Console.Error.WriteLine($"Placeholder image not found: {placeholderPath}");
             return;
         }
 
-        // Load the original PDF document
-        using (Document doc = new Document(inputPdfPath))
+        try
         {
-            // Read QR placeholder bytes once – will be reused for each replacement
-            byte[] qrBytes = File.ReadAllBytes(qrPlaceholderPath);
-
-            // Iterate over all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            using (Document doc = new Document(inputPath))
             {
-                // Process only odd‑numbered pages
-                if (pageNum % 2 == 0) continue;
-
-                Page page = doc.Pages[pageNum];
-
-                // Find all image placements on the current page
-                ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-                page.Accept(absorber);
-
-                // For each image placement, replace the underlying XImage with the QR placeholder
-                foreach (ImagePlacement placement in absorber.ImagePlacements)
+                // Process only odd‑numbered pages (Aspose.Pdf uses 1‑based indexing)
+                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex += 2)
                 {
-                    // Determine the index of the XImage within the page's image collection (1‑based)
-                    int imgIndex = 1;
-                    XImage targetImage = null;
+                    Page page = doc.Pages[pageIndex];
+
+                    // Collect names of all images on the page
+                    List<string> imageNames = new List<string>();
                     foreach (XImage img in page.Resources.Images)
                     {
-                        if (img == placement.Image)
-                        {
-                            targetImage = img;
-                            break;
-                        }
-                        imgIndex++;
+                        if (!string.IsNullOrEmpty(img.Name))
+                            imageNames.Add(img.Name);
                     }
 
-                    if (targetImage == null) continue; // Safety check
-
-                    // Replace the image with the QR placeholder
-                    using (MemoryStream qrStream = new MemoryStream(qrBytes))
+                    // Delete each image resource from the page
+                    foreach (string name in imageNames)
                     {
-                        page.Resources.Images.Replace(imgIndex, qrStream);
+                        page.Resources.Images.Delete(name);
                     }
 
-                    // After replacement, obtain the new XImage instance
-                    XImage newImg = page.Resources.Images[imgIndex];
+                    // Add a QR‑code placeholder as an ImageStamp covering the page
+                    ImageStamp qrStamp = new ImageStamp(placeholderPath)
+                    {
+                        Background = false,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        // Provide alternative text for accessibility
+                        AlternativeText = "QR code linking to original image source"
+                    };
 
-                    // Set alternative text that points to the original image source (placeholder URL)
-                    string altText = $"Replaced image on page {pageNum}";
-                    newImg.TrySetAlternativeText(altText, page);
+                    page.AddStamp(qrStamp);
                 }
+
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdfPath);
+            Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF saved with placeholders: {outputPdfPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,15 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Vector;   // for GraphicElement and Matrix
-using Aspose.Pdf.Text;     // for Point
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "moved_vector.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,59 +15,71 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Work with the first page (pages are 1‑based)
+            // Work on the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Verify that the page actually contains vector graphics
-            if (!page.HasVectorGraphics())
+            // Retrieve the XObject collection. The property name changed between
+            // Aspose.Pdf versions ("XObjects" in older releases, "XObjectResources"
+            // in newer ones). We use reflection to support both without a compile‑time
+            // dependency on a specific version.
+            var resources = page.Resources;
+            var xObjectProp = resources.GetType().GetProperty("XObjects") ??
+                               resources.GetType().GetProperty("XObjectResources");
+            if (xObjectProp == null)
             {
-                Console.WriteLine("No vector graphics found on the page.");
+                Console.Error.WriteLine("No XObject collection found on the page resources.");
                 doc.Save(outputPath);
                 return;
             }
 
-            // -----------------------------------------------------------------
-            // NOTE: Aspose.Pdf does not expose a direct collection of vector
-            // graphics (SubPathCollection, AddVectorGraphics, etc. are not
-            // available). In a real scenario you would obtain a concrete
-            // GraphicElement (e.g., SubPath) from the page via a supported API.
-            // For the purpose of this example we illustrate how the position
-            // of such an element would be changed.
-            // -----------------------------------------------------------------
+            var xObjectCollection = xObjectProp.GetValue(resources) as System.Collections.IEnumerable;
+            if (xObjectCollection == null)
+            {
+                Console.Error.WriteLine("Unable to enumerate XObjects.");
+                doc.Save(outputPath);
+                return;
+            }
 
-            // Suppose 'graphic' is a GraphicElement that has been extracted.
-            // The GraphicElement class provides a virtual Position property.
-            // Changing Position automatically updates the underlying Matrix.
-            // Example (commented out because we do not have a concrete instance):
-            //
-            // GraphicElement graphic = ... // obtained from the page
-            // double dx = 50; // shift right by 50 units
-            // double dy = 30; // shift up by 30 units
-            // // Update the position (adds the delta to the current coordinates)
-            // graphic.Position = new Point(graphic.Position.X + dx, graphic.Position.Y + dy);
-            //
-            // Alternatively, you can build a translation matrix and assign it
-            // via the Position setter (the matrix is applied internally).
+            // Define translation offsets (e.g., 50 points right, 30 points up)
+            const double dx = 50;   // horizontal shift
+            const double dy = -30;  // vertical shift (PDF origin is bottom‑left)
 
-            // Demonstrate creation of a translation matrix (identity source matrix)
-            double dx = 50; // horizontal shift
-            double dy = 30; // vertical shift
-            Matrix identity = new Matrix(new double[] { 1, 0, 0, 1, 0, 0 });
-            Matrix translation = Matrix.Translate(dx, dy, identity);
+            // Use reflection to manipulate FormXObject objects without referencing
+            // the Aspose.Pdf.XObjects namespace (which may be absent in some versions).
+            foreach (var obj in xObjectCollection)
+            {
+                if (obj == null) continue;
 
-            // If you had a GraphicElement 'graphic', you could apply the matrix:
-            // graphic.Position = new Point(translation.Transform(graphic.Position).X,
-            //                              translation.Transform(graphic.Position).Y);
+                var objType = obj.GetType();
+                // FormXObject (or any XObject that supports a Matrix) has a "Matrix" property.
+                var matrixProp = objType.GetProperty("Matrix");
+                if (matrixProp == null) continue;
 
-            Console.WriteLine("Vector graphic would be moved by updating its Position or applying a translation matrix.");
+                // Get or create the Matrix instance.
+                var matrix = matrixProp.GetValue(obj);
+                if (matrix == null)
+                {
+                    // Matrix class lives in Aspose.Pdf namespace.
+                    var matrixCtor = typeof(Matrix).GetConstructor(Type.EmptyTypes);
+                    matrix = matrixCtor.Invoke(null);
+                    matrixProp.SetValue(obj, matrix);
+                }
 
-            // Save the modified PDF (save rule: Document.Save without extra options writes PDF)
+                // Call Matrix.Translate(dx, dy) via reflection.
+                var translateMethod = matrix.GetType().GetMethod("Translate", new[] { typeof(double), typeof(double) });
+                if (translateMethod != null)
+                {
+                    translateMethod.Invoke(matrix, new object[] { dx, dy });
+                }
+            }
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved to '{outputPath}'.");
+        Console.WriteLine($"Vector graphic(s) moved and saved to '{outputPath}'.");
     }
 }

@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_compressed.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,26 +16,39 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create optimization options
-            OptimizationOptions opt = new OptimizationOptions();
+            // Iterate over all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                Page page = doc.Pages[i];
 
-            // Enable image compression
-            opt.ImageCompressionOptions.CompressImages = true;
-            // Set JPEG quality (0‑100). Lower value = higher compression.
-            opt.ImageCompressionOptions.ImageQuality = 75;
-            // Optionally limit the maximum resolution of images (dpi)
-            opt.ImageCompressionOptions.MaxResolution = 150;
+                // Iterate over all images on the page to detect large ones (optional logging)
+                foreach (XImage img in page.Resources.Images)
+                {
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        img.Save(ms);
+                        long sizeInBytes = ms.Length;
+                        if (sizeInBytes > 1_048_576) // 1 MB
+                        {
+                            // Log the large image – actual compression will be done globally later
+                            Console.WriteLine($"Found large image ({sizeInBytes / 1024} KB) on page {i} – will be compressed.");
+                        }
+                    }
+                }
+            }
 
-            // Apply the optimization to the document
+            // Apply global optimization that recompresses images (including those >1 MB)
+            OptimizationOptions opt = OptimizationOptions.All();
+            opt.CompressImages = true;          // enable image recompression
+            opt.ImageQuality = 50;              // adjust quality (0‑100) as needed
+            opt.RemoveUnusedObjects = true;
+            opt.RemoveUnusedStreams = true;
             doc.OptimizeResources(opt);
 
-            // Optional: merge identical resource streams to further reduce size
-            doc.OptimizeSize = true;
-
-            // Save the optimized PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

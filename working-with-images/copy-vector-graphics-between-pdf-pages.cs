@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Vector;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -9,36 +9,69 @@ class Program
     {
         const string sourcePdfPath = "source.pdf";
         const string targetPdfPath = "target.pdf";
-        const string outputPdfPath = "merged.pdf";
+        const string tempSvgPath   = "temp.svg";
+        const string outputPdfPath = "output.pdf";
 
+        // Verify input files exist
         if (!File.Exists(sourcePdfPath) || !File.Exists(targetPdfPath))
         {
-            Console.Error.WriteLine("Source or target PDF not found.");
+            Console.Error.WriteLine("Source or target PDF file not found.");
             return;
         }
 
-        // Load source and target documents
-        using (Document sourceDoc = new Document(sourcePdfPath))
-        using (Document targetDoc = new Document(targetPdfPath))
+        // -----------------------------------------------------------------
+        // Step 1: Extract the vector graphic from the first page of the source PDF
+        //         by saving that page as an SVG (vector format).
+        // -----------------------------------------------------------------
+        using (Document srcDoc = new Document(sourcePdfPath))
         {
-            // Choose pages (1‑based indexing)
-            Page sourcePage = sourceDoc.Pages[1];
-            Page targetPage = targetDoc.Pages[1];
-
-            // Absorb vector graphics from the source page using the correct absorber class
-            GraphicsAbsorber absorber = new GraphicsAbsorber();
-            absorber.Visit(sourcePage);
-
-            // Add each extracted graphic element individually to the target page
-            foreach (var element in absorber.Elements)
-            {
-                element.AddOnPage(targetPage);
-            }
-
-            // Save the modified target document
-            targetDoc.Save(outputPdfPath);
+            // Save the whole document as SVG – the example focuses on the first page.
+            // If only the first page is required, the SVG can be trimmed later.
+            var svgOpts = new SvgSaveOptions();
+            srcDoc.Save(tempSvgPath, svgOpts);
         }
 
-        Console.WriteLine($"Vector graphics copied to '{outputPdfPath}'.");
+        // -----------------------------------------------------------------
+        // Step 2 & 3: Load the generated SVG as an Image and insert it into the
+        //             Paragraphs collection of the first page of the target PDF.
+        // -----------------------------------------------------------------
+        using (Document tgtDoc = new Document(targetPdfPath))
+        {
+            Page firstPage = tgtDoc.Pages[1];
+
+            // The SVG file is read as a stream and assigned to the Image.ImageStream
+            // property. This avoids constructors that are not available in the current
+            // Aspose.Pdf version.
+            using (FileStream svgStream = new FileStream(tempSvgPath, FileMode.Open, FileAccess.Read))
+            {
+                Image pdfImage = new Image
+                {
+                    ImageStream = svgStream,
+                    // Optional: set desired dimensions (points). Adjust as needed.
+                    FixWidth  = 200,
+                    FixHeight = 200,
+                    // You can also control alignment instead of absolute positioning.
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Center
+                };
+
+                firstPage.Paragraphs.Add(pdfImage);
+
+                // Save the modified PDF while the stream is still open.
+                tgtDoc.Save(outputPdfPath);
+            }
+        }
+
+        // Clean up the temporary SVG file
+        try
+        {
+            File.Delete(tempSvgPath);
+        }
+        catch
+        {
+            // Ignored – if deletion fails, the file will be left on disk.
+        }
+
+        Console.WriteLine($"Vector graphic inserted and saved to '{outputPdfPath}'.");
     }
 }

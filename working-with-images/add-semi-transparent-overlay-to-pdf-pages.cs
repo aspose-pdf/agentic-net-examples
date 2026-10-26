@@ -4,35 +4,27 @@ using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
+class ThemeConfig
+{
+    public string Theme { get; set; } = null!; // non‑nullable, initialized to suppress warning
+    public OverlayColorConfig OverlayColor { get; set; } = null!; // non‑nullable, initialized to suppress warning
+}
+
+class OverlayColorConfig
+{
+    public double R { get; set; }   // 0.0 – 1.0
+    public double G { get; set; }
+    public double B { get; set; }
+    public double A { get; set; }   // 0.0 – 1.0 (opacity)
+}
+
 class Program
 {
-    // Simple configuration model
-    private class ThemeConfig
-    {
-        // Provide default values to satisfy non‑nullable warnings
-        public string OverlayColor { get; set; } = "#FFFFFF"; // default white
-        public double Opacity { get; set; } = 1.0;            // fully opaque
-    }
-
-    static Aspose.Pdf.Color ParseColor(string hex, double opacity)
-    {
-        // Remove leading '#', support 6‑digit hex
-        if (hex.StartsWith("#")) hex = hex.Substring(1);
-        if (hex.Length != 6) throw new ArgumentException("OverlayColor must be a 6‑digit hex value.");
-
-        int r = Convert.ToInt32(hex.Substring(0, 2), 16);
-        int g = Convert.ToInt32(hex.Substring(2, 2), 16);
-        int b = Convert.ToInt32(hex.Substring(4, 2), 16);
-        // Aspose.Pdf.Color supports ARGB via FromArgb (alpha 0‑255)
-        int a = (int)Math.Round(opacity * 255);
-        return Aspose.Pdf.Color.FromArgb(a, r, g, b);
-    }
-
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "output.pdf";
-        const string configFilePath = "themeConfig.json";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string themeConfigPath = "theme.json";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -40,9 +32,9 @@ class Program
             return;
         }
 
-        if (!File.Exists(configFilePath))
+        if (!File.Exists(themeConfigPath))
         {
-            Console.Error.WriteLine($"Config file not found: {configFilePath}");
+            Console.Error.WriteLine($"Theme config not found: {themeConfigPath}");
             return;
         }
 
@@ -50,58 +42,50 @@ class Program
         ThemeConfig config;
         try
         {
-            string json = File.ReadAllText(configFilePath);
-            config = JsonSerializer.Deserialize<ThemeConfig>(json);
-            if (config == null || string.IsNullOrWhiteSpace(config.OverlayColor))
-                throw new InvalidDataException("Invalid configuration content.");
+            string json = File.ReadAllText(themeConfigPath);
+            config = JsonSerializer.Deserialize<ThemeConfig>(json) ?? throw new InvalidDataException("Invalid theme config JSON.");
+            if (config.OverlayColor == null)
+                throw new InvalidDataException("OverlayColor section missing.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
+            Console.Error.WriteLine($"Failed to read theme config: {ex.Message}");
             return;
         }
 
-        // Parse the overlay color with the requested opacity
-        Aspose.Pdf.Color overlayColor;
-        try
-        {
-            overlayColor = ParseColor(config.OverlayColor, config.Opacity);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Invalid color/opacity: {ex.Message}");
-            return;
-        }
+        // Convert double (0‑1) to byte (0‑255) for Aspose.Pdf.Color
+        int a = (int)Math.Round(config.OverlayColor.A * 255);
+        int r = (int)Math.Round(config.OverlayColor.R * 255);
+        int g = (int)Math.Round(config.OverlayColor.G * 255);
+        int b = (int)Math.Round(config.OverlayColor.B * 255);
+        Aspose.Pdf.Color overlayColor = Aspose.Pdf.Color.FromArgb(a, r, g, b);
 
-        // Process PDF
+        // Open PDF and add semi‑transparent overlay to each page
         using (Document doc = new Document(inputPdfPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Page dimensions from MediaBox
-                double pageWidth  = page.MediaBox.URX - page.MediaBox.LLX;
-                double pageHeight = page.MediaBox.URY - page.MediaBox.LLY;
+                // Create a Graph that spans the whole page (float parameters required)
+                Graph graph = new Graph((float)page.PageInfo.Width, (float)page.PageInfo.Height);
 
-                // Graph that covers the whole page (use float values as required by Graph ctor)
-                Graph graph = new Graph((float)pageWidth, (float)pageHeight);
+                // Rectangle shape covering the entire page (left, bottom, width, height)
+                Aspose.Pdf.Drawing.Rectangle shape = new Aspose.Pdf.Drawing.Rectangle(
+                    0f,                     // left
+                    0f,                     // bottom
+                    (float)page.PageInfo.Width,   // width
+                    (float)page.PageInfo.Height); // height
 
-                // Drawing rectangle (Aspose.Pdf.Drawing.Rectangle) – the shape added to the graph
-                var rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, (float)pageWidth, (float)pageHeight)
-                {
-                    GraphInfo = new GraphInfo
-                    {
-                        FillColor = overlayColor,   // semi‑transparent fill
-                        Color     = overlayColor,   // stroke color (optional)
-                        LineWidth = 0f
-                    }
-                };
+                // Apply the semi‑transparent fill color
+                shape.GraphInfo.FillColor = overlayColor;
+                // Optional: remove border line
+                shape.GraphInfo.Color = overlayColor; // same color, line width defaults to 0
+                shape.GraphInfo.LineWidth = 0;
 
-                graph.Shapes.Add(rect);
-
-                // Add the graph to the page's content
+                // Add shape to graph and graph to page
+                graph.Shapes.Add(shape);
                 page.Paragraphs.Add(graph);
             }
 

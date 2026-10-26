@@ -7,46 +7,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "PageImages";
-        const string defaultFont = "Arial";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "PageImages";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Set DPI and default font for rendering
+        var resolution = new Resolution(300);
+        var renderOpts = new RenderingOptions { DefaultFontName = "Times New Roman" };
+
+        // PngDevice constructor takes a Resolution; assign RenderingOptions separately
+        var pngDevice = new PngDevice(resolution);
+        pngDevice.RenderingOptions = renderOpts;
+
+        // Load the PDF with deterministic disposal
+        using (var doc = new Document(inputPdf))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Prepare output image file path
-                string imagePath = Path.Combine(outputFolder, $"Page_{pageNumber}.png");
-
-                // Convert the current page to PNG using PngDevice
-                using (FileStream imageStream = new FileStream(imagePath, FileMode.Create))
-                {
-                    // Configure rendering options for the device
-                    RenderingOptions renderOpts = new RenderingOptions();
-                    renderOpts.DefaultFontName = defaultFont;
-
-                    // PngDevice renders a PDF page to a PNG image
-                    PngDevice pngDevice = new PngDevice();
-                    pngDevice.RenderingOptions = renderOpts;
-                    pngDevice.Process(pdfDoc.Pages[pageNumber], imageStream);
-                }
-
-                Console.WriteLine($"Saved page {pageNumber} as image: {imagePath}");
+                string outPath = Path.Combine(outputDir, $"page_{i}.png");
+                pngDevice.Process(doc.Pages[i], outPath);
+                Console.WriteLine($"Saved page {i} as image: {outPath}");
             }
         }
 
-        Console.WriteLine("All pages have been converted to images.");
+        Console.WriteLine("All pages have been rendered to images.");
     }
 }
