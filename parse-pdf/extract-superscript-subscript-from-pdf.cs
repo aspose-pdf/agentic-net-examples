@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -9,66 +9,77 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputTxtPath = "extracted.txt";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF inside a using block for deterministic disposal.
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Process each page separately
-            foreach (Page page in doc.Pages)
+            // Collect all text fragments from every page.
+            List<TextFragment> allFragments = new List<TextFragment>();
+            foreach (Page page in pdfDoc.Pages)
             {
-                // Use TextFragmentAbsorber to obtain text fragments for the current page
                 TextFragmentAbsorber absorber = new TextFragmentAbsorber();
+                // Use Pure mode to get formatting information (font size, etc.).
                 absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
                 page.Accept(absorber);
+                allFragments.AddRange(absorber.TextFragments);
+            }
 
-                var fragments = absorber.TextFragments;
-                if (fragments == null || fragments.Count == 0)
-                    continue;
+            if (allFragments.Count == 0)
+            {
+                Console.WriteLine("No text fragments found.");
+                return;
+            }
 
-                // Compute average font size and average baseline Y (LLY) for the page
-                double avgFontSize = fragments.Sum(f => f.TextState.FontSize) / fragments.Count;
-                double avgBaselineY = fragments.Sum(f => f.Rectangle.LLY) / fragments.Count;
+            // Compute average font size and average baseline Y position across all fragments.
+            double totalFontSize = 0;
+            double totalY = 0;
+            foreach (TextFragment frag in allFragments)
+            {
+                totalFontSize += frag.TextState.FontSize;
+                // Use the lower‑left Y coordinate of the fragment's rectangle as its baseline.
+                totalY += frag.Rectangle.LLY;
+            }
 
-                // Heuristic thresholds
-                const double sizeThreshold = 0.8;   // smaller than 80% of average size
-                const double yOffset = 2.0;        // vertical offset from average baseline (points)
+            double avgFontSize = totalFontSize / allFragments.Count;
+            double avgY = totalY / allFragments.Count;
 
-                // Output detected superscript and subscript characters
-                foreach (var frag in fragments)
+            // Thresholds for detecting superscript/subscript.
+            double sizeThreshold = avgFontSize * 0.8;               // significantly smaller than average
+            double ySupThreshold = avgY + avgFontSize * 0.2;       // noticeably higher
+            double ySubThreshold = avgY - avgFontSize * 0.2;       // noticeably lower
+
+            // Build the output with annotations.
+            StringBuilder sb = new StringBuilder();
+
+            foreach (TextFragment frag in allFragments)
+            {
+                string annotation = string.Empty;
+                double fragSize = frag.TextState.FontSize;
+                double fragY = frag.Rectangle.LLY;
+
+                if (fragSize < sizeThreshold && fragY > ySupThreshold)
                 {
-                    bool isSmall = frag.TextState.FontSize < avgFontSize * sizeThreshold;
-                    double baselineY = frag.Rectangle.LLY;
-                    bool isSup = isSmall && baselineY > avgBaselineY + yOffset;
-                    bool isSub = isSmall && baselineY < avgBaselineY - yOffset;
-
-                    foreach (char ch in frag.Text)
-                    {
-                        if (isSup)
-                        {
-                            // U+207A = SUPERSCRIPT PLUS used as a generic superscript marker
-                            Console.Write($"\u207A{ch}");
-                        }
-                        else if (isSub)
-                        {
-                            // U+208A = SUBSCRIPT PLUS used as a generic subscript marker
-                            Console.Write($"\u208A{ch}");
-                        }
-                        else
-                        {
-                            Console.Write(ch);
-                        }
-                    }
+                    annotation = "[Superscript] ";
+                }
+                else if (fragSize < sizeThreshold && fragY < ySubThreshold)
+                {
+                    annotation = "[Subscript] ";
                 }
 
-                Console.WriteLine(); // separate pages
+                sb.AppendLine($"{annotation}{frag.Text}");
             }
+
+            // Write the annotated text to a plain .txt file.
+            File.WriteAllText(outputTxtPath, sb.ToString());
+            Console.WriteLine($"Extraction complete. Output written to '{outputTxtPath}'.");
         }
     }
 }

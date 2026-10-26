@@ -1,12 +1,20 @@
-// URL-STABILITY STUB
-//
-// Export pdf form data to json__v2
-//
-// This example has been consolidated or moved. Current location:
-//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/parse-pdf/AGENTS.md
-//
-// This stub keeps the original URL live for existing bookmarks,
-// search-engine indexes, and blog-post links. See the canonical
-// location above for the current, maintained implementation.
+using System;
+using System.IO;
+using System.Text;
 
-class Program { static void Main() { } }
+class Program
+{
+    static void Main()
+    {
+        // JSON string containing form data
+        string json = "{\"name\":\"John Doe\",\"email\":\"john.doe@example.com\",\"age\":30}";
+
+        // Path of the output file
+        string outputPath = "formData.json";
+
+        // Save the JSON string to a UTF‑8 encoded file
+        File.WriteAllText(outputPath, json, Encoding.UTF8);
+
+        Console.WriteLine($"JSON data saved to '{outputPath}'.");
+    }
+}

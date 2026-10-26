@@ -1,7 +1,7 @@
 {
   "category": "parse-pdf",
   "nuget_version": "26.9.0",
-  "last_updated": "2026-10-08T11:55:54Z",
+  "last_updated": "2026-10-26T07:50:30Z",
   "examples": {
     "load-pdf-extract-acroform-fields": {
       "title": "Load PDF and List AcroForm Fields",
@@ -24,7 +24,7 @@
         "Aspose.Pdf.Forms.Field.Value"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19756"
     },
@@ -50,7 +50,7 @@
         "Aspose.Pdf.Document.Form"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19757"
     },
@@ -73,7 +73,7 @@
         "Aspose.Pdf.Forms.Field.PartialName"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19758"
     },
@@ -95,7 +95,7 @@
         "Aspose.Pdf.Forms.Field.Value"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19759"
     },
@@ -118,7 +118,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19760"
     },
@@ -141,7 +141,7 @@
         "Aspose.Pdf.WidgetAnnotation"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19761"
     },
@@ -163,7 +163,7 @@
         "Aspose.Pdf.Forms.CheckboxField.Value"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19762"
     },
@@ -186,14 +186,14 @@
         "Aspose.Pdf.Forms.FieldCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19763"
     },
     "export-pdf-form-data-to-json": {
-      "title": "Export PDF Form Data to JSON Stream",
+      "title": "Export PDF Form Fields to JSON",
       "filename": "export-pdf-form-data-to-json.cs",
-      "description": "Demonstrates how to load a PDF document with a form and export its field data directly to a JSON file using a FileStream.",
+      "description": "Shows how to load a PDF document with Aspose.Pdf, export all form fields to a JSON string using the Form.ExportToJson method, and output the JSON.",
       "tags": [
         "pdf",
         "form",
@@ -207,9 +207,9 @@
         "Aspose.Pdf.Forms.Form.ExportToJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
-      "task_id": "19781"
+      "task_id": "19764"
     },
     "export-pdf-form-fields-to-xml": {
       "title": "Export PDF Form Fields to XML",
@@ -230,7 +230,7 @@
         "Aspose.Pdf.Forms.Form.Fields"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19766"
     },
@@ -252,7 +252,7 @@
         "Aspose.Pdf.Form.ExportToJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19767"
     },
@@ -273,7 +273,7 @@
         "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19768"
     },
@@ -299,7 +299,7 @@
         "Aspose.Pdf.EpubSaveOptions"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19769"
     },
@@ -322,7 +322,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19770"
     },
@@ -345,7 +345,7 @@
         "Aspose.Pdf.Forms.Field.Value"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19771"
     },
@@ -369,7 +369,7 @@
         "Aspose.Pdf.Forms.Field.Value"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19773"
     },
@@ -390,7 +390,7 @@
         "Aspose.Pdf.FormField"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19775"
     },
@@ -411,7 +411,7 @@
         "Aspose.Pdf.FormField"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19776"
     },
@@ -435,7 +435,7 @@
         "Aspose.Pdf.Forms.Field.Value"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19777"
     },
@@ -455,7 +455,7 @@
         "Aspose.Pdf.Form"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19778"
     },
@@ -478,7 +478,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19779"
     },
@@ -500,7 +500,7 @@
         "Aspose.Pdf.Forms.FieldCollection"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19780"
     },
@@ -521,7 +521,7 @@
         "Aspose.Pdf.Form.ExportToJson"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19782"
     },
@@ -544,7 +544,7 @@
         "Form.Fields"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19783"
     },
@@ -565,7 +565,7 @@
         "Aspose.Pdf.Facades.Form.ExportXfdf"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19784"
     },
@@ -588,32 +588,32 @@
         "Aspose.Pdf.Forms.Field.PageIndex"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19785"
     },
     "extract-vector-graphics-to-svg": {
-      "title": "Extract Vector Graphics from PDF Page to SVG",
+      "title": "Extract Vector Graphics from PDF to SVG",
       "filename": "extract-vector-graphics-to-svg.cs",
-      "description": "Loads a PDF, extracts a single page, and saves its vector graphics as an SVG file using Aspose.Pdf.",
+      "description": "Loads a PDF, iterates through its pages, and saves each page as an individual SVG file, preserving vector graphics using Aspose.Pdf.",
       "tags": [
         "pdf",
         "svg",
-        "vector-graphics",
+        "vector",
         "extraction",
-        "Aspose.Pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.SvgSaveOptions",
-        "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.Document.Pages.Add"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
-      "task_id": "19787"
+      "task_id": "19786"
     },
     "combine-pdf-page-vector-graphics-into-svg": {
       "title": "Extract Vector Graphics to Multi‑Page SVG",
@@ -632,7 +632,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19788"
     },
@@ -657,7 +657,7 @@
         "Aspose.Pdf.Devices.ImageFormat"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19789"
     },
@@ -680,7 +680,7 @@
         "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19790"
     },
@@ -705,7 +705,7 @@
         "Aspose.Pdf.XImage.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19791"
     },
@@ -728,7 +728,7 @@
         "Aspose.Pdf.Page.Accept"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19792"
     },
@@ -751,7 +751,7 @@
         "Aspose.Pdf.PageCollection.Accept"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19793"
     },
@@ -775,33 +775,32 @@
         "Aspose.Pdf.Page.Annotations"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19794"
     },
     "extract-superscript-subscript-from-pdf": {
-      "title": "Detect Superscript and Subscript in PDF Text",
+      "title": "Extract Superscripts and Subscripts from PDF",
       "filename": "extract-superscript-subscript-from-pdf.cs",
-      "description": "Loads a PDF, extracts text fragments with Aspose.Pdf, and uses font size and baseline heuristics to identify superscript and subscript characters, marking them with Unicode superscript/subscript symbols.",
+      "description": "Loads a PDF with Aspose.Pdf, extracts all text fragments, identifies superscript and subscript fragments based on font size and baseline position, and writes the annotated text to a plain .txt file.",
       "tags": [
         "pdf",
         "text-extraction",
         "superscript",
         "subscript",
-        "aspose"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragmentAbsorber",
         "Aspose.Pdf.Text.TextExtractionOptions",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.TextState"
+        "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
-      "task_id": "19816"
+      "task_id": "19795"
     },
     "extract-paragraphs-with-line-breaks": {
       "title": "Extract Paragraph Text from PDF Preserving Line Breaks",
@@ -822,7 +821,7 @@
         "Aspose.Pdf.PageCollection.Accept"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19796"
     },
@@ -846,7 +845,7 @@
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19797"
     },
@@ -869,7 +868,7 @@
         "Aspose.Pdf.Page.Resources"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19798"
     },
@@ -894,7 +893,7 @@
         "Aspose.Pdf.Text.TextFragment"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19799"
     },
@@ -918,7 +917,7 @@
         "Aspose.Pdf.Forms.Field.Value"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19800"
     },
@@ -941,7 +940,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19801"
     },
@@ -964,7 +963,7 @@
         "Aspose.Pdf.Text.TextAbsorber.Text"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19802"
     },
@@ -987,7 +986,7 @@
         "Aspose.Pdf.SvgSaveOptions.ScaleToPixels"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19803"
     },
@@ -1010,7 +1009,7 @@
         "Aspose.Pdf.XImage.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19804"
     },
@@ -1033,7 +1032,7 @@
         "Aspose.Pdf.PageCollection"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19805"
     },
@@ -1055,7 +1054,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19806"
     },
@@ -1079,7 +1078,7 @@
         "Aspose.Pdf.Devices.Resolution"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19807"
     },
@@ -1102,7 +1101,7 @@
         "Aspose.Pdf.Document.Dispose"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19809"
     },
@@ -1125,7 +1124,7 @@
         "Aspose.Pdf.Resources"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19810"
     },
@@ -1148,7 +1147,7 @@
         "Aspose.Pdf.Form"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19811"
     },
@@ -1171,7 +1170,7 @@
         "Aspose.Pdf.FontInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19812"
     },
@@ -1194,7 +1193,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19813"
     },
@@ -1217,7 +1216,7 @@
         "Aspose.Pdf.PageCollection.Accept"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19815"
     },
@@ -1240,7 +1239,7 @@
         "Aspose.Pdf.PageCollection.Accept"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19817"
     },
@@ -1263,7 +1262,7 @@
         "Aspose.Pdf.Forms.FieldCollection"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19818"
     },
@@ -1284,7 +1283,7 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19820"
     },
@@ -1307,9 +1306,140 @@
         "Aspose.Pdf.Page"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-08T11:55:54Z",
+      "generated_at": "2026-10-26T07:50:30Z",
       "status": "verified",
       "task_id": "19808"
+    },
+    "export-pdf-form-data-to-json__v2": {
+      "title": "Save JSON Form Data to UTF-8 File",
+      "filename": "export-pdf-form-data-to-json__v2.cs",
+      "description": "Demonstrates writing a JSON string containing form data to a UTF‑8 encoded file using File.WriteAllText in C#.",
+      "tags": [
+        "json",
+        "file-io",
+        "utf-8",
+        "csharp",
+        "write-text"
+      ],
+      "apis_used": [],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:50:30Z",
+      "status": "verified",
+      "task_id": "19765"
+    },
+    "export-pdf-form-data-to-json__v3": {
+      "title": "Extract PDF Form Data to JSON Files",
+      "filename": "export-pdf-form-data-to-json__v3.cs",
+      "description": "Loads each PDF in a folder, reads its form fields using Aspose.Pdf, and writes the extracted name/value pairs to a formatted JSON file.",
+      "tags": [
+        "pdf",
+        "form",
+        "json",
+        "extraction",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Form",
+        "Aspose.Pdf.Form",
+        "Aspose.Pdf.Form.Fields",
+        "Aspose.Pdf.Form.Field"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:50:30Z",
+      "status": "verified",
+      "task_id": "19772"
+    },
+    "export-pdf-form-data-to-json__v4": {
+      "title": "Export PDF Form Data to JSON",
+      "filename": "export-pdf-form-data-to-json__v4.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, verify that it contains form fields, and export the form data to a JSON file.",
+      "tags": [
+        "pdf",
+        "form",
+        "export",
+        "json",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.Form.ExportToJson",
+        "Aspose.Pdf.Document.Form",
+        "Aspose.Pdf.Document (constructor)"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:50:30Z",
+      "status": "verified",
+      "task_id": "19774"
+    },
+    "export-pdf-form-data-to-json__v5": {
+      "title": "Export PDF Form Data to JSON Stream",
+      "filename": "export-pdf-form-data-to-json__v5.cs",
+      "description": "Demonstrates how to load a PDF document with a form and export its field data directly to a JSON file using a FileStream.",
+      "tags": [
+        "pdf",
+        "form",
+        "json",
+        "export",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.Form.ExportToJson"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:50:30Z",
+      "status": "verified",
+      "task_id": "19781"
+    },
+    "extract-vector-graphics-to-svg__v2": {
+      "title": "Extract Vector Graphics from PDF Page to SVG",
+      "filename": "extract-vector-graphics-to-svg__v2.cs",
+      "description": "Loads a PDF, extracts a single page, and saves its vector graphics as an SVG file using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "svg",
+        "vector-graphics",
+        "extraction",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.SvgSaveOptions",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-10-26T07:50:30Z",
+      "status": "verified",
+      "task_id": "19787"
+    },
+    "extract-superscript-subscript-from-pdf__v2": {
+      "title": "Detect Superscript and Subscript in PDF Text",
+      "filename": "extract-superscript-subscript-from-pdf__v2.cs",
+      "description": "Loads a PDF, extracts text fragments with Aspose.Pdf, and uses font size and baseline heuristics to identify superscript and subscript characters, marking them with Unicode superscript/subscript symbols.",
+      "tags": [
+        "pdf",
+        "text-extraction",
+        "superscript",
+        "subscript",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextExtractionOptions",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextState"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-10-26T07:50:30Z",
+      "status": "verified",
+      "task_id": "19816"
     }
   }
 }
