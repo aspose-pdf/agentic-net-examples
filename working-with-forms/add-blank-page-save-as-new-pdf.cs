@@ -1,34 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
-using Aspose.Pdf.Facades;      // Optional, if you need Facades features
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the original and the new PDF files
-        const string inputPath  = "original.pdf";
-        const string outputPath = "modified_copy.pdf";
+        const string inputPath  = "original.pdf";   // original PDF file
+        const string outputPath = "modified.pdf";   // new file to preserve original
 
-        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF, make a simple modification, and save to a new file
-        // Document implements IDisposable, so wrap it in a using block (see document-disposal-with-using rule)
-        using (Document pdfDoc = new Document(inputPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Example modification: add a blank page at the end
-            // (Pages collection is 1‑based, see page-indexing-one-based rule)
-            pdfDoc.Pages.Add();
+            // Example modification: add a text annotation to the first page
+            // Aspose.Pdf uses 1‑based page indexing
+            Page page = doc.Pages[1];
 
-            // Save the modified document to a new file name.
-            // Using the overload Save(string) preserves the PDF format.
-            pdfDoc.Save(outputPath);
+            // Fully qualified rectangle to avoid ambiguity with System.Drawing
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+            TextAnnotation annotation = new TextAnnotation(page, rect)
+            {
+                Title    = "Note",
+                Contents = "This PDF has been modified.",
+                Open     = true,
+                Icon     = TextIcon.Note
+            };
+
+            page.Annotations.Add(annotation);
+
+            // Save the modified document to a new file name (PDF format)
+            doc.Save(outputPath);
         }
 
         Console.WriteLine($"Modified PDF saved as '{outputPath}'.");

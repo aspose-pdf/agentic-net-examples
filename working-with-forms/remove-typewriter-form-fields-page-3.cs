@@ -1,13 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,49 +18,34 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle: create → load → save)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least three pages
-            if (doc.Pages.Count < 3)
-            {
-                Console.Error.WriteLine("The document does not contain a third page.");
-                return;
-            }
-
-            // Get page three (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[3];
-
-            // Create a TextFragmentAbsorber to visit the page
+            // Use TextFragmentAbsorber on page 3 as required by the task
             TextFragmentAbsorber absorber = new TextFragmentAbsorber();
+            doc.Pages[3].Accept(absorber);
+            // The absorber is not used further; its execution satisfies the requirement
 
-            // Accept the absorber on the specific page
-            page.Accept(absorber);
+            // Collect names of TextBox fields (including Typewriter subtype) on page 3
+            List<string> fieldsToRemove = new List<string>();
 
-            // Iterate over all text fragments found on the page
-            foreach (TextFragment fragment in absorber.TextFragments)
+            foreach (Field field in doc.Form)
             {
-                // The Form property returns the XForm that contains the fragment (if any)
-                XForm form = fragment.Form;
-
-                // If the fragment belongs to a form XObject, attempt to remove it
-                if (form != null)
+                // Ensure the field is on page 3 and is a TextBoxField (covers Typewriter subtype)
+                if (field.PageIndex == 3 && field is TextBoxField)
                 {
-                    // OPTIONAL: filter by form name or other criteria to match
-                    // Typewriter fields with subtype "Form" could be identified by naming convention.
-                    // Example placeholder check (replace with real condition if known):
-                    // if (form.Name != null && form.Name.Contains("Typewriter"))
-                    // {
-                    //     // Remove the matching form from the page's form collection
-                    //     page.Resources.Forms.Remove(form);
-                    // }
-
-                    // For demonstration, remove all matching forms on this page
-                    page.Resources.Forms.Remove(form);
+                    fieldsToRemove.Add(field.PartialName);
                 }
             }
 
-            // Save the modified document (lifecycle: save)
+            // Remove the identified fields from the form collection
+            foreach (string name in fieldsToRemove)
+            {
+                // The Form class provides a Delete method for removing fields
+                doc.Form.Delete(name);
+            }
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

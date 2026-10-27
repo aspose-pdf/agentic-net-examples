@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "template.pdf";
+        const string outputPath = "filled_readonly.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,22 +16,21 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the form field named "EmployeeID"
-            Field employeeIdField = doc.Form["EmployeeID"] as Field;
-            if (employeeIdField != null)
+            // Access the form field named 'EmployeeID'
+            var employeeField = doc.Form["EmployeeID"] as TextBoxField;
+            if (employeeField != null)
             {
-                // Make the field read‑only to prevent user edits
-                employeeIdField.ReadOnly = true;
-            }
-            else
-            {
-                Console.Error.WriteLine("Field 'EmployeeID' not found.");
+                // Set the field value (optional, based on generation logic)
+                employeeField.Value = "12345";
+
+                // Mark the field as read‑only to prevent user edits
+                employeeField.ReadOnly = true;
             }
 
-            // Save the updated PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

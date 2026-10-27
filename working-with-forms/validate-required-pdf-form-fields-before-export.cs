@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
@@ -8,50 +7,51 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "form_data.json";
+        const string inputPdf = "form.pdf";
+        const string outputFdf = "form_data.fdf";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdf))
         {
-            // Validate required fields
-            List<string> missingFields = new List<string>();
+            bool allValid = true;
 
-            // Iterate over form fields (base type is Field)
-            foreach (Field field in doc.Form)
+            // Iterate over all form fields
+            foreach (Field field in doc.Form?.Fields ?? Array.Empty<Field>())
             {
-                // Check if the field is marked as required
+                // Only check fields that are marked as required (use the Required property)
                 if (field.Required)
                 {
-                    // Field value can be null or empty string
+                    // Convert the field value to string for validation
                     string value = field.Value?.ToString() ?? string.Empty;
-                    if (string.IsNullOrWhiteSpace(value))
+
+                    // Treat unchecked checkboxes/radio buttons ("Off") as empty
+                    if (string.IsNullOrWhiteSpace(value) ||
+                        value.Equals("Off", StringComparison.OrdinalIgnoreCase))
                     {
-                        missingFields.Add(field.PartialName);
+                        Console.Error.WriteLine($"Required field '{field.FullName}' is empty.");
+                        allValid = false;
                     }
                 }
             }
 
-            if (missingFields.Count > 0)
+            // Abort export if any required field is missing data
+            if (!allValid)
             {
-                Console.Error.WriteLine("The following required fields are empty:");
-                foreach (string name in missingFields)
-                {
-                    Console.Error.WriteLine($"- {name}");
-                }
-                Console.Error.WriteLine("Export aborted to prevent incomplete submission.");
+                Console.Error.WriteLine("Form validation failed – export aborted.");
                 return;
             }
 
-            // All required fields have values; export form data to JSON
-            doc.Form.ExportToJson(outputJson);
-            Console.WriteLine($"Form data exported successfully to '{outputJson}'.");
+            // All required fields contain data – export the form data to FDF.
+            // The overload without SaveFormat infers the format from the file extension.
+            doc.Save(outputFdf);
+            Console.WriteLine($"Form data exported to '{outputFdf}'.");
         }
     }
 }

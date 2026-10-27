@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,60 +8,52 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF (contains the form fields) and the destination PDF
-        const string sourcePdfPath = "source.pdf";
-        const string destinationPdfPath = "destination.pdf";
-        const string outputPdfPath = "merged_with_form_fields.pdf";
+        const string sourcePdf = "source.pdf";
+        const string destPdf   = "destination.pdf";
 
-        // Verify that the input files exist
-        if (!File.Exists(sourcePdfPath))
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
             return;
         }
-        if (!File.Exists(destinationPdfPath))
+        if (!File.Exists(destPdf))
         {
-            Console.Error.WriteLine($"Destination file not found: {destinationPdfPath}");
+            Console.Error.WriteLine($"Destination file not found: {destPdf}");
             return;
         }
 
-        // Load both documents inside using blocks for deterministic disposal
-        using (Document srcDoc = new Document(sourcePdfPath))
-        using (Document dstDoc = new Document(destinationPdfPath))
+        try
         {
-            // Ensure the destination document has a Form object. Accessing dstDoc.Form will create one if it does not exist.
-            var form = dstDoc.Form; // read‑only property, but accessing it lazily creates the AcroForm when needed.
+            // Load the source and destination PDFs using the core Document API
+            Document sourceDoc = new Document(sourcePdf);
+            Document destDoc   = new Document(destPdf);
 
-            // Choose a page to place the copied fields. For simplicity we use the first page of the destination document.
-            int targetPageNumber;
-            if (dstDoc.Pages.Count > 0)
+            // Ensure both documents have a Form object (AcroForm)
+            if (sourceDoc.Form == null || destDoc.Form == null)
             {
-                targetPageNumber = 1; // first existing page
-            }
-            else
-            {
-                // Add a new page and use its page number (which will be 1 after the addition)
-                dstDoc.Pages.Add();
-                targetPageNumber = dstDoc.Pages.Count;
+                Console.Error.WriteLine("One of the documents does not contain a form.");
+                return;
             }
 
-            // Copy each form field from the source document to the destination document
-            if (srcDoc.Form != null)
+            // Iterate over each form field in the source document
+            foreach (var srcField in sourceDoc.Form?.Fields ?? Array.Empty<Field>())
             {
-                foreach (Field srcField in srcDoc.Form.Fields)
-                {
-                    // Clone the field – this creates a deep copy of the field definition and its appearance
-                    Field clonedField = (Field)srcField.Clone();
+                // Clone the field so it can be added to another Document instance
+                Field clonedField = (Field)srcField.Clone();
 
-                    // Add the cloned field to the destination document on the chosen page
-                    form.Add(clonedField, targetPageNumber);
-                }
+                // PageIndex is zero‑based; Form.Add expects a 1‑based page number
+                int pageNumber = srcField.PageIndex + 1;
+
+                // Add the cloned field to the destination document's form
+                destDoc.Form.Add(clonedField, pageNumber);
             }
 
-            // Save the resulting PDF that now contains the combined form fields
-            dstDoc.Save(outputPdfPath);
+            // Save the updated destination PDF
+            destDoc.Save(destPdf);
         }
-
-        Console.WriteLine($"Form fields copied successfully. Output saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

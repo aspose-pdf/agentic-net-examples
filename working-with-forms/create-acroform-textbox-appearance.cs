@@ -1,48 +1,47 @@
 using System;
-using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // Retained for completeness; not used directly in this example
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Output PDF path
         const string outputPath = "AcroForm.pdf";
 
-        // Create a new PDF document
+        // Ensure the Document is disposed properly
         using (Document doc = new Document())
         {
-            // Add a blank page (1‑based indexing)
+            // Add a blank page to host the form field
             Page page = doc.Pages.Add();
 
-            // Define the rectangle where the form field will appear
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the field rectangle (llx, lly, urx, ury)
+            var fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 630);
 
-            // Create a text box field on the document
-            // Constructor (Document, Rectangle) places the field on the specified page
-            TextBoxField textField = new TextBoxField(doc, fieldRect)
+            // Create a TextBoxField (AcroForm field) on the page
+            var txtField = new TextBoxField(page, fieldRect)
             {
-                // Set the field name (used to retrieve the field later)
-                PartialName = "SampleField"
+                PartialName = "SampleField",          // Field name
+                Value = "Enter text here"             // Default value
             };
 
-            // Set the default appearance: font, size, and text color
-            // Use the constructor that accepts font name, size, and System.Drawing.Color
-            textField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Blue);
+            // Set appearance using DefaultAppearance object (font, size, text colour)
+            // DefaultAppearance expects a System.Drawing.Color, not Aspose.Pdf.Color
+            txtField.DefaultAppearance = new DefaultAppearance("Helv", 12, System.Drawing.Color.Blue);
 
-            // Set the border width (Border requires the parent annotation in its constructor)
-            textField.Border = new Border(textField) { Width = 1 };
+            // Set border colour and width using the Color and Border properties (BorderColor does not exist)
+            txtField.Color = Aspose.Pdf.Color.Black;               // border colour
+            txtField.Border = new Border(txtField) { Width = 1 };   // optional border width
 
-            // Set the border color via the field's own Color property (Border has no Color member)
-            textField.Color = Aspose.Pdf.Color.Black;
+            // Set a light‑gray background if the property is available in the used version.
+            // Older versions of Aspose.Pdf do not expose BackgroundColor on TextBoxField, so the line is commented out.
+            // txtField.BackgroundColor = Aspose.Pdf.Color.FromRgb(0.9, 0.9, 0.9);
 
-            // Add the field to the form on page 1 (1‑based page indexing)
-            doc.Form.Add(textField, 1);
+            // Add the field to the document's form (field index 1)
+            doc.Form.Add(txtField, 1);
 
-            // Save the PDF (no SaveOptions needed for PDF output)
+            // Save the PDF; Document.Save(string) writes a PDF regardless of extension
             doc.Save(outputPath);
         }
 

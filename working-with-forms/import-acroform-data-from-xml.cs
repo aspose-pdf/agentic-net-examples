@@ -8,50 +8,73 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF, the XML data file and the output PDF
-        const string sourcePdfPath = "input.pdf";
-        const string xmlDataPath    = "updatedData.xml";
-        const string outputPdfPath = "output.pdf";
+        const string pdfPath = "input.pdf";        // source PDF with AcroForm
+        const string xmlPath = "updatedData.xml";  // XML containing form field values
+        const string outputPath = "output.pdf";    // PDF after data import
 
-        // Verify that the required files exist
-        if (!File.Exists(sourcePdfPath))
+        // Verify input files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(xmlDataPath))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML data file not found: {xmlDataPath}");
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument = new Document(sourcePdfPath);
-
-        // Load the XML data (expected format: <Fields><Field name="FieldName">Value</Field>...</Fields>)
-        XDocument xmlDoc = XDocument.Load(xmlDataPath);
-        foreach (XElement fieldElement in xmlDoc.Descendants("Field"))
+        try
         {
-            XAttribute nameAttr = fieldElement.Attribute("name");
-            if (nameAttr == null) continue; // skip malformed entries
-            string fieldName = nameAttr.Value;
-            string fieldValue = fieldElement.Value ?? string.Empty;
+            // Load the PDF document (contains the AcroForm)
+            Document doc = new Document(pdfPath);
 
-            // The Form indexer returns a WidgetAnnotation; cast it to Field before using.
-            Field? pdfField = pdfDocument.Form[fieldName] as Field;
-            if (pdfField != null)
+            // Load the XML that holds the form data.
+            // Expected structure:
+            // <FormData>
+            //   <Field name="FieldName">FieldValue</Field>
+            //   ...
+            // </FormData>
+            XDocument xmlDoc = XDocument.Load(xmlPath);
+            if (xmlDoc.Root == null)
             {
-                pdfField.Value = fieldValue;
+                Console.Error.WriteLine("XML does not contain a root element.");
+                return;
             }
-            else
+
+            // Iterate over each <Field> element and push the value into the matching PDF field.
+            foreach (XElement fieldElement in xmlDoc.Root.Elements("Field"))
             {
-                Console.Error.WriteLine($"Warning: field '{fieldName}' not found in the PDF form.");
+                XAttribute nameAttr = fieldElement.Attribute("name");
+                if (nameAttr == null)
+                {
+                    // skip malformed entries
+                    continue;
+                }
+
+                string fieldName = nameAttr.Value;
+                string fieldValue = fieldElement.Value ?? string.Empty;
+
+                // Locate the field in the PDF form collection. The Form indexer returns a WidgetAnnotation,
+                // so we need to cast it to Aspose.Pdf.Forms.Field before accessing the Value property.
+                Field? pdfField = doc.Form[fieldName] as Field;
+                if (pdfField != null)
+                {
+                    pdfField.Value = fieldValue;
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Warning: field '{fieldName}' not found in PDF.");
+                }
             }
+
+            // Save the updated PDF.
+            doc.Save(outputPath);
+            Console.WriteLine($"AcroForm data imported and saved to '{outputPath}'.");
         }
-
-        // Save the modified PDF
-        pdfDocument.Save(outputPdfPath);
-
-        Console.WriteLine($"AcroForm data imported and saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

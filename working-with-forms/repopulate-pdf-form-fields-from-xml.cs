@@ -1,49 +1,76 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Linq;
+using System.Xml.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";      // PDF with form fields
-        const string xmlDataPath   = "data.xml";       // Transformed XML containing field values
-        const string outputPdfPath = "output.pdf";     // PDF after repopulating fields
+        const string pdfPath = "template.pdf";
+        const string xmlPath = "data.xml";
+        const string outputPath = "filled.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
+        }
+        if (!File.Exists(xmlPath))
+        {
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
             return;
         }
 
-        if (!File.Exists(xmlDataPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            Console.Error.WriteLine($"XML data file not found: {xmlDataPath}");
-            return;
+            // Import field values from the transformed XML.
+            // The core Aspose.Pdf API does not provide a direct ImportXml method on Document.Form,
+            // so we parse the XML ourselves and assign values to the matching form fields.
+            ImportFormDataFromXml(pdfDoc, xmlPath);
+
+            // Save the updated PDF.
+            pdfDoc.Save(outputPath);
         }
 
-        try
+        Console.WriteLine($"PDF with imported data saved to '{outputPath}'.");
+    }
+
+    /// <summary>
+    /// Reads a simple XML representation of form data and populates the corresponding fields
+    /// in the provided PDF document.
+    /// Expected XML format (compatible with Aspose export):
+    /// <form>
+    ///   <field name="FieldName1">Value1</field>
+    ///   <field name="FieldName2">Value2</field>
+    ///   ...
+    /// </form>
+    /// </summary>
+    private static void ImportFormDataFromXml(Document pdfDoc, string xmlPath)
+    {
+        if (pdfDoc?.Form?.Fields == null)
+            return;
+
+        XDocument xDoc = XDocument.Load(xmlPath);
+        // The XML may contain a root element named "form" or "FormData" – we handle both.
+        var fieldElements = xDoc.Descendants("field");
+        foreach (var elem in fieldElements)
         {
-            // Load the existing PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
+            string fieldName = (string)elem.Attribute("name");
+            if (string.IsNullOrEmpty(fieldName))
+                continue;
+
+            string fieldValue = elem.Value ?? string.Empty;
+            // Find the field in the PDF (case‑sensitive match on Name).
+            var pdfField = pdfDoc.Form.Fields.FirstOrDefault(f => f.Name == fieldName);
+            if (pdfField != null)
             {
-                // Load the transformed XML into an XmlDocument
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(xmlDataPath);
-
-                // Assign the XML (XFA) data to the PDF form
-                pdfDoc.Form.AssignXfa(xmlDoc);
-
-                // Save the updated PDF
-                pdfDoc.Save(outputPdfPath);
+                // Most field types expose a Value property that accepts an object.
+                pdfField.Value = fieldValue;
             }
-
-            Console.WriteLine($"PDF fields repopulated and saved to '{outputPdfPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

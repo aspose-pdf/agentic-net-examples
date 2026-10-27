@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
@@ -7,64 +8,67 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "form.pdf";
-        const string jsonPath  = "data.json";
-        const string outputPdf = "filled.pdf";
+        const string inputPath  = "template.pdf";
+        const string outputPath = "filled.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(jsonPath))
+        // Define the values to fill – keys are field names in the PDF form
+        var fieldValues = new Dictionary<string, string>
         {
-            Console.Error.WriteLine($"JSON data file not found: {jsonPath}");
-            return;
-        }
+            { "FirstName", "John" },
+            { "LastName",  "Doe" },
+            { "Email",     "john.doe@example.com" },
+            { "Phone",     "555-1234" } // may not exist in the template
+        };
 
         try
         {
-            // Load the PDF document (wrapped in using for deterministic disposal)
-            using (Document doc = new Document(inputPdf))
+            // Open the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Optional: ignore corrupted objects during processing
-                doc.IgnoreCorruptedObjects = true;
-
-                // Open the JSON file once and reuse the stream for each field
-                using (FileStream jsonStream = File.OpenRead(jsonPath))
+                // Iterate over the values to set
+                foreach (var kvp in fieldValues)
                 {
-                    // Iterate over all form fields in the document
-                    foreach (Field field in doc.Form.Fields)
+                    string fieldName = kvp.Key;
+                    string fieldValue = kvp.Value;
+
+                    // Attempt to retrieve the form field; if it does not exist, skip it
+                    try
                     {
-                        // Reset stream position before each import attempt
-                        jsonStream.Position = 0;
-
-                        // Try to import the field value from JSON.
-                        // Returns false if the field name is not present in the JSON.
-                        bool imported = field.ImportValueFromJson(jsonStream);
-
-                        if (!imported)
+                        // The Form collection returns a FormField; null if not present
+                        var field = doc.Form[fieldName] as TextBoxField;
+                        if (field == null)
                         {
-                            // Gracefully skip missing fields
-                            Console.WriteLine($"Field '{field.FullName}' not found in JSON – skipping.");
+                            // Field not found or not a TextBoxField – skip gracefully
+                            continue;
                         }
-                        else
-                        {
-                            Console.WriteLine($"Field '{field.FullName}' filled successfully.");
-                        }
+
+                        // Set the value
+                        field.Value = fieldValue;
+                    }
+                    catch (Exception ex)
+                    {
+                        // Any unexpected error while processing this field is logged,
+                        // but the bulk operation continues with the next field.
+                        Console.Error.WriteLine($"Skipping field '{fieldName}': {ex.Message}");
                     }
                 }
 
-                // Save the filled PDF
-                doc.Save(outputPdf);
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Bulk fill completed. Output saved to '{outputPdf}'.");
+            Console.WriteLine($"Bulk fill completed. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during bulk fill: {ex.Message}");
+            // Top‑level error handling
+            Console.Error.WriteLine($"Operation failed: {ex.Message}");
         }
     }
 }

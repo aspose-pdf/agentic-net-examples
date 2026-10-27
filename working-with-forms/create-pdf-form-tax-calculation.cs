@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Drawing; // needed for System.Drawing.Color used in DefaultAppearance
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
@@ -10,61 +12,67 @@ class Program
     {
         const string outputPath = "TaxForm.pdf";
 
-        // Create a new PDF document
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
             // Add a single page
             Page page = doc.Pages.Add();
 
-            // Define rectangles for the fields (left, bottom, right, top)
-            Aspose.Pdf.Rectangle rectSubtotal = new Aspose.Pdf.Rectangle(100, 700, 250, 720);
-            Aspose.Pdf.Rectangle rectTaxRate = new Aspose.Pdf.Rectangle(100, 650, 250, 670);
-            Aspose.Pdf.Rectangle rectTaxAmount = new Aspose.Pdf.Rectangle(100, 600, 250, 620);
+            // Define rectangles for the form fields (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rectSubtotal = new Aspose.Pdf.Rectangle(50, 750, 200, 770);
+            Aspose.Pdf.Rectangle rectPercent   = new Aspose.Pdf.Rectangle(50, 700, 200, 720);
+            Aspose.Pdf.Rectangle rectTax       = new Aspose.Pdf.Rectangle(50, 650, 200, 670);
 
-            // ----- Subtotal NumberField -----
-            NumberField subtotalField = new NumberField(page, rectSubtotal);
-            subtotalField.PartialName = "Subtotal";
-            subtotalField.Color = Aspose.Pdf.Color.LightGray;
-            subtotalField.AllowedChars = "0123456789.";
-            // Border must be set after the field is instantiated
+            // Create a TextBox for Subtotal
+            TextBoxField subtotalField = new TextBoxField(page, rectSubtotal);
+            subtotalField.PartialName = "subtotal";
+            subtotalField.Value = "0.00";
             subtotalField.Border = new Border(subtotalField) { Width = 1 };
-            page.Paragraphs.Add(subtotalField);
+            subtotalField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
+            doc.Form.Add(subtotalField);
 
-            // ----- Tax Rate NumberField (percentage) -----
-            NumberField taxRateField = new NumberField(page, rectTaxRate);
-            taxRateField.PartialName = "TaxRate";
-            taxRateField.Color = Aspose.Pdf.Color.LightGray;
-            taxRateField.AllowedChars = "0123456789.";
-            taxRateField.Border = new Border(taxRateField) { Width = 1 };
-            page.Paragraphs.Add(taxRateField);
+            // Create a TextBox for Tax Percentage
+            TextBoxField percentField = new TextBoxField(page, rectPercent);
+            percentField.PartialName = "percent";
+            percentField.Value = "0";
+            percentField.Border = new Border(percentField) { Width = 1 };
+            percentField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
+            doc.Form.Add(percentField);
 
-            // ----- Tax Amount NumberField (calculated, read‑only) -----
-            NumberField taxAmountField = new NumberField(page, rectTaxAmount);
-            taxAmountField.PartialName = "TaxAmount";
-            taxAmountField.Color = Aspose.Pdf.Color.LightGray;
-            taxAmountField.ReadOnly = true;
-            taxAmountField.Border = new Border(taxAmountField) { Width = 1 };
-            page.Paragraphs.Add(taxAmountField);
+            // Create a read‑only TextBox for Tax Amount
+            TextBoxField taxField = new TextBoxField(page, rectTax);
+            taxField.PartialName = "tax";
+            taxField.Value = "0.00";
+            taxField.Border = new Border(taxField) { Width = 1 };
+            taxField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
+            taxField.ReadOnly = true;
+            doc.Form.Add(taxField);
 
-            // JavaScript calculation for TaxAmount field
+            // JavaScript that calculates tax = subtotal * percent / 100
             string jsCalc = @"
-                var subtotal = this.getField('Subtotal').value;
-                var rate = this.getField('TaxRate').value;
-                if (subtotal == '' || rate == '') {
-                    event.value = '';
+                var sub = this.getField('subtotal').value;
+                var pct = this.getField('percent').value;
+                var tax = parseFloat(sub) * parseFloat(pct) / 100;
+                if (!isNaN(tax)) {
+                    this.getField('tax').value = tax.toFixed(2);
                 } else {
-                    event.value = (subtotal * rate / 100).toFixed(2);
+                    this.getField('tax').value = '';
                 }
             ";
-            taxAmountField.Actions.OnCalculate = new JavascriptAction(jsCalc);
 
-            // Enable automatic recalculation (default is true, but set explicitly for clarity)
-            doc.Form.AutoRecalculate = true;
+            // Attach the script to the OnCalculate event of the fields that affect the tax value
+            subtotalField.Actions.OnCalculate = new JavascriptAction(jsCalc);
+            percentField.Actions.OnCalculate   = new JavascriptAction(jsCalc);
+
+            // Optional: add labels for visual clarity
+            page.Paragraphs.Add(new TextFragment("Subtotal:") { Position = new Position(250, 760) });
+            page.Paragraphs.Add(new TextFragment("Tax %:")   { Position = new Position(250, 710) });
+            page.Paragraphs.Add(new TextFragment("Tax:")     { Position = new Position(250, 660) });
 
             // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF form with tax calculation saved to '{outputPath}'.");
+        Console.WriteLine($"PDF form saved to '{outputPath}'.");
     }
 }

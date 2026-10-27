@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "locked_output.pdf";
+        const string inputPath = "form.pdf";
+        const string outputPath = "form_locked.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,22 +16,19 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Option 1: Set each field to read‑only
+            // Iterate over every form field and make it read‑only
             foreach (Field field in doc.Form.Fields)
             {
                 field.ReadOnly = true;
             }
 
-            // Option 2 (alternative): flatten the form so fields become part of the page content
-            // doc.Form.Flatten();
-
-            // Save the modified document
+            // Save the updated PDF; the fields are now locked
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All form fields locked and saved to '{outputPath}'.");
+        Console.WriteLine($"All fields locked and saved to '{outputPath}'.");
     }
 }

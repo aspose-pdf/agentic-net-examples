@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -10,8 +9,9 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "TextField1";      // existing field name to copy
-        const int targetPageNumber = 2;             // page where the copy will be placed
+        const string fieldName = "myField";   // name of the field to copy
+        const int sourcePage = 1;               // page where the original field resides (kept for reference)
+        const int targetPage = 2;               // page where the copy will be placed
 
         if (!File.Exists(inputPath))
         {
@@ -19,35 +19,41 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the AcroForm of the document
-            Form form = doc.Form;
-
-            // Retrieve the source field (cast from WidgetAnnotation to Field)
-            Field sourceField = doc.Form[fieldName] as Field;
-            if (sourceField == null)
+            // Retrieve the original field (assumed to be a TextBoxField; adjust type if needed)
+            TextBoxField originalField = doc.Form[fieldName] as TextBoxField;
+            if (originalField == null)
             {
-                Console.Error.WriteLine($"Field '{fieldName}' not found in the document.");
+                Console.Error.WriteLine($"Field '{fieldName}' not found or not a TextBoxField.");
                 return;
             }
 
-            // Preserve the original rectangle (position and size) of the field
-            Aspose.Pdf.Rectangle sourceRect = sourceField.Rect;
+            // Clone the field to create an independent copy
+            TextBoxField copiedField = (TextBoxField)originalField.Clone();
 
-            // Create a copy of the field on the target page.
-            // The Add method with a partial name returns the newly created field instance.
-            string copyPartialName = fieldName + "_Copy";
-            Field copiedField = form.Add(sourceField, copyPartialName, targetPageNumber);
+            // Assign a new unique name to avoid name collisions
+            copiedField.PartialName = $"Copy_of_{originalField.PartialName}";
 
-            // Add the visual appearance of the copied field on the target page
-            form.AddFieldAppearance(copiedField, targetPageNumber, sourceRect);
+            // Preserve the original rectangle (position and size)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
+                originalField.Rect.LLX,
+                originalField.Rect.LLY,
+                originalField.Rect.URX,
+                originalField.Rect.URY);
+            copiedField.Rect = rect;
 
-            // Save the updated PDF
+            // Add the new field to the document's form collection
+            doc.Form.Add(copiedField);
+
+            // Place the copied field on the target page using AddFieldAppearance
+            doc.Form.AddFieldAppearance(copiedField, targetPage, rect);
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Field '{fieldName}' successfully copied to page {targetPageNumber} and saved as '{outputPath}'.");
+        Console.WriteLine($"Field '{fieldName}' copied to page {targetPage} and saved as '{outputPath}'.");
     }
 }

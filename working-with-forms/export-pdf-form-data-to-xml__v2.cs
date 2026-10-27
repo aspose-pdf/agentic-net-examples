@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using System.Xml;
-using System.Xml;
-using System.Linq;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -10,99 +8,63 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string xmlPath = "formdata.xml";
+        const string inputPdfPath = "input.pdf";
+        const string outputXmlPath = "formdata.xml";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
         try
         {
             // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Verify that the document contains an interactive form
-                if (doc.Form != null && doc.Form.Count > 0)
-                {
-                    // Export the form field values to a local XML file using a custom serializer
-                    ExportFormDataToXml(doc, xmlPath);
-                }
-                else
-                {
-                    Console.WriteLine("The PDF does not contain any form fields.");
-                }
-
-                // Save the (unchanged) PDF to a new file
-                doc.Save(outputPdf);
+                // Serialize the current form fields to an XML file
+                ExportFormDataToXml(pdfDoc, outputXmlPath);
+                Console.WriteLine($"Form data successfully exported to '{outputXmlPath}'.");
             }
-
-            Console.WriteLine($"Form data exported to '{xmlPath}'. PDF saved as '{outputPdf}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during export: {ex.Message}");
         }
     }
 
     /// <summary>
-    /// Serialises the AcroForm fields of a PDF document to a simple XML representation.
-    /// This replaces the missing Form.ExportXml method while staying within the core Aspose.Pdf APIs.
+    /// Exports the values of all form fields in the given PDF document to an XML file.
+    /// The XML structure is:
+    /// <FormData>
+    ///   <Field name="fieldName" value="fieldValue" />
+    ///   ...
+    /// </FormData>
     /// </summary>
-    private static void ExportFormDataToXml(Document doc, string filePath)
+    private static void ExportFormDataToXml(Document pdfDocument, string xmlFilePath)
     {
-        var settings = new XmlWriterSettings { Indent = true, Encoding = System.Text.Encoding.UTF8 };
-        using (var writer = XmlWriter.Create(filePath, settings))
+        // Ensure the document actually contains a form
+        if (pdfDocument?.Form?.Fields == null)
         {
-            writer.WriteStartDocument();
-            writer.WriteStartElement("FormData");
-
-            foreach (Field field in doc.Form.Fields)
-            {
-                writer.WriteStartElement("Field");
-                writer.WriteAttributeString("Name", field.PartialName ?? string.Empty);
-
-                string value = string.Empty;
-                switch (field)
-                {
-                    case TextBoxField txt:
-                        value = txt.Value ?? string.Empty;
-                        break;
-                    case CheckboxField chk:
-                        value = chk.Checked ? "true" : "false";
-                        break;
-                    case RadioButtonField rad:
-                        value = rad.Value ?? string.Empty;
-                        break;
-                    case ListBoxField list:
-                        // ListBoxField.SelectedItems returns an int[] of selected indices.
-                        // Convert indices to the corresponding display values if needed; here we simply join the indices.
-                        var selected = list.SelectedItems?.Select(i => i.ToString()).ToArray();
-                        value = selected != null ? string.Join(",", selected) : string.Empty;
-                        break;
-                    case ComboBoxField combo:
-                        value = combo.Value ?? string.Empty;
-                        break;
-                    case SignatureField _:
-                        // Signature fields do not expose a simple string value; leave empty or add custom handling.
-                        value = string.Empty;
-                        break;
-                    default:
-                        // For any other field types, attempt to use the generic Value property if available.
-                        if (field.Value != null)
-                            value = field.Value.ToString();
-                        break;
-                }
-
-                writer.WriteString(value);
-                writer.WriteEndElement(); // Field
-            }
-
-            writer.WriteEndElement(); // FormData
-            writer.WriteEndDocument();
+            // Create an empty XML file to indicate no form data
+            new XDocument(new XElement("FormData")).Save(xmlFilePath);
+            return;
         }
+
+        var root = new XElement("FormData");
+        foreach (Field field in pdfDocument.Form.Fields)
+        {
+            // Some fields may have complex values (e.g., list boxes). Use ToString() for a simple representation.
+            string fieldName = field?.Name ?? field?.FullName ?? string.Empty;
+            string fieldValue = field?.Value?.ToString() ?? string.Empty;
+
+            var fieldElement = new XElement("Field",
+                new XAttribute("name", fieldName),
+                new XAttribute("value", fieldValue));
+            root.Add(fieldElement);
+        }
+
+        var doc = new XDocument(root);
+        doc.Save(xmlFilePath);
     }
 }

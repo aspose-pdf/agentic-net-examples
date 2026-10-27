@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Linq;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,66 +9,66 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string xmlDataPath    = "formData.xml";
-        const string outputPdfPath  = "output.pdf";
+        const string pdfPath    = "form.pdf";
+        const string xmlPath    = "data.xml";
+        const string outputPath = "filled_form.pdf";
 
-        // Verify that the source PDF exists.
-        if (!File.Exists(inputPdfPath))
+        // Verify the source PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – '{inputPdfPath}'.");
+            Console.Error.WriteLine($"Error: PDF file not found – '{pdfPath}'.");
             return;
         }
 
-        // Load the PDF document.
-        try
+        // Load the PDF document inside a using block (deterministic disposal)
+        using (Document doc = new Document(pdfPath))
         {
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Attempt to load form data from the XML file if it exists
+            if (File.Exists(xmlPath))
             {
-                // Check for the XML import file.
-                if (File.Exists(xmlDataPath))
+                try
                 {
-                    // Load the XML into an XmlDocument.
-                    XmlDocument xmlDoc = new XmlDocument();
-                    try
+                    // Load XML and map values to form fields manually (ImportXml is not available in core API)
+                    XDocument xDoc = XDocument.Load(xmlPath);
+                    foreach (XElement element in xDoc.Root.Elements())
                     {
-                        xmlDoc.Load(xmlDataPath);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.Error.WriteLine($"Error loading XML file '{xmlDataPath}': {ex.Message}");
-                        // Proceed without importing XML data.
-                        xmlDoc = null;
-                    }
+                        string fieldName = element.Name.LocalName;
+                        string fieldValue = element.Value ?? string.Empty;
 
-                    // If the XML was loaded successfully, assign it to the XFA form.
-                    if (xmlDoc != null)
-                    {
-                        try
+                        // Find the field in the PDF form collection
+                        var field = doc.Form?.Fields?.FirstOrDefault(f => f.Name == fieldName || f.FullName == fieldName);
+                        if (field != null)
                         {
-                            pdfDoc.Form.AssignXfa(xmlDoc);
-                            Console.WriteLine("XML form data imported successfully.");
+                            field.Value = fieldValue;
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            Console.Error.WriteLine($"Error assigning XFA data: {ex.Message}");
+                            Console.WriteLine($"Warning: Field '{fieldName}' not found in PDF form.");
                         }
                     }
                 }
-                else
+                catch (Exception ex) when (ex is PdfException || ex is InvalidOperationException || ex is IOException || ex is System.Xml.XmlException)
                 {
-                    // XML file is missing – handle gracefully.
-                    Console.WriteLine($"Warning: XML import file '{xmlDataPath}' not found. Skipping form data import.");
+                    // Handle errors related to XML loading or PDF field assignment
+                    Console.Error.WriteLine($"Failed to import XML form data: {ex.Message}");
                 }
-
-                // Save the modified PDF.
-                pdfDoc.Save(outputPdfPath);
-                Console.WriteLine($"PDF saved to '{outputPdfPath}'.");
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            else
+            {
+                // XML file is missing – skip loading but continue processing
+                Console.WriteLine($"Warning: XML data file '{xmlPath}' not found. Proceeding without importing form data.");
+            }
+
+            // Save the (potentially) updated PDF
+            try
+            {
+                doc.Save(outputPath);
+                Console.WriteLine($"PDF saved to '{outputPath}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error saving PDF: {ex.Message}");
+            }
         }
     }
 }

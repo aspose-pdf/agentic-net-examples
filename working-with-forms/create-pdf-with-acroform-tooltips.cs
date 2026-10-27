@@ -7,53 +7,52 @@ class Program
 {
     static void Main()
     {
+        // Define output PDF path
         const string outputPath = "AcroFormWithTooltips.pdf";
 
-        // Create a new PDF document inside a using block for proper disposal
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page (1‑based indexing)
+            // Add a single page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // ---------- First Name field ----------
-            // Define the field rectangle (lower‑left X/Y, upper‑right X/Y)
-            Aspose.Pdf.Rectangle firstNameRect = new Aspose.Pdf.Rectangle(50, 750, 250, 770);
-            // Create a text box field on the document with the rectangle
-            TextBoxField firstNameField = new TextBoxField(doc, firstNameRect);
-            firstNameField.Name = "FirstName";                     // field name (used in scripts, extraction, etc.)
-            firstNameField.AlternateName = "Enter your first name"; // tooltip shown in Acrobat
-            firstNameField.Value = "";                             // initial value (empty)
-            // Add the field to the form on page 1
-            doc.Form.Add(firstNameField, 1);
+            // Define a rectangle for the first text box field
+            Aspose.Pdf.Rectangle nameRect = new Aspose.Pdf.Rectangle(100, 700, 300, 730);
+            // Create a text box field, set its name, tooltip (via Contents) and initial value
+            TextBoxField nameField = new TextBoxField(page, nameRect)
+            {
+                PartialName = "FullName",
+                Value       = ""
+            };
+            // Set tooltip using the Contents property (the tooltip text for widget annotations)
+            nameField.Contents = "Enter your full name";
+            // Add the field to the document's form collection
+            doc.Form.Add(nameField);
 
-            // ---------- Last Name field ----------
-            Aspose.Pdf.Rectangle lastNameRect = new Aspose.Pdf.Rectangle(50, 720, 250, 740);
-            TextBoxField lastNameField = new TextBoxField(doc, lastNameRect);
-            lastNameField.Name = "LastName";
-            lastNameField.AlternateName = "Enter your last name";
-            lastNameField.Value = "";
-            doc.Form.Add(lastNameField, 1);
+            // Define a rectangle for a second text box field (e.g., email)
+            Aspose.Pdf.Rectangle emailRect = new Aspose.Pdf.Rectangle(100, 650, 300, 680);
+            TextBoxField emailField = new TextBoxField(page, emailRect)
+            {
+                PartialName = "EmailAddress",
+                Value       = ""
+            };
+            emailField.Contents = "Enter your email address";
+            doc.Form.Add(emailField);
 
-            // ---------- Email field ----------
-            Aspose.Pdf.Rectangle emailRect = new Aspose.Pdf.Rectangle(50, 690, 250, 710);
-            TextBoxField emailField = new TextBoxField(doc, emailRect);
-            emailField.Name = "Email";
-            emailField.AlternateName = "Enter your email address";
-            emailField.Value = "";
-            doc.Form.Add(emailField, 1);
+            // Define a rectangle for a checkbox field
+            Aspose.Pdf.Rectangle agreeRect = new Aspose.Pdf.Rectangle(100, 600, 115, 615);
+            CheckboxField agreeField = new CheckboxField(page, agreeRect)
+            {
+                PartialName = "AgreeTerms",
+                Checked     = false
+            };
+            agreeField.Contents = "Check to agree to the terms and conditions";
+            doc.Form.Add(agreeField);
 
-            // ---------- Age field (numeric) ----------
-            Aspose.Pdf.Rectangle ageRect = new Aspose.Pdf.Rectangle(50, 660, 150, 680);
-            NumberField ageField = new NumberField(doc, ageRect);
-            ageField.Name = "Age";
-            ageField.AlternateName = "Enter your age (numeric)";
-            ageField.Value = "";
-            doc.Form.Add(ageField, 1);
-
-            // Save the PDF (no extra SaveOptions needed for PDF output)
+            // Save the PDF (no SaveOptions needed for PDF format)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with AcroForm fields saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with AcroForm fields and tooltips saved to '{outputPath}'.");
     }
 }

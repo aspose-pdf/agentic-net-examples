@@ -8,63 +8,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_validated.pdf";
+        const string outputPath = "validated_form.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and add a page
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            Page page = doc.Pages.Add();
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Access the form object
-            Form form = doc.Form;
+            // Define the rectangle for the text box field (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 700, 300, 730);
 
-            // Example: mark a specific field as required and give it a red border
-            const string requiredFieldName = "Name"; // change to your field name
+            // Create a required text box field
+            TextBoxField nameField = new TextBoxField(page, fieldRect);
+            nameField.PartialName = "NameField";
+            nameField.Value = "";               // initially empty
+            nameField.Required = true;          // mark as required (PDF flag)
 
-            if (form.HasField(requiredFieldName))
+            // Add the field to the document's AcroForm on page 1
+            doc.Form.Add(nameField, 1);
+
+            // Simulate form submission: if the required field is empty, highlight it
+            if (string.IsNullOrWhiteSpace(nameField.Value))
             {
-                // Retrieve the field (as a generic Field, which derives from WidgetAnnotation)
-                Field field = (Field)form[requiredFieldName];
-
-                // Set the field as required
-                field.Required = true;
-
-                // Set a red border (color is set on the annotation itself)
-                field.Color = Aspose.Pdf.Color.Red;
-
-                // Optionally set border width via Border object (requires parent annotation in ctor)
-                field.Border = new Border(field) { Width = 1 };
+                // Border requires the parent annotation (the field itself) in the constructor
+                nameField.Border = new Border(nameField);
+                nameField.Border.Width = 2;                     // set border thickness
+                nameField.Color = Aspose.Pdf.Color.Red;        // set border color to red
             }
 
-            // Simulate form submission: check each required field and highlight empty ones
-            foreach (Field field in form.Fields)
-            {
-                if (field.Required)
-                {
-                    string value = field.Value?.ToString();
-
-                    // If the field is empty, ensure the border is red
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        field.Color = Aspose.Pdf.Color.Red;
-                    }
-                    else
-                    {
-                        // Optional: reset to default color when filled
-                        field.Color = Aspose.Pdf.Color.Black;
-                    }
-                }
-            }
-
-            // Save the modified PDF
+            // Save the resulting PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Validated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with validation saved to '{outputPath}'.");
     }
 }

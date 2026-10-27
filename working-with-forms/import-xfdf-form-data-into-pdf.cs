@@ -1,42 +1,67 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // XfdfReader resides here
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";   // Source PDF with form fields
-        const string xfdfPath  = "data.xfdf";   // XFDF (XML) file containing field values
-        const string outputPath = "output.pdf"; // Resulting PDF after import
+        const string pdfPath = "input.pdf";
+        const string xmlDataPath = "data.xml";
+        const string outputPath = "output.pdf";
 
-        // Validate input files
+        // Verify input files exist
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(xfdfPath))
+        if (!File.Exists(xmlDataPath))
         {
-            Console.Error.WriteLine($"XFDF file not found: {xfdfPath}");
+            Console.Error.WriteLine($"XML data file not found: {xmlDataPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(pdfPath))
+        try
         {
-            // Open the XFDF stream and import field values
-            using (FileStream xfdfStream = File.OpenRead(xfdfPath))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                // Reads field values from the XFDF stream and updates matching fields in the PDF
-                XfdfReader.ReadFields(xfdfStream, pdfDoc);
+                // -----------------------------------------------------------------
+                // Import form data from the XML file.
+                // The Aspose.Pdf.Forms.Form class does not expose an ImportXml method
+                // in the core API (it exists only in the Facades wrapper, which we are
+                // prohibited from using). Therefore we manually parse the XML and set
+                // matching field values.
+                // -----------------------------------------------------------------
+                XDocument xmlDoc = XDocument.Load(xmlDataPath);
+                var root = xmlDoc.Root;
+                if (root != null && doc.Form != null && doc.Form.Fields != null)
+                {
+                    foreach (Field field in doc.Form.Fields)
+                    {
+                        // Try to find an element whose name matches the field name.
+                        // XML element names are case‑sensitive; adjust as needed.
+                        var element = root.Element(field.Name);
+                        if (element != null)
+                        {
+                            field.Value = element.Value;
+                        }
+                    }
+                }
+
+                // Save the updated PDF. No SaveOptions needed for PDF output.
+                doc.Save(outputPath);
             }
 
-            // Save the updated PDF
-            pdfDoc.Save(outputPath);
+            Console.WriteLine($"Form data imported and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Form data imported successfully. Saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,36 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+// URL-STABILITY STUB
+//
+// Export pdf form appearance to json
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/working-with-forms/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf = "template.pdf";
-        const string outputJson = "formAppearance.json";
-
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
-
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
-        {
-            // Optional: configure JSON export options
-            ExportFieldsToJsonOptions jsonOptions = new ExportFieldsToJsonOptions
-            {
-                ExportPasswordValue = false, // do not export password values
-                WriteIndented = true         // produce indented (readable) JSON
-            };
-
-            // Export all form fields (including appearance settings) to a JSON file
-            pdfDoc.Form.ExportToJson(outputJson, jsonOptions);
-        }
-
-        Console.WriteLine($"Form fields exported to JSON: {outputJson}");
-    }
-}
+class Program { static void Main() { } }

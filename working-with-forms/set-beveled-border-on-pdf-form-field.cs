@@ -2,15 +2,15 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // required for Border and BorderStyle
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_beveled.pdf";
-        const string fieldName = "myTextField"; // replace with your field name
+        const string outputPath = "output.pdf";
+        const string fieldName = "myField";
 
         if (!File.Exists(inputPath))
         {
@@ -18,36 +18,40 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the widget annotation that represents the form field
-            var widget = doc.Form[fieldName];
-
-            if (widget == null)
+            // Ensure the form and the specific field exist
+            if (doc.Form != null && doc.Form[fieldName] != null)
             {
-                Console.Error.WriteLine($"Field '{fieldName}' not found.");
+                // Cast to a concrete field type (e.g., TextBoxField)
+                var field = doc.Form[fieldName] as TextBoxField;
+                if (field != null)
+                {
+                    // Set the border color on the field itself (Border class has no Color property)
+                    field.Color = Aspose.Pdf.Color.Black;
+
+                    // Apply a beveled (3‑D) border style using the correct Border class
+                    field.Border = new Border(field)
+                    {
+                        Width = 1,               // optional border width
+                        Style = BorderStyle.Beveled // beveled style for a 3‑D look
+                    };
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Field '{fieldName}' is not a TextBoxField.");
+                }
             }
             else
             {
-                // Explicitly cast the widget to a Field (the explicit conversion operator is provided by Aspose.Pdf)
-                Field field = (Field)widget;
-
-                // Create a Border instance that is linked to the field (Border requires the parent annotation)
-                field.Border = new Border(field)
-                {
-                    Style = BorderStyle.Beveled,
-                    Width = 1 // 1 point width
-                };
-
-                // Set the border colour via the annotation's own Color property (Border has no Color property)
-                field.Color = Color.Black;
+                Console.Error.WriteLine($"Form field '{fieldName}' not found.");
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with beveled border on field '{fieldName}' to '{outputPath}'.");
+        Console.WriteLine($"Saved PDF with beveled border to '{outputPath}'.");
     }
 }

@@ -1,6 +1,6 @@
 using System;
-using System.Globalization;
 using System.IO;
+using System.Globalization;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,49 +8,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "template.pdf";
-        const string outputPdf = "filled_currency.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a simple one‑page PDF if the template does not exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            using (Document doc = new Document())
-            {
-                doc.Pages.Add();
-                doc.Save(inputPdf);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdf))
+        // Example currency amount to insert
+        decimal amount = 1234567.89m;
+        // Format with currency symbol and thousand separators (e.g., $1,234,567.89)
+        string formattedAmount = amount.ToString("C", CultureInfo.GetCultureInfo("en-US"));
+
+        // Load the PDF, modify the form field, and save
+        using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing for pages)
-            Page page = pdfDoc.Pages[1];
-
-            // Define the rectangle where the field will be placed (llx, lly, urx, ury)
-            // Rectangle constructor expects double values
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 630);
-
-            // Create the RichTextBoxField on the page
-            RichTextBoxField currencyField = new RichTextBoxField(page, fieldRect);
-
-            // Optional visual styling (border removed because the Border class is not available in the referenced version)
-            currencyField.Color = Aspose.Pdf.Color.LightGray;
-
-            // Example numeric value
-            decimal amount = 1234567.89m;
-
-            // Format as currency with symbol and thousand separators (US culture)
-            string formattedCurrency = amount.ToString("C", CultureInfo.GetCultureInfo("en-US"));
-            currencyField.FormattedValue = formattedCurrency;
-
-            // Add the field to the document's form collection (page number is 1‑based)
-            pdfDoc.Form.Add(currencyField, 1);
+            // Replace "AmountField" with the actual name of the target form field
+            TextBoxField field = doc.Form["AmountField"] as TextBoxField;
+            if (field != null)
+            {
+                field.Value = formattedAmount;
+            }
+            else
+            {
+                Console.Error.WriteLine("Form field 'AmountField' not found.");
+            }
 
             // Save the updated PDF
-            pdfDoc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Currency field populated and saved to '{outputPdf}'.");
+        Console.WriteLine($"Currency value saved to '{outputPath}'.");
     }
 }

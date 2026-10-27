@@ -7,10 +7,11 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string radioFieldName = "MyRadioGroup";   // name of the radio button field in the PDF
-        const string optionExportValue = "CODE123";     // the export value required by downstream systems
+        const string fieldName = "myRadioGroup"; // name of the radio button field
+        const int optionIndex = 2;               // zero‑based index of the option to modify
+        const string exportCode = "CODE123";    // value required by downstream systems
 
         if (!File.Exists(inputPath))
         {
@@ -18,45 +19,41 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Access the form object
-            Form form = doc.Form;
-
-            // Retrieve the radio button field by its name
-            RadioButtonField radio = form[radioFieldName] as RadioButtonField;
-            if (radio == null)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine($"Radio button field '{radioFieldName}' not found.");
-                return;
+                // Retrieve the radio button field by name
+                RadioButtonField radio = doc.Form[fieldName] as RadioButtonField;
+                if (radio == null)
+                {
+                    Console.Error.WriteLine($"Radio button field '{fieldName}' not found.");
+                }
+                else
+                {
+                    // Verify the option index is within range
+                    if (optionIndex >= 0 && optionIndex < radio.Options.Count)
+                    {
+                        // Set the export value (Name) of the selected option
+                        radio.Options[optionIndex].Name = exportCode;
+                        Console.WriteLine($"Export value of option {optionIndex} set to '{exportCode}'.");
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine($"Option index {optionIndex} out of range (count: {radio.Options.Count}).");
+                    }
+                }
+
+                // Save the modified PDF (PDF format by default)
+                doc.Save(outputPath);
             }
 
-            // Ensure the radio button has at least one option
-            if (radio.Options.Count == 0)
-            {
-                Console.Error.WriteLine("Radio button has no options to set export value on.");
-                return;
-            }
-
-            // Example: set the export value of the first option.
-            // Options collection contains Option objects; each Option has a Value property (export value).
-            radio.Options[0].Value = optionExportValue;
-
-            // If you need to set a specific option by name, you can locate it:
-            // foreach (Option opt in radio.Options)
-            // {
-            //     if (opt.Name == "DesiredOptionName")
-            //     {
-            //         opt.Value = optionExportValue;
-            //         break;
-            //     }
-            // }
-
-            // Save the modified PDF (lifecycle rule: use the same Document instance)
-            doc.Save(outputPath);
+            Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Export value set and PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

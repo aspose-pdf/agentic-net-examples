@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,9 +8,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const int desiredIndex = 2; // 1‑based index of the option to select
+        const string inputPath = "input.pdf";          // existing PDF with a list box
+        const string outputPath = "output.pdf";        // PDF after selection
+        const string listBoxName = "myListBox";        // name of the ListBox field
+        const int desiredIndex = 2;                     // zero‑based index of the entry to select
 
         if (!File.Exists(inputPath))
         {
@@ -17,31 +19,37 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for proper disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the ListBox field by its name (replace "MyListBox" with the actual field name)
-            ListBoxField listBox = doc.Form["MyListBox"] as ListBoxField;
-            if (listBox == null)
+            // Retrieve the ListBox field by its name using the Fields collection
+            var field = doc.Form?.Fields?.FirstOrDefault(f => f.Name == listBoxName);
+            if (field == null)
             {
-                Console.Error.WriteLine("ListBox field not found.");
+                Console.Error.WriteLine($"ListBox field '{listBoxName}' not found.");
                 return;
             }
 
-            // Validate the desired index against the number of options
-            if (desiredIndex < 1 || desiredIndex > listBox.Options.Count)
+            if (!(field is ListBoxField listBox))
             {
-                Console.Error.WriteLine("Desired index is out of range.");
+                Console.Error.WriteLine($"Field '{listBoxName}' is not a ListBox.");
                 return;
             }
 
-            // Set the selected option (items are numbered from 1)
-            listBox.Selected = desiredIndex;
+            // Ensure the desired index is within the Options collection bounds
+            if (desiredIndex < 0 || desiredIndex >= listBox.Options.Count)
+            {
+                Console.Error.WriteLine($"Index {desiredIndex} is out of range. Options count: {listBox.Options.Count}");
+                return;
+            }
 
-            // Save the modified document
+            // Set the selected index (ListBoxField.SelectedItems expects an int[] of indexes)
+            listBox.SelectedItems = new int[] { desiredIndex };
+
+            // Save the modified PDF (still PDF format)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"ListBox selection saved to '{outputPath}'.");
+        Console.WriteLine($"ListBox entry at index {desiredIndex} selected and saved to '{outputPath}'.");
     }
 }

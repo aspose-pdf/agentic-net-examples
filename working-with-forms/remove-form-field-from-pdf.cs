@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "myField";
+        const string fieldName = "MyTextField";
 
         if (!File.Exists(inputPath))
         {
@@ -19,23 +19,23 @@ class Program
 
         using (Document doc = new Document(inputPath))
         {
-            // Verify the field exists
-            if (doc.Form.HasField(fieldName))
+            // The Form indexer returns a WidgetAnnotation. Use it only to check existence.
+            var annotation = doc.Form[fieldName];
+            if (annotation != null)
             {
-                // Remove the field using the correct API method
+                // Delete the field by name – this removes the underlying WidgetAnnotation
+                // from the AcroForm collection.
                 doc.Form.Delete(fieldName);
-                // Optionally you can check that the field was removed
-                // Console.WriteLine($"Deleted field: {fieldName}");
+                Console.WriteLine($"Field '{fieldName}' removed.");
             }
             else
             {
-                Console.WriteLine($"Field '{fieldName}' not found.");
+                Console.WriteLine($"Field '{fieldName}' not found; no removal performed.");
             }
 
-            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Field removed and saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

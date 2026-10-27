@@ -6,73 +6,39 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "MultiPageForm.pdf";
+        const string outputPath = "multi_page_form.pdf";
 
         // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // ---------- Page 1 ----------
-            // Add first page (1‑based indexing)
-            Page page1 = doc.Pages.Add();
-
-            // Define rectangle for the text box field (left, bottom, right, top)
-            Aspose.Pdf.Rectangle rect1 = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
-
-            // Create a TextBox field on page 1
-            TextBoxField txtField = new TextBoxField(page1, rect1)
+            // Add three pages; each page will receive its own distinct form fields
+            for (int i = 1; i <= 3; i++)
             {
-                Name = "txtName",          // full field name
-                PartialName = "Name",      // displayed name
-                Value = "John Doe"         // default value
-            };
+                // Add a blank page
+                Page page = doc.Pages.Add();
 
-            // Add the field to the form on page 1 (page number = 1)
-            doc.Form.Add(txtField, 1);
+                // ----- TextBox field (unique per page) -----
+                // Define the rectangle for the field on the current page
+                Rectangle txtRect = new Rectangle(100, 700, 300, 730);
+                // Use the constructor that takes the page and rectangle – this binds the field to the page
+                TextBoxField txt = new TextBoxField(page, txtRect);
+                txt.PartialName = $"txtPage{i}";
+                txt.Value = $"Text on page {i}";
+                // Add the field to the document's AcroForm collection
+                doc.Form.Add(txt);
 
-            // ---------- Page 2 ----------
-            Page page2 = doc.Pages.Add();
+                // ----- CheckBox field (unique per page) -----
+                Rectangle chkRect = new Rectangle(100, 650, 115, 665);
+                CheckboxField chk = new CheckboxField(page, chkRect);
+                chk.PartialName = $"chkPage{i}";
+                chk.Checked = (i % 2 == 0); // checked on even pages, unchecked on odd
+                doc.Form.Add(chk);
+            }
 
-            Aspose.Pdf.Rectangle rect2 = new Aspose.Pdf.Rectangle(100, 600, 120, 620);
-
-            // Create a CheckBox field on page 2
-            CheckboxField chkField = new CheckboxField(page2, rect2)
-            {
-                Name = "chkAgree",
-                PartialName = "Agree",
-                Value = "Yes",
-                Checked = true
-            };
-
-            // Add the field to the form on page 2
-            doc.Form.Add(chkField, 2);
-
-            // ---------- Page 3 ----------
-            Page page3 = doc.Pages.Add();
-
-            Aspose.Pdf.Rectangle rect3 = new Aspose.Pdf.Rectangle(100, 600, 250, 630);
-
-            // Create a ComboBox (dropdown) field on page 3
-            ComboBoxField comboField = new ComboBoxField(page3, rect3)
-            {
-                Name = "cmbCountry",
-                PartialName = "Country"
-            };
-
-            // Populate the combo box options
-            comboField.AddOption("USA");
-            comboField.AddOption("Canada");
-            comboField.AddOption("Mexico");
-
-            // Set default selected value (must match one of the options)
-            comboField.Value = "USA";
-
-            // Add the field to the form on page 3
-            doc.Form.Add(comboField, 3);
-
-            // Save the multi‑page PDF with distinct form fields
+            // Save the resulting PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with AcroForm fields saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with distinct AcroForm fields saved to '{outputPath}'.");
     }
 }

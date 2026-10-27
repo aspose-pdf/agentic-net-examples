@@ -2,15 +2,15 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // required for Border class
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";   // source PDF with form fields
-        const string outputPath = "styled_output.pdf"; // result PDF
-        const string fieldName = "MyTextField"; // name of the field to style
+        const string inputPath = "input.pdf";          // source PDF with form fields
+        const string outputPath = "styled_form.pdf";   // result PDF
+        const string fieldName = "myField";            // name of the field to style
 
         if (!File.Exists(inputPath))
         {
@@ -18,29 +18,31 @@ class Program
             return;
         }
 
-        // Load the PDF document (dispose automatically)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the form field by name – the Form indexer returns a WidgetAnnotation,
-            // which can be treated as a generic Field.
-            Field? field = doc.Form[fieldName] as Field;
-            if (field == null)
+            // Retrieve the form field by name; cast to the appropriate field type
+            // (TextBoxField is used as an example – adjust the cast for other field types)
+            if (doc.Form[fieldName] is TextBoxField field)
             {
-                Console.Error.WriteLine($"Field '{fieldName}' not found or is not a form field.");
-                return;
-            }
+                // Set border width – Border.Width expects an integer value
+                field.Border = new Border(field) { Width = 2 };
 
-            // Corporate style: 2‑point solid blue border.
-            // For form fields the Border property expects an Aspose.Pdf.Annotations.Border instance.
-            // The Border constructor requires the parent annotation (the field itself).
-            field.Border = new Border(field) { Width = 2 }; // Width is an int, not a float
-            // Border colour is defined by the field's own Color property, not by BorderInfo.
-            field.Color = Aspose.Pdf.Color.Blue;
+                // Set border colour – colour is controlled by the field's own Color property
+                field.Color = Color.FromRgb(0, 0, 255); // corporate blue
+
+                // Optional: set other visual properties, e.g., background colour
+                // field.BackgroundColor = Color.FromRgb(255, 255, 255);
+            }
+            else
+            {
+                Console.WriteLine($"Form field '{fieldName}' not found or not a TextBoxField.");
+            }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Form field '{fieldName}' styled and saved to '{outputPath}'.");
+        Console.WriteLine($"Styled PDF saved to '{outputPath}'.");
     }
 }

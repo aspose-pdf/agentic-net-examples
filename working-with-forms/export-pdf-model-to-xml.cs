@@ -1,44 +1,64 @@
 using System;
 using System.IO;
+using System.Xml;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // for Pdf3DCrossSection if needed
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        // Directory containing the PDF file.
-        string dataDir = "YOUR_DATA_DIRECTORY";
+        const string inputPdf = "input.pdf";
+        const string outputXml = "visibility.xml";
 
-        // Input PDF and output XML paths.
-        string pdfPath = Path.Combine(dataDir, "input.pdf");
-        string xmlPath = Path.Combine(dataDir, "output.xml");
-
-        // Verify the input file exists.
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document.
-        using (Document pdfDoc = new Document(pdfPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // OPTIONAL: Adjust visibility of 3‑D cross‑section annotations.
-            // This demonstrates accessing the Visibility property.
-            // foreach (var annotation in pdfDoc.Pages[1].Annotations)
-            // {
-            //     if (annotation is Pdf3DCrossSection crossSection)
-            //     {
-            //         crossSection.Visibility = true; // or false as required
-            //     }
-            // }
+            // Verify that the PDF is tagged by checking TaggedContent for null
+            if (doc.TaggedContent == null)
+            {
+                Console.WriteLine("PDF is not tagged. No conditional visibility information available.");
+                return;
+            }
 
-            // Save the document model to XML, preserving all state (including visibility).
-            XmlSaveOptions saveOptions = new XmlSaveOptions();
-            pdfDoc.Save(xmlPath, saveOptions);
+            ITaggedContent tagged = doc.TaggedContent;
+            StructureElement root = tagged.RootElement;
+
+            // Collect all structure elements (replace with real visibility logic as needed)
+            var allElements = root.FindElements<StructureElement>(true);
+
+            // Write visibility state to XML
+            using (XmlWriter writer = XmlWriter.Create(outputXml, new XmlWriterSettings { Indent = true }))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("VisibilitySettings");
+
+                foreach (StructureElement element in allElements)
+                {
+                    // Example identifier – replace with actual element ID if available
+                    string id = element.GetHashCode().ToString();
+
+                    // Placeholder visibility – replace with actual conditional visibility retrieval
+                    bool isVisible = true;
+
+                    writer.WriteStartElement("Element");
+                    writer.WriteAttributeString("id", id);
+                    writer.WriteAttributeString("visible", isVisible.ToString().ToLower());
+                    writer.WriteEndElement();
+                }
+
+                writer.WriteEndElement(); // VisibilitySettings
+                writer.WriteEndDocument();
+            }
+
+            Console.WriteLine($"Conditional visibility exported to '{outputXml}'.");
         }
-
-        Console.WriteLine($"Document model exported to XML: {xmlPath}");
     }
 }

@@ -1,39 +1,70 @@
 using System;
 using System.IO;
+using System.Xml.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Local PDF file containing the AcroForm
-        const string pdfPath = @"C:\Input\sample.pdf";
+        // Local PDF file to process
+        const string pdfPath = @"C:\Docs\input.pdf";
 
-        // Destination UNC path on the network share where the XFDF (XML) will be saved
-        const string xfdfPath = @"\\NetworkShare\AcroFormData\sample.xfdf";
+        // UNC network share where the XML will be saved
+        const string xmlNetworkPath = @"\\fileserver\shared\AcroFormData.xml";
 
-        // Verify the source PDF exists
+        // Validate input PDF existence
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
+        // Ensure the target directory on the network share exists
         try
         {
-            // Load the PDF document (wrapped in using for deterministic disposal)
-            using (Document pdfDoc = new Document(pdfPath))
-            {
-                // Export all form annotations (AcroForm data) to an XFDF file.
-                // XFDF is an XML representation of the form fields.
-                pdfDoc.ExportAnnotationsToXfdf(xfdfPath);
-            }
+            string? networkDir = Path.GetDirectoryName(xmlNetworkPath);
+            if (string.IsNullOrEmpty(networkDir))
+                throw new InvalidOperationException("Invalid network path.");
 
-            Console.WriteLine($"AcroForm data successfully exported to: {xfdfPath}");
+            if (!Directory.Exists(networkDir))
+                Directory.CreateDirectory(networkDir);
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during export: {ex.Message}");
+            Console.Error.WriteLine($"Failed to prepare network directory: {ex.Message}");
+            return;
         }
+
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(pdfPath))
+        {
+            // Check whether the PDF contains an AcroForm
+            if (doc.Form == null || doc.Form.Count == 0)
+            {
+                Console.WriteLine("No AcroForm fields found in the PDF.");
+                return;
+            }
+
+            // Build an XML representation of the form fields
+            XDocument xmlDoc = new XDocument(new XElement("AcroForm"));
+            XElement root = xmlDoc.Root!;
+
+            foreach (Field field in doc.Form.Fields)
+            {
+                string name = field.Name ?? field.FullName ?? string.Empty;
+                string value = field.Value?.ToString() ?? string.Empty;
+                XElement fieldElement = new XElement("Field",
+                    new XAttribute("name", name),
+                    new XAttribute("value", value));
+                root.Add(fieldElement);
+            }
+
+            // Save the XML to the network share
+            xmlDoc.Save(xmlNetworkPath);
+        }
+
+        Console.WriteLine($"AcroForm XML exported to: {xmlNetworkPath}");
     }
 }

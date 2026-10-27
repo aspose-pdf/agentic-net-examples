@@ -17,31 +17,33 @@ class Program
             return;
         }
 
-        // Load the PDF document (standard load rule)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // The Form indexer returns a WidgetAnnotation; cast it to Field to access form‑specific members
-            Field? field = doc.Form["myField"] as Field;
-            if (field == null)
+            // Retrieve the form field by its name (replace "myField" with the actual field name)
+            if (doc.Form["myField"] is TextBoxField field)
             {
-                Console.Error.WriteLine("Form field 'myField' not found or is not a form field.");
-                return;
+                // JavaScript that runs when the field loses focus (OnBlur event)
+                // Example: calculate the sum of two other fields (fieldA and fieldB) and set the result in this field
+                string jsCode = @"
+                    var a = this.getField('fieldA').value;
+                    var b = this.getField('fieldB').value;
+                    var sum = Number(a) + Number(b);
+                    this.getField('myField').value = sum;
+                ";
+
+                // Assign the JavaScript action to the OnLostFocus event (blur)
+                field.Actions.OnLostFocus = new JavascriptAction(jsCode);
+            }
+            else
+            {
+                Console.Error.WriteLine("Form field 'myField' not found or is not a TextBoxField.");
             }
 
-            // JavaScript that runs when the field loses focus – doubles the numeric value
-            string jsCode = @"
-                var val = parseFloat(event.target.value);
-                if (!isNaN(val)) {
-                    event.target.value = (val * 2).toString();
-                }
-            ";
-
-            field.Actions.OnLostFocus = new JavascriptAction(jsCode);
-
-            // Save the modified PDF (standard save rule)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with JavaScript action: {outputPath}");
+        Console.WriteLine($"PDF saved with JavaScript action to '{outputPath}'.");
     }
 }

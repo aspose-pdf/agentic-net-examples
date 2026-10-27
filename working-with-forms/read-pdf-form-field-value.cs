@@ -7,16 +7,20 @@ class Program
 {
     static void Main()
     {
+        // Path to the PDF containing the form
         const string pdfPath = "input.pdf";
+
+        // Name of the form field to extract
         const string fieldName = "myField";
 
+        // Verify the file exists before proceeding
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for proper disposal)
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(pdfPath))
         {
             // The Form indexer returns a WidgetAnnotation; cast it to Field.
@@ -24,13 +28,14 @@ class Program
 
             if (field == null)
             {
-                Console.WriteLine($"Field \"{fieldName}\" not found in the document.");
+                Console.WriteLine($"Form field '{fieldName}' not found.");
                 return;
             }
 
-            // Get the field's value and write it to the console.
-            string value = field.Value?.ToString() ?? string.Empty;
-            Console.WriteLine($"Field \"{fieldName}\" value: {value}");
+            // The Value property holds the field's data for all field types.
+            string fieldValue = field.Value?.ToString() ?? string.Empty;
+
+            Console.WriteLine($"Field '{fieldName}' value: {fieldValue}");
         }
     }
 }

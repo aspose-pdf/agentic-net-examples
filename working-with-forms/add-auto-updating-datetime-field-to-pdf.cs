@@ -8,44 +8,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";      // existing PDF
-        const string outputPath = "output.pdf";     // PDF with date/time field
+        const string outputPath = "DateTimeField.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the output directory exists
+        string outputDir = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
+
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a single page (pages are 1‑based)
+            Page page = doc.Pages.Add();
 
-        // Load the PDF document (using statement ensures proper disposal)
-        using (Document doc = new Document(inputPath))
-        {
-            // Define the rectangle where the field will appear (left, bottom, right, top)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 300, 750);
+            // Define the rectangle where the field will appear (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 700, 300, 730);
 
-            // Create a DateField on the first page
-            DateField dateField = new DateField(doc.Pages[1], rect)
-            {
-                PartialName = "CurrentDateTime",          // field name (used in JavaScript)
-                DateFormat  = "dd/MM/yyyy HH:mm:ss",     // display format
-                Value       = DateTime.Now                // initial value
-            };
+            // Create a text box form field that will hold the date/time
+            TextBoxField dateTimeField = new TextBoxField(page, fieldRect);
+            dateTimeField.PartialName = "DateTimeField";
+            dateTimeField.Value = "Loading..."; // placeholder, will be overwritten by JavaScript
 
-            // Add the field to the document's form
-            doc.Form.Add(dateField);
+            // Set visual appearance – border (background color is not supported on TextBoxField in older versions)
+            dateTimeField.Border = new Border(dateTimeField) { Width = 1, Style = BorderStyle.Solid };
+            // Optional: set border color if desired
+            // dateTimeField.Color = Aspose.Pdf.Color.LightGray;
 
-            // JavaScript to update the field each time the PDF is opened
-            // The script sets the field's value to the current date/time of the viewer
-            string jsCode = "this.getField('CurrentDateTime').value = new Date().toString();";
-            JavascriptAction jsAction = new JavascriptAction(jsCode);
+            // Add the field to the document's form collection
+            doc.Form.Add(dateTimeField);
 
-            // Attach the script to the document's OpenAction (executed on each view)
-            doc.OpenAction = jsAction;
+            // JavaScript that runs when the document is opened.
+            // It sets the field's value to the current date and time.
+            string js = "this.getField('DateTimeField').value = util.printd('mm/dd/yyyy HH:MM:ss', new Date());";
 
-            // Save the modified PDF
+            // Attach the JavaScript to the document's OpenAction (the correct way to add document‑level JavaScript)
+            doc.OpenAction = new JavascriptAction(js);
+
+            // Save the PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with auto‑updating date/time field saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with dynamic date/time field saved to '{outputPath}'.");
     }
 }

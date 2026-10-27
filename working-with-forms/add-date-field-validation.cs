@@ -1,53 +1,58 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations; // JavascriptAction lives here
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "DateFieldValidated.pdf";
+        const string inputPdf = "form_with_datepicker.pdf";
+        const string outputPdf = "form_with_datepicker_validated.pdf";
+        const string fieldName = "DatePicker"; // name of the date picker field in the PDF
 
-        // Create a new PDF document and add a blank page
-        using (Document doc = new Document())
+        if (!File.Exists(inputPdf))
         {
-            doc.Pages.Add();
-
-            // Define the rectangle where the date field will be placed
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 630);
-
-            // Create the DateField on the first page
-            DateField dateField = new DateField(doc.Pages[1], rect);
-            dateField.Name = "myDate";
-            dateField.AlternateName = "Select a date";
-            dateField.DateFormat = "dd/MM/yyyy"; // default format
-            dateField.Value = new DateTime(2023, 1, 1); // default value
-
-            // Add JavaScript validation to prevent dates earlier than 01/01/2000
-            // The script runs when the field loses focus (OnLostFocus event)
-            string js = @"
-Date minDate = new Date('2000-01-01');
-var fieldVal = this.getField('myDate').value;
-if (fieldVal) {
-    var enteredDate = util.scand('dd/MM/yyyy', fieldVal);
-    if (enteredDate < minDate) {
-        app.alert('Date must be on or after January 1, 2000.');
-        this.getField('myDate').value = '';
-    }
-}
-";
-            // Assign the JavaScript action to the OnLostFocus event
-            dateField.Actions.OnLostFocus = new JavascriptAction(js);
-
-            // Add the field to the document's form collection
-            doc.Form.Add(dateField);
-
-            // Save the PDF
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
         }
 
-        Console.WriteLine($"PDF with validated DateField saved to '{outputPath}'.");
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
+        {
+            // Locate the form field by name
+            var field = doc.Form[fieldName];
+            if (field == null)
+            {
+                Console.Error.WriteLine($"Field \"{fieldName}\" not found in the document.");
+                return;
+            }
+
+            // JavaScript validation script that rejects dates earlier than 2000-01-01.
+            string jsValidate = @"
+                // Convert the entered value to a Date object.
+                var entered = util.scand('yyyy-mm-dd', event.value);
+                var minDate = new Date(2000, 0, 1); // January is month 0
+                if (entered < minDate) {
+                    app.alert('Date must be on or after January 1, 2000.');
+                    event.rc = false; // reject the value
+                }";
+
+            // Assign the JavaScript to the OnValidate action.
+            field.Actions.OnValidate = new JavascriptAction(jsValidate);
+
+            // Set a default value that complies with the rule.
+            // Use TextBoxField (or any field that supports a string value) because DateTimeField may not be available in all SDK versions.
+            if (field is TextBoxField txtField)
+            {
+                txtField.Value = "2000-01-01";
+            }
+
+            // Save the modified PDF.
+            doc.Save(outputPdf);
+        }
+
+        Console.WriteLine($"Validated PDF saved to \"{outputPdf}\".");
     }
 }

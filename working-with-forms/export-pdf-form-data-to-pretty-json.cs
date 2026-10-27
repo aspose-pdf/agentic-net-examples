@@ -1,34 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using System.Text.Json;
+using Aspose.Pdf;               // Core PDF API
+using Aspose.Pdf.Forms;        // For Form handling
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "formdata.json";
+        const string inputPdf = "input.pdf";          // PDF containing form fields
+        const string outputJson = "formData.json";    // Destination JSON file
+        const string tempJson = "tempFormData.json"; // Intermediate file (raw export)
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Error: File not found – {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block to ensure deterministic disposal
         using (Document doc = new Document(inputPdf))
         {
-            // Set up export options to enable pretty‑printing (indented JSON)
-            ExportFieldsToJsonOptions jsonOptions = new ExportFieldsToJsonOptions
-            {
-                WriteIndented = true
-            };
-
-            // Export all form fields to a JSON file with the specified options
-            doc.Form.ExportToJson(outputJson, jsonOptions);
+            // Export the form data to a temporary JSON file using the default (compact) format
+            doc.Form.ExportToJson(tempJson);
         }
 
-        Console.WriteLine($"Form data exported to '{outputJson}'.");
+        // Read the raw JSON, re‑serialize it with indentation for pretty‑printing, and write the final file
+        string rawJson = File.ReadAllText(tempJson);
+        using (JsonDocument doc = JsonDocument.Parse(rawJson))
+        {
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string prettyJson = JsonSerializer.Serialize(doc.RootElement, options);
+            File.WriteAllText(outputJson, prettyJson);
+        }
+
+        // Clean up the temporary file
+        if (File.Exists(tempJson))
+        {
+            File.Delete(tempJson);
+        }
+
+        Console.WriteLine($"Form data exported to '{outputJson}' with pretty‑printing.");
     }
 }

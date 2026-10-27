@@ -1,46 +1,65 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "multiselect_listbox.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document and add a page
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Define the rectangle for the ListBox field (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Replace "myListBox" with the actual name of the list box field in the PDF
+            const string listBoxName = "myListBox";
 
-            // Create the ListBox field on the page
-            ListBoxField listBox = new ListBoxField(page, rect);
+            // Retrieve the list box field from the form collection
+            ListBoxField listBox = doc.Form[listBoxName] as ListBoxField;
 
-            // Enable multiselection
+            if (listBox == null)
+            {
+                Console.Error.WriteLine($"List box field '{listBoxName}' not found.");
+                return;
+            }
+
+            // Ensure the field is configured for multiple selection
             listBox.MultiSelect = true;
 
-            // Add options to the list box
-            listBox.AddOption("Option A");
-            listBox.AddOption("Option B");
-            listBox.AddOption("Option C");
-            listBox.AddOption("Option D");
+            // Clear any existing selections by assigning an empty array
+            listBox.SelectedItems = new int[0];
 
-            // Select multiple items (indices are 1‑based)
-            // Here we select "Option A", "Option C", and "Option D"
-            listBox.SelectedItems = new int[] { 1, 3, 4 };
+            // Desired values to be selected (they must exist in the field's Options collection)
+            string[] valuesToSelect = { "Option1", "Option3", "Option5" };
 
-            // Add the field to the document's form collection
-            doc.Form.Add(listBox);
+            // Determine the indices of the desired values using the Options collection
+            List<int> selectedIndices = new List<int>();
+            for (int i = 0; i < listBox.Options.Count; i++)
+            {
+                var option = listBox.Options[i];
+                if (valuesToSelect.Contains(option.Value))
+                {
+                    selectedIndices.Add(i);
+                }
+            }
 
-            // Save the PDF
+            // Apply the selections
+            listBox.SelectedItems = selectedIndices.ToArray();
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with multiselect ListBox saved to '{outputPath}'.");
+        Console.WriteLine($"Multi-select list box populated and saved to '{outputPath}'.");
     }
 }

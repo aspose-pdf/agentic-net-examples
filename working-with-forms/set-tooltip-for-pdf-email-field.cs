@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,15 +16,16 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the existing field named "Email"
-            // The Form indexer returns a generic Field; cast to TextBoxField to access tooltip property
-            if (doc.Form["Email"] is TextBoxField emailField)
+            // Retrieve the form field named "Email"
+            TextBoxField emailField = doc.Form["Email"] as TextBoxField;
+            if (emailField != null)
             {
-                // Set the tooltip (alternate name) that appears in Adobe Acrobat
-                emailField.AlternateName = "Enter email in format user@example.com";
+                // Set tooltip (popup text) to guide users on the required input format
+                // The Tooltip property is not available in this version; use the Contents property instead.
+                emailField.Contents = "Enter a valid email address (e.g., user@example.com)";
             }
             else
             {
@@ -35,6 +36,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with tooltip set: {outputPath}");
+        Console.WriteLine($"PDF saved with tooltip to '{outputPath}'.");
     }
 }

@@ -8,10 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string originalFieldName = "TextField1";
-        const int copies = 5;
-        const double verticalOffset = 20; // shift each copy down by 20 units
+        const string outputPath = "output_duplicated_fields.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,40 +16,41 @@ class Program
             return;
         }
 
-        // Load the PDF with a form
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the field to be duplicated
-            Field originalField = doc.Form[originalFieldName] as Field;
-            if (originalField == null)
+            // Page that contains the original field – required for the field constructor
+            Page page = doc.Pages[1];
+
+            // Retrieve the existing field; the Form indexer returns a WidgetAnnotation
+            TextBoxField? existingField = doc.Form["Field1"] as TextBoxField;
+            if (existingField == null)
             {
-                Console.Error.WriteLine($"Field '{originalFieldName}' not found.");
+                Console.Error.WriteLine("Field 'Field1' not found or is not a TextBoxField.");
                 return;
             }
 
-            // Store original rectangle and page number (1‑based)
-            Aspose.Pdf.Rectangle origRect = originalField.Rect;
-            int pageNumber = originalField.PageIndex;
-
-            // Create copies
-            for (int i = 1; i <= copies; i++)
+            const int duplicateCount = 5;
+            for (int i = 1; i <= duplicateCount; i++)
             {
-                string newName = $"{originalFieldName}_Copy{i}";
+                string newFieldName = $"Field1_Copy{i}";
+                Aspose.Pdf.Rectangle rect = existingField.Rect;
 
-                // Add a copy of the field; this creates a new field instance
-                Field copy = doc.Form.Add(originalField, newName, pageNumber);
+                // Correct constructor signature: (Page, Rectangle)
+                TextBoxField newField = new TextBoxField(page, rect)
+                {
+                    PartialName = newFieldName,
+                    Value = existingField.Value,
+                    // Use the property that exists in the target version. If IsReadOnly is unavailable, ReadOnly is the alternative.
+                    ReadOnly = existingField.ReadOnly,
+                    Border = existingField.Border
+                    // BackgroundColor is not available in this version of Aspose.Pdf, so it is omitted.
+                };
 
-                // Adjust position of the copy (optional)
-                Aspose.Pdf.Rectangle newRect = new Aspose.Pdf.Rectangle(
-                    origRect.LLX,
-                    origRect.LLY - i * verticalOffset,
-                    origRect.URX,
-                    origRect.URY - i * verticalOffset);
-
-                copy.Rect = newRect;
+                // Add the duplicated field to the document's form collection
+                doc.Form.Add(newField);
             }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

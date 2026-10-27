@@ -2,68 +2,63 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "template.pdf";   // existing PDF or blank PDF
-        const string outputPath = "localized.pdf";
+        const string outputPath = "LocalizedLabel.pdf";
 
-        // Ensure the input PDF exists; if not, create a simple one
-        if (!File.Exists(inputPath))
+        using (Document doc = new Document())
         {
-            using (Document blank = new Document())
-            {
-                // Add a single page
-                blank.Pages.Add();
-                // Add a textbox field that will display the translated label
-                TextBoxField labelField = new TextBoxField(blank.Pages[1], new Rectangle(100, 700, 300, 750))
-                {
-                    PartialName = "LabelField",
-                    Value = "" // initial empty value
-                };
-                blank.Form.Add(labelField);
-                blank.Save(inputPath);
-            }
-        }
+            // Add a single page to the document
+            Page page = doc.Pages.Add();
 
-        // Load the PDF, add JavaScript dictionary and locale handling
-        using (Document doc = new Document(inputPath))
-        {
-            // 1. Add a JavaScript dictionary of translations
-            // The dictionary maps locale codes to the text that should appear in the label field.
-            string translationScript = @"
+            // Create a combo box for selecting the locale (en, fr, es)
+            ComboBoxField localeField = new ComboBoxField(page, new Aspose.Pdf.Rectangle(100, 700, 200, 730));
+            localeField.PartialName = "locale";
+            // Populate the combo box using AddOption (Option class has no public ctor)
+            localeField.AddOption("en");
+            localeField.AddOption("fr");
+            localeField.AddOption("es");
+            localeField.Value = "en"; // default selection
+            doc.Form.Add(localeField);
+
+            // Create a read‑only text field that will display the translated label
+            TextBoxField labelField = new TextBoxField(page, new Aspose.Pdf.Rectangle(100, 650, 300, 680));
+            labelField.PartialName = "myLabel";
+            labelField.ReadOnly = true;
+            doc.Form.Add(labelField);
+
+            // JavaScript dictionary and helper function to update the label based on the selected locale
+            string js = @"
 var translations = {
     'en': 'Hello',
     'fr': 'Bonjour',
-    'es': 'Hola',
-    'de': 'Hallo'
+    'es': 'Hola'
 };
 
-function setLocale(lang) {
-    var txt = translations[lang] || '';
-    // 'LabelField' is the name of the textbox field added earlier
-    this.getField('LabelField').value = txt;
+function updateLabel() {
+    var locale = this.getField('locale').value;
+    var text = translations[locale] || '';
+    this.getField('myLabel').value = text;
 }
+
+// Execute on document open
+updateLabel();
+
+// Attach the function to the combo box change event
+this.getField('locale').setAction('MouseUp', 'updateLabel();');
 ";
 
-            // Add the script to the document's JavaScript collection
-            // Use fully qualified type name to avoid ambiguity.
-            Aspose.Pdf.JavaScriptCollection js = doc.JavaScript;
-            js["Translations"] = translationScript;
+            // Assign the script to the document's OpenAction so it runs when the PDF is opened
+            doc.OpenAction = new JavascriptAction(js);
 
-            // 2. Add a document‑open action that sets a default locale (e.g., English)
-            js["DocOpen"] = "setLocale('en');";
-
-            // 3. (Optional) expose a function that can be called from external tools to change locale
-            // This can be invoked via PDF viewers that support JavaScript.
-            js["ChangeLocale"] = "function ChangeLocale(lang) { setLocale(lang); }";
-
-            // Save the modified PDF
+            // Save the PDF; Document.Save(string) writes a PDF regardless of extension
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with JavaScript dictionary saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

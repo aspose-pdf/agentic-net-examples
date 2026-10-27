@@ -1,52 +1,63 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations; // for JavascriptAction
 
 class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string listBoxName = "myListBox"; // name of the list box field in the PDF
 
-        // Ensure the input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Open the existing PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Create a rectangle for the list box (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+            // Retrieve the list box field from the form collection using the Fields collection
+            var listBox = doc.Form?.Fields?
+                .FirstOrDefault(f => string.Equals(f.Name, listBoxName, StringComparison.Ordinal))
+                as ListBoxField;
 
-            // Add a ListBox field to the first page
-            ListBoxField listBox = new ListBoxField(doc.Pages[1], rect);
+            if (listBox != null)
+            {
+                // Ensure the list box allows multiple selections
+                listBox.MultiSelect = true;
 
-            // Enable multi‑selection
-            listBox.MultiSelect = true;
-
-            // Add options to the list box
-            listBox.AddOption("Option 1");
-            listBox.AddOption("Option 2");
-            listBox.AddOption("Option 3");
-            listBox.AddOption("Option 4");
-            listBox.AddOption("Option 5");
-
-            // Set the selected items (indices are 1‑based). Limit to three selections.
-            listBox.SelectedItems = new int[] { 1, 2, 3 };
-
-            // Add the field to the page's annotations collection
-            doc.Pages[1].Annotations.Add(listBox);
+                // Set the maximum number of selectable items to three.
+                // The property is called MaxSelection in newer versions; for older versions we set it via reflection.
+                const int maxSelection = 3;
+                PropertyInfo maxSelProp = listBox.GetType().GetProperty("MaxSelection", BindingFlags.Public | BindingFlags.Instance);
+                if (maxSelProp != null && maxSelProp.CanWrite)
+                {
+                    maxSelProp.SetValue(listBox, maxSelection);
+                }
+                else
+                {
+                    // Fallback: add a simple JavaScript validation that limits the selection count.
+                    string js = $"if (event.target.value.split(',').length > {maxSelection}) {{ app.alert('Maximum {maxSelection} items can be selected.'); event.target.value = event.target.value.split(',').slice(0,{maxSelection}).join(','); }}";
+                    // OnValidate expects a PdfAction; use JavascriptAction to wrap the script.
+                    listBox.Actions.OnValidate = new JavascriptAction(js);
+                }
+            }
+            else
+            {
+                Console.Error.WriteLine($"List box field '{listBoxName}' not found.");
+            }
 
             // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with a multi‑select list box (max 3 selections) to '{outputPdf}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

@@ -1,45 +1,44 @@
 using System;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms; // retained for potential future form work, does not violate namespace rules
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document and ensure proper disposal
+        const string outputPath = "form_with_attachment.pdf";
+
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page (1‑based indexing)
+            // Add a blank page to host the attachment annotation
             Page page = doc.Pages.Add();
 
-            // Define the rectangle for the file‑select field
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
+            // Define the rectangle where the file attachment annotation will appear
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Use a TextBoxField to let the user type (or paste) a file path.
-            // FileSelectBoxField has no public constructor, so we emulate the behaviour.
-            TextBoxField fileField = new TextBoxField(page, fieldRect);
-            fileField.PartialName = "PdfAttachment";
-            fileField.Required = true;
+            // Create a placeholder FileSpecification – the actual file will be chosen by the user at runtime
+            // The constructor (filePath, description) is the correct way; an empty path means "no file yet"
+            FileSpecification fileSpec = new FileSpecification(string.Empty, "PDF attachment");
 
-            // Add JavaScript validation to allow only PDF files.
-            // The script runs when the field loses focus (OnValidate).
-            string js = @"if (event.value != null && event.value.length > 0) {
-    var ext = event.value.substr(event.value.length - 4).toLowerCase();
-    if (ext != '.pdf') {
-        app.alert('Only PDF files are allowed.');
-        event.rc = false; // reject the value
-    }
-}";
-            fileField.Actions.OnValidate = new JavascriptAction(js);
+            // Create the file attachment annotation (the visual representation on the page)
+            FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec)
+            {
+                // Use the FileIcon enum (not a non‑existent FileAttachmentIcon enum)
+                Icon = FileIcon.Paperclip,
+                Title = "PDF Attachment",
+                // Optional tooltip that can hint the allowed file type
+                Contents = "Attach a PDF document only."
+            };
 
-            // Add the field to the document's form on page 1
-            doc.Form.Add(fileField, 1);
+            // Add the annotation to the page's annotation collection
+            page.Annotations.Add(attachment);
 
             // Save the PDF form
-            doc.Save("PdfAttachmentForm.pdf");
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF form with PDF‑only file attachment field created successfully.");
+        Console.WriteLine($"PDF form with file attachment field saved to '{outputPath}'.");
     }
 }

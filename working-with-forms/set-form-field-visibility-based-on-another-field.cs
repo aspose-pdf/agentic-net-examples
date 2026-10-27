@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations; // Needed for AnnotationFlags
 
 class Program
 {
@@ -17,53 +17,38 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Names of the fields
-            const string sourceFieldName = "sourceField"; // field whose value controls visibility
-            const string targetFieldName = "targetField"; // field to be shown/hidden
+            // Source field whose value determines visibility (e.g., a checkbox named "ShowDetails")
+            CheckboxField sourceField = doc.Form["ShowDetails"] as CheckboxField;
 
-            // Retrieve the source and target fields (they are returned as WidgetAnnotation, so cast to Field)
-            Field sourceField = (Field)doc.Form[sourceFieldName];
-            if (sourceField == null)
+            // Target field whose visibility will be changed (e.g., a text box named "Details")
+            TextBoxField targetField = doc.Form["Details"] as TextBoxField;
+
+            if (sourceField != null && targetField != null)
             {
-                Console.Error.WriteLine($"Source field '{sourceFieldName}' not found.");
-                return;
+                // If the checkbox is checked, make the target field visible; otherwise hide it
+                bool isChecked = sourceField.Checked;
+
+                // Form fields are widget annotations; they inherit the Flags property from Annotation.
+                // Use AnnotationFlags.Hidden to control visibility.
+                if (isChecked)
+                {
+                    // Remove the Hidden flag to show the field
+                    targetField.Flags &= ~AnnotationFlags.Hidden;
+                }
+                else
+                {
+                    // Add the Hidden flag to hide the field
+                    targetField.Flags |= AnnotationFlags.Hidden;
+                }
             }
-
-            Field targetField = (Field)doc.Form[targetFieldName];
-            if (targetField == null)
-            {
-                Console.Error.WriteLine($"Target field '{targetFieldName}' not found.");
-                return;
-            }
-
-            // JavaScript that toggles the visibility of the target field based on the source field's value.
-            string js = $@"
-if (event.value == 'Yes')
-{{
-    this.getField('{targetFieldName}').display = display.visible;
-}}
-else
-{{
-    this.getField('{targetFieldName}').display = display.hidden;
-}}
-";
-
-            // Attach the JavaScript to the source field's OnCalculate action (the valid trigger for value‑change scripts).
-            sourceField.Actions.OnCalculate = new JavascriptAction(js);
-
-            // Optionally set the initial visibility of the target field when the document is opened.
-            // This can be done with a separate JavaScript on the document level or by evaluating the current value now.
-            bool initiallyVisible = string.Equals(sourceField.Value?.ToString(), "Yes", StringComparison.OrdinalIgnoreCase);
-            // Use a HideAction on the target field to set its initial state.
-            targetField.Actions.OnCalculate = new HideAction(targetFieldName, !initiallyVisible);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

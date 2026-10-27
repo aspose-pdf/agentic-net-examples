@@ -1,7 +1,8 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
 
 class Program
@@ -10,68 +11,109 @@ class Program
     {
         const string sourcePdfPath = "source.pdf";
         const string targetPdfPath = "target.pdf";
-        const string xfdfPath = "formData.xfdf";
-        const string outputPdfPath = "target_synced.pdf";
+        const string outputPdfPath = "target_filled.pdf";
+        const string xmlDataPath   = "formData.xml";
 
-        // ------------------------------------------------------------
-        // 1. Create a source PDF that contains a form field with a value.
-        // ------------------------------------------------------------
-        using (Document sourceDoc = new Document())
+        // Verify input files exist
+        if (!File.Exists(sourcePdfPath))
         {
-            Page page = sourceDoc.Pages.Add();
-            // Create a text box field named "NameField" and set an initial value.
-            TextBoxField sourceField = new TextBoxField(page, new Rectangle(100, 600, 300, 650))
-            {
-                PartialName = "NameField",
-                Value = "John Doe"
-            };
-            sourceDoc.Form.Add(sourceField);
-            sourceDoc.Save(sourcePdfPath);
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            return;
+        }
+        if (!File.Exists(targetPdfPath))
+        {
+            Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // 2. Create a target PDF that has the same field name but no value.
-        // ------------------------------------------------------------
-        using (Document targetDoc = new Document())
+        try
         {
-            Page page = targetDoc.Pages.Add();
-            TextBoxField targetField = new TextBoxField(page, new Rectangle(100, 600, 300, 650))
+            // Export form data from the source PDF to an XML file
+            using (Document sourceDoc = new Document(sourcePdfPath))
             {
-                PartialName = "NameField",
-                Value = "" // empty value – will be filled from XFDF
-            };
-            targetDoc.Form.Add(targetField);
-            targetDoc.Save(targetPdfPath);
-        }
-
-        // ------------------------------------------------------------
-        // 3. Export the form data (as XFDF) from the source PDF.
-        // ------------------------------------------------------------
-        using (Document sourceDoc = new Document(sourcePdfPath))
-        {
-            sourceDoc.ExportAnnotationsToXfdf(xfdfPath);
-        }
-
-        // ------------------------------------------------------------
-        // 4. Import the XFDF data into the target PDF and save the result.
-        // ------------------------------------------------------------
-        using (Document targetDoc = new Document(targetPdfPath))
-        {
-            using (FileStream xfdfStream = File.OpenRead(xfdfPath))
-            {
-                XfdfReader.ReadFields(xfdfStream, targetDoc);
+                if (sourceDoc.Form == null || sourceDoc.Form.Fields.Count() == 0)
+                {
+                    Console.WriteLine("Source PDF contains no form fields to export.");
+                }
+                else
+                {
+                    ExportFormDataToXml(sourceDoc, xmlDataPath);
+                    Console.WriteLine($"Form data exported to XML: {xmlDataPath}");
+                }
             }
-            targetDoc.Save(outputPdfPath);
-        }
 
-        // ------------------------------------------------------------
-        // 5. Clean‑up temporary XFDF file.
-        // ------------------------------------------------------------
-        if (File.Exists(xfdfPath))
+            // Import the XML form data into the target PDF and save the result
+            using (Document targetDoc = new Document(targetPdfPath))
+            {
+                if (targetDoc.Form == null || targetDoc.Form.Fields.Count() == 0)
+                {
+                    Console.WriteLine("Target PDF contains no form fields to import into.");
+                }
+                else
+                {
+                    ImportFormDataFromXml(targetDoc, xmlDataPath);
+                    Console.WriteLine("Form data imported into target PDF.");
+                }
+
+                // Save the updated PDF
+                targetDoc.Save(outputPdfPath);
+                Console.WriteLine($"Updated PDF saved to: {outputPdfPath}");
+            }
+
+            // Clean up temporary XML file
+            if (File.Exists(xmlDataPath))
+            {
+                File.Delete(xmlDataPath);
+            }
+        }
+        catch (Exception ex)
         {
-            File.Delete(xfdfPath);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
+    }
 
-        Console.WriteLine($"Form data synchronized. Output saved to '{outputPdfPath}'.");
+    /// <summary>
+    /// Serialises all form fields of a PDF document to a simple XML structure.
+    /// </summary>
+    private static void ExportFormDataToXml(Document doc, string xmlPath)
+    {
+        var root = new XElement("FormData");
+        foreach (Field field in doc.Form.Fields)
+        {
+            // Use FullName if Name is null (some fields expose FullName only)
+            string fieldName = field.Name ?? field.FullName ?? string.Empty;
+            string fieldValue = field.Value?.ToString() ?? string.Empty;
+            var fieldElement = new XElement("Field",
+                new XAttribute("Name", fieldName),
+                new XAttribute("Value", fieldValue));
+            root.Add(fieldElement);
+        }
+        var docXml = new XDocument(root);
+        docXml.Save(xmlPath);
+    }
+
+    /// <summary>
+    /// Deserialises form field values from the XML created by ExportFormDataToXml and applies them to the PDF document.
+    /// </summary>
+    private static void ImportFormDataFromXml(Document doc, string xmlPath)
+    {
+        if (!File.Exists(xmlPath))
+            throw new FileNotFoundException("XML data file not found.", xmlPath);
+
+        var docXml = XDocument.Load(xmlPath);
+        foreach (XElement fieldElement in docXml.Root.Elements("Field"))
+        {
+            string name = fieldElement.Attribute("Name")?.Value;
+            string value = fieldElement.Attribute("Value")?.Value ?? string.Empty;
+            if (string.IsNullOrEmpty(name))
+                continue;
+
+            // The Form indexer returns a WidgetAnnotation; cast it to Field safely.
+            Field? pdfField = doc.Form[name] as Field;
+            if (pdfField != null)
+            {
+                pdfField.Value = value;
+            }
+        }
     }
 }

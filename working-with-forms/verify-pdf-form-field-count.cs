@@ -1,13 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const int expectedFieldCount = 5; // adjust to the expected number of form fields
+        const string outputPath = "output_filled.pdf";
+        const int expectedFormCount = 5; // adjust as needed
 
         if (!File.Exists(inputPath))
         {
@@ -15,30 +17,33 @@ class Program
             return;
         }
 
-        try
+        // Ensure the Document is disposed properly
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            // Verify the number of form fields
+            int actualCount = doc.Form.Count;
+            Console.WriteLine($"Form fields found: {actualCount}");
+
+            if (actualCount != expectedFormCount)
             {
-                // Verify the number of form fields
-                int actualCount = doc.Form.Count;
-                Console.WriteLine($"Form fields found: {actualCount}");
-
-                if (actualCount != expectedFieldCount)
-                {
-                    Console.Error.WriteLine($"Unexpected number of form fields. Expected {expectedFieldCount}, but found {actualCount}.");
-                    return;
-                }
-
-                // Proceed with further processing now that the count is verified
-                Console.WriteLine("Form field count verification passed.");
-                // Example processing could be added here
-                // doc.Save("processed.pdf"); // Save if needed
+                Console.Error.WriteLine($"Unexpected form field count. Expected {expectedFormCount}, but found {actualCount}.");
+                // Abort further processing if the count is not as expected
+                return;
             }
+
+            // Example processing: set a default value for each text box field
+            foreach (Field field in doc.Form)
+            {
+                if (field is TextBoxField txtField)
+                {
+                    txtField.Value = "Sample Text";
+                }
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

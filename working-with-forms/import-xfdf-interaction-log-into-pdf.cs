@@ -1,53 +1,76 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core API
-using Aspose.Pdf.Annotations;        // For XfdfReader (optional)
+using System.Xml.Linq;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
-class Program
+class InteractionReconstructor
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string pdfTemplatePath   = "template.pdf";          // Base PDF (could be empty)
-        const string xfdfLogPath       = "interaction_log.xfdf"; // Interaction log in XFDF (XML) format
-        const string outputPdfPath     = "reconstructed.pdf";
+        const string pdfPath        = "input.pdf";
+        const string xmlLogPath     = "interactions.xml";
+        const string outputPdfPath  = "reconstructed_output.pdf";
 
-        // Verify input files exist
-        if (!File.Exists(pdfTemplatePath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Template PDF not found: {pdfTemplatePath}");
-            return;
-        }
-        if (!File.Exists(xfdfLogPath))
-        {
-            Console.Error.WriteLine($"XFDF log not found: {xfdfLogPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        try
+        if (!File.Exists(xmlLogPath))
         {
-            // Load the base PDF document (using a using block for deterministic disposal)
-            using (Document pdfDoc = new Document(pdfTemplatePath))
+            Console.Error.WriteLine($"XML log not found: {xmlLogPath}");
+            return;
+        }
+
+        // Load interaction log
+        XDocument logDoc = XDocument.Load(xmlLogPath);
+        // Load PDF document
+        using (Document pdfDoc = new Document(pdfPath))
+        {
+            // Iterate over each Interaction element
+            foreach (XElement interaction in logDoc.Root.Elements("Interaction"))
             {
-                // Import annotations (user interactions) from the XFDF file.
-                // This method parses the XML‑based XFDF and adds the annotations to the document.
-                pdfDoc.ImportAnnotationsFromXfdf(xfdfLogPath);
+                // Parse required attributes
+                int pageNumber = (int)interaction.Attribute("Page");
+                double x       = (double)interaction.Attribute("X");
+                double y       = (double)interaction.Attribute("Y");
+                string type    = (string)interaction.Attribute("Type") ?? "Interaction";
+                string desc    = (string)interaction.Attribute("Description") ?? $"{type}";
 
-                // Alternatively, the static XfdfReader can be used:
-                // using (FileStream xfdfStream = File.OpenRead(xfdfLogPath))
-                // {
-                //     XfdfReader.ReadAnnotations(xfdfStream, pdfDoc);
-                // }
+                // Validate page number (Aspose.Pdf uses 1‑based indexing)
+                if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
+                {
+                    Console.Error.WriteLine($"Invalid page number {pageNumber} in log entry; skipping.");
+                    continue;
+                }
 
-                // Save the reconstructed PDF with the imported interaction data.
-                pdfDoc.Save(outputPdfPath);
+                Page page = pdfDoc.Pages[pageNumber];
+
+                // Define a small rectangle around the point (width=20, height=20)
+                // Use fully qualified Rectangle to avoid ambiguity
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(x, y, x + 20, y + 20);
+
+                // Create a text annotation showing the interaction description
+                TextAnnotation annotation = new TextAnnotation(page, rect)
+                {
+                    Title    = type,
+                    Contents = desc,
+                    Open     = true,
+                    Icon     = TextIcon.Note,
+                    // Use Aspose.Pdf.Color for cross‑platform compatibility
+                    Color    = Aspose.Pdf.Color.LightYellow
+                };
+
+                // Add the annotation to the page
+                page.Annotations.Add(annotation);
             }
 
-            Console.WriteLine($"Reconstructed PDF saved to '{outputPdfPath}'.");
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during processing: {ex.Message}");
-        }
+
+        Console.WriteLine($"Reconstructed PDF saved to '{outputPdfPath}'.");
     }
 }

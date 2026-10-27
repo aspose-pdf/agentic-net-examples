@@ -1,38 +1,70 @@
 using System;
 using System.IO;
+using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF containing the tax calculation form.
-        const string inputPdfPath = "tax_form.pdf";
+        const string pdfPath = "form.pdf";
+        const string xmlOutput = "formData.xml";
 
-        // Output XML file that will hold the exported form data.
-        const string outputXmlPath = "tax_data.xml";
-
-        // Verify that the source PDF exists.
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF containing the form
+        using (Document doc = new Document(pdfPath))
         {
-            // At this point the form has been submitted and the calculated
-            // tax value is stored in the form fields. Export the entire PDF
-            // (including form field values) to XML using XmlSaveOptions.
-            XmlSaveOptions xmlOptions = new XmlSaveOptions();
+            // Example: fill some form fields before exporting
+            if (doc.Form != null && doc.Form.Count > 0)
+            {
+                // Text box field named "Name"
+                if (doc.Form["Name"] is TextBoxField nameField)
+                    nameField.Value = "John Doe";
 
-            // Save the document as XML. The file will contain the form field
-            // values, which downstream processes can parse.
-            pdfDocument.Save(outputXmlPath, xmlOptions);
+                // Check box field named "Subscribe"
+                if (doc.Form["Subscribe"] is CheckboxField subscribeField)
+                    subscribeField.Checked = true;
+            }
+
+            // Ensure the directory for the XML file exists
+            string xmlDir = Path.GetDirectoryName(xmlOutput);
+            if (!string.IsNullOrEmpty(xmlDir) && !Directory.Exists(xmlDir))
+                Directory.CreateDirectory(xmlDir);
+
+            // Export form data to a local XML file (offline collection)
+            ExportFormDataToXml(doc, xmlOutput);
         }
 
-        Console.WriteLine($"Form data exported to XML: {outputXmlPath}");
+        Console.WriteLine($"Form data exported to {xmlOutput}");
+    }
+
+    private static void ExportFormDataToXml(Document doc, string filePath)
+    {
+        var root = new XElement("FormData");
+
+        if (doc?.Form?.Fields != null)
+        {
+            foreach (var field in doc.Form.Fields)
+            {
+                string name = field.Name ?? field.FullName ?? "Unnamed";
+                string value = field.Value?.ToString() ?? string.Empty;
+
+                var fieldElement = new XElement("Field",
+                    new XAttribute("Name", name),
+                    new XAttribute("Type", field.GetType().Name),
+                    new XAttribute("Value", value));
+
+                root.Add(fieldElement);
+            }
+        }
+
+        var xmlDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"), root);
+        xmlDoc.Save(filePath);
     }
 }

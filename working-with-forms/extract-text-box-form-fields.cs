@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "textboxes.txt";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,33 +17,34 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
+        // Load PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Check if the document contains any form fields
-            if (doc.Form == null || doc.Form.Count == 0)
+            // Verify that the document contains a form with fields
+            if (doc.Form == null || doc.Form.Fields == null)
             {
-                Console.WriteLine("No form fields present in the document.");
+                Console.WriteLine("No form fields present.");
+                doc.Save(outputPath);
                 return;
             }
 
-            // Use LINQ to filter only TextBoxField instances
+            // LINQ query: retrieve only TextBoxField instances
             var textBoxFields = doc.Form.Fields
                 .OfType<TextBoxField>()
                 .ToList();
 
-            // Write the names and current values of the text box fields to a text file
-            using (StreamWriter writer = new StreamWriter(outputPath))
+            Console.WriteLine($"Found {textBoxFields.Count} text box field(s).");
+
+            // Example operation: set a default value for each text box
+            foreach (var tb in textBoxFields)
             {
-                foreach (var field in textBoxFields)
-                {
-                    writer.WriteLine($"Name: {field.FullName}");
-                    writer.WriteLine($"Value: {field.Value}");
-                    writer.WriteLine();
-                }
+                tb.Value = "Sample text";
             }
 
-            Console.WriteLine($"Extracted {textBoxFields.Count} text box fields to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

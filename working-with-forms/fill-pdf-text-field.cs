@@ -7,38 +7,43 @@ class Program
 {
     static void Main()
     {
-        // Paths and field data
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "filled.pdf";
-        const string fieldName = "myTextField";
-        const string fieldValue = "Hello World";
+        const string fieldName  = "myTextField";
+        const string fieldValue = "Provided string value";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // The Form indexer returns a WidgetAnnotation; cast it to Field safely
-            Field? field = doc.Form[fieldName] as Field;
-            if (field != null)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPath))
             {
-                // Set the field's value
-                field.Value = fieldValue;
-            }
-            else
-            {
-                Console.Error.WriteLine($"Field '{fieldName}' not found or is not a text field.");
+                // Access the text box form field by its name
+                TextBoxField textField = pdfDoc.Form[fieldName] as TextBoxField;
+                if (textField != null)
+                {
+                    // Set the field's value
+                    textField.Value = fieldValue;
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Text field '{fieldName}' not found.");
+                }
+
+                // Save the modified PDF
+                pdfDoc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Field '{fieldName}' filled and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Filled PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -18,39 +18,39 @@ class Program
             return;
         }
 
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Access (or create) the AcroForm
-            Form form = doc.Form;
-
-            // Define the button rectangle (left, bottom, right, top)
-            Rectangle btnRect = new Rectangle(100, 500, 200, 540);
-
-            // Create a push‑button field
-            ButtonField submitBtn = new ButtonField(doc, btnRect)
+            using (Document doc = new Document(inputPath))
             {
-                PartialName      = "SubmitBtn",
-                NormalCaption    = "Submit",
-                AlternateCaption = "Submit"
-            };
+                // Access the AcroForm; it is created automatically if it does not exist.
+                Form pdfForm = doc.Form;
 
-            // SubmitFormAction expects a FileSpecification for the URL
-            SubmitFormAction submitAction = new SubmitFormAction
-            {
-                Url   = new FileSpecification(submitUrl, "Submit URL"),
-                Flags = SubmitFormAction.ExportFormat // export as HTML form (GET)
-            };
+                // Define button rectangle (llx, lly, urx, ury) in points.
+                var btnRect = new Aspose.Pdf.Rectangle(100, 700, 200, 750);
 
-            // Assign the action to a supported button event (press mouse button)
-            submitBtn.Actions.OnPressMouseBtn = submitAction;
+                // Create a button field on the first page.
+                ButtonField submitBtn = new ButtonField(doc.Pages[1], btnRect);
+                submitBtn.PartialName = "SubmitButton";          // field name
+                submitBtn.AlternateName = "Submit form data";   // tooltip / alt text
+                submitBtn.Value = "Submit";                     // visible caption
 
-            // Add the button to page 1 of the document
-            form.Add(submitBtn, 1);
+                // Create a SubmitFormAction and assign the target URL.
+                SubmitFormAction submitAction = new SubmitFormAction();
+                submitAction.Url = new FileSpecification(submitUrl);
+                submitBtn.OnActivated = submitAction;            // attach action to button
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+                // Add the button to the form on page 1.
+                pdfForm.Add(submitBtn, 1);
+
+                // Save the modified PDF.
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF with submit button saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF with submit button saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

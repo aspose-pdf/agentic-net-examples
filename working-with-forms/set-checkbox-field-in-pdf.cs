@@ -5,15 +5,13 @@ using Aspose.Pdf.Forms;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Determine the desired checkbox state (default to true)
-        bool check = true;
-        if (args.Length > 0 && bool.TryParse(args[0], out bool parsed))
-            check = parsed;
+        // Example input data: determine whether the checkbox should be checked
+        bool shouldCheck = true; // replace with actual logic or data source
 
         if (!File.Exists(inputPath))
         {
@@ -21,25 +19,36 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Retrieve the checkbox field by its full name (replace "CheckBox1" with the actual field name)
-            var checkbox = doc.Form["CheckBox1"] as CheckboxField;
-            if (checkbox != null)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Set the checkbox state
-                checkbox.Checked = check;
-            }
-            else
-            {
-                Console.Error.WriteLine("Checkbox field not found.");
+                // Name of the checkbox field in the PDF form
+                const string fieldName = "myCheckBox"; // replace with the actual field name
+
+                // The Form indexer returns a WidgetAnnotation; cast it to Field safely
+                Field? field = doc.Form[fieldName] as Field;
+
+                if (field is CheckboxField checkBox)
+                {
+                    // Set the checkbox state based on input data
+                    checkBox.Checked = shouldCheck;
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Checkbox field '{fieldName}' not found or is not a CheckboxField.");
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
